@@ -48,13 +48,14 @@ namespace wrench {
             std::shared_ptr<Node> createStorageServer(const std::string& hostname, const std::string& mount_point, WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,WRENCH_PROPERTY_COLLECTION_TYPE node_property_list={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list={});
             std::shared_ptr<Node> createSupervisor(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE node_property_list={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list={});
             std::shared_ptr<Node> createStorageSupervisor(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,WRENCH_PROPERTY_COLLECTION_TYPE node_property_list={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list={});
+            ~XRootD(){}
             /***********************/
             /** \cond DEVELOPER    */
             /***********************/
             /** @brief The max number of hops a search message can take.  Used to prevent infinite loops in a poorly constructed XRootD tree. */
             int defaultTimeToLive=1024;//how long trivial search message can wander for;
-            void createFile(const std::shared_ptr<DataFile> &file);
-            void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location);
+            
+            virtual void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location);
             void deleteFile(const std::shared_ptr<DataFile> &file);
             void removeFileLocation(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location);
             unsigned int size();

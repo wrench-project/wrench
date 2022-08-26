@@ -113,13 +113,7 @@ namespace wrench {
 
         }
 
-        /**
-         * @brief create a file (unimplemented one-argument method)
-         * @param file: A shared pointer to the file
-         */
-        void XRootD::createFile(const std::shared_ptr<DataFile> &file) {
-            throw std::invalid_argument("XRootD::createFile(file): Not implemented due to ambiguity over WHERE to put the file. Use XRootD::createFile(file,desiredStorageServer) instead");
-        }
+
 
         /**
         * @brief create a new file in the federation.  Use instead of wrench::Simulation::createFile when adding files to XRootD
@@ -128,7 +122,7 @@ namespace wrench {
         *
         * @throw std::invalid_argument
         */
-        void XRootD::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location) {
+         void XRootD::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location) {
             if(file==nullptr){
                 throw std::invalid_argument("XRootD::createFile(): The file can not be null");
             }else if(location==nullptr){
@@ -136,8 +130,8 @@ namespace wrench {
             }else if(location->internalStorage==nullptr) {
                 throw std::invalid_argument("XRootD::createFile(): The location must be a storage service");
             }
-            files[file].push_back(location);
-            wrench::Simulation::createFile(file, location->getStorageServer());
+
+            location->createFile(file);
 
         }
         /**
