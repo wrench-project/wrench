@@ -22,7 +22,7 @@ class XRootDServiceFunctionalTest : public ::testing::Test {
 
 public:
 
-    void do_BasicFunctionality_test();
+    void do_BasicFunctionality_test(std::string arg);
 
     std::shared_ptr<wrench::XRootD::Node> supervisor;
 
@@ -39,19 +39,19 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\">"
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
                           "             <prop id=\"mount\" value=\"/disk100/\"/>"
                           "          </disk>"
                           "       </host>"
                           "       <host id=\"Host2\" speed=\"1f\">"
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
                           "             <prop id=\"mount\" value=\"/disk100/\"/>"
                           "          </disk>"
                           "       </host>"
                           "       <host id=\"Host3\" speed=\"1f\">"
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
                           "             <prop id=\"mount\" value=\"/disk100/\"/>"
                           "          </disk>"
                           "       </host>"
@@ -125,17 +125,20 @@ private:
 };
 
 TEST_F(XRootDServiceFunctionalTest, BasicFunctionality) {
-    DO_TEST_WITH_FORK(do_BasicFunctionality_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test,"false");
+}
+TEST_F(XRootDServiceFunctionalTest, FastSearch) {
+    DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test,"true");
 }
 
-void XRootDServiceFunctionalTest::do_BasicFunctionality_test() {
+void XRootDServiceFunctionalTest::do_BasicFunctionality_test(std::string arg) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+   //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -143,7 +146,7 @@ void XRootDServiceFunctionalTest::do_BasicFunctionality_test() {
     simulation->instantiatePlatform(platform_file_path);
 
     // Create a XRootD Manager object
-    wrench::XRootD::XRootD xrootdManager(simulation,{{wrench::XRootD::Property::CACHE_MAX_LIFETIME,"28800"},{wrench::XRootD::Property::REDUCED_SIMULATION,"true"}},{});
+    wrench::XRootD::XRootD xrootdManager(simulation,{{wrench::XRootD::Property::CACHE_MAX_LIFETIME,"28800"},{wrench::XRootD::Property::REDUCED_SIMULATION,arg}},{});
 
     this->supervisor = xrootdManager.createSupervisor("Host1");
 
