@@ -548,6 +548,20 @@ namespace wrench {
 
                         }
                     }
+                    try {
+                        S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                 new StorageServiceFileDeleteAnswerMessage(
+                                    msg->file,
+                                    getSharedPtr<Node>(),
+                                    true,
+                                    nullptr,
+                                    getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)
+                                )
+
+                        );
+                    } catch (std::shared_ptr<NetworkError> &cause) {
+                        throw ExecutionException(cause);
+                    }
                 }else {
                     S4U_Mailbox::dputMessage(this->mailbox, new RippleDelete(msg, metavisor->defaultTimeToLive));
 
@@ -571,7 +585,11 @@ namespace wrench {
                 }
                 if (internalStorage) {
                     //File in internal storage
-                    StorageService::deleteFile(msg->file, FileLocation::LOCATION(internalStorage));
+                    try{
+                        StorageService::deleteFile(msg->file, FileLocation::LOCATION(internalStorage));
+                    }catch(ExecutionException &e){
+                        //we dont actually care if this fails, that just means the file we tried to delete wasnt there already.  Big woop.
+                    }
                 }
                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                 if (children.size() > 0 && msg->timeToLive > 0) {//shotgun remove search message to all chldren

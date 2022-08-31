@@ -119,6 +119,16 @@ private:
 
         }
 
+        this->test->supervisor->deleteFile(file1);
+
+        try {
+            this->test->supervisor->readFile(file1);
+            throw std::runtime_error("File not deleted properly");
+        }catch(wrench::ExecutionException &e){
+
+
+        }
+
 
         return 0;
     }
