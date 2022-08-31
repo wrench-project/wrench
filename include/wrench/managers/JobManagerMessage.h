@@ -110,23 +110,23 @@ namespace wrench {
         std::shared_ptr<FailureCause> cause;
     };
 
-    /**
-    * @brief A message sent by the JobManager to notify some submitter that a PilotJob has failed
-    */
-    class JobManagerPilotJobFailedMessage : public JobManagerMessage {
-    public:
-        JobManagerPilotJobFailedMessage(std::shared_ptr<PilotJob> job,
-                                        std::shared_ptr<ComputeService> compute_service,
-                                        std::shared_ptr<FailureCause> cause);
-
-
-        /** @brief The job that has failed */
-        std::shared_ptr<PilotJob> job;
-        /** @brief The compute service on which the job has failed */
-        std::shared_ptr<ComputeService> compute_service;
-        /** @brief The failure cause */
-        std::shared_ptr<FailureCause> cause;
-    };
+    //    /**
+    //    * @brief A message sent by the JobManager to notify some submitter that a PilotJob has failed
+    //    */
+    //    class JobManagerPilotJobFailedMessage : public JobManagerMessage {
+    //    public:
+    //        JobManagerPilotJobFailedMessage(std::shared_ptr<PilotJob> job,
+    //                                        std::shared_ptr<ComputeService> compute_service,
+    //                                        std::shared_ptr<FailureCause> cause);
+    //
+    //
+    //        /** @brief The job that has failed */
+    //        std::shared_ptr<PilotJob> job;
+    //        /** @brief The compute service on which the job has failed */
+    //        std::shared_ptr<ComputeService> compute_service;
+    //        /** @brief The failure cause */
+    //        std::shared_ptr<FailureCause> cause;
+    //    };
 
     /***********************/
     /** \endcond           */

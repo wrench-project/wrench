@@ -414,6 +414,7 @@ namespace wrench {
     void FileTransferThread::copyFileLocally(const std::shared_ptr<DataFile> &f,
                                              const std::shared_ptr<FileLocation> &src_loc,
                                              const std::shared_ptr<FileLocation> &dst_loc) {
+
         double remaining = f->getSize();
         double to_send = std::min<double>((double) this->buffer_size, remaining);
 
