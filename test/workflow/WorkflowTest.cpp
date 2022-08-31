@@ -21,6 +21,7 @@ protected:
     }
 
     WorkflowTest() {
+
         workflow = wrench::Workflow::createWorkflow();
 
         // create simple diamond workflow
@@ -384,4 +385,41 @@ TEST_F(AllDependenciesWorkflowTest, AllDependenciesWorkflowStructure) {
     ASSERT_EQ(3, workflow->getTasks().size());
 
     workflow->removeTask(t1);
+}
+
+TEST_F(WorkflowTest, LowLevelDagOfTasksTest) {
+    wrench::DagOfTasks dag;
+
+    ASSERT_NO_THROW(dag.addVertex((wrench::WorkflowTask *) 1));
+    ASSERT_NO_THROW(dag.removeVertex((wrench::WorkflowTask *) 1));
+    ASSERT_THROW(dag.removeVertex((wrench::WorkflowTask *) 1), std::invalid_argument);
+    ASSERT_NO_THROW(dag.addVertex((wrench::WorkflowTask *) 1));
+    ASSERT_NO_THROW(dag.addVertex((wrench::WorkflowTask *) 2));
+
+    ASSERT_NO_THROW(dag.addEdge((wrench::WorkflowTask *) 1, (wrench::WorkflowTask *) 2));
+    ASSERT_NO_THROW(dag.removeEdge((wrench::WorkflowTask *) 1, (wrench::WorkflowTask *) 2));
+    ASSERT_THROW(dag.removeEdge((wrench::WorkflowTask *) 1, (wrench::WorkflowTask *) 3), std::invalid_argument);
+    ASSERT_THROW(dag.removeEdge((wrench::WorkflowTask *) 3, (wrench::WorkflowTask *) 1), std::invalid_argument);
+    ASSERT_THROW(dag.addEdge((wrench::WorkflowTask *) 1, (wrench::WorkflowTask *) 3), std::invalid_argument);
+    ASSERT_THROW(dag.addEdge((wrench::WorkflowTask *) 3, (wrench::WorkflowTask *) 1), std::invalid_argument);
+
+    ASSERT_NO_THROW(dag.doesPathExist((wrench::WorkflowTask *) 1, (wrench::WorkflowTask *) 2));
+    ASSERT_THROW(dag.doesPathExist((wrench::WorkflowTask *) 1, (wrench::WorkflowTask *) 3), std::invalid_argument);
+    ASSERT_THROW(dag.doesPathExist((wrench::WorkflowTask *) 3, (wrench::WorkflowTask *) 1), std::invalid_argument);
+
+    ASSERT_NO_THROW(dag.doesEdgeExist((wrench::WorkflowTask *) 1, (wrench::WorkflowTask *) 2));
+    ASSERT_THROW(dag.doesEdgeExist((wrench::WorkflowTask *) 1, (wrench::WorkflowTask *) 3), std::invalid_argument);
+    ASSERT_THROW(dag.doesEdgeExist((wrench::WorkflowTask *) 3, (wrench::WorkflowTask *) 1), std::invalid_argument);
+
+    ASSERT_NO_THROW(dag.getNumberOfChildren((wrench::WorkflowTask *) 1));
+    ASSERT_THROW(dag.getNumberOfChildren((wrench::WorkflowTask *) 3), std::invalid_argument);
+
+    ASSERT_NO_THROW(dag.getChildren((wrench::WorkflowTask *) 1));
+    ASSERT_THROW(dag.getChildren((wrench::WorkflowTask *) 3), std::invalid_argument);
+
+    ASSERT_NO_THROW(dag.getNumberOfParents((wrench::WorkflowTask *) 1));
+    ASSERT_THROW(dag.getNumberOfParents((wrench::WorkflowTask *) 3), std::invalid_argument);
+
+    ASSERT_NO_THROW(dag.getParents((wrench::WorkflowTask *) 1));
+    ASSERT_THROW(dag.getParents((wrench::WorkflowTask *) 3), std::invalid_argument);
 }

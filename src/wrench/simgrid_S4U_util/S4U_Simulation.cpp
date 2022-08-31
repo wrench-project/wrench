@@ -494,10 +494,10 @@ namespace wrench {
             // Broken behavior of thread_execute() on VMs in SimGrid 3.31.0 and before
             std::vector<simgrid::s4u::ExecPtr> thread_handles;
             thread_handles.push_back(simgrid::s4u::this_actor::exec_async(sequential_work + parallel_per_thread_work));
-            for (int i = 0; i < num_threads - 1; i++) {
+            for (unsigned long i = 0; i < num_threads - 1; i++) {
                 thread_handles.push_back(simgrid::s4u::this_actor::exec_async(parallel_per_thread_work));
             }
-            for (int i = 0; i < num_threads; i++) {
+            for (unsigned long i = 0; i < num_threads; i++) {
                 thread_handles.at(i)->wait();
             }
 #endif
