@@ -22,6 +22,9 @@ add_subdirectory(examples/action_api/multi-action-multi-job EXCLUDE_FROM_ALL)
 add_subdirectory(examples/action_api/job-action-failure EXCLUDE_FROM_ALL)
 add_subdirectory(examples/action_api/super-custom-action EXCLUDE_FROM_ALL)
 
+add_subdirectory(examples/action_api/XRootD/basic-test/ EXCLUDE_FROM_ALL)
+add_subdirectory(examples/action_api/XRootD/stress-test/ EXCLUDE_FROM_ALL)
+
 add_custom_command(TARGET examples
     COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/examples/run_all_examples.sh.in | sed "s~TO_FILL_IN~${CMAKE_BINARY_DIR}/examples/~g" > ${CMAKE_BINARY_DIR}/examples/run_all_examples.sh
     COMMAND chmod +x ${CMAKE_BINARY_DIR}/examples/run_all_examples.sh
