@@ -148,6 +148,7 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -186,7 +187,6 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
 
     ASSERT_NO_THROW(simulation->launch());
 
-
     int expected_start_timestamps = 4;
     int expected_failure_timestamps = 0;
     int expected_completion_timestamps = 4;
@@ -211,7 +211,6 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
 
     wrench::SimulationTimestampFileWrite *xl_file_start = start_timestamps[3]->getContent();
     wrench::SimulationTimestampFileWrite *xl_file_end = completion_timestamps[3]->getContent();
-
 
     // list of expected matching start and end timestamps
     std::vector<std::pair<wrench::SimulationTimestampFileWrite *, wrench::SimulationTimestampFileWrite *>> file_write_timestamps = {
@@ -251,6 +250,7 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
     }
 
 
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
     // test constructors for invalid arguments
     ASSERT_THROW(simulation->getOutput().addTimestampFileWriteStart(0.0,
                                                                     nullptr,
@@ -316,6 +316,7 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
                                                                          nullptr,
                                                                          task),
                  std::invalid_argument);
+#endif
 
 
     for (int i = 0; i < argc; i++)
