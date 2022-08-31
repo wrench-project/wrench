@@ -319,7 +319,6 @@ namespace wrench {
                                                                                std::shared_ptr<DataFile> file,
                                                                                std::shared_ptr<FileLocation> location,
                                                                                double num_bytes_to_read,
-                                                                               unsigned long buffer_size,
                                                                                double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
 
@@ -334,7 +333,6 @@ namespace wrench {
         this->file = std::move(file);
         this->location = std::move(location);
         this->num_bytes_to_read = num_bytes_to_read;
-        this->buffer_size = buffer_size;
     }
     /**
     * @brief Constructor
