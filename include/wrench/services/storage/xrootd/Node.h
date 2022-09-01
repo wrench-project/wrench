@@ -74,10 +74,11 @@ namespace wrench {
 
             bool cached(shared_ptr<DataFile> file);
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
-            void createFile(const std::shared_ptr<DataFile> &file);
 
-            void createFile(const std::shared_ptr<DataFile> &file, const string & path);
-            void createFile(const std::shared_ptr<DataFile> &file,  const std::shared_ptr<FileLocation> &location);
+            void createFile(const std::shared_ptr<DataFile> &file) override;
+            void createFile(const std::shared_ptr<DataFile> &file, const string & path) override;
+            void createFile(const std::shared_ptr<DataFile> &file,  const std::shared_ptr<FileLocation> &location) override;
+
             double getLoad() override;
             /***********************/
             /** \cond INTERNAL     */

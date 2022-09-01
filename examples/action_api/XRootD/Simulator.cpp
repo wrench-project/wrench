@@ -10,10 +10,7 @@
 
 /**
  ** This is the main function for a WRENCH simulator. The simulator takes
- ** a input an XML platform description file. It generates a workflow with
- ** a simple diamond structure, instantiates a few services on the platform, and
- ** starts an execution controller to execute the workflow using these services
- ** using a simple greedy algorithm.
+ ** as input an XML platform description file.
  **/
 
 #include <iostream>
@@ -21,14 +18,8 @@
 #include <wrench/services/storage/xrootd/XRootD.h>
 
 #include <wrench/services/storage/xrootd/Node.h>
-#include "../include/Controller.h"
-std::string to_string(bool a){
-	if(a){
-		return "true";
-	}else{
-		return "false";
-	}
-}
+#include "Controller.h"
+
 
 /**
  * @brief The Simulator's main function
@@ -46,8 +37,8 @@ int main(int argc, char **argv) {
     simulation->init(&argc, argv);
 	bool reduced=false;
     /* Parsing of the command-line arguments */
-    if (argc <2|| argc>3) {
-        std::cerr << "Usage: " << argv[0] << " <xml platform file> (runReduced? true/false*)[--log=controller.threshold=info | --wrench-full-log]" << std::endl;
+    if (argc 2|| argc>3) {
+        std::cerr << "Usage: " << argv[0] << " <xml platform file>  [--log=controller.threshold=info | --wrench-full-log]" << std::endl;
         exit(1);
     }
 	if(argc==3){
@@ -79,7 +70,8 @@ int main(int argc, char **argv) {
 									Leaf9  Leaf10  Leaf11
 	        
 	*/
-	wrench::XRootD::XRootD xrootdManager(simulation,{{wrench::XRootD::Property::CACHE_MAX_LIFETIME,"28800"},{wrench::XRootD::Property::REDUCED_SIMULATION,to_string(reduced)}},{});
+	wrench::XRootD::XRootD xrootdManager(simulation,{{wrench::XRootD::Property::CACHE_MAX_LIFETIME,"28800"},
+                                                  {wrench::XRootD::Property::REDUCED_SIMULATION,(reduced ? "true" : "false")}},{});
 	std::shared_ptr<wrench::XRootD::Node> root=xrootdManager.createSupervisor("root");
 	root->addChild(xrootdManager.createStorageServer("leaf1","/",{},{}));
 	root->addChild(xrootdManager.createStorageServer("leaf2","/",{},{}));

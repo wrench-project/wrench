@@ -12,8 +12,8 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include <wrench/services/storage/xrootd/XRootD.h>
-#include <wrench-dev.h>
+#include "../../../include/wrench/services/storage/xrootd/XRootD.h"
+#include "../../../include/wrench-dev.h"
 
 namespace wrench {
 
@@ -25,9 +25,9 @@ namespace wrench {
     public:
         // Constructor
         Controller(
-				const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service,
+				const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
                 const std::shared_ptr<wrench::XRootD::Node> &storage_service,
-				XRootD::XRootD *xrootdManager,vector<std::shared_ptr<wrench::DataFile>> files,
+				XRootD::XRootD *xrootdManager,
                 const std::string &hostname);
 
     protected:
@@ -35,13 +35,14 @@ namespace wrench {
         void processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent>) override;
 
     private:
-        // main() method of the WMS
+        // main() method of the Controller
         int main() override;
 
         const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
         const std::shared_ptr<wrench::XRootD::Node> root;
 		XRootD::XRootD *xrootdManager;
-		vector<shared_ptr<wrench::DataFile>>files;
     };
+
 }// namespace wrench
+
 #endif//CONTROLLER_H

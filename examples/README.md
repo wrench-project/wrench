@@ -33,11 +33,11 @@ to analyze action failures.
   - `action_api/super-custom-action`: An example that showcases how a custom action within a job can do powerful things (and essentially act itself
     as an execution controller).
 
-  - `action_api/bare-metal-bag-of-tasks`: A simulation of the execution of a
-  bag-of-tasks workload on a bare-metal compute
-  service, with all data being read/written from/to a single
-  storage service. Two  tasks are executed concurrently on
-  the compute service until the workload is complete. 
+  - `action_api/*-bag-of-actions`: A simulation of the execution of a
+  bag-of-actions workload on various compute servies, with all data being read/written from/to a single
+  storage service. 
+    
+  - 'XRootD': A simulation of a storage system that resembles the XRootD storage system.
   
 ### Workflow-API simulator examples
 
