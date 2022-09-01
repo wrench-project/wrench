@@ -17,39 +17,38 @@
 #define GBYTE (1000.0 * 1000.0 * 1000.0)
 
 #include <iostream>
+#include <iomanip>
+#include <utility>
 #include <wrench/services/storage/xrootd/Node.h>
-#include "../include/Controller.h"
+#include "Controller.h"
+
+/*
+ * Helper function for pretty-printed output
+ */
 std::string padLong(long l){
-	
-	if(l<10){
-		return "0"+std::to_string(l);
-	}else{
-		return std::to_string(l);
-	}
+	return (l < 10 ? "0"+std::to_string(l) : std::to_string(l));
 }
+
 std::string padDouble(double l){
-	
-	if(l<10){
-		return "0"+std::to_string(l);
-	}else{
-		return std::to_string(l);
-	}
+	return (l < 10 ? "0"+std::to_string(l) : std::to_string(l));
 }
+
 std::string formatDate(double time){
 	if(time<0){
 		return "Not Started";
 	}
 	long seconds=(long)time;
-	double ms=time-seconds;
-	long minutes=seconds/60;
-	seconds%=60;
+	double ms = time - (double)seconds;
+	long minutes = seconds / 60;
+	seconds %= 60;
 	long hours=minutes/60;
 	minutes%=60;
-	int days=hours/24;
+	long days=hours/24;
 	hours%=24;
 	
-	return std::to_string(days)+"-"+padLong(hours)+':'+padLong(minutes)+':'+padDouble(seconds+ms);
+	return std::to_string(days)+"-"+padLong(hours)+':'+padLong(minutes)+':'+padDouble((double)seconds+ms);
 }
+
 WRENCH_LOG_CATEGORY(controller, "Log category for Controller");
 
 namespace wrench {
@@ -61,7 +60,7 @@ namespace wrench {
      * @param storage_services: a set of storage services available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    Controller::Controller(std::shared_ptr<BareMetalComputeService> bare_metal_compute_service,
+    Controller::Controller(const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
                            const std::shared_ptr<XRootD::Node> &root,
 						   XRootD::XRootD *xrootdManager,
                            const std::string &hostname) : ExecutionController(hostname, "controller"),
@@ -80,17 +79,19 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
         WRENCH_INFO("Controller starting");
 
-        /* Create a files */
+        /* Add a bunch of 1-byte files to the simulation, which will
+         * then be stored at storage servers in the XRootD tree
+         */
         std::vector<std::shared_ptr<DataFile>> files ={ 
-			wrench::Simulation::addFile("file1", 1 ),
-			wrench::Simulation::addFile("file2", 1 ),
-			wrench::Simulation::addFile("file3", 1 ),
-			wrench::Simulation::addFile("file4", 1 ),
-			wrench::Simulation::addFile("file5", 1 ),
-			wrench::Simulation::addFile("file6", 1 ),
-			wrench::Simulation::addFile("file7", 1),
-			wrench::Simulation::addFile("file8", 1 ),
-			wrench::Simulation::addFile("file9", 1 ),
+			wrench::Simulation::addFile("file01", 1 ),
+			wrench::Simulation::addFile("file02", 1 ),
+			wrench::Simulation::addFile("file03", 1 ),
+			wrench::Simulation::addFile("file04", 1 ),
+			wrench::Simulation::addFile("file05", 1 ),
+			wrench::Simulation::addFile("file06", 1 ),
+			wrench::Simulation::addFile("file07", 1),
+			wrench::Simulation::addFile("file08", 1 ),
+			wrench::Simulation::addFile("file09", 1 ),
 			wrench::Simulation::addFile("file10", 1 ),
 			wrench::Simulation::addFile("file11", 1),
 			wrench::Simulation::addFile("file12", 1 ),
