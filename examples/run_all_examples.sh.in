@@ -70,11 +70,7 @@ ${INSTALL_DIR}/action_api/XRootD/basic-test/wrench-example-xrootd-basic ${INSTAL
 echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/XRootD/basic-test/wrench-example-xrootd-basic platform.xml false${normal}"
 ${INSTALL_DIR}/action_api/XRootD/basic-test/wrench-example-xrootd-basic ${INSTALL_DIR}/action_api/XRootD/basic-test/platform.xml false
 
-echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/XRootD/stress-test/wrench-example-xrootd-stress 200 false${normal}"
-${INSTALL_DIR}/action_api/XRootD/stress-test/wrench-example-xrootd-stress 200 true
 
-echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/XRootD/stress-test/wrench-example-xrootd-stress 200 false${normal}"
-${INSTALL_DIR}/action_api/XRootD/stress-test/wrench-example-xrootd-stress 200 false
 #${INSTALL_DIR}/workflow_api/basic-examples/io-pagecache/
 
 
