@@ -14,6 +14,9 @@
  **
  ** Example invocation of the simulator with no logging:
  **    ./wrench-example-xrootd-basic ./xrootd_platform.xml
+ **
+ ** Example invocation of the simulator with simulation controller logging
+ **    ./wrench-example-xrootd-basic ./xrootd_platform.xml
  **/
 
 #include <iostream>
@@ -59,7 +62,7 @@ int main(int argc, char **argv) {
      */
     wrench::XRootD::XRootDDeployment xrootd_deployment(simulation,
                                                    {
-                                                 {wrench::XRootD::Property::CACHE_MAX_LIFETIME,"28800"},
+                                                 {wrench::XRootD::Property::CACHE_MAX_LIFETIME,"3600"},
                                                  {wrench::XRootD::Property::REDUCED_SIMULATION,"false"}
                                          },
                                                    {});

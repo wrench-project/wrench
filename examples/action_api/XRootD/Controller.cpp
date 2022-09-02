@@ -27,27 +27,27 @@
  * Helper function for pretty-printed output
  */
 std::string padLong(long l){
-	return (l < 10 ? "0"+std::to_string(l) : std::to_string(l));
+    return (l < 10 ? "0"+std::to_string(l) : std::to_string(l));
 }
 
 std::string padDouble(double l){
-	return (l < 10 ? "0"+std::to_string(l) : std::to_string(l));
+    return (l < 10 ? "0"+std::to_string(l) : std::to_string(l));
 }
 
 std::string formatDate(double time){
-	if(time < 0){
-		return "Not Started";
-	}
-	long seconds = (long)time;
-	double ms = time - (double)seconds;
-	long minutes = seconds / 60;
-	seconds %= 60;
-	long hours = minutes / 60;
-	minutes %= 60;
-	long days = hours / 24;
-	hours %= 24;
-	
-	return std::to_string(days)+"-"+padLong(hours)+':'+padLong(minutes)+':'+padDouble((double)seconds+ms);
+    if(time < 0){
+        return "Not Started";
+    }
+    long seconds = (long)time;
+    double ms = time - (double)seconds;
+    long minutes = seconds / 60;
+    seconds %= 60;
+    long hours = minutes / 60;
+    minutes %= 60;
+    long days = hours / 24;
+    hours %= 24;
+
+    return std::to_string(days)+"-"+padLong(hours)+':'+padLong(minutes)+':'+padDouble((double)seconds+ms);
 }
 
 WRENCH_LOG_CATEGORY(controller, "Log category for Controller");
@@ -63,7 +63,7 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the Controller
      */
     Controller::Controller(const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
-						   XRootD::XRootDDeployment *xrootd_deployment,
+                           XRootD::XRootDDeployment *xrootd_deployment,
                            const std::string &hostname) : ExecutionController(hostname, "controller"),
                                                           bare_metal_compute_service(bare_metal_compute_service),
                                                           xrootd_deployment(xrootd_deployment) {}
@@ -84,118 +84,84 @@ namespace wrench {
         /* Add a bunch of 1-byte files to the simulation, which will
          * then be stored at storage servers in the XRootD tree
          */
-        std::vector<std::shared_ptr<DataFile>> files ={ 
-			wrench::Simulation::addFile("file01", 1 ),
-			wrench::Simulation::addFile("file02", 1 ),
-			wrench::Simulation::addFile("file03", 1 ),
-			wrench::Simulation::addFile("file04", 1 ),
-			wrench::Simulation::addFile("file05", 1 ),
-			wrench::Simulation::addFile("file06", 1 ),
-			wrench::Simulation::addFile("file07", 1),
-			wrench::Simulation::addFile("file08", 1 ),
-			wrench::Simulation::addFile("file09", 1 ),
-			wrench::Simulation::addFile("file10", 1 ),
-			wrench::Simulation::addFile("file11", 1),
-			wrench::Simulation::addFile("file12", 1 ),
-			wrench::Simulation::addFile("file13", 1 ),
-			wrench::Simulation::addFile("file14", 1 ),
-		};
-        
+        auto some_file = wrench::Simulation::addFile("some_file", 12 * MBYTE);
+
+        /* This is the XRootD tree that was constructed before the simulation was launched.
+         * We will create replicas of the "some_file" file at nodes leaf4, leaf8, leaf9, which
+         * we marked with a '*' below.
+
+            root
+         /   |   \
+    leaf1  leaf2  super1
+                 /   |   \
+            leaf3  leaf4*  super2
+                         /   |   \
+                    leaf5  leaf6  super3
+                                 /   |   \
+                            leaf7  leaf8*  super4
+                                         /   |   \
+                                    leaf9*  leaf10  leaf11
+    */
+
         auto root = this->xrootd_deployment->getRootSupervisor();
 
+        /*
+         * Let's create the replicas of the "some_file" file here and there
+         */
 
-        root->getChild(0)->createFile(files[0]);
-        root->getChild(1)->createFile(files[1]);
-        root->getChild(2)->getChild(0)->createFile(files[2]);
-        root->getChild(2)->getChild(1)->createFile(files[3]);
-		root->getChild(2)->getChild(2)->getChild(0)->createFile(files[4]);//leaf 5
-        root->getChild(2)->getChild(2)->getChild(1)->createFile(files[5]);//leaf 6
-        root->getChild(2)->getChild(2)->getChild(2)->getChild(0)->createFile(files[6]);//leaf 7
-        root->getChild(2)->getChild(2)->getChild(2)->getChild(1)->createFile(files[7]);//leaf 8
-        root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(0)->createFile(files[8]);//leaf 9
-		root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(1)->createFile(files[9]);//leaf 10
-        root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2)->createFile(files[10]);//leaf 11
+        WRENCH_INFO("Creating file replicas in the XRootD tree");
+        auto super1 = root->getChild(2);
+        auto leaf4 = super1->getChild(1);
+        auto super2 = super1->getChild(2);
+        auto super3 = super2->getChild(2);
+        auto leaf8 = super3->getChild(1);
+        auto leaf9 = super3->getChild(2)->getChild(0);
 
-        root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2)->createFile(files[12]);//File for supervisor tests
+        leaf4->createFile(some_file);
+        leaf8->createFile(some_file);
+        leaf9->createFile(some_file);
 
-        root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2)->createFile(files[13]);//File for direct tests
-
-		// TODO: Add a createFile() on Supervisor and catch the exception
-
-		//  root  super1       super2       super3       super4
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
-        WRENCH_INFO("Creating a compound job with an assortment of file reads");
+        /* Create a compound job that just reads the file */
+        WRENCH_INFO("Submitting a job that should successfully read the file from XRootD");
         auto job1 = job_manager->createCompoundJob("job1");
-        auto fileread1 = job1->addFileReadAction("fileread1", files[0], root);//should be fast
-		auto fileread2 = job1->addFileReadAction("fileread2", files[1], root);//should be equally fast
-		auto fileread3 = job1->addFileReadAction("fileread3", files[2], root);//depth 1 search
-		auto fileread4 = job1->addFileReadAction("fileread4", files[3], root);//depth 1 search
-		auto fileread5 = job1->addFileReadAction("fileread5", files[4], root);//depth 2 search
-		auto fileread6 = job1->addFileReadAction("fileread6", files[5], root);//depth 2 search
-		auto fileread7 = job1->addFileReadAction("fileread7", files[6], root);//depth 3 search
-		auto fileread8 = job1->addFileReadAction("fileread8", files[7], root);//depth 3 search
-		auto fileread9 = job1->addFileReadAction("fileread9", files[8], root);//depth 4 search
-		auto fileread10 = job1->addFileReadAction("fileread10", files[9], root);//depth 4 search
-		auto fileread11 = job1->addFileReadAction("fileread11", files[10], root);//depth 4 search
-		auto fileread12 = job1->addFileReadAction("fileread12", files[11], root);//this file does not exist
-		auto fileread13 = job1->addFileReadAction("fileread13", files[10], root);//depth 4 search, but cached
-		
-		auto fileread14 = job1->addFileReadAction("fileread14", files[11], root);//this file does not exist
-		
-		auto fileread15 = job1->addFileReadAction("fileread15", files[10], root);//depth 4 search, but no longer cached
-		auto fileread16 = job1->addFileReadAction("fileread16", files[12], root->getChild(2)->getChild(2)->getChild(2)->getChild(2));//check superviosor
-		auto fileread17 = job1->addFileReadAction("fileread17", files[12], root->getChild(2)->getChild(2)->getChild(2)->getChild(2));//check superviosor cached
-		auto fileread18 = job1->addFileReadAction("fileread18", files[13], root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2));//direct
-		auto fileread19 = job1->addFileReadAction("fileread19", files[13], root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2));//direct cached
+        auto fileread1 = job1->addFileReadAction("fileread1", some_file, root);
 
-		// TODO: Add comment that compute is super long to invalidate cachue
-
-		auto compute = job1->addComputeAction("compute", 500 * GFLOP, 50 * MBYTE, 1, 3, wrench::ParallelModel::AMDAHL(0.8));//should invalidate cache
-        job1->addActionDependency(fileread1, fileread2);
-        job1->addActionDependency(fileread2, fileread3);
-        job1->addActionDependency(fileread3, fileread4);
-        job1->addActionDependency(fileread4, fileread5);
-        job1->addActionDependency(fileread5, fileread6);
-        job1->addActionDependency(fileread6, fileread7);
-        job1->addActionDependency(fileread7, fileread8);
-        job1->addActionDependency(fileread8, fileread9);
-        job1->addActionDependency(fileread9, fileread10);
-        job1->addActionDependency(fileread10, fileread11);
-        job1->addActionDependency(fileread11, fileread13);
-		job1->addActionDependency(fileread13,compute);
-        job1->addActionDependency(compute, fileread12);
-
-        job1->addActionDependency(compute, fileread15);
-		
-        job1->addActionDependency(fileread12, fileread14);//this task should never start
-
-        job1->addActionDependency(fileread15, fileread16);
-        job1->addActionDependency(fileread16, fileread17);
-        job1->addActionDependency(fileread17, fileread18);
-		
-        job1->addActionDependency(fileread18, fileread19);
+        /* Submit the job that will succeed */
         job_manager->submitJob(job1, this->bare_metal_compute_service);
+
+        /* Wait and process the next event, which will be a job success */
         this->waitForAndProcessNextEvent();
 
-        WRENCH_INFO("Execution complete!");
+        /* Delete the file replica at leaf4 and submit a similar job, which now will fail
+         * because the root's cache still says that the file should be at leaf 4 */
+        WRENCH_INFO("Deleting the file replica at leaf4");
+        leaf4->deleteFile(some_file);
 
-        std::vector<std::shared_ptr<wrench::Action>> actions = {fileread1, fileread2, fileread3, fileread4,fileread5,fileread6,fileread7,fileread8,fileread9,fileread10,fileread11,fileread13,compute,fileread12,fileread15,fileread16,fileread17,fileread18,fileread19,fileread14};
-		std::vector<std::string> comments={"should be fast","should be fast","depth 1 search","depth 1 search","depth 2 search","depth 2 search","depth 3 search","depth 3 search","depth 4 search","depth 4 search","depth 4 search","Depth 4, BUT cached","This long compute should invalidate the caches","This file Does not exist","depth 4, file should no longer be cached","depth 4, but directly from supervisor, should be depth 1","repeat but cached","direct leaf access","direct leaf access but cached","This action should not run"};
-        for (unsigned int i=0;i<actions.size();i++) {
-			auto const &a=actions[i];
-			std::cout<<std::right<<std::setfill(' ') 
-			<<"Action "<<std::setw(10)<<a->getName()<<": "
-			<<std::setw(17)<<formatDate(a->getStartDate())
-			<<" - "
-			<<std::setw(17)<<formatDate(a->getEndDate())
-			<<", Duration: "
-			<<std::setw(7)<<a->getEndDate()-a->getStartDate()
-			<<" Comment: "
-			<< comments[i]<<std::endl;
-            //printf("Action %s: %.2fs - %.2fs, duration:%.2fs\n", a->getName().c_str(), a->getStartDate(), a->getEndDate(),a->getEndDate()-a->getStartDate());
-        }
+        WRENCH_INFO("Submitting a job that will fail to read the file from XRootD");
+        auto job2 = job_manager->createCompoundJob("job2");
+        auto fileread2 = job2->addFileReadAction("fileread2", some_file, root);
+        job_manager->submitJob(job2, this->bare_metal_compute_service);
+        this->waitForAndProcessNextEvent();
+
+        /* Sleep 2 hours, which is long enough for the XRootD cache to be cleared (based
+         * on the {wrench::XRootD::Property::CACHE_MAX_LIFETIME,"3600"} property passed
+         * to the XRootDDeployment constructor in Simulator.cpp
+         */
+        WRENCH_INFO("Sleeping 2 hours, letting the XRootD cache be cleared");
+        wrench::Simulation::sleep(7200);
+
+        /* Submit yet another similar job that will succeed because now that the cache
+         * has been cleared, the XRootD root will search for the file
+         */
+        WRENCH_INFO("Submitting a job that should successfully read the file from XRootD");
+        auto job3 = job_manager->createCompoundJob("job3");
+        auto fileread3 = job3->addFileReadAction("fileread3", some_file, root);
+        job_manager->submitJob(job3, this->bare_metal_compute_service);
+        this->waitForAndProcessNextEvent();
+
         return 0;
     }
 
@@ -207,7 +173,21 @@ namespace wrench {
     void Controller::processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->job;
-        /* Print info about all actions in the job */
-        WRENCH_INFO("Notified that compound job %s has completed:", job->getName().c_str());
+        WRENCH_INFO("Notified that compound job %s has successfully completed", job->getName().c_str());
     }
+
+    /**
+     * @brief Process a compound job completion event
+     *
+     * @param event: the event
+     */
+    void Controller::processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent> event) {
+        /* Retrieve the job that this event is for */
+        auto job = event->job;
+        auto action = *(job->getActions().begin());
+
+        WRENCH_INFO("Notified that compound job %s has failed (%s)", job->getName().c_str(),
+                    action->getFailureCause()->toString().c_str());
+    }
+
 }// namespace wrench
