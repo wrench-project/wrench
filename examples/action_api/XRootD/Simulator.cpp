@@ -18,7 +18,7 @@
 
 #include <iostream>
 #include <wrench-dev.h>
-#include <wrench/services/storage/xrootd/XRootD.h>
+#include <wrench/services/storage/xrootd/XRootDDeployment.h>
 
 #include <wrench/services/storage/xrootd/Node.h>
 #include "Controller.h"
@@ -58,12 +58,12 @@ int main(int argc, char **argv) {
      * abstracts away more simulation details, which speeds up the simulation but
      * may make it less realistic. See the documentation for more details.
      */
-    wrench::XRootD::XRootD xrootdManager(simulation,
-                                         {
+    wrench::XRootD::XRootDDeployment xrootd_deployment(simulation,
+                                                   {
                                                  {wrench::XRootD::Property::CACHE_MAX_LIFETIME,"28800"},
                                                  {wrench::XRootD::Property::REDUCED_SIMULATION,"false"}
                                          },
-                                         {});
+                                                   {});
 
     /* Construct an XRootD tree as follows (vertices are host names)
 
@@ -79,32 +79,31 @@ int main(int argc, char **argv) {
                                          /   |   \
                                     leaf9  leaf10  leaf11
     */
-    std::shared_ptr<wrench::XRootD::Node> root=xrootdManager.createSupervisor("root");
-    root->addChild(xrootdManager.createStorageServer("leaf1","/",{},{}));
-    root->addChild(xrootdManager.createStorageServer("leaf2","/",{},{}));
-    auto super1 = xrootdManager.createSupervisor("super1");
-    root->addChild(super1);
+    auto root = xrootd_deployment.createRootSupervisor("root");
 
-    super1->addChild(xrootdManager.createStorageServer("leaf3","/",{},{}));
-    super1->addChild(xrootdManager.createStorageServer("leaf4","/",{},{}));
-    auto super2 = xrootdManager.createSupervisor("super2");
-    super1->addChild(super2);
+    root->addChildStorageServer("leaf1","/",{},{});
+    root->addChildStorageServer("leaf2","/",{},{});
+    auto super1 = root->addChildSupervisor("super1");
 
-    super2->addChild(xrootdManager.createStorageServer("leaf5","/",{},{}));
-    super2->addChild(xrootdManager.createStorageServer("leaf6","/",{},{}));
-    auto super3 = xrootdManager.createSupervisor("super3");
-    super2->addChild(super3);
+    // TODO: Try to add a chile to a non-super
 
-    super3->addChild(xrootdManager.createStorageServer("leaf7","/",{},{}));
-    super3->addChild(xrootdManager.createStorageServer("leaf8","/",{},{}));
-    auto super4 = xrootdManager.createSupervisor("super4");
-    super3->addChild(super4);
-    super4->addChild(xrootdManager.createStorageServer("leaf9","/",{},{}));
-    super4->addChild(xrootdManager.createStorageServer("leaf10","/",{},{}));
-    super4->addChild(xrootdManager.createStorageServer("leaf11","/",{},{}));
+    super1->addChildStorageServer("leaf3","/",{},{});
+    super1->addChildStorageServer("leaf4","/",{},{});
+    auto super2 = super1->addChildSupervisor("super2");
+
+    super2->addChildStorageServer("leaf5","/",{},{});
+    super2->addChildStorageServer("leaf6","/",{},{});
+    auto super3 = super2->addChildSupervisor("super3");
+
+    super3->addChildStorageServer("leaf7","/",{},{});
+    super3->addChildStorageServer("leaf8","/",{},{});
+    auto super4 = super3->addChildSupervisor("super4");
+    super4->addChildStorageServer("leaf9","/",{},{});
+    super4->addChildStorageServer("leaf10","/",{},{});
+    super4->addChildStorageServer("leaf11","/",{},{});
 
     /* Instantiate an execution controller */
-    auto controller = simulation->add(new wrench::Controller(baremetal_service, root,&xrootdManager, "root"));
+    auto controller = simulation->add(new wrench::Controller(baremetal_service, &xrootd_deployment, "root"));
 
     /* Launch the simulation */
     simulation->launch();

@@ -12,7 +12,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "../../../include/wrench/services/storage/xrootd/XRootD.h"
+#include "wrench/services/storage/xrootd/XRootDDeployment.h"
 #include "../../../include/wrench-dev.h"
 
 namespace wrench {
@@ -26,8 +26,7 @@ namespace wrench {
         // Constructor
         Controller(
 				const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
-                const std::shared_ptr<wrench::XRootD::Node> &storage_service,
-				XRootD::XRootD *xrootdManager,
+				XRootD::XRootDDeployment *xrootd_deployment,
                 const std::string &hostname);
 
     protected:
@@ -39,8 +38,7 @@ namespace wrench {
         int main() override;
 
         const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
-        const std::shared_ptr<wrench::XRootD::Node> root;
-		XRootD::XRootD *xrootdManager;
+		XRootD::XRootDDeployment *xrootd_deployment;
     };
 
 }// namespace wrench
