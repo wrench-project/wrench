@@ -38,7 +38,6 @@ int main(int argc, char **argv) {
 
     /* Initialize the simulation */
     simulation->init(&argc, argv);
-    bool reduced=false;
 
     /* Parsing of the command-line arguments */
     if (argc  != 2) {

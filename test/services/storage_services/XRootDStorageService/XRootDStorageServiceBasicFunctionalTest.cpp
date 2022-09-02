@@ -15,7 +15,7 @@
 #include "../../../include/UniqueTmpPathPrefix.h"
 
 
-WRENCH_LOG_CATEGORY(xrootd_storage_service_functional_test, "Log category for XRootDServiceFunctionalTest");
+WRENCH_LOG_CATEGORY(xrootd_storage_service_basic_functional_test, "Log category for XRootDServiceBasicFunctionalTest");
 
 
 class XRootDServiceFunctionalTest : public ::testing::Test {
@@ -170,3 +170,6 @@ void XRootDServiceFunctionalTest::do_BasicFunctionality_test(std::string arg) {
         free(argv[i]);
     free(argv);
 }
+
+
+
