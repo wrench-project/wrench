@@ -37,7 +37,7 @@ to analyze action failures.
   bag-of-actions workload on various compute servies, with all data being read/written from/to a single
   storage service. 
     
-  - 'XRootD': A simulation of a storage system that resembles the XRootD storage system.
+  - 'XRootD': A simulation of a storage system that resembles the XRootD storage system.jjjjjjjjjjjjjjj
   
 ### Workflow-API simulator examples
 

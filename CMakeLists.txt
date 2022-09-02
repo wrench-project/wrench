@@ -413,7 +413,8 @@ set(TEST_FILES
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceBatschedContiguityTest.cpp
         test/services/helper_services/HostStateChangeTest.cpp
         test/services/helper_services/AlarmTest.cpp
-        test/services/storage_services/XRootDStorageService/XRootDStorageServiceFunctionalTest.cpp
+        test/services/storage_services/XRootDStorageService/XRootDStorageServiceBasicFunctionalTest.cpp
+        test/services/storage_services/XRootDStorageService/XRootDStorageServiceFullFunctionalTest.cpp
         test/wms/WMSTest.cpp
         test/wms/MultipleWMSTest.cpp
         test/services/compute_services/virtualized_cluster/VirtualizedClusterServiceTest.cpp
