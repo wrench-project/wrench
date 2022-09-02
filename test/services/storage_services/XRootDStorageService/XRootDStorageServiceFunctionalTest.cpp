@@ -160,8 +160,6 @@ void XRootDServiceFunctionalTest::do_BasicFunctionality_test(std::string arg) {
     auto ss2 = this->root_supervisor->addChildStorageServer("Host2", "/disk100", {}, {});
     auto ss3 = this->root_supervisor->addChildStorageServer("Host3", "/disk100", {}, {});
 
-    ASSERT_THROW(ss2->addChildSupervisor("Host3"), std::runtime_error);
-
     // Create an execution controller
     auto controller = simulation->add(new XRootDServiceBasicFunctionalityTestExecutionController(this, "Host1"));
 
