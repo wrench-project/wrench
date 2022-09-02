@@ -128,7 +128,10 @@ private:
 
         root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2)->createFile(files[13]);//File for direct tests
 
-        // TODO: Add a createFile() on Supervisor and catch the exception
+        try {
+            root->createFile(files[0]);
+            throw std::runtime_error("Should not be able to create a file on a non-storage node");
+        } catch (std::runtime_error &ignore) {}
 
         //  root  super1       super2       super3       super4
         /* Create a job manager so that we can create/submit jobs */
