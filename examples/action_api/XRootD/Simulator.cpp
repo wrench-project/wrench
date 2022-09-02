@@ -85,8 +85,6 @@ int main(int argc, char **argv) {
     root->addChildStorageServer("leaf2","/",{},{});
     auto super1 = root->addChildSupervisor("super1");
 
-    // TODO: Try to add a chile to a non-super
-
     super1->addChildStorageServer("leaf3","/",{},{});
     super1->addChildStorageServer("leaf4","/",{},{});
     auto super2 = super1->addChildSupervisor("super2");
@@ -109,5 +107,4 @@ int main(int argc, char **argv) {
     simulation->launch();
 
     return 0;
-
 }
