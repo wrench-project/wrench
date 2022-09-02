@@ -9,7 +9,8 @@
  */
 
 /**
- ** An execution controller to execute a workflow
+ ** An execution controller to execute a multi-action job, where the actions
+ ** read files from and XRootD deployment
  **/
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
@@ -34,17 +35,17 @@ std::string padDouble(double l){
 }
 
 std::string formatDate(double time){
-	if(time<0){
+	if(time < 0){
 		return "Not Started";
 	}
-	long seconds=(long)time;
+	long seconds = (long)time;
 	double ms = time - (double)seconds;
 	long minutes = seconds / 60;
 	seconds %= 60;
-	long hours=minutes/60;
-	minutes%=60;
-	long days=hours/24;
-	hours%=24;
+	long hours = minutes / 60;
+	minutes %= 60;
+	long days = hours / 24;
+	hours %= 24;
 	
 	return std::to_string(days)+"-"+padLong(hours)+':'+padLong(minutes)+':'+padDouble((double)seconds+ms);
 }
@@ -56,15 +57,16 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param bare_metal_compute_service: a set of compute services available to run actions
-     * @param storage_services: a set of storage services available to store files
-     * @param hostname: the name of the host on which to start the WMS
+     * @param bare_metal_compute_service: a bare-metal compute services available to run actions
+     * @param root: The root node of an XRootD deployment
+     * @param xrootd_manager: The XRootD manager
+     * @param hostname: the name of the host on which to start the Controller
      */
     Controller::Controller(const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
-                           const std::shared_ptr<XRootD::Node> &root,
-						   XRootD::XRootD *xrootdManager,
+						   XRootD::XRootDDeployment *xrootd_deployment,
                            const std::string &hostname) : ExecutionController(hostname, "controller"),
-                                                          bare_metal_compute_service(bare_metal_compute_service), root(root),xrootdManager(xrootdManager) {}
+                                                          bare_metal_compute_service(bare_metal_compute_service),
+                                                          xrootd_deployment(xrootd_deployment) {}
 
     /**
      * @brief main method of the Controller
@@ -99,23 +101,28 @@ namespace wrench {
 			wrench::Simulation::addFile("file14", 1 ),
 		};
         
-			
-        xrootdManager->createFile(files[0], root->getChild(0));//leaf 1
-		xrootdManager->createFile(files[1], root->getChild(1));//leaf 2
-		xrootdManager->createFile(files[2], root->getChild(2)->getChild(0));//leaf 3
-		xrootdManager->createFile(files[3], root->getChild(2)->getChild(1));//leaf 4
+        auto root = this->xrootd_deployment->getRootSupervisor();
+
+
+        root->getChild(0)->createFile(files[0]);
+        root->getChild(1)->createFile(files[1]);
+        root->getChild(2)->getChild(0)->createFile(files[2]);
+        root->getChild(2)->getChild(1)->createFile(files[3]);
 		root->getChild(2)->getChild(2)->getChild(0)->createFile(files[4]);//leaf 5
-		root->getChild(2)->getChild(2)->getChild(1)->createFile(files[5]);//leaf 6
-		root->getChild(2)->getChild(2)->getChild(2)->getChild(0)->createFile(files[6]);//leaf 7
-		root->getChild(2)->getChild(2)->getChild(2)->getChild(1)->createFile(files[7]);//leaf 8
-		root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(0)->createFile(files[8]);//leaf 9
+        root->getChild(2)->getChild(2)->getChild(1)->createFile(files[5]);//leaf 6
+        root->getChild(2)->getChild(2)->getChild(2)->getChild(0)->createFile(files[6]);//leaf 7
+        root->getChild(2)->getChild(2)->getChild(2)->getChild(1)->createFile(files[7]);//leaf 8
+        root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(0)->createFile(files[8]);//leaf 9
 		root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(1)->createFile(files[9]);//leaf 10
-		root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2)->createFile(files[10]);//leaf 11
-		
-		root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2)->createFile(files[12]);//File for supervisor tests
-		
-		root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2)->createFile(files[13]);//File for direct tests
-	//  root  super1       super2       super3       super4       
+        root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2)->createFile(files[10]);//leaf 11
+
+        root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2)->createFile(files[12]);//File for supervisor tests
+
+        root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2)->createFile(files[13]);//File for direct tests
+
+		// TODO: Add a createFile() on Supervisor and catch the exception
+
+		//  root  super1       super2       super3       super4
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
@@ -135,8 +142,6 @@ namespace wrench {
 		auto fileread12 = job1->addFileReadAction("fileread12", files[11], root);//this file does not exist
 		auto fileread13 = job1->addFileReadAction("fileread13", files[10], root);//depth 4 search, but cached
 		
-		
-		
 		auto fileread14 = job1->addFileReadAction("fileread14", files[11], root);//this file does not exist
 		
 		auto fileread15 = job1->addFileReadAction("fileread15", files[10], root);//depth 4 search, but no longer cached
@@ -144,7 +149,10 @@ namespace wrench {
 		auto fileread17 = job1->addFileReadAction("fileread17", files[12], root->getChild(2)->getChild(2)->getChild(2)->getChild(2));//check superviosor cached
 		auto fileread18 = job1->addFileReadAction("fileread18", files[13], root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2));//direct
 		auto fileread19 = job1->addFileReadAction("fileread19", files[13], root->getChild(2)->getChild(2)->getChild(2)->getChild(2)->getChild(2));//direct cached
-        auto compute = job1->addComputeAction("compute", 500 * GFLOP, 50 * MBYTE, 1, 3, wrench::ParallelModel::AMDAHL(0.8));//should invalidate cache
+
+		// TODO: Add comment that compute is super long to invalidate cachue
+
+		auto compute = job1->addComputeAction("compute", 500 * GFLOP, 50 * MBYTE, 1, 3, wrench::ParallelModel::AMDAHL(0.8));//should invalidate cache
         job1->addActionDependency(fileread1, fileread2);
         job1->addActionDependency(fileread2, fileread3);
         job1->addActionDependency(fileread3, fileread4);
@@ -158,12 +166,11 @@ namespace wrench {
         job1->addActionDependency(fileread11, fileread13);
 		job1->addActionDependency(fileread13,compute);
         job1->addActionDependency(compute, fileread12);
-		
+
         job1->addActionDependency(compute, fileread15);
 		
         job1->addActionDependency(fileread12, fileread14);//this task should never start
-        
-		
+
         job1->addActionDependency(fileread15, fileread16);
         job1->addActionDependency(fileread16, fileread17);
         job1->addActionDependency(fileread17, fileread18);
@@ -183,11 +190,11 @@ namespace wrench {
 			<<std::setw(17)<<formatDate(a->getStartDate())
 			<<" - "
 			<<std::setw(17)<<formatDate(a->getEndDate())
-			<<", Durration: "
+			<<", Duration: "
 			<<std::setw(7)<<a->getEndDate()-a->getStartDate()
 			<<" Comment: "
 			<< comments[i]<<std::endl;
-            //printf("Action %s: %.2fs - %.2fs, durration:%.2fs\n", a->getName().c_str(), a->getStartDate(), a->getEndDate(),a->getEndDate()-a->getStartDate());
+            //printf("Action %s: %.2fs - %.2fs, duration:%.2fs\n", a->getName().c_str(), a->getStartDate(), a->getEndDate(),a->getEndDate()-a->getStartDate());
         }
         return 0;
     }

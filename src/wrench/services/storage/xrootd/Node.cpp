@@ -9,7 +9,7 @@
 
 #include <wrench/services/storage/xrootd/Node.h>
 
-#include <wrench/services/storage/xrootd/XRootD.h>
+#include <wrench/services/storage/xrootd/XRootDDeployment.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/failure_causes/NetworkError.h>
@@ -58,13 +58,13 @@ namespace wrench {
          * @throws runtime_error if node already has 64 children.
          */
          //should this throw an exception instead?
-        int Node::addChild(std::shared_ptr<Node> child) {
+        std::shared_ptr<Node> Node::addChild(std::shared_ptr<Node> child) {
             child->supervisor = this;
             if (children.size() < 64) {
                 children.push_back(child);
-                return children.size() - 1;
+                return child;
             }
-            throw std::runtime_error(hostname+" already has 64 children");
+            throw std::runtime_error("Supervisor running on " + hostname + " already has 64 children");
         }
 //            /**
 //             * @brief Get mount point of underlying storage service
@@ -700,10 +700,11 @@ namespace wrench {
         *
         * @return a shared pointer to the newly created Node
         */
-        Node::Node(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list):StorageService(hostname,"XRootD"){
+        Node::Node(XRootDDeployment *deployment, const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list):StorageService(hostname,"XRootD"){
             this->setProperties(this->default_property_values, property_list);
             setMessagePayloads(default_messagepayload_values,messagepayload_list);
             cache.maxCacheTime= getPropertyValueAsDouble(Property::CACHE_MAX_LIFETIME);
+            this->deployment = deployment;
         }
 /**
         * @brief make this node a file server
@@ -929,9 +930,26 @@ namespace wrench {
             if(internalStorage==nullptr){
                 throw std::runtime_error("Node::createFile() called on non storage Node "+hostname);
             }
-
             internalStorage->createFile(file, path);
             metavisor->files[file].push_back(this->getSharedPtr<Node>());
         }
+
+
+        std::shared_ptr<Node> Node::addChildSupervisor(const std::string &hostname) {
+            return this->addChild(this->deployment->createSupervisor(hostname));
+        }
+
+
+        std::shared_ptr<Node> Node::addChildStorageServer(const std::string& hostname, const std::string& mount_point,
+                                         WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,
+                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,
+                                         WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
+                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list) {
+            return this->addChild(this->deployment->createStorageServer(hostname, mount_point,
+                                                                              storage_property_list, storage_messagepayload_list,
+                                                                              node_property_list, node_messagepayload_list));
+        }
+
+
     }
 }
