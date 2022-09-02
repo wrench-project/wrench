@@ -18,7 +18,7 @@
 //todo overload mountpoint functions
 namespace wrench {
     namespace XRootD{
-        class XRootD;
+        class XRootDDeployment;
         class SearchStack;
         /**
          * @brief An XRootD node, this can be either a supervisor or a storage server.
@@ -29,7 +29,12 @@ namespace wrench {
          */
         class Node:public StorageService{
         public:
-            int addChild(std::shared_ptr<Node> child);
+
+            std::shared_ptr<Node> addChildSupervisor(const std::string &hostname);
+            std::shared_ptr<Node> addChildStorageServer(const std::string& hostname, const std::string& mount_point,
+                                      WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,
+                                      WRENCH_PROPERTY_COLLECTION_TYPE node_property_list={}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list={});
+
             std::shared_ptr<Node> getChild(unsigned int n);
             Node* getParent();
         /***********************/
@@ -87,8 +92,14 @@ namespace wrench {
 
             int main() override;
             bool processNextMessage();
-            Node(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
+            Node(XRootDDeployment *deployment, const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
         private:
+
+            XRootDDeployment *deployment;
+
+            std::shared_ptr<Node> addChild(std::shared_ptr<Node> child);
+
+
             map<Node*,vector<stack<Node*>>> splitStack(vector<stack<Node*>> searchStack);
             virtual std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
             vector<stack<Node*>> constructFileSearchTree(vector<shared_ptr<Node>>& targets);
@@ -108,10 +119,10 @@ namespace wrench {
             /** @brief The supervisor of this node.  All continue search and ripple delete messages should come from this, and all update cache messages go to this server */
             Node* supervisor=nullptr;
             /** @brief The Meta supervisor for this entire XRootD data federation */
-            XRootD* metavisor=nullptr;
+            XRootDDeployment* metavisor=nullptr;
             /** @brief Whether this node is running a reduced simulation.  Initilized from the properties in main */
             bool reduced;
-            friend XRootD;
+            friend XRootDDeployment;
             friend SearchStack;
             /***********************/
             /** \endcond           */

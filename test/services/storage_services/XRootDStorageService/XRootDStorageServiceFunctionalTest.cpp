@@ -24,7 +24,7 @@ public:
 
     void do_BasicFunctionality_test(std::string arg);
 
-    std::shared_ptr<wrench::XRootD::Node> supervisor;
+    std::shared_ptr<wrench::XRootD::Node> root_supervisor;
 
 protected:
 
@@ -101,10 +101,10 @@ private:
         // Create a copy file1 on the first child
         //wrench::Simulation::createFile(file1,
         //wrench::FileLocation::LOCATION(this->test->supervisor->getChild(0)->internalStorage));
-        this->test->supervisor->getChild(0)->createFile(file1,"/disk100");
+        this->test->root_supervisor->getChild(0)->createFile(file1,"/disk100");
 
         // Read file1 from XRootD
-        this->test->supervisor->readFile(file1);
+        this->test->root_supervisor->readFile(file1);
 
         // Try to read file2 from XRootD although it is nowhere
         // TODO: This should raise some FileNotFound Exception rather
@@ -112,21 +112,17 @@ private:
         // set the search timeout as a special property, since the default 30-sec is WAY too long
         // here.
         try {
-            this->test->supervisor->readFile(file2);
+            this->test->root_supervisor->readFile(file2);
             throw std::runtime_error("Non extant files should throw exceptions when not found");
-        }catch(wrench::ExecutionException &e){
-
-
+        } catch(wrench::ExecutionException &ignore){
         }
 
-        this->test->supervisor->deleteFile(file1);
+        this->test->root_supervisor->deleteFile(file1);
 
         try {
-            this->test->supervisor->readFile(file1);
+            this->test->root_supervisor->readFile(file1);
             throw std::runtime_error("File not deleted properly");
-        }catch(wrench::ExecutionException &e){
-
-
+        } catch (wrench::ExecutionException &ignore){
         }
 
 
@@ -156,19 +152,18 @@ void XRootDServiceFunctionalTest::do_BasicFunctionality_test(std::string arg) {
     simulation->instantiatePlatform(platform_file_path);
 
     // Create a XRootD Manager object
-    wrench::XRootD::XRootD xrootdManager(simulation,{{wrench::XRootD::Property::CACHE_MAX_LIFETIME,"28800"},{wrench::XRootD::Property::REDUCED_SIMULATION,arg}},{});
+    wrench::XRootD::XRootDDeployment xrootd_deployment(simulation, {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"}, {wrench::XRootD::Property::REDUCED_SIMULATION, arg}}, {});
 
-    this->supervisor = xrootdManager.createSupervisor("Host1");
+    this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1");
+    ASSERT_THROW(this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1"), std::runtime_error);
 
-    auto ss2 = xrootdManager.createStorageServer("Host2", "/disk100", {}, {});
-    auto ss3 = xrootdManager.createStorageServer("Host3", "/disk100", {}, {});
+    auto ss2 = this->root_supervisor->addChildStorageServer("Host2", "/disk100", {}, {});
+    auto ss3 = this->root_supervisor->addChildStorageServer("Host3", "/disk100", {}, {});
 
-    supervisor->addChild(ss2);
-    supervisor->addChild(ss3);
+    ASSERT_THROW(ss2->addChildSupervisor("Host3"), std::runtime_error);
 
     // Create an execution controller
     auto controller = simulation->add(new XRootDServiceBasicFunctionalityTestExecutionController(this, "Host1"));
-
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
