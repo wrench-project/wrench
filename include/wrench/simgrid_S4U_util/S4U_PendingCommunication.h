@@ -15,12 +15,11 @@
 #include <vector>
 #include <simgrid/s4u/Comm.hpp>
 #include "wrench/util/MessageManager.h"
-
-//#include "S4U_PendingCommunication.h"
+#include "wrench/simulation/SimulationMessage.h"
 
 namespace wrench {
 
-    class SimulationMessage;
+//    class SimulationMessage;
 
     /*******************/
     /** \cond INTERNAL */
