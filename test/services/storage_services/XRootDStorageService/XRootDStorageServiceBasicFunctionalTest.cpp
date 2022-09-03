@@ -21,15 +21,12 @@ WRENCH_LOG_CATEGORY(xrootd_storage_service_basic_functional_test, "Log category 
 class XRootDServiceBasicFunctionalTest : public ::testing::Test {
 
 public:
-
     void do_BasicFunctionality_test(std::string arg);
 
     std::shared_ptr<wrench::XRootD::Node> root_supervisor;
 
 protected:
-
     XRootDServiceBasicFunctionalTest() {
-
 
 
         // Create a one-host platform file
@@ -69,7 +66,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 
@@ -81,8 +77,7 @@ class XRootDServiceBasicFunctionalityTestExecutionController : public wrench::Ex
 
 public:
     XRootDServiceBasicFunctionalityTestExecutionController(XRootDServiceBasicFunctionalTest *test,
-                                                           std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                                           std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -101,7 +96,7 @@ private:
         // Create a copy file1 on the first child
         //wrench::Simulation::createFile(file1,
         //wrench::FileLocation::LOCATION(this->test->supervisor->getChild(0)->internalStorage));
-        this->test->root_supervisor->getChild(0)->createFile(file1,"/disk100");
+        this->test->root_supervisor->getChild(0)->createFile(file1, "/disk100");
 
         // Read file1 from XRootD
         this->test->root_supervisor->readFile(file1);
@@ -114,7 +109,7 @@ private:
         try {
             this->test->root_supervisor->readFile(file2);
             throw std::runtime_error("Non extant files should throw exceptions when not found");
-        } catch(wrench::ExecutionException &ignore){
+        } catch (wrench::ExecutionException &ignore) {
         }
 
         this->test->root_supervisor->deleteFile(file1);
@@ -122,7 +117,7 @@ private:
         try {
             this->test->root_supervisor->readFile(file1);
             throw std::runtime_error("File not deleted properly");
-        } catch (wrench::ExecutionException &ignore){
+        } catch (wrench::ExecutionException &ignore) {
         }
 
 
@@ -131,10 +126,10 @@ private:
 };
 
 TEST_F(XRootDServiceBasicFunctionalTest, BasicFunctionalityFullSimulation) {
-    DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test,"false");
+    DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test, "false");
 }
 TEST_F(XRootDServiceBasicFunctionalTest, FastSearchQuickSimulation) {
-    DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test,"true");
+    DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test, "true");
 }
 
 void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string arg) {
@@ -144,7 +139,7 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-   //    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -170,6 +165,3 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
         free(argv[i]);
     free(argv);
 }
-
-
-

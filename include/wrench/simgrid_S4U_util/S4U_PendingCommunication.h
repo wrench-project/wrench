@@ -19,7 +19,7 @@
 
 namespace wrench {
 
-//    class SimulationMessage;
+    //    class SimulationMessage;
 
     /*******************/
     /** \cond INTERNAL */

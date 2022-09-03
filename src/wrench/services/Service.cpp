@@ -157,9 +157,9 @@ namespace wrench {
         if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
             try {
                 throw std::invalid_argument(
-                    "Service::getMessagePayloadValue(): Cannot find value for message_payload " +
-                    ServiceMessagePayload::translatePayloadType(message_payload) +
-                    " (perhaps a derived service class does not provide a default value?)");
+                        "Service::getMessagePayloadValue(): Cannot find value for message_payload " +
+                        ServiceMessagePayload::translatePayloadType(message_payload) +
+                        " (perhaps a derived service class does not provide a default value?)");
             } catch (std::out_of_range &e) {
                 throw std::invalid_argument(
                         "Service::getMessagePayloadValue(): invalid message_payload index");
