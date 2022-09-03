@@ -81,8 +81,8 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
         WRENCH_INFO("Controller starting");
 
-        /* Add a bunch of 1-byte files to the simulation, which will
-         * then be stored at storage servers in the XRootD tree
+        /* Add a 12-megabyte file to the simulation, which will
+         * then be stored in several storage servers in the XRootD tree
          */
         auto some_file = wrench::Simulation::addFile("some_file", 12 * MBYTE);
 
