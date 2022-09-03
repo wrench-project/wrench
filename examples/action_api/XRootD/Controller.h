@@ -25,8 +25,8 @@ namespace wrench {
     public:
         // Constructor
         Controller(
-				const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
-				XRootD::XRootDDeployment *xrootd_deployment,
+                const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
+                XRootD::XRootDDeployment *xrootd_deployment,
                 const std::string &hostname);
 
     protected:
@@ -39,7 +39,7 @@ namespace wrench {
         int main() override;
 
         const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
-		XRootD::XRootDDeployment *xrootd_deployment;
+        XRootD::XRootDDeployment *xrootd_deployment;
     };
 
 }// namespace wrench

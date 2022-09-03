@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
     simulation->init(&argc, argv);
 
     /* Parsing of the command-line arguments */
-    if (argc  != 2) {
+    if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <xml platform file>  [--log=controller.threshold=info | --wrench-full-log]" << std::endl;
         exit(1);
     }
@@ -61,11 +61,9 @@ int main(int argc, char **argv) {
      * may make it less realistic. See the documentation for more details.
      */
     wrench::XRootD::XRootDDeployment xrootd_deployment(simulation,
-                                                   {
-                                                 {wrench::XRootD::Property::CACHE_MAX_LIFETIME,"3600"},
-                                                 {wrench::XRootD::Property::REDUCED_SIMULATION,"false"}
-                                         },
-                                                   {});
+                                                       {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "3600"},
+                                                        {wrench::XRootD::Property::REDUCED_SIMULATION, "false"}},
+                                                       {});
 
     /* Construct an XRootD tree as follows (vertices are host names)
 
@@ -83,24 +81,24 @@ int main(int argc, char **argv) {
     */
     auto root = xrootd_deployment.createRootSupervisor("root");
 
-    root->addChildStorageServer("leaf1","/",{},{});
-    root->addChildStorageServer("leaf2","/",{},{});
+    root->addChildStorageServer("leaf1", "/", {}, {});
+    root->addChildStorageServer("leaf2", "/", {}, {});
     auto super1 = root->addChildSupervisor("super1");
 
-    super1->addChildStorageServer("leaf3","/",{},{});
-    super1->addChildStorageServer("leaf4","/",{},{});
+    super1->addChildStorageServer("leaf3", "/", {}, {});
+    super1->addChildStorageServer("leaf4", "/", {}, {});
     auto super2 = super1->addChildSupervisor("super2");
 
-    super2->addChildStorageServer("leaf5","/",{},{});
-    super2->addChildStorageServer("leaf6","/",{},{});
+    super2->addChildStorageServer("leaf5", "/", {}, {});
+    super2->addChildStorageServer("leaf6", "/", {}, {});
     auto super3 = super2->addChildSupervisor("super3");
 
-    super3->addChildStorageServer("leaf7","/",{},{});
-    super3->addChildStorageServer("leaf8","/",{},{});
+    super3->addChildStorageServer("leaf7", "/", {}, {});
+    super3->addChildStorageServer("leaf8", "/", {}, {});
     auto super4 = super3->addChildSupervisor("super4");
-    super4->addChildStorageServer("leaf9","/",{},{});
-    super4->addChildStorageServer("leaf10","/",{},{});
-    super4->addChildStorageServer("leaf11","/",{},{});
+    super4->addChildStorageServer("leaf9", "/", {}, {});
+    super4->addChildStorageServer("leaf10", "/", {}, {});
+    super4->addChildStorageServer("leaf11", "/", {}, {});
 
     /* Instantiate an execution controller */
     auto controller = simulation->add(new wrench::Controller(baremetal_service, &xrootd_deployment, "root"));

@@ -673,15 +673,13 @@ namespace wrench {
          * @return The number of threads
          */
     double SimpleStorageService::countRunningFileTransferThreads() {
-        return running_file_transfer_threads.size()+pending_file_transfer_threads.size();
-
+        return running_file_transfer_threads.size() + pending_file_transfer_threads.size();
     }
-        /**
+    /**
          * @brief Get the load (number of concurrent reads) on the storage service
          * @return the load on the service
          */
     double SimpleStorageService::getLoad() {
         return countRunningFileTransferThreads();
-
     }
 };// namespace wrench

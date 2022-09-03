@@ -17,7 +17,7 @@ WRENCH_LOG_CATEGORY(wrench_core_logical_file_system, "Log category for Logical F
 
 
 namespace wrench {
-    const std::string LogicalFileSystem::DEV_NULL="/dev/null";
+    const std::string LogicalFileSystem::DEV_NULL = "/dev/null";
     std::map<std::string, StorageService *> LogicalFileSystem::mount_points;
 
     /**
@@ -36,10 +36,10 @@ namespace wrench {
 
         this->occupied_space = 0;
         this->initialized = false;
-        if (mount_point==DEV_NULL){
-            devnull=true;
+        if (mount_point == DEV_NULL) {
+            devnull = true;
             this->total_capacity = std::numeric_limits<double>::infinity();
-        }else{
+        } else {
             mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
             // Check validity
             if (not S4U_Simulation::hostHasMountPoint(hostname, mount_point)) {
@@ -59,7 +59,7 @@ namespace wrench {
         // Check uniqueness
         auto lfs = LogicalFileSystem::mount_points.find(this->hostname + ":" + this->mount_point);
 
-        if (lfs != LogicalFileSystem::mount_points.end()&&mount_point!=DEV_NULL) {
+        if (lfs != LogicalFileSystem::mount_points.end() && mount_point != DEV_NULL) {
             if (lfs->second != this->storage_service) {
                 throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem with mount point " + this->mount_point + " at host " + this->hostname + " already exists");
             } else {
@@ -78,8 +78,8 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::createDirectory(const std::string &absolute_path) {
-        if(devnull) {
-            return ;
+        if (devnull) {
+            return;
         }
         assertInitHasBeenCalled();
         assertDirectoryDoesNotExist(absolute_path);
@@ -92,7 +92,7 @@ namespace wrench {
  * @return true if the directory exists
  */
     bool LogicalFileSystem::doesDirectoryExist(const std::string &absolute_path) {
-        if(devnull) {
+        if (devnull) {
             return false;
         }
         assertInitHasBeenCalled();
@@ -107,7 +107,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     bool LogicalFileSystem::isDirectoryEmpty(const std::string &absolute_path) {
-        if(devnull) {
+        if (devnull) {
             return true;
         }
         assertInitHasBeenCalled();
@@ -122,8 +122,8 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::removeEmptyDirectory(const std::string &absolute_path) {
-        if(devnull) {
-            return ;
+        if (devnull) {
+            return;
         }
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
@@ -140,8 +140,8 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::storeFileInDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path) {
-        if(devnull) {
-            return ;
+        if (devnull) {
+            return;
         }
         assertInitHasBeenCalled();
         // If directory does not exit, create it
@@ -166,8 +166,8 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::removeFileFromDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path) {
-        if(devnull) {
-            return ;
+        if (devnull) {
+            return;
         }
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
@@ -183,8 +183,8 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::removeAllFilesInDirectory(const std::string &absolute_path) {
-        if(devnull) {
-            return ;
+        if (devnull) {
+            return;
         }
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
@@ -201,7 +201,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     bool LogicalFileSystem::isFileInDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path) {
-        if(devnull) {
+        if (devnull) {
             return false;
         }
         assertInitHasBeenCalled();
@@ -222,7 +222,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     std::set<std::shared_ptr<DataFile>> LogicalFileSystem::listFilesInDirectory(const std::string &absolute_path) {
-        if(devnull) {
+        if (devnull) {
             return std::set<std::shared_ptr<DataFile>>();
         }
         assertInitHasBeenCalled();
@@ -265,7 +265,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::reserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
-        if(devnull) {
+        if (devnull) {
             return;
         }
         assertInitHasBeenCalled();
@@ -290,7 +290,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::unreserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
-        if(devnull) {
+        if (devnull) {
             return;
         }
         assertInitHasBeenCalled();
@@ -318,7 +318,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void LogicalFileSystem::stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
-        if(devnull) {
+        if (devnull) {
             return;
         }
         // If Space is not sufficient, forget it
