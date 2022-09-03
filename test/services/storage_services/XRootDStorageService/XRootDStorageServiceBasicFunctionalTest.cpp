@@ -18,7 +18,7 @@
 WRENCH_LOG_CATEGORY(xrootd_storage_service_basic_functional_test, "Log category for XRootDServiceBasicFunctionalTest");
 
 
-class XRootDServiceFunctionalTest : public ::testing::Test {
+class XRootDServiceBasicFunctionalTest : public ::testing::Test {
 
 public:
 
@@ -28,7 +28,7 @@ public:
 
 protected:
 
-    XRootDServiceFunctionalTest() {
+    XRootDServiceBasicFunctionalTest() {
 
 
 
@@ -80,13 +80,13 @@ protected:
 class XRootDServiceBasicFunctionalityTestExecutionController : public wrench::ExecutionController {
 
 public:
-    XRootDServiceBasicFunctionalityTestExecutionController(XRootDServiceFunctionalTest *test,
+    XRootDServiceBasicFunctionalityTestExecutionController(XRootDServiceBasicFunctionalTest *test,
                                                            std::string hostname) :
             wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-    XRootDServiceFunctionalTest *test;
+    XRootDServiceBasicFunctionalTest *test;
 
     int main() {
 
@@ -130,14 +130,14 @@ private:
     }
 };
 
-TEST_F(XRootDServiceFunctionalTest, BasicFunctionality) {
+TEST_F(XRootDServiceBasicFunctionalTest, BasicFunctionalityFullSimulation) {
     DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test,"false");
 }
-TEST_F(XRootDServiceFunctionalTest, FastSearch) {
+TEST_F(XRootDServiceBasicFunctionalTest, FastSearchQuickSimulation) {
     DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test,"true");
 }
 
-void XRootDServiceFunctionalTest::do_BasicFunctionality_test(std::string arg) {
+void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string arg) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
