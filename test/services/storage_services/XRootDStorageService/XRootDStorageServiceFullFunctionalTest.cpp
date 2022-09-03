@@ -48,7 +48,7 @@ std::string formatDate(double time){
     return std::to_string(days)+"-"+padLong(hours)+':'+padLong(minutes)+':'+padDouble((double)seconds+ms);
 }
 
-class XRootDServiceFunctionalTest : public ::testing::Test {
+class XRootDServiceFullFunctionalTest : public ::testing::Test {
 
 public:
 
@@ -58,7 +58,7 @@ public:
 
 protected:
 
-    XRootDServiceFunctionalTest() {
+    XRootDServiceFullFunctionalTest() {
     }
 
 };
@@ -71,7 +71,7 @@ protected:
 class XRootDServiceFullFunctionalityTestExecutionController : public wrench::ExecutionController {
 
 public:
-    XRootDServiceFullFunctionalityTestExecutionController(XRootDServiceFunctionalTest *test,
+    XRootDServiceFullFunctionalityTestExecutionController(XRootDServiceFullFunctionalTest *test,
                                                           wrench::XRootD::XRootDDeployment *xrootd_deployment,
                                                           std::shared_ptr<wrench::BareMetalComputeService> bare_metal_compute_service,
                                                           std::string hostname) :
@@ -80,7 +80,7 @@ public:
             bare_metal_compute_service(bare_metal_compute_service) {}
 
 private:
-    XRootDServiceFunctionalTest *test;
+    XRootDServiceFullFunctionalTest *test;
     wrench::XRootD::XRootDDeployment *xrootd_deployment;
     std::shared_ptr<wrench::BareMetalComputeService> bare_metal_compute_service;
 
@@ -216,11 +216,11 @@ private:
     }
 };
 
-TEST_F(XRootDServiceFunctionalTest, FullFunctionality) {
+TEST_F(XRootDServiceFullFunctionalTest, ComplexTreeAndOperations) {
     DO_TEST_WITH_FORK(do_FullFunctionality_test);
 }
 
-void XRootDServiceFunctionalTest::do_FullFunctionality_test() {
+void XRootDServiceFullFunctionalTest::do_FullFunctionality_test() {
 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
