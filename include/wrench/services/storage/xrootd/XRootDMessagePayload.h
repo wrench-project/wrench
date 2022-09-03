@@ -18,15 +18,13 @@
 #include <wrench/services/storage/StorageServiceMessagePayload.h>
 
 namespace wrench {
-    namespace XRootD{
+    namespace XRootD {
         /**
          * @brief Configurable message payloads for a XRootD node
          */
         class MessagePayload : public StorageServiceMessagePayload {
 
         public:
-
-
             /** @brief The number of bytes in the control message sent by the daemon to answer a file read request **/
             DECLARE_MESSAGEPAYLOAD_NAME(FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD);
 
@@ -38,12 +36,9 @@ namespace wrench {
 
             /** @brief The number of bytes for each cache entry **/
             DECLARE_MESSAGEPAYLOAD_NAME(CACHE_ENTRY);
-
-
         };
-    };
-};// namespace wrench
+    };// namespace XRootD
+};    // namespace wrench
 
 
-
-#endif //WRENCH_XROOTDMESSAGEPAYLOAD_H
+#endif//WRENCH_XROOTDMESSAGEPAYLOAD_H

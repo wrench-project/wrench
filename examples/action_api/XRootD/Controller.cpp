@@ -26,20 +26,20 @@
 /*
  * Helper function for pretty-printed output
  */
-std::string padLong(long l){
-    return (l < 10 ? "0"+std::to_string(l) : std::to_string(l));
+std::string padLong(long l) {
+    return (l < 10 ? "0" + std::to_string(l) : std::to_string(l));
 }
 
-std::string padDouble(double l){
-    return (l < 10 ? "0"+std::to_string(l) : std::to_string(l));
+std::string padDouble(double l) {
+    return (l < 10 ? "0" + std::to_string(l) : std::to_string(l));
 }
 
-std::string formatDate(double time){
-    if(time < 0){
+std::string formatDate(double time) {
+    if (time < 0) {
         return "Not Started";
     }
-    long seconds = (long)time;
-    double ms = time - (double)seconds;
+    long seconds = (long) time;
+    double ms = time - (double) seconds;
     long minutes = seconds / 60;
     seconds %= 60;
     long hours = minutes / 60;
@@ -47,7 +47,7 @@ std::string formatDate(double time){
     long days = hours / 24;
     hours %= 24;
 
-    return std::to_string(days)+"-"+padLong(hours)+':'+padLong(minutes)+':'+padDouble((double)seconds+ms);
+    return std::to_string(days) + "-" + padLong(hours) + ':' + padLong(minutes) + ':' + padDouble((double) seconds + ms);
 }
 
 WRENCH_LOG_CATEGORY(controller, "Log category for Controller");

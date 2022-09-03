@@ -64,17 +64,17 @@ namespace wrench {
         virtual void writeFile(const std::shared_ptr<DataFile> &file);
 
         virtual void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
-        virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string& path);
+        virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path);
         virtual void createFile(const std::shared_ptr<DataFile> &file);
         /**
          * @brief Get the theoretical load of a service
          * @return the load on the service
          */
-        virtual double getLoad()=0;
+        virtual double getLoad() = 0;
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
-        static void readFile(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& location, simgrid::s4u::Mailbox * answer_mailbox, simgrid::s4u::Mailbox * chunk_receiving_mailbox, double num_bytes);
+        static void readFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location, simgrid::s4u::Mailbox *answer_mailbox, simgrid::s4u::Mailbox *chunk_receiving_mailbox, double num_bytes);
 
         bool isScratch() const;
 

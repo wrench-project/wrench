@@ -34,8 +34,7 @@ namespace wrench {
     class LogicalFileSystem {
 
     public:
-
-        explicit LogicalFileSystem(const std::string &hostname, StorageService *storage_service, std::string mount_point=DEV_NULL);
+        explicit LogicalFileSystem(const std::string &hostname, StorageService *storage_service, std::string mount_point = DEV_NULL);
 
         void init();
 
@@ -70,7 +69,7 @@ namespace wrench {
         std::string mount_point;
         double total_capacity;
         double occupied_space;
-        bool devnull=false;
+        bool devnull = false;
         std::map<std::string, double> reserved_space;
 
         bool initialized;

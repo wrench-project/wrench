@@ -28,7 +28,7 @@
 #include "wrench/services/storage/StorageServiceMessage.h"
 
 namespace wrench {
-    namespace XRootD{
+    namespace XRootD {
 
         /***********************/
         /** \cond INTERNAL     */
@@ -49,22 +49,22 @@ namespace wrench {
             ContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                   std::shared_ptr<StorageServiceFileReadRequestMessage> original,
                                   std::shared_ptr<DataFile> file,
-                                  Node* node,
+                                  Node *node,
                                   double payload,
                                   std::shared_ptr<bool> answered,
                                   int timeToLive);
-            ContinueSearchMessage(ContinueSearchMessage* toCopy);
+            ContinueSearchMessage(ContinueSearchMessage *toCopy);
             /** @brief Mailbox to which the FINAL answer message should be sent */
             simgrid::s4u::Mailbox *answer_mailbox;
 
-            /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/\
+            /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/
             std::shared_ptr<StorageServiceFileReadRequestMessage> original;
 
             /** @brief The file being searched for */
             std::shared_ptr<DataFile> file;
 
             /** The node that originally received the FileLookupRequest or FileReadRequest */
-            Node* node;
+            Node *node;
             /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_mailbox spamming for multiple file hits */
             std::shared_ptr<bool> answered;
             /** How many more hops this message can live for, to prevent messages living forever in improper configurations with loops.*/
@@ -77,20 +77,20 @@ namespace wrench {
 
         class UpdateCacheMessage : public Message {
         public:
-            UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox,std::shared_ptr<StorageServiceFileReadRequestMessage> original,Node* node,std::shared_ptr<DataFile> file,  std::set<std::shared_ptr<FileLocation>> locations,
+            UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<StorageServiceFileReadRequestMessage> original, Node *node, std::shared_ptr<DataFile> file, std::set<std::shared_ptr<FileLocation>> locations,
                                double payload, std::shared_ptr<bool> answered);
-            UpdateCacheMessage(UpdateCacheMessage& other);
-            UpdateCacheMessage(UpdateCacheMessage* other);
+            UpdateCacheMessage(UpdateCacheMessage &other);
+            UpdateCacheMessage(UpdateCacheMessage *other);
             /** @brief Mailbox to which the FINAL answer message should be sent */
             simgrid::s4u::Mailbox *answer_mailbox;
-            /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/\
+            /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/
             std::shared_ptr<StorageServiceFileReadRequestMessage> original;
             /** @brief The file found */
             std::shared_ptr<DataFile> file;
             /** @brief the locations to cache */
             set<std::shared_ptr<FileLocation>> locations;
             /** @brief The highest node in the tree to return to when caching (should be the node the original message was sent) */
-            Node* node;
+            Node *node;
             /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_mailbox spamming for multiple file hits */
             std::shared_ptr<bool> answered;
         };
@@ -100,53 +100,52 @@ namespace wrench {
          */
         class RippleDelete : public Message {
         public:
-            RippleDelete(std::shared_ptr<DataFile> file,double payload,int timeToLive);
-            RippleDelete(RippleDelete* other);
-            RippleDelete(StorageServiceFileDeleteRequestMessage* other,int timeToLive);
+            RippleDelete(std::shared_ptr<DataFile> file, double payload, int timeToLive);
+            RippleDelete(RippleDelete *other);
+            RippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive);
             /** @brief The file to delete */
             std::shared_ptr<DataFile> file;
             /** @brief The remaining hops before the message should no longer be perpetuated */
             int timeToLive;
         };
 
-/**
+        /**
          * @brief A message sent to a XRootD Node to delete a file
          */
         class AdvancedContinueSearchMessage : public ContinueSearchMessage {
         public:
             AdvancedContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                    std::shared_ptr<StorageServiceFileReadRequestMessage> original,
-                    std::shared_ptr<DataFile> file,
-                    Node* node,
-                    double payload,
-                    std::shared_ptr<bool> answered,
-                    int timeToLive,
-                    std::vector<std::stack<Node*>> searchStack);
-            AdvancedContinueSearchMessage(AdvancedContinueSearchMessage* toCopy);
-            AdvancedContinueSearchMessage(ContinueSearchMessage* toCopy,std::vector<std::stack<Node*>> searchStack);
-            std::vector<std::stack<Node*>> searchStack;
+                                          std::shared_ptr<StorageServiceFileReadRequestMessage> original,
+                                          std::shared_ptr<DataFile> file,
+                                          Node *node,
+                                          double payload,
+                                          std::shared_ptr<bool> answered,
+                                          int timeToLive,
+                                          std::vector<std::stack<Node *>> searchStack);
+            AdvancedContinueSearchMessage(AdvancedContinueSearchMessage *toCopy);
+            AdvancedContinueSearchMessage(ContinueSearchMessage *toCopy, std::vector<std::stack<Node *>> searchStack);
+            std::vector<std::stack<Node *>> searchStack;
             /** @brief The paths to follow */
-        };/**
+        }; /**
  *
          * @brief A message sent to a XRootD Node to delete a file
          */
         class AdvancedRippleDelete : public RippleDelete {
         public:
-            AdvancedRippleDelete(std::shared_ptr<DataFile> file,double payload,int timeToLive,std::vector<std::stack<Node*>> searchStack);
-            AdvancedRippleDelete(AdvancedRippleDelete* other);
-            AdvancedRippleDelete(StorageServiceFileDeleteRequestMessage* other,int timeToLive,std::vector<std::stack<Node*>> searchStack);
-            AdvancedRippleDelete(RippleDelete* other,std::vector<std::stack<Node*>> searchStack);
+            AdvancedRippleDelete(std::shared_ptr<DataFile> file, double payload, int timeToLive, std::vector<std::stack<Node *>> searchStack);
+            AdvancedRippleDelete(AdvancedRippleDelete *other);
+            AdvancedRippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive, std::vector<std::stack<Node *>> searchStack);
+            AdvancedRippleDelete(RippleDelete *other, std::vector<std::stack<Node *>> searchStack);
             /** @brief The paths to follow */
-            std::vector<std::stack<Node*>> searchStack;
+            std::vector<std::stack<Node *>> searchStack;
         };
-
 
 
         /***********************/
         /** \endcond           */
         /***********************/
-    }
-};// namespace wrench
+    }// namespace XRootD
+};   // namespace wrench
 
 
 #endif//WRENCH_XRootDMessage_H

@@ -6,7 +6,7 @@
 #ifndef WRENCH_XROOTDPROPERTY_H
 #define WRENCH_XROOTDPROPERTY_H
 namespace wrench {
-    namespace XRootD{
+    namespace XRootD {
         /**
          * @brief Configurable service properties for a XRootD node
          */
@@ -27,6 +27,6 @@ namespace wrench {
             DECLARE_PROPERTY_NAME(REDUCED_SIMULATION);
         };
 
-    }
-}
-#endif //WRENCH_XROOTDPROPERTY_H
+    }// namespace XRootD
+}// namespace wrench
+#endif//WRENCH_XROOTDPROPERTY_H

@@ -8,19 +8,17 @@
 */
 #include "wrench/services/storage/xrootd/XRootDMessagePayload.h"
 namespace wrench {
-    namespace XRootD{
+    namespace XRootD {
 
 
+        SET_MESSAGEPAYLOAD_NAME(MessagePayload, FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD);
 
-        SET_MESSAGEPAYLOAD_NAME(MessagePayload,FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD);
+        SET_MESSAGEPAYLOAD_NAME(MessagePayload, CONTINUE_SEARCH);
 
-        SET_MESSAGEPAYLOAD_NAME(MessagePayload,CONTINUE_SEARCH);
+        SET_MESSAGEPAYLOAD_NAME(MessagePayload, UPDATE_CACHE);
 
-        SET_MESSAGEPAYLOAD_NAME(MessagePayload,UPDATE_CACHE);
-
-        SET_MESSAGEPAYLOAD_NAME(MessagePayload,CACHE_ENTRY);
-
+        SET_MESSAGEPAYLOAD_NAME(MessagePayload, CACHE_ENTRY);
 
 
-    };
-};// namespace wrench
+    };// namespace XRootD
+};    // namespace wrench
