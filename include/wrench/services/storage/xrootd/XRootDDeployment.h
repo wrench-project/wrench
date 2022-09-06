@@ -30,12 +30,11 @@ namespace wrench {
     namespace XRootD {
 
 
-      /**
+        /**
        * @brief A class that implements the notion of an XRootD deployment. This tracks all nodes and files within the system.
        */
         class XRootDDeployment {
         public:
-
             /**
              * @brief Create an XRootD manager
              * @param simulation: the simulation that all nodes run in.  Nodes are automatically added to this simulation as created.
