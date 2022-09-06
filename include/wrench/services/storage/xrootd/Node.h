@@ -15,6 +15,7 @@
 #include "wrench/services/storage/xrootd/Cache.h"
 
 #include <wrench/services/storage/xrootd/XRootDProperty.h>
+
 //todo overload mountpoint functions
 namespace wrench {
     namespace XRootD {
@@ -36,9 +37,18 @@ namespace wrench {
 
             std::shared_ptr<Node> getChild(unsigned int n);
             Node *getParent();
+
             /***********************/
             /** \cond DEVELOPER    */
             /***********************/
+
+            void createFile(const std::shared_ptr<DataFile> &file) override;
+            void createFile(const std::shared_ptr<DataFile> &file, const string &path) override;
+
+            /***********************/
+            /** \endcond           */
+            /***********************/
+
         private:
             WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                     {Property::MESSAGE_OVERHEAD, "1"},
@@ -61,6 +71,10 @@ namespace wrench {
                     {MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 1024}};
 
         public:
+
+            /***********************/
+            /** \cond INTERNAL     */
+            /***********************/
             //XRootD* getMetavisor();
 
             std::shared_ptr<SimpleStorageService> getStorageServer();
@@ -78,14 +92,10 @@ namespace wrench {
             bool cached(shared_ptr<DataFile> file);
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
 
-            void createFile(const std::shared_ptr<DataFile> &file) override;
-            void createFile(const std::shared_ptr<DataFile> &file, const string &path) override;
+
             void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) override;
 
             double getLoad() override;
-            /***********************/
-            /** \cond INTERNAL     */
-            /***********************/
 
 
             int main() override;
@@ -98,7 +108,7 @@ namespace wrench {
             std::shared_ptr<Node> addChild(std::shared_ptr<Node> child);
 
 
-            map<Node *, vector<stack<Node *>>> splitStack(vector<stack<Node *>> searchStack);
+            map<Node *, vector<stack<Node *>>> splitStack(vector<stack<Node *>> search_stack);
             virtual std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
             vector<stack<Node *>> constructFileSearchTree(vector<shared_ptr<Node>> &targets);
             stack<Node *> constructSearchStack(Node *target);

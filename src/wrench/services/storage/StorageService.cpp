@@ -54,7 +54,7 @@ namespace wrench {
         }
 
         this->state = StorageService::UP;
-        this->is_stratch = false;
+        this->is_scratch = false;
     }
     /**
      * @brief Constructor
@@ -72,14 +72,14 @@ namespace wrench {
      * @return true if it is, false otherwise
      */
     bool StorageService::isScratch() const {
-        return this->is_stratch;
+        return this->is_scratch;
     }
 
     /**
      * @brief Indicate that this storace service is a scratch service of a ComputeService
      */
     void StorageService::setScratch() {
-        this->is_stratch = true;
+        this->is_scratch = true;
     }
 
 
@@ -100,13 +100,13 @@ namespace wrench {
      *
      * @param file: a file
      * @param mountpoint: a mount point
-     * @param directory: a directory
+     * @param path: a path at the mount point
      */
-    void StorageService::stageFile(const std::shared_ptr<DataFile> &file, const std::string &mountpoint, std::string directory) {
+    void StorageService::stageFile(const std::shared_ptr<DataFile> &file, const std::string &mountpoint, std::string path) {
         auto fs = this->file_systems[mountpoint].get();
 
         try {
-            fs->stageFile(file, std::move(directory));
+            fs->stageFile(file, std::move(path));
         } catch (std::exception &e) {
             throw;
         }
@@ -168,8 +168,7 @@ namespace wrench {
      * @brief Synchronously read a file from the storage service
      *
      * @param file: the file
-     * @param location: the location to read the file from
-     * @param num_bytes: the numger of bytes to read
+     * @param num_bytes: the number of bytes to read
      *
      * @throw ExecutionException
      * @throw std::invalid_arguments
@@ -814,6 +813,7 @@ namespace wrench {
         stageFile(file, location->getMountPoint(),
                   location->getAbsolutePathAtMountPoint());
     }
+
     /**
      * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
      * at that location.
@@ -823,7 +823,6 @@ namespace wrench {
     * @param path: optional path to file
     *
     */
-
     void StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
 
         createFile(file, FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path));
@@ -832,13 +831,9 @@ namespace wrench {
     /**
      * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
      * at that location.
-
-    *
-            * @param file: a file
-                                   * @param path: optional path to file
-                                                          *
-                                                                  */
-
+     * @param file: a file
+     *
+     */
     void StorageService::createFile(const std::shared_ptr<DataFile> &file) {
 
         createFile(file, FileLocation::LOCATION(this->getSharedPtr<StorageService>(), getMountPoint()));

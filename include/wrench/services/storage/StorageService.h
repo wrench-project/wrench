@@ -127,9 +127,9 @@ namespace wrench {
         static void writeOrReadFiles(FileOperation action,
                                      std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
-        void stageFile(const std::shared_ptr<DataFile> &file, const std::string &mountpoint, std::string directory);
+        void stageFile(const std::shared_ptr<DataFile> &file, const std::string &mountpoint, std::string path);
 
-        bool is_stratch;
+        bool is_scratch;
     };
 
     /***********************/

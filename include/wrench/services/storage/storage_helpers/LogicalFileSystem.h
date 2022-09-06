@@ -34,11 +34,16 @@ namespace wrench {
     class LogicalFileSystem {
 
     public:
+        /**
+         * @brief A constant that signifies /dev/null, when the actual location/path/mountpoint/etc. is unknown
+         */
+        const static std::string DEV_NULL;
+
         explicit LogicalFileSystem(const std::string &hostname, StorageService *storage_service, std::string mount_point = DEV_NULL);
 
         void init();
 
-        const static std::string DEV_NULL;
+
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
         double getFreeSpace();

@@ -16,8 +16,6 @@ namespace wrench {
         /**
         * @brief Create the XRootD Node that will be the root supervisor
         * @param hostname: the name of the host on which the service should run
-        * @param property_list: The property list to use for the supervisor
-        * @param messagepayload_list: The message payload list to use for supervisor
         * @param node_property_list: The property list to use for the new Node, defaluts to {}
         * @param node_messagepayload_list: The message payload list to use for the new Node, defaults to {}
         *
@@ -46,9 +44,8 @@ namespace wrench {
 
         /**
         * @brief Create the an XRootD Node that will be a supervisor
+        *
         * @param hostname: the name of the host on which the service should run
-        * @param property_list: The property list to use for the supervisor
-        * @param messagepayload_list: The message payload list to use for supervisor
         * @param node_property_list: The property list to use for the new Node, defaluts to {}
         * @param node_messagepayload_list: The message payload list to use for the new Node, defaults to {}
         *

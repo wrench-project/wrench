@@ -158,7 +158,7 @@ namespace wrench {
                     } else {
                         if (children.size() > 0) {
 
-                            map<Node *, vector<stack<Node *>>> splitStacks = splitStack(msg->searchStack);
+                            map<Node *, vector<stack<Node *>>> splitStacks = splitStack(msg->search_stack);
                             S4U_Simulation::compute(
                                     this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                             WRENCH_DEBUG("Advanced Broadcast to %lu hosts", splitStacks.size());
@@ -232,7 +232,7 @@ namespace wrench {
 
                     if (children.size() > 0) {
 
-                        map<Node *, vector<stack<Node *>>> splitStacks = splitStack(msg->searchStack);
+                        map<Node *, vector<stack<Node *>>> splitStacks = splitStack(msg->search_stack);
                         S4U_Simulation::compute(
                                 this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                         for (auto entry: splitStacks) {
@@ -315,9 +315,9 @@ namespace wrench {
                                 WRENCH_DEBUG("Starting advanced search for %s", msg->file->getID().c_str());
                                 shared_ptr<bool> answered = make_shared<bool>(false);
                                 auto targets = metavisor->getFileNodes(msg->file);
-                                auto searchStack = constructFileSearchTree(targets);
-                                map<Node *, vector<stack<Node *>>> splitStacks = splitStack(searchStack);
-                                WRENCH_DEBUG("Searching %lu subtrees for %s", searchStack.size(), msg->file->getID().c_str());
+                                auto search_stack = constructFileSearchTree(targets);
+                                map<Node *, vector<stack<Node *>>> splitStacks = splitStack(search_stack);
+                                WRENCH_DEBUG("Searching %lu subtrees for %s", search_stack.size(), msg->file->getID().c_str());
                                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                                 for (auto entry: splitStacks) {
                                     if (entry.first == this) {//this node was the target
@@ -491,8 +491,8 @@ namespace wrench {
 
                     shared_ptr<bool> answered = make_shared<bool>(false);
                     auto targets = metavisor->getFileNodes(msg->file);
-                    auto searchStack = constructFileSearchTree(targets);
-                    map<Node *, vector<stack<Node *>>> splitStacks = splitStack(searchStack);
+                    auto search_stack = constructFileSearchTree(targets);
+                    map<Node *, vector<stack<Node *>>> splitStacks = splitStack(search_stack);
                     S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                     for (auto entry: splitStacks) {
                         if (entry.first == this) {//this node was the target
@@ -648,13 +648,15 @@ namespace wrench {
         bool Node::makeSupervisor() {//this function does nothing anymore?
             return true;
         }
+
         /**
         * @brief Constructor, should not be used directly except by XRootD createNode
+        *
+        * @param deployment: the XRootD deployment this node belongs to
         * @param hostname: the name of the host on which the service and its storage service should run
         * @param property_list: A property list
         * @param messagepayload_list: A Message Payload list
         *
-        * @return a shared pointer to the newly created Node
         */
         Node::Node(XRootDDeployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootD") {
             this->setProperties(this->default_property_values, property_list);
@@ -662,6 +664,7 @@ namespace wrench {
             cache.maxCacheTime = getPropertyValueAsDouble(Property::CACHE_MAX_LIFETIME);
             this->deployment = deployment;
         }
+
         /**
         * @brief make this node a file server
         * @param path: the path the filesystem gets.
@@ -678,6 +681,7 @@ namespace wrench {
             internalStorage = make_shared<SimpleStorageService>(hostname, path, property_list, messagepayload_list);
             return true;
         }
+
         /**
         * @brief Gets the underlying storage server
         * @return A pointer to the simple storage server for this file server
@@ -685,14 +689,15 @@ namespace wrench {
         std::shared_ptr<SimpleStorageService> Node::getStorageServer() {
             return internalStorage;
         }
+
         /**
         * @brief Split a search stack into subtrees
-        * @searchStack: The search stack to split
+        * @param search_stack: The search stack to split
         * @return A map where each key is the next node to broadcast too, and the value is the search stack to send
         */
-        map<Node *, vector<stack<Node *>>> Node::splitStack(vector<stack<Node *>> searchStack) {
+        map<Node *, vector<stack<Node *>>> Node::splitStack(vector<stack<Node *>> search_stack) {
             map<Node *, vector<stack<Node *>>> splitStacks;
-            for (stack<Node *> aStack: searchStack) {
+            for (stack<Node *> aStack: search_stack) {
                 if (!aStack.empty()) {
                     Node *top = aStack.top();
                     aStack.pop();
@@ -875,7 +880,7 @@ namespace wrench {
         /**
         * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
         * @param file: A shared pointer to a file
-        * @param location: a file location, must be the same object as the function is envoked on
+        * @param path: a path at the node's mount point
         *
         * @throw std::invalid_argument
         */
@@ -888,11 +893,26 @@ namespace wrench {
         }
 
 
+        /**
+         * @brief Adds a child, which will be a supervisor, to a node
+         * @param hostname: the name of the host on which the child will run
+         * @return The child
+         */
         std::shared_ptr<Node> Node::addChildSupervisor(const std::string &hostname) {
             return this->addChild(this->deployment->createSupervisor(hostname));
         }
 
 
+        /**
+         * @brief Adds a child, which will be a storage server, to a node
+         * @param hostname: the name of the host on which the child will run
+         * @param mount_point: the mount point at that host
+         * @param storage_property_list: the storage server's property list
+         * @param storage_messagepayload_list: the storage server's message payload list
+         * @param node_property_list: the XRootD node's property list
+         * @param node_messagepayload_list: the XRootD node's message payload list
+         * @return The child
+         */
         std::shared_ptr<Node> Node::addChildStorageServer(const std::string &hostname, const std::string &mount_point,
                                                           WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,
                                                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,
