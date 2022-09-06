@@ -85,6 +85,18 @@ namespace wrench {
             return s;
         }
 
+        /**
+         * @brief Method to add a service to the simulation
+         * @tparam T: The service class (base class is Service)
+         * @param t: the service object (shared ptr)
+         * @return a shared_ptr to the service object
+         */
+        template<class T>
+        std::shared_ptr<T> add(std::shared_ptr<T> t) {
+            this->addService(t);
+            return t;
+        }
+
         SimulationOutput &getOutput();
 
         //start energy related calls
@@ -102,7 +114,7 @@ namespace wrench {
         void stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
 
         static void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
-
+        static void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &server);
 
         /***********************/
         /** \cond DEVELOPER    */

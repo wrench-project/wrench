@@ -80,7 +80,8 @@ namespace wrench {
         ~SimpleStorageService() override;
 
         void cleanup(bool has_returned_from_main, int return_value) override;
-
+        double getLoad() override;
+        double countRunningFileTransferThreads();
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -110,7 +111,7 @@ namespace wrench {
         bool
         processFileReadRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
                                double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox,
-                               simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content, unsigned long buffer_size);
+                               simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content);
 
         bool processFileCopyRequest(const std::shared_ptr<DataFile> &file,
                                     const std::shared_ptr<FileLocation> &src,

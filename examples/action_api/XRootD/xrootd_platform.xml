@@ -1,0 +1,399 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
+<platform version="4.1">
+  <zone id="zone0" routing="Full">
+    <host id="leaf1" speed="1Mf">
+   		<disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+    </host>
+	<host id="leaf2" speed="1Mf">
+   		<disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+    </host>
+	<host id="leaf3" speed="1Mf">
+   		<disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+    </host>
+	<host id="leaf4" speed="1Mf">
+   		<disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+    </host>
+	<host id="leaf5" speed="1Mf">
+   		<disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+    </host>
+	<host id="leaf6" speed="1Mf">
+   		<disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+    </host>
+	<host id="leaf7" speed="1Mf">
+   		<disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+    </host>
+	<host id="leaf8" speed="1Mf">
+   		<disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+    </host>
+	<host id="leaf9" speed="1Mf">
+   		<disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+    </host>
+	<host id="leaf10" speed="1Mf">
+   		<disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+    </host>
+	<host id="leaf11" speed="1Mf">
+   		<disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+    </host>
+    <host id="root" speed="1Mf"/>
+    <host id="super1" speed="1Mf"/>
+    <host id="super2" speed="1Mf"/>
+    <host id="super3" speed="1Mf"/>
+    <host id="super4" speed="1Mf"/>
+
+    <host id="user" speed="10Mf"/>
+    
+    <link id="1" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="2" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="3" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="4" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="5" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="6" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="7" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="8" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="9" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="10" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="11" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="12" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="13" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="14" bandwidth="0.01MBps" latency="50ms"/>
+	<link id="15" bandwidth="0.01MBps" latency="50ms"/>
+    <link id="16" bandwidth="300MBps" latency="100ms"/>
+    <link id="loopback" bandwidth="498MBps" latency="15us" sharing_policy="FATPIPE"/>
+
+    <route src="leaf1" dst="leaf1">
+      <link_ctn id="loopback"/>
+    </route>
+    <route src="leaf2" dst="leaf2">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="leaf3" dst="leaf3">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="leaf4" dst="leaf4">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="leaf5" dst="leaf5">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="leaf6" dst="leaf6">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="leaf7" dst="leaf7">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="leaf8" dst="leaf8">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="leaf9" dst="leaf9">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="leaf10" dst="leaf10">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="leaf11" dst="leaf11">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="root" dst="root">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="user" dst="user">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="super1" dst="super1">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="super2" dst="super2">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="super3" dst="super3">
+      <link_ctn id="loopback"/>
+    </route>
+	<route src="super4" dst="super4">
+      <link_ctn id="loopback"/>
+    </route>
+	
+    <route src="leaf1" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="leaf2" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="leaf3" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="leaf4" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="leaf5" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="leaf6" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="leaf7" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="leaf8" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="leaf9" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="leaf10" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="leaf11" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="root" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="super1" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="super2" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="super3" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	<route src="super4" dst="user">
+      <link_ctn id="16"/>
+    </route>
+	
+	<route src="leaf1" dst="root">
+      <link_ctn id="1"/>
+    </route>
+	<route src="leaf2" dst="root">
+      <link_ctn id="2"/>
+    </route>
+	<route src="leaf3" dst="super1">
+      <link_ctn id="4"/>
+    </route>
+	<route src="leaf4" dst="super1">
+      <link_ctn id="5"/>
+    </route>
+	<route src="leaf5" dst="super2">
+      <link_ctn id="7"/>
+    </route>
+	<route src="leaf6" dst="super2">
+      <link_ctn id="8"/>
+    </route>
+	<route src="leaf7" dst="super3">
+      <link_ctn id="10"/>
+    </route>
+	<route src="leaf8" dst="super3">
+      <link_ctn id="11"/>
+    </route>
+	<route src="leaf9" dst="super4">
+      <link_ctn id="13"/>
+    </route>
+	<route src="leaf10" dst="super4">
+      <link_ctn id="14"/>
+    </route>
+	<route src="leaf11" dst="super4">
+      <link_ctn id="15"/>
+    </route>
+	<route src="root" dst="super1">
+      <link_ctn id="3"/>
+    </route>
+	<route src="super1" dst="super2">
+      <link_ctn id="6"/>
+    </route>
+	<route src="super2" dst="super3">
+      <link_ctn id="9"/>
+    </route>
+	<route src="super3" dst="super4">
+      <link_ctn id="12"/>
+    </route>
+	
+	<route src="root" dst="super2">
+      <link_ctn id="3"/>
+      <link_ctn id="6"/>
+    </route>
+	<route src="super1" dst="super3">
+      <link_ctn id="6"/>
+      <link_ctn id="9"/>
+    </route>
+	<route src="super2" dst="super4">
+      <link_ctn id="9"/>
+      <link_ctn id="12"/>
+    </route>
+	<route src="leaf3" dst="root">
+      <link_ctn id="4"/>
+	  <link_ctn id="3"/>
+    </route>
+	<route src="leaf4" dst="root">
+      <link_ctn id="5"/>
+	  <link_ctn id="3"/>
+    </route>
+	<route src="leaf5" dst="super1">
+      <link_ctn id="7"/>
+	  <link_ctn id="6"/>
+    </route>
+	<route src="leaf6" dst="super1">
+      <link_ctn id="8"/>
+	  <link_ctn id="6"/>
+    </route>
+	<route src="leaf7" dst="super2">
+      <link_ctn id="10"/>
+	  <link_ctn id="9"/>
+    </route>
+	<route src="leaf8" dst="super2">
+      <link_ctn id="11"/>
+	  <link_ctn id="9"/>
+    </route>
+	<route src="leaf9" dst="super3">
+      <link_ctn id="13"/>
+	  <link_ctn id="12"/>
+    </route>
+	<route src="leaf10" dst="super3">
+      <link_ctn id="14"/>
+	  <link_ctn id="12"/>
+    </route>
+	<route src="leaf11" dst="super3">
+      <link_ctn id="15"/>
+	  <link_ctn id="12"/>
+    </route>
+    
+	<route src="root" dst="super3">
+      <link_ctn id="3"/>
+      <link_ctn id="6"/>
+      <link_ctn id="9"/>
+    </route>
+	<route src="super1" dst="super4">
+      <link_ctn id="6"/>
+      <link_ctn id="9"/>
+      <link_ctn id="12"/>
+    </route>
+	<route src="leaf5" dst="root">
+      <link_ctn id="7"/>
+	  <link_ctn id="6"/>
+	  <link_ctn id="3"/>
+    </route>
+	<route src="leaf6" dst="root">
+      <link_ctn id="8"/>
+	  <link_ctn id="6"/>
+	  <link_ctn id="3"/>
+    </route>
+	<route src="leaf7" dst="super1">
+      <link_ctn id="10"/>
+	  <link_ctn id="9"/>
+	  <link_ctn id="6"/>
+    </route>
+	<route src="leaf8" dst="super1">
+      <link_ctn id="11"/>
+	  <link_ctn id="9"/>
+	  <link_ctn id="6"/>
+    </route>
+	<route src="leaf9" dst="super2">
+      <link_ctn id="13"/>
+	  <link_ctn id="12"/>
+	  <link_ctn id="9"/>
+    </route>
+	<route src="leaf10" dst="super2">
+      <link_ctn id="14"/>
+	  <link_ctn id="12"/>
+	  <link_ctn id="9"/>
+    </route>
+	<route src="leaf11" dst="super2">
+      <link_ctn id="15"/>
+	  <link_ctn id="12"/>
+	  <link_ctn id="9"/>
+    </route>
+	
+	<route src="root" dst="super4">
+      <link_ctn id="3"/>
+      <link_ctn id="6"/>
+      <link_ctn id="9"/>
+      <link_ctn id="12"/>
+    </route>
+	<route src="leaf7" dst="root">
+      <link_ctn id="10"/>
+	  <link_ctn id="9"/>
+	  <link_ctn id="6"/>
+	  <link_ctn id="3"/>
+    </route>
+	<route src="leaf8" dst="root">
+      <link_ctn id="11"/>
+	  <link_ctn id="9"/>
+	  <link_ctn id="6"/>
+	  <link_ctn id="3"/>
+    </route>
+	<route src="leaf9" dst="super1">
+      <link_ctn id="13"/>
+	  <link_ctn id="12"/>
+	  <link_ctn id="9"/>
+	  <link_ctn id="6"/>
+    </route>
+	<route src="leaf10" dst="super1">
+      <link_ctn id="14"/>
+	  <link_ctn id="12"/>
+	  <link_ctn id="9"/>
+	  <link_ctn id="6"/>
+    </route>
+	<route src="leaf11" dst="super1">
+      <link_ctn id="15"/>
+	  <link_ctn id="12"/>
+	  <link_ctn id="9"/>
+	  <link_ctn id="6"/>
+    </route>
+	
+	<route src="leaf9" dst="root">
+      <link_ctn id="13"/>
+	  <link_ctn id="12"/>
+	  <link_ctn id="9"/>
+	  <link_ctn id="6"/>
+	  <link_ctn id="3"/>
+    </route>
+	<route src="leaf10" dst="root">
+      <link_ctn id="14"/>
+	  <link_ctn id="12"/>
+	  <link_ctn id="9"/>
+	  <link_ctn id="6"/>
+	  <link_ctn id="3"/>
+    </route>
+	<route src="leaf11" dst="root">
+      <link_ctn id="15"/>
+	  <link_ctn id="12"/>
+	  <link_ctn id="9"/>
+	  <link_ctn id="6"/>
+	  <link_ctn id="3"/>
+    </route>
+  </zone>
+</platform>
+
