@@ -1,9 +1,29 @@
 .. _guide-102-simplestorage:
 
-Interacting with a storage service
-==================================
+Interacting with a simple storage service
+=========================================
 
-Several interactions with a storage service are done simple by calling
+The following operations are supported by an instance of
+:cpp:class:`wrench::SimpleStorageService`:
+
+-  Synchronously check that a file exists
+-  Synchronously read a file (rarely used by an execution controller but
+   included for completeness)
+-  Synchronously write a file (rarely used by an execution controller
+   but included for completeness)
+-  Synchronously delete a file
+-  Synchronously copy a file from one storage service to another
+-  Asynchronously copy a file from one storage service to another
+
+The first 4 interactions above are done by calling member functions of
+the :cpp:class:`wrench::StorageService` class. The last two are done via a Data
+Movement Manager, i.e., by calling member functions of the
+:cpp:class:`wrench::DataMovementManager` class. Some of these member functions
+take an optional :cpp:class:`wrench::FileRegistryService` argument, in which case
+they will also update entries in a file registry service (e.g., removing
+an entry when a file is deleted).
+
+Several interactions with a simple storage service are done simple by calling
 **static methods** of the :cpp:class:`wrench::StorageService` class. These make
 it possible to lookup, delete, read, and write files. For instance:
 
@@ -72,5 +92,5 @@ an example in which a file is copied between storage services:
    this->waitForAndProcessNextEvent();
 
 See the execution controller implementation in
-``examples/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp``
+``examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp``
 for a more complete example.

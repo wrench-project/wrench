@@ -55,7 +55,7 @@ large), :cpp:class:`wrench::JobManager::submitJob()` method throws a
 :cpp:class:`wrench::ExecutionException`.
 
 See the execution controller implementation in
-``examples/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp``
+``examples/workflow_api/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp``
 for a more complete example.
 
 A batch compute service also supports pilot jobs. Once started, a pilot
@@ -85,5 +85,5 @@ While the pilot job is running, :ref:`standard jobs can be submitted to its
 bare-metal service <guide-102-baremetal>`.
 
 See the execution controller implementation in
-``examples/basic-examples/basic-examples/batch-pilot-job/PilotJobWMS.cpp``
+``examples/workflow_api/basic-examples/basic-examples/batch-pilot-job/PilotJobWMS.cpp``
 for a more complete example.
