@@ -8,9 +8,6 @@
 */
 
 #include "wrench/services/storage/xrootd/XRootDMessage.h"
-//
-// Created by jamcdonald on 3/28/22.
-//
 
 /**
  * Copyright (c) 2017. The WRENCH Team.
@@ -93,6 +90,7 @@ namespace wrench {
         * @param timeToLive:  The max number of hops this message can take
         */
         RippleDelete::RippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive) : Message(other->payload), file(other->file), timeToLive(timeToLive) {}
+
         /**
          * @brief Constructor
          * @param answer_mailbox: The mailbox the final answer should be sent to
@@ -102,46 +100,51 @@ namespace wrench {
          * @param payload: The message size in bytes
          * @param answered: A shared boolean for if the answer has been sent to the client.  This should be the same for all messages searching for this request.  Used to prevent the multiple response problem
          * @param timeToLive: The max number of hops this message can take
-         * @param searchStack:  The available paths to the file
+         * @param search_stack:  The available paths to the file
          */
         AdvancedContinueSearchMessage::AdvancedContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<StorageServiceFileReadRequestMessage> original,
-                                                                     std::shared_ptr<DataFile> file, Node *node, double payload, std::shared_ptr<bool> answered, int timeToLive, std::vector<std::stack<Node *>> searchStack) : ContinueSearchMessage(answer_mailbox, original, file, node, payload, answered, timeToLive), searchStack(searchStack){};
+                                                                     std::shared_ptr<DataFile> file, Node *node, double payload, std::shared_ptr<bool> answered, int timeToLive, std::vector<std::stack<Node *>> search_stack) : ContinueSearchMessage(answer_mailbox, original, file, node, payload, answered, timeToLive), search_stack(search_stack){};
         /**
         * @brief Pointer Copy Constructor with auxiliary stack
-        * @param other: The message to copy, timeToLive is decremented
-        * @param searchStack:  The available paths to the file
+        * @param toCopy: The message to copy, timeToLive is decremented
+        * @param search_stack:  The available paths to the file
         */
-        AdvancedContinueSearchMessage::AdvancedContinueSearchMessage(ContinueSearchMessage *toCopy, std::vector<std::stack<Node *>> searchStack) : ContinueSearchMessage(toCopy), searchStack(searchStack){};
+        AdvancedContinueSearchMessage::AdvancedContinueSearchMessage(ContinueSearchMessage *toCopy, std::vector<std::stack<Node *>> search_stack) : ContinueSearchMessage(toCopy), search_stack(search_stack){};
+
         /**
         * @brief Pointer Copy Constructor
-        * @param other: The message to copy, timeToLive is decremented
+        * @param toCopy: The message to copy, timeToLive is decremented
         */
-        AdvancedContinueSearchMessage::AdvancedContinueSearchMessage(AdvancedContinueSearchMessage *toCopy) : ContinueSearchMessage(toCopy), searchStack(toCopy->searchStack){};
+        AdvancedContinueSearchMessage::AdvancedContinueSearchMessage(AdvancedContinueSearchMessage *toCopy) : ContinueSearchMessage(toCopy), search_stack(toCopy->search_stack){};
+
         /**
         * @brief Constructor
         * @param file: The file to delete.
         * @param payload: the message size in bytes
         * @param timeToLive:  The max number of hops this message can take
-        * @param searchStack:  The available paths to the file
+        * @param search_stack:  The available paths to the file
         */
-        AdvancedRippleDelete::AdvancedRippleDelete(std::shared_ptr<DataFile> file, double payload, int timeToLive, std::vector<std::stack<Node *>> searchStack) : RippleDelete(file, payload, timeToLive), searchStack(searchStack) {}
+        AdvancedRippleDelete::AdvancedRippleDelete(std::shared_ptr<DataFile> file, double payload, int timeToLive, std::vector<std::stack<Node *>> search_stack) : RippleDelete(file, payload, timeToLive), search_stack(search_stack) {}
+
         /**
         * @brief Copy Constructor with auxiliary stack
         * @param other: The message to copy.
-        * @param searchStack:  The available paths to the file
+        * @param search_stack:  The available paths to the file
         */
-        AdvancedRippleDelete::AdvancedRippleDelete(RippleDelete *other, std::vector<std::stack<Node *>> searchStack) : RippleDelete(other), searchStack(searchStack){};
+        AdvancedRippleDelete::AdvancedRippleDelete(RippleDelete *other, std::vector<std::stack<Node *>> search_stack) : RippleDelete(other), search_stack(search_stack){};
+
         /**
         * @brief Copy Constructor
         * @param other: The message to copy.
         */
-        AdvancedRippleDelete::AdvancedRippleDelete(AdvancedRippleDelete *other) : RippleDelete(other), searchStack(other->searchStack){};
+        AdvancedRippleDelete::AdvancedRippleDelete(AdvancedRippleDelete *other) : RippleDelete(other), search_stack(other->search_stack){};
+
         /**
          * @brief External Copy Constructor
          * @param other: The storage service file delete message to copy.
          * @param timeToLive:  The max number of hops this message can take
-         * @param searchStack:  The available paths to the file
+         * @param search_stack:  The available paths to the file
          */
-        AdvancedRippleDelete::AdvancedRippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive, std::vector<std::stack<Node *>> searchStack) : RippleDelete(other, timeToLive), searchStack(searchStack){};
+        AdvancedRippleDelete::AdvancedRippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive, std::vector<std::stack<Node *>> search_stack) : RippleDelete(other, timeToLive), search_stack(search_stack){};
     }// namespace XRootD
 };   // namespace wrench

@@ -354,7 +354,6 @@ namespace wrench {
      * @param num_bytes_to_read: the number of bytes to read
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @param mailbox_to_receive_the_file_content: the mailbox to which the file will be sent
-     * @param buffer_size: the buffer_size to use
      * @return
      */
     bool SimpleStorageService::processFileReadRequest(const std::shared_ptr<DataFile> &file,

@@ -24,6 +24,9 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+        /**
+         * @brief A class that implements the XRootD cache
+         */
         class Cache {
         private:
             /** @brief The internal cache data structure, currently just a map of data files pointers to a set of file locations, each with corresponding last update time */

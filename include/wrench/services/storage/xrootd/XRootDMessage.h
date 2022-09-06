@@ -1,7 +1,3 @@
-//
-// Created by jamcdonald on 3/28/22.
-//
-
 /**
  * Copyright (c) 2017. The WRENCH Team.
  *
@@ -33,10 +29,11 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+        class Node;
+
         /**
          * @brief Top-level class for messages received/sent by a XRootD Node
          */
-        class Node;
         class Message : public StorageServiceMessage {
         protected:
             Message(double payload);
@@ -121,23 +118,27 @@ namespace wrench {
                                           double payload,
                                           std::shared_ptr<bool> answered,
                                           int timeToLive,
-                                          std::vector<std::stack<Node *>> searchStack);
+                                          std::vector<std::stack<Node *>> search_stack);
             AdvancedContinueSearchMessage(AdvancedContinueSearchMessage *toCopy);
-            AdvancedContinueSearchMessage(ContinueSearchMessage *toCopy, std::vector<std::stack<Node *>> searchStack);
-            std::vector<std::stack<Node *>> searchStack;
+            AdvancedContinueSearchMessage(ContinueSearchMessage *toCopy, std::vector<std::stack<Node *>> search_stack);
+            
             /** @brief The paths to follow */
-        }; /**
- *
+            std::vector<std::stack<Node *>> search_stack;
+        }; 
+        
+        /**
+         *
          * @brief A message sent to a XRootD Node to delete a file
          */
         class AdvancedRippleDelete : public RippleDelete {
         public:
-            AdvancedRippleDelete(std::shared_ptr<DataFile> file, double payload, int timeToLive, std::vector<std::stack<Node *>> searchStack);
+            AdvancedRippleDelete(std::shared_ptr<DataFile> file, double payload, int timeToLive, std::vector<std::stack<Node *>> search_stack);
             AdvancedRippleDelete(AdvancedRippleDelete *other);
-            AdvancedRippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive, std::vector<std::stack<Node *>> searchStack);
-            AdvancedRippleDelete(RippleDelete *other, std::vector<std::stack<Node *>> searchStack);
+            AdvancedRippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive, std::vector<std::stack<Node *>> search_stack);
+            AdvancedRippleDelete(RippleDelete *other, std::vector<std::stack<Node *>> search_stack);
+            
             /** @brief The paths to follow */
-            std::vector<std::stack<Node *>> searchStack;
+            std::vector<std::stack<Node *>> search_stack;
         };
 
 

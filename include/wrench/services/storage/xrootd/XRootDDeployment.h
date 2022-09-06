@@ -27,13 +27,15 @@
 #include "wrench/services/storage/xrootd/Node.h"
 
 namespace wrench {
-    /**
-     * @brief A Meta manager for an XRootD data Federation.  This tracks all nodes and files within the system.
-     */
     namespace XRootD {
 
+
+      /**
+       * @brief A class that implements the notion of an XRootD deployment. This tracks all nodes and files within the system.
+       */
         class XRootDDeployment {
         public:
+
             /**
              * @brief Create an XRootD manager
              * @param simulation: the simulation that all nodes run in.  Nodes are automatically added to this simulation as created.
@@ -56,6 +58,9 @@ namespace wrench {
             void deleteFile(const std::shared_ptr<DataFile> &file);
             void removeFileLocation(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location);
             unsigned int size();
+            /***********************/
+            /** \endcond          */
+            /***********************/
 
         private:
             /** @brief The property values that should be used to overwrite the defaults of all Nodes (unless otherwise specified) */

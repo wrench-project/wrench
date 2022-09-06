@@ -84,6 +84,13 @@ namespace wrench {
             this->addService(s);
             return s;
         }
+
+        /**
+         * @brief Method to add a service to the simulation
+         * @tparam T: The service class (base class is Service)
+         * @param t: the service object (shared ptr)
+         * @return a shared_ptr to the service object
+         */
         template<class T>
         std::shared_ptr<T> add(std::shared_ptr<T> t) {
             this->addService(t);
