@@ -85,5 +85,5 @@ While the pilot job is running, :ref:`standard jobs can be submitted to its
 bare-metal service <guide-102-baremetal>`.
 
 See the execution controller implementation in
-``examples/workflow_api/basic-examples/basic-examples/batch-pilot-job/PilotJobWMS.cpp``
+``examples/workflow_api/basic-examples/batch-pilot-job/PilotJobWMS.cpp``
 for a more complete example.
