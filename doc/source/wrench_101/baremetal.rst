@@ -66,5 +66,6 @@ See the documentation of :cpp:class:`wrench::BareMetalComputeServiceProperty` an
 :cpp:class:`wrench::BareMetalComputeServiceMessagePayload` for all possible
 configuration options.
 
-Also see the simulators in the ``examples/basic-examples/bare-metal-*/``
+Also see the simulators in the ``examples/workflow_api/basic-examples/bare-metal-*/`` and
+``examples/action_api/bare-metal-*/``
 directories, which use bare-metal compute services.
