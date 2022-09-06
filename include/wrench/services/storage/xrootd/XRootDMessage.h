@@ -121,11 +121,11 @@ namespace wrench {
                                           std::vector<std::stack<Node *>> search_stack);
             AdvancedContinueSearchMessage(AdvancedContinueSearchMessage *toCopy);
             AdvancedContinueSearchMessage(ContinueSearchMessage *toCopy, std::vector<std::stack<Node *>> search_stack);
-            
+
             /** @brief The paths to follow */
             std::vector<std::stack<Node *>> search_stack;
-        }; 
-        
+        };
+
         /**
          *
          * @brief A message sent to a XRootD Node to delete a file
@@ -136,7 +136,7 @@ namespace wrench {
             AdvancedRippleDelete(AdvancedRippleDelete *other);
             AdvancedRippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive, std::vector<std::stack<Node *>> search_stack);
             AdvancedRippleDelete(RippleDelete *other, std::vector<std::stack<Node *>> search_stack);
-            
+
             /** @brief The paths to follow */
             std::vector<std::stack<Node *>> search_stack;
         };
