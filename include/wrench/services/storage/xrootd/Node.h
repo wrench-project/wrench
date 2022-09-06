@@ -32,7 +32,7 @@ namespace wrench {
         public:
             std::shared_ptr<Node> addChildSupervisor(const std::string &hostname);
             std::shared_ptr<Node> addChildStorageServer(const std::string &hostname, const std::string &mount_point,
-                                                        WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,
+                                                        WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list = {},
                                                         WRENCH_PROPERTY_COLLECTION_TYPE node_property_list = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list = {});
 
             std::shared_ptr<Node> getChild(unsigned int n);
