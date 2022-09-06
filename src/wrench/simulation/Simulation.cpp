@@ -743,7 +743,6 @@ namespace wrench {
             frs->addEntryToDatabase(file, location);
         }
     }
-
     /**
      * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
      * at that location.
@@ -753,9 +752,22 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
+
     void Simulation::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-        location->getStorageService()->stageFile(file, location->getMountPoint(),
-                                                 location->getAbsolutePathAtMountPoint());
+        //location->getStorageService()->stageFile(file, location->getMountPoint(),
+        //                                         location->getAbsolutePathAtMountPoint());
+        location->getStorageService()->createFile(file, location);
+    }
+    /**
+     * @brief Store a file on a particular file server ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+     * at that location.
+     * @param file: a file
+     * @param service: a storage service
+     *
+     * @throw std::invalid_argument
+     */
+    [[deprecated("Replaced by StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location), do not use if using XRootD or other distributed file system")]] void Simulation::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &service) {
+        service->createFile(file);
     }
 
     /**

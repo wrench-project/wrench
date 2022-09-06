@@ -91,5 +91,5 @@ unknown task, number of cores too large), the
 :cpp:class:`wrench::ExecutionException`.
 
 See the execution controller implementation in
-``examples/basic-examples/bare-metal-bag-of-tasks/TwoTasksAtATimeWMS.cpp``
+``examples/workflow_api/basic-examples/bare-metal-bag-of-tasks/TwoTasksAtATimeWMS.cpp``
 for a more complete example.
