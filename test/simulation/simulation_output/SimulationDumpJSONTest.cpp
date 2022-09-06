@@ -858,9 +858,9 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
 
     EXPECT_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(""), std::invalid_argument);
 
-    ASSERT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
+    //    ASSERT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
 
-    //    simulation->getOutput().dumpUnifiedJSON(workflow, "/tmp/energy_unified.json", false, true, false, true, false, false, false);
+    simulation->getOutput().dumpUnifiedJSON(workflow, this->energy_consumption_data_file_path, false, false, false, true, false, false, false);
 
     nlohmann::json expected_json = R"(
     {
