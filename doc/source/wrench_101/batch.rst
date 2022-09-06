@@ -71,5 +71,6 @@ See the documentation of :cpp:class:`wrench::BatchComputeServiceProperty` and
 :cpp:class:`wrench::BatchComputeServiceMessagePayload` for all possible
 configuration options.
 
-Also see the simulators in the ``examples/basic-examples/batch-*/``
+Also see the simulators in the ``examples/workflow_api/basic-examples/batch-*/`` and
+``examples/action_api/batch-*/``
 directories, which use batch compute services.
