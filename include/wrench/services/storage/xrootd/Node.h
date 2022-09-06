@@ -71,7 +71,6 @@ namespace wrench {
                     {MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 1024}};
 
         public:
-
             /***********************/
             /** \cond INTERNAL     */
             /***********************/
