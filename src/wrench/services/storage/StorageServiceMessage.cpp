@@ -310,7 +310,6 @@ namespace wrench {
    * @param file: the file
    * @param location: the location where the file is stored
    * @param num_bytes_to_read: the number of bytes to read
-   * @param buffer_size: the requested buffer size
    * @param payload: the message size in bytes
    *
    * @throw std::invalid_argument
@@ -320,9 +319,9 @@ namespace wrench {
                                                                                std::shared_ptr<DataFile> file,
                                                                                std::shared_ptr<FileLocation> location,
                                                                                double num_bytes_to_read,
-                                                                               unsigned long buffer_size,
                                                                                double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
+
         if ((answer_mailbox == nullptr) || (mailbox_to_receive_the_file_content == nullptr) ||
             (file == nullptr) || (location == nullptr) || (num_bytes_to_read == -1)) {
             throw std::invalid_argument(
@@ -334,15 +333,30 @@ namespace wrench {
         this->file = std::move(file);
         this->location = std::move(location);
         this->num_bytes_to_read = num_bytes_to_read;
-        this->buffer_size = buffer_size;
     }
-
+    /**
+    * @brief Constructor
+    * @param other: packet to copy
+    *
+    * @throw std::invalid_argument
+    */
+    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage &other) : StorageServiceFileReadRequestMessage(&other) {
+    }
+    /**
+    * @brief Constructor
+    * @param other: packet to copy
+    *
+    * @throw std::invalid_argument
+    */
+    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage *other) : StorageServiceMessage(other->payload), answer_mailbox(other->answer_mailbox), mailbox_to_receive_the_file_content(other->mailbox_to_receive_the_file_content), file(other->file), location(other->location), num_bytes_to_read(other->num_bytes_to_read) {
+    }
     /**
      * @brief Constructor
      * @param file: the file
-     * @param location: the location of the file
+     * @param location: the location of the file trrex
      * @param success: whether the read operation was successful
      * @param failure_cause: the cause of the failure (or nullptr on success)
+   * @param buffer_size: the buffer size that will be used
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -351,6 +365,7 @@ namespace wrench {
                                                                              std::shared_ptr<FileLocation> location,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
+                                                                             unsigned long buffer_size,
                                                                              double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (location == nullptr) ||
@@ -362,6 +377,8 @@ namespace wrench {
         this->file = std::move(file);
         this->location = std::move(location);
         this->success = success;
+        this->buffer_size = buffer_size;
+
         this->failure_cause = std::move(failure_cause);
     }
 
