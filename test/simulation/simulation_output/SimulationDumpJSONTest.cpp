@@ -801,7 +801,9 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
 
     EXPECT_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(""), std::invalid_argument);
 
-    ASSERT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
+    //    ASSERT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
+
+    simulation->getOutput().dumpUnifiedJSON(workflow, this->energy_consumption_data_file_path, false, false, false, true, false, false, false);
 
     auto expected_json = boost::json::parse(R"(
     {

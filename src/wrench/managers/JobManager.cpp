@@ -413,7 +413,6 @@ namespace wrench {
             throw std::invalid_argument("JobManager::submitJob(): service does not support standard jobs");
         }
 
-
         // Do a sanity check on task states
         for (const auto &t: job->tasks) {
             if ((t->getState() == WorkflowTask::State::COMPLETED) or
@@ -423,7 +422,6 @@ namespace wrench {
                                             WorkflowTask::stateToString(t->getState()));
             }
         }
-
 
         // If the job uses scratch, then do a sanity check on the CS
         if (job->usesScratch()) {
@@ -481,20 +479,19 @@ namespace wrench {
         for (auto const &t: job->tasks) {
             t->setState(WorkflowTask::State::PENDING);
         }
-
         // The compound job
         this->cjob_to_sjob_map[job->compound_job] = job;
         job->compound_job->state = CompoundJob::State::SUBMITTED;
-        this->acquireDaemonLock();
-        this->jobs_to_dispatch.push_back(job->compound_job);
-        this->releaseDaemonLock();
-
 
         job->already_submitted_to_job_manager = true;
         job->submit_date = Simulation::getCurrentSimulatedDate();
         job->compound_job->setServiceSpecificArguments(new_args);
         job->setParentComputeService(compute_service);
         job->compound_job->setParentComputeService(compute_service);
+
+        this->acquireDaemonLock();
+        this->jobs_to_dispatch.push_back(job->compound_job);
+        this->releaseDaemonLock();
 
         // Send a message to wake up the daemon
         try {

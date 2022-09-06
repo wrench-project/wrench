@@ -34,9 +34,15 @@ namespace wrench {
     class LogicalFileSystem {
 
     public:
-        explicit LogicalFileSystem(const std::string &hostname, StorageService *storage_service, std::string mount_point);
+        /**
+         * @brief A constant that signifies /dev/null, when the actual location/path/mountpoint/etc. is unknown
+         */
+        const static std::string DEV_NULL;
+
+        explicit LogicalFileSystem(const std::string &hostname, StorageService *storage_service, std::string mount_point = DEV_NULL);
 
         void init();
+
 
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
@@ -57,7 +63,6 @@ namespace wrench {
 
     private:
         friend class StorageService;
-
         void stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path);
 
         static std::map<std::string, StorageService *> mount_points;
@@ -69,6 +74,7 @@ namespace wrench {
         std::string mount_point;
         double total_capacity;
         double occupied_space;
+        bool devnull = false;
         std::map<std::string, double> reserved_space;
 
         bool initialized;

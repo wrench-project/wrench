@@ -121,11 +121,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void S4U_Simulation::setupPlatform(const std::function<void()> &creation_function) {
-        try {
-            creation_function();
-        } catch (std::exception &e) {
-            throw;
-        }
+
+        creation_function();
         this->platform_setup = true;
     }
 
