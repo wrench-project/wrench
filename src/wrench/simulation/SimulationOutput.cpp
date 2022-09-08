@@ -206,6 +206,7 @@ namespace wrench {
         output.close();
     }
 
+#if 0// Seems to never be used
     /**
      * @brief Function called by the nlohmann::json constructor when a WorkflowTaskExecutionInstance is passed in as
      *      a parameter. This returns the JSON representation of a WorkflowTaskExecutionInstance. The name of this function
@@ -258,6 +259,7 @@ namespace wrench {
 
         j["terminated"] = w.terminated;
     }
+#endif
 
     /**
      * @brief Determines if a point lies on a line segment.

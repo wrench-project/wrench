@@ -88,7 +88,7 @@ namespace wrench {
      *        one task in the job cannot run if less ram than this minimum is available)
      * @return the number of cores
      */
-    unsigned long StandardJob::getMinimumRequiredMemory() const {
+    double StandardJob::getMinimumRequiredMemory() const {
         unsigned long max_ram = 0;
         for (auto const &t: tasks) {
             max_ram = std::max<unsigned long>(max_ram, (unsigned long) (t->getMemoryRequirement()));
@@ -606,21 +606,22 @@ namespace wrench {
             // Create fileread time stamps
             for (auto const &a: this->task_file_read_actions[t]) {
                 auto fra = std::dynamic_pointer_cast<FileReadAction>(a);
+                auto fra_file = fra->getFile();
                 switch (a->getState()) {
                     case Action::NOT_READY:
                     case Action::READY:
                         break;
                     case Action::STARTED:
-                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra->getFile(), fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra_file, fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
                         break;
                     case Action::COMPLETED:
-                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra->getFile(), fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
-                        simulation->getOutput().addTimestampFileReadCompletion(fra->getEndDate(), fra->getFile(), fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra_file, fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileReadCompletion(fra->getEndDate(), fra_file, fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
                         break;
                     case Action::KILLED:
                     case Action::FAILED:
-                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra->getFile(), fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
-                        simulation->getOutput().addTimestampFileReadFailure(fra->getEndDate(), fra->getFile(), fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra_file, fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileReadFailure(fra->getEndDate(), fra_file, fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
                         break;
                 }
             }
@@ -697,21 +698,22 @@ namespace wrench {
             // Create filewrite time stamps
             for (auto const &a: this->task_file_write_actions[t]) {
                 auto fwa = std::dynamic_pointer_cast<FileWriteAction>(a);
+                auto fwa_file = fwa->getFile();
                 switch (a->getState()) {
                     case Action::NOT_READY:
                     case Action::READY:
                         break;
                     case Action::STARTED:
-                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa->getFile(), fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa_file, fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
                         break;
                     case Action::COMPLETED:
-                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa->getFile(), fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
-                        simulation->getOutput().addTimestampFileWriteCompletion(fwa->getEndDate(), fwa->getFile(), fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa_file, fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileWriteCompletion(fwa->getEndDate(), fwa_file, fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
                         break;
                     case Action::KILLED:
                     case Action::FAILED:
-                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa->getFile(), fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
-                        simulation->getOutput().addTimestampFileWriteFailure(fwa->getEndDate(), fwa->getFile(), fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa_file, fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileWriteFailure(fwa->getEndDate(), fwa_file, fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
                         break;
                 }
             }
@@ -804,7 +806,7 @@ namespace wrench {
     /**
      * @brief Apply updates to tasks
      * @param state_changes: state changes
-     * @param failure_count_increments: failure_cound_increments
+     * @param failure_count_increments: set of tasks whose failure counts should be incremented by one
      */
     void StandardJob::applyTaskUpdates(map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
                                        set<std::shared_ptr<WorkflowTask>> &failure_count_increments) {

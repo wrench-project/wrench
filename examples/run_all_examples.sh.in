@@ -64,7 +64,7 @@ ${INSTALL_DIR}/workflow_api/real-workflow-example/wrench-example-real-workflow $
 echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/condor-grid-example/wrench-example-condor-grid-universe${normal}"
 ${INSTALL_DIR}/workflow_api/condor-grid-example/wrench-example-condor-grid-universe ${INSTALL_DIR}/workflow_api/condor-grid-example/condor-grid-hosts.xml
 
-#${INSTALL_DIR}/workflow_api/basic-examples/io-pagecache/
-
+echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/XRootD/wrench-example-xrootd-basic xrootd_platform.xml${normal}"
+${INSTALL_DIR}/action_api/XRootD/wrench-example-xrootd-basic ${INSTALL_DIR}/action_api/XRootD/xrootd_platform.xml
 
 

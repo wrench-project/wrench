@@ -17,6 +17,8 @@
 #include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
 #include <wrench/services/storage/StorageService.h>
 
+#include <utility>
+
 namespace wrench {
 
     /**
@@ -35,11 +37,14 @@ namespace wrench {
     */
     StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                  double payload)
-        : StorageServiceMessage(payload), answer_mailbox(answer_mailbox) {
+        : StorageServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
                     "StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(): Invalid arguments");
         }
+#endif
+        this->answer_mailbox = answer_mailbox;
     }
 
     /**
@@ -52,13 +57,16 @@ namespace wrench {
     StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(
             std::map<std::string, double> free_space, double payload)
         : StorageServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+
         for (auto const &f: free_space) {
             if (f.second < 0) {
                 throw std::invalid_argument(
                         "StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(): Invalid arguments");
             }
         }
-        this->free_space = free_space;
+#endif
+        this->free_space = std::move(free_space);
     }
 
     /**
@@ -74,11 +82,16 @@ namespace wrench {
                                                                                    std::shared_ptr<DataFile> file,
                                                                                    std::shared_ptr<FileLocation> location,
                                                                                    double payload)
-        : StorageServiceMessage(payload), answer_mailbox(answer_mailbox), file(file), location(location) {
+        : StorageServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (location == nullptr) || (answer_mailbox == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(): Invalid arguments");
         }
+#endif
+        this->answer_mailbox = answer_mailbox;
+        this->file = std::move(file);
+        this->location = std::move(location);
     }
 
     /**
@@ -93,11 +106,13 @@ namespace wrench {
                                                                                  bool file_is_available,
                                                                                  double payload)
         : StorageServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (file == nullptr) {
             throw std::invalid_argument(
                     "StorageServiceFileLookupAnswerMessage::StorageServiceFileLookupAnswerMessage(): Invalid arguments");
         }
-        this->file = file;
+#endif
+        this->file = std::move(file);
         this->file_is_available = file_is_available;
     }
 
@@ -114,11 +129,16 @@ namespace wrench {
                                                                                    std::shared_ptr<DataFile> file,
                                                                                    std::shared_ptr<FileLocation> location,
                                                                                    double payload)
-        : StorageServiceMessage(payload), answer_mailbox(answer_mailbox), file(file), location(location) {
+        : StorageServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(): Invalid arguments");
         }
+#endif
+        this->answer_mailbox = answer_mailbox;
+        this->file = std::move(file);
+        this->location = std::move(location);
     }
 
     /**
@@ -137,14 +157,16 @@ namespace wrench {
                                                                                  std::shared_ptr<FailureCause> failure_cause,
                                                                                  double payload)
         : StorageServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (storage_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             ((!success) && (failure_cause == nullptr))) {
             throw std::invalid_argument(
                     "StorageServiceFileDeleteAnswerMessage::StorageServiceFileDeleteAnswerMessage(): Invalid arguments");
         }
-        this->file = file;
-        this->storage_service = storage_service;
+#endif
+        this->file = std::move(file);
+        this->storage_service = std::move(storage_service);
         this->success = success;
         this->failure_cause = std::move(failure_cause);
     }
@@ -165,11 +187,18 @@ namespace wrench {
                                                                                std::shared_ptr<FileLocation> src,
                                                                                std::shared_ptr<FileLocation> dst,
                                                                                std::shared_ptr<FileRegistryService> file_registry_service,
-                                                                               double payload) : StorageServiceMessage(payload), answer_mailbox(answer_mailbox), file(file), src(src), dst(dst), file_registry_service(file_registry_service) {
+                                                                               double payload) : StorageServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (file == nullptr) || (src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(): Invalid arguments");
         }
+#endif
+        this->answer_mailbox = answer_mailbox;
+        this->file = std::move(file);
+        this->src = std::move(src);
+        this->dst = std::move(dst);
+        this->file_registry_service = std::move(file_registry_service);
     }
 
     /**
@@ -194,6 +223,7 @@ namespace wrench {
                                                                              std::shared_ptr<FailureCause> failure_cause,
                                                                              double payload)
         : StorageServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (src == nullptr) || (dst == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             (!success && (failure_cause == nullptr)) ||
@@ -201,13 +231,14 @@ namespace wrench {
             throw std::invalid_argument(
                     "StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(): Invalid arguments");
         }
-        this->file = file;
-        this->src = src;
-        this->dst = dst;
+#endif
+        this->file = std::move(file);
+        this->src = std::move(src);
+        this->dst = std::move(dst);
         this->file_registry_service = file_registry_service;
         this->file_registry_service_updated = file_registry_service_updated;
         this->success = success;
-        this->failure_cause = failure_cause;
+        this->failure_cause = std::move(failure_cause);
         this->file_registry_service = file_registry_service;
     }
 
@@ -226,11 +257,17 @@ namespace wrench {
                                                                                  std::shared_ptr<FileLocation> location,
                                                                                  unsigned long buffer_size,
                                                                                  double payload)
-        : StorageServiceMessage(payload), answer_mailbox(answer_mailbox), file(file), location(location), buffer_size(buffer_size) {
+        : StorageServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(): Invalid arguments");
         }
+#endif
+        this->answer_mailbox = answer_mailbox;
+        this->file = std::move(file);
+        this->location = std::move(location);
+        this->buffer_size = buffer_size;
     }
 
     /**
@@ -250,6 +287,7 @@ namespace wrench {
                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                simgrid::s4u::Mailbox *data_write_mailbox,
                                                                                double payload) : StorageServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (location == nullptr) ||
             (success && (data_write_mailbox == nullptr)) ||
             (!success && (data_write_mailbox != nullptr)) ||
@@ -257,10 +295,11 @@ namespace wrench {
             throw std::invalid_argument(
                     "StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(): Invalid arguments");
         }
-        this->file = file;
-        this->location = location;
+#endif
+        this->file = std::move(file);
+        this->location = std::move(location);
         this->success = success;
-        this->failure_cause = failure_cause;
+        this->failure_cause = std::move(failure_cause);
         this->data_write_mailbox = data_write_mailbox;
     }
 
@@ -271,7 +310,6 @@ namespace wrench {
    * @param file: the file
    * @param location: the location where the file is stored
    * @param num_bytes_to_read: the number of bytes to read
-   * @param buffer_size: the requested buffer size
    * @param payload: the message size in bytes
    *
    * @throw std::invalid_argument
@@ -281,21 +319,44 @@ namespace wrench {
                                                                                std::shared_ptr<DataFile> file,
                                                                                std::shared_ptr<FileLocation> location,
                                                                                double num_bytes_to_read,
-                                                                               unsigned long buffer_size,
-                                                                               double payload) : StorageServiceMessage(payload), answer_mailbox(answer_mailbox), mailbox_to_receive_the_file_content(mailbox_to_receive_the_file_content), file(file), location(location), num_bytes_to_read(num_bytes_to_read), buffer_size(buffer_size) {
+                                                                               double payload) : StorageServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+
         if ((answer_mailbox == nullptr) || (mailbox_to_receive_the_file_content == nullptr) ||
             (file == nullptr) || (location == nullptr) || (num_bytes_to_read == -1)) {
             throw std::invalid_argument(
                     "StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(): Invalid arguments");
         }
+#endif
+        this->answer_mailbox = answer_mailbox;
+        this->mailbox_to_receive_the_file_content = mailbox_to_receive_the_file_content;
+        this->file = std::move(file);
+        this->location = std::move(location);
+        this->num_bytes_to_read = num_bytes_to_read;
     }
-
+    /**
+    * @brief Constructor
+    * @param other: packet to copy
+    *
+    * @throw std::invalid_argument
+    */
+    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage &other) : StorageServiceFileReadRequestMessage(&other) {
+    }
+    /**
+    * @brief Constructor
+    * @param other: packet to copy
+    *
+    * @throw std::invalid_argument
+    */
+    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage *other) : StorageServiceMessage(other->payload), answer_mailbox(other->answer_mailbox), mailbox_to_receive_the_file_content(other->mailbox_to_receive_the_file_content), file(other->file), location(other->location), num_bytes_to_read(other->num_bytes_to_read) {
+    }
     /**
      * @brief Constructor
      * @param file: the file
-     * @param location: the location of the file
+     * @param location: the location of the file trrex
      * @param success: whether the read operation was successful
      * @param failure_cause: the cause of the failure (or nullptr on success)
+   * @param buffer_size: the buffer size that will be used
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -304,16 +365,21 @@ namespace wrench {
                                                                              std::shared_ptr<FileLocation> location,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
+                                                                             unsigned long buffer_size,
                                                                              double payload) : StorageServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (location == nullptr) ||
             (success && (failure_cause != nullptr)) || (!success && (failure_cause == nullptr))) {
             throw std::invalid_argument(
                     "StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(): Invalid arguments");
         }
-        this->file = file;
-        this->location = location;
+#endif
+        this->file = std::move(file);
+        this->location = std::move(location);
         this->success = success;
-        this->failure_cause = failure_cause;
+        this->buffer_size = buffer_size;
+
+        this->failure_cause = std::move(failure_cause);
     }
 
     /**
@@ -323,12 +389,14 @@ namespace wrench {
     * @param last_chunk: whether this is the last chunk in the file
     */
     StorageServiceFileContentChunkMessage::StorageServiceFileContentChunkMessage(
-            std::shared_ptr<DataFile> file, unsigned long chunk_size, bool last_chunk) : StorageServiceMessage(chunk_size) {
+            std::shared_ptr<DataFile> file, unsigned long chunk_size, bool last_chunk) : StorageServiceMessage((double) chunk_size) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (file == nullptr) {
             throw std::invalid_argument(
                     "StorageServiceFileContentChunkMessage::StorageServiceFileContentChunkMessage(): Invalid arguments");
         }
-        this->file = file;
+#endif
+        this->file = std::move(file);
         this->last_chunk = last_chunk;
     }
 

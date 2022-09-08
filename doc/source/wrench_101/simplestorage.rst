@@ -51,5 +51,6 @@ See the documentation of :cpp:class:`wrench::SimpleStorageServiceProperty` and
 :cpp:class:`wrench::SimpleStorageServiceMessagePayload` for all possible
 configuration options.
 
-Also see the simulators in the ``examples/basic-examples/*``
+Also see the simulators in the ``examples/workflow_api/basic-examples/*`` and
+``examples/action_api/*``
 directories, which all use simple storage services.

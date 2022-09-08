@@ -46,6 +46,7 @@ protected:
         t2->setAverageCPU(90.2);
 
         workflow->addControlDependency(t1, t2);
+        t2->getStateAsString();
 
         // t3 is created in InputOutputFile test..
         t4 = workflow->addTask("task1-04", 10, 1, 3, 0);
@@ -104,6 +105,9 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
     ASSERT_NE(t2->getID(), "task1-01");
 
     ASSERT_GT(t1->getFlops(), t2->getFlops());
+    auto old_flops = t1->getFlops();
+    ASSERT_NO_THROW(t1->setFlops(old_flops + 1));
+    ASSERT_EQ(t1->getFlops(), old_flops + 1);
 
     ASSERT_EQ(t1->getMinNumCores(), 1);
     ASSERT_EQ(t1->getMaxNumCores(), 1);

@@ -186,6 +186,13 @@ set(HEADER_FILES
         include/wrench/execution_controller/ExecutionController.h
         include/wrench/execution_controller/ExecutionControllerMessage.h
         include/wrench/data_file/DataFile.h
+        include/wrench/services/storage/xrootd/XRootDDeployment.h
+        include/wrench/services/storage/xrootd/Node.h
+        include/wrench/services/storage/xrootd/XRootDMessagePayload.h
+        include/wrench/services/storage/xrootd/XRootDMessage.h
+        include/wrench/services/storage/xrootd/SearchStack.h
+        include/wrench/services/storage/xrootd/Cache.h
+        include/wrench/services/storage/xrootd/XRootDProperty.h
         )
 
 # source files
@@ -347,6 +354,13 @@ set(SOURCE_FILES
         src/wrench/execution_controller/ExecutionController.cpp
         src/wrench/execution_controller/ExecutionControllerMessage.cpp
         src/wrench/data_file/DataFile.cpp
+        src/wrench/services/storage/xrootd/XRootDDeployment.cpp
+        src/wrench/services/storage/xrootd/Node.cpp
+        src/wrench/services/storage/xrootd/SearchStack.cpp
+        src/wrench/services/storage/xrootd/Cache.cpp
+        src/wrench/services/storage/xrootd/XRootDMessagePayload.cpp
+        src/wrench/services/storage/xrootd/XRootDMessage.cpp
+        src/wrench/services/storage/xrootd/XRootDProperty.cpp
         )
 
 # test files
@@ -384,6 +398,7 @@ set(TEST_FILES
         test/services/helper_services/action_executor/FileDeleteActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileCopyActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileWriteActionExecutorTest.cpp
+        test/services/helper_services/action_executor/FileRegistryActionExecutorTest.cpp
         test/services/helper_services/action_executor/KillFailureActionExecutorTest.cpp
         test/services/helper_services/action_execution_service/ActionExecutionServiceTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceResourceInformationTest.cpp
@@ -398,6 +413,8 @@ set(TEST_FILES
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceBatschedContiguityTest.cpp
         test/services/helper_services/HostStateChangeTest.cpp
         test/services/helper_services/AlarmTest.cpp
+        test/services/storage_services/XRootDStorageService/XRootDStorageServiceBasicFunctionalTest.cpp
+        test/services/storage_services/XRootDStorageService/XRootDStorageServiceFullFunctionalTest.cpp
         test/wms/WMSTest.cpp
         test/wms/MultipleWMSTest.cpp
         test/services/compute_services/virtualized_cluster/VirtualizedClusterServiceTest.cpp
@@ -454,7 +471,8 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
-        test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp
+        test/simulation/S4U_MailboxTest.cpp
+        test/misc/UnitParserTest.cpp
         )
 
 

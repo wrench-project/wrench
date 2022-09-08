@@ -61,5 +61,5 @@ See the documentation of
 possible configuration options.
 
 Also see the simulators in the
-``examples/basic-examples/virtualized-cluster-*/`` directories, which
+``examples/workflow_api/basic-examples/virtualized-cluster-*/`` directories, which
 use virtualized cluster services.
