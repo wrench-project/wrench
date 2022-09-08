@@ -62,7 +62,7 @@ how many bytes of free space are available on it. And so on…
 
 To take a concrete example, consider the execution controller
 implementation in
-``examples/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp``.
+``examples/workflow_api/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp``.
 This WMS finds out the compute speed of the cores of the compute nodes
 available to a :cpp:class:`wrench::BatchComputeService` as:
 
@@ -137,7 +137,7 @@ instantiating and starting these managers:
 
 Creating one or two of these managers typically is the first thing an
 execution controller does. For instance, the execution controller in
-``examples/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp``
+``examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp``
 starts by doing:
 
 .. code:: cpp
@@ -153,28 +153,14 @@ sections below.
 Interacting with storage services
 ---------------------------------
 
-The possible interactions between an execution controller and a storage
-service include:
+Typical interactions between an execution controller and a storage
+service include locating, reading, writing, and copying files. Different storage
+service implementations may or not implement some of of these operations.
+Click on the following links to see concrete examples
+of interactions with the currently available storage service type:
 
--  Synchronously check that a file exists
--  Synchronously read a file (rarely used by an execution controller but
-   included for completeness)
--  Synchronously write a file (rarely used by an execution controller
-   but included for completeness)
--  Synchronously delete a file
--  Synchronously copy a file from one storage service to another
--  Asynchronously copy a file from one storage service to another
-
-The first 4 interactions above are done by calling member functions of
-the :cpp:class:`wrench::StorageService` class. The last two are done via a Data
-Movement Manager, i.e., by calling member functions of the
-:cpp:class:`wrench::DataMovementManager` class. Some of these member functions
-take an optional :cpp:class:`wrench::FileRegistryService` argument, in which case
-they will also update entries in a file registry service (e.g., removing
-an entry when a file is deleted).
-
-See :ref:`this page <guide-102-simplestorage>` for concrete examples
-of interactions with a :cpp:class:`wrench::SimpleStorageService`.
+- :ref:`Simple storage service <guide-102-simplestorage>`
+- :ref:`XRootD storage service <guide-102-xrootd>`
 
 .. _wrench-102-controller-services-compute:
 
@@ -396,7 +382,7 @@ which can be accessed to analyze (or just display) the root cause of the
 failure.
 
 Consider the execution controller in
-``examples/basic-examples/bare-metal-bag-of-tasks/TwoTasksAtATimeWMS.cpp``.
+``examples/workflow_api/basic-examples/bare-metal-bag-of-tasks/TwoTasksAtATimeWMS.cpp``.
 At each each iteration of its main loop it does:
 
 .. code:: cpp
@@ -440,7 +426,7 @@ functions as follows:
    }
 
 You may note some difference between the above code and that in
-``examples/basic-examples/bare-metal-bag-of-tasks/TwoTasksAtATimeWMS.cpp``.
+``examples/workflow_api/basic-examples/bare-metal-bag-of-tasks/TwoTasksAtATimeWMS.cpp``.
 This is for clarity purposes, and especially because we have not yet
 explained how WRENCH does message logging. See :ref:`an upcoming section
 about logging <wrench-102-controller-logging>`.
@@ -451,7 +437,7 @@ in the code of the main loop of the execution controller rather than in
 a callback member function. This is done by calling the
 :cpp:class:`wrench::waitForNextEvent()` member function. For instance, the
 execution controller in
-``examples/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp``
+``examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp``
 does it as:
 
 .. code:: cpp
@@ -515,9 +501,9 @@ and then check that a host exists (given a hostname) and, if so, set its
 See the documentation of the :cpp:class:`wrench::Simulation` class for all
 details. Specifically regarding host pstates, see the example execution
 controller in
-``examples/basic-examples/cloud-bag-of-tasks-energy/TwoTasksAtATimeCloudWMS.cpp``,
+``examples/workflow_api/basic-examples/cloud-bag-of-tasks-energy/TwoTasksAtATimeCloudWMS.cpp``,
 which interacts with host pstates (and the
-``examples/basic-examples/cloud-bag-of-tasks-energy/four_hosts_energy.xml``
+``examples/workflow_api/basic-examples/cloud-bag-of-tasks-energy/four_hosts_energy.xml``
 platform description file which defines pstates).
 
 .. _wrench-102-controller-logging:
@@ -551,7 +537,7 @@ When inspecting the code of the execution controllers in the example
 simulators you will find many examples of calls to
 :cpp:class:`wrench::WRENCH_INFO()`. The logging is per ``.cpp`` file, each of
 which corresponds to a declared logging category. For instance, in
-``examples/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp``,
+``examples/workflow_api/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp``,
 you will find the typical pattern:
 
 .. code:: cpp

@@ -53,5 +53,5 @@ In the code above the VM instances are not used for anything. See the
 an example in which jobs are submitted to the VM instances.
 
 See the execution controller implementation in
-``examples/basic-examples/virtualized-cluster-bag-of-tasks/TwoTasksAtATimeVirtualizedClusterWMS.cpp``
+``examples/workflow_api/basic-examples/virtualized-cluster-bag-of-tasks/TwoTasksAtATimeVirtualizedClusterWMS.cpp``
 for a more complete example.
