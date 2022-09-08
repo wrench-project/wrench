@@ -73,7 +73,7 @@ file for a brief description of all examples. Examples can be built by
 typing ``make examples`` in the build directory.
 
 For instance, the
-``examples/action_api/basic-examples/bare-metal-bag-of-actions`` example
+``examples/action_api/bare-metal-bag-of-actions`` example
 can be executed as:
 
 .. code:: sh
@@ -81,7 +81,7 @@ can be executed as:
    $ wrench-example-bare-metal-bag-of-actions 6 two_hosts.xml --log=custom_wms.threshold=info
 
 (File ``two_hosts.xml`` is in the
-``examples/action_api/basic-examples/bare-metal-bag-of-actions``
+``examples/action_api/bare-metal-bag-of-actions``
 directory.) You should see some output in the terminal. The output in
 white is produced by the simulator's main function. The output in green
 is produced by the execution controller implemented with the WRENCH
