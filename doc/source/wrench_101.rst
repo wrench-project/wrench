@@ -41,7 +41,7 @@ whatever it wanted to accomplish).
 
 In this section, we dive deeper into what it takes to implement a WRENCH
 simulator. *To provide context, we refer to the example simulator in
-the* ``examples/basic-examples/action_api/multi-action-multi-job``
+the* ``examples/action_api/multi-action-multi-job``
 *directory of the WRENCH distribution*. This simulator simulates the
 execution of a few jobs, each of which consists of one or more actions,
 on a 4-host platform that runs a couple of compute services and storage
@@ -369,7 +369,7 @@ description file <https://simgrid.org/doc/latest/Platform.html>`. The
 energy consumed by all hosts in the platform. **Important:** The energy
 plugin is NOT enabled by default in WRENCH simulations. To enable it,
 pass the ``--wrench-energy-simulation`` command line option to the
-simulator. See ``examples/basic-examples/cloud-bag-of-tasks-energy`` for
+simulator. See ``examples/workflow_api/basic-examples/cloud-bag-of-tasks-energy`` for
 an example simulator that makes use of this plugin (and an example
 platform description file that defines host power consumption profiles).
 
