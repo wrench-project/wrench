@@ -231,16 +231,10 @@ namespace wrench {
         }
 
         // Call retire on all mailboxes passed, which is pretty brute force be should work
-        // TODO: Figure out which ones to retire in the methods called above
-        //        if (answer_mailbox_if_read) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_read);
-        //        if (answer_mailbox_if_write) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_write);
-        //        if (answer_mailbox_if_copy) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_copy);
         if (this->dst_mailbox) {
-            //            std::cerr << "FTT: RETIRING MAILBOX " << this->dst_mailbox->get_name() << "\n";
             S4U_Mailbox::retireTemporaryMailbox(this->dst_mailbox);
         }
         if (this->src_mailbox) {
-            //            std::cerr << "FTT: RETIRING MAILBOX " << this->src_mailbox->get_name() << "\n";
             S4U_Mailbox::retireTemporaryMailbox(this->src_mailbox);
         }
 
@@ -420,6 +414,7 @@ namespace wrench {
     void FileTransferThread::copyFileLocally(const std::shared_ptr<DataFile> &f,
                                              const std::shared_ptr<FileLocation> &src_loc,
                                              const std::shared_ptr<FileLocation> &dst_loc) {
+
         double remaining = f->getSize();
         double to_send = std::min<double>((double) this->buffer_size, remaining);
 
@@ -497,8 +492,6 @@ namespace wrench {
                             f,
                             src_loc,
                             f->getSize(),
-                            std::min<unsigned long>(this->buffer_size,
-                                                    this->buffer_size),
                             src_loc->getStorageService()->getMessagePayloadValue(
                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {

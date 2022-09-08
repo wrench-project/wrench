@@ -59,5 +59,6 @@ See the documentation of :cpp:class:`wrench::CloudComputeServiceProperty` and
 :cpp:class:`wrench::CloudComputeServiceMessagePayload` for all possible
 configuration options.
 
-Also see the simulators in the ``examples/basic-examples/cloud-*/``
+Also see the simulators in the ``examples/workflow_api/basic-examples/cloud-*/`` and
+``examples/action_api/cloud-*/``
 directories, which use cloud compute services.

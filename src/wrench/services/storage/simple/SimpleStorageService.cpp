@@ -221,7 +221,7 @@ namespace wrench {
 
         } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
             return processFileReadRequest(msg->file, msg->location, msg->num_bytes_to_read, msg->answer_mailbox,
-                                          msg->mailbox_to_receive_the_file_content, msg->buffer_size);
+                                          msg->mailbox_to_receive_the_file_content);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
             return processFileCopyRequest(msg->file, msg->src, msg->dst, msg->answer_mailbox);
@@ -354,15 +354,13 @@ namespace wrench {
      * @param num_bytes_to_read: the number of bytes to read
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @param mailbox_to_receive_the_file_content: the mailbox to which the file will be sent
-     * @param buffer_size: the buffer_size to use
      * @return
      */
     bool SimpleStorageService::processFileReadRequest(const std::shared_ptr<DataFile> &file,
                                                       const std::shared_ptr<FileLocation> &location,
                                                       double num_bytes_to_read,
                                                       simgrid::s4u::Mailbox *answer_mailbox,
-                                                      simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
-                                                      unsigned long buffer_size) {
+                                                      simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content) {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
@@ -395,6 +393,7 @@ namespace wrench {
                         location,
                         success,
                         failure_cause,
+                        buffer_size,
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
 
@@ -574,7 +573,7 @@ namespace wrench {
                 // May be no corresponding timestamp.
                 try {
                     this->simulation->getOutput().addTimestampFileCopyCompletion(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
-                } catch (invalid_argument &e) {
+                } catch (invalid_argument &ignore) {
                 }
 
             } else {
@@ -668,5 +667,18 @@ namespace wrench {
         this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
         this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::BUFFER_SIZE);
     }
-
+    /**
+         * @brief Get number of File Transfer Threads that are currently running or are pending
+         * @return The number of threads
+         */
+    double SimpleStorageService::countRunningFileTransferThreads() {
+        return running_file_transfer_threads.size() + pending_file_transfer_threads.size();
+    }
+    /**
+         * @brief Get the load (number of concurrent reads) on the storage service
+         * @return the load on the service
+         */
+    double SimpleStorageService::getLoad() {
+        return countRunningFileTransferThreads();
+    }
 };// namespace wrench

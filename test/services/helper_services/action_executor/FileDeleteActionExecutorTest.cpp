@@ -132,6 +132,14 @@ private:
         // Add a file_delete_action
         auto file_delete_action = job->addFileDeleteAction("", this->test->file,
                                                            wrench::FileLocation::LOCATION(this->test->ss));
+
+
+        // coverage
+        wrench::Action::getActionTypeAsString(file_delete_action);
+        file_delete_action->getFile();
+        file_delete_action->getFileLocation();
+        file_delete_action->usesScratch();
+
         // Create a file read action executor
         auto file_delete_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_delete_action, nullptr));

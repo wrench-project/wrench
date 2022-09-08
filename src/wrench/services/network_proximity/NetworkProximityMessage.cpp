@@ -28,13 +28,15 @@ namespace wrench {
      */
     NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                std::pair<std::string, std::string> hosts,
-                                                                               double payload) : NetworkProximityMessage(payload), answer_mailbox(answer_mailbox), hosts(std::move(hosts)) {
+                                                                               double payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || (std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
+        if ((answer_mailbox == nullptr) || (std::get<0>(hosts).empty()) || (std::get<1>(hosts).empty())) {
             throw std::invalid_argument(
                     "NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(): Invalid argument");
         }
 #endif
+        this->answer_mailbox = answer_mailbox;
+        this->hosts = std::move(hosts);
     }
 
 
@@ -49,7 +51,7 @@ namespace wrench {
                                                                              double proximity_value, double timestamp,
                                                                              double payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
+        if ((std::get<0>(hosts).empty()) || (std::get<1>(hosts).empty())) {
             throw std::invalid_argument(
                     "NetworkProximityLookupAnswerMessage::NetworkProximityLookupAnswerMessage(): Invalid argument");
         }
@@ -68,7 +70,7 @@ namespace wrench {
     NetworkProximityComputeAnswerMessage::NetworkProximityComputeAnswerMessage(
             std::pair<std::string, std::string> hosts, double proximity_value, double payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
+        if ((std::get<0>(hosts).empty()) || (std::get<1>(hosts).empty())) {
             throw std::invalid_argument(
                     "NetworkProximityComputeAnswerMessage::NetworkProximityComputeAnswerMessage(): Invalid argument");
         }
@@ -124,13 +126,15 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                                                   std::string requested_host, double payload) : NetworkProximityMessage(payload), answer_mailbox(answer_mailbox), requested_host(std::move(requested_host)) {
+                                                                   std::string requested_host, double payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if (answer_mailbox == nullptr || requested_host == "") {
+        if (answer_mailbox == nullptr || requested_host.empty()) {
             throw std::invalid_argument(
                     "CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(): Invalid argument");
         }
 #endif
+        this->answer_mailbox = answer_mailbox;
+        this->requested_host = std::move(requested_host);
     }
 
     /**
@@ -147,7 +151,7 @@ namespace wrench {
                                                                  double timestamp,
                                                                  double payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if (requested_host == "") {
+        if (requested_host.empty()) {
             throw std::invalid_argument(
                     "CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage(): Invalid argument");
         }
