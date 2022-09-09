@@ -102,7 +102,7 @@ namespace wrench {
         std::set<std::shared_ptr<ComputeService>> compute_services;
         /** queue of pending jobs **/
         std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> pending_jobs;
-        /** running workflow jobs **/
+        /** running jobs **/
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> running_jobs;
         /** whether a negotiator is dispatching jobs **/
         bool dispatching_jobs = false;
