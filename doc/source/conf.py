@@ -277,3 +277,11 @@ breathe_projects = {
 
 version = '2.1-dev'
 release = '2.1-dev'
+breathe_projects = {
+    "user": "../../docs/2.1-dev/user/xml/",
+    "developer": "../../docs/2.1-dev/developer/xml/",
+    "internal": "../../docs/2.1-dev/internal/xml/",
+}
+
+version = '2.1-dev'
+release = '2.1-dev'

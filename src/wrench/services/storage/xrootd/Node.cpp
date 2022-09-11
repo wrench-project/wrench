@@ -9,7 +9,7 @@
 
 #include <wrench/services/storage/xrootd/Node.h>
 
-#include <wrench/services/storage/xrootd/XRootDDeployment.h>
+#include <wrench/services/storage/xrootd/Deployment.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/failure_causes/NetworkError.h>
@@ -658,7 +658,7 @@ namespace wrench {
         * @param messagepayload_list: A Message Payload list
         *
         */
-        Node::Node(XRootDDeployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootD") {
+        Node::Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootD") {
             this->setProperties(this->default_property_values, property_list);
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
             cache.maxCacheTime = getPropertyValueAsDouble(Property::CACHE_MAX_LIFETIME);
