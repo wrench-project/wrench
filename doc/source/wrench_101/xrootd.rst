@@ -25,8 +25,8 @@ Creating an XRootD storage service
 An XRootD storage service is described by specifying the deployment of the nodes in the XRootD tree
 on hardware resources (i.e., hosts where individual nodes in the
  tree will execute and access disks available at these hosts). To this end,
-a :cpp:class:`wrench::XRootD::XRootDDeployment` object must be created first, before the
-simulation is launched. An instance of an XRootDDeployment is constructed based on:
+a :cpp:class:`wrench::XRootD::Deployment` object must be created first, before the
+simulation is launched. An instance of an Deployment is constructed based on:
 
 -  A :cpp:class:`wrench::Simulation` object;
 -  Optional Maps (``std::map``) of configurable default properties
@@ -35,7 +35,7 @@ simulation is launched. An instance of an XRootDDeployment is constructed based 
 
 Once the deployment object is created, it can be used to add nodes to the tree, i.e., instances
 of the :cpp:class:`wrench::XRootD::Node` class.  First a root node must be instantiated by calling the
-:cpp:class:`wrench::XRootD::XRootDDeployment::createRootSupervisor()` method.
+:cpp:class:`wrench::XRootD::Deployment::createRootSupervisor()` method.
 
 Once the root node has been instantiated, it can be used to build the rest of XRootD tree. Some nodes
 in the trees are *supervisors*, i.e., they know about all other nodes in the subtree of which they are the root and can direct

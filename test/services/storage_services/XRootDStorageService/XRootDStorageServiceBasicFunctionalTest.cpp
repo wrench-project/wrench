@@ -147,7 +147,7 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     simulation->instantiatePlatform(platform_file_path);
 
     // Create a XRootD Manager object
-    wrench::XRootD::XRootDDeployment xrootd_deployment(simulation, {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"}, {wrench::XRootD::Property::REDUCED_SIMULATION, arg}}, {});
+    wrench::XRootD::Deployment xrootd_deployment(simulation, {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"}, {wrench::XRootD::Property::REDUCED_SIMULATION, arg}}, {});
 
     this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1");
     ASSERT_THROW(this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1"), std::runtime_error);
