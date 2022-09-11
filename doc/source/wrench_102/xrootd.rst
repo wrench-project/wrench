@@ -1,100 +1,64 @@
 .. _guide-102-xrootd:
 
-Interacting with an XRootD storage service
+Interacting with an XRootD deployment
 ==========================================
 
-TO UPDATE
 
-The following operations are supported by an instance of
-:cpp:class:`wrench::SimpleStorageService`:
+The following operations are supported by an supervisor instance of
+:cpp:class:`wrench::xrootd::Node`: and will be done in the subtree that node supervises
 
--  Synchronously check that a file exists
 -  Synchronously read a file (rarely used by an execution controller but
    included for completeness)
--  Synchronously write a file (rarely used by an execution controller
-   but included for completeness)
--  Synchronously delete a file
--  Synchronously copy a file from one storage service to another
--  Asynchronously copy a file from one storage service to another
+-  Semi-Synchronously delete a file (execution waits for initial Node to acknowledge delete request, 
+but does not wait for the full XRootD subtree to be purged)
+-  Get parrent or specific child of node (done outside simulation time)
 
-The first 4 interactions above are done by calling member functions of
-the :cpp:class:`wrench::StorageService` class. The last two are done via a Data
-Movement Manager, i.e., by calling member functions of the
-:cpp:class:`wrench::DataMovementManager` class. Some of these member functions
+In addition, all Storage Nodes support all operations that :ref:`Simple Storage Service <guide-102-simplestorage>` does,
+but only when done directly on that node.
+
+These interactions above are done by calling member functions of
+the :erf:class:`wrench::StorageService` class. Some of these member functions
 take an optional :cpp:class:`wrench::FileRegistryService` argument, in which case
 they will also update entries in a file registry service (e.g., removing
-an entry when a file is deleted).
+an entry when a file is deleted).  
+The operataions
+- Write to file and
+- Create File
+are intentionaly only implimented for individual storage nodes and not subtrees
+because of the inherent ambiguity of which Node in the subtree is being written too.
 
-Several interactions with a simple storage service are done simple by calling
-**static methods** of the :cpp:class:`wrench::StorageService` class. These make
-it possible to lookup, delete, read, and write files. For instance:
+
+Several interactions with an XRootD Deployment are done simply 
+ by calling **virtual** of the :cpp:class:`wrench::StorageService` class, although these
+are generaly also possible by calling the same static methods as :ref:`Simple Storage Service <guide-102-simplestorage>`
+some of the core concepts there (like knowing the location of the file before you try to read it)
+break down for distributed file systems. These make
+it possible to read and delete files. For instance:
 
 .. code:: cpp
 
-   std::shared_ptr<wrench::SimpleStorageService> storage_service;
-   // Get the file registry service
-   std::shared_ptr<wrench::FileRegistryService> file_registry;
-
+   std::shared_ptr<wrench::xrootd::Deployment> deployment;
    std::shared_ptr<wrench::DataFile> some_file;
 
    [...]
-
-   // Check whether the storage service holds the file at path /data/ and delete it if so
-   auto file_location = wrench::FileLocation::LOCATION(storage_service, "/data/");
-   if (wrench::StorageService::lookupFile(some_file, file_location) {
-     std::cerr << "File found!" << std::endl;
-     wrench::StorageService::deleteFile(some_file, file_location, file_registry);
-   }
-
-Note that the file registry service is passed to the
-:cpp:class:`wrench::StorageService::deleteFile()` method since the file deletion
-should cause the file registry to remove one of its entries.
-
+   // Read a file from the first subtree then delete it from the whole deployment
+   
+   deployment->getRootSupervisor()->getChild(0)->readFile(some_file);
+   deployment->getRootSupervisor()->deleteFile(some_file);
+   
+Note: file deletion in XRootD will appear to work, even if the file does not exist as delete is semi-synchronous and XRootD does not
+propogate file not found errors up the tree.  Similaraly, the only indication a readFile has failed is a network timeout while searching.
 Reading and writing files is something an execution controller typically
 does not do directly (instead, workflow tasks read and write files as
-they execute). But, if for some reason an execution controller needs to
-spend time doing file I/O, it is easily done:
+they execute).  The same file read API's that a developer would use for :ref:`Simple Storage Service <guide-102-simplestorage>`
+work for xrootd subtrees (within the supported operations atleast).
 
 .. code:: cpp
 
-   // Read some file from the "/" path at some storage service. 
-   // This does not change the simulation state besides simulating a time overhead during which the execution controller is busy
-   wrench::StorageService::readFile(some_file, wrench::FileLocation::LOCATION(storage_service, "/");
-
-   // Write some file to the "/stuff/" path at some storage service. 
-   // This simulates a time overhead after which the storage service will host the file. It
-   // is a good idea to then add an entry to the file registry service
-   wrench::StorageService::writeFile(some_file, wrench::FileLocation::LOCATION(storage_service, "/stuff/");
-
-An operation commonly performed by an execution controller is copying
-files between storage services (e.g., to enforce some data locality).
-This is typically done by :ref:`specifying file copy operations as part of
-standard jobs <wrench-102-controller-services-compute-job>`.
-But it can also be done manually by the execution controller via the
-data movement manager’s methods
-:cpp:class:`wrench::DataMovementManager::doSynchronousFileCopy()` and
-:cpp:class:`wrench::DataMovementManager::initiateAsynchronousFileCopy()`. Here is
-an example in which a file is copied between storage services:
-
-.. code:: cpp
-
-   // Create a data movement manager
-   auto data_movement_manager = this->createDataMovementManager();
-
-   // Synchronously copy some_file from storage_service1 to storage_service2
-   // While this is taking place, the execution controller is busy
-   data_movement_manager->doSynchronousFileCopy(some_file, wrench::FileLocation::LOCATION(storage_service1), wrench::FileLocation::LOCATION(storage_service2));
-
-   // Asynchronously copy some_file from storage_service2 to storage_service3
-   data_movement_manager->initiateAsynchronousFileCopy(some_file, wrench::FileLocation::LOCATION(storage_service2), wrench::FileLocation::LOCATION(storage_service3));
-
-   [...]
-
-   // Wait for and process the next event (may be a file copy completion or failure)
-   this->waitForAndProcessNextEvent();
+    auto job1 = job_manager->createCompoundJob("job1");
+    auto fileread1 = job1->addFileReadAction("fileread1", some_file, deployment->getRootSupervisor());
+	
 
 See the execution controller implementation in
-``examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp``
+``examples/action-api/XRootD/Controller.cpp``
 for a more complete example.
-
-END TO UPDATE
