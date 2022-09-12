@@ -1,39 +1,42 @@
 .. _guide-102-xrootd:
 
 Interacting with an XRootD deployment
-==========================================
+=====================================
 
 
-The following operations are supported by an supervisor instance of
-:cpp:class:`wrench::xrootd::Node`: and will be done in the subtree that node supervises
+Recall that an XRootD deployment consists of a tree of instances
+of :cpp:class:`wrench::xrootd::Node`, with some of these nodes 
+being *supervisors nodes* and others being *storage nodes*. 
+The following operations are supported by a supervisor node
+(and are accomplished by the supervisor
+interacting with the nodes that are in the subtree of which it is the root):
 
--  Synchronously read a file (rarely used by an execution controller but
-   included for completeness)
--  Semi-Synchronously delete a file (execution waits for initial Node to acknowledge delete request, 
-but does not wait for the full XRootD subtree to be purged)
--  Get parrent or specific child of node (done outside simulation time)
+  -  Synchronously reading a file (rarely used by an execution controller but
+     included for completeness); and 
+  -  Semi-Synchronously deleting a file (execution waits for supervisor to acknowledge delete request, 
+  but does not wait for the full XRootD subtree to be purged)
 
-In addition, all Storage Nodes support all operations that :ref:`Simple Storage Service <guide-102-simplestorage>` does,
-but only when done directly on that node.
+In addition, all storage nodes in an XRootD tree support all operations that an instance of :ref:`Simple Storage Service <guide-102-simplestorage>` does (which must be invoked directory on that node). 
 
-These interactions above are done by calling member functions of
-the :erf:class:`wrench::StorageService` class. Some of these member functions
+All interactions above are done by calling member functions of
+the :cpp:class:`wrench::StorageService` class. Some of these member functions
 take an optional :cpp:class:`wrench::FileRegistryService` argument, in which case
 they will also update entries in a file registry service (e.g., removing
 an entry when a file is deleted).  
-The operataions
-- Write to file and
-- Create File
-are intentionaly only implimented for individual storage nodes and not subtrees
-because of the inherent ambiguity of which Node in the subtree is being written too.
+
+The following operations:
+
+  - Writing to a file; and
+  - Creating a file
+
+are intentionally only implemented for storage nodes and not supervisor
+nodes (i.e., subtrees), due to the ambiguity of which storage node in the
+subtree rooted at the supervisor should storage the newly created data.
 
 
-Several interactions with an XRootD Deployment are done simply 
- by calling **virtual** of the :cpp:class:`wrench::StorageService` class, although these
-are generaly also possible by calling the same static methods as :ref:`Simple Storage Service <guide-102-simplestorage>`
-some of the core concepts there (like knowing the location of the file before you try to read it)
-break down for distributed file systems. These make
-it possible to read and delete files. For instance:
+Several interactions with an XRootD Deployment are done simply by calling **virtual** methods of the :cpp:class:`wrench::StorageService` class, but it is also 
+possible to call directly methods of these :ref:`Simple Storage Service <guide-102-simplestorage>` class for XRootD storage nodes. This is because, in the XRootD distributed
+file systems, so notions (such as the location of a file) are different than in a non-distributed file system. For instance: 
 
 .. code:: cpp
 
@@ -41,22 +44,34 @@ it possible to read and delete files. For instance:
    std::shared_ptr<wrench::DataFile> some_file;
 
    [...]
-   // Read a file from the first subtree then delete it from the whole deployment
-   
+
+   // Read a file from one specific storage node 
    deployment->getRootSupervisor()->getChild(0)->readFile(some_file);
+
+   // Delete a file from the whole subtree, which may
+   // delete the file at multiple storage nodes
    deployment->getRootSupervisor()->deleteFile(some_file);
    
-Note: file deletion in XRootD will appear to work, even if the file does not exist as delete is semi-synchronous and XRootD does not
-propogate file not found errors up the tree.  Similaraly, the only indication a readFile has failed is a network timeout while searching.
-Reading and writing files is something an execution controller typically
-does not do directly (instead, workflow tasks read and write files as
-they execute).  The same file read API's that a developer would use for :ref:`Simple Storage Service <guide-102-simplestorage>`
-work for xrootd subtrees (within the supported operations atleast).
+
+Note that file deletion from an XRootD (sub)tree  will not return an error
+even if the file does not exist. This is because the delete operation is 
+only semi-synchronous and XRootD does not
+propagate "file not found" errors up the tree.  Similarly, the only indication that
+a file read operation has failed is a network timeout while searching.
+
+
+Note that reading and writing files is something an execution controller typically
+does not do directly. Instead, jobs created by the execution controller contain
+actions/tasks that read and write files as
+they execute.  A XRootD supervisor node can then be passed to these tasks/actions 
+exactly as one would pass a :ref:`Simple Storage Service <guide-102-simplestorage>` instance. For instance: 
 
 .. code:: cpp
 
-    auto job1 = job_manager->createCompoundJob("job1");
-    auto fileread1 = job1->addFileReadAction("fileread1", some_file, deployment->getRootSupervisor());
+    // Create a job
+    auto job = job_manager->createCompoundJob("some_job");
+    // Add a file read action that will read from an XRootD supervisor node
+    auto action = job->addFileReadAction("file_read", some_file, deployment->getRootSupervisor());
 	
 
 See the execution controller implementation in
