@@ -159,8 +159,9 @@ service implementations may or not implement some of of these operations.
 Click on the following links to see concrete examples
 of interactions with the currently available storage service type:
 
-- :ref:`Simple storage service <guide-102-simplestorage>`
-- :ref:`XRootD storage service <guide-102-xrootd>`
+  - :ref:`Simple storage service <guide-102-simplestorage>`
+
+  - :ref:`XRootD storage service <guide-102-xrootd>`
 
 .. _wrench-102-controller-services-compute:
 
