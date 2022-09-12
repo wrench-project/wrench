@@ -69,7 +69,7 @@ class XRootDServiceFullFunctionalityTestExecutionController : public wrench::Exe
 
 public:
     XRootDServiceFullFunctionalityTestExecutionController(XRootDServiceFullFunctionalTest *test,
-                                                          wrench::XRootD::XRootDDeployment *xrootd_deployment,
+                                                          wrench::XRootD::Deployment *xrootd_deployment,
                                                           std::shared_ptr<wrench::BareMetalComputeService> bare_metal_compute_service,
                                                           std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test),
                                                                                   xrootd_deployment(xrootd_deployment),
@@ -77,7 +77,7 @@ public:
 
 private:
     XRootDServiceFullFunctionalTest *test;
-    wrench::XRootD::XRootDDeployment *xrootd_deployment;
+    wrench::XRootD::Deployment *xrootd_deployment;
     std::shared_ptr<wrench::BareMetalComputeService> bare_metal_compute_service;
 
     int main() override {
@@ -247,7 +247,7 @@ void XRootDServiceFullFunctionalTest::do_FullFunctionality_test() {
  * abstracts away more simulation details, which speeds up the simulation but
  * may make it less realistic. See the documentation for more details.
  */
-    wrench::XRootD::XRootDDeployment xrootd_deployment(simulation,
+    wrench::XRootD::Deployment xrootd_deployment(simulation,
                                                        {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"},
                                                         {wrench::XRootD::Property::REDUCED_SIMULATION, "false"}},
                                                        {});

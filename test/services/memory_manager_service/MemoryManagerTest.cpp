@@ -102,7 +102,7 @@ protected:
         fclose(platform_file);
     }
 
-    std::string bad_platform_file_path = UNIQUE_TMP_PATH_PREFIX + "bas_platform.xml";
+    std::string bad_platform_file_path = UNIQUE_TMP_PATH_PREFIX + "bad_platform.xml";
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::shared_ptr<wrench::Workflow> workflow;
 };
