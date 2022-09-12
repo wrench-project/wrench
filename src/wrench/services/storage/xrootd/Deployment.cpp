@@ -22,8 +22,8 @@ namespace wrench {
         * @return a shared pointer to the newly created Node
         */
         std::shared_ptr<Node> Deployment::createRootSupervisor(const std::string &hostname,
-                                                                     WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
-                                                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list) {
+                                                               WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
+                                                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list) {
             if (this->root_supervisor) {
                 throw std::runtime_error("Deployment::createRootSupervisor(): A Root supervisor has already been created for this XRootD deployment");
             }
@@ -52,8 +52,8 @@ namespace wrench {
         * @return a shared pointer to the newly created Node
         */
         std::shared_ptr<Node> Deployment::createSupervisor(const std::string &hostname,
-                                                                 WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
-                                                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list) {
+                                                           WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
+                                                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list) {
             std::shared_ptr<Node> ret = createNode(hostname, node_property_list, node_messagepayload_list);
             ret->makeSupervisor();
             supervisors.push_back(ret);
