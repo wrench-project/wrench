@@ -261,7 +261,107 @@ namespace wrench {
                 }
                 return false;
 
-            } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
+            } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
+                WRENCH_DEBUG("External File Lookup Request for %s", msg->file->getID().c_str());
+                S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::CACHE_LOOKUP_OVERHEAD));
+                if (cached(msg->file)) {//File Cached
+                    WRENCH_DEBUG("File %s found in cache", msg->file->getID().c_str());
+                    auto cacheCopies = getCached(msg->file);
+                    shared_ptr<FileLocation> best = selectBest(cacheCopies);
+
+                    try {
+                        S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                                 new StorageServiceFileLookupAnswerMessage(
+                                                         msg->file,
+                                                         true,
+                                                         getMessagePayloadValue(
+                                                                 MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+                    } catch (std::shared_ptr<NetworkError> &cause) {
+                        throw ExecutionException(cause);
+                    }
+                } else {//File Not Cached
+                    if (internalStorage && StorageService::lookupFile(msg->file, FileLocation::LOCATION(internalStorage))) {
+
+
+                        try {
+                            S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                                     new StorageServiceFileLookupAnswerMessage(
+                                                             msg->file,
+                                                             true,
+                                                             getMessagePayloadValue(
+                                                                     MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+
+
+                        } catch (std::shared_ptr<NetworkError> &cause) {
+                            throw ExecutionException(cause);
+                        }
+                    } else {//no internal storage
+
+
+                        if (children.size() > 0) {//recursive search
+                            if (reduced) {
+                                WRENCH_DEBUG("Starting advanced lookup for %s", msg->file->getID().c_str());
+                                shared_ptr<bool> answered = make_shared<bool>(false);
+                                auto targets = metavisor->getFileNodes(msg->file);
+                                auto search_stack = constructFileSearchTree(targets);
+                                map<Node *, vector<stack<Node *>>> splitStacks = splitStack(search_stack);
+                                WRENCH_DEBUG("Searching %lu subtrees for %s", search_stack.size(), msg->file->getID().c_str());
+                                S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
+                                for (auto entry: splitStacks) {
+                                    if (entry.first == this) {//this node was the target
+                                        //we shouldnt have to worry about this, it should have been handled earlier.  But just in case, I dont want a rogue search going who knows where
+                                    } else {
+                                        try {
+                                            S4U_Mailbox::dputMessage(entry.first->mailbox,
+                                                                     new AdvancedContinueSearchMessage(
+                                                                             msg->answer_mailbox,
+                                                                             nullptr,
+                                                                             msg->file,
+                                                                             this,
+                                                                             getMessagePayloadValue(
+                                                                                     MessagePayload::CONTINUE_SEARCH),
+                                                                             answered,
+                                                                             metavisor->defaultTimeToLive,
+                                                                             entry.second));
+                                        } catch (std::shared_ptr<NetworkError> &cause) {
+                                            throw ExecutionException(cause);
+                                        }
+                                    }
+                                }
+                            } else {//shotgun continued search message to all children
+                                WRENCH_DEBUG("Starting basic lookup for %s", msg->file->getID().c_str());
+                                shared_ptr<bool> answered = make_shared<bool>(false);
+
+                                for (auto child: children) {
+                                    S4U_Mailbox::dputMessage(child->mailbox,
+                                                             new ContinueSearchMessage(
+                                                                     msg->answer_mailbox,
+                                                                     nullptr,
+                                                                     msg->file,
+                                                                     this,
+                                                                     getMessagePayloadValue(
+                                                                             MessagePayload::CONTINUE_SEARCH),
+                                                                     answered,
+                                                                     metavisor->defaultTimeToLive));
+                                }
+                            }
+                        } else {
+                            try {
+                                S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                                         new StorageServiceFileLookupAnswerMessage(
+                                                                 msg->file,
+                                                                 false,
+                                                                 getMessagePayloadValue(
+                                                                         MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+                            } catch (std::shared_ptr<NetworkError> &cause) {
+                                throw ExecutionException(cause);
+                            }
+                        }
+                    }
+                }
+                return true;
+
+            }else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
                 WRENCH_DEBUG("External File Read Request for %s", msg->file->getID().c_str());
                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::CACHE_LOOKUP_OVERHEAD));
                 if (cached(msg->file)) {//File Cached
