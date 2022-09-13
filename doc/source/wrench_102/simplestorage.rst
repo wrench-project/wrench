@@ -49,7 +49,8 @@ Note that the file registry service is passed to the
 should cause the file registry to remove one of its entries.
 
 Reading and writing files is something an execution controller typically
-does not do directly (instead, workflow tasks read and write files as
+does not do directly (instead, jobs created by the controller contain
+actions/tasks  that read and write files as
 they execute). But, if for some reason an execution controller needs to
 spend time doing file I/O, it is easily done:
 
