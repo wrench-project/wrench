@@ -43,7 +43,7 @@ namespace wrench {
 
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD, "0.0"},
+                {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD, "0"},
                 {ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "false"},
                 {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, "false"},
                 {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"},

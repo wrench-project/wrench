@@ -75,11 +75,11 @@ int main(int argc, char **argv) {
             new wrench::HTCondorComputeService(
                     "BatchHeadNode",
                     {batch_cs},
-                    {{wrench::HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD, "1.0"},
-                     {wrench::HTCondorComputeServiceProperty::GRID_PRE_EXECUTION_DELAY, "10.0"},
-                     {wrench::HTCondorComputeServiceProperty::GRID_POST_EXECUTION_DELAY, "10.0"},
-                     {wrench::HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY, "5.0"},
-                     {wrench::HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY, "5.0"}},
+                    {{wrench::HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD, "10s"},
+                     {wrench::HTCondorComputeServiceProperty::GRID_PRE_EXECUTION_DELAY, "1s"},
+                     {wrench::HTCondorComputeServiceProperty::GRID_POST_EXECUTION_DELAY, "2s"},
+                     {wrench::HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY, "2s"},
+                     {wrench::HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY, "4s"}},
                     {}));
 
     // Set the default local storage service
@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
     // Run the simulation
     std::cerr << "Launching simulation of execution...\n";
     simulation->launch();
-    std::cerr << "Simulation execution finished at time " << workflow->getCompletionDate() << "\n";
+    std::cerr << "Simulation execution finished at time " << wrench::Simulation::getCurrentSimulatedDate() << "\n";
 
     return 0;
 }

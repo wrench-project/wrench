@@ -8,6 +8,7 @@
  */
 
 #include <wrench/services/compute/htcondor/HTCondorComputeServiceMessagePayload.h>
+#include <wrench/services/compute/htcondor/HTCondorComputeService.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
@@ -20,6 +21,8 @@
 #include <wrench/services/compute/htcondor/HTCondorNegotiatorService.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/failure_causes/NetworkError.h>
+
+#include <memory>
 
 
 WRENCH_LOG_CATEGORY(wrench_core_HTCondorCentralManager,
@@ -41,11 +44,21 @@ namespace wrench {
     HTCondorCentralManagerService::HTCondorCentralManagerService(
             const std::string &hostname,
             double negotiator_startup_overhead,
+            double grid_pre_overhead,
+            double grid_post_overhead,
+            double non_grid_pre_overhead,
+            double non_grid_post_overhead,
             std::set<shared_ptr<ComputeService>> compute_services,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
-        : ComputeService(hostname, "htcondor_central_manager", "") {
+            : ComputeService(hostname, "htcondor_central_manager", "") {
         this->negotiator_startup_overhead = negotiator_startup_overhead;
+
+        this->grid_pre_overhead = grid_pre_overhead;
+        this->grid_post_overhead = grid_post_overhead;
+        this->non_grid_pre_overhead = non_grid_pre_overhead;
+        this->non_grid_post_overhead = non_grid_post_overhead;
+
         this->compute_services = compute_services;
 
         // Set default and specified properties
@@ -148,10 +161,13 @@ namespace wrench {
                 if (not this->pending_jobs.empty()) {
                     this->dispatching_jobs = true;
                     //WRENCH_INFO("adding BatchComputeService service to new negotiator---> %p", this->grid_universe_batch_service_shared_ptr.get());
-                    auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
-                            new HTCondorNegotiatorService(this->hostname, this->negotiator_startup_overhead,
-                                                          this->compute_services,
-                                                          this->running_jobs, this->pending_jobs, this->mailbox));
+                    auto negotiator = std::make_shared<HTCondorNegotiatorService>(
+                            this->hostname,
+                            this->negotiator_startup_overhead,
+                            this->grid_pre_overhead,
+                            this->non_grid_pre_overhead,
+                            this->compute_services,
+                            this->running_jobs, this->pending_jobs, this->mailbox);
                     negotiator->setSimulation(this->simulation);
                     negotiator->start(negotiator, true, false);// Daemonized, no auto-restart
                 }
@@ -222,10 +238,20 @@ namespace wrench {
             //            return true;
             //
         } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobDoneMessage *>(message.get())) {
+            if (HTCondorComputeService::isJobGridUniverse(msg->job)) {
+                S4U_Simulation::sleep(this->grid_post_overhead);
+            } else {
+                S4U_Simulation::sleep(this->non_grid_post_overhead);
+            }
             processCompoundJobCompletion(msg->job);
             return true;
 
         } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobFailedMessage *>(message.get())) {
+            if (HTCondorComputeService::isJobGridUniverse(msg->job)) {
+                S4U_Simulation::sleep(this->grid_post_overhead);
+            } else {
+                S4U_Simulation::sleep(this->non_grid_post_overhead);
+            }
             processCompoundJobFailure(msg->job);
             return true;
 
@@ -332,7 +358,7 @@ namespace wrench {
         // Send the callback to the originator
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceCompoundJobDoneMessage(
-                                          job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
+                        job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
 
         this->running_jobs.erase(job);
@@ -352,8 +378,8 @@ namespace wrench {
         // Send the callback to the originator
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceCompoundJobFailedMessage(
-                                          job, this->getSharedPtr<HTCondorCentralManagerService>(),
-                                          this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
+                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
+                        this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
 
         this->running_jobs.erase(job);
