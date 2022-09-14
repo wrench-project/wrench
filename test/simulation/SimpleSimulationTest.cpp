@@ -434,12 +434,16 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_EQ(compute_service->getPropertyValueAsTimeInSecond(wrench::ServiceProperty::translateString("CloudComputeServiceProperty::VM_BOOT_OVERHEAD")), 0.1);
     ASSERT_EQ(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::translateString("CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD")), 2);
     ASSERT_EQ(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::translateString("ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD")), 3);
+
     // Things don't work if not using the top-level class name for the payload
     ASSERT_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::translateString("CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD")), std::exception);
 
     // Try to get the property in bogus ways, for coverage
     ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD), std::invalid_argument);
     ASSERT_THROW(compute_service->getPropertyValueAsUnsignedLong(wrench::BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN), std::invalid_argument);
+    ASSERT_THROW(compute_service->getPropertyValueAsTimeInSecond(wrench::BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN), std::invalid_argument);
+    ASSERT_THROW(compute_service->getPropertyValueAsBandwidthInBytePerSecond(wrench::BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN), std::invalid_argument);
+    ASSERT_THROW(compute_service->getPropertyValueAsSizeInByte(wrench::BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN), std::invalid_argument);
 
     // Try to get a message payload value, just for kicks
     ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
