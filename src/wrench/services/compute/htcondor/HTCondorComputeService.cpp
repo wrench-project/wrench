@@ -95,7 +95,11 @@ namespace wrench {
         // create central manager service
         this->central_manager = std::make_shared<HTCondorCentralManagerService>(
                 hostname,
-                getPropertyValueAsDouble(HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD),
+                this->getPropertyValueAsTimeInSecond(HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD),
+                this->getPropertyValueAsTimeInSecond(HTCondorComputeServiceProperty::GRID_PRE_EXECUTION_DELAY),
+                this->getPropertyValueAsTimeInSecond(HTCondorComputeServiceProperty::GRID_POST_EXECUTION_DELAY),
+                this->getPropertyValueAsTimeInSecond(HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY),
+                this->getPropertyValueAsTimeInSecond(HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY),
                 compute_services, property_list, messagepayload_list);
     }
 
@@ -305,7 +309,6 @@ namespace wrench {
                         job,
                         this->getSharedPtr<HTCondorComputeService>(),
                         true, nullptr, this->getMessagePayloadValue(HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
-        return;
     }
 
     ///**

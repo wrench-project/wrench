@@ -146,10 +146,10 @@ int main(int argc, char **argv) {
 
     std::cerr << "Instantiating a SimpleStorageService on storage_host..." << std::endl;
     auto server_storage_service = simulation->add(new wrench::SimpleStorageService(
-            "storage_host", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000"}}, {}));
+            "storage_host", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100MB"}}, {}));
 
     auto client_storage_service = simulation->add(new wrench::SimpleStorageService(
-            "compute_host", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000"}}, {}));
+            "compute_host", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100MB"}}, {}));
 
     std::cerr << "Instantiating a bare-metal compute service on compute_host..." << std::endl;
     auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
