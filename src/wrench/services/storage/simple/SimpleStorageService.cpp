@@ -97,7 +97,7 @@ namespace wrench {
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(
                 SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-        this->buffer_size = (unsigned long)this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
+        this->buffer_size = (unsigned long) this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
     }
 
     /**

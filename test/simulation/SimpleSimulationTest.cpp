@@ -381,7 +381,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123},
                                               {wrench::ServiceMessagePayload::translateString("StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD"), 234}}));
 
-    ASSERT_DOUBLE_EQ(678*1024*1024,
+    ASSERT_DOUBLE_EQ(678 * 1024 * 1024,
                      storage_service->getPropertyValueAsSizeInByte(wrench::SimpleStorageServiceProperty::BUFFER_SIZE));
 
     // Coverage

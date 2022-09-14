@@ -147,7 +147,6 @@ namespace wrench {
         bool shutting_down = false;
 
     private:
-
         double getPropertyValueWithUnitsAsValue(
                 WRENCH_PROPERTY_TYPE property,
                 const std::function<double(std::string &s)> &unit_parsing_function);
