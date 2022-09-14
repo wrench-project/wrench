@@ -46,8 +46,8 @@ namespace wrench {
             std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
             std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
             simgrid::s4u::Mailbox *reply_mailbox)
-            : Service(hostname, "htcondor_negotiator"), reply_mailbox(reply_mailbox),
-              compute_services(compute_services), running_jobs(running_jobs), pending_jobs(pending_jobs) {
+        : Service(hostname, "htcondor_negotiator"), reply_mailbox(reply_mailbox),
+          compute_services(compute_services), running_jobs(running_jobs), pending_jobs(pending_jobs) {
         this->startup_overhead = startup_overhead;
         this->grid_pre_overhead = grid_pre_overhead;
         this->non_grid_pre_overhead = non_grid_pre_overhead;
@@ -120,8 +120,8 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(
                     this->reply_mailbox, new NegotiatorCompletionMessage(
-                            scheduled_jobs, this->getMessagePayloadValue(
-                                    HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
+                                                 scheduled_jobs, this->getMessagePayloadValue(
+                                                                         HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return 1;
         }
@@ -156,8 +156,8 @@ namespace wrench {
  */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceGridUniverse(
             std::shared_ptr<CompoundJob> job, std::map<std::string,
-            std::string>
-    service_specific_arguments) {
+                                                       std::string>
+                                                      service_specific_arguments) {
         std::set<std::shared_ptr<BatchComputeService>> available_batch_compute_services;
 
         // Figure out which BatchComputeService compute services are available
@@ -219,8 +219,8 @@ namespace wrench {
  */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceNonGridUniverse(
             std::shared_ptr<CompoundJob> job, std::map<std::string,
-            std::string>
-    service_specific_arguments) {
+                                                       std::string>
+                                                      service_specific_arguments) {
         std::shared_ptr<BareMetalComputeService> target_cs = nullptr;
 
         // Figure out which BatchComputeService compute services are available

@@ -51,7 +51,7 @@ namespace wrench {
             std::set<shared_ptr<ComputeService>> compute_services,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
-            : ComputeService(hostname, "htcondor_central_manager", "") {
+        : ComputeService(hostname, "htcondor_central_manager", "") {
         this->negotiator_startup_overhead = negotiator_startup_overhead;
 
         this->grid_pre_overhead = grid_pre_overhead;
@@ -358,7 +358,7 @@ namespace wrench {
         // Send the callback to the originator
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceCompoundJobDoneMessage(
-                        job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
+                                          job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
 
         this->running_jobs.erase(job);
@@ -378,8 +378,8 @@ namespace wrench {
         // Send the callback to the originator
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceCompoundJobFailedMessage(
-                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
-                        this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
+                                          job, this->getSharedPtr<HTCondorCentralManagerService>(),
+                                          this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
 
         this->running_jobs.erase(job);

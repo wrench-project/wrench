@@ -46,7 +46,6 @@ namespace wrench {
         static double parse_compute_speed(const std::string &string);
         static double parse_bandwidth(const std::string &string);
         static double parse_time(const std::string &string);
-
     };
 
     /***********************/
