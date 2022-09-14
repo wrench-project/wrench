@@ -377,9 +377,12 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     storage_service = simulation->add(
             new wrench::SimpleStorageService(hostname, {"/disk2"},
                                              {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "567"},
-                                              {wrench::ServiceProperty::translateString("StorageServiceProperty::BUFFER_SIZE"), "678"}},
+                                              {wrench::ServiceProperty::translateString("StorageServiceProperty::BUFFER_SIZE"), "678MiB"}},
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123},
                                               {wrench::ServiceMessagePayload::translateString("StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD"), 234}}));
+
+    ASSERT_DOUBLE_EQ(678*1024*1024,
+                     storage_service->getPropertyValueAsSizeInByte(wrench::SimpleStorageServiceProperty::BUFFER_SIZE));
 
     // Coverage
     ASSERT_GE(storage_service->getPropertyList().size(), 2);
@@ -406,12 +409,11 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_EQ(234, storage_service->getMessagePayloadValue(
                            wrench::ServiceMessagePayload::translateString("StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD")));
 
-
     // Create a Cloud Service with predefined maps for properties and payloads
     //    std::vector<std::string> execution_hosts = {"QuadCoreHost"};
     wrench::WRENCH_PROPERTY_COLLECTION_TYPE property_list = {
             {wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"},
-            {wrench::ServiceProperty::translateString("CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS"), "1"}};
+            {wrench::ServiceProperty::translateString("CloudComputeServiceProperty::VM_BOOT_OVERHEAD"), "100ms"}};
     wrench::WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {
             {wrench::CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD, 2},
             {wrench::ServiceMessagePayload::translateString("ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD"), 3},
@@ -422,14 +424,14 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
                                                             property_list, messagepayload_list)));
 
     // Check on properties and payload
+    ASSERT_DOUBLE_EQ(compute_service->getPropertyValueAsTimeInSecond(wrench::CloudComputeServiceProperty::VM_BOOT_OVERHEAD), 0.1);
     ASSERT_EQ(compute_service->getPropertyValueAsString(wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM), "best-fit-ram-first");
-    ASSERT_EQ(compute_service->getPropertyValueAsUnsignedLong(wrench::CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS), 1);
     ASSERT_EQ(compute_service->getMessagePayloadValue(wrench::CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD), 2);
     ASSERT_EQ(compute_service->getMessagePayloadValue(wrench::CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD), 3);
 
-    // Check on properties and payload (using
+    // Check on properties and payload (using strings)
     ASSERT_EQ(compute_service->getPropertyValueAsString(wrench::ServiceProperty::translateString("CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM")), "best-fit-ram-first");
-    ASSERT_EQ(compute_service->getPropertyValueAsUnsignedLong(wrench::ServiceProperty::translateString("CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS")), 1);
+    ASSERT_EQ(compute_service->getPropertyValueAsTimeInSecond(wrench::ServiceProperty::translateString("CloudComputeServiceProperty::VM_BOOT_OVERHEAD")), 0.1);
     ASSERT_EQ(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::translateString("CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD")), 2);
     ASSERT_EQ(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::translateString("ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD")), 3);
     // Things don't work if not using the top-level class name for the payload
