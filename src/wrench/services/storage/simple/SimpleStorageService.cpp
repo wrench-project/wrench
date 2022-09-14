@@ -97,7 +97,7 @@ namespace wrench {
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(
                 SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-        this->buffer_size = (unsigned long)this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
+        this->buffer_size = this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
     }
 
     /**
@@ -255,7 +255,7 @@ namespace wrench {
      * @return true if this process should keep running
      */
     bool SimpleStorageService::processFileWriteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
-                                                       simgrid::s4u::Mailbox *answer_mailbox, unsigned long buffer_size) {
+                                                       simgrid::s4u::Mailbox *answer_mailbox, double buffer_size) {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 

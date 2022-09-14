@@ -106,7 +106,7 @@ namespace wrench {
                                       simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processFileWriteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &, simgrid::s4u::Mailbox *answer_mailbox,
-                                     unsigned long buffer_size);
+                                     double buffer_size);
 
         bool
         processFileReadRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
