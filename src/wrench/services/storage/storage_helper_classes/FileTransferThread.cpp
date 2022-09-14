@@ -47,13 +47,13 @@ namespace wrench {
                                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
                                            double buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
-                                                                        parent(std::move(parent)),
-                                                                        file(std::move(file)),
-                                                                        num_bytes_to_transfer(num_bytes_to_transfer),
-                                                                        answer_mailbox_if_read(answer_mailbox_if_read),
-                                                                        answer_mailbox_if_write(answer_mailbox_if_write),
-                                                                        answer_mailbox_if_copy(answer_mailbox_if_copy),
-                                                                        buffer_size(buffer_size) {
+                                                                 parent(std::move(parent)),
+                                                                 file(std::move(file)),
+                                                                 num_bytes_to_transfer(num_bytes_to_transfer),
+                                                                 answer_mailbox_if_read(answer_mailbox_if_read),
+                                                                 answer_mailbox_if_write(answer_mailbox_if_write),
+                                                                 answer_mailbox_if_copy(answer_mailbox_if_copy),
+                                                                 buffer_size(buffer_size) {
         this->src_mailbox = src_mailbox;
         this->src_location = nullptr;
         this->dst_mailbox = nullptr;
@@ -86,13 +86,13 @@ namespace wrench {
                                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
                                            double buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
-                                                                        parent(std::move(parent)),
-                                                                        file(std::move(file)),
-                                                                        num_bytes_to_transfer(num_bytes_to_transfer),
-                                                                        answer_mailbox_if_read(answer_mailbox_if_read),
-                                                                        answer_mailbox_if_write(answer_mailbox_if_write),
-                                                                        answer_mailbox_if_copy(answer_mailbox_if_copy),
-                                                                        buffer_size(buffer_size) {
+                                                                 parent(std::move(parent)),
+                                                                 file(std::move(file)),
+                                                                 num_bytes_to_transfer(num_bytes_to_transfer),
+                                                                 answer_mailbox_if_read(answer_mailbox_if_read),
+                                                                 answer_mailbox_if_write(answer_mailbox_if_write),
+                                                                 answer_mailbox_if_copy(answer_mailbox_if_copy),
+                                                                 buffer_size(buffer_size) {
         this->src_mailbox = nullptr;
         this->src_location = std::move(src_location);
         this->dst_mailbox = dst_mailbox;
@@ -125,13 +125,13 @@ namespace wrench {
                                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
                                            double buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
-                                                                        parent(std::move(parent)),
-                                                                        file(std::move(file)),
-                                                                        num_bytes_to_transfer(num_bytes_to_transfer),
-                                                                        answer_mailbox_if_read(answer_mailbox_if_read),
-                                                                        answer_mailbox_if_write(answer_mailbox_if_write),
-                                                                        answer_mailbox_if_copy(answer_mailbox_if_copy),
-                                                                        buffer_size(buffer_size) {
+                                                                 parent(std::move(parent)),
+                                                                 file(std::move(file)),
+                                                                 num_bytes_to_transfer(num_bytes_to_transfer),
+                                                                 answer_mailbox_if_read(answer_mailbox_if_read),
+                                                                 answer_mailbox_if_write(answer_mailbox_if_write),
+                                                                 answer_mailbox_if_copy(answer_mailbox_if_copy),
+                                                                 buffer_size(buffer_size) {
         this->src_mailbox = nullptr;
         this->src_location = std::move(src_location);
         this->dst_mailbox = nullptr;
