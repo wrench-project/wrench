@@ -53,7 +53,7 @@ namespace wrench {
         /***********************/
 
 
-//        void setComputeService(std::shared_ptr<BareMetalComputeService> cs);
+        //        void setComputeService(std::shared_ptr<BareMetalComputeService> cs);
 
         /***********************/
         /** \endcond           */

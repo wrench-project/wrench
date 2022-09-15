@@ -375,7 +375,7 @@ namespace wrench {
                 throw ExecutionException(cause);
             }
 
-            if (msg->buffer_size == 0) {
+            if (msg->buffer_size < DBL_EPSILON) {
                 S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                 throw std::runtime_error("StorageService::readFile(): Zero buffer size not implemented yet");
 
@@ -470,16 +470,16 @@ namespace wrench {
                 throw ExecutionException(msg->failure_cause);
             }
 
-            if (storage_service->buffer_size == 0) {
+            if (storage_service->buffer_size < DBL_EPSILON) {
                 throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
             } else {
                 try {
                     double remaining = file->getSize();
-                    while (remaining > (double) storage_service->buffer_size) {
+                    while (remaining - storage_service->buffer_size > DBL_EPSILON) {
                         S4U_Mailbox::putMessage(msg->data_write_mailbox,
                                                 new StorageServiceFileContentChunkMessage(
                                                         file, storage_service->buffer_size, false));
-                        remaining -= (double) storage_service->buffer_size;
+                        remaining -= storage_service->buffer_size;
                     }
                     S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
                                                                              file, (unsigned long) remaining, true));
