@@ -91,7 +91,26 @@ namespace wrench {
             /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_mailbox spamming for multiple file hits */
             std::shared_ptr<bool> answered;
         };
+        /**
+        * @brief A message who's only purpose in life is to act as a timeout for file searches looking for files that dont exist
+        */
 
+        class FileNotFoundAlarm : public Message {
+        public:
+            FileNotFoundAlarm(simgrid::s4u::Mailbox *answer_mailbox,
+                              std::shared_ptr<DataFile> file,
+                              bool fileReadRequest,
+                              std::shared_ptr<bool> answered);
+
+            /** @brief Mailbox to which the FINAL answer message should be sent */
+            simgrid::s4u::Mailbox *answer_mailbox;
+            /** @brief The file being searched for */
+            std::shared_ptr<DataFile> file;
+            /** @brief Whether this message is in response to a file read request (true) or a file lookup request (false) */
+             bool fileReadRequest;
+            /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_mailbox spamming for multiple file hits */
+            std::shared_ptr<bool> answered;
+        };
         /**
          * @brief A message sent to a XRootD Node to delete a file
          */

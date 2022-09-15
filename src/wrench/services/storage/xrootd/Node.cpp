@@ -20,6 +20,7 @@
 #include "wrench/services/storage/xrootd/SearchStack.h"
 #include <wrench/services/storage/xrootd/XRootDProperty.h>
 #include <wrench/exceptions/ExecutionException.h>
+#include <wrench/services/helper_services/alarm/Alarm.h>
 WRENCH_LOG_CATEGORY(wrench_core_xrootd_data_server,
                     "Log category for XRootD");
 namespace wrench {
@@ -261,6 +262,36 @@ namespace wrench {
                 }
                 return false;
 
+            } else if (auto msg = dynamic_cast<FileNotFoundAlarm *>(message.get())) {
+                if(!*msg->answered){
+                    *msg->answered=true;
+                    try {
+                        if(msg->fileReadRequest){
+                            S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                                     new StorageServiceFileReadAnswerMessage(
+                                                             msg->file,
+                                                             FileLocation::LOCATION(getSharedPtr<Node>()),
+                                                             false,
+                                                             std::shared_ptr<FailureCause>(
+                                                                     new FileNotFound(msg->file, FileLocation::LOCATION(getSharedPtr<Node>()))),
+                                                             0,
+                                                             getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
+
+
+                        }else{
+                            S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                                     new StorageServiceFileLookupAnswerMessage(
+                                                             msg->file,
+                                                             false,
+                                                             getMessagePayloadValue(MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+
+
+                        }
+                    } catch (std::shared_ptr<NetworkError> &cause) {
+                        throw ExecutionException(cause);
+                    }
+
+                }
             } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
                 WRENCH_DEBUG("External File Lookup Request for %s", msg->file->getID().c_str());
                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::CACHE_LOOKUP_OVERHEAD));
@@ -299,9 +330,12 @@ namespace wrench {
 
 
                         if (children.size() > 0) {//recursive search
+                            shared_ptr<bool> answered = make_shared<bool>(false);
+                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock()+this->getPropertyValueAsDouble(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
+                                                       new FileNotFoundAlarm(msg->answer_mailbox,msg->file,false,answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
                                 WRENCH_DEBUG("Starting advanced lookup for %s", msg->file->getID().c_str());
-                                shared_ptr<bool> answered = make_shared<bool>(false);
+
                                 auto targets = metavisor->getFileNodes(msg->file);
                                 auto search_stack = constructFileSearchTree(targets);
                                 map<Node *, vector<stack<Node *>>> splitStacks = splitStack(search_stack);
@@ -330,7 +364,7 @@ namespace wrench {
                                 }
                             } else {//shotgun continued search message to all children
                                 WRENCH_DEBUG("Starting basic lookup for %s", msg->file->getID().c_str());
-                                shared_ptr<bool> answered = make_shared<bool>(false);
+
 
                                 for (auto child: children) {
                                     S4U_Mailbox::dputMessage(child->mailbox,
@@ -362,6 +396,7 @@ namespace wrench {
                 return true;
 
             }else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
+
                 WRENCH_DEBUG("External File Read Request for %s", msg->file->getID().c_str());
                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::CACHE_LOOKUP_OVERHEAD));
                 if (cached(msg->file)) {//File Cached
@@ -411,9 +446,12 @@ namespace wrench {
 
 
                         if (children.size() > 0) {//recursive search
+                            shared_ptr<bool> answered = make_shared<bool>(false);
+                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock()+this->getPropertyValueAsDouble(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
+                                                         new FileNotFoundAlarm(msg->answer_mailbox,msg->file,true,answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
                                 WRENCH_DEBUG("Starting advanced search for %s", msg->file->getID().c_str());
-                                shared_ptr<bool> answered = make_shared<bool>(false);
+
                                 auto targets = metavisor->getFileNodes(msg->file);
                                 auto search_stack = constructFileSearchTree(targets);
                                 map<Node *, vector<stack<Node *>>> splitStacks = splitStack(search_stack);
@@ -443,7 +481,6 @@ namespace wrench {
                             } else {//shotgun continued search message to all children
                                 WRENCH_DEBUG("Starting basic search for %s", msg->file->getID().c_str());
                                 shared_ptr<bool> answered = make_shared<bool>(false);
-
                                 for (auto child: children) {
                                     S4U_Mailbox::dputMessage(child->mailbox,
                                                              new ContinueSearchMessage(
