@@ -370,7 +370,7 @@ namespace wrench {
         if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
             // If it's not a success, throw an exception
             if (not msg->success) {
-                std::shared_ptr<FailureCause> &cause = msg->failure_cause;
+                std::shared_ptr<FailureCause> cause = msg->failure_cause;
                 S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                 throw ExecutionException(cause);
             }
