@@ -21,7 +21,7 @@ namespace wrench {
             DECLARE_PROPERTY_NAME(SEARCH_BROADCAST_OVERHEAD);
             /** @brief The overhead to handle a cache update, in flops **/
             DECLARE_PROPERTY_NAME(UPDATE_CACHE_OVERHEAD);
-            /** @brief The time an entry will remain in the cache before being erased, in seconds **/
+            /** @brief The time an entry will remain in the cache before being erased, in Default: "infinity", Default unit: second. Example: "30", "20s", "100ms", etc. **/
             DECLARE_PROPERTY_NAME(CACHE_MAX_LIFETIME);
             /** @brief If set to "true", then the simulation of the XRootD search does not simulate all
              * control message sends/receives, but just those to the node that the search will find (which
@@ -30,6 +30,8 @@ namespace wrench {
              * and/or network load of the control
              * messages involved in the search is an important part of the simulation (default is "false") **/
             DECLARE_PROPERTY_NAME(REDUCED_SIMULATION);
+            /** @brief The ammount of time a supervisor should wait after a file request before sending a "file not found" message. Default: 30, Default unit: second. Example: "30", "20s", "100ms", etc.  */
+            DECLARE_PROPERTY_NAME(FILE_NOT_FOUND_TIMEOUT);
         };
 
     }// namespace XRootD
