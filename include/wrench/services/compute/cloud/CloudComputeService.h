@@ -36,7 +36,7 @@ namespace wrench {
     class CloudComputeService : public ComputeService {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"},
+                {CloudComputeServiceProperty::VM_BOOT_OVERHEAD, "0"},
                 {CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {

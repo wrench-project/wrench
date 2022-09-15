@@ -22,6 +22,7 @@
 #include <wrench/failure_causes/NetworkError.h>
 #include <wrench/failure_causes/NotAllowed.h>
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
+#include <wrench/util/UnitParser.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_service, "Log category for Service");
 namespace std {
@@ -117,6 +118,54 @@ namespace wrench {
                     this->getPropertyValueAsString(property));
         }
         return value;
+    }
+
+    /**
+     * @brief A helper method to parse a property value with units
+     * @param property: the property
+     * @param unit_parsing_function: the unit parsing function
+     * @return the property value as a double, in the basic unit
+     */
+    double Service::getPropertyValueWithUnitsAsValue(WRENCH_PROPERTY_TYPE property,
+                                                     const std::function<double(std::string &s)> &unit_parsing_function) {
+        double value;
+        std::string string_value;
+        try {
+            string_value = this->getPropertyValueAsString(property);
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
+        if (string_value == "infinity") {
+            return DBL_MAX;
+        }
+        return unit_parsing_function(string_value);
+    }
+
+    /**
+     * @brief Method to parse a property value that is a time with (optional) units
+     * @param property: the property
+     * @return the time in second
+     */
+    double Service::getPropertyValueAsTimeInSecond(WRENCH_PROPERTY_TYPE property) {
+        return this->getPropertyValueWithUnitsAsValue(property, UnitParser::parse_time);
+    }
+
+    /**
+     * @brief Method to parse a property value that is a date size with (optional) units
+     * @param property: the property
+     * @return the size in byte
+     */
+    double Service::getPropertyValueAsSizeInByte(WRENCH_PROPERTY_TYPE property) {
+        return this->getPropertyValueWithUnitsAsValue(property, UnitParser::parse_size);
+    }
+
+    /**
+     * @brief Method to parse a property value that is a bandwidth with (optional) units
+     * @param property: the property
+     * @return the bandwidth in byte/sec
+     */
+    double Service::getPropertyValueAsBandwidthInBytePerSecond(WRENCH_PROPERTY_TYPE property) {
+        return this->getPropertyValueWithUnitsAsValue(property, UnitParser::parse_bandwidth);
     }
 
     /**
