@@ -107,7 +107,7 @@ namespace wrench {
             /** @brief The file being searched for */
             std::shared_ptr<DataFile> file;
             /** @brief Whether this message is in response to a file read request (true) or a file lookup request (false) */
-             bool fileReadRequest;
+            bool fileReadRequest;
             /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_mailbox spamming for multiple file hits */
             std::shared_ptr<bool> answered;
         };
