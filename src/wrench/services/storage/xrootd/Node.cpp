@@ -265,11 +265,11 @@ namespace wrench {
             } else if (auto msg = dynamic_cast<FileNotFoundAlarm *>(message.get())) {
 
                 //WRENCH_INFO("Got message %p %d %d",msg,*msg->answered,msg->fileReadRequest);
-                if(!*msg->answered){
+                if (!*msg->answered) {
                     *msg->answered = true;
-                   // WRENCH_INFO("%p %p",msg,msg->answered.get());
+                    // WRENCH_INFO("%p %p",msg,msg->answered.get());
                     try {
-                        if(msg->fileReadRequest){
+                        if (msg->fileReadRequest) {
 
                             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                                      new StorageServiceFileReadAnswerMessage(
@@ -282,19 +282,16 @@ namespace wrench {
                                                              getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
 
 
-                        }else{
+                        } else {
                             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                                      new StorageServiceFileLookupAnswerMessage(
                                                              msg->file,
                                                              false,
                                                              getMessagePayloadValue(MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-
-
                         }
                     } catch (std::shared_ptr<NetworkError> &cause) {
                         throw ExecutionException(cause);
                     }
-
                 }
             } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
                 WRENCH_DEBUG("External File Lookup Request for %s", msg->file->getID().c_str());
@@ -335,8 +332,8 @@ namespace wrench {
 
                         if (children.size() > 0) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
-                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock()+this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
-                                                       new FileNotFoundAlarm(msg->answer_mailbox,msg->file,false,answered), "XROOTD_FileNotFoundAlarm");
+                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
+                                                       new FileNotFoundAlarm(msg->answer_mailbox, msg->file, false, answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
                                 WRENCH_DEBUG("Starting advanced lookup for %s", msg->file->getID().c_str());
 
@@ -399,7 +396,7 @@ namespace wrench {
                 }
                 return true;
 
-            }else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
+            } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
 
                 WRENCH_DEBUG("External File Read Request for %s", msg->file->getID().c_str());
                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::CACHE_LOOKUP_OVERHEAD));
@@ -451,8 +448,8 @@ namespace wrench {
 
                         if (children.size() > 0) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
-                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock()+this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
-                                                         new FileNotFoundAlarm(msg->answer_mailbox,msg->file,true,answered), "XROOTD_FileNotFoundAlarm");
+                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
+                                                       new FileNotFoundAlarm(msg->answer_mailbox, msg->file, true, answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
                                 WRENCH_DEBUG("Starting advanced search for %s", msg->file->getID().c_str());
 
