@@ -54,7 +54,7 @@ namespace wrench {
         FileNotFoundAlarm::FileNotFoundAlarm(simgrid::s4u::Mailbox *answer_mailbox,
                                              std::shared_ptr<DataFile> file,
                                              bool fileReadRequest,
-                                             std::shared_ptr<bool> answered) : Message(0), answer_mailbox(answer_mailbox), fileReadRequest(fileReadRequest), answered(answered) {}
+                                             std::shared_ptr<bool> answered) : Message(0), answer_mailbox(answer_mailbox), file(file), fileReadRequest(fileReadRequest), answered(answered) {}
         /**
         * @brief Copy Constructor
         * @param other: The message to copy.  timeToLive is decremented
