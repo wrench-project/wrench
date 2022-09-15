@@ -248,9 +248,9 @@ void XRootDServiceFullFunctionalTest::do_FullFunctionality_test() {
  * may make it less realistic. See the documentation for more details.
  */
     wrench::XRootD::Deployment xrootd_deployment(simulation,
-                                                       {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"},
-                                                        {wrench::XRootD::Property::REDUCED_SIMULATION, "false"}},
-                                                       {});
+                                                 {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"},
+                                                  {wrench::XRootD::Property::REDUCED_SIMULATION, "false"}},
+                                                 {});
 
     /* Construct an XRootD tree as follows (vertices are host names)
 

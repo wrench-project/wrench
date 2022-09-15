@@ -255,7 +255,7 @@ namespace wrench {
     StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                  std::shared_ptr<DataFile> file,
                                                                                  std::shared_ptr<FileLocation> location,
-                                                                                 unsigned long buffer_size,
+                                                                                 double buffer_size,
                                                                                  double payload)
         : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -365,7 +365,7 @@ namespace wrench {
                                                                              std::shared_ptr<FileLocation> location,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
-                                                                             unsigned long buffer_size,
+                                                                             double buffer_size,
                                                                              double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (location == nullptr) ||

@@ -61,9 +61,9 @@ int main(int argc, char **argv) {
      * may make it less realistic. See the documentation for more details.
      */
     wrench::XRootD::Deployment xrootd_deployment(simulation,
-                                                       {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "3600"},
-                                                        {wrench::XRootD::Property::REDUCED_SIMULATION, "false"}},
-                                                       {});
+                                                 {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "3600"},
+                                                  {wrench::XRootD::Property::REDUCED_SIMULATION, "false"}},
+                                                 {});
 
     /* Construct an XRootD tree as follows (vertices are host names)
 

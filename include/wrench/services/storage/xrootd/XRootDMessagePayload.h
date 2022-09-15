@@ -28,13 +28,13 @@ namespace wrench {
             /** @brief The number of bytes in the control message sent by the daemon to answer a file read request **/
             DECLARE_MESSAGEPAYLOAD_NAME(FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD);
 
-            /** @brief The number of bytes in the control message sent by the daemon to continue a search request **/
+            /** @brief The number of bytes in the control message sent by the daemon to pass on a search request **/
             DECLARE_MESSAGEPAYLOAD_NAME(CONTINUE_SEARCH);
 
             /** @brief The number of bytes in the control message sent by the daemon to update the cache **/
             DECLARE_MESSAGEPAYLOAD_NAME(UPDATE_CACHE);
 
-            /** @brief The number of bytes for each cache entry **/
+            /** @brief The number of bytes for each cache entry when sent over the network **/
             DECLARE_MESSAGEPAYLOAD_NAME(CACHE_ENTRY);
         };
     };// namespace XRootD
