@@ -263,10 +263,14 @@ namespace wrench {
                 return false;
 
             } else if (auto msg = dynamic_cast<FileNotFoundAlarm *>(message.get())) {
+
+                //WRENCH_INFO("Got message %p %d %d",msg,*msg->answered,msg->fileReadRequest);
                 if(!*msg->answered){
-                    *msg->answered=true;
+                    *msg->answered = true;
+                   // WRENCH_INFO("%p %p",msg,msg->answered.get());
                     try {
                         if(msg->fileReadRequest){
+
                             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                                      new StorageServiceFileReadAnswerMessage(
                                                              msg->file,
@@ -331,7 +335,7 @@ namespace wrench {
 
                         if (children.size() > 0) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
-                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock()+this->getPropertyValueAsDouble(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
+                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock()+this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
                                                        new FileNotFoundAlarm(msg->answer_mailbox,msg->file,false,answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
                                 WRENCH_DEBUG("Starting advanced lookup for %s", msg->file->getID().c_str());
@@ -447,7 +451,7 @@ namespace wrench {
 
                         if (children.size() > 0) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
-                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock()+this->getPropertyValueAsDouble(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
+                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock()+this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
                                                          new FileNotFoundAlarm(msg->answer_mailbox,msg->file,true,answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
                                 WRENCH_DEBUG("Starting advanced search for %s", msg->file->getID().c_str());
@@ -480,7 +484,6 @@ namespace wrench {
                                 }
                             } else {//shotgun continued search message to all children
                                 WRENCH_DEBUG("Starting basic search for %s", msg->file->getID().c_str());
-                                shared_ptr<bool> answered = make_shared<bool>(false);
                                 for (auto child: children) {
                                     S4U_Mailbox::dputMessage(child->mailbox,
                                                              new ContinueSearchMessage(
@@ -585,8 +588,9 @@ namespace wrench {
                 } else {
                     WRENCH_DEBUG("Update has reached top of subtree");
                     if (!*msg->answered) {
-                        WRENCH_DEBUG("Sending File %s found to request", msg->file->getID().c_str());
                         *msg->answered = true;
+                        //WRENCH_INFO("%p %p",msg,msg->answered.get());
+                        //WRENCH_DEBUG("Sending File %s found to request", msg->file->getID().c_str());
 
                         auto cacheCopies = getCached(msg->file);
                         if (msg->original) {//this was a file read
@@ -798,7 +802,7 @@ namespace wrench {
         Node::Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootD") {
             this->setProperties(this->default_property_values, property_list);
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
-            cache.maxCacheTime = getPropertyValueAsDouble(Property::CACHE_MAX_LIFETIME);
+            cache.maxCacheTime = getPropertyValueAsTimeInSecond(Property::CACHE_MAX_LIFETIME);
             this->deployment = deployment;
         }
 
