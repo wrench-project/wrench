@@ -118,6 +118,7 @@ private:
             throw std::runtime_error("Non extant files should throw exceptions when not found");
         } catch (wrench::ExecutionException &ignore) {
         }
+
         try {
             this->test->root_supervisor->getChild(0)->readFile(file2);
             throw std::runtime_error("Non extant files should throw exceptions when not found");
@@ -129,6 +130,7 @@ private:
         if(!this->test->root_supervisor->lookupFile(file3)) throw std::runtime_error("File that exists not located - uncached");
         if(this->test->root_supervisor->lookupFile(file2)) throw std::runtime_error("File that does not exist located - indirect");
         if(this->test->root_supervisor->getChild(0)->lookupFile(file2)) throw std::runtime_error("File that does not exist located - direct");
+
         this->test->root_supervisor->deleteFile(file1);
 
 
@@ -187,7 +189,7 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-        //argv[1] = strdup("--wrench-full-log");
+    //argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -195,7 +197,9 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     simulation->instantiatePlatform(platform_file_path);
 
     // Create a XRootD Manager object
+
     wrench::XRootD::Deployment xrootd_deployment(simulation, {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"}, {wrench::XRootD::Property::REDUCED_SIMULATION, arg},{wrench::XRootD::Property::FILE_NOT_FOUND_TIMEOUT, "10"}}, {{wrench::StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD,1024}});
+
 
     this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1");
     ASSERT_THROW(this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1"), std::runtime_error);

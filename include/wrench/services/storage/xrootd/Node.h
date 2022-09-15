@@ -57,13 +57,13 @@ namespace wrench {
                     {Property::UPDATE_CACHE_OVERHEAD, "1"},
                     {Property::CACHE_MAX_LIFETIME, "infinity"},
                     {Property::REDUCED_SIMULATION, "false"},
-                    {Property::FILE_NOT_FOUND_TIMEOUT,"30"}};
+                    {Property::FILE_NOT_FOUND_TIMEOUT, "30"}};
 
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                     {MessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD,1024},
+                    {MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::UPDATE_CACHE, 1024},
                     {MessagePayload::CONTINUE_SEARCH, 1024},
                     {MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024},
