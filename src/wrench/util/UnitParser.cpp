@@ -102,13 +102,11 @@ namespace wrench {
                                                   std::make_tuple("b", 0.125, 10, true),
                                                   std::make_tuple("B", 1.0, 2, true),
                                                   std::make_tuple("B", 1.0, 10, true)};
-        double size;
         try {
-            size = parseValueWithUnit(string, units, "B");// default: bytes
+            return parseValueWithUnit(string, units, "B");// default: bytes
         } catch (std::runtime_error &e) {
             throw std::invalid_argument(e.what());
         }
-        return size;
     }
 
 
@@ -121,14 +119,54 @@ namespace wrench {
      */
     double UnitParser::parse_compute_speed(const std::string &string) {
         static const UnitParser::unit_scale units{std::make_tuple("f", 1.0, 10, true)};
-        double compute_speed;
         try {
-            compute_speed = parseValueWithUnit(string, units, "f");// default: bytes
+            return parseValueWithUnit(string, units, "f");// default: bytes
         } catch (std::runtime_error &e) {
             throw std::invalid_argument(e.what());
         }
-        return compute_speed;
     }
 
+    /**
+    * @brief Given a string bandwidth specification with units (e.g., "3Mbps", "40MiBps") return the size in bytes
+    * @param string: the bandwidth specification
+    * @return the bandwidth in byte/sec
+    *
+    * @throws std::invalid_argument
+    */
+    double UnitParser::parse_bandwidth(const std::string &string) {
+        static const UnitParser::unit_scale units{std::make_tuple("bps", 0.125, 2, true),
+                                                  std::make_tuple("bps", 0.125, 10, true),
+                                                  std::make_tuple("Bps", 1.0, 2, true),
+                                                  std::make_tuple("Bps", 1.0, 10, true)};
+        try {
+            return parseValueWithUnit(string, units, "bps");// default: bits
+        } catch (std::runtime_error &e) {
+            throw std::invalid_argument(e.what());
+        }
+    }
+
+    /**
+    * @brief Given a string time with units (e.g., "10us", "10ms") return the time in seconds
+    * @param string: the time specification
+    * @return the time in second
+    *
+    * @throws std::invalid_argument
+    */
+    double UnitParser::parse_time(const std::string &string) {
+        static const unit_scale units{std::make_pair("w", 7 * 24 * 60 * 60),
+                                      std::make_pair("d", 24 * 60 * 60),
+                                      std::make_pair("h", 60 * 60),
+                                      std::make_pair("m", 60),
+                                      std::make_pair("s", 1.0),
+                                      std::make_pair("ms", 1e-3),
+                                      std::make_pair("us", 1e-6),
+                                      std::make_pair("ns", 1e-9),
+                                      std::make_pair("ps", 1e-12)};
+        try {
+            return parseValueWithUnit(string, units, "s");// default: bits
+        } catch (std::runtime_error &e) {
+            throw std::invalid_argument(e.what());
+        }
+    }
 
 };// namespace wrench

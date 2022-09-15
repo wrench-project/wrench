@@ -57,6 +57,11 @@ namespace wrench {
         double getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE);
         unsigned long getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE);
         bool getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE);
+
+        double getPropertyValueAsTimeInSecond(WRENCH_PROPERTY_TYPE);
+        double getPropertyValueAsSizeInByte(WRENCH_PROPERTY_TYPE);
+        double getPropertyValueAsBandwidthInBytePerSecond(WRENCH_PROPERTY_TYPE);
+
         const WRENCH_PROPERTY_COLLECTION_TYPE &getPropertyList() const;
 
         void assertServiceIsUp();
@@ -142,6 +147,10 @@ namespace wrench {
         bool shutting_down = false;
 
     private:
+        double getPropertyValueWithUnitsAsValue(
+                WRENCH_PROPERTY_TYPE property,
+                const std::function<double(std::string &s)> &unit_parsing_function);
+
         /***********************/
         /** \endcond           */
         /***********************/

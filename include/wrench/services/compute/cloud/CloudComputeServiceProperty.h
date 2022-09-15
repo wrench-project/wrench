@@ -20,8 +20,11 @@ namespace wrench {
     class CloudComputeServiceProperty : public ComputeServiceProperty {
 
     public:
-        /** @brief The overhead, in seconds, to boot a VM **/
-        DECLARE_PROPERTY_NAME(VM_BOOT_OVERHEAD_IN_SECONDS);
+        /** @brief The overhead to boot a VM. Default: "0"
+         *         Examples: "1s", "100ms", "1m", "1.5s", etc.
+         **/
+        DECLARE_PROPERTY_NAME(VM_BOOT_OVERHEAD);
+
         /** @brief The VM resource allocation algorithm by which VMs are started on physical hosts. Possible values are:
          *      - best-fit-ram-first (default): Start VMs on hosts using a best-fit algorithm,
          *        considering first the RAM and then the number of cores
