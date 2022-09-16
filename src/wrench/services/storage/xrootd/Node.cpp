@@ -21,6 +21,8 @@
 #include <wrench/services/storage/xrootd/XRootDProperty.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/helper_services/alarm/Alarm.h>
+#include <wrench/failure_causes/NotAllowed.h>
+
 WRENCH_LOG_CATEGORY(wrench_core_xrootd_data_server,
                     "Log category for XRootD");
 namespace wrench {
@@ -696,18 +698,34 @@ namespace wrench {
                     }
                 }
             } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
-                msg->location = FileLocation::LOCATION(internalStorage);
-                msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(SimpleStorageServiceProperty::BUFFER_SIZE);
-                std::cerr << "BUFFER SIZE = " << msg->buffer_size << "\n";
-                S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
+                if (not internalStorage) {
+                    // Reply this is not allowed
+                    std::string error_message = "Cannot write file at non-storage XRooD node";
+                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                             new StorageServiceFileWriteAnswerMessage(
+                                                     msg->file,
+                                                     FileLocation::LOCATION(getSharedPtr<Node>()),
+                                                     false,
+                                                     std::shared_ptr<FailureCause>(
+                                                             new NotAllowed(getSharedPtr<Node>(), error_message)), 0,
+                                                     getMessagePayloadValue(MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+
+                } else {
+                    // Forward the message
+                    msg->location = FileLocation::LOCATION(internalStorage);
+                    msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
+                            SimpleStorageServiceProperty::BUFFER_SIZE);
+                    S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
+                }
 
             } else if (auto msg = dynamic_cast<StorageServiceMessage *>(message.get())) {//we got a message targeted at a normal storage server
-                if (internalStorage) {
+                if (not internalStorage) {
+                    // TODO: deal with the Copy message, which then needs a reply with a NotAllowed failure cause,
+                    // TODO: just like for FileWriteRequest above
+                    throw std::runtime_error("Non-Storage XRooD node received a message it cannot process - internal error");
+                } else {
                     // Forwarding the message as-is to the internal Storage
                     S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
-                } else {
-                    WRENCH_WARN("XRootD manager %s received an unhandled vanilla StorageService message %s",
-                                hostname.c_str(), msg->getName().c_str());
                 }
             } else {
                 throw std::runtime_error(

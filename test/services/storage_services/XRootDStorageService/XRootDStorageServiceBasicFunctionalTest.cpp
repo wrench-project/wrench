@@ -146,11 +146,22 @@ private:
         // attempt to write file directly to leaf
         this->test->root_supervisor->getChild(0)->writeFile(file3);
 
-        //attempt to write file directly to supervisor.
-        //TODO should this throw an exception?  Right now its just a warning
-        //TODO This has some network error to trace later
-        // TODO BY HENRI: This below causes something super weird to happen, some invalid_argument:exception (not a warning)
-//        this->test->root_supervisor->writeFile(file3);
+        // attempt to write file directly to supervisor.
+        try {
+            this->test->root_supervisor->writeFile(file3);
+            throw std::runtime_error("Should not be able to write a file directly on a supervisor node");
+        } catch (wrench::ExecutionException &ignore) {
+            if (not std::dynamic_pointer_cast<wrench::NotAllowed>(ignore.getCause())) {
+                throw std::runtime_error("Should have gotten a NotAllowed exception");
+            }
+        }
+
+        // TODO: Do a file copy
+//        std::cerr << "DOING THE FILE COPY\n";
+//        wrench::StorageService::copyFile(
+//                file3,
+//                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0)),
+//                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(1)));
 
         //mark
         if(this->test->root_supervisor->getChild(3)!=nullptr){

@@ -66,11 +66,17 @@ namespace wrench {
                     {MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::UPDATE_CACHE, 1024},
                     {MessagePayload::CONTINUE_SEARCH, 1024},
+                    {MessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::CACHE_ENTRY, 1024},
                     {MessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 1024}};
+                    {MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, 1024}
+            };
 
         public:
             /***********************/
