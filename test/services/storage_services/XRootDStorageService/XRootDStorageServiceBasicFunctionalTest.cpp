@@ -198,7 +198,7 @@ private:
 
 
         //mark
-        if(this->test->root_supervisor->getChild(3)!=nullptr){
+        if (this->test->root_supervisor->getChild(3) != nullptr) {
             throw std::runtime_error("Got child where none should be found");
         }
         if(this->test->root_supervisor->getParent()!=nullptr){
@@ -207,7 +207,7 @@ private:
         if(this->test->root_supervisor->getChild(0)->getParent()!=this->test->root_supervisor.get()){
             throw std::runtime_error("Child has wrong parent somehow");
         }
-        if(this->test->root_supervisor->getStorageServer()!=nullptr){
+        if (this->test->root_supervisor->getStorageServer() != nullptr) {
             throw std::runtime_error("Why does root have internal storage?");
         }
 
@@ -218,7 +218,6 @@ private:
         return 0;
 
         //TODO hookup cache.clear to something or remove it
-
     }
 };
 
@@ -227,7 +226,6 @@ TEST_F(XRootDServiceBasicFunctionalTest, BasicFunctionalityFullSimulation) {
 }
 TEST_F(XRootDServiceBasicFunctionalTest, FastSearchQuickSimulation) {
     DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test, "true");
-
 }
 
 void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string arg) {
@@ -246,7 +244,7 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
 
     // Create a XRootD Manager object
 
-    wrench::XRootD::Deployment xrootd_deployment(simulation, {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"}, {wrench::XRootD::Property::REDUCED_SIMULATION, arg},{wrench::XRootD::Property::FILE_NOT_FOUND_TIMEOUT, "10"}}, {{wrench::StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD,1024}});
+    wrench::XRootD::Deployment xrootd_deployment(simulation, {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"}, {wrench::XRootD::Property::REDUCED_SIMULATION, arg}, {wrench::XRootD::Property::FILE_NOT_FOUND_TIMEOUT, "10"}}, {{wrench::StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 1024}});
 
 
     this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1");
