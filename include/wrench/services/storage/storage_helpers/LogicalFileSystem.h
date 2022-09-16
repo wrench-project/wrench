@@ -43,7 +43,6 @@ namespace wrench {
 
         void init();
 
-
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
         double getFreeSpace();

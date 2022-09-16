@@ -27,10 +27,10 @@ namespace wrench {
 
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "0.0"},
+                {NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "0s"},
                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "1024"},
-                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "60"},
+                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "60s"},
                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "20"},
                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED, "0"},
                 {NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"},

@@ -74,14 +74,14 @@ int main(int argc, char **argv) {
      * is a basic storage service implementation provided by WRENCH.
      * Throughout the simulation execution, input/output files of workflow tasks will be located
      * in this storage service, and accessed remotely by the compute service. Note that the
-     * storage service is configured to use a buffer size of 50M when transferring data over
+     * storage service is configured to use a buffer size of 50MB when transferring data over
      * the network (i.e., to pipeline disk reads/writes and network revs/sends). */
     std::cerr << "Instantiating a SimpleStorageService on StorageHost1..." << std::endl;
     auto storage_service_1 = simulation->add(new wrench::SimpleStorageService(
-            "StorageHost1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
+            "StorageHost1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
     std::cerr << "Instantiating a SimpleStorageService on StorageHost2..." << std::endl;
     auto storage_service_2 = simulation->add(new wrench::SimpleStorageService(
-            "StorageHost2", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
+            "StorageHost2", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
 
     /* Instantiate a bare-metal compute service, and add it to the simulation.

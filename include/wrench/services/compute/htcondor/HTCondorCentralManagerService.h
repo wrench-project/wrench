@@ -30,24 +30,20 @@ namespace wrench {
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {HTCondorCentralManagerServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
                 {HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
-                //                {HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                //                {HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
                 {HTCondorCentralManagerServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
                 {HTCondorCentralManagerServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                //                {HTCondorCentralManagerServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                //                {HTCondorCentralManagerServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
                 {HTCondorCentralManagerServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
                 {HTCondorCentralManagerServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
-                //                {HTCondorCentralManagerServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, 1024},
                 {HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD, 1024},
-                {HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD, 1024}
-                //                {HTCondorCentralManagerServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD, 1024},
-                //                {HTCondorCentralManagerServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD, 1024}
-        };
+                {HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD, 1024}};
 
     public:
         HTCondorCentralManagerService(const std::string &hostname,
                                       double negotiator_startup_overhead,
+                                      double grid_pre_overhead,
+                                      double grid_post_overhead,
+                                      double non_grid_pre_overhead,
+                                      double non_grid_post_overhead,
                                       std::set<std::shared_ptr<ComputeService>> compute_services,
                                       WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                       WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
@@ -58,22 +54,12 @@ namespace wrench {
 
         void addComputeService(std::shared_ptr<ComputeService> compute_service);
 
-        //        void submitStandardJob(std::shared_ptr<StandardJob> job,
-        //                               const std::map<std::string, std::string> &service_specific_arguments);
-
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
                                const std::map<std::string, std::string> &service_specific_arguments) override;
 
-        //        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) override;
-
-
         ~HTCondorCentralManagerService() override;
 
-        //        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
-
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override{};
-
-        //        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
 
         bool jobKindIsSupported(const std::shared_ptr<Job> &job, std::map<std::string, std::string> service_specific_arguments);
 
@@ -102,7 +88,7 @@ namespace wrench {
         std::set<std::shared_ptr<ComputeService>> compute_services;
         /** queue of pending jobs **/
         std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> pending_jobs;
-        /** running workflow jobs **/
+        /** running jobs **/
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> running_jobs;
         /** whether a negotiator is dispatching jobs **/
         bool dispatching_jobs = false;
@@ -110,6 +96,11 @@ namespace wrench {
         bool resources_unavailable = false;
         /** negotiator startup overhead in seconds **/
         double negotiator_startup_overhead = 0.0;
+
+        double grid_pre_overhead = 0.0;
+        double grid_post_overhead = 0.0;
+        double non_grid_pre_overhead = 0.0;
+        double non_grid_post_overhead = 0.0;
     };
 
     /***********************/

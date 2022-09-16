@@ -97,7 +97,7 @@ namespace wrench {
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(
                 SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-        this->buffer_size = this->getPropertyValueAsUnsignedLong(StorageServiceProperty::BUFFER_SIZE);
+        this->buffer_size = this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
     }
 
     /**
@@ -255,7 +255,7 @@ namespace wrench {
      * @return true if this process should keep running
      */
     bool SimpleStorageService::processFileWriteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
-                                                       simgrid::s4u::Mailbox *answer_mailbox, unsigned long buffer_size) {
+                                                       simgrid::s4u::Mailbox *answer_mailbox, double buffer_size) {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
@@ -383,7 +383,6 @@ namespace wrench {
         }
 
         bool success = (failure_cause == nullptr);
-        ;
 
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
         S4U_Mailbox::dputMessage(
@@ -660,24 +659,26 @@ namespace wrench {
     }
 
     /**
-     * @brief Helper method to validate propery values
+     * @brief Helper method to validate property values
      * throw std::invalid_argument
      */
     void SimpleStorageService::validateProperties() {
         this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-        this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::BUFFER_SIZE);
+        this->getPropertyValueAsSizeInByte(SimpleStorageServiceProperty::BUFFER_SIZE);
     }
+
     /**
-         * @brief Get number of File Transfer Threads that are currently running or are pending
-         * @return The number of threads
-         */
+     * @brief Get number of File Transfer Threads that are currently running or are pending
+     * @return The number of threads
+     */
     double SimpleStorageService::countRunningFileTransferThreads() {
-        return running_file_transfer_threads.size() + pending_file_transfer_threads.size();
+        return this->running_file_transfer_threads.size() + this->pending_file_transfer_threads.size();
     }
+
     /**
-         * @brief Get the load (number of concurrent reads) on the storage service
-         * @return the load on the service
-         */
+     * @brief Get the load (number of concurrent reads) on the storage service
+     * @return the load on the service
+     */
     double SimpleStorageService::getLoad() {
         return countRunningFileTransferThreads();
     }
