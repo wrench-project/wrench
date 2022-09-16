@@ -185,6 +185,18 @@ namespace wrench {
     }
 
     /**
+     * @brief Determine whether a job is a grid-universe job or not
+     * @param job: a job
+     *
+     * @return true if grid-universe, false otherwise
+     */
+    bool HTCondorComputeService::isJobGridUniverse(std::shared_ptr<CompoundJob> &job) {
+        auto service_specific_arguments = job->getServiceSpecificArguments();
+        return (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
+               (service_specific_arguments["-universe"] == "grid");
+    }
+
+    /**
      * @brief Main method of the daemon
      *
      * @return 0 on termination

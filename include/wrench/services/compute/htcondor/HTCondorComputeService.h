@@ -97,11 +97,7 @@ namespace wrench {
 
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override{};
 
-        static bool isJobGridUniverse(std::shared_ptr<CompoundJob> &job) {
-            auto service_specific_arguments = job->getServiceSpecificArguments();
-            return (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
-                   (service_specific_arguments["-universe"] == "grid");
-        }
+        static bool isJobGridUniverse(std::shared_ptr<CompoundJob> &job);
 
         /***********************/
         /** \endcond          **/
