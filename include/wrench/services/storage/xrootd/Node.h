@@ -75,8 +75,7 @@ namespace wrench {
                     {MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, 1024}
-            };
+                    {MessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, 1024}};
 
         public:
             /***********************/
