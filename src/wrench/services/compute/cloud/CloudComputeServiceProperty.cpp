@@ -12,7 +12,7 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(CloudComputeServiceProperty, VM_BOOT_OVERHEAD_IN_SECONDS);
+    SET_PROPERTY_NAME(CloudComputeServiceProperty, VM_BOOT_OVERHEAD);
     SET_PROPERTY_NAME(CloudComputeServiceProperty, VM_RESOURCE_ALLOCATION_ALGORITHM);
 
 }// namespace wrench

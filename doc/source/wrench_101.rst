@@ -416,6 +416,7 @@ on how to create them.
    give access to workflow files:
 
    -  :ref:`Simple Storage Service <guide-101-simplestorage>`
+   -  :ref:`XRootD Storage Service <guide-101-xrootd>`
 
 -  **File Registry Services**: These services, also known as *replica
    catalogs*, are simply databases of ``<filename, list of locations>``

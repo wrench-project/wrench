@@ -184,7 +184,7 @@ void VirtualizedClusterServiceTest::do_ConstructorTest_test() {
     ASSERT_THROW(cloud_compute_service = simulation->add(
                          new wrench::CloudComputeService(
                                  hostname, execution_hosts, {"/"},
-                                 {{wrench::CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "-1.0"}})),
+                                 {{wrench::CloudComputeServiceProperty::VM_BOOT_OVERHEAD, "-1.0"}})),
                  std::invalid_argument);
 
     ASSERT_THROW(cloud_compute_service = simulation->add(
