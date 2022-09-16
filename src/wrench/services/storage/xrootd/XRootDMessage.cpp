@@ -44,6 +44,18 @@ namespace wrench {
                                                      std::shared_ptr<bool> answered,
                                                      int timeToLive) : Message(payload), answer_mailbox(answer_mailbox), original(original), file(file), node(node), answered(answered), timeToLive(timeToLive) {}
         /**
+         * @brief Constructor
+         * @param answer_mailbox: The mailbox the final answer should be sent to
+         * @param file: The file being searched for
+         * @param fileReadRequest: Whether this message is in response to a file read request (true) or a file lookup request (false)
+         * @param answered: A shared boolean for if the answer has been sent to the client.  This should be the same for all messages searching for this request.  Used to prevent the multiple response problem
+
+         */
+        FileNotFoundAlarm::FileNotFoundAlarm(simgrid::s4u::Mailbox *answer_mailbox,
+                                             std::shared_ptr<DataFile> file,
+                                             bool fileReadRequest,
+                                             std::shared_ptr<bool> answered) : Message(0), answer_mailbox(answer_mailbox), file(file), fileReadRequest(fileReadRequest), answered(answered) {}
+        /**
         * @brief Copy Constructor
         * @param other: The message to copy.  timeToLive is decremented
         */

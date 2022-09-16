@@ -45,7 +45,7 @@ namespace wrench {
                 {HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
                 {HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
                 {HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD, 1024},// for forwarding
+                {HTCondorComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD, 1024},// for forwarding
                 {HTCondorComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, 1024},
                 {HTCondorComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, 1024},
         };
@@ -95,11 +95,9 @@ namespace wrench {
 
         ~HTCondorComputeService() override;
 
-        //        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
-
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override{};
 
-        //        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
+        static bool isJobGridUniverse(std::shared_ptr<CompoundJob> &job);
 
         /***********************/
         /** \endcond          **/
@@ -108,12 +106,10 @@ namespace wrench {
     private:
         int main() override;
 
-
         bool processNextMessage();
 
         void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<CompoundJob> job,
                                       const std::map<std::string, std::string> &service_specific_args);
-
 
         //        void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob>job,
         //                                      const std::map<std::string, std::string> &service_specific_args);

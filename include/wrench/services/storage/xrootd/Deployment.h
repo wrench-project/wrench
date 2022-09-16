@@ -15,8 +15,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_XROOTDDEPLOYMENT_H
-#define WRENCH_XROOTDDEPLOYMENT_H
+#ifndef WRENCH_XROOTD_Deployment_H
+#define WRENCH_XROOTD_Deployment_H
 #include "wrench/services/Service.h"
 #include <vector>
 #include <unordered_map>
@@ -33,7 +33,7 @@ namespace wrench {
         /**
        * @brief A class that implements the notion of an XRootD deployment. This tracks all nodes and files within the system.
        */
-        class XRootDDeployment {
+        class Deployment {
         public:
             /**
              * @brief Create an XRootD manager
@@ -41,12 +41,12 @@ namespace wrench {
              * @param property_values: The property values that should be used to overwrite the defaults of all Nodes (defaults to none) (unless otherwise specified)
              * @param messagepayload_values: The message paylaod values that should be used to overwrite the defaults of all Nodes (defaults to none) (unless otherwise specified)
              */
-            XRootDDeployment(std::shared_ptr<Simulation> simulation, WRENCH_PROPERTY_COLLECTION_TYPE property_values = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_values = {}) : property_values(property_values), messagepayload_values(messagepayload_values), simulation(simulation) {}
+            Deployment(std::shared_ptr<Simulation> simulation, WRENCH_PROPERTY_COLLECTION_TYPE property_values = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_values = {}) : property_values(property_values), messagepayload_values(messagepayload_values), simulation(simulation) {}
 
             std::shared_ptr<Node> createRootSupervisor(const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE node_property_list = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list = {});
             std::shared_ptr<Node> getRootSupervisor();
 
-            ~XRootDDeployment() {}
+            ~Deployment() {}
             /***********************/
             /** \cond DEVELOPER    */
             /***********************/
@@ -95,4 +95,4 @@ namespace wrench {
         };
     }// namespace XRootD
 }// namespace wrench
-#endif//WRENCH_XROOTDDEPLOYMENT_H
+#endif//WRENCH_XROOTD_Deployment_H
