@@ -695,8 +695,15 @@ namespace wrench {
                         S4U_Mailbox::dputMessage(child->mailbox, new RippleDelete(msg));
                     }
                 }
+            } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
+                msg->location = FileLocation::LOCATION(internalStorage);
+                msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(SimpleStorageServiceProperty::BUFFER_SIZE);
+                std::cerr << "BUFFER SIZE = " << msg->buffer_size << "\n";
+                S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
+
             } else if (auto msg = dynamic_cast<StorageServiceMessage *>(message.get())) {//we got a message targeted at a normal storage server
-                if (internalStorage) {                                                   //if there is an internal storage server, assume the message is misstargeted and forward
+                if (internalStorage) {
+                    // Forwarding the message as-is to the internal Storage
                     S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
                 } else {
                     WRENCH_WARN("XRootD manager %s received an unhandled vanilla StorageService message %s",
@@ -704,7 +711,7 @@ namespace wrench {
                 }
             } else {
                 throw std::runtime_error(
-                        "SimpleStorageService::processNextMessage(): Unexpected [" + message->getName() + "] message");
+                        "Node:processNextMessage(): Unexpected [" + message->getName() + "] message");
             }
             return true;
         }
@@ -799,6 +806,7 @@ namespace wrench {
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
             cache.maxCacheTime = getPropertyValueAsTimeInSecond(Property::CACHE_MAX_LIFETIME);
             this->deployment = deployment;
+            this->buffer_size = 1.0; // Not used, but letting it be zero will raise unwanted exception
         }
 
         /**
