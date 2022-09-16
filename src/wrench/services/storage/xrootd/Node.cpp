@@ -134,7 +134,7 @@ namespace wrench {
             }
 
             WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
-            if (reduced) {//handle the 2 Advancecd Messages if reduced simulation is enabled for this node
+            if (reduced) {//handle the 2 Advanced Messages if reduced simulation is enabled for this node
                 if (auto msg = dynamic_cast<AdvancedContinueSearchMessage *>(message.get())) {
                     WRENCH_DEBUG("Advanced Continue Search for %s", msg->file->getID().c_str());
 
@@ -715,6 +715,25 @@ namespace wrench {
                     msg->location = FileLocation::LOCATION(internalStorage);
                     msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
                             SimpleStorageServiceProperty::BUFFER_SIZE);
+                    S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
+                }
+
+            } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
+                if (not internalStorage) {
+                    // Reply this is not allowed
+                    std::string error_message = "Cannot copy file to/from non-storage XRooD node";
+                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                             new StorageServiceFileWriteAnswerMessage(
+                                                     msg->file,
+                                                     FileLocation::LOCATION(getSharedPtr<Node>()),
+                                                     false,
+                                                     std::shared_ptr<FailureCause>(
+                                                             new NotAllowed(getSharedPtr<Node>(), error_message)), 0,
+                                                     getMessagePayloadValue(MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+
+                } else {
+                    // Forward the message
+                    msg->dst = FileLocation::LOCATION(internalStorage);
                     S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
                 }
 
