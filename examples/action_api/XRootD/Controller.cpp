@@ -63,7 +63,7 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the Controller
      */
     Controller::Controller(const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
-                           XRootD::XRootDDeployment *xrootd_deployment,
+                           XRootD::Deployment *xrootd_deployment,
                            const std::string &hostname) : ExecutionController(hostname, "controller"),
                                                           bare_metal_compute_service(bare_metal_compute_service),
                                                           xrootd_deployment(xrootd_deployment) {}
@@ -148,7 +148,7 @@ namespace wrench {
 
         /* Sleep 2 hours, which is long enough for the XRootD cache to be cleared (based
          * on the {wrench::XRootD::Property::CACHE_MAX_LIFETIME,"3600"} property passed
-         * to the XRootDDeployment constructor in Simulator.cpp
+         * to the Deployment constructor in Simulator.cpp
          */
         WRENCH_INFO("Sleeping 2 hours, letting the XRootD cache be cleared");
         wrench::Simulation::sleep(7200);

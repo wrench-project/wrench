@@ -53,7 +53,7 @@ namespace wrench {
         /***********************/
 
 
-        void setComputeService(std::shared_ptr<BareMetalComputeService> cs);
+        //        void setComputeService(std::shared_ptr<BareMetalComputeService> cs);
 
         /***********************/
         /** \endcond           */
@@ -64,7 +64,7 @@ namespace wrench {
 
         friend class JobManager;
 
-        PilotJob(std::shared_ptr<JobManager> job_manager);
+        explicit PilotJob(std::shared_ptr<JobManager> job_manager);
 
         State state;
         std::shared_ptr<BareMetalComputeService> compute_service;// Associated compute service, i.e., the running pilot job

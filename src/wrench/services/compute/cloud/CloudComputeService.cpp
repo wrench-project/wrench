@@ -910,7 +910,7 @@ namespace wrench {
 
                 // Sleep for the VM booting overhead
                 Simulation::sleep(
-                        this->getPropertyValueAsDouble(CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
+                        this->getPropertyValueAsTimeInSecond(CloudComputeServiceProperty::VM_BOOT_OVERHEAD));
 
                 // Start the actual vm
                 vm->start(picked_host);
@@ -1251,15 +1251,15 @@ namespace wrench {
         bool success = true;
         double vm_boot_overhead = 0;
         try {
-            vm_boot_overhead = this->getPropertyValueAsDouble(CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS);
+            vm_boot_overhead = this->getPropertyValueAsTimeInSecond(CloudComputeServiceProperty::VM_BOOT_OVERHEAD);
         } catch (std::invalid_argument &e) {
             success = false;
         }
 
         if ((!success) or (vm_boot_overhead < 0)) {
-            throw std::invalid_argument("Invalid VM_BOOT_OVERHEAD_IN_SECONDS property specification: " +
+            throw std::invalid_argument("Invalid VM_BOOT_OVERHEAD property specification: " +
                                         this->getPropertyValueAsString(
-                                                CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
+                                                CloudComputeServiceProperty::VM_BOOT_OVERHEAD));
         }
 
         // VM resource allocation algorithm

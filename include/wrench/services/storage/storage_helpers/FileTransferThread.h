@@ -44,7 +44,7 @@ namespace wrench {
                            simgrid::s4u::Mailbox *answer_mailbox_if_read,
                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                           unsigned long buffer_size);
+                           double buffer_size);
 
         FileTransferThread(std::string hostname,
                            std::shared_ptr<StorageService> parent,
@@ -55,7 +55,7 @@ namespace wrench {
                            simgrid::s4u::Mailbox *answer_mailbox_if_read,
                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                           unsigned long buffer_size);
+                           double buffer_size);
 
         FileTransferThread(std::string hostname,
                            std::shared_ptr<StorageService> parent,
@@ -66,7 +66,7 @@ namespace wrench {
                            simgrid::s4u::Mailbox *answer_mailbox_if_read,
                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                           unsigned long buffer_size);
+                           double buffer_size);
 
         int main() override;
         void cleanup(bool has_returned_from_main, int return_value) override;
@@ -89,7 +89,7 @@ namespace wrench {
         simgrid::s4u::Mailbox *answer_mailbox_if_read;
         simgrid::s4u::Mailbox *answer_mailbox_if_write;
         simgrid::s4u::Mailbox *answer_mailbox_if_copy;
-        unsigned long buffer_size;
+        double buffer_size;
 
         void receiveFileFromNetwork(const std::shared_ptr<DataFile> &f, simgrid::s4u::Mailbox *mailbox, const std::shared_ptr<FileLocation> &location);
         void sendLocalFileToNetwork(const std::shared_ptr<DataFile> &f, const std::shared_ptr<FileLocation> &location, double num_bytes, simgrid::s4u::Mailbox *mailbox);

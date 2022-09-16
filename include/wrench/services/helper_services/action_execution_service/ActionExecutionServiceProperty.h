@@ -25,7 +25,9 @@ namespace wrench {
     class ActionExecutionServiceProperty : public ServiceProperty {
 
     public:
-        /** @brief The ActionExecutionService's overhead for creating a thread, in seconds **/
+        /** @brief The ActionExecutionService's overhead for creating a thread (Default value: "0", Default unit: second).
+         *         Example: "1s", "14ms", "0.12s"
+         **/
         DECLARE_PROPERTY_NAME(THREAD_CREATION_OVERHEAD);
 
         /** @brief Whether the ActionExecutionService should simulation computations as sleep **/

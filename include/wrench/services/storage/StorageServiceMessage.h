@@ -189,7 +189,7 @@ namespace wrench {
         StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                               std::shared_ptr<DataFile> file,
                                               std::shared_ptr<FileLocation> location,
-                                              unsigned long buffer_size,
+                                              double buffer_size,
                                               double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
@@ -199,7 +199,7 @@ namespace wrench {
         /** @brief The location to write the file to */
         std::shared_ptr<FileLocation> location;
         /** @brief The buffer size to use */
-        unsigned long buffer_size;
+        double buffer_size;
     };
 
     /**
@@ -260,7 +260,7 @@ namespace wrench {
                                             std::shared_ptr<FileLocation> location,
                                             bool success,
                                             std::shared_ptr<FailureCause> failure_cause,
-                                            unsigned long buffer_size,
+                                            double buffer_size,
                                             double payload);
 
         /** @brief The file that was read */
@@ -272,7 +272,7 @@ namespace wrench {
         /** @brief The cause of the failure, or nullptr on success */
         std::shared_ptr<FailureCause> failure_cause;
         /** @brief The requested buffer size */
-        unsigned long buffer_size;
+        double buffer_size;
     };
 
     /**

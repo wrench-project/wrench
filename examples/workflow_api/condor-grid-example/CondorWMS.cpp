@@ -20,7 +20,6 @@ WRENCH_LOG_CATEGORY(custom_wms, "Log category for Custom WMS");
  *  jobs.
  **/
 
-
 namespace wrench {
 
     CondorWMS::CondorWMS(

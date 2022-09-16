@@ -15,9 +15,11 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/job/PilotJob.h>
 #include <wrench/job/CompoundJob.h>
+#include <wrench/simulation/Simulation.h>
 #include <wrench/failure_causes/NetworkError.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
+#include <wrench/services/compute/htcondor/HTCondorComputeService.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_htcondor_negotiator, "Log category for HTCondorNegotiator");
 
@@ -28,6 +30,8 @@ namespace wrench {
      *
      * @param hostname: the hostname on which to start the service
      * @param startup_overhead: a startup overhead, in seconds
+     * @param grid_pre_overhead: a pre-job overhead for grid jobs, in seconds
+     * @param non_grid_pre_overhead: a pre-job overhead for non-grid jobs, in seconds
      * @param compute_services: a set of 'child' compute services available to and via the HTCondor pool
      * @param running_jobs: a list of currently running jobs
      * @param pending_jobs: a list of pending jobs
@@ -36,6 +40,8 @@ namespace wrench {
     HTCondorNegotiatorService::HTCondorNegotiatorService(
             std::string &hostname,
             double startup_overhead,
+            double grid_pre_overhead,
+            double non_grid_pre_overhead,
             std::set<std::shared_ptr<ComputeService>> &compute_services,
             std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
             std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
@@ -43,6 +49,8 @@ namespace wrench {
         : Service(hostname, "htcondor_negotiator"), reply_mailbox(reply_mailbox),
           compute_services(compute_services), running_jobs(running_jobs), pending_jobs(pending_jobs) {
         this->startup_overhead = startup_overhead;
+        this->grid_pre_overhead = grid_pre_overhead;
+        this->non_grid_pre_overhead = non_grid_pre_overhead;
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
 
@@ -96,6 +104,12 @@ namespace wrench {
 
             if (target_compute_service) {
                 job->pushCallbackMailbox(this->reply_mailbox);
+
+                if (HTCondorComputeService::isJobGridUniverse(job)) {
+                    S4U_Simulation::sleep(this->grid_pre_overhead);
+                } else {
+                    S4U_Simulation::sleep(this->non_grid_pre_overhead);
+                }
                 target_compute_service->submitCompoundJob(job, service_specific_arguments);
                 this->running_jobs.insert(std::make_pair(job, target_compute_service));
                 scheduled_jobs.push_back(job);
@@ -118,18 +132,16 @@ namespace wrench {
     }
 
     /**
- * @brief Helper method to pick a target compute service for a job
- * @param job
- * @param service_specific_arguments
- * @return
- */
+     * @brief Helper method to pick a target compute service for a job
+     * @param job
+     * @param service_specific_arguments
+     * @return
+     */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeService(
-            std::shared_ptr<CompoundJob> job, std::map<std::string,
-                                                       std::string>
-                                                      service_specific_arguments) {
-        bool is_grid_universe = (service_specific_arguments.find("-universe") != service_specific_arguments.end());
+            std::shared_ptr<CompoundJob> job,
+            std::map<std::string, std::string> service_specific_arguments) {
 
-        if (is_grid_universe) {
+        if (HTCondorComputeService::isJobGridUniverse(job)) {
             return pickTargetComputeServiceGridUniverse(job, service_specific_arguments);
         } else {
             return pickTargetComputeServiceNonGridUniverse(job, service_specific_arguments);

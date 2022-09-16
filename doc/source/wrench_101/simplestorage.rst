@@ -21,7 +21,7 @@ Creating a Simple storage service
 
 In WRENCH, a Simple storage service represents a storage service
 (:cpp:class:`wrench::StorageService`), which is defined by the
-:cpp:class:`wrench::SimpleStorage` class. An instantiation of a Simple storage
+:cpp:class:`wrench::SimpleStorageService` class. An instantiation of a Simple storage
 service requires the following parameters:
 
 -  The name of a host on which to start the service;
@@ -51,5 +51,6 @@ See the documentation of :cpp:class:`wrench::SimpleStorageServiceProperty` and
 :cpp:class:`wrench::SimpleStorageServiceMessagePayload` for all possible
 configuration options.
 
-Also see the simulators in the ``examples/basic-examples/*``
+Also see the simulators in the ``examples/workflow_api/basic-examples/*`` and
+``examples/action_api/*``
 directories, which all use simple storage services.

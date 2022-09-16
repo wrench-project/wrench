@@ -34,6 +34,8 @@ namespace wrench {
     public:
         HTCondorNegotiatorService(std::string &hostname,
                                   double startup_overhead,
+                                  double grid_pre_overhead,
+                                  double non_grid_pre_overhead,
                                   std::set<std::shared_ptr<ComputeService>> &compute_services,
                                   std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
                                   std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
@@ -55,6 +57,10 @@ namespace wrench {
 
         /** startup overhead **/
         double startup_overhead;
+        /** grid, pre-overhead */
+        double grid_pre_overhead;
+        /** non-grid, pre-overhead */
+        double non_grid_pre_overhead;
         /** mailbox to reply **/
         simgrid::s4u::Mailbox *reply_mailbox;
         /** set of compute resources **/

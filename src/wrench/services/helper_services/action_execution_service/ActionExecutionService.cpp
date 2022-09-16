@@ -471,7 +471,7 @@ namespace wrench {
                     new ActionExecutor(target_host,
                                        target_num_cores,
                                        required_ram,
-                                       this->getPropertyValueAsDouble(ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD),
+                                       this->getPropertyValueAsTimeInSecond(ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD),
                                        this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP),
                                        this->mailbox,
                                        action,

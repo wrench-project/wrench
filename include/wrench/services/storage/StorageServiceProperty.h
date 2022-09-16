@@ -27,6 +27,7 @@ namespace wrench {
          *  - "0": an ideal fluid model
          *  - any integral value in between: an actual buffer size (the smaller the buffer size, the slower the simulation)
          *  - Default value: "1048576" (1 MiB)
+         *  - Example values: "42", "42B", "56MB", "100KiB", etc.
          **/
         DECLARE_PROPERTY_NAME(BUFFER_SIZE);
     };

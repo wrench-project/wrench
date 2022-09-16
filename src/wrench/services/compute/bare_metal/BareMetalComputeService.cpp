@@ -762,7 +762,7 @@ namespace wrench {
         // Thread startup overhead
         double thread_startup_overhead = 0;
         try {
-            thread_startup_overhead = this->getPropertyValueAsDouble(
+            thread_startup_overhead = this->getPropertyValueAsTimeInSecond(
                     BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD);
         } catch (std::invalid_argument &e) {
             success = false;

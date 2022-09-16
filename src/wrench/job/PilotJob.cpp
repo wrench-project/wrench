@@ -38,13 +38,13 @@ namespace wrench {
         return this->compute_service;
     }
 
-    /**
-     * @brief Set the compute service that runs on the pilot job
-     * @param cs: a compute service
-     */
-    void PilotJob::setComputeService(std::shared_ptr<BareMetalComputeService> cs) {
-        this->compute_service = std::move(cs);
-    }
+    //    /**
+    //     * @brief Set the compute service that runs on the pilot job
+    //     * @param cs: a compute service
+    //     */
+    //    void PilotJob::setComputeService(std::shared_ptr<BareMetalComputeService> cs) {
+    //        this->compute_service = std::move(cs);
+    //    }
 
 
 }// namespace wrench

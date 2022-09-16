@@ -8,6 +8,7 @@
  */
 
 #include <wrench/services/compute/htcondor/HTCondorComputeServiceMessagePayload.h>
+#include <wrench/services/compute/htcondor/HTCondorComputeService.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
@@ -21,6 +22,8 @@
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/failure_causes/NetworkError.h>
 
+#include <memory>
+
 
 WRENCH_LOG_CATEGORY(wrench_core_HTCondorCentralManager,
                     "Log category for HTCondorCentralManagerService");
@@ -32,6 +35,10 @@ namespace wrench {
      *
      * @param hostname: the hostname on which to start the service
      * @param negotiator_startup_overhead: negotiator startup overhead
+     * @param grid_pre_overhead: grid job pre-overhead
+     * @param grid_post_overhead: grid job post-overhead
+     * @param non_grid_pre_overhead: non-grid job pre-overhead
+     * @param non_grid_post_overhead: non-grid job post-overhead
      * @param compute_services: a set of 'child' compute resources available to and via the HTCondor pool
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -41,11 +48,21 @@ namespace wrench {
     HTCondorCentralManagerService::HTCondorCentralManagerService(
             const std::string &hostname,
             double negotiator_startup_overhead,
+            double grid_pre_overhead,
+            double grid_post_overhead,
+            double non_grid_pre_overhead,
+            double non_grid_post_overhead,
             std::set<shared_ptr<ComputeService>> compute_services,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
         : ComputeService(hostname, "htcondor_central_manager", "") {
         this->negotiator_startup_overhead = negotiator_startup_overhead;
+
+        this->grid_pre_overhead = grid_pre_overhead;
+        this->grid_post_overhead = grid_post_overhead;
+        this->non_grid_pre_overhead = non_grid_pre_overhead;
+        this->non_grid_post_overhead = non_grid_post_overhead;
+
         this->compute_services = compute_services;
 
         // Set default and specified properties
@@ -148,10 +165,13 @@ namespace wrench {
                 if (not this->pending_jobs.empty()) {
                     this->dispatching_jobs = true;
                     //WRENCH_INFO("adding BatchComputeService service to new negotiator---> %p", this->grid_universe_batch_service_shared_ptr.get());
-                    auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
-                            new HTCondorNegotiatorService(this->hostname, this->negotiator_startup_overhead,
-                                                          this->compute_services,
-                                                          this->running_jobs, this->pending_jobs, this->mailbox));
+                    auto negotiator = std::make_shared<HTCondorNegotiatorService>(
+                            this->hostname,
+                            this->negotiator_startup_overhead,
+                            this->grid_pre_overhead,
+                            this->non_grid_pre_overhead,
+                            this->compute_services,
+                            this->running_jobs, this->pending_jobs, this->mailbox);
                     negotiator->setSimulation(this->simulation);
                     negotiator->start(negotiator, true, false);// Daemonized, no auto-restart
                 }
@@ -222,10 +242,20 @@ namespace wrench {
             //            return true;
             //
         } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobDoneMessage *>(message.get())) {
+            if (HTCondorComputeService::isJobGridUniverse(msg->job)) {
+                S4U_Simulation::sleep(this->grid_post_overhead);
+            } else {
+                S4U_Simulation::sleep(this->non_grid_post_overhead);
+            }
             processCompoundJobCompletion(msg->job);
             return true;
 
         } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobFailedMessage *>(message.get())) {
+            if (HTCondorComputeService::isJobGridUniverse(msg->job)) {
+                S4U_Simulation::sleep(this->grid_post_overhead);
+            } else {
+                S4U_Simulation::sleep(this->non_grid_post_overhead);
+            }
             processCompoundJobFailure(msg->job);
             return true;
 

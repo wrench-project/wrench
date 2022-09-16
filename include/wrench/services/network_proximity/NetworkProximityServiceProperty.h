@@ -20,7 +20,9 @@ namespace wrench {
 
     class NetworkProximityServiceProperty : public ServiceProperty {
     public:
-        /** @brief The overhead, in seconds, of looking up entries for a file (default: 0) **/
+        /** @brief The overhead of looking up entries for a file (default: 0, default unit: second)
+         *         Examples: "1", "1s", "1.5ms" etc.
+         **/
         DECLARE_PROPERTY_NAME(LOOKUP_OVERHEAD);
 
         /** @brief The type of network proximity implementation to be used:
@@ -32,7 +34,9 @@ namespace wrench {
         /** @brief The message size (in bytes) to be used in RTT measurements (default: 1024) **/
         DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MESSAGE_SIZE);
 
-        /** @brief The inter-measurement period (in seconds) to be used (default: 60) **/
+        /** @brief The inter-measurement period to be used (default: 60, default unit seconds)
+         *         Examples: "60", "1m", "1.2h", etc.
+         **/
         DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD);
 
         /** @brief The maximum random uniformly distributed noise (in seconds) to be added to the measurement period (useful

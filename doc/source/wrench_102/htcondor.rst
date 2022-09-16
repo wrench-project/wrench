@@ -17,7 +17,7 @@ The examples code fragments below showcase the creation of a
 controller. Let’s start with the creation (in main). Note that arguments
 to service constructors are omitted for brevity (see the execution
 controller implementation in
-``examples/condor-grid-example/CondorWMS.cp`` for a complete and working
+``examples/workflow_api/condor-grid-example/CondorWMS.cp`` for a complete and working
 example).
 
 .. code:: cpp
@@ -106,7 +106,7 @@ In the example below, we show both kinds of job submissions:
    job_manager->submitJob(g_job, htcondor_cs, service_specific_args);
 
 The above covers the essentials. See the API documnetation for more
-options, and the code in the ``examples/condor-grid-example/`` directory
+options, and the code in the ``examples/workflow_api/condor-grid-example/`` directory
 for working/usable code.
 
 .. _guide-htcondor-anatomy:

@@ -68,5 +68,5 @@ control over how the physical resources are used you likely need a
 :ref:`virtualized cluster services <guide-102-virtualizedcluster>`.
 
 See the execution controller implementation in
-``examples/basic-examples/cloud-bag-of-tasks/TwoTasksAtATimeCloudWMS.cpp``
+``examples/workflow_api/basic-examples/cloud-bag-of-tasks/TwoTasksAtATimeCloudWMS.cpp``
 for a more complete example.

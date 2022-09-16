@@ -21,9 +21,9 @@ namespace wrench {
     class BatchComputeServiceProperty : public ComputeServiceProperty {
 
     public:
-        /**
-         * @brief The overhead to start a thread, in seconds
-         */
+        /** @brief The overhead to start a thread (default value: "0", default unit: seconds):
+         *         Examples: "5", "5s", "5000ms", etc.
+         **/
         DECLARE_PROPERTY_NAME(THREAD_STARTUP_OVERHEAD);
 
         /**
@@ -158,18 +158,6 @@ namespace wrench {
         *            have no effect in some cases).
         */
         DECLARE_PROPERTY_NAME(BATSCHED_CONTIGUOUS_ALLOCATION);
-
-        //        /** @brief Overhead delay in seconds between condor and slurm for the start of execution
-        //         *      - defaults to calibrated figure
-        //         *      - property is set on first receiving grid universe job.
-        //         */
-        //        DECLARE_PROPERTY_NAME(GRID_PRE_EXECUTION_DELAY);
-        //
-        //        /** @brief Overhead delay in seconds between condor and slurm for the completion of execution
-        //         *      - defaults to calibrated figure
-        //         *      - property is set on first receiving grid universe job.
-        //         */
-        //        DECLARE_PROPERTY_NAME(GRID_POST_EXECUTION_DELAY);
 
 
         /***********************/

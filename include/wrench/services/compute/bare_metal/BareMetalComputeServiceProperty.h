@@ -23,7 +23,9 @@ namespace wrench {
     class BareMetalComputeServiceProperty : public ComputeServiceProperty {
 
     public:
-        /** @brief The overhead to start a thread, in seconds **/
+        /** @brief The overhead to start a thread (default value: "0", default unit: seconds):
+         *         Examples: "5", "5s", "5000ms", etc.
+         **/
         DECLARE_PROPERTY_NAME(THREAD_STARTUP_OVERHEAD);
         /** @brief If true, fail action after an executor crash, otherwise re-ready it and try again **/
         DECLARE_PROPERTY_NAME(FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH);

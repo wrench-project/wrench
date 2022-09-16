@@ -21,7 +21,7 @@
 
 #include <iostream>
 #include <wrench-dev.h>
-#include <wrench/services/storage/xrootd/XRootDDeployment.h>
+#include <wrench/services/storage/xrootd/Deployment.h>
 
 #include <wrench/services/storage/xrootd/Node.h>
 #include "Controller.h"
@@ -60,10 +60,10 @@ int main(int argc, char **argv) {
      * abstracts away more simulation details, which speeds up the simulation but
      * may make it less realistic. See the documentation for more details.
      */
-    wrench::XRootD::XRootDDeployment xrootd_deployment(simulation,
-                                                       {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "3600"},
-                                                        {wrench::XRootD::Property::REDUCED_SIMULATION, "false"}},
-                                                       {});
+    wrench::XRootD::Deployment xrootd_deployment(simulation,
+                                                 {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "3600"},
+                                                  {wrench::XRootD::Property::REDUCED_SIMULATION, "false"}},
+                                                 {});
 
     /* Construct an XRootD tree as follows (vertices are host names)
 

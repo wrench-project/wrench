@@ -29,7 +29,7 @@ namespace wrench {
     class VirtualizedClusterComputeService : public CloudComputeService {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {VirtualizedClusterComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"}};
+                {VirtualizedClusterComputeServiceProperty::VM_BOOT_OVERHEAD, "0"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {VirtualizedClusterComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
