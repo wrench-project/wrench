@@ -24,6 +24,7 @@ public:
     void do_BasicFunctionality_test(std::string arg);
 
     std::shared_ptr<wrench::XRootD::Node> root_supervisor;
+    std::shared_ptr<wrench::SimpleStorageService> standalone_ss;
 
 protected:
     XRootDServiceBasicFunctionalTest() {
@@ -58,6 +59,7 @@ protected:
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"link12\"/> </route>"
                           "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"link13\"/> </route>"
                           "       <route src=\"Host3\" dst=\"Host3\"> <link_ctn id=\"link23\"/> </route>"
+                          "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"link23\"/> </route>"
                           "   </zone> "
                           "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -156,12 +158,44 @@ private:
             }
         }
 
-        // TODO: Do a file copy
-//        std::cerr << "DOING THE FILE COPY\n";
-//        wrench::StorageService::copyFile(
-//                file3,
-//                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0)),
-//                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(1)));
+        // Copy a file child 0 to child 1
+        auto file4 = wrench::Simulation::addFile("file4", 10000);
+
+        this->test->root_supervisor->getChild(0)->writeFile(file4);
+        wrench::StorageService::copyFile(
+                file4,
+                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0)),
+                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(1)));
+        // Check that the copy has worked
+        if(!this->test->root_supervisor->getChild(1)->lookupFile(file4)) {
+            throw std::runtime_error("It seems that file4 was never copied to child 1 from child 0");
+        }
+
+        // Copy a file from child 0 to a stand-alone SimpleStorageService
+        auto file5 = wrench::Simulation::addFile("file5", 10000);
+        this->test->root_supervisor->getChild(0)->writeFile(file5);
+        wrench::StorageService::copyFile(
+                file5,
+                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0)),
+                wrench::FileLocation::LOCATION(this->test->standalone_ss));
+        // Check that the copy has worked
+        if(!this->test->standalone_ss->lookupFile(file5)) {
+            throw std::runtime_error("It seems that file5 was never copied to standalone ss from child 0");
+        }
+
+        // Copy a file from stand-alone SimpleStorageService to child 1
+        auto file6 = wrench::Simulation::addFile("file6", 10000);
+        this->test->standalone_ss->writeFile(file6);
+        wrench::StorageService::copyFile(
+                file6,
+                wrench::FileLocation::LOCATION(this->test->standalone_ss),
+                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(1)));
+
+        // Check that the copy has worked
+        if(!this->test->root_supervisor->getChild(1)->lookupFile(file6)) {
+            throw std::runtime_error("It seems that file6 was never copied from standalone ss to child 1");
+        }
+
 
         //mark
         if(this->test->root_supervisor->getChild(3)!=nullptr){
@@ -200,10 +234,10 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -220,6 +254,9 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
 
     auto ss2 = this->root_supervisor->addChildStorageServer("Host2", "/disk100", {}, {});
     auto ss3 = this->root_supervisor->addChildStorageServer("Host3", "/disk100", {}, {});
+
+    this->standalone_ss = simulation->add(new wrench::SimpleStorageService(
+            "Host1", {"/disk100"}, {}, {}));
 
     // Create an execution controller
     auto controller = simulation->add(new XRootDServiceBasicFunctionalityTestExecutionController(this, "Host1"));
