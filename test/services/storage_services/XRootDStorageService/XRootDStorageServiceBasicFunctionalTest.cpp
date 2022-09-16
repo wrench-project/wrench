@@ -143,32 +143,33 @@ private:
             }
         }
 
-
-
-        //attempt to write file directly to leaf
-        //TODO this segfaults and I dont know why
-        //this->test->root_supervisor->getChild(0)->writeFile(file3);
+        // attempt to write file directly to leaf
+        this->test->root_supervisor->getChild(0)->writeFile(file3);
 
         //attempt to write file directly to supervisor.
         //TODO should this throw an exception?  Right now its just a warning
         //TODO This has some network error to trace later
-        //this->test->root_supervisor->writeFile(file3);
+        // TODO BY HENRI: This below causes something super weird to happen, some invalid_argument:exception (not a warning)
+//        this->test->root_supervisor->writeFile(file3);
+
         //mark
         if(this->test->root_supervisor->getChild(3)!=nullptr){
             throw std::runtime_error("Got child where none should be found");
         }
         if(this->test->root_supervisor->getParent()!=nullptr){
-            throw std::runtime_error("Root has a parrent somehow");
+            throw std::runtime_error("Root has a parent somehow");
         }
         if(this->test->root_supervisor->getChild(0)->getParent()!=this->test->root_supervisor.get()){
-            throw std::runtime_error("Child has wrong parrent somehow");
+            throw std::runtime_error("Child has wrong parent somehow");
         }
         if(this->test->root_supervisor->getStorageServer()!=nullptr){
             throw std::runtime_error("Why does root have internal storage?");
         }
+
         //TODO not really sure a good way to test if load is correct but this covers, and root should be 0
         this->test->root_supervisor->getLoad();
         this->test->root_supervisor->getChild(0)->getLoad();
+
         return 0;
 
         //TODO hookup cache.clear to something or remove it
@@ -188,10 +189,10 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
