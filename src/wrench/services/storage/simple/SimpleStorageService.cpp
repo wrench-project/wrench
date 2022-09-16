@@ -383,7 +383,6 @@ namespace wrench {
         }
 
         bool success = (failure_cause == nullptr);
-        ;
 
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
         S4U_Mailbox::dputMessage(
