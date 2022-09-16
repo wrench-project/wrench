@@ -46,8 +46,8 @@ namespace wrench {
         /**
          * @brief Constructor
          * @param answer_mailbox: The mailbox the final answer should be sent to
-         * @brief The file being searched for
-         * @brief fileReadRequest Whether this message is in response to a file read request (true) or a file lookup request (false)
+         * @param file: The file being searched for
+         * @param fileReadRequest: Whether this message is in response to a file read request (true) or a file lookup request (false)
          * @param answered: A shared boolean for if the answer has been sent to the client.  This should be the same for all messages searching for this request.  Used to prevent the multiple response problem
 
          */
