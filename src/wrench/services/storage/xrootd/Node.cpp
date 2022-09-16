@@ -846,7 +846,8 @@ namespace wrench {
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
             cache.maxCacheTime = getPropertyValueAsTimeInSecond(Property::CACHE_MAX_LIFETIME);
             this->deployment = deployment;
-            this->buffer_size = 1.0;// Not used, but letting it be zero will raise unwanted exception
+            this->buffer_size = DBL_MAX;// Not used, but letting it be zero will raise unwanted exception since
+                                        // clients "think" that they're talking to a real storage service
         }
 
         /**
