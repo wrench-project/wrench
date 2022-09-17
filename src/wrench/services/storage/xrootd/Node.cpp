@@ -152,8 +152,8 @@ namespace wrench {
                                                              msg->file,
                                                              cached,
                                                              getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                             getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
-                                                             cached.size(),
+                                                                     getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                                                             cached.size(),
                                                              msg->answered));
                         } catch (std::shared_ptr<NetworkError> &cause) {
                             throw ExecutionException(cause);
@@ -181,7 +181,7 @@ namespace wrench {
                                                                              msg->file,
                                                                              set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage)},
                                                                              getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                             getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                                                     getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                                              msg->answered));
                                         } catch (std::shared_ptr<NetworkError> &cause) {
                                             throw ExecutionException(cause);
@@ -213,7 +213,7 @@ namespace wrench {
                                                                  msg->file,
                                                                  set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage)},
                                                                  getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                                  msg->answered));
                             } catch (std::shared_ptr<NetworkError> &cause) {
                                 throw ExecutionException(cause);
@@ -279,7 +279,8 @@ namespace wrench {
                                                              FileLocation::LOCATION(getSharedPtr<Node>()),
                                                              false,
                                                              std::shared_ptr<FailureCause>(
-                                                                     new FileNotFound(msg->file, FileLocation::LOCATION(getSharedPtr<Node>()))), 0,
+                                                                     new FileNotFound(msg->file, FileLocation::LOCATION(getSharedPtr<Node>()))),
+                                                             0,
                                                              getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
 
                         } else {
@@ -532,8 +533,8 @@ namespace wrench {
                                                          msg->file,
                                                          cached,
                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
-                                                         cached.size(),
+                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                                                         cached.size(),
                                                          msg->answered));
                     } catch (std::shared_ptr<NetworkError> &cause) {
                         throw ExecutionException(cause);
@@ -553,7 +554,7 @@ namespace wrench {
                                                              msg->file,
                                                              set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage)},
                                                              getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                             getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                                     getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                              msg->answered));
                         } catch (std::shared_ptr<NetworkError> &cause) {
                             throw ExecutionException(cause);
@@ -707,7 +708,8 @@ namespace wrench {
                                                      FileLocation::LOCATION(getSharedPtr<Node>()),
                                                      false,
                                                      std::shared_ptr<FailureCause>(
-                                                             new NotAllowed(getSharedPtr<Node>(), error_message)), 0,
+                                                             new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                                     0,
                                                      getMessagePayloadValue(MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
 
                 } else {
@@ -728,7 +730,8 @@ namespace wrench {
                                                      FileLocation::LOCATION(getSharedPtr<Node>()),
                                                      false,
                                                      std::shared_ptr<FailureCause>(
-                                                             new NotAllowed(getSharedPtr<Node>(), error_message)), 0,
+                                                             new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                                     0,
                                                      getMessagePayloadValue(MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
 
                 } else {
@@ -843,7 +846,8 @@ namespace wrench {
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
             cache.maxCacheTime = getPropertyValueAsTimeInSecond(Property::CACHE_MAX_LIFETIME);
             this->deployment = deployment;
-            this->buffer_size = 1.0; // Not used, but letting it be zero will raise unwanted exception
+            this->buffer_size = DBL_MAX;// Not used, but letting it be zero will raise unwanted exception since
+                                        // clients "think" that they're talking to a real storage service
         }
 
         /**
