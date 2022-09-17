@@ -468,7 +468,7 @@ namespace wrench {
             throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
         }
 
-        WRENCH_INFO("Downloading f  %s from location %s",
+        WRENCH_INFO("Downloading file  %s from location %s",
                     f->getID().c_str(), src_loc->toString().c_str());
 
         // Check that the buffer size is compatible
