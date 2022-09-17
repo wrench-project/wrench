@@ -196,6 +196,19 @@ private:
             throw std::runtime_error("It seems that file6 was never copied from standalone ss to child 1");
         }
 
+        // Copy from superviser to standalone storage service
+        auto file7 = wrench::Simulation::addFile("file7", 10000);
+        this->test->root_supervisor->getChild(0)->writeFile(file7);
+        wrench::StorageService::copyFile(
+                file7,
+                wrench::FileLocation::LOCATION(this->test->root_supervisor),
+                wrench::FileLocation::LOCATION(this->test->standalone_ss));
+
+        // Check that the copy has worked
+        if(!this->test->standalone_ss->lookupFile(file7)) {
+            throw std::runtime_error("It seems that file7 was never copied from supervisor to standalone ss");
+        }
+
 
         //mark
         if(this->test->root_supervisor->getChild(3)!=nullptr){
