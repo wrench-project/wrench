@@ -446,7 +446,6 @@ namespace wrench {
                         //        this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                         //extra compute call
 
-
                         if (children.size() > 0) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
                             Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
@@ -701,7 +700,7 @@ namespace wrench {
             } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
                 if (not internalStorage) {
                     // Reply this is not allowed
-                    std::string error_message = "Cannot write file at non-storage XRooD node";
+                    std::string error_message = "Cannot write file at non-storage XRootD node";
                     S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                              new StorageServiceFileWriteAnswerMessage(
                                                      msg->file,
@@ -1077,6 +1076,24 @@ namespace wrench {
             metavisor->files[file].push_back(this->getSharedPtr<Node>());
         }
 
+        /**
+        * @brief write a file on this node.
+        * @param file: A shared pointer to a file
+        * @param path: a path at the node's mount point
+        *
+        * @throw std::invalid_argument
+        */
+        void Node::writeFile(const std::shared_ptr<DataFile> &file) {
+            if (internalStorage == nullptr) {
+                std::string error_message = "Cannot write file at non-storage XRootD node";
+                throw ExecutionException(
+                        std::shared_ptr<FailureCause>(
+                                new NotAllowed(getSharedPtr<Node>(), error_message)));
+            }
+            internalStorage->writeFile(file);
+            metavisor->files[file].push_back(this->getSharedPtr<Node>());
+        }
+
 
         /**
          * @brief Adds a child, which will be a supervisor, to a node
@@ -1086,7 +1103,6 @@ namespace wrench {
         std::shared_ptr<Node> Node::addChildSupervisor(const std::string &hostname) {
             return this->addChild(this->deployment->createSupervisor(hostname));
         }
-
 
         /**
          * @brief Adds a child, which will be a storage server, to a node
