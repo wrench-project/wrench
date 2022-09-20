@@ -46,11 +46,29 @@ namespace wrench {
 
         // Launch the Batsched process
 
-        // The "mod by 1500" below is totally ad-hoc, but not modding seemed
-        // to lead to weird zmq "address already in use" errors...
-        this->batsched_port = 28000 + (getpid() % 1500) +
-                              S4U_Mailbox::generateUniqueSequenceNumber();
-        this->pid = getpid();
+        // Determine q "good" port number, if possible
+        // This process below is implemented because of some srange
+        // "address already in use" errors with ZMQ
+        while (1) {
+            // The "mod by 1500" below is totally ad-hoc, but not modding seemed
+            // to lead to even more weird ZMQ "address already in use" errors...
+            this->batsched_port = 28000 + (getpid() % 1500) +
+                                  S4U_Mailbox::generateUniqueSequenceNumber();
+            std::cerr << "Thinking of starting Batsched on port " << this->batsched_port << "...\n";
+            this->pid = getpid();
+            zmq::context_t context(1);
+            zmq::socket_t socket(context, ZMQ_REQ);
+            std::string address = "tcp://*:" + std::to_string(this->batsched_port);
+            int rc = zmq_bind (socket, address.c_str());
+            if (rc != 0) {
+                std::cerr << "Couldn't bind socket to port (errno=" << errno << " - EADDRINUSE = " << EADDRINUSE << ". Retrying...\n";
+                continue;
+            } else {
+                std::cerr << "Was able to bind socket to port, unbinding and proceedings\n";
+                zmq_unbind (socket, address.c_str());
+                break;
+            }
+        }
 
         int top_pid = fork();
 
