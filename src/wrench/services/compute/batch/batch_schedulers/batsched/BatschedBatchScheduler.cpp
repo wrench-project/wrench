@@ -52,10 +52,6 @@ namespace wrench {
                               S4U_Mailbox::generateUniqueSequenceNumber();
         this->pid = getpid();
 
-        // Sleep 1 s, to perhaps avoid the "Address already in use" that occurs on GitHub
-        // when running all the unit tests...
-        sleep(1);
-
         int top_pid = fork();
 
         if (top_pid == 0) {// Child process that will exec batsched
