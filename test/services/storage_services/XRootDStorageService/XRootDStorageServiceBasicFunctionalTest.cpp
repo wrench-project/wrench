@@ -205,7 +205,7 @@ private:
                 wrench::FileLocation::LOCATION(this->test->standalone_ss));
 
         // Check that the copy has worked
-        if(!this->test->standalone_ss->lookupFile(file7)) {
+        if (!this->test->standalone_ss->lookupFile(file7)) {
             throw std::runtime_error("It seems that file7 was never copied from supervisor to standalone ss");
         }
 
