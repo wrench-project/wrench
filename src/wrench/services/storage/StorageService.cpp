@@ -287,7 +287,7 @@ namespace wrench {
                         remaining -= this->buffer_size;
                     }
                     S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
-                            file, (unsigned long) remaining, true));
+                                                                             file, (unsigned long) remaining, true));
 
                 } catch (std::shared_ptr<NetworkError> &cause) {
                     throw ExecutionException(cause);
@@ -309,7 +309,6 @@ namespace wrench {
             throw std::runtime_error("StorageService::writeFile(): Received a totally unexpected [" +
                                      message->getName() + "] message!");
         }
-
     }
 
 
@@ -547,7 +546,6 @@ namespace wrench {
                                      message->getName() + "] message!");
         }
     }
-
 
 
     /**
