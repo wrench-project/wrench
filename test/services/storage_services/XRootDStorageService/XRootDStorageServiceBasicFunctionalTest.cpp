@@ -198,7 +198,7 @@ private:
 
         // Copy a file from Supervisor to stand-alone storage service
         auto file7 = wrench::Simulation::addFile("file7", 10000);
-//        this->test->root_supervisor->getChild(0)->createFile(file7);  // works too
+        //        this->test->root_supervisor->getChild(0)->createFile(file7);  // works too
         this->test->root_supervisor->getChild(0)->writeFile(file7);
         wrench::StorageService::copyFile(
                 file7,
