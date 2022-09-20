@@ -45,6 +45,8 @@ namespace wrench {
             void createFile(const std::shared_ptr<DataFile> &file) override;
             void createFile(const std::shared_ptr<DataFile> &file, const string &path) override;
 
+            void writeFile(const std::shared_ptr<DataFile> &file) override;
+
             /***********************/
             /** \endcond           */
             /***********************/
