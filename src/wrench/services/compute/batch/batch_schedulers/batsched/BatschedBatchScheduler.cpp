@@ -59,12 +59,12 @@ namespace wrench {
             zmq::context_t context(1);
             zmq::socket_t socket(context, ZMQ_REQ);
             std::string address = "tcp://*:" + std::to_string(this->batsched_port);
-            int rc = zmq_bind (socket, address.c_str());
+            int rc = zmq_bind(socket, address.c_str());
             if (rc != 0) {
 //                std::cerr << "Couldn't bind socket to port (errno=" << errno << " - EADDRINUSE = " << EADDRINUSE << ". Retrying...\n";
                 continue;
             } else {
-//                std::cerr << "Was able to bind socket to port, unbinding and proceedings\n";
+//                std::cerr << "Was able to bind socket to port, unbinding and proceeding\n";
                 zmq_unbind (socket, address.c_str());
                 break;
             }
