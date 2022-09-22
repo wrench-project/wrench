@@ -24,6 +24,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/conf/cmake/")
 find_package(Boost REQUIRED)
 find_package(SimGrid REQUIRED)
 
+find_package(nlohmann_json)
+
 set(CMAKE_CXX_STANDARD 14)
 
 # build the version number
@@ -186,7 +188,7 @@ set(HEADER_FILES
         include/wrench/execution_controller/ExecutionController.h
         include/wrench/execution_controller/ExecutionControllerMessage.h
         include/wrench/data_file/DataFile.h
-        include/wrench/services/storage/xrootd/XRootDDeployment.h
+        include/wrench/services/storage/xrootd/Deployment.h
         include/wrench/services/storage/xrootd/Node.h
         include/wrench/services/storage/xrootd/XRootDMessagePayload.h
         include/wrench/services/storage/xrootd/XRootDMessage.h
@@ -354,7 +356,7 @@ set(SOURCE_FILES
         src/wrench/execution_controller/ExecutionController.cpp
         src/wrench/execution_controller/ExecutionControllerMessage.cpp
         src/wrench/data_file/DataFile.cpp
-        src/wrench/services/storage/xrootd/XRootDDeployment.cpp
+        src/wrench/services/storage/xrootd/Deployment.cpp
         src/wrench/services/storage/xrootd/Node.cpp
         src/wrench/services/storage/xrootd/SearchStack.cpp
         src/wrench/services/storage/xrootd/Cache.cpp

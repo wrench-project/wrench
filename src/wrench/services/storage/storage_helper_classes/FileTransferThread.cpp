@@ -46,14 +46,14 @@ namespace wrench {
                                            simgrid::s4u::Mailbox *answer_mailbox_if_read,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                                           unsigned long buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
-                                                                        parent(std::move(parent)),
-                                                                        file(std::move(file)),
-                                                                        num_bytes_to_transfer(num_bytes_to_transfer),
-                                                                        answer_mailbox_if_read(answer_mailbox_if_read),
-                                                                        answer_mailbox_if_write(answer_mailbox_if_write),
-                                                                        answer_mailbox_if_copy(answer_mailbox_if_copy),
-                                                                        buffer_size(buffer_size) {
+                                           double buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
+                                                                 parent(std::move(parent)),
+                                                                 file(std::move(file)),
+                                                                 num_bytes_to_transfer(num_bytes_to_transfer),
+                                                                 answer_mailbox_if_read(answer_mailbox_if_read),
+                                                                 answer_mailbox_if_write(answer_mailbox_if_write),
+                                                                 answer_mailbox_if_copy(answer_mailbox_if_copy),
+                                                                 buffer_size(buffer_size) {
         this->src_mailbox = src_mailbox;
         this->src_location = nullptr;
         this->dst_mailbox = nullptr;
@@ -85,14 +85,14 @@ namespace wrench {
                                            simgrid::s4u::Mailbox *answer_mailbox_if_read,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                                           unsigned long buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
-                                                                        parent(std::move(parent)),
-                                                                        file(std::move(file)),
-                                                                        num_bytes_to_transfer(num_bytes_to_transfer),
-                                                                        answer_mailbox_if_read(answer_mailbox_if_read),
-                                                                        answer_mailbox_if_write(answer_mailbox_if_write),
-                                                                        answer_mailbox_if_copy(answer_mailbox_if_copy),
-                                                                        buffer_size(buffer_size) {
+                                           double buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
+                                                                 parent(std::move(parent)),
+                                                                 file(std::move(file)),
+                                                                 num_bytes_to_transfer(num_bytes_to_transfer),
+                                                                 answer_mailbox_if_read(answer_mailbox_if_read),
+                                                                 answer_mailbox_if_write(answer_mailbox_if_write),
+                                                                 answer_mailbox_if_copy(answer_mailbox_if_copy),
+                                                                 buffer_size(buffer_size) {
         this->src_mailbox = nullptr;
         this->src_location = std::move(src_location);
         this->dst_mailbox = dst_mailbox;
@@ -124,14 +124,14 @@ namespace wrench {
                                            simgrid::s4u::Mailbox *answer_mailbox_if_read,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                                           unsigned long buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
-                                                                        parent(std::move(parent)),
-                                                                        file(std::move(file)),
-                                                                        num_bytes_to_transfer(num_bytes_to_transfer),
-                                                                        answer_mailbox_if_read(answer_mailbox_if_read),
-                                                                        answer_mailbox_if_write(answer_mailbox_if_write),
-                                                                        answer_mailbox_if_copy(answer_mailbox_if_copy),
-                                                                        buffer_size(buffer_size) {
+                                           double buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
+                                                                 parent(std::move(parent)),
+                                                                 file(std::move(file)),
+                                                                 num_bytes_to_transfer(num_bytes_to_transfer),
+                                                                 answer_mailbox_if_read(answer_mailbox_if_read),
+                                                                 answer_mailbox_if_write(answer_mailbox_if_write),
+                                                                 answer_mailbox_if_copy(answer_mailbox_if_copy),
+                                                                 buffer_size(buffer_size) {
         this->src_mailbox = nullptr;
         this->src_location = std::move(src_location);
         this->dst_mailbox = nullptr;
@@ -160,7 +160,7 @@ namespace wrench {
 
         WRENCH_INFO(
                 "New FileTransferThread (file=%s, bytes_to_transfer=%.2lf, src_mailbox=%s; src_location=%s; dst_mailbox=%s; dst_location=%s; "
-                "answer_mailbox_if_read=%s; answer_mailbox_if_write=%s; answer_mailbox_if_copy=%s; buffer size=%lu",
+                "answer_mailbox_if_read=%s; answer_mailbox_if_write=%s; answer_mailbox_if_copy=%s; buffer size=%.2lf",
                 file->getID().c_str(),
                 this->num_bytes_to_transfer,
                 ((src_mailbox == nullptr) ? "none" : src_mailbox->get_cname()),
@@ -261,7 +261,7 @@ namespace wrench {
                                                     simgrid::s4u::Mailbox *mailbox,
                                                     const std::shared_ptr<FileLocation> &location) {
         /** Ideal Fluid model buffer size */
-        if (this->buffer_size == 0) {
+        if (this->buffer_size < DBL_EPSILON) {
             throw std::runtime_error(
                     "FileTransferThread::receiveFileFromNetwork(): Zero buffer size not implemented yet");
 
@@ -356,7 +356,7 @@ namespace wrench {
                                                     double num_bytes,
                                                     simgrid::s4u::Mailbox *mailbox) {
         /** Ideal Fluid model buffer size */
-        if (this->buffer_size == 0) {
+        if (this->buffer_size < DBL_EPSILON) {
             throw std::runtime_error(
                     "FileTransferThread::sendLocalFileToNetwork(): Zero buffer size not implemented yet");
 
@@ -371,8 +371,8 @@ namespace wrench {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
                 }
 
-                while (remaining > 0) {
-                    double chunk_size = std::min<double>((double) this->buffer_size, remaining);
+                while (remaining > DBL_EPSILON) {
+                    double chunk_size = std::min<double>(this->buffer_size, remaining);
 
                     if (Simulation::isPageCachingEnabled()) {
                         simulation->readWithMemoryCache(f, chunk_size, location);
@@ -382,7 +382,7 @@ namespace wrench {
                                                  location->getMountPoint());
                     }
 
-                    remaining -= (double) (this->buffer_size);
+                    remaining -= this->buffer_size;
                     if (req) {
                         req->wait();
                         //                        WRENCH_INFO("Bytes sent over the network were received");
@@ -416,7 +416,7 @@ namespace wrench {
                                              const std::shared_ptr<FileLocation> &dst_loc) {
 
         double remaining = f->getSize();
-        double to_send = std::min<double>((double) this->buffer_size, remaining);
+        double to_send = std::min<double>(this->buffer_size, remaining);
 
         if ((src_loc->getStorageService() == dst_loc->getStorageService()) and
             (src_loc->getFullAbsolutePath() == dst_loc->getFullAbsolutePath())) {
@@ -427,7 +427,7 @@ namespace wrench {
         }
 
         /** Ideal Fluid model buffer size */
-        if (this->buffer_size == 0) {
+        if (this->buffer_size < DBL_EPSILON) {
             throw std::runtime_error(
                     "FileTransferThread::copyFileLocally(): Zero buffer size not implemented yet");
 
@@ -436,9 +436,9 @@ namespace wrench {
             simulation->readFromDisk(to_send, src_loc->getStorageService()->hostname,
                                      src_loc->getMountPoint());
             // start the pipeline
-            while (remaining > (double) this->buffer_size) {
+            while (remaining - this->buffer_size > DBL_EPSILON) {
                 simulation->readFromDiskAndWriteToDiskConcurrently(
-                        (double) this->buffer_size, (double) this->buffer_size, src_loc->getStorageService()->hostname,
+                        this->buffer_size, this->buffer_size, src_loc->getStorageService()->hostname,
                         src_loc->getMountPoint(), dst_loc->getMountPoint());
 
                 //
@@ -447,7 +447,7 @@ namespace wrench {
                 //                simulation->readFromDisk(this->buffer_size, src_loc->getStorageService()->hostname,
                 //                                             src_loc->getMountPoint());
 
-                remaining -= (double) this->buffer_size;
+                remaining -= this->buffer_size;
             }
             // Write the last chunk
             simulation->writeToDisk(remaining, dst_loc->getStorageService()->hostname,
@@ -468,12 +468,12 @@ namespace wrench {
             throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
         }
 
-        WRENCH_INFO("Downloading f  %s from location %s",
+        WRENCH_INFO("Downloading file  %s from location %s",
                     f->getID().c_str(), src_loc->toString().c_str());
 
         // Check that the buffer size is compatible
-        if (((this->buffer_size == 0) && (src_loc->getStorageService()->buffer_size != 0)) or
-            ((this->buffer_size != 0) && (src_loc->getStorageService()->buffer_size == 0))) {
+        if (((this->buffer_size < DBL_EPSILON) && (src_loc->getStorageService()->buffer_size > DBL_EPSILON)) or
+            ((this->buffer_size > DBL_EPSILON) && (src_loc->getStorageService()->buffer_size < DBL_EPSILON))) {
             throw std::invalid_argument("FileTransferThread::downloadFileFromStorageService(): "
                                         "Incompatible buffer size specs (both must be zero, or both must be non-zero");
         }
@@ -524,7 +524,7 @@ namespace wrench {
         WRENCH_INFO("Download request accepted (will receive f content on mailbox_name %s)",
                     mailbox_that_should_receive_file_content->get_cname());
 
-        if (this->buffer_size == 0) {
+        if (this->buffer_size < DBL_EPSILON) {
             S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
             throw std::runtime_error(
                     "FileTransferThread::downloadFileFromStorageService(): Zero buffer size not implemented yet");
