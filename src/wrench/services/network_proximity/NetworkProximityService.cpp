@@ -206,11 +206,11 @@ namespace wrench {
                             this->simulation, h, this->mailbox,
                             this->getPropertyValueAsDouble(
                                     NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
-                            this->getPropertyValueAsDouble(
+                            this->getPropertyValueAsTimeInSecond(
                                     NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD),
                             this->getPropertyValueAsDouble(
                                     NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE),
-                            this->getPropertyValueAsDouble(
+                            this->getPropertyValueAsUnsignedLong(
                                     NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED),
                             this->messagepayload_list));
             this->network_daemons.push_back(np_daemon);
@@ -309,6 +309,9 @@ namespace wrench {
                 }
             }
 
+            // Overhead
+            S4U_Simulation::sleep(this->getPropertyValueAsTimeInSecond(NetworkProximityServiceProperty::LOOKUP_OVERHEAD));
+
             S4U_Mailbox::dputMessage(
                     msg->answer_mailbox,
                     new NetworkProximityLookupAnswerMessage(
@@ -365,6 +368,10 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
             }
+
+            // Overhead
+            S4U_Simulation::sleep(this->getPropertyValueAsTimeInSecond(NetworkProximityServiceProperty::LOOKUP_OVERHEAD));
+
             S4U_Mailbox::dputMessage(msg->answer_mailbox, msg_to_send_back);
             return true;
 
@@ -519,7 +526,7 @@ namespace wrench {
             }
         }
 
-        if (this->getPropertyValueAsDouble(NetworkProximityServiceProperty::LOOKUP_OVERHEAD) < 0) {
+        if (this->getPropertyValueAsTimeInSecond(NetworkProximityServiceProperty::LOOKUP_OVERHEAD) < 0) {
             throw std::invalid_argument(error_prefix + "Invalid LOOKUP_OVERHEAD value " +
                                         this->getPropertyValueAsString(
                                                 NetworkProximityServiceProperty::LOOKUP_OVERHEAD));
@@ -531,7 +538,7 @@ namespace wrench {
                                                 NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE));
         }
 
-        if (this->getPropertyValueAsDouble(NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD) <=
+        if (this->getPropertyValueAsTimeInSecond(NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD) <=
             0) {
             throw std::invalid_argument(error_prefix + "Invalid NETWORK_PROXIMITY_MEASUREMENT_PERIOD value " +
                                         this->getPropertyValueAsString(

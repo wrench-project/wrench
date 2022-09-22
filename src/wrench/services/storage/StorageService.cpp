@@ -176,6 +176,49 @@ namespace wrench {
     void StorageService::readFile(const std::shared_ptr<DataFile> &file, double num_bytes) {
         StorageService::readFile(file, FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())), num_bytes);
     }
+
+    /**
+     * @brief Synchronously read a file from the storage service
+     *
+     * @param file: the file
+     * @param path: the absolute file path
+     *
+     * @throw ExecutionException
+     * @throw std::invalid_arguments
+     */
+    void StorageService::readFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+        StorageService::readFile(file, FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this()), path));
+    }
+
+    /**
+     * @brief Synchronously read a file from the storage service
+     *
+     * @param file: the file
+     * @param path: the absolute file path
+     * @param num_bytes: the number of bytes to read
+     *
+     * @throw ExecutionException
+     * @throw std::invalid_arguments
+     */
+    void StorageService::readFile(const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes) {
+        StorageService::readFile(file, FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this()), path), num_bytes);
+    }
+
+    /**
+     * @brief Synchronously write a file to the storage service
+     *
+     * @param file: the file
+     * @param location: the location to write it to
+     *
+     * @throw ExecutionException
+     */
+    void StorageService::writeFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
+        if ((file == nullptr) or (location == nullptr)) {
+            throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
+        }
+        location->getStorageService()->writeFile(file, location->getFullAbsolutePath());
+    }
+
     /**
      * @brief Synchronously write a file to the storage service
      *
@@ -184,7 +227,88 @@ namespace wrench {
      * @throw ExecutionException
      */
     void StorageService::writeFile(const std::shared_ptr<DataFile> &file) {
-        StorageService::writeFile(file, FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())));
+        this->writeFile(file, this->getMountPoint());
+    }
+
+    /**
+     * @brief Synchronously write a file to the storage service
+     *
+     * @param file: the file
+     *
+     * @throw ExecutionException
+     */
+    void StorageService::writeFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+        if (file == nullptr) {
+            throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
+        }
+
+        assertServiceIsUp();
+
+        // Send a  message to the daemon
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+
+        try {
+            S4U_Mailbox::putMessage(this->mailbox,
+                                    new StorageServiceFileWriteRequestMessage(
+                                            answer_mailbox,
+                                            file,
+                                            wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path),
+                                            this->buffer_size,
+                                            this->getMessagePayloadValue(
+                                                    StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw ExecutionException(cause);
+        }
+
+        // Wait for a reply
+        std::shared_ptr<SimulationMessage> message;
+
+        try {
+            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw ExecutionException(cause);
+        }
+
+        if (auto msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
+            // If not a success, throw an exception
+            if (not msg->success) {
+                throw ExecutionException(msg->failure_cause);
+            }
+
+            if (this->buffer_size < DBL_EPSILON) {
+                throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
+            } else {
+                try {
+                    double remaining = file->getSize();
+                    while (remaining - this->buffer_size > DBL_EPSILON) {
+                        S4U_Mailbox::putMessage(msg->data_write_mailbox,
+                                                new StorageServiceFileContentChunkMessage(
+                                                        file, this->buffer_size, false));
+                        remaining -= this->buffer_size;
+                    }
+                    S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
+                                                                             file, (unsigned long) remaining, true));
+
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    throw ExecutionException(cause);
+                }
+
+                //Waiting for the final ack
+                try {
+                    message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    throw ExecutionException(cause);
+                }
+                if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
+                    throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
+                                             message->getName() + "] message instead of final ack!");
+                }
+            }
+
+        } else {
+            throw std::runtime_error("StorageService::writeFile(): Received a totally unexpected [" +
+                                     message->getName() + "] message!");
+        }
     }
 
 
@@ -314,7 +438,6 @@ namespace wrench {
 
     void StorageService::readFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location, double num_bytes_to_read) {
         // Get mailbox to send message too
-
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         auto chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
         readFile(file, location, answer_mailbox, chunk_receiving_mailbox, num_bytes_to_read);
@@ -370,12 +493,12 @@ namespace wrench {
         if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
             // If it's not a success, throw an exception
             if (not msg->success) {
-                std::shared_ptr<FailureCause> &cause = msg->failure_cause;
+                std::shared_ptr<FailureCause> cause = msg->failure_cause;
                 S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                 throw ExecutionException(cause);
             }
 
-            if (msg->buffer_size == 0) {
+            if (msg->buffer_size < DBL_EPSILON) {
                 S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                 throw std::runtime_error("StorageService::readFile(): Zero buffer size not implemented yet");
 
@@ -423,88 +546,7 @@ namespace wrench {
                                      message->getName() + "] message!");
         }
     }
-    /**
-     * @brief Synchronously write a file to the storage service
-     *
-     * @param file: the file
-     * @param location: the location to write it to
-     *
-     * @throw ExecutionException
-     */
-    void StorageService::writeFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-        if ((file == nullptr) or (location == nullptr)) {
-            throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
-        }
 
-        auto storage_service = location->getStorageService();
-        assertServiceIsUp(storage_service);
-
-        // Send a  message to the daemon
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-
-        try {
-            S4U_Mailbox::putMessage(storage_service->mailbox,
-                                    new StorageServiceFileWriteRequestMessage(
-                                            answer_mailbox,
-                                            file,
-                                            location,
-                                            storage_service->buffer_size,
-                                            storage_service->getMessagePayloadValue(
-                                                    StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
-
-        // Wait for a reply
-        std::shared_ptr<SimulationMessage> message;
-
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
-
-        if (auto msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
-            // If not a success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-
-            if (storage_service->buffer_size == 0) {
-                throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
-            } else {
-                try {
-                    double remaining = file->getSize();
-                    while (remaining > (double) storage_service->buffer_size) {
-                        S4U_Mailbox::putMessage(msg->data_write_mailbox,
-                                                new StorageServiceFileContentChunkMessage(
-                                                        file, storage_service->buffer_size, false));
-                        remaining -= (double) storage_service->buffer_size;
-                    }
-                    S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
-                                                                             file, (unsigned long) remaining, true));
-
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    throw ExecutionException(cause);
-                }
-
-                //Waiting for the final ack
-                try {
-                    message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    throw ExecutionException(cause);
-                }
-                if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
-                    throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
-                                             message->getName() + "] message instead of final ack!");
-                }
-            }
-
-        } else {
-            throw std::runtime_error("StorageService::writeFile(): Received a totally unexpected [" +
-                                     message->getName() + "] message!");
-        }
-    }
 
     /**
      * @brief Synchronously and sequentially read a set of files from storage services

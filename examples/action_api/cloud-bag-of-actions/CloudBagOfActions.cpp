@@ -87,11 +87,11 @@ int main(int argc, char **argv) {
      * is a basic storage service implementation provided by WRENCH.
      * Throughout the simulation execution, data files will be located
      * in this storage service, and accessed remotely by the compute service. Note that the
-     * storage service is configured to use a buffer size of 50M when transferring data over
+     * storage service is configured to use a buffer size of 50MB when transferring data over
      * the network (i.e., to pipeline disk reads/writes and network revs/sends). */
     std::cerr << "Instantiating a SimpleStorageService on UserHost..." << std::endl;
     auto storage_service = simulation->add(new wrench::SimpleStorageService(
-            "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
+            "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
     /* Instantiate a cloud compute service, and add it to the simulation.
      * A wrench::CloudComputeService is an abstraction of a compute service that corresponds

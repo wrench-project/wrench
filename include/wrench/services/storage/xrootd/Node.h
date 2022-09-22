@@ -19,7 +19,7 @@
 //todo overload mountpoint functions
 namespace wrench {
     namespace XRootD {
-        class XRootDDeployment;
+        class Deployment;
         class SearchStack;
         /**
          * @brief An XRootD node, this can be either a supervisor or a storage server.
@@ -32,7 +32,7 @@ namespace wrench {
         public:
             std::shared_ptr<Node> addChildSupervisor(const std::string &hostname);
             std::shared_ptr<Node> addChildStorageServer(const std::string &hostname, const std::string &mount_point,
-                                                        WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,
+                                                        WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list = {},
                                                         WRENCH_PROPERTY_COLLECTION_TYPE node_property_list = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list = {});
 
             std::shared_ptr<Node> getChild(unsigned int n);
@@ -45,6 +45,8 @@ namespace wrench {
             void createFile(const std::shared_ptr<DataFile> &file) override;
             void createFile(const std::shared_ptr<DataFile> &file, const string &path) override;
 
+            void writeFile(const std::shared_ptr<DataFile> &file) override;
+
             /***********************/
             /** \endcond           */
             /***********************/
@@ -56,19 +58,26 @@ namespace wrench {
                     {Property::SEARCH_BROADCAST_OVERHEAD, "1"},
                     {Property::UPDATE_CACHE_OVERHEAD, "1"},
                     {Property::CACHE_MAX_LIFETIME, "infinity"},
-                    {Property::REDUCED_SIMULATION, "false"}};
+                    {Property::REDUCED_SIMULATION, "false"},
+                    {Property::FILE_NOT_FOUND_TIMEOUT, "30"}};
 
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                     {MessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::UPDATE_CACHE, 1024},
                     {MessagePayload::CONTINUE_SEARCH, 1024},
+                    {MessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::CACHE_ENTRY, 1024},
                     {MessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 1024}};
+                    {MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, 1024}};
 
         public:
             /***********************/
@@ -99,10 +108,10 @@ namespace wrench {
 
             int main() override;
             bool processNextMessage();
-            Node(XRootDDeployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
+            Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
 
         private:
-            XRootDDeployment *deployment;
+            Deployment *deployment;
 
             std::shared_ptr<Node> addChild(std::shared_ptr<Node> child);
 
@@ -126,10 +135,10 @@ namespace wrench {
             /** @brief The supervisor of this node.  All continue search and ripple delete messages should come from this, and all update cache messages go to this server */
             Node *supervisor = nullptr;
             /** @brief The Meta supervisor for this entire XRootD data federation */
-            XRootDDeployment *metavisor = nullptr;
+            Deployment *metavisor = nullptr;
             /** @brief Whether this node is running a reduced simulation.  Initilized from the properties in main */
             bool reduced;
-            friend XRootDDeployment;
+            friend Deployment;
             friend SearchStack;
             /***********************/
             /** \endcond           */

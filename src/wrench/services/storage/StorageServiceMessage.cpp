@@ -255,7 +255,7 @@ namespace wrench {
     StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                  std::shared_ptr<DataFile> file,
                                                                                  std::shared_ptr<FileLocation> location,
-                                                                                 unsigned long buffer_size,
+                                                                                 double buffer_size,
                                                                                  double payload)
         : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -365,7 +365,7 @@ namespace wrench {
                                                                              std::shared_ptr<FileLocation> location,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
-                                                                             unsigned long buffer_size,
+                                                                             double buffer_size,
                                                                              double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (location == nullptr) ||
@@ -389,7 +389,7 @@ namespace wrench {
     * @param last_chunk: whether this is the last chunk in the file
     */
     StorageServiceFileContentChunkMessage::StorageServiceFileContentChunkMessage(
-            std::shared_ptr<DataFile> file, unsigned long chunk_size, bool last_chunk) : StorageServiceMessage((double) chunk_size) {
+            std::shared_ptr<DataFile> file, double chunk_size, bool last_chunk) : StorageServiceMessage(chunk_size) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (file == nullptr) {
             throw std::invalid_argument(

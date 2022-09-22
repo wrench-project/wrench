@@ -40,6 +40,7 @@ namespace wrench {
             devnull = true;
             this->total_capacity = std::numeric_limits<double>::infinity();
         } else {
+            devnull = false;
             mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
             // Check validity
             if (not S4U_Simulation::hostHasMountPoint(hostname, mount_point)) {
