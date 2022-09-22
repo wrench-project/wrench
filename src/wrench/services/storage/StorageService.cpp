@@ -234,6 +234,7 @@ namespace wrench {
      * @brief Synchronously write a file to the storage service
      *
      * @param file: the file
+     * @param path: path to file
      *
      * @throw ExecutionException
      */
@@ -862,7 +863,7 @@ namespace wrench {
 
     *
     * @param file: a file
-    * @param path: optional path to file
+    * @param path: path to file
     *
     */
     void StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
