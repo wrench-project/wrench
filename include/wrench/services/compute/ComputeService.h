@@ -119,8 +119,6 @@ namespace wrench {
 
         std::map<std::string, double> getCoreFlopRate();
 
-        double getTTL();
-
         double getTotalScratchSpaceSize();
 
         double getFreeScratchSpaceSize();

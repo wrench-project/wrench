@@ -45,6 +45,10 @@ protected:
         t2->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.5));
         t2->setAverageCPU(90.2);
 
+        // Coverage
+        t1->setColor("blue");
+        t1->getColor();
+
         workflow->addControlDependency(t1, t2);
         t2->getStateAsString();
 

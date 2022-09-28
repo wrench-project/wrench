@@ -99,6 +99,7 @@ private:
         if (clusters.size() != 2) {
             throw std::runtime_error("Invalid number of netzones found");
         }
+
         if (clusters["world"].size() != 2) {
             throw std::runtime_error("Invalid number of clusters found under the 'world' netzone");
         }
@@ -129,6 +130,7 @@ private:
         if (hosts.size() != 3) {
             throw std::runtime_error("Invalid number of clusters found");
         }
+
         if (hosts["simple"].size() != 8) {
             throw std::runtime_error("Invalid number of hosts found under cluster 'simple' found");
         }

@@ -124,7 +124,7 @@ private:
             try {
 
                 wrench::Simulation::sleep(25);
-                switch (i % 9) {
+                switch (i % 8) {
                     case 0:
                         this->test->cs->getNumHosts();
                         break;
@@ -148,9 +148,6 @@ private:
                         break;
                     case 7:
                         this->test->cs->getPerHostAvailableMemoryCapacity();
-                        break;
-                    case 8:
-                        this->test->cs->getTTL();
                         break;
                 }
 
