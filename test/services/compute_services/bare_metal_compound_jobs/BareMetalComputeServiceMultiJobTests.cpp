@@ -147,10 +147,10 @@ private:
 
         job1->addChildJob(job2);
         job1->addChildJob(job3);
-        job4->addParentJob(job3); // coverage by doing the reverse
+        job4->addParentJob(job3);// coverage by doing the reverse
 
-        job4->getParentJobs(); // coverage
-        job3->getChildrenJobs(); // coverage
+        job4->getParentJobs();  // coverage
+        job3->getChildrenJobs();// coverage
 
         // Add an invalid dependency for testing
         try {
