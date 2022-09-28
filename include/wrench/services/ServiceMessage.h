@@ -54,17 +54,6 @@ namespace wrench {
         ServiceDaemonStoppedMessage(double payload);
     };
 
-
-    /**
-    * @brief A message sent to a Service to notify it that its time-to-live has expired (which will
-     *       cause the service to terminate)
-    */
-    class ServiceTTLExpiredMessage : public ServiceMessage {
-    public:
-        ServiceTTLExpiredMessage(double payload);
-    };
-
-
     /***********************/
     /** \endcond           */
     /***********************/
