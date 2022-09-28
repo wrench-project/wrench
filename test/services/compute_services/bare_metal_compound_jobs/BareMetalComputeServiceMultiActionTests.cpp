@@ -205,8 +205,14 @@ private:
         }
 
 
+        // Coverage
+        job->getCallbackMailbox();
+
         // Submit the job
         job_manager->submitJob(job, this->test->compute_service, {});
+
+        // Coverage
+        job->printCallbackMailboxStack();
 
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
