@@ -38,6 +38,12 @@ protected:
         workflow->addControlDependency(t2, t4);
         workflow->addControlDependency(t3, t4);
 
+        // Add a cycle-producing dependency
+        try {
+            workflow->addControlDependency(t2, t1);
+            throw std::runtime_error("Creating a dependency cycle in workflow should throw");
+        } catch (std::runtime_error &ignore) {}
+
         f1 = workflow->addFile("file-01", 1);
         f2 = workflow->addFile("file-02", 1);
         f3 = workflow->addFile("file-03", 1);
@@ -53,6 +59,12 @@ protected:
         t4->addInputFile(f3);
         t4->addInputFile(f4);
         t4->addOutputFile(f5);
+
+        // Coverage
+        auto tasks = workflow->getTasksThatInput(f2);
+        if ((tasks.find(t2) == tasks.end()) or (tasks.find(t3) == tasks.end())) {
+            throw std::runtime_error("getTasksThatInput() doesn't generate the same output");
+        }
     }
 
     // data members
