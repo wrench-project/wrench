@@ -716,7 +716,7 @@ private:
 
         auto sleep1 = job->addSleepAction("sleep1", 10.0);
         auto file_read = job->addFileReadAction("file_read", this->test->input_file,
-                                                wrench::FileLocation::LOCATION(this->test->storage_service1),
+                                                this->test->storage_service1,
                                                 this->test->input_file->getSize());
         auto sleep_after_file_read = job->addSleepAction("sleep_after_file_read", 10.0);
         auto compute = job->addComputeAction("compute", 10000.0, 100.0, 1, 1, wrench::ParallelModel::AMDAHL(1.0));

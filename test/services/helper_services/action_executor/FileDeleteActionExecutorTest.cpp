@@ -131,7 +131,7 @@ private:
         auto job = job_manager->createCompoundJob("");
         // Add a file_delete_action
         auto file_delete_action = job->addFileDeleteAction("", this->test->file,
-                                                           wrench::FileLocation::LOCATION(this->test->ss));
+                                                           this->test->ss);
 
 
         // coverage
