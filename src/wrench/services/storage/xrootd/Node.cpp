@@ -1079,7 +1079,6 @@ namespace wrench {
         /**
         * @brief write a file on this node.
         * @param file: A shared pointer to a file
-        * @param path: a path at the node's mount point
         *
         * @throw std::invalid_argument
         */
