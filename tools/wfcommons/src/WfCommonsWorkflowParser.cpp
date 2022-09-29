@@ -30,8 +30,9 @@ namespace wrench {
                                                                               bool ignore_cycle_creating_dependencies,
                                                                               unsigned long min_cores_per_task,
                                                                               unsigned long max_cores_per_task,
-                                                                              bool enforce_num_cores) {a
-        std::ifstream file;
+                                                                              bool enforce_num_cores) {
+        a
+                std::ifstream file;
         nlohmann::json j;
         std::set<std::string> ignored_auxiliary_jobs;
         std::set<std::string> ignored_transfer_jobs;
