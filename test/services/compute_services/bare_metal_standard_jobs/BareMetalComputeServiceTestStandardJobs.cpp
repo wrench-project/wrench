@@ -396,8 +396,11 @@ private:
             throw std::runtime_error("Job minimum required memory is incorrect");
         }
         two_task_job->getFileLocations();
-        two_task_job->setPreJobOverheadInSeconds(0.0);
-        two_task_job->setPostJobOverheadInSeconds(0.0);
+
+        // Coverage
+        double post_pre_overhead = 10.0;
+        two_task_job->setPreJobOverheadInSeconds(post_pre_overhead);
+        two_task_job->setPostJobOverheadInSeconds(post_pre_overhead);
 
         // Submit the 2-task1 job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
@@ -426,6 +429,14 @@ private:
         if (delta > 0.1) {
             throw std::runtime_error("Task completion times should be about 0.0 seconds apart but they are " +
                                      std::to_string(delta) + " apart.");
+        }
+
+        // Check on overhead
+        double now = wrench::Simulation::getCurrentSimulatedDate();
+        double job_start = 0.0;
+        double work_time = this->test->task1->getEndDate() - this->test->task1->getStartDate();
+        if ((now - job_start) - work_time - 2 * post_pre_overhead > 0.1) {
+            throw std::runtime_error("Something doesn't add up given the pre- and post-job overhead");
         }
 
         return 0;
