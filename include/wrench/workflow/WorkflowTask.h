@@ -189,7 +189,6 @@ namespace wrench {
         void computeTopLevel();
 
     public:
-
         void setInternalState(WorkflowTask::InternalState);
         void setState(WorkflowTask::State);
 
