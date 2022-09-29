@@ -504,13 +504,15 @@ namespace wrench {
                                                 std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments,
                                                 std::shared_ptr<FailureCause> &job_failure_cause,
                                                 Simulation *simulation) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         switch (this->state) {
             case StandardJob::State::PENDING:
             case StandardJob::State::RUNNING:
-                throw std::runtime_error("StandardJob::processCompoundJobOutcome(): Cannot be called on a RUNNING/PENDING job");
+                throw std::rBuntime_error("StandardJob::processCompoundJobOutcome(): Cannot be called on a RUNNING/PENDING job");
             default:
                 break;
         }
+#endif
 
         // At this point all tasks are pending, so no matter what we need to change all states
         // So we provisionally make them all NOT_READY right now, which we may overwrite with

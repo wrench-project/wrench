@@ -1147,9 +1147,6 @@ namespace wrench {
                 dict.insert(std::make_pair(host, total_ram - ram_allocated_to_vms));
             }
 
-        } else if (key == "ttl") {
-            dict.insert(std::make_pair(this->getName(), DBL_MAX));
-
         } else {
             throw std::runtime_error("CloudComputeService::processGetResourceInformation(): unknown key");
         }
