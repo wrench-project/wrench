@@ -1014,7 +1014,6 @@ namespace wrench {
                           this->getPropertyValueAsString(
                                   BatchComputeServiceProperty::THREAD_STARTUP_OVERHEAD)}},
                         {},
-                        DBL_MAX,
                         nullptr,
                         "_one_shot_bm_",
                         this->getScratch()));
@@ -1086,8 +1085,6 @@ namespace wrench {
                     dict.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
                 }
             }
-        } else if (key == "ttl") {
-            dict.insert(std::make_pair(this->getName(), DBL_MAX));
         } else {
             throw std::runtime_error("BatchComputeService::processGetResourceInformation(): unknown key");
         }

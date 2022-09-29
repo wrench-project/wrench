@@ -38,6 +38,12 @@ protected:
         workflow->addControlDependency(t2, t4);
         workflow->addControlDependency(t3, t4);
 
+        // Add a cycle-producing dependency
+        try {
+            workflow->addControlDependency(t2, t1);
+            throw std::runtime_error("Creating a dependency cycle in workflow should throw");
+        } catch (std::runtime_error &ignore) {}
+
         f1 = workflow->addFile("file-01", 1);
         f2 = workflow->addFile("file-02", 1);
         f3 = workflow->addFile("file-03", 1);
@@ -53,6 +59,12 @@ protected:
         t4->addInputFile(f3);
         t4->addInputFile(f4);
         t4->addOutputFile(f5);
+
+        // Coverage
+        auto tasks = workflow->getTasksThatInput(f2);
+        if ((tasks.find(t2) == tasks.end()) or (tasks.find(t3) == tasks.end())) {
+            throw std::runtime_error("getTasksThatInput() doesn't generate the same output");
+        }
     }
 
     // data members
@@ -201,6 +213,14 @@ void doTopBottomLevelsTest(bool dynamic_updates) {
     if (not dynamic_updates) {
         wf->updateAllTopBottomLevels();
     }
+    //    std::cerr << "T1 TL=" << t1->getTopLevel() << "\n";
+    //    std::cerr << "T1 BL=" << t1->getBottomLevel() << "\n";
+    //    std::cerr << "T2 TL=" << t2->getTopLevel() << "\n";
+    //    std::cerr << "T2 BL=" << t2->getBottomLevel() << "\n";
+    //    std::cerr << "T3 TL=" << t3->getTopLevel() << "\n";
+    //    std::cerr << "T3 BL=" << t3->getBottomLevel() << "\n";
+    //    std::cerr << "T4 TL=" << t4->getTopLevel() << "\n";
+    //    std::cerr << "T4 BL=" << t4->getBottomLevel() << "\n";
 
     ASSERT_TRUE(t1->getTopLevel() == 0 and t1->getBottomLevel() == 2);
     ASSERT_TRUE(t2->getTopLevel() == 1 and t2->getBottomLevel() == 0);

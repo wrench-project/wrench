@@ -42,14 +42,4 @@ namespace wrench {
         : ServiceMessage(payload) {}
 
 
-    /**
-      * @brief Constructor
-      * @param payload: message size in bytes
-      *
-      * @throw std::invalid_arguments
-      */
-    ServiceTTLExpiredMessage::ServiceTTLExpiredMessage(double payload)
-        : ServiceMessage(payload) {}
-
-
 };// namespace wrench

@@ -1581,9 +1581,8 @@ private:
         try {
             wrench::StorageService::writeFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100"));
             throw std::runtime_error("Should not be able to write a nullptr file to a service");
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &ignore) {
         }
-
 
         try {
             wrench::StorageService::writeFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100"));

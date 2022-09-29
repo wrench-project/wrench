@@ -134,7 +134,7 @@ private:
         auto job = job_manager->createCompoundJob("");
         // Add a file_write_action
         auto file_write_action = job->addFileWriteAction("", this->test->file,
-                                                         wrench::FileLocation::LOCATION(this->test->ss1));
+                                                         this->test->ss1);
 
         // coverage
         wrench::Action::getActionTypeAsString(file_write_action);
