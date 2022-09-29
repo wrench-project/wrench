@@ -646,7 +646,6 @@ namespace wrench {
                                     execution_service->getComputeResources(),
                                     {},
                                     {},
-                                    DBL_MAX,
                                     nullptr,
                                     "_one_shot_bm",
                                     std::dynamic_pointer_cast<ComputeService>(execution_service->getParentService())->getScratch()));

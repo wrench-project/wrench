@@ -30,9 +30,17 @@ void UnitParserTest::do_parse_test() {
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10kB"), 10.0 * 1000.0);
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10MB"), 10.0 * 1000.0 * 1000.0);
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10GB"), 10.0 * 1000.0 * 1000.0 * 1000.0);
+    ASSERT_THROW(wrench::UnitParser::parse_size("10FO"), std::invalid_argument);
 
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_compute_speed("10"), 10.0);
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_compute_speed("10f"), 10.0);
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_compute_speed("10kf"), 10.0 * 1000.0);
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_compute_speed("10Mf"), 10.0 * 1000.0 * 1000.0);
+    ASSERT_THROW(wrench::UnitParser::parse_compute_speed("10FO"), std::invalid_argument);
+
+    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_time("10s"), 10.0);
+    ASSERT_THROW(wrench::UnitParser::parse_time("10FO"), std::invalid_argument);
+
+    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_bandwidth("10Bps"), 10.0);
+    ASSERT_THROW(wrench::UnitParser::parse_bandwidth("10FO"), std::invalid_argument);
 }
