@@ -128,7 +128,6 @@ namespace wrench {
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-                                double ttl,
                                 std::shared_ptr<PilotJob> pj, const std::string &suffix,
                                 std::shared_ptr<StorageService> scratch_space);// reference to upper level scratch space
 
@@ -146,7 +145,6 @@ namespace wrench {
                               std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                               WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-                              double ttl,
                               std::shared_ptr<PilotJob> pj);
 
 
@@ -181,20 +179,6 @@ namespace wrench {
          * @brief Map of numbers of per-compound-job dispatched actions
          */
         std::unordered_map<std::shared_ptr<CompoundJob>, int> num_dispatched_actions_for_cjob;
-
-        /**
-         * @brief Time to live (TTL)
-         */
-        double ttl;
-        /**
-         * @brief Death date
-         */
-        double death_date;
-        /**
-         * @brief Whether this service has a TTL
-         */
-        bool has_ttl;
-
 
         // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
         //        void storeFilesStoredInScratch(std::set<std::shared_ptr<DataFile>> scratch_files);

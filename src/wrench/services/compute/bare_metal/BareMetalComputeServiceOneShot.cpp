@@ -37,7 +37,6 @@ namespace wrench {
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     * @param ttl: the time-to-live, in seconds (DBL_MAX: infinite time-to-live)
      * @param pj: a containing PilotJob  (nullptr if none)
      * @param suffix: a string to append to the process name
      * @param scratch_space: the scratch space to use
@@ -50,9 +49,8 @@ namespace wrench {
             std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            double ttl,
             std::shared_ptr<PilotJob> pj,
-            const std::string &suffix, std::shared_ptr<StorageService> scratch_space) : BareMetalComputeService(hostname, std::move(compute_resources), std::move(property_list), std::move(messagepayload_list), ttl, std::move(pj), suffix, std::move(scratch_space)), job(std::move(job)) {
+            const std::string &suffix, std::shared_ptr<StorageService> scratch_space) : BareMetalComputeService(hostname, std::move(compute_resources), std::move(property_list), std::move(messagepayload_list), std::move(pj), suffix, std::move(scratch_space)), job(std::move(job)) {
     }
 
     /**
@@ -72,12 +70,6 @@ namespace wrench {
         this->action_execution_service->setParentService(this->getSharedPtr<Service>());
         this->action_execution_service->setSimulation(this->simulation);
         this->action_execution_service->start(this->action_execution_service, true, false);
-
-        // Set an alarm for my timely death, if necessary
-        if (this->has_ttl) {
-            this->death_date = S4U_Simulation::getClock() + this->ttl;
-        }
-
 
         /** Note that the code below doesn't do any checks at all, the job had better be well-formed **/
 

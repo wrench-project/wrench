@@ -257,7 +257,7 @@ namespace wrench {
                                                                                         scratch_space_mount_point) {
         initiateInstance(hostname,
                          compute_resources,
-                         std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
+                         std::move(property_list), std::move(messagepayload_list), nullptr);
     }
 
     /**
@@ -285,7 +285,7 @@ namespace wrench {
 
         initiateInstance(hostname,
                          specified_compute_resources,
-                         std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
+                         std::move(property_list), std::move(messagepayload_list), nullptr);
     }
 
     /**
@@ -296,7 +296,6 @@ namespace wrench {
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     * @param ttl: the time-to-live, in seconds (DBL_MAX: infinite time-to-live)
      * @param pj: a containing PilotJob  (nullptr if none)
      * @param suffix: a string to append to the process name
      * @param scratch_space: the scratch storage service
@@ -308,7 +307,6 @@ namespace wrench {
             std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            double ttl,
             std::shared_ptr<PilotJob> pj,
             const std::string &suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
                                                                                                        "bare_metal" + suffix,
@@ -317,7 +315,6 @@ namespace wrench {
                          std::move(compute_resources),
                          std::move(property_list),
                          std::move(messagepayload_list),
-                         ttl,
                          std::move(pj));
     }
 
@@ -341,7 +338,7 @@ namespace wrench {
                                                                             std::move(scratch_space)) {
         initiateInstance(hostname,
                          compute_resources,
-                         std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
+                         std::move(property_list), std::move(messagepayload_list), nullptr);
     }
 
     /**
@@ -352,7 +349,6 @@ namespace wrench {
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     * @param ttl: the time-to-live, in seconds (DBL_MAX: infinite time-to-live)
      * @param pj: a containing PilotJob  (nullptr if none)
      *
      * @throw std::invalid_argument
@@ -362,12 +358,7 @@ namespace wrench {
             std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            double ttl,
             std::shared_ptr<PilotJob> pj) {
-        if (ttl < 0) {
-            throw std::invalid_argument(
-                    "BareMetalComputeService::initiateInstance(): invalid TTL value (must be >0)");
-        }
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -394,10 +385,6 @@ namespace wrench {
         } catch (std::invalid_argument &e) {
             throw;
         }
-
-        this->ttl = ttl;
-        this->has_ttl = (this->ttl != DBL_MAX);
-        //        this->containing_pilot_job = std::move(pj);
     }
 
     /**
@@ -424,12 +411,6 @@ namespace wrench {
                                                    this->mailbox, false, true));
             termination_detector->setSimulation(this->simulation);
             termination_detector->start(termination_detector, true, false);// Daemonized, no auto-restart
-        }
-
-
-        // Set an alarm for my timely death, if necessary
-        if (this->has_ttl) {
-            this->death_date = S4U_Simulation::getClock() + this->ttl;
         }
 
         /** Main loop **/
@@ -718,11 +699,7 @@ namespace wrench {
                                                                 const std::string &key) {
         std::map<std::string, double> dict;
 
-        if (key == "ttl") {
-            dict["ttl"] = this->ttl;
-        } else {
-            dict = this->action_execution_service->getResourceInformation(key);
-        }
+        dict = this->action_execution_service->getResourceInformation(key);
 
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(
