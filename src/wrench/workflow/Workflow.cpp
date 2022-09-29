@@ -782,7 +782,7 @@ namespace wrench {
         }
 
         // Reset all levels to -1 for memoization purposes
-        for (auto const &t : this->tasks) {
+        for (auto const &t: this->tasks) {
             t.second->toplevel = -1;
             t.second->bottomlevel = -1;
         }
