@@ -181,17 +181,16 @@ namespace wrench {
 
         static std::string stateToString(InternalState internal_state);
 
+    protected:
         unsigned long updateTopLevel();
-
         unsigned long updateBottomLevel();
 
+        void computeBottomLevel();
+        void computeTopLevel();
+
+    public:
         void setInternalState(WorkflowTask::InternalState);
-
         void setState(WorkflowTask::State);
-
-        //        void setUpcomingState(WorkflowTask::State);
-        //
-        //        WorkflowTask::State getUpcomingState() const;
 
         WorkflowTask::InternalState getInternalState() const;
 

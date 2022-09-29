@@ -443,23 +443,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the time-to-live of the compute service
-     * @return the ttl in seconds
-     *
-     * @throw ExecutionException
-     */
-    double ComputeService::getTTL() {
-        std::map<std::string, double> dict;
-        try {
-            dict = this->getServiceResourceInformation("ttl");
-        } catch (ExecutionException &e) {
-            throw;
-        }
-
-        return (*(dict.begin())).second;
-    }
-
-    /**
      * @brief Get information about the compute service as a dictionary of vectors
      * @param key: the desired resource information (i.e., dictionary key) that's needed)
      * @return service information

@@ -57,10 +57,10 @@ namespace wrench {
     std::shared_ptr<Workflow> WfCommonsWorkflowParser::createWorkflowFromJSON(const std::string &filename,
                                                                               const std::string &reference_flop_rate,
                                                                               bool redundant_dependencies,
+                                                                              bool ignore_cycle_creating_dependencies,
                                                                               unsigned long min_cores_per_task,
                                                                               unsigned long max_cores_per_task,
                                                                               bool enforce_num_cores) {
-
         std::ifstream file;
         boost::json::object j;
         std::set<std::string> ignored_auxiliary_jobs;
@@ -247,6 +247,12 @@ namespace wrench {
                             workflow->addControlDependency(parent_task, task, redundant_dependencies);
                         } catch (std::invalid_argument &e) {
                             // do nothing
+                        } catch (std::runtime_error &e) {
+                            if (ignore_cycle_creating_dependencies) {
+                                // nothing
+                            } else {
+                                throw;
+                            }
                         }
                     }
                 }
@@ -265,6 +271,7 @@ namespace wrench {
      */
     std::shared_ptr<Workflow> WfCommonsWorkflowParser::createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
                                                                                         bool redundant_dependencies,
+                                                                                        bool ignore_cycle_creating_dependencies,
                                                                                         unsigned long min_cores_per_task,
                                                                                         unsigned long max_cores_per_task,
                                                                                         bool enforce_num_cores) {

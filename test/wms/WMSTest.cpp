@@ -281,7 +281,6 @@ private:
             throw std::runtime_error("Did not get expected StandardJobCompletionEvent");
         }
 
-
         // Get a "PILOT JOB STARTED" event (default handler)
         auto job2 = job_manager->createPilotJob();
         job_manager->submitJob(job2, this->test->cs_batch, {{"-N", "1"}, {"-c", "1"}, {"-t", "2"}});
@@ -309,7 +308,7 @@ private:
                                                             wrench::FileLocation::LOCATION(this->test->storage_service2), nullptr);
         this->waitForAndProcessNextEvent();
         if (this->counter != 5) {
-            throw std::runtime_error("Did not get expected FileCoompletedEvent");
+            throw std::runtime_error("Did not get expected FileCompletedEvent");
         }
 
         // Get a "FILE COPY FAILURE" event (default handler)
@@ -320,7 +319,6 @@ private:
         if (this->counter != 6) {
             throw std::runtime_error("Did not get expected FileCopyFailureEvent");
         }
-
 
         // Set a timer
         double timer_off_date = wrench::Simulation::getCurrentSimulatedDate() + 10;
@@ -399,11 +397,7 @@ private:
     }
 };
 
-#ifdef ENABLE_BATSCHED
 TEST_F(WMSTest, CustomEventHandling) {
-#else
-TEST_F(WMSTest, CustomEventHandling) {
-#endif
     DO_TEST_WITH_FORK(do_CustomHandlerWMS_test);
 }
 

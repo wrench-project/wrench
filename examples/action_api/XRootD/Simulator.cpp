@@ -104,7 +104,9 @@ int main(int argc, char **argv) {
     auto controller = simulation->add(new wrench::Controller(baremetal_service, &xrootd_deployment, "root"));
 
     /* Launch the simulation */
+    std::cerr << "Launching the Simulation...\n";
     simulation->launch();
+    std::cerr << "Simulation done!\n";
 
     return 0;
 }

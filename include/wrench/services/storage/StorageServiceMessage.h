@@ -281,7 +281,7 @@ namespace wrench {
     class StorageServiceFileContentChunkMessage : public StorageServiceMessage {
     public:
         explicit StorageServiceFileContentChunkMessage(std::shared_ptr<DataFile> file,
-                                                       unsigned long chunk_size, bool last_chunk);
+                                                       double chunk_size, bool last_chunk);
 
         /** @brief The file */
         std::shared_ptr<DataFile> file;

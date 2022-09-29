@@ -25,6 +25,8 @@ find_package(Boost REQUIRED)
 find_package(Boost COMPONENTS json REQUIRED)
 find_package(SimGrid REQUIRED)
 
+find_package(nlohmann_json)
+
 set(CMAKE_CXX_STANDARD 14)
 
 # build the version number

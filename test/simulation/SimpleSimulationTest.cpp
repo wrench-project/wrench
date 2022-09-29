@@ -361,6 +361,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
+    // Can't init again
+    ASSERT_THROW(simulation->init(&argc, argv), std::runtime_error);
+
+
     // Setting up the platform
     //    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
     simulation->instantiatePlatform(platform_file_path);
@@ -383,6 +387,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     ASSERT_DOUBLE_EQ(678 * 1024 * 1024,
                      storage_service->getPropertyValueAsSizeInByte(wrench::SimpleStorageServiceProperty::BUFFER_SIZE));
+
+    // Coverage
+    ASSERT_EQ(wrench::ServiceProperty::translateString(wrench::ServiceProperty::translatePropertyType(wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS)),
+              wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
 
     // Coverage
     ASSERT_GE(storage_service->getPropertyList().size(), 2);

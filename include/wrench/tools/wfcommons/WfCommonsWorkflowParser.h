@@ -43,6 +43,9 @@ namespace wrench {
          *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
          *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
          *                             would likely pass "false".
+         * @param ignore_cycle_creating_dependencies: if true, simply ignore dependencies that would make the workflow graph
+         *                             acyclic. If false, throw an exception if the workflow graph would be made acyclic by
+         *                             adding a dependency.
          * @param min_cores_per_task: If the JSON file does not specify a number of cores for a task, the minimum number of
          *                            cores on which the task can run is set to this value. (default is 1)
          * @param max_cores_per_task: If the JSON file does not specify a number of cores for a task, the maximum number of
@@ -56,6 +59,7 @@ namespace wrench {
 
         static std::shared_ptr<Workflow> createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
                                                                 bool redundant_dependencies = false,
+                                                                bool ignore_cycle_creating_dependencies = false,
                                                                 unsigned long min_cores_per_task = 1,
                                                                 unsigned long max_cores_per_task = 1,
                                                                 bool enforce_num_cores = false);
@@ -76,7 +80,10 @@ namespace wrench {
           *                             closures or existing edges in the workflow graphs). Passing redundant_dependencies=true
           *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
           *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
-          *                             woudl likely pass "false".
+          *                             would likely pass "false".
+          * @param ignore_cycle_creating_dependencies: if true, simply ignore dependencies that would make the workflow graph
+          *                             acyclic. If false, throw an exception if the workflow graph would be made acyclic by
+          *                             adding a dependency.
           * @param min_cores_per_task: If the JSON file does not specify a number of cores for a task, the minimum number of
           *                            cores on which the task can run is set to this value. (default is 1)
           * @param max_cores_per_task: If the JSON file does not specify a number of cores for a task, the maximum number of
@@ -89,6 +96,7 @@ namespace wrench {
           */
         static std::shared_ptr<Workflow> createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
                                                                           bool redundant_dependencies = false,
+                                                                          bool ignore_cycle_creating_dependencies = false,
                                                                           unsigned long min_cores_per_task = 1,
                                                                           unsigned long max_cores_per_task = 1,
                                                                           bool enforce_num_cores = false);

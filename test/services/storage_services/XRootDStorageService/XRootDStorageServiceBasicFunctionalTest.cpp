@@ -58,7 +58,6 @@ protected:
                           "       <link id=\"link23\" bandwidth=\"5GBps\" latency=\"10us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"link12\"/> </route>"
                           "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"link13\"/> </route>"
-                          "       <route src=\"Host3\" dst=\"Host3\"> <link_ctn id=\"link23\"/> </route>"
                           "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"link23\"/> </route>"
                           "   </zone> "
                           "</platform>";
@@ -86,6 +85,7 @@ private:
     XRootDServiceBasicFunctionalTest *test;
 
     int main() {
+
 
         WRENCH_INFO("Adding a file files to the simulation");
         auto file1 = wrench::Simulation::addFile("file1", 10000);
@@ -196,6 +196,19 @@ private:
             throw std::runtime_error("It seems that file6 was never copied from standalone ss to child 1");
         }
 
+        // Copy a file from Supervisor to stand-alone storage service
+        auto file7 = wrench::Simulation::addFile("file7", 10000);
+        //        this->test->root_supervisor->getChild(0)->createFile(file7);  // works too
+        this->test->root_supervisor->getChild(0)->writeFile(file7);
+        wrench::StorageService::copyFile(
+                file7,
+                wrench::FileLocation::LOCATION(this->test->root_supervisor),
+                wrench::FileLocation::LOCATION(this->test->standalone_ss));
+
+        // Check that the copy has worked
+        if (!this->test->standalone_ss->lookupFile(file7)) {
+            throw std::runtime_error("It seems that file7 was never copied from supervisor to standalone ss");
+        }
 
         //mark
         if (this->test->root_supervisor->getChild(3) != nullptr) {

@@ -169,11 +169,6 @@ private:
             throw std::runtime_error("getCoreFlopRate() should return {1,10} or {10,1} for compute service #1");
         }
 
-        // Get the TTL
-        if (this->test->compute_service1->getTTL() < DBL_MAX) {
-            throw std::runtime_error("getTTL() should return +inf for compute service #1 (instead of " + std::to_string(this->test->compute_service1->getTTL()) + ")");
-        }
-
         // Create a job that will use cores on compute service #1
         std::shared_ptr<wrench::WorkflowTask> t1 = this->test->workflow->addTask("task1", 60.0000, 3, 3, 0);
         std::shared_ptr<wrench::WorkflowTask> t2 = this->test->workflow->addTask("task2", 60000000000.0001, 2, 2, 0);
