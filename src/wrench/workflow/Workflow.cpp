@@ -185,7 +185,10 @@ namespace wrench {
         if ((src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument("Workflow::addControlDependency(): Invalid arguments");
         }
-        if (src == dst) std::cerr << "WTF!!\n";
+
+        if (src == dst) {
+            return;
+        }
 
         if (this->dag.doesPathExist(dst.get(), src.get())) {
             throw std::runtime_error("Workflow::addControlDependency(): Adding dependency between task " + src->getID() +
