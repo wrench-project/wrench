@@ -213,6 +213,14 @@ void doTopBottomLevelsTest(bool dynamic_updates) {
     if (not dynamic_updates) {
         wf->updateAllTopBottomLevels();
     }
+//    std::cerr << "T1 TL=" << t1->getTopLevel() << "\n";
+//    std::cerr << "T1 BL=" << t1->getBottomLevel() << "\n";
+//    std::cerr << "T2 TL=" << t2->getTopLevel() << "\n";
+//    std::cerr << "T2 BL=" << t2->getBottomLevel() << "\n";
+//    std::cerr << "T3 TL=" << t3->getTopLevel() << "\n";
+//    std::cerr << "T3 BL=" << t3->getBottomLevel() << "\n";
+//    std::cerr << "T4 TL=" << t4->getTopLevel() << "\n";
+//    std::cerr << "T4 BL=" << t4->getBottomLevel() << "\n";
 
     ASSERT_TRUE(t1->getTopLevel() == 0 and t1->getBottomLevel() == 2);
     ASSERT_TRUE(t2->getTopLevel() == 1 and t2->getBottomLevel() == 0);
