@@ -30,7 +30,7 @@ namespace wrench {
                                                                               bool ignore_cycle_creating_dependencies,
                                                                               unsigned long min_cores_per_task,
                                                                               unsigned long max_cores_per_task,
-                                                                              bool enforce_num_cores) {a
+                                                                              bool enforce_num_cores) {
         std::ifstream file;
         nlohmann::json j;
         std::set<std::string> ignored_auxiliary_jobs;
@@ -47,7 +47,7 @@ namespace wrench {
             throw;
         }
 
-        //handle the exceptions of opening the json file
+        // handle exceptions when opening the json file
         file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
         try {
             file.open(filename);
