@@ -38,8 +38,8 @@ namespace wrench {
                                                                   memory_requirement(memory_requirement),
                                                                   execution_host(""),
                                                                   visible_state(WorkflowTask::State::READY),
-            //            upcoming_visible_state(WorkflowTask::State::UNKNOWN),
-            //            internal_state(WorkflowTask::InternalState::TASK_READY),
+                                                                  //            upcoming_visible_state(WorkflowTask::State::UNKNOWN),
+                                                                  //            internal_state(WorkflowTask::InternalState::TASK_READY),
                                                                   job(nullptr) {
         // The default is that the task is perfectly parallelizable
         this->parallel_model = ParallelModel::CONSTANTEFFICIENCY(1.0);
@@ -803,7 +803,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
  * @brief Returns the task's top level (max number of hops on a reverse path up to an entry task. Entry
  *        tasks have a top-level of 0)
  * @return
@@ -812,7 +812,7 @@ namespace wrench {
         return this->toplevel;
     }
 
-/**
+    /**
  * @brief Returns the task's bottom level (max number of hops on a path down to an exit task. Exit
  *        tasks have a bottom-level of 0)
  * @return
@@ -822,7 +822,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
  * @brief Returns the name of the host on which the task has most recently been executed, or "" if
  *        the task has never been executed yet. Could be a virtual hostname.
  * @return hostname
@@ -831,7 +831,7 @@ namespace wrench {
         return (not this->execution_history.empty()) ? this->execution_history.top().execution_host : "";
     }
 
-/**
+    /**
 * @brief Returns the name of the PHYSICAL host on which the task has most recently been executed, or "" if
 *        the task has never been executed yet.
 * @return hostname
@@ -840,7 +840,7 @@ namespace wrench {
         return (not this->execution_history.empty()) ? this->execution_history.top().physical_execution_host : "";
     }
 
-/**
+    /**
  * @brief Returns the number of cores allocated for this task's most recent execution or 0 if an execution attempt was never made
  * @return number of cores
  */
@@ -848,7 +848,7 @@ namespace wrench {
         return (not this->execution_history.empty()) ? this->execution_history.top().num_cores_allocated : 0;
     }
 
-/**
+    /**
  * @brief Sets the host on which this task is running.If the hostname is a VM name, then
  * the corresponding physical host name will be set!
  * @param hostname: the host name
@@ -871,7 +871,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
  * @brief Sets the number of cores allocated for this task
  * @param num_cores: the number of cores allocated to this task
  */
@@ -884,7 +884,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
  * @brief Get the task's color ("" if none)
  * @return A color string in  "#rrggbb" format
  */
@@ -892,7 +892,7 @@ namespace wrench {
         return this->color;
     }
 
-/**
+    /**
  * @brief Set the task's color
  * @param c: A color string in  "#rrggbb" format
  */
@@ -900,7 +900,7 @@ namespace wrench {
         this->color = c;
     }
 
-/**
+    /**
  * @brief Set the task's parallel model
  * @param model: a parallel model
  */
@@ -908,7 +908,7 @@ namespace wrench {
         this->parallel_model = std::move(model);
     }
 
-/**
+    /**
  * @brief Get the task's parallel model
  * @return the parallel model
  */
@@ -916,7 +916,7 @@ namespace wrench {
         return this->parallel_model;
     }
 
-/**
+    /**
  * @brief Update task readiness
  */
     void WorkflowTask::updateReadiness() {
