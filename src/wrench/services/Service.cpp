@@ -328,7 +328,7 @@ namespace wrench {
             // Wait for the ack
             message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
 
-        } catch (ExecutionException &e) { // network error
+        } catch (ExecutionException &e) {// network error
             this->shutting_down = false;
             throw;
         }
