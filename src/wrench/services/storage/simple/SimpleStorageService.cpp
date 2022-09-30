@@ -169,7 +169,7 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
             return true;// oh well
         }
@@ -181,7 +181,7 @@ namespace wrench {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
+            } catch (ExecutionException &e) {
                 return false;
             }
             return false;
@@ -454,7 +454,7 @@ namespace wrench {
         //                                                this->getMessagePayloadValue(
         //                                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         //
-        //            } catch (std::shared_ptr<NetworkError> &cause) {
+        //            } catch (ExecutionException &e) {
         //                return true;
         //            }
         //            return true;
@@ -483,7 +483,7 @@ namespace wrench {
                                     this->getMessagePayloadValue(
                                             SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
 
-                } catch (std::shared_ptr<NetworkError> &cause) {
+                } catch (ExecutionException &e) {
                     return true;
                 }
                 return true;

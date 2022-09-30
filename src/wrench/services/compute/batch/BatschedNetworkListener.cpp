@@ -104,12 +104,8 @@ namespace wrench {
      */
     void BatschedNetworkListener::sendExecuteMessageToBatchComputeService(simgrid::s4u::Mailbox *answer_mailbox,
                                                                           std::string execute_job_reply_data) {
-        try {
-            S4U_Mailbox::putMessage(this->batch_service_mailbox,
-                                    new BatchExecuteJobFromBatSchedMessage(answer_mailbox, execute_job_reply_data, 0));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->batch_service_mailbox,
+                                new BatchExecuteJobFromBatSchedMessage(answer_mailbox, execute_job_reply_data, 0));
     }
 
     /**
@@ -117,12 +113,8 @@ namespace wrench {
      * @param estimated_waiting_time: BatchComputeService queue wait time estimate
      */
     void BatschedNetworkListener::sendQueryAnswerMessageToBatchComputeService(double estimated_waiting_time) {
-        try {
-            S4U_Mailbox::putMessage(this->batch_service_mailbox,
-                                    new BatchQueryAnswerMessage(estimated_waiting_time, 0));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->batch_service_mailbox,
+                                new BatchQueryAnswerMessage(estimated_waiting_time, 0));
     }
 
     /**

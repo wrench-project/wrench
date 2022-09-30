@@ -269,11 +269,7 @@ namespace wrench {
         for (auto job: set_of_jobs) {
             // Get the answer
             std::unique_ptr<SimulationMessage> message = nullptr;
-            try {
-                message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                throw ExecutionException(cause);
-            }
+            message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
 
             if (auto msg = dynamic_cast<BatchQueryAnswerMessage *>(message.get())) {
                 job_estimated_start_times[std::get<0>(job)] = msg->estimated_start_time;

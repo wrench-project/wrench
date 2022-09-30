@@ -8,6 +8,7 @@
  */
 
 #include <wrench/logging/TerminalOutput.h>
+#include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h>
 #include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h>
 #include <wrench/services/compute/htcondor/HTCondorNegotiatorService.h>
@@ -122,7 +123,7 @@ namespace wrench {
                     this->reply_mailbox, new NegotiatorCompletionMessage(
                                                  scheduled_jobs, this->getMessagePayloadValue(
                                                                          HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             return 1;
         }
 

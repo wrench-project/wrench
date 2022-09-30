@@ -284,8 +284,8 @@ namespace wrench {
         std::shared_ptr<ParallelModel> parallel_model;
         double memory_requirement;
         unsigned long priority = 0;    // Task priority
-        unsigned long toplevel;        // 0 if entry task
-        unsigned long bottomlevel;     // 0 if exit task
+        int toplevel;                  // 0 if entry task
+        int bottomlevel;               // 0 if exit task
         unsigned int failure_count = 0;// Number of times the tasks has failed
         std::string execution_host;    // Host on which the task executed ("" if not executed successfully - yet)
         State visible_state;           // To be exposed to developer level

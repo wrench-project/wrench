@@ -57,6 +57,10 @@ protected:
 
 
         large_input_file = workflow->addFile("large_input_file", 1000000);
+        workflow->getTasksThatInput(large_input_file); // coverage
+        workflow->getTaskThatOutputs(large_input_file); // coverage
+
+
         small_input_file = workflow->addFile("zz_small_input_file", 10);
         t4_output_file = workflow->addFile("t4_output_file", 1000);
 
@@ -66,6 +70,9 @@ protected:
         t4->setBytesRead(1000010);
         t4->setBytesWritten(1000);
         t4->setAverageCPU(50.5);
+
+        workflow->getTasksThatInput(large_input_file); // coverage
+        workflow->getTaskThatOutputs(large_input_file); // coverage
 
         t5 = workflow->addTask("task1-05", 100, 1, 2, 0);
         t6 = workflow->addTask("task1-06", 100, 1, 3, 0);

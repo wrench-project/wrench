@@ -364,24 +364,17 @@ namespace wrench {
 
         // Send a "run a BatchComputeService job" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-        try {
-            S4U_Mailbox::dputMessage(
-                    this->mailbox,
-                    new BatchComputeServiceJobRequestMessage(
-                            answer_mailbox, batch_job,
-                            this->getMessagePayloadValue(
-                                    BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::dputMessage(
+                this->mailbox,
+                new BatchComputeServiceJobRequestMessage(
+                        answer_mailbox, batch_job,
+                        this->getMessagePayloadValue(
+                                BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
         std::shared_ptr<SimulationMessage> message = nullptr;
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+
         auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitCompoundJobAnswerMessage>(message);
         if (!msg) {
             throw std::runtime_error(
@@ -403,26 +396,18 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         // Send a "terminate a  job" message to the daemon's mailbox_name
-        try {
-            S4U_Mailbox::putMessage(
-                    this->mailbox,
-                    new ComputeServiceTerminateCompoundJobRequestMessage(
-                            answer_mailbox,
-                            job,
-                            this->getMessagePayloadValue(
-                                    BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(
+                this->mailbox,
+                new ComputeServiceTerminateCompoundJobRequestMessage(
+                        answer_mailbox,
+                        job,
+                        this->getMessagePayloadValue(
+                                BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobAnswerMessage *>(message.get());
 
@@ -498,7 +483,7 @@ namespace wrench {
                             job, this->getSharedPtr<BatchComputeService>(),
                             this->getMessagePayloadValue(
                                     BatchComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             return;// ignore
         }
     }
@@ -737,7 +722,7 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             return true;
         }
 
@@ -758,7 +743,7 @@ namespace wrench {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 BatchComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
+            } catch (ExecutionException &e) {
                 return false;
             }
             return false;

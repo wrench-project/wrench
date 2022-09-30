@@ -65,22 +65,14 @@ namespace wrench {
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        try {
-            S4U_Mailbox::putMessage(this->mailbox, new FileRegistryFileLookupRequestMessage(
-                                                           answer_mailbox, file,
-                                                           this->getMessagePayloadValue(
-                                                                   FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->mailbox, new FileRegistryFileLookupRequestMessage(
+                                                       answer_mailbox, file,
+                                                       this->getMessagePayloadValue(
+                                                               FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<FileRegistryFileLookupAnswerMessage *>(message.get())) {
             std::set<std::shared_ptr<FileLocation>> result = msg->locations;
@@ -121,26 +113,18 @@ namespace wrench {
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        try {
-            S4U_Mailbox::putMessage(
-                    this->mailbox,
-                    new FileRegistryFileLookupByProximityRequestMessage(
-                            answer_mailbox, file,
-                            reference_host,
-                            network_proximity_service,
-                            this->getMessagePayloadValue(
-                                    FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(
+                this->mailbox,
+                new FileRegistryFileLookupByProximityRequestMessage(
+                        answer_mailbox, file,
+                        reference_host,
+                        network_proximity_service,
+                        this->getMessagePayloadValue(
+                                FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<FileRegistryFileLookupByProximityAnswerMessage *>(message.get())) {
             return msg->locations;
@@ -168,24 +152,16 @@ namespace wrench {
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        try {
-            S4U_Mailbox::putMessage(
-                    this->mailbox,
-                    new FileRegistryAddEntryRequestMessage(
-                            answer_mailbox, file, location,
-                            this->getMessagePayloadValue(
-                                    FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(
+                this->mailbox,
+                new FileRegistryAddEntryRequestMessage(
+                        answer_mailbox, file, location,
+                        this->getMessagePayloadValue(
+                                FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
 
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
             return;
@@ -212,24 +188,16 @@ namespace wrench {
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        try {
-            S4U_Mailbox::putMessage(
-                    this->mailbox,
-                    new FileRegistryRemoveEntryRequestMessage(
-                            answer_mailbox, file, location,
-                            this->getMessagePayloadValue(
-                                    FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(
+                this->mailbox,
+                new FileRegistryRemoveEntryRequestMessage(
+                        answer_mailbox, file, location,
+                        this->getMessagePayloadValue(
+                                FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
 
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
             if (!msg->success) {
@@ -273,7 +241,7 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             return true;
         }
 
@@ -285,7 +253,7 @@ namespace wrench {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
+            } catch (ExecutionException &e) {
                 return false;
             }
             return false;

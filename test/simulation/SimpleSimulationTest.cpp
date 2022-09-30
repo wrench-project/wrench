@@ -313,6 +313,7 @@ private:
         cs->suspend();
         cs->resume();
         cs->stop();
+        cs->stop();
         cs->suspend();
 
         try {
@@ -434,6 +435,9 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Check on properties and payload
     ASSERT_DOUBLE_EQ(compute_service->getPropertyValueAsTimeInSecond(wrench::CloudComputeServiceProperty::VM_BOOT_OVERHEAD), 0.1);
     ASSERT_EQ(compute_service->getPropertyValueAsString(wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM), "best-fit-ram-first");
+    ASSERT_THROW(compute_service->getPropertyValueAsDouble(wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM), std::invalid_argument);
+    ASSERT_THROW(compute_service->getPropertyValueAsUnsignedLong(wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM), std::invalid_argument);
+    ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM), std::invalid_argument);
     ASSERT_EQ(compute_service->getMessagePayloadValue(wrench::CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD), 2);
     ASSERT_EQ(compute_service->getMessagePayloadValue(wrench::CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD), 3);
 

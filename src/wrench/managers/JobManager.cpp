@@ -65,12 +65,8 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void JobManager::stop() {
-        try {
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->mailbox,
+                                new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**
@@ -924,7 +920,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             WRENCH_INFO("Error while receiving message... ignoring");
             return true;
         }

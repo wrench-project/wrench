@@ -117,9 +117,10 @@ private:
             try {
                 pending_send->wait();
                 throw std::runtime_error("Should have gotten a NetworkError");
-            } catch (std::shared_ptr<wrench::NetworkError> &e) {
-                e->toString();
-                e->getMailbox();
+            } catch (wrench::ExecutionException &e) {
+                auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
+                cause->toString();
+                cause->getMailbox();
             }
             wrench::Simulation::sleep(10);
             wrench::Simulation::turnOnLink("1");
@@ -139,17 +140,19 @@ private:
             try {
                 sends_failure.at(index)->wait();
                 throw std::runtime_error("Should have gotten a NetworkError");
-            } catch (std::shared_ptr<wrench::NetworkError> &e) {
-                e->toString();
-                e->getMailbox();
+            } catch (wrench::ExecutionException &e) {
+                auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
+                cause->toString();
+                cause->getMailbox();
             }
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_failure, 10000);
             try {
                 sends_failure.at(index)->wait();
                 throw std::runtime_error("Should have gotten a NetworkError");
-            } catch (std::shared_ptr<wrench::NetworkError> &e) {
-                e->toString();
-                e->getMailbox();
+            } catch (wrench::ExecutionException &e) {
+                auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
+                cause->toString();
+                cause->getMailbox();
             }
 
 
@@ -158,9 +161,10 @@ private:
                 wrench::S4U_Mailbox::putMessage(this->test->wms2->mailbox,
                                                 new wrench::SimulationMessage(100));
                 throw std::runtime_error("Should have gotten a NetworkError");
-            } catch (std::shared_ptr<wrench::NetworkError> &e) {
-                e->toString();
-                e->getMailbox();
+            } catch (wrench::ExecutionException &e) {
+                auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
+                cause->toString();
+                cause->getMailbox();
             }
 
 
@@ -192,8 +196,10 @@ private:
             try {
                 wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox);
                 throw std::runtime_error("Should have gotten a NetworkError");
-            } catch (std::shared_ptr<wrench::NetworkError> &e) {
-                e->toString();
+            } catch (wrench::ExecutionException &e) {
+                auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
+                cause->toString();
+                cause->getMailbox();
             }
 
             //            WRENCH_INFO("TWO ASYNCHRPNOUS RECV / NETWORK FAILURES");
@@ -202,14 +208,15 @@ private:
             try {
                 wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox);
                 throw std::runtime_error("Should have gotten a NetworkError");
-            } catch (std::shared_ptr<wrench::NetworkError> &e) {
+            } catch (wrench::ExecutionException &e) {
             }
             try {
                 wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox);
                 throw std::runtime_error("Should have gotten a NetworkError");
-            } catch (std::shared_ptr<wrench::NetworkError> &e) {
-                e->toString();
-                e->getMailbox();
+            } catch (wrench::ExecutionException &e) {
+                auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
+                cause->toString();
+                cause->getMailbox();
             }
 
             // One asynchronous recv, network failure
@@ -218,9 +225,10 @@ private:
             try {
                 pending_recv->wait();
                 throw std::runtime_error("Should have gotten a NetworkError");
-            } catch (std::shared_ptr<wrench::NetworkError> &e) {
-                e->toString();
-                e->getMailbox();
+            } catch (wrench::ExecutionException &e) {
+                auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
+                cause->toString();
+                cause->getMailbox();
             }
         }
 

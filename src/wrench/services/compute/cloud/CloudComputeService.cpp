@@ -493,20 +493,12 @@ namespace wrench {
                                                                         ComputeServiceMessage *message) {
         serviceSanityCheck();
 
-        try {
-            S4U_Mailbox::putMessage(this->mailbox, message);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->mailbox, message);
 
         // Wait for a reply
         std::shared_ptr<SimulationMessage> answer_message = nullptr;
 
-        try {
-            answer_message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        answer_message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         return answer_message;
     }
@@ -526,7 +518,7 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             return true;
         }
 
@@ -545,7 +537,7 @@ namespace wrench {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 CloudComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
+            } catch (ExecutionException &e) {
                 return false;
             }
             return false;
