@@ -115,7 +115,7 @@ class CustomActionExecutorTestWMS : public wrench::ExecutionController {
 
 public:
     CustomActionExecutorTestWMS(CustomActionExecutorTest *test,
-                                const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
@@ -154,12 +154,12 @@ private:
 
         auto action_executor = std::make_shared<wrench::ActionExecutor>(
                 "Host2",
-                                           num_cores,
-                                           ram,
-                                           0,
-                                           false,
-                                           this->mailbox,
-                                           action, nullptr);
+                num_cores,
+                ram,
+                0,
+                false,
+                this->mailbox,
+                action, nullptr);
 
         // Start it
         action_executor->setSimulation(this->simulation);
