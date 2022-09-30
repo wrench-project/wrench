@@ -323,9 +323,9 @@ namespace wrench {
                                             ComputeService::TerminationCause::TERMINATION_NONE,
                                             this->getMessagePayloadValue(
                                                     ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             this->shutting_down = false;
-            throw ExecutionException(cause);
+            throw;
         }
 
         // Wait for the ack
@@ -333,9 +333,9 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             this->shutting_down = false;
-            throw ExecutionException(cause);
+            throw;
         }
 
         if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
