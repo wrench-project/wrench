@@ -158,14 +158,14 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "run a standard job" message to the daemon's mailbox_name
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new ActionExecutionServiceSubmitActionRequestMessage(
-                                            answer_mailbox, action,
-                                            0.0));
+        S4U_Mailbox::putMessage(this->mailbox,
+                                new ActionExecutionServiceSubmitActionRequestMessage(
+                                        answer_mailbox, action,
+                                        0.0));
 
         // Get the answer
         std::unique_ptr<SimulationMessage> message = nullptr;
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<ActionExecutionServiceSubmitActionAnswerMessage *>(message.get())) {
             // If not a success, throw an exception
@@ -719,13 +719,13 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "terminate action" message to the daemon's mailbox_name
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new ActionExecutionServiceTerminateActionRequestMessage(
-                                            answer_mailbox, std::move(action), termination_cause, 0.0));
+        S4U_Mailbox::putMessage(this->mailbox,
+                                new ActionExecutionServiceTerminateActionRequestMessage(
+                                        answer_mailbox, std::move(action), termination_cause, 0.0));
 
         // Get the answer
         std::unique_ptr<SimulationMessage> message = nullptr;
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<ActionExecutionServiceTerminateActionAnswerMessage *>(message.get())) {
             // If no success, throw an exception
