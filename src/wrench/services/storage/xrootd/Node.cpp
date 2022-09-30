@@ -151,8 +151,8 @@ namespace wrench {
                                                          msg->file,
                                                          cached,
                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
-                                                         cached.size(),
+                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                                                         cached.size(),
                                                          msg->answered));
                     } else {
                         if (children.size() > 0) {
@@ -176,7 +176,7 @@ namespace wrench {
                                                                          msg->file,
                                                                          set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage)},
                                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                                          msg->answered));
                                     }
                                 } else {
@@ -200,7 +200,7 @@ namespace wrench {
                                                              msg->file,
                                                              set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage)},
                                                              getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                             getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                                     getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                              msg->answered));
                         }
                     }
@@ -473,8 +473,8 @@ namespace wrench {
                                                      msg->file,
                                                      cached,
                                                      getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                     getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
-                                                     cached.size(),
+                                                             getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                                                     cached.size(),
                                                      msg->answered));
                 } else {//File Not Cached
                     if (internalStorage &&
@@ -490,7 +490,7 @@ namespace wrench {
                                                          msg->file,
                                                          set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage)},
                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                          msg->answered));
                     } else {//File not in internal storage or cache
                         if (children.size() > 0 &&

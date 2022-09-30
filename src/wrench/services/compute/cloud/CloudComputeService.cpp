@@ -493,12 +493,12 @@ namespace wrench {
                                                                         ComputeServiceMessage *message) {
         serviceSanityCheck();
 
-            S4U_Mailbox::putMessage(this->mailbox, message);
+        S4U_Mailbox::putMessage(this->mailbox, message);
 
         // Wait for a reply
         std::shared_ptr<SimulationMessage> answer_message = nullptr;
 
-            answer_message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        answer_message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         return answer_message;
     }

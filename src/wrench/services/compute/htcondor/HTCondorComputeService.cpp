@@ -136,16 +136,16 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "run a standard job" message to the daemon's mailbox_name
-            S4U_Mailbox::putMessage(
-                    this->mailbox,
-                    new ComputeServiceSubmitCompoundJobRequestMessage(
-                            answer_mailbox, job, service_specific_args,
-                            this->getMessagePayloadValue(
-                                    HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::putMessage(
+                this->mailbox,
+                new ComputeServiceSubmitCompoundJobRequestMessage(
+                        answer_mailbox, job, service_specific_args,
+                        this->getMessagePayloadValue(
+                                HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
         std::unique_ptr<SimulationMessage> message = nullptr;
-            message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox);
 
         if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
