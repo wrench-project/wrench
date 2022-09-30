@@ -92,9 +92,10 @@ private:
         try {
             message = wrench::S4U_Mailbox::getMessage(mailbox);
             throw std::runtime_error("Should never have gotten the alarm's message");
-        } catch (std::shared_ptr<wrench::NetworkError> &error) {
-            error->toString();
-            error->getMailbox();
+        } catch (wrench::ExecutionException &e) {
+            e.getCause()->toString();
+            auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
+            cause->getMailbox();
         }
 
         return 0;
