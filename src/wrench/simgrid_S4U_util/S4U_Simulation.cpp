@@ -472,6 +472,7 @@ namespace wrench {
      * @param sequential_work: the sequential work (in flops)
      * @param parallel_per_thread_work: the parallel per thread work (in flops)
      */
+
     void S4U_Simulation::compute_multi_threaded(unsigned long num_threads,
                                                 double thread_creation_overhead,
                                                 double sequential_work,

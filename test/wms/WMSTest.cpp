@@ -99,6 +99,7 @@ private:
         auto cloud = this->test->cs_cloud;
         auto vm_name = cloud->createVM(4, 0.0);
         auto vm_cs = cloud->startVM(vm_name);
+        vm_cs->getPhysicalHostname(); // coverage
 
         // Get a "STANDARD JOB COMPLETION" event (default handler)
         auto task1 = this->test->workflow->addTask("task1", 10.0, 1, 1, 0);
