@@ -65,12 +65,8 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void JobManager::stop() {
-        try {
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->mailbox,
+                                new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**
@@ -636,37 +632,37 @@ namespace wrench {
                 "pilot_job_",
                 0, 0,
                 [callback_mailbox, job, compute_service](const std::shared_ptr<ActionExecutor> &executor) {
-                    // Create a bare-metal compute service and start it
-                    auto execution_service = executor->getActionExecutionService();
+                  // Create a bare-metal compute service and start it
+                  auto execution_service = executor->getActionExecutionService();
 
-                    // TODO: Deal with Properties!
-                    auto bm_cs = std::shared_ptr<BareMetalComputeService>(
-                            new BareMetalComputeService(
-                                    executor->hostname,
-                                    execution_service->getComputeResources(),
-                                    {},
-                                    {},
-                                    nullptr,
-                                    "_one_shot_bm",
-                                    std::dynamic_pointer_cast<ComputeService>(execution_service->getParentService())->getScratch()));
+                  // TODO: Deal with Properties!
+                  auto bm_cs = std::shared_ptr<BareMetalComputeService>(
+                          new BareMetalComputeService(
+                                  executor->hostname,
+                                  execution_service->getComputeResources(),
+                                  {},
+                                  {},
+                                  nullptr,
+                                  "_one_shot_bm",
+                                  std::dynamic_pointer_cast<ComputeService>(execution_service->getParentService())->getScratch()));
 
-                    bm_cs->simulation = executor->getSimulation();
-                    bm_cs->start(bm_cs, true, false);// Daemonized, no auto-restart
-                    job->compute_service = bm_cs;
+                  bm_cs->simulation = executor->getSimulation();
+                  bm_cs->start(bm_cs, true, false);// Daemonized, no auto-restart
+                  job->compute_service = bm_cs;
 
-                    // Send a call back
-                    S4U_Mailbox::dputMessage(
-                            callback_mailbox,
-                            new ComputeServicePilotJobStartedMessage(
-                                    job, compute_service,
-                                    compute_service->getMessagePayloadValue(
-                                            BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
+                  // Send a call back
+                  S4U_Mailbox::dputMessage(
+                          callback_mailbox,
+                          new ComputeServicePilotJobStartedMessage(
+                                  job, compute_service,
+                                  compute_service->getMessagePayloadValue(
+                                          BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
 
-                    // Sleep FOREVER (will be killed by service above)
-                    Simulation::sleep(DBL_MAX);
+                  // Sleep FOREVER (will be killed by service above)
+                  Simulation::sleep(DBL_MAX);
                 },
                 [job](const std::shared_ptr<ActionExecutor> &executor) {
-                    job->compute_service->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
+                  job->compute_service->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
                 });
 
         job->compound_job = cjob;
@@ -924,7 +920,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             WRENCH_INFO("Error while receiving message... ignoring");
             return true;
         }
