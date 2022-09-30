@@ -136,8 +136,8 @@ private:
         auto job = job_manager->createCompoundJob("");
         // Add a file_copy_action
         auto file_copy_action = job->addFileCopyAction("", this->test->file,
-                                                       wrench::FileLocation::LOCATION(this->test->ss1),
-                                                       wrench::FileLocation::LOCATION(this->test->ss2));
+                                                       this->test->ss1,
+                                                       this->test->ss2);
 
         // coverage
         wrench::Action::getActionTypeAsString(file_copy_action);
