@@ -80,8 +80,8 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void BandwidthMeterService::stop() {
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
+        S4U_Mailbox::putMessage(this->mailbox,
+                                new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**

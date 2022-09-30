@@ -90,16 +90,16 @@ namespace wrench {
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-            S4U_Mailbox::putMessage(
-                    this->mailbox,
-                    new CoordinateLookupRequestMessage(
-                            answer_mailbox, requested_host,
-                            this->getMessagePayloadValue(
-                                    NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::putMessage(
+                this->mailbox,
+                new CoordinateLookupRequestMessage(
+                        answer_mailbox, requested_host,
+                        this->getMessagePayloadValue(
+                                NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<CoordinateLookupAnswerMessage *>(message.get())) {
             return std::make_pair(msg->xy_coordinate, msg->timestamp);
@@ -135,16 +135,16 @@ namespace wrench {
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-            S4U_Mailbox::putMessage(
-                    this->mailbox,
-                    new NetworkProximityLookupRequestMessage(
-                            answer_mailbox, std::move(hosts),
-                            this->getMessagePayloadValue(
-                                    NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::putMessage(
+                this->mailbox,
+                new NetworkProximityLookupRequestMessage(
+                        answer_mailbox, std::move(hosts),
+                        this->getMessagePayloadValue(
+                                NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<NetworkProximityLookupAnswerMessage *>(message.get())) {
             return std::make_pair(msg->proximity_value, msg->timestamp);

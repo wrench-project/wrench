@@ -209,7 +209,6 @@ private:
                 wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox);
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (wrench::ExecutionException &e) {
-
             }
             try {
                 wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox);

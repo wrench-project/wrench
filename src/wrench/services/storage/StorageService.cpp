@@ -279,7 +279,7 @@ namespace wrench {
                     remaining -= this->buffer_size;
                 }
                 S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
-                        file, (unsigned long) remaining, true));
+                                                                         file, (unsigned long) remaining, true));
 
 
                 //Waiting for the final ack
@@ -316,14 +316,14 @@ namespace wrench {
 
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-            S4U_Mailbox::putMessage(this->mailbox, new StorageServiceFreeSpaceRequestMessage(
-                    answer_mailbox,
-                    this->getMessagePayloadValue(
-                            StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::putMessage(this->mailbox, new StorageServiceFreeSpaceRequestMessage(
+                                                       answer_mailbox,
+                                                       this->getMessagePayloadValue(
+                                                               StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
         std::unique_ptr<SimulationMessage> message = nullptr;
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<StorageServiceFreeSpaceAnswerMessage *>(message.get())) {
             return msg->free_space;
@@ -355,18 +355,18 @@ namespace wrench {
 
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-            S4U_Mailbox::putMessage(
-                    location->getStorageService()->mailbox,
-                    new StorageServiceFileLookupRequestMessage(
-                            answer_mailbox,
-                            file,
-                            location,
-                            storage_service->getMessagePayloadValue(
-                                    StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::putMessage(
+                location->getStorageService()->mailbox,
+                new StorageServiceFileLookupRequestMessage(
+                        answer_mailbox,
+                        file,
+                        location,
+                        storage_service->getMessagePayloadValue(
+                                StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
         std::shared_ptr<SimulationMessage> message;
-            message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
+        message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
 
         if (auto msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {
             return msg->file_is_available;
@@ -483,7 +483,7 @@ namespace wrench {
                     }
 
                     if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage *>(
-                            file_content_message.get())) {
+                                file_content_message.get())) {
                         if (file_content_chunk_msg->last_chunk) {
                             S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                             break;
@@ -498,7 +498,7 @@ namespace wrench {
                 S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
 
                 //Waiting for the final ack
-                    message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
+                message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
                 if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
                     throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                              message->getName() + "] message!");
@@ -609,18 +609,18 @@ namespace wrench {
         bool unregister = (file_registry_service != nullptr);
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-            S4U_Mailbox::putMessage(storage_service->mailbox,
-                                    new StorageServiceFileDeleteRequestMessage(
-                                            answer_mailbox,
-                                            file,
-                                            location,
-                                            storage_service->getMessagePayloadValue(
-                                                    StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::putMessage(storage_service->mailbox,
+                                new StorageServiceFileDeleteRequestMessage(
+                                        answer_mailbox,
+                                        file,
+                                        location,
+                                        storage_service->getMessagePayloadValue(
+                                                StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-            message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
+        message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
 
         if (auto msg = dynamic_cast<StorageServiceFileDeleteAnswerMessage *>(message.get())) {
             // On failure, throw an exception
@@ -665,21 +665,21 @@ namespace wrench {
                                                                                              src_location,
                                                                                              dst_location);
 
-            S4U_Mailbox::putMessage(
-                    dst_location->getStorageService()->mailbox,
-                    new StorageServiceFileCopyRequestMessage(
-                            answer_mailbox,
-                            file,
-                            src_location,
-                            dst_location,
-                            nullptr,
-                            dst_location->getStorageService()->getMessagePayloadValue(
-                                    StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::putMessage(
+                dst_location->getStorageService()->mailbox,
+                new StorageServiceFileCopyRequestMessage(
+                        answer_mailbox,
+                        file,
+                        src_location,
+                        dst_location,
+                        nullptr,
+                        dst_location->getStorageService()->getMessagePayloadValue(
+                                StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-            message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox);
 
         if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
             if (msg->failure_cause) {
@@ -717,16 +717,16 @@ namespace wrench {
                                                                                              dst_location);
 
         // Send a message to the daemon on the dst location
-            S4U_Mailbox::putMessage(
-                    dst_location->getStorageService()->mailbox,
-                    new StorageServiceFileCopyRequestMessage(
-                            answer_mailbox,
-                            file,
-                            src_location,
-                            dst_location,
-                            nullptr,
-                            dst_location->getStorageService()->getMessagePayloadValue(
-                                    StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::putMessage(
+                dst_location->getStorageService()->mailbox,
+                new StorageServiceFileCopyRequestMessage(
+                        answer_mailbox,
+                        file,
+                        src_location,
+                        dst_location,
+                        nullptr,
+                        dst_location->getStorageService()->getMessagePayloadValue(
+                                StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
     }
 
     /**
