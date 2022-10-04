@@ -190,7 +190,7 @@ namespace wrench {
             /** Sending a local file to the network **/
             try {
                 sendLocalFileToNetwork(this->file, this->src_location, num_bytes_to_transfer, this->dst_mailbox);
-            } catch (std::shared_ptr<NetworkError> &failure_cause) {
+            } catch (ExecutionException &e) {
                 WRENCH_INFO(
                         "FileTransferThread::main(): Network error (%s)", failure_cause->toString().c_str());
                 msg_to_send_back->success = false;
@@ -202,7 +202,7 @@ namespace wrench {
             /** Receiving a file from the network **/
             try {
                 receiveFileFromNetwork(this->file, this->src_mailbox, this->dst_location);
-            } catch (std::shared_ptr<NetworkError> &failure_cause) {
+            } catch (ExecutionException &e) {
                 WRENCH_INFO(
                         "FileTransferThread::main() Network error (%s)", failure_cause->toString().c_str());
                 msg_to_send_back->success = false;
@@ -219,7 +219,7 @@ namespace wrench {
             /** Downloading a file from another storage service */
             try {
                 downloadFileFromStorageService(this->file, this->src_location, this->dst_location);
-            } catch (std::shared_ptr<NetworkError> &failure_cause) {
+            } catch (ExecutionException &e) {
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
             } catch (std::shared_ptr<FailureCause> &failure_cause) {
@@ -242,7 +242,7 @@ namespace wrench {
             // Send report back to the service
             // (a dput() right before death is always dicey, so this is a put())
             S4U_Mailbox::putMessage(this->parent->mailbox, msg_to_send_back);
-        } catch (std::shared_ptr<NetworkError> &e) {
+        } catch (ExecutionException &e) {
             // oh well...
         }
 
@@ -336,7 +336,7 @@ namespace wrench {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
                     //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
-            } catch (std::shared_ptr<NetworkError> &e) {
+            } catch (ExecutionException &e) {
                 throw;
             }
         }
@@ -494,7 +494,7 @@ namespace wrench {
                             f->getSize(),
                             src_loc->getStorageService()->getMessagePayloadValue(
                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
             throw;
         }
@@ -504,7 +504,7 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
             throw;
         }
@@ -583,7 +583,7 @@ namespace wrench {
                                             dst_loc->getStorageService()->getHostname(),
                                             dst_loc->getMountPoint());
                 }
-            } catch (std::shared_ptr<NetworkError> &e) {
+            } catch (ExecutionException &e) {
                 S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
                 throw;
             }

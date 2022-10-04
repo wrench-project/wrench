@@ -54,11 +54,13 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(mailbox, timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<NetworkError>(e.getCause());
             if (cause->isTimeout()) {
                 return nullptr;
+            } else {
+                throw;
             }
-            throw ExecutionException(cause);
         }
 
         if (auto m = dynamic_cast<JobManagerCompoundJobCompletedMessage *>(message.get())) {
