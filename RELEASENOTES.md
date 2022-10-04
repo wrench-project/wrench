@@ -1,21 +1,31 @@
 WRENCH Release Notes
 ------
 
-### WRENCH 2.0
+### wrench 2.0
 
-(April 8, 2022) This is a **major** release, which includes:
+(october XXX, 2022) this release include **a new storage service implementation**, **performance enhancements**, and **minor bug fixes**. More specifically:
 
-- Created a more general Developer API, called the *action API*, that makes it possible
-  to simulate application workloads that are not necessarily workflow applications. Examples
+- implementation of a new storage service for the simulation of the [XRootD](https://xrootd.slac.stanford.edu/) storage system, along with implementation and examples.
+- many performance and scalability improvements that reduce memory footprint and simulation execution time. 
+
+**note**: wrench 2.0 requires [simgrid 3.32](https://simgrid.org)
+
+
+### wrench 2.0
+
+(april 8, 2022) this is a **major** release, which includes:
+
+- created a more general developer api, called the *action api*, that makes it possible
+  to simulate application workloads that are not necessarily workflow applications. examples
   are provided in the `examples/action_api` directory. 
-- Minor changes to the workflow API (which is now implemented internally on top of the action API).
-- Removed support for the obsolete DAX XML workflow description format, which removes an external software dependency.
-- Added support for the [WfCommons](https://wfcommons.org) JSON workflow description format.
-- Many additional API functionality, typically as requested by users.
-- Scalability improvements both in terms of simulation time and simulation memory footprint.
-- New and improved documentation.
+- minor changes to the workflow api (which is now implemented internally on top of the action api).
+- removed support for the obsolete dax xml workflow description format, which removes an external software dependency.
+- added support for the [wfcommons](https://wfcommons.org) json workflow description format.
+- many additional api functionality, typically as requested by users.
+- scalability improvements both in terms of simulation time and simulation memory footprint.
+- new and improved documentation.
 
-**Note**: WRENCH 2.0 requires [SimGrid 3.31](https://simgrid.org)
+**note**: wrench 2.0 requires [simgrid 3.31](https://simgrid.org)
 
 
 ### WRENCH 1.11
