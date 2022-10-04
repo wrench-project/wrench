@@ -41,7 +41,7 @@ And, one of the following:
 
 ### Required Dependencies 
 
-- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.31
+- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - **version 3.32**
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
 
 ### Optional Dependencies
