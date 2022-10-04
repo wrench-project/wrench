@@ -11,16 +11,11 @@
 #include <wrench-dev.h>
 
 #include <wrench/action/Action.h>
-#include <wrench/action/SleepAction.h>
-#include <wrench/action/CustomAction.h>
-#include <wrench/action/FileReadAction.h>
-#include <wrench/action/FileWriteAction.h>
-#include <wrench/action/FileCopyAction.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 #include <wrench/job/CompoundJob.h>
-#include <wrench/failure_causes/HostError.h>
 
+#include <memory>
 #include <utility>
 
 #include "../../../include/TestWithFork.h"
@@ -120,14 +115,14 @@ class CustomActionExecutorTestWMS : public wrench::ExecutionController {
 
 public:
     CustomActionExecutorTestWMS(CustomActionExecutorTest *test,
-                                std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
 private:
     CustomActionExecutorTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -136,7 +131,6 @@ private:
         auto job = job_manager->createCompoundJob("");
 
         // Create an action executor
-        std::shared_ptr<wrench::Action> action;
         unsigned long num_cores = 0;
         double ram = 0;
 
@@ -148,19 +142,24 @@ private:
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
 
-        action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", 0, 0, lambda_execute, lambda_terminate));
+        auto action = job->addCustomAction("", 0, 0, lambda_execute, lambda_terminate);
+
+        // Coverage (to call removeAction and the funky addCustomAction method
+        std::shared_ptr<wrench::Action> to_remove = action;
+        job->removeAction(to_remove);
+        job->addCustomAction(action);
 
         // coverage
         wrench::Action::getActionTypeAsString(action);
 
-        auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2",
+        auto action_executor = std::make_shared<wrench::ActionExecutor>(
+                "Host2",
                                            num_cores,
                                            ram,
                                            0,
                                            false,
                                            this->mailbox,
-                                           action, nullptr));
+                                           action, nullptr);
 
         // Start it
         action_executor->setSimulation(this->simulation);
@@ -170,7 +169,8 @@ private:
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+        } catch (wrench::ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
         }
 

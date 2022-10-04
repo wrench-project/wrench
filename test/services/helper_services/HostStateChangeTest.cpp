@@ -76,7 +76,7 @@ private:
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox, 10);
-        } catch (std::shared_ptr<wrench::NetworkError> &e) {
+        } catch (wrench::ExecutionException &) {
             throw std::runtime_error("Did not get a message before the timeout");
         }
         if (not std::dynamic_pointer_cast<wrench::HostHasTurnedOffMessage>(message)) {
@@ -88,7 +88,7 @@ private:
 
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox, 10);
-        } catch (std::shared_ptr<wrench::NetworkError> &e) {
+        } catch (wrench::ExecutionException &) {
             throw std::runtime_error("Did not get a message before the timeout");
         }
         if (not std::dynamic_pointer_cast<wrench::HostHasTurnedOnMessage>(message)) {
@@ -103,7 +103,7 @@ private:
 
             try {
                 message = wrench::S4U_Mailbox::getMessage(this->mailbox, 10);
-            } catch (std::shared_ptr<wrench::NetworkError> &e) {
+            } catch (wrench::ExecutionException &) {
                 throw std::runtime_error("Did not get a message before the timeout");
             }
             if (not std::dynamic_pointer_cast<wrench::HostHasChangedSpeedMessage>(message)) {
