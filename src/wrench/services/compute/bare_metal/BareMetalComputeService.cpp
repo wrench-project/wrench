@@ -204,23 +204,15 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "run a standard job" message to the daemon's mailbox_name
-        try {
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new ComputeServiceSubmitCompoundJobRequestMessage(
-                                            answer_mailbox, job, service_specific_args,
-                                            this->getMessagePayloadValue(
-                                                    ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->mailbox,
+                                new ComputeServiceSubmitCompoundJobRequestMessage(
+                                        answer_mailbox, job, service_specific_args,
+                                        this->getMessagePayloadValue(
+                                                ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
         std::unique_ptr<SimulationMessage> message = nullptr;
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
@@ -437,7 +429,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<NetworkError> &error) {
+        } catch (ExecutionException &e) {
             WRENCH_INFO(
                     "Got a network error while getting some message... ignoring");
             return true;
@@ -454,7 +446,7 @@ namespace wrench {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
+            } catch (ExecutionException &e) {
                 return false;
             }
             return false;
@@ -512,21 +504,13 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "terminate a compound job" message to the daemon's mailbox_name
-        try {
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new ComputeServiceTerminateCompoundJobRequestMessage(
-                                            answer_mailbox, job, this->getMessagePayloadValue(BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->mailbox,
+                                new ComputeServiceTerminateCompoundJobRequestMessage(
+                                        answer_mailbox, job, this->getMessagePayloadValue(BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
         std::unique_ptr<SimulationMessage> message = nullptr;
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
@@ -627,7 +611,7 @@ namespace wrench {
                                     job, this->getSharedPtr<BareMetalComputeService>(),
                                     this->getMessagePayloadValue(
                                             BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
-                } catch (std::shared_ptr<NetworkError> &cause) {
+                } catch (ExecutionException &e) {
                     return;// ignore
                 }
             }
@@ -854,7 +838,7 @@ namespace wrench {
             } else {
                 // job is not one
             }
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             return;// ignore
         }
     }
