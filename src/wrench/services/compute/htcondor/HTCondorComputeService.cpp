@@ -270,7 +270,8 @@ namespace wrench {
     void HTCondorComputeService::processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox,
                                                           std::shared_ptr<CompoundJob> job,
                                                           const std::map<std::string, std::string> &service_specific_args) {
-        WRENCH_INFO("Asked to run compound job %s, which has %u actions", job->getName().c_str(), job->getActions().size());
+
+        WRENCH_INFO("Asked to run compound job %s, which has %lu actions", job->getName().c_str(), job->getActions().size());
 
         // Check that the job can run on some child service
         if (not this->central_manager->jobCanRunSomewhere(job, service_specific_args)) {
