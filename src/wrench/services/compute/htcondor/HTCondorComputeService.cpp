@@ -268,7 +268,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorComputeService::processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox,
-                                                          const std::shared_ptr<CompoundJob>& job,
+                                                          const std::shared_ptr<CompoundJob> &job,
                                                           const std::map<std::string, std::string> &service_specific_args) {
 
         WRENCH_INFO("Asked to run compound job %s, which has %zu actions", job->getName().c_str(), job->getActions().size());
