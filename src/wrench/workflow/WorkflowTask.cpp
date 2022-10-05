@@ -732,7 +732,7 @@ namespace wrench {
         if (parents.empty()) {
             this->toplevel = 0;
         } else {
-            unsigned long max_toplevel = 0;
+            int max_toplevel = 0;
             for (const auto &parent: parents) {
                 max_toplevel = (max_toplevel < parent->toplevel ? parent->toplevel : max_toplevel);
             }
