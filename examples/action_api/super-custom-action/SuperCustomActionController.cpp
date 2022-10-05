@@ -180,7 +180,7 @@ namespace wrench {
         if (auto job_completion_event = std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(second_event)) {
             auto completed_job = job_completion_event->job;
             WRENCH_INFO("Job %s has completed!", completed_job->getName().c_str());
-            WRENCH_INFO("It had %lu actions:", completed_job->getActions().size());
+            WRENCH_INFO("It had %u actions:", completed_job->getActions().size());
             auto derived_custom_action = std::dynamic_pointer_cast<DerivedCustomAction>(*(completed_job->getActions().begin()));
             WRENCH_INFO("The additional instance variable's value in the action is now %d", derived_custom_action->additional_variable);
         } else {

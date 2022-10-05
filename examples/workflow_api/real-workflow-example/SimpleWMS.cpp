@@ -46,7 +46,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
         WRENCH_INFO("Starting on host %s", S4U_Simulation::getHostName().c_str());
-        WRENCH_INFO("About to execute a workflow with %u tasks", this->workflow->getNumberOfTasks());
+        WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -187,7 +187,7 @@ namespace wrench {
             return;
         }
 
-        WRENCH_INFO("Trying to schedule %lu ready tasks", ready_tasks.size());
+        WRENCH_INFO("Trying to schedule %u ready tasks", ready_tasks.size());
 
         unsigned long num_tasks_scheduled = 0;
         for (auto const &task: ready_tasks) {
@@ -221,7 +221,7 @@ namespace wrench {
             }
             if (not scheduled) break;
         }
-        WRENCH_INFO("Was able to schedule %lu out of %lu ready tasks", num_tasks_scheduled, ready_tasks.size());
+        WRENCH_INFO("Was able to schedule %lu out of %u ready tasks", num_tasks_scheduled, ready_tasks.size());
     }
 
 }// namespace wrench
