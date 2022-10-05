@@ -29,7 +29,9 @@
 
 WRENCH_LOG_CATEGORY(action_scheduler_test, "Log category for ActionExecutionServiceTest");
 
-#define EPSILON (std::numeric_limits<double>::epsilon())
+//#define EPSILON (std::numeric_limits<double>::epsilon())
+#define EPSILON (0.000001)
+
 
 class ActionExecutionServiceTest : public ::testing::Test {
 
