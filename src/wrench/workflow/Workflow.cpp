@@ -552,7 +552,7 @@ namespace wrench {
      * @param max: the high end of the range (inclusive)
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInTopLevelRange(unsigned long min, unsigned long max) {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInTopLevelRange(int min, int max) {
         std::vector<std::shared_ptr<WorkflowTask>> to_return;
         for (auto const &task: this->getTasks()) {
             if ((task->getTopLevel() >= min) and (task->getTopLevel() <= max)) {
@@ -568,7 +568,7 @@ namespace wrench {
      * @param max: the high end of the range (inclusive)
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInBottomLevelRange(unsigned long min, unsigned long max) {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInBottomLevelRange(int min, int max) {
         std::vector<std::shared_ptr<WorkflowTask>> to_return;
         for (auto const &task: this->getTasks()) {
             if ((task->getBottomLevel() >= min) and (task->getBottomLevel() <= max)) {
