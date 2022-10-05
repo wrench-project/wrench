@@ -21,7 +21,9 @@
 
 WRENCH_LOG_CATEGORY(sleep_action_executor_test, "Log category for SleepActionExecutorTest");
 
-#define EPSILON (std::numeric_limits<double>::epsilon())
+//#define EPSILON (std::numeric_limits<double>::epsilon())
+#define EPSILON (0.000001)
+
 
 class SleepActionExecutorTest : public ::testing::Test {
 

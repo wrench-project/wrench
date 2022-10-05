@@ -23,8 +23,8 @@
 
 WRENCH_LOG_CATEGORY(file_read_action_executor_test, "Log category for FileReadActionExecutorTest");
 
-#define EPSILON (std::numeric_limits<double>::epsilon())
-//#define EPSILON (0.0000001)
+//#define EPSILON (std::numeric_limits<double>::epsilon())
+#define EPSILON (0.000001)
 
 class FileReadActionExecutorTest : public ::testing::Test {
 
