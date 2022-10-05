@@ -13,8 +13,9 @@
   <br /><br />
 </p>
 
-WRENCH is an _open-source library_ that exposes several high-level simulation 
-abstractions that serve as **building blocks** for developing custom simulators.
+WRENCH is an _open-source library_ that provides high-level simulation 
+abstractions that serve as **building blocks** for developing custom simulators of
+distributed computing systems, platforms, and applications.
 
 More information and Documentation: [WRENCH Project Website](http://wrench-project.org)
 
