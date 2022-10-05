@@ -27,7 +27,6 @@ WRENCH_LOG_CATEGORY(file_copy_action_executor_test, "Log category for FileCopyAc
 #define EPSILON (0.000001)
 
 
-
 class FileCopyActionExecutorTest : public ::testing::Test {
 
 public:
