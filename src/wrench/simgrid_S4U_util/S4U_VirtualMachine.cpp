@@ -83,13 +83,13 @@ namespace wrench {
         }
 
         this->vm = physical_host->create_vm(this->vm_name,
-                                                 (int) this->num_cores,
-                                                 (size_t) this->ram_memory);
+                                            (int) this->num_cores,
+                                            (size_t) this->ram_memory);
 
-//        this->vm = new simgrid::s4u::VirtualMachine(this->vm_name,
-//                                                    physical_host,
-//                                                    (int) this->num_cores,
-//                                                    (size_t) this->ram_memory);
+        //        this->vm = new simgrid::s4u::VirtualMachine(this->vm_name,
+        //                                                    physical_host,
+        //                                                    (int) this->num_cores,
+        //                                                    (size_t) this->ram_memory);
         this->vm->start();
         this->state = State::RUNNING;
         this->pm_name = pm_name;
