@@ -651,7 +651,7 @@ namespace wrench {
      * @return the number of levels
      */
     unsigned long Workflow::getNumLevels() {
-        unsigned long max_top_level = 0;
+        int max_top_level = 0;
         for (auto const &t: this->tasks) {
             auto task = t.second.get();
             if (task->getNumberOfChildren() == 0) {
