@@ -301,8 +301,7 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
 
 
 /**********************************************************************/
-/**  FILE READ TEST
- * **/
+/**  FILE READ TEST                                                  **/
 /*******************************z**************************************/
 
 class SimpleStorageServiceFileReadTestWMS : public wrench::ExecutionController {
