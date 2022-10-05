@@ -343,7 +343,6 @@ private:
             job->addActionDependency(action1, action1);
             throw std::runtime_error("Shouldn't be able to add a dependency between the same action");
         } catch (std::invalid_argument &ignore) {
-
         }
 
         job->addActionDependency(action1, action2);
