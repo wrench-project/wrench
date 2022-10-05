@@ -171,7 +171,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -184,26 +184,26 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname1, {"/"})));
+                            new wrench::SimpleStorageService(hostname1, {"/"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname2, {"/"})));
+                            new wrench::SimpleStorageService(hostname2, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> cloud_hosts;
     cloud_hosts.push_back(hostname1);
     ASSERT_NO_THROW(cs_cloud = simulation->add(
-            new wrench::CloudComputeService(hostname1, cloud_hosts, "/scratch", {}, {})));
+                            new wrench::CloudComputeService(hostname1, cloud_hosts, "/scratch", {}, {})));
 
     // Create a Batch Service
     std::vector<std::string> batch_hosts;
     batch_hosts.push_back(hostname2);
     ASSERT_NO_THROW(cs_batch = simulation->add(
-            new wrench::BatchComputeService(hostname2, batch_hosts, "/scratch",
-                                            {},
-                    //                    {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "false"}},
-                                            {})));
+                            new wrench::BatchComputeService(hostname2, batch_hosts, "/scratch",
+                                                            {},
+                                                            //                    {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "false"}},
+                                                            {})));
 
 
     // Create a WMS
@@ -211,7 +211,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new TestDefaultHandlerWMS(this, 100, hostname1)));
+                            new TestDefaultHandlerWMS(this, 100, hostname1)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
@@ -416,23 +416,23 @@ void WMSTest::do_CustomHandlerWMS_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname1, {"/"})));
+                            new wrench::SimpleStorageService(hostname1, {"/"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname2, {"/"})));
+                            new wrench::SimpleStorageService(hostname2, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> cloud_hosts;
     cloud_hosts.push_back(hostname1);
     ASSERT_NO_THROW(cs_cloud = simulation->add(
-            new wrench::CloudComputeService(hostname1, cloud_hosts, "/scratch", {}, {})));
+                            new wrench::CloudComputeService(hostname1, cloud_hosts, "/scratch", {}, {})));
 
     // Create a Batch Service
     std::vector<std::string> batch_hosts;
     batch_hosts.push_back(hostname1);
     ASSERT_NO_THROW(cs_batch = simulation->add(
-            new wrench::BatchComputeService(hostname2, batch_hosts, "/scratch", {}, {})));
+                            new wrench::BatchComputeService(hostname2, batch_hosts, "/scratch", {}, {})));
 
 
     // Create a WMS
@@ -440,7 +440,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new TestCustomHandlerWMS(this, 100, hostname1)));
+                            new TestCustomHandlerWMS(this, 100, hostname1)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
