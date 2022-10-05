@@ -46,7 +46,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
         WRENCH_INFO("Starting on host %s", S4U_Simulation::getHostName().c_str());
-        WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
+        WRENCH_INFO("About to execute a workflow with %u tasks", this->workflow->getNumberOfTasks());
 
         // Create a job manager
         auto job_manager = this->createJobManager();
