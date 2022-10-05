@@ -86,6 +86,8 @@ namespace wrench {
         void Cache::remove(std::shared_ptr<DataFile> file) {
             cache.erase(file);
         }
+
+#if 0
         /**
          * @brief Deap Clean the cache of outdated entries.  Possibly slow, but if the cache size is getting out of hand, this can help.
          * @param file: The file to check the cache for
@@ -114,5 +116,7 @@ namespace wrench {
                 }
             }
         }
+#endif
+
     }// namespace XRootD
 }// namespace wrench
