@@ -89,7 +89,7 @@ namespace wrench {
 
             /* Submit the cheap task to the small VM */
             /* First, we need to create a map of file locations, stating for each file
-             * where is should be read/written */
+             * where it should be read/written */
             std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations1;
             file_locations1[cheap_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
             file_locations1[cheap_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
@@ -106,7 +106,7 @@ namespace wrench {
 
             /* Submit the expensive task to the large VM */
             /* First, we need to create a map of file locations, stating for each file
-             * where is should be read/written */
+             * where it should be read/written */
             std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations2;
             file_locations2[expensive_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
             file_locations2[expensive_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
