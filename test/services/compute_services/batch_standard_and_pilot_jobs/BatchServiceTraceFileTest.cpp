@@ -182,7 +182,7 @@ TEST_F(BatchServiceTest, BatchTraceFileReplayTest) {
 void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
