@@ -425,7 +425,6 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
     argv[2] = strdup("--cfg=contexts/stack-size:100");
     //    argv[2] = strdup("--wrench-full-logs");
 
-
     simulation->init(&argc, argv);
 
     // Setting up the platform
