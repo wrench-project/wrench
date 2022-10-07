@@ -811,7 +811,7 @@ namespace wrench {
         }
 
 
-    /**
+        /**
      * @brief Get a file's last write date at a location (in zero simulated time)
      *
      * @param file: the file
@@ -820,18 +820,18 @@ namespace wrench {
      * @return the file's last write date, or -1 if the file is not found
      *
      */
-    double Node::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-        if ((file == nullptr) or (location == nullptr)) {
-            throw std::invalid_argument("Node::getFileLastWriteDate(): Invalid arguments");
+        double Node::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
+            if ((file == nullptr) or (location == nullptr)) {
+                throw std::invalid_argument("Node::getFileLastWriteDate(): Invalid arguments");
+            }
+            if (internalStorage) {
+                return internalStorage->getFileLastWriteDate(file, location);
+            } else {
+                throw std::runtime_error("Node::getFileLastWriteDate() called on non storage Node " + hostname);
+            }
         }
-        if (internalStorage) {
-            return internalStorage->getFileLastWriteDate(file, location);
-        } else {
-            throw std::runtime_error("Node::getFileLastWriteDate() called on non storage Node " + hostname);
-        }
-    }
 
-    /**
+        /**
      * @brief Get the load of the underlying storage service
      * @return the load on the service
      */
