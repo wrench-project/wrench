@@ -123,7 +123,7 @@ namespace wrench {
     /***************************************************************/
     /****** THESE FUNCTIONS PROVIDE AN OBJECT API FOR TALKING ******/
     /******     TO SPECIFIC STORAGE SERVERS NOT LOCATIONS     ******/
-    /******    CONSTRUCTS LOCATION AND FORWARDS TO DAEMNON    ******/
+    /******    CONSTRUCTS LOCATION AND FORWARDS TO DAEMON    ******/
     /***************************************************************/
 
     /**
@@ -139,6 +139,7 @@ namespace wrench {
     bool StorageService::lookupFile(const std::shared_ptr<DataFile> &file) {
         return StorageService::lookupFile(file, FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())));
     }
+
     /**
      * @brief Synchronously delete a file at a location
      *

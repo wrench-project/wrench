@@ -809,83 +809,29 @@ namespace wrench {
             }
             return splitStacks;//I sure hope RVO takes care of this copy
         }
-        /*
-        bool Node::lookupFile(std::shared_ptr<DataFile>file){
-            if ((file == nullptr) ) {
-                throw std::invalid_argument("XrootD::Node::lookupFile(): Invalid arguments");
-            }
-            assertServiceIsUp();
-            auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-                S4U_Mailbox::dputMessage(mailbox,
-                                        new FileSearchRequestMessage(
-                                                answer_mailbox,
-                                                file,
-                                                getMessagePayloadValue(MessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD))
-                );
 
-            // Wait for a reply
-            std::unique_ptr<SimulationMessage> message = nullptr;
 
-            try {
-                message = S4U_Mailbox::getMessage(answer_mailbox, network_timeout);
-            } catch (ExecutionException &e) {
-                return false;
-            }
-
-            if (auto msg = dynamic_cast<FileSearchAnswerMessage *>(message.get())) {
-                // If it's not a success, throw an exception
-                return msg->success;
-            } else {
-                throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                         message->getName() + "] message!");
-            }
+    /**
+     * @brief Get a file's last write date at a location (in zero simulated time)
+     *
+     * @param file: the file
+     * @param location: the file location
+     *
+     * @return the file's last write date, or -1 if the file is not found
+     *
+     */
+    double Node::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
+        if ((file == nullptr) or (location == nullptr)) {
+            throw std::invalid_argument("Node::getFileLastWriteDate(): Invalid arguments");
         }
-        void Node::deleteFile(std::shared_ptr<DataFile>file) { //nonmeta delete from sub tree
-            S4U_Mailbox::dputMessage(mailbox,
-                                    new FileDeleteRequestMessage(
-                                            file,
-                                            getMessagePayloadValue(MessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD),
-                                            metavisor->defaultTimeToLive
-                                            )
-            );
+        if (internalStorage) {
+            return internalStorage->getFileLastWriteDate(file, location);
+        } else {
+            throw std::runtime_error("Node::getFileLastWriteDate() called on non storage Node " + hostname);
         }
+    }
 
-        void Node::readFile(std::shared_ptr<DataFile>file){
-            readFile(file,file->getSize());
-        }
-        void Node::readFile(std::shared_ptr<DataFile>file, double num_bytes){
-            if ((file == nullptr)  or (num_bytes < 0.0)) {
-
-                throw std::invalid_argument("XrootD::Node::readFile(): Invalid arguments");
-            }
-            assertServiceIsUp();
-            auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-                S4U_Mailbox::dputMessage(mailbox,
-                                        new FileSearchRequestMessage(
-                                                answer_mailbox,
-                                                file,
-                                                getMessagePayloadValue(MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD))
-                                        );
-
-            // Wait for a reply
-            std::unique_ptr<SimulationMessage> message = nullptr;
-
-                message = S4U_Mailbox::getMessage(answer_mailbox, network_timeout);
-
-            if (auto msg = dynamic_cast<FileSearchAnswerMessage *>(message.get())) {
-                // If it's not a success, throw an exception
-                if (not msg->success) {
-                    std::shared_ptr<FailureCause> &cause = msg->failure_cause;
-                    throw ExecutionException(cause);
-                }
-                StorageService::readFile(msg->file,msg->location);
-            } else {
-                throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                         message->getName() + "] message!");
-            }
-        }
-        */
-        /**
+    /**
      * @brief Get the load of the underlying storage service
      * @return the load on the service
      */

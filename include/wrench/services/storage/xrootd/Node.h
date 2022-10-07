@@ -47,6 +47,8 @@ namespace wrench {
 
             void writeFile(const std::shared_ptr<DataFile> &file) override;
 
+            double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
+
             /***********************/
             /** \endcond           */
             /***********************/

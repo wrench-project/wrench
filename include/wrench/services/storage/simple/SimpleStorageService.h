@@ -82,6 +82,9 @@ namespace wrench {
         void cleanup(bool has_returned_from_main, int return_value) override;
         double getLoad() override;
         double countRunningFileTransferThreads();
+
+        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
+
         /***********************/
         /** \endcond          **/
         /***********************/
