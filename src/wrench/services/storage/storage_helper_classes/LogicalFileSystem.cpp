@@ -140,7 +140,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::storeFileInDirectory(const std::shared_ptr<DataFile>& file, const std::string &absolute_path) {
+    void LogicalFileSystem::storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return;
         }
@@ -166,7 +166,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::removeFileFromDirectory(const std::shared_ptr<DataFile>& file, const std::string &absolute_path) {
+    void LogicalFileSystem::removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return;
         }
@@ -201,7 +201,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    bool LogicalFileSystem::isFileInDirectory(const std::shared_ptr<DataFile>& file, const std::string &absolute_path) {
+    bool LogicalFileSystem::isFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return false;
         }
@@ -229,7 +229,7 @@ namespace wrench {
         }
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
-        for (auto const &f : this->content[absolute_path]) {
+        for (auto const &f: this->content[absolute_path]) {
             to_return.insert(f.first);
         }
         return to_return;
@@ -269,7 +269,7 @@ namespace wrench {
  * @param absolute_path: the path where it will be written
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::reserveSpace(const std::shared_ptr<DataFile> &file, const std::string& absolute_path) {
+    void LogicalFileSystem::reserveSpace(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return;
         }
