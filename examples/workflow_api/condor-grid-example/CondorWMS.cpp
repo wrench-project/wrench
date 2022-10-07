@@ -86,7 +86,7 @@ namespace wrench {
         }
 
         // Submit the first tasks as part of a single "grid universe" job to HTCondor
-        WRENCH_INFO("Creating a standard job with the first %ld tasks", first_tasks.size());
+        WRENCH_INFO("Creating a standard job with the first %zu tasks", first_tasks.size());
         auto grid_universe_job = job_manager->createStandardJob(first_tasks, file_locations);
         WRENCH_INFO("Submitting the job as a grid-universe job to HTCondor, asking for 3 compute nodes");
         std::map<std::string, std::string> htcondor_service_specific_arguments;

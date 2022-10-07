@@ -23,7 +23,9 @@
 
 WRENCH_LOG_CATEGORY(file_delete_action_executor_test, "Log category for FileDeleteActionExecutorTest");
 
-#define EPSILON (std::numeric_limits<double>::epsilon())
+//#define EPSILON (std::numeric_limits<double>::epsilon())
+#define EPSILON (0.000001)
+
 
 class FileDeleteActionExecutorTest : public ::testing::Test {
 

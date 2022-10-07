@@ -117,9 +117,9 @@ namespace wrench {
 
         std::vector<std::shared_ptr<DataFile>> getOutputFiles() const;
 
-        unsigned long getTopLevel() const;
+        int getTopLevel() const;
 
-        unsigned long getBottomLevel() const;
+        int getBottomLevel() const;
 
         double getStartDate() const;
 

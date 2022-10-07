@@ -391,7 +391,7 @@ namespace wrench {
                     req = S4U_Mailbox::iputMessage(mailbox,
                                                    new StorageServiceFileContentChunkMessage(
                                                            this->file,
-                                                           (unsigned long) chunk_size, (remaining <= 0)));
+                                                           chunk_size, (remaining <= 0)));
                 }
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();

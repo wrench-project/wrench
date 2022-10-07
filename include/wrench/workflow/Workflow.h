@@ -103,8 +103,8 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        std::vector<std::shared_ptr<WorkflowTask>> getTasksInTopLevelRange(unsigned long min, unsigned long max);
-        std::vector<std::shared_ptr<WorkflowTask>> getTasksInBottomLevelRange(unsigned long min, unsigned long max);
+        std::vector<std::shared_ptr<WorkflowTask>> getTasksInTopLevelRange(int min, int max);
+        std::vector<std::shared_ptr<WorkflowTask>> getTasksInBottomLevelRange(int min, int max);
 
         std::vector<std::shared_ptr<WorkflowTask>> getReadyTasks();
 

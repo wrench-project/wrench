@@ -18,8 +18,8 @@
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/services/compute/ComputeService.h>
-#include <wrench/failure_causes/NetworkError.h>
-#include <wrench/failure_causes/JobKilled.h>
+
+#include <utility>
 
 WRENCH_LOG_CATEGORY(wrench_core_HTCondor, "Log category for HTCondorComputeService Scheduler");
 
@@ -117,7 +117,7 @@ namespace wrench {
      * @param compute_service: the compute service to add
      */
     void HTCondorComputeService::addComputeService(std::shared_ptr<ComputeService> compute_service) {
-        this->central_manager->addComputeService(compute_service);
+        this->central_manager->addComputeService(std::move(compute_service));
     }
 
     /**
@@ -268,9 +268,10 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorComputeService::processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox,
-                                                          std::shared_ptr<CompoundJob> job,
+                                                          const std::shared_ptr<CompoundJob> &job,
                                                           const std::map<std::string, std::string> &service_specific_args) {
-        WRENCH_INFO("Asked to run compound job %s, which has %ld actions", job->getName().c_str(), job->getActions().size());
+
+        WRENCH_INFO("Asked to run compound job %s, which has %zu actions", job->getName().c_str(), job->getActions().size());
 
         // Check that the job can run on some child service
         if (not this->central_manager->jobCanRunSomewhere(job, service_specific_args)) {

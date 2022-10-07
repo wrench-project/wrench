@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
     auto workflow = wrench::Workflow::createWorkflow();
 
     /* Initialize and seed a RNG */
-    std::uniform_int_distribution<long> dist(100000000, 10000000000);
+    std::uniform_int_distribution<long> dist(10000000, 1000000000);
     std::mt19937 rng(42);
 
     /* Add workflow tasks and files */

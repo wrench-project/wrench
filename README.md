@@ -13,8 +13,9 @@
   <br /><br />
 </p>
 
-WRENCH is an _open-source library_ that exposes several high-level simulation 
-abstractions that serve as **building blocks** for developing custom simulators.
+WRENCH is an _open-source library_ that provides high-level simulation 
+abstractions that serve as **building blocks** for developing custom simulators of
+distributed computing systems, platforms, and applications.
 
 More information and Documentation: [WRENCH Project Website](http://wrench-project.org)
 
@@ -42,7 +43,8 @@ And, one of the following:
 ### Required Dependencies 
 
 - [Boost](https://www.boost.org) - version 1.75 or higher
-- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.31
+- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - **version 3.32**
+- [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
 
 ### Optional Dependencies
 

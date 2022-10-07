@@ -139,7 +139,7 @@ namespace wrench {
             if (auto job_completion_event = std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event)) {
                 auto completed_job = job_completion_event->job;
                 WRENCH_INFO("Job %s has completed!", completed_job->getName().c_str());
-                WRENCH_INFO("It had %lu actions:", completed_job->getActions().size());
+                WRENCH_INFO("It had %zu actions:", completed_job->getActions().size());
                 for (auto const &action: completed_job->getActions()) {
                     WRENCH_INFO("  - Action %s ran on host %s (physical: %s)",
                                 action->getName().c_str(),

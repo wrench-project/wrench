@@ -46,8 +46,11 @@ ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-data-movement/wrench-examp
 echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks/wrench-example-cloud-bag-of-tasks${normal}"
 ${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks/wrench-example-cloud-bag-of-tasks 10 ${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks/four_hosts.xml
 
-echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks-energy/wrench-example-cloud-bag-of-tasks-energy${normal}"
-${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks-energy/wrench-example-cloud-bag-of-tasks-energy 10 ${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks-energy/four_hosts_energy.xml --wrench-energy-simulation
+echo ""
+echo "${bold}**SKIPPING**:${normal} ${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks-energy/wrench-example-cloud-bag-of-tasks-energy"
+echo ""
+#echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks-energy/wrench-example-cloud-bag-of-tasks-energy${normal}"
+#${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks-energy/wrench-example-cloud-bag-of-tasks-energy 10 ${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks-energy/four_hosts_energy.xml --wrench-energy-simulation
 
 echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/virtualized-cluster-bag-of-tasks/wrench-example-virtualized-cluster-bag-of-tasks${normal}"
 ${INSTALL_DIR}/workflow_api/basic-examples/virtualized-cluster-bag-of-tasks/wrench-example-virtualized-cluster-bag-of-tasks 10 ${INSTALL_DIR}/workflow_api/basic-examples/virtualized-cluster-bag-of-tasks/four_hosts.xml

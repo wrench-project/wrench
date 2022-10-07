@@ -125,7 +125,7 @@ namespace wrench {
         // If writeback device simulation is activated
         if (Simulation::isPageCachingEnabled()) {
             //  Find the "memory" disk (we know there is one)
-            auto host = simgrid::s4u::Host::by_name(this->getHostname());
+            auto host = S4U_Simulation::get_host_or_vm_by_name(this->getHostname());
             simgrid::s4u::Disk *memory_disk = nullptr;
             for (auto const &d: host->get_disks()) {
                 // Get the disk's mount point

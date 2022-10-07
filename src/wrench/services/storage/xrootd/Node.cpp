@@ -160,7 +160,7 @@ namespace wrench {
                             map<Node *, vector<stack<Node *>>> splitStacks = splitStack(msg->search_stack);
                             S4U_Simulation::compute(
                                     this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
-                            WRENCH_DEBUG("Advanced Broadcast to %lu hosts", splitStacks.size());
+                            WRENCH_DEBUG("Advanced Broadcast to %zu hosts", splitStacks.size());
 
                             for (auto entry: splitStacks) {
                                 if (entry.first == this) {//this node was the target
@@ -307,7 +307,7 @@ namespace wrench {
                                 auto targets = metavisor->getFileNodes(msg->file);
                                 auto search_stack = constructFileSearchTree(targets);
                                 map<Node *, vector<stack<Node *>>> splitStacks = splitStack(search_stack);
-                                WRENCH_DEBUG("Searching %lu subtrees for %s", search_stack.size(), msg->file->getID().c_str());
+                                WRENCH_DEBUG("Searching %u subtrees for %s", search_stack.size(), msg->file->getID().c_str());
                                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                                 for (auto entry: splitStacks) {
                                     if (entry.first == this) {//this node was the target
@@ -406,7 +406,7 @@ namespace wrench {
                                 auto targets = metavisor->getFileNodes(msg->file);
                                 auto search_stack = constructFileSearchTree(targets);
                                 map<Node *, vector<stack<Node *>>> splitStacks = splitStack(search_stack);
-                                WRENCH_DEBUG("Searching %lu subtrees for %s", search_stack.size(), msg->file->getID().c_str());
+                                WRENCH_DEBUG("Searching %zu subtrees for %s", search_stack.size(), msg->file->getID().c_str());
                                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                                 for (auto entry: splitStacks) {
                                     if (entry.first == this) {//this node was the target
@@ -932,7 +932,7 @@ namespace wrench {
             if (next != this) {//failed to find this in parrent tree
                 ret = stack<Node *>();
             } else {
-                WRENCH_DEBUG("Found file server %s in subtree at depth %lu", target->getName().c_str(), ret.size());
+                WRENCH_DEBUG("Found file server %s in subtree at depth %zu", target->getName().c_str(), ret.size());
             }
             return ret;
         }

@@ -23,7 +23,9 @@
 
 WRENCH_LOG_CATEGORY(custom_action_executor_test, "Log category for CustomActionExecutorTest");
 
-#define EPSILON (std::numeric_limits<double>::epsilon())
+//#define EPSILON (std::numeric_limits<double>::epsilon())
+#define EPSILON (0.000001)
+
 
 class CustomActionExecutorTest : public ::testing::Test {
 
@@ -115,7 +117,7 @@ class CustomActionExecutorTestWMS : public wrench::ExecutionController {
 
 public:
     CustomActionExecutorTestWMS(CustomActionExecutorTest *test,
-                                const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
@@ -154,12 +156,12 @@ private:
 
         auto action_executor = std::make_shared<wrench::ActionExecutor>(
                 "Host2",
-                                           num_cores,
-                                           ram,
-                                           0,
-                                           false,
-                                           this->mailbox,
-                                           action, nullptr);
+                num_cores,
+                ram,
+                0,
+                false,
+                this->mailbox,
+                action, nullptr);
 
         // Start it
         action_executor->setSimulation(this->simulation);

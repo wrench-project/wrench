@@ -339,6 +339,12 @@ private:
         auto action3 = job->addSleepAction("chain1_sleep_3", 10.0);
         auto action4 = job->addSleepAction("chain1_sleep_4", 10.0);
 
+        try {
+            job->addActionDependency(action1, action1);
+            throw std::runtime_error("Shouldn't be able to add a dependency between the same action");
+        } catch (std::invalid_argument &ignore) {
+        }
+
         job->addActionDependency(action1, action2);
         job->addActionDependency(action2, action3);
         job->addActionDependency(action3, action4);

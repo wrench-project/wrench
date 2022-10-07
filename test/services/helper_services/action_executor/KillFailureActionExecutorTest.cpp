@@ -29,7 +29,8 @@
 
 WRENCH_LOG_CATEGORY(kill_fail_action_executor_test, "Log category for KillFailActionExecutorTest");
 
-#define EPSILON (std::numeric_limits<double>::epsilon())
+//#define EPSILON (std::numeric_limits<double>::epsilon())
+#define EPSILON (0.000001)
 
 class KillFailActionExecutorTest : public ::testing::Test {
 

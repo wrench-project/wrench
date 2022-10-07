@@ -667,12 +667,12 @@ namespace wrench {
                                                std::string hostname) {
         mountpoint = FileLocation::sanitizePath(mountpoint);
 
-        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
         if (not host) {
             throw std::invalid_argument("MemoryManager::getDisk: unknown host " + hostname);
         }
 
-        auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
+        auto disk_list = host->get_disks();
         for (auto disk: disk_list) {
             std::string disk_mountpoint =
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));

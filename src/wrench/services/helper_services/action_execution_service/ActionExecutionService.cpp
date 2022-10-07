@@ -282,7 +282,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
         // Print some logging
-        WRENCH_INFO("New Action Execution Service started by %s on %ld hosts",
+        WRENCH_INFO("New Action Execution Service started by %s on %zu hosts",
                     this->parent_service->getName().c_str(), this->compute_resources.size());
         std::string msg = "\n";
         for (auto cr: this->compute_resources) {
