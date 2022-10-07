@@ -145,6 +145,12 @@ private:
         auto action3 = job3->addSleepAction("job3_sleep", 10.);
         auto action4 = job4->addSleepAction("job4_sleep", 10.);
 
+        try {
+            job1->addActionDependency(action1, action2);
+            throw std::runtime_error("Shouldn't be able to add cross-job dependencies");
+        } catch (std::invalid_argument &ignore) {
+        }
+
         job1->addChildJob(job2);
         job1->addChildJob(job3);
         job4->addParentJob(job3);// coverage by doing the reverse

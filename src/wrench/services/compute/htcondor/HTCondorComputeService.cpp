@@ -18,8 +18,8 @@
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/services/compute/ComputeService.h>
-#include <wrench/failure_causes/NetworkError.h>
-#include <wrench/failure_causes/JobKilled.h>
+
+#include <utility>
 
 WRENCH_LOG_CATEGORY(wrench_core_HTCondor, "Log category for HTCondorComputeService Scheduler");
 
@@ -117,7 +117,7 @@ namespace wrench {
      * @param compute_service: the compute service to add
      */
     void HTCondorComputeService::addComputeService(std::shared_ptr<ComputeService> compute_service) {
-        this->central_manager->addComputeService(compute_service);
+        this->central_manager->addComputeService(std::move(compute_service));
     }
 
     /**
@@ -136,24 +136,16 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "run a standard job" message to the daemon's mailbox_name
-        try {
-            S4U_Mailbox::putMessage(
-                    this->mailbox,
-                    new ComputeServiceSubmitCompoundJobRequestMessage(
-                            answer_mailbox, job, service_specific_args,
-                            this->getMessagePayloadValue(
-                                    HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(
+                this->mailbox,
+                new ComputeServiceSubmitCompoundJobRequestMessage(
+                        answer_mailbox, job, service_specific_args,
+                        this->getMessagePayloadValue(
+                                HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
         std::unique_ptr<SimulationMessage> message = nullptr;
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox);
 
         if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
@@ -234,7 +226,7 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             return true;
         }
 
@@ -252,7 +244,7 @@ namespace wrench {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 HTCondorComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
+            } catch (ExecutionException &e) {
                 return false;
             }
             return false;
@@ -276,9 +268,10 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorComputeService::processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox,
-                                                          std::shared_ptr<CompoundJob> job,
+                                                          const std::shared_ptr<CompoundJob> &job,
                                                           const std::map<std::string, std::string> &service_specific_args) {
-        WRENCH_INFO("Asked to run compound job %s, which has %ld actions", job->getName().c_str(), job->getActions().size());
+
+        WRENCH_INFO("Asked to run compound job %s, which has %zu actions", job->getName().c_str(), job->getActions().size());
 
         // Check that the job can run on some child service
         if (not this->central_manager->jobCanRunSomewhere(job, service_specific_args)) {

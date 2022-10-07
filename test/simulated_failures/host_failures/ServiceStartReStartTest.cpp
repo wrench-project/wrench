@@ -188,7 +188,8 @@ private:
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+        } catch (wrench::ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
 
