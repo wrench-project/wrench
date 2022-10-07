@@ -40,24 +40,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - build: "Ubuntu Bionic - g++-7"
-            DIST: ubuntu-bionic
-            COMPILER: gcc7
-            batsched: off
-          
-          - build: "Ubuntu Bionic - g++-7 (batsched)"
-            DIST: ubuntu-bionic
-            COMPILER: gcc7-batsched
-            batsched: on
-
-          - build: "Ubuntu Bionic - clang++-9"
-            DIST: ubuntu-bionic
-            COMPILER: clang9
-            batsched: off
-
-          - build: "Ubuntu Focal - g++-9"
-            DIST: ubuntu-focal
-            COMPILER: gcc9
+          - build: "Debian Bullseye - g++-10"
+            DIST: debian-bullseye
+            COMPILER: gcc10
             batsched: off
 
           - build: "Debian Buster - g++-8"
@@ -65,9 +50,19 @@ jobs:
             COMPILER: gcc8
             batsched: off
 
-          - build: "Debian Bullseye - g++-10"
-            DIST: debian-bullseye
-            COMPILER: gcc10
+          - build: "Ubuntu Focal - clang++-10"
+            DIST: ubuntu-focal
+            COMPILER: clang10
+            batsched: off
+
+          - build: "Ubuntu Focal - g++-9"
+            DIST: ubuntu-focal
+            COMPILER: gcc9
+            batsched: off
+
+          - build: "Ubuntu Jammy Jellyfish - clang++-14"
+            DIST: ubuntu-jammy
+            COMPILER: clang14
             batsched: off
 
           - build: "Ubuntu Jammy Jellyfish - g++-11"
@@ -75,10 +70,11 @@ jobs:
             COMPILER: gcc11
             batsched: off
 
-          - build: "Ubuntu Jammy Jellyfish - clang++-14"
+          - build: "Ubuntu Jammy Jellyfish - g++-11 - batsched"
             DIST: ubuntu-jammy
-            COMPILER: clang14
-            batsched: off
+            COMPILER: gcc11-batsched
+            batsched: on
+
 
     steps:
       - uses: actions/checkout@v2
