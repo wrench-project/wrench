@@ -307,7 +307,7 @@ namespace wrench {
                                 auto targets = metavisor->getFileNodes(msg->file);
                                 auto search_stack = constructFileSearchTree(targets);
                                 map<Node *, vector<stack<Node *>>> splitStacks = splitStack(search_stack);
-                                WRENCH_DEBUG("Searching %u subtrees for %s", search_stack.size(), msg->file->getID().c_str());
+                                WRENCH_DEBUG("Searching %zu subtrees for %s", search_stack.size(), msg->file->getID().c_str());
                                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                                 for (auto entry: splitStacks) {
                                     if (entry.first == this) {//this node was the target
