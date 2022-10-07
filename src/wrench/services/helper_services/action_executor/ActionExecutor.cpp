@@ -43,9 +43,12 @@ namespace wrench {
             simgrid::s4u::Mailbox *callback_mailbox,
             std::shared_ptr<Action> action,
             std::shared_ptr<ActionExecutionService> action_execution_service) : ExecutionController(hostname, "action_executor") {
+
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (action == nullptr) {
             throw std::invalid_argument("ActionExecutor::ActionExecutor(): action cannot be nullptr");
         }
+#endif
 
         this->callback_mailbox = callback_mailbox;
         this->action = action;
@@ -147,7 +150,7 @@ namespace wrench {
 
         try {
             S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             WRENCH_INFO("Action executor can't report back due to network error.. oh well!");
         }
         WRENCH_INFO("Action executor for action %s terminating!", this->action->getName().c_str());

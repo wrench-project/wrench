@@ -205,8 +205,14 @@ private:
         }
 
 
+        // Coverage
+        job->getCallbackMailbox();
+
         // Submit the job
         job_manager->submitJob(job, this->test->compute_service, {});
+
+        // Coverage
+        job->printCallbackMailboxStack();
 
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
@@ -332,6 +338,12 @@ private:
         auto action2 = job->addSleepAction("chain1_sleep_2", 10.0);
         auto action3 = job->addSleepAction("chain1_sleep_3", 10.0);
         auto action4 = job->addSleepAction("chain1_sleep_4", 10.0);
+
+        try {
+            job->addActionDependency(action1, action1);
+            throw std::runtime_error("Shouldn't be able to add a dependency between the same action");
+        } catch (std::invalid_argument &ignore) {
+        }
 
         job->addActionDependency(action1, action2);
         job->addActionDependency(action2, action3);
@@ -716,7 +728,7 @@ private:
 
         auto sleep1 = job->addSleepAction("sleep1", 10.0);
         auto file_read = job->addFileReadAction("file_read", this->test->input_file,
-                                                wrench::FileLocation::LOCATION(this->test->storage_service1),
+                                                this->test->storage_service1,
                                                 this->test->input_file->getSize());
         auto sleep_after_file_read = job->addSleepAction("sleep_after_file_read", 10.0);
         auto compute = job->addComputeAction("compute", 10000.0, 100.0, 1, 1, wrench::ParallelModel::AMDAHL(1.0));

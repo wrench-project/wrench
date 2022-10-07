@@ -287,7 +287,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
  * @brief Determines whether a host exists for a given hostname (does not include VMs)
  * @param hostname: the name of the host
  * @return true or false
@@ -475,6 +475,7 @@ namespace wrench {
      * @param sequential_work: the sequential work (in flops)
      * @param parallel_per_thread_work: the parallel per thread work (in flops)
      */
+
     void S4U_Simulation::compute_multi_threaded(unsigned long num_threads,
                                                 double thread_creation_overhead,
                                                 double sequential_work,
@@ -1133,7 +1134,7 @@ namespace wrench {
      * @param name: the host/vm name or null if none
      * @return a SimGrid host
      */
-    simgrid::s4u::Host *S4U_Simulation::get_host_or_vm_by_name_or_null(const std::string& name) {
+    simgrid::s4u::Host *S4U_Simulation::get_host_or_vm_by_name_or_null(const std::string &name) {
         auto host = simgrid::s4u::Host::by_name_or_null(name);
         if (!host) {
             // Perhaps it's a VM
@@ -1150,7 +1151,7 @@ namespace wrench {
      * @param name: the host/vm name
      * @return a SimGrid host
      */
-    simgrid::s4u::Host *S4U_Simulation::get_host_or_vm_by_name(const std::string& name) {
+    simgrid::s4u::Host *S4U_Simulation::get_host_or_vm_by_name(const std::string &name) {
         auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(name);
         if (!host) {
             throw std::invalid_argument("S4U_Simulation::get_host_or_vm_by_name(): Unknown host");

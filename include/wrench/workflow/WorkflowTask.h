@@ -117,9 +117,9 @@ namespace wrench {
 
         std::vector<std::shared_ptr<DataFile>> getOutputFiles() const;
 
-        unsigned long getTopLevel() const;
+        int getTopLevel() const;
 
-        unsigned long getBottomLevel() const;
+        int getBottomLevel() const;
 
         double getStartDate() const;
 
@@ -181,17 +181,16 @@ namespace wrench {
 
         static std::string stateToString(InternalState internal_state);
 
+    protected:
         unsigned long updateTopLevel();
-
         unsigned long updateBottomLevel();
 
+        void computeBottomLevel();
+        void computeTopLevel();
+
+    public:
         void setInternalState(WorkflowTask::InternalState);
-
         void setState(WorkflowTask::State);
-
-        //        void setUpcomingState(WorkflowTask::State);
-        //
-        //        WorkflowTask::State getUpcomingState() const;
 
         WorkflowTask::InternalState getInternalState() const;
 
@@ -285,8 +284,8 @@ namespace wrench {
         std::shared_ptr<ParallelModel> parallel_model;
         double memory_requirement;
         unsigned long priority = 0;    // Task priority
-        unsigned long toplevel;        // 0 if entry task
-        unsigned long bottomlevel;     // 0 if exit task
+        int toplevel;                  // 0 if entry task
+        int bottomlevel;               // 0 if exit task
         unsigned int failure_count = 0;// Number of times the tasks has failed
         std::string execution_host;    // Host on which the task executed ("" if not executed successfully - yet)
         State visible_state;           // To be exposed to developer level

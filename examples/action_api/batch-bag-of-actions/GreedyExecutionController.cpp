@@ -129,7 +129,7 @@ namespace wrench {
         /* Wait for execution events, one per job. Some job will likely fail! The code below doe "manual"
          * processing of the event, rather than using registered callback functions */
         for (int i = 0; i < this->num_actions / 2; i++) {
-            WRENCH_INFO("Number of queued jobs at the batch service: %lu", this->compute_service->getQueue().size());
+            WRENCH_INFO("Number of queued jobs at the batch service: %zu", this->compute_service->getQueue().size());
             auto event = this->waitForNextEvent();
             WRENCH_INFO("Received an execution event: %s", event->toString().c_str());
         }

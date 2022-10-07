@@ -16,6 +16,7 @@
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <random>
 #include "wrench/services/network_proximity/NetworkProximityMessage.h"
+#include "wrench/exceptions/ExecutionException.h"
 
 
 WRENCH_LOG_CATEGORY(wrench_core_network_daemons_service, "Log category for Network Daemons Service");
@@ -116,7 +117,7 @@ namespace wrench {
                                             this->getSharedPtr<NetworkProximityDaemon>(),
                                             this->getMessagePayloadValue(
                                                     NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             // give up right away!
             return 0;
         }
@@ -143,7 +144,7 @@ namespace wrench {
                         S4U_Mailbox::putMessage(this->next_mailbox_to_send,
                                                 new NetworkProximityTransferMessage(
                                                         this->message_size));
-                    } catch (std::shared_ptr<NetworkError> &cause) {
+                    } catch (ExecutionException &e) {
                         time_for_next_measurement = this->getTimeUntilNextMeasurement();
                         continue;
                     }
@@ -173,7 +174,7 @@ namespace wrench {
                                                         this->getSharedPtr<NetworkProximityDaemon>(),
                                                         this->getMessagePayloadValue(
                                                                 NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
-                    } catch (std::shared_ptr<NetworkError> &cause) {
+                    } catch (ExecutionException &e) {
                         // Couldn't find out who to talk to next... will try again soon
                     }
                 }
@@ -192,7 +193,8 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox, timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<NetworkError>(e.getCause());
             if (not cause->isTimeout()) {
                 WRENCH_INFO("Got a network error... oh well (%s)",
                             cause->toString().c_str());
@@ -208,7 +210,7 @@ namespace wrench {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
+            } catch (ExecutionException &e) {
                 return false;
             }
             return false;

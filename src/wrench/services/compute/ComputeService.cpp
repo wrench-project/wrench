@@ -59,9 +59,9 @@ namespace wrench {
                                             termination_cause,
                                             this->getMessagePayloadValue(
                                                     ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             this->shutting_down = false;
-            throw ExecutionException(cause);
+            throw;
         }
 
         // Wait for the ack
@@ -69,9 +69,9 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             this->shutting_down = false;
-            throw ExecutionException(cause);
+            throw;
         }
 
         if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
@@ -368,24 +368,16 @@ namespace wrench {
         // send a "info request" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        try {
-            S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
-                                                           answer_mailbox,
-                                                           num_cores,
-                                                           ram,
-                                                           this->getMessagePayloadValue(
-                                                                   ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
+                                                       answer_mailbox,
+                                                       num_cores,
+                                                       ram,
+                                                       this->getMessagePayloadValue(
+                                                               ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         std::unique_ptr<SimulationMessage> message = nullptr;
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage *>(message.get())) {
             return msg->answer;
@@ -443,23 +435,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the time-to-live of the compute service
-     * @return the ttl in seconds
-     *
-     * @throw ExecutionException
-     */
-    double ComputeService::getTTL() {
-        std::map<std::string, double> dict;
-        try {
-            dict = this->getServiceResourceInformation("ttl");
-        } catch (ExecutionException &e) {
-            throw;
-        }
-
-        return (*(dict.begin())).second;
-    }
-
-    /**
      * @brief Get information about the compute service as a dictionary of vectors
      * @param key: the desired resource information (i.e., dictionary key) that's needed)
      * @return service information
@@ -473,23 +448,15 @@ namespace wrench {
         // send a "info request" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        try {
-            S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
-                                                           answer_mailbox,
-                                                           key,
-                                                           this->getMessagePayloadValue(
-                                                                   ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
+                                                       answer_mailbox,
+                                                       key,
+                                                       this->getMessagePayloadValue(
+                                                               ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         std::unique_ptr<SimulationMessage> message = nullptr;
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage *>(message.get())) {
             return msg->info;

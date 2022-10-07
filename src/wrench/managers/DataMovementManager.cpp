@@ -50,11 +50,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void DataMovementManager::stop() {
-        try {
-            S4U_Mailbox::putMessage(this->mailbox, new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->mailbox, new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**
@@ -167,7 +163,7 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             WRENCH_INFO("Oops... somebody tried to send a message, but that failed...");
             return true;
         }

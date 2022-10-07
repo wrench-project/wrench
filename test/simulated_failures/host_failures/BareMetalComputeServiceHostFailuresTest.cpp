@@ -418,12 +418,12 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 3;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
+    argv[2] = strdup("--cfg=contexts/stack-size:100");
     //    argv[2] = strdup("--wrench-full-logs");
-
 
     simulation->init(&argc, argv);
 

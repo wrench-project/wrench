@@ -315,6 +315,7 @@ namespace wrench {
 
         // Send a termination message to the daemon's mailbox_name - SYNCHRONOUSLY
         auto ack_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             S4U_Mailbox::putMessage(this->mailbox,
                                     new ServiceStopDaemonMessage(
@@ -323,19 +324,13 @@ namespace wrench {
                                             ComputeService::TerminationCause::TERMINATION_NONE,
                                             this->getMessagePayloadValue(
                                                     ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            this->shutting_down = false;
-            throw ExecutionException(cause);
-        }
 
-        // Wait for the ack
-        std::unique_ptr<SimulationMessage> message = nullptr;
-
-        try {
+            // Wait for the ack
             message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+
+        } catch (ExecutionException &e) {// network error
             this->shutting_down = false;
-            throw ExecutionException(cause);
+            throw;
         }
 
         if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {

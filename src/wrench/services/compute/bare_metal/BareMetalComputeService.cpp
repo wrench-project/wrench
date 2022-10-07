@@ -204,23 +204,15 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "run a standard job" message to the daemon's mailbox_name
-        try {
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new ComputeServiceSubmitCompoundJobRequestMessage(
-                                            answer_mailbox, job, service_specific_args,
-                                            this->getMessagePayloadValue(
-                                                    ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->mailbox,
+                                new ComputeServiceSubmitCompoundJobRequestMessage(
+                                        answer_mailbox, job, service_specific_args,
+                                        this->getMessagePayloadValue(
+                                                ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
         std::unique_ptr<SimulationMessage> message = nullptr;
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
@@ -257,7 +249,7 @@ namespace wrench {
                                                                                         scratch_space_mount_point) {
         initiateInstance(hostname,
                          compute_resources,
-                         std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
+                         std::move(property_list), std::move(messagepayload_list), nullptr);
     }
 
     /**
@@ -285,7 +277,7 @@ namespace wrench {
 
         initiateInstance(hostname,
                          specified_compute_resources,
-                         std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
+                         std::move(property_list), std::move(messagepayload_list), nullptr);
     }
 
     /**
@@ -296,7 +288,6 @@ namespace wrench {
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     * @param ttl: the time-to-live, in seconds (DBL_MAX: infinite time-to-live)
      * @param pj: a containing PilotJob  (nullptr if none)
      * @param suffix: a string to append to the process name
      * @param scratch_space: the scratch storage service
@@ -308,7 +299,6 @@ namespace wrench {
             std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            double ttl,
             std::shared_ptr<PilotJob> pj,
             const std::string &suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
                                                                                                        "bare_metal" + suffix,
@@ -317,7 +307,6 @@ namespace wrench {
                          std::move(compute_resources),
                          std::move(property_list),
                          std::move(messagepayload_list),
-                         ttl,
                          std::move(pj));
     }
 
@@ -341,7 +330,7 @@ namespace wrench {
                                                                             std::move(scratch_space)) {
         initiateInstance(hostname,
                          compute_resources,
-                         std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
+                         std::move(property_list), std::move(messagepayload_list), nullptr);
     }
 
     /**
@@ -352,7 +341,6 @@ namespace wrench {
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     * @param ttl: the time-to-live, in seconds (DBL_MAX: infinite time-to-live)
      * @param pj: a containing PilotJob  (nullptr if none)
      *
      * @throw std::invalid_argument
@@ -362,12 +350,7 @@ namespace wrench {
             std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            double ttl,
             std::shared_ptr<PilotJob> pj) {
-        if (ttl < 0) {
-            throw std::invalid_argument(
-                    "BareMetalComputeService::initiateInstance(): invalid TTL value (must be >0)");
-        }
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -394,10 +377,6 @@ namespace wrench {
         } catch (std::invalid_argument &e) {
             throw;
         }
-
-        this->ttl = ttl;
-        this->has_ttl = (this->ttl != DBL_MAX);
-        //        this->containing_pilot_job = std::move(pj);
     }
 
     /**
@@ -426,12 +405,6 @@ namespace wrench {
             termination_detector->start(termination_detector, true, false);// Daemonized, no auto-restart
         }
 
-
-        // Set an alarm for my timely death, if necessary
-        if (this->has_ttl) {
-            this->death_date = S4U_Simulation::getClock() + this->ttl;
-        }
-
         /** Main loop **/
         while (this->processNextMessage()) {
             dispatchReadyActions();
@@ -456,7 +429,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<NetworkError> &error) {
+        } catch (ExecutionException &e) {
             WRENCH_INFO(
                     "Got a network error while getting some message... ignoring");
             return true;
@@ -473,7 +446,7 @@ namespace wrench {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
+            } catch (ExecutionException &e) {
                 return false;
             }
             return false;
@@ -531,21 +504,13 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "terminate a compound job" message to the daemon's mailbox_name
-        try {
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new ComputeServiceTerminateCompoundJobRequestMessage(
-                                            answer_mailbox, job, this->getMessagePayloadValue(BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        S4U_Mailbox::putMessage(this->mailbox,
+                                new ComputeServiceTerminateCompoundJobRequestMessage(
+                                        answer_mailbox, job, this->getMessagePayloadValue(BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
         std::unique_ptr<SimulationMessage> message = nullptr;
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
         if (auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
@@ -571,7 +536,7 @@ namespace wrench {
             simgrid::s4u::Mailbox *answer_mailbox,
             const std::shared_ptr<CompoundJob> &job,
             std::map<std::string, std::string> &service_specific_arguments) {
-        WRENCH_INFO("Asked to run compound job %s, which has %ld actions", job->getName().c_str(), job->getActions().size());
+        WRENCH_INFO("Asked to run compound job %s, which has %zu actions", job->getName().c_str(), job->getActions().size());
 
         // Can we run this job at all in terms of available resources?
         bool can_run = true;
@@ -646,7 +611,7 @@ namespace wrench {
                                     job, this->getSharedPtr<BareMetalComputeService>(),
                                     this->getMessagePayloadValue(
                                             BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
-                } catch (std::shared_ptr<NetworkError> &cause) {
+                } catch (ExecutionException &e) {
                     return;// ignore
                 }
             }
@@ -718,11 +683,7 @@ namespace wrench {
                                                                 const std::string &key) {
         std::map<std::string, double> dict;
 
-        if (key == "ttl") {
-            dict["ttl"] = this->ttl;
-        } else {
-            dict = this->action_execution_service->getResourceInformation(key);
-        }
+        dict = this->action_execution_service->getResourceInformation(key);
 
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(
@@ -877,7 +838,7 @@ namespace wrench {
             } else {
                 // job is not one
             }
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             return;// ignore
         }
     }

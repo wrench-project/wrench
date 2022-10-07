@@ -23,7 +23,9 @@
 
 WRENCH_LOG_CATEGORY(file_delete_action_executor_test, "Log category for FileDeleteActionExecutorTest");
 
-#define EPSILON (std::numeric_limits<double>::epsilon())
+//#define EPSILON (std::numeric_limits<double>::epsilon())
+#define EPSILON (0.000001)
+
 
 class FileDeleteActionExecutorTest : public ::testing::Test {
 
@@ -131,7 +133,7 @@ private:
         auto job = job_manager->createCompoundJob("");
         // Add a file_delete_action
         auto file_delete_action = job->addFileDeleteAction("", this->test->file,
-                                                           wrench::FileLocation::LOCATION(this->test->ss));
+                                                           this->test->ss);
 
 
         // coverage
@@ -151,7 +153,8 @@ private:
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+        } catch (wrench::ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
         }
 
