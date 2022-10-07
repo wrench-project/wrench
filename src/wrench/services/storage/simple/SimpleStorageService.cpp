@@ -259,17 +259,6 @@ namespace wrench {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        //        // Invalid mount point
-        //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end())) {
-        //
-        //            failure_cause = std::shared_ptr<FailureCause>(
-        //                    new InvalidDirectoryPath(
-        //                            this->getSharedPtr<SimpleStorageService>(),
-        //                            location->getMountPoint()
-        //                            + "/" +
-        //                            location->getAbsolutePathAtMountPoint()));
-        //        } else {
-
         auto fs = this->file_systems[location->getMountPoint()].get();
 
         // If the file is not already there, do a capacity check/update
@@ -288,7 +277,6 @@ namespace wrench {
         //        }
 
         if (failure_cause == nullptr) {
-            auto fs = this->file_systems[location->getMountPoint()].get();
 
             if (not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) {
                 fs->createDirectory(location->getAbsolutePathAtMountPoint());
@@ -682,4 +670,22 @@ namespace wrench {
     double SimpleStorageService::getLoad() {
         return countRunningFileTransferThreads();
     }
+
+    /**
+     * @brief Get a file's last write date at a location (in zero simulated time)
+     *
+     * @param file: the file
+     * @param location: the file location
+     *
+     * @return the file's last write date, or -1 if the file is not found
+     *
+     */
+    double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
+        if ((file == nullptr) or (location == nullptr)) {
+            throw std::invalid_argument("SimpleStorageService::getFileLastWriteDate(): Invalid arguments");
+        }
+        auto fs = this->file_systems[location->getMountPoint()].get();
+        return fs->getFileLastWriteDate(file, location->getAbsolutePathAtMountPoint());
+    }
+
 };// namespace wrench

@@ -123,7 +123,7 @@ private:
         auto data_movement_manager = this->createDataMovementManager();
 
         // Do a few lookups from the file registry service
-        for (auto f: {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
+        for (const auto &f: {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
             std::set<std::shared_ptr<wrench::FileLocation>> result = this->test->file_registry_service->lookupEntry(f);
 
             if ((result.size() != 1) || ((*(result.begin()))->getStorageService() != this->test->storage_service_1000)) {
@@ -141,7 +141,7 @@ private:
         }
 
         // Do a few queries to storage services
-        for (auto f: {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
+        for (const auto &f: {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
             if ((not wrench::StorageService::lookupFile(f, wrench::FileLocation::LOCATION(this->test->storage_service_1000))) ||
                 (wrench::StorageService::lookupFile(f, wrench::FileLocation::LOCATION(this->test->storage_service_100))) ||
                 (wrench::StorageService::lookupFile(f, wrench::FileLocation::LOCATION(this->test->storage_service_510)))) {
@@ -149,7 +149,7 @@ private:
             }
         }
 
-        // Do a couple of bogus copies
+        // Do a few of bogus copies
         try {
             wrench::StorageService::copyFile(nullptr,
                                              wrench::FileLocation::LOCATION(this->test->storage_service_1000),
@@ -190,13 +190,28 @@ private:
             throw std::runtime_error("File copy to a storage service without enough space shouldn't have succeeded");
         }
 
+        if (this->test->storage_service_1000->getFileLastWriteDate(
+                this->test->file_10,
+                wrench::FileLocation::LOCATION(this->test->storage_service_1000)) > 0) {
+            throw std::runtime_error("Last file write date of staged file should be 0");
+        }
+
         // Copy a file to a storage service that has enough space
+        double before_copy = wrench::Simulation::getCurrentSimulatedDate() ;
         try {
             wrench::StorageService::copyFile(this->test->file_10,
                                              wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                              wrench::FileLocation::LOCATION(this->test->storage_service_100));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to store a file to a storage service that has enough capacity");
+        }
+        double after_copy = wrench::Simulation::getCurrentSimulatedDate();
+
+        double last_file_write_date = this->test->storage_service_100->getFileLastWriteDate(
+                this->test->file_10,
+                wrench::FileLocation::LOCATION(this->test->storage_service_100));
+        if ((last_file_write_date < before_copy) or (last_file_write_date > after_copy)) {
+            throw std::runtime_error("Last file write date is incoherent");
         }
 
         // Send a free space request
@@ -587,32 +602,32 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService(hostname,
-                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                                {})));
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                          wrench::ComputeService::ALL_RAM))},
+                                                {})));
     // Create a bad Storage Service (no mount point)
     ASSERT_THROW(storage_service_100 = simulation->add(
-                         new wrench::SimpleStorageService(hostname, {})),
+            new wrench::SimpleStorageService(hostname, {})),
                  std::invalid_argument);
 
     // Create a bad Storage Service (invalid mountpoint)
     ASSERT_THROW(storage_service_100 = simulation->add(
-                         new wrench::SimpleStorageService(hostname, {"/bogus"})),
+            new wrench::SimpleStorageService(hostname, {"/bogus"})),
                  std::invalid_argument);
 
     // Create a Storage Service with a bogus property
     ASSERT_THROW(storage_service_100 = simulation->add(
-                         new wrench::SimpleStorageService(hostname, {"/"}, {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "BOGUS"}})),
+            new wrench::SimpleStorageService(hostname, {"/"}, {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "BOGUS"}})),
                  std::invalid_argument);
 
     // Create Three Storage Services
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk100"})));
+            new wrench::SimpleStorageService(hostname, {"/disk100"})));
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk510"})));
+            new wrench::SimpleStorageService(hostname, {"/disk510"})));
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
 
 
     // Create a file registry
@@ -622,7 +637,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new SimpleStorageServiceBasicFunctionalityTestWMS(this, hostname)));
+            new SimpleStorageServiceBasicFunctionalityTestWMS(this, hostname)));
 
     // A bogus staging
     ASSERT_THROW(simulation->stageFile(nullptr, storage_service_100), std::invalid_argument);
@@ -760,22 +775,22 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
 
     // Create a  Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService(hostname,
-                                                                {std::make_pair(hostname, std::make_tuple(1, 0))}, "",
-                                                                {})));
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(1, 0))}, "",
+                                                {})));
 
     // Create 2 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk510"})));
+            new wrench::SimpleStorageService(hostname, {"/disk510"})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new SimpleStorageServiceSynchronousFileCopyTestWMS(
-                                    this, hostname)));
+            new SimpleStorageServiceSynchronousFileCopyTestWMS(
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -890,23 +905,23 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService(hostname,
-                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                                {})));
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                          wrench::ComputeService::ALL_RAM))},
+                                                {})));
 
     // Create 2 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk510"})));
+            new wrench::SimpleStorageService(hostname, {"/disk510"})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new SimpleStorageServiceAsynchronousFileCopyTestWMS(
-                                    this, hostname)));
+            new SimpleStorageServiceAsynchronousFileCopyTestWMS(
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1081,28 +1096,28 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService(hostname,
-                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                                {})));
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                          wrench::ComputeService::ALL_RAM))},
+                                                {})));
 
     // Create 3 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk510"})));
+            new wrench::SimpleStorageService(hostname, {"/disk510"})));
 
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk100"}, {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "infinity"}})));
+            new wrench::SimpleStorageService(hostname, {"/disk100"}, {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "infinity"}})));
 
     ASSERT_NO_THROW(storage_service_100->getPropertyValueAsDouble(wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(
-                                    this, hostname)));
+            new SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1281,27 +1296,27 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService(hostname,
-                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                                {})));
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                          wrench::ComputeService::ALL_RAM))},
+                                                {})));
 
     // Create 3 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk510"})));
+            new wrench::SimpleStorageService(hostname, {"/disk510"})));
 
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk100"})));
+            new wrench::SimpleStorageService(hostname, {"/disk100"})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(
-                                    this, hostname)));
+            new SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1531,18 +1546,18 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
 
     // Create 2 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk510"})));
+            new wrench::SimpleStorageService(hostname, {"/disk510"})));
 
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new PartitionsTestWMS(
-                                    this, hostname)));
+            new PartitionsTestWMS(
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1632,7 +1647,7 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
 
     // Create 1 Storage Services
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk100", "/disk1000"})));
+            new wrench::SimpleStorageService(hostname, {"/disk100", "/disk1000"})));
 
     ASSERT_THROW(storage_service_100->getMountPoint(), std::invalid_argument);
 
@@ -1654,8 +1669,8 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new FileWriteTestWMS(
-                                    this, hostname)));
+            new FileWriteTestWMS(
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
