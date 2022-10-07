@@ -1,12 +1,12 @@
 WRENCH Release Notes
 ------
 
-### wrench 2.0
+### wrench 2.1
 
-(october XXX, 2022) this release include **a new storage service implementation**, **performance enhancements**, and **minor bug fixes**. More specifically:
+(october 7, 2022) this release include **a new storage service implementation**, **performance enhancements**, and **minor bug fixes**. More specifically:
 
 - implementation of a new storage service for the simulation of the [XRootD](https://xrootd.slac.stanford.edu/) storage system, along with implementation and examples.
-- many performance and scalability improvements that reduce memory footprint and simulation execution time. 
+- performance and scalability improvements that reduce memory footprint and simulation execution time. 
 
 **note**: wrench 2.0 requires [simgrid 3.32](https://simgrid.org)
 
