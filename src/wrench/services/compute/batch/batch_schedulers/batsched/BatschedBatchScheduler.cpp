@@ -54,18 +54,18 @@ namespace wrench {
             // to lead to even more weird ZMQ "address already in use" errors...
             this->batsched_port = 28000 + (getpid() % 1500) +
                                   S4U_Mailbox::generateUniqueSequenceNumber();
-//            std::cerr << "Thinking of starting Batsched on port " << this->batsched_port << "...\n";
+            //            std::cerr << "Thinking of starting Batsched on port " << this->batsched_port << "...\n";
             this->pid = getpid();
             zmq::context_t context(1);
             zmq::socket_t socket(context, ZMQ_REQ);
             std::string address = "tcp://*:" + std::to_string(this->batsched_port);
             int rc = zmq_bind(socket, address.c_str());
             if (rc != 0) {
-//                std::cerr << "Couldn't bind socket to port (errno=" << errno << " - EADDRINUSE = " << EADDRINUSE << ". Retrying...\n";
+                //                std::cerr << "Couldn't bind socket to port (errno=" << errno << " - EADDRINUSE = " << EADDRINUSE << ". Retrying...\n";
                 continue;
             } else {
-//                std::cerr << "Was able to bind socket to port, unbinding and proceeding\n";
-                zmq_unbind (socket, address.c_str());
+                //                std::cerr << "Was able to bind socket to port, unbinding and proceeding\n";
+                zmq_unbind(socket, address.c_str());
                 break;
             }
         }
@@ -268,11 +268,7 @@ namespace wrench {
         for (auto job: set_of_jobs) {
             // Get the answer
             std::unique_ptr<SimulationMessage> message = nullptr;
-            try {
-                message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                throw ExecutionException(cause);
-            }
+            message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
 
             if (auto msg = dynamic_cast<BatchQueryAnswerMessage *>(message.get())) {
                 job_estimated_start_times[std::get<0>(job)] = msg->estimated_start_time;

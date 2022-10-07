@@ -732,7 +732,7 @@ namespace wrench {
         if (parents.empty()) {
             this->toplevel = 0;
         } else {
-            unsigned long max_toplevel = 0;
+            int max_toplevel = 0;
             for (const auto &parent: parents) {
                 max_toplevel = (max_toplevel < parent->toplevel ? parent->toplevel : max_toplevel);
             }
@@ -754,7 +754,7 @@ namespace wrench {
         if (children.empty()) {
             this->bottomlevel = 0;
         } else {
-            unsigned long max_bottomlevel = 0;
+            int max_bottomlevel = 0;
             for (const auto &child: children) {
                 max_bottomlevel = (max_bottomlevel < child->bottomlevel ? child->bottomlevel : max_bottomlevel);
             }
@@ -769,55 +769,90 @@ namespace wrench {
 
 
     /**
-     * @brief Returns the task's top level (max number of hops on a reverse path up to an entry task. Entry
-     *        tasks have a top-level of 0)
-     * @return
+     * @brief Update the task's top level recursively (to be used by the updateAllTopBottomLevels method)
      */
-    unsigned long WorkflowTask::getTopLevel() const {
+    void WorkflowTask::computeBottomLevel() {
+
+        this->bottomlevel = 0;
+        // Compute children if needed
+        int max_child_bottom_level = -1;
+        for (const auto &child: this->getChildren()) {
+            if (child->bottomlevel == -1) {
+                child->computeBottomLevel();
+            }
+            max_child_bottom_level = std::max<int>(max_child_bottom_level, child->bottomlevel);
+        }
+        this->bottomlevel = 1 + max_child_bottom_level;
+    }
+
+    /**
+     * @brief Update the task's bottom level recursively (to be used by the updateAllTopBottomLevels method)
+     */
+    void WorkflowTask::computeTopLevel() {
+
+        this->toplevel = 0;
+        // Compute parents if needed
+        int max_parent_top_level = -1;
+        for (const auto &parent: this->getParents()) {
+            if (parent->toplevel == -1) {
+                parent->computeTopLevel();
+            }
+            max_parent_top_level = std::max<int>(max_parent_top_level, parent->toplevel);
+        }
+        this->toplevel = 1 + max_parent_top_level;
+    }
+
+
+    /**
+ * @brief Returns the task's top level (max number of hops on a reverse path up to an entry task. Entry
+ *        tasks have a top-level of 0)
+ * @return
+ */
+    int WorkflowTask::getTopLevel() const {
         return this->toplevel;
     }
 
     /**
-     * @brief Returns the task's bottom level (max number of hops on a path down to an exit task. Exit
-     *        tasks have a bottom-level of 0)
-     * @return
-     */
-    unsigned long WorkflowTask::getBottomLevel() const {
+ * @brief Returns the task's bottom level (max number of hops on a path down to an exit task. Exit
+ *        tasks have a bottom-level of 0)
+ * @return
+ */
+    int WorkflowTask::getBottomLevel() const {
         return this->bottomlevel;
     }
 
 
     /**
-     * @brief Returns the name of the host on which the task has most recently been executed, or "" if
-     *        the task has never been executed yet. Could be a virtual hostname.
-     * @return hostname
-     */
+ * @brief Returns the name of the host on which the task has most recently been executed, or "" if
+ *        the task has never been executed yet. Could be a virtual hostname.
+ * @return hostname
+ */
     std::string WorkflowTask::getExecutionHost() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().execution_host : "";
     }
 
     /**
-    * @brief Returns the name of the PHYSICAL host on which the task has most recently been executed, or "" if
-    *        the task has never been executed yet.
-    * @return hostname
-    */
+* @brief Returns the name of the PHYSICAL host on which the task has most recently been executed, or "" if
+*        the task has never been executed yet.
+* @return hostname
+*/
     std::string WorkflowTask::getPhysicalExecutionHost() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().physical_execution_host : "";
     }
 
     /**
-     * @brief Returns the number of cores allocated for this task's most recent execution or 0 if an execution attempt was never made
-     * @return number of cores
-     */
+ * @brief Returns the number of cores allocated for this task's most recent execution or 0 if an execution attempt was never made
+ * @return number of cores
+ */
     unsigned long WorkflowTask::getNumCoresAllocated() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().num_cores_allocated : 0;
     }
 
     /**
-     * @brief Sets the host on which this task is running.If the hostname is a VM name, then
-     * the corresponding physical host name will be set!
-     * @param hostname: the host name
-     */
+ * @brief Sets the host on which this task is running.If the hostname is a VM name, then
+ * the corresponding physical host name will be set!
+ * @param hostname: the host name
+ */
     void WorkflowTask::setExecutionHost(const std::string &hostname) {
         std::string physical_hostname;
         /** The conversion below has been removed as it makes more sense to keep the virtual and the physical separate **/
@@ -837,9 +872,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Sets the number of cores allocated for this task
-     * @param num_cores: the number of cores allocated to this task
-     */
+ * @brief Sets the number of cores allocated for this task
+ * @param num_cores: the number of cores allocated to this task
+ */
     void WorkflowTask::setNumCoresAllocated(unsigned long num_cores) {
         if (not this->execution_history.empty()) {
             this->execution_history.top().num_cores_allocated = num_cores;
@@ -850,40 +885,40 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the task's color ("" if none)
-     * @return A color string in  "#rrggbb" format
-     */
+ * @brief Get the task's color ("" if none)
+ * @return A color string in  "#rrggbb" format
+ */
     std::string WorkflowTask::getColor() const {
         return this->color;
     }
 
     /**
-     * @brief Set the task's color
-     * @param c: A color string in  "#rrggbb" format
-     */
+ * @brief Set the task's color
+ * @param c: A color string in  "#rrggbb" format
+ */
     void WorkflowTask::setColor(const std::string &c) {
         this->color = c;
     }
 
     /**
-     * @brief Set the task's parallel model
-     * @param model: a parallel model
-     */
+ * @brief Set the task's parallel model
+ * @param model: a parallel model
+ */
     void WorkflowTask::setParallelModel(std::shared_ptr<ParallelModel> model) {
         this->parallel_model = std::move(model);
     }
 
     /**
-     * @brief Get the task's parallel model
-     * @return the parallel model
-     */
+ * @brief Get the task's parallel model
+ * @return the parallel model
+ */
     std::shared_ptr<ParallelModel> WorkflowTask::getParallelModel() const {
         return this->parallel_model;
     }
 
     /**
-     * @brief Update task readiness
-     */
+ * @brief Update task readiness
+ */
     void WorkflowTask::updateReadiness() {
         if (this->getState() == WorkflowTask::State::NOT_READY) {
             for (auto const &parent: this->getParents()) {

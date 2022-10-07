@@ -97,7 +97,7 @@ private:
 
 
         // Starting a victim on the FailedHost, which should fail at time 50
-        auto victim1 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
+        auto victim1 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 200, new wrench::ServiceDaemonStoppedMessage(1), this->mailbox));
         victim1->setSimulation(this->simulation);
         victim1->start(victim1, true, false);// Daemonized, no auto-restart
 
@@ -113,7 +113,7 @@ private:
         failure_detector1->start(failure_detector1, true, false);// Daemonized, no auto-restart
 
         // Starting a victim on the FailedHostTrace, which should fail at time 100
-        auto victim2 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
+        auto victim2 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHostTrace", 200, new wrench::ServiceDaemonStoppedMessage(1), this->mailbox));
         victim2->setSimulation(this->simulation);
         victim2->start(victim2, true, false);// Daemonized, no auto-restart
 
@@ -129,7 +129,8 @@ private:
 
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+        } catch (wrench::ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
 
@@ -146,7 +147,8 @@ private:
 
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+        } catch (wrench::ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
 
@@ -219,7 +221,7 @@ private:
     int main() override {
 
         // Starting a victim on the FailedHost, which should fail at time 50
-        auto victim1 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
+        auto victim1 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHost", 200, new wrench::ServiceDaemonStoppedMessage(1), this->mailbox));
         victim1->setSimulation(this->simulation);
         victim1->start(victim1, true, false);// Daemonized, no auto-restart
 
@@ -235,7 +237,7 @@ private:
         failure_detector1->start(failure_detector1, true, false);// Daemonized, no auto-restart
 
         // Starting a victim on the FailedHostTrace, which should fail at time 100
-        auto victim2 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
+        auto victim2 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHostTrace", 200, new wrench::ServiceDaemonStoppedMessage(1), this->mailbox));
         victim2->setSimulation(this->simulation);
         victim2->start(victim2, true, false);// Daemonized, no auto-restart
 
@@ -249,7 +251,8 @@ private:
 
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+        } catch (wrench::ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting a message! " + cause->toString());
         }
 
@@ -265,7 +268,8 @@ private:
         // And again...
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+        } catch (wrench::ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
 

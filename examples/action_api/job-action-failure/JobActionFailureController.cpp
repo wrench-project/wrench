@@ -100,7 +100,7 @@ namespace wrench {
             auto completed_job = job_completion_event->job;
             WRENCH_INFO("Job %s has failed!", completed_job->getName().c_str());
             WRENCH_INFO("Job failure cause: %s", job_completion_event->failure_cause->toString().c_str());
-            WRENCH_INFO("It had %lu actions:", completed_job->getActions().size());
+            WRENCH_INFO("It had %zu actions:", completed_job->getActions().size());
             for (auto const &action: completed_job->getActions()) {
                 WRENCH_INFO("  * Action %s: in state %s", action->getName().c_str(), action->getStateAsString().c_str());
                 if (action->getState() == wrench::Action::State::FAILED) {

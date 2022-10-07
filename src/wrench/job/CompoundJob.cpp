@@ -598,7 +598,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the job's parent jobs, if any
+     * @brief Returns a reference to the job's parent jobs, if any (use with caution)
      * @return a set of jobs
      */
     std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getParents() {

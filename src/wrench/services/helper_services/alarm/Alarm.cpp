@@ -14,6 +14,7 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/failure_causes/NetworkError.h>
 #include <wrench/failure_causes/HostError.h>
+#include "wrench/exceptions/ExecutionException.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_alarm_service, "Log category for Alarm Service");
 
@@ -58,7 +59,7 @@ namespace wrench {
         WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_mailbox->get_cname());
         try {
             S4U_Mailbox::putMessage(this->reply_mailbox, msg);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (ExecutionException &e) {
             WRENCH_WARN("AlarmService was not able to send its message");
         }
         this->setStateToDown();

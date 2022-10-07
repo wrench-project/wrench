@@ -313,6 +313,7 @@ private:
         cs->suspend();
         cs->resume();
         cs->stop();
+        cs->stop();
         cs->suspend();
 
         try {
@@ -361,6 +362,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
+    // Can't init again
+    ASSERT_THROW(simulation->init(&argc, argv), std::runtime_error);
+
+
     // Setting up the platform
     //    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
     simulation->instantiatePlatform(platform_file_path);
@@ -383,6 +388,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     ASSERT_DOUBLE_EQ(678 * 1024 * 1024,
                      storage_service->getPropertyValueAsSizeInByte(wrench::SimpleStorageServiceProperty::BUFFER_SIZE));
+
+    // Coverage
+    ASSERT_EQ(wrench::ServiceProperty::translateString(wrench::ServiceProperty::translatePropertyType(wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS)),
+              wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
 
     // Coverage
     ASSERT_GE(storage_service->getPropertyList().size(), 2);
@@ -426,6 +435,9 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Check on properties and payload
     ASSERT_DOUBLE_EQ(compute_service->getPropertyValueAsTimeInSecond(wrench::CloudComputeServiceProperty::VM_BOOT_OVERHEAD), 0.1);
     ASSERT_EQ(compute_service->getPropertyValueAsString(wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM), "best-fit-ram-first");
+    ASSERT_THROW(compute_service->getPropertyValueAsDouble(wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM), std::invalid_argument);
+    ASSERT_THROW(compute_service->getPropertyValueAsUnsignedLong(wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM), std::invalid_argument);
+    ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM), std::invalid_argument);
     ASSERT_EQ(compute_service->getMessagePayloadValue(wrench::CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD), 2);
     ASSERT_EQ(compute_service->getMessagePayloadValue(wrench::CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD), 3);
 

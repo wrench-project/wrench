@@ -186,6 +186,10 @@ namespace wrench {
             throw std::invalid_argument("Workflow::addControlDependency(): Invalid arguments");
         }
 
+        if (src == dst) {
+            return;
+        }
+
         if (this->dag.doesPathExist(dst.get(), src.get())) {
             throw std::runtime_error("Workflow::addControlDependency(): Adding dependency between task " + src->getID() +
                                      " and " + dst->getID() + " would create a cycle in the workflow graph");
@@ -548,7 +552,7 @@ namespace wrench {
      * @param max: the high end of the range (inclusive)
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInTopLevelRange(unsigned long min, unsigned long max) {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInTopLevelRange(int min, int max) {
         std::vector<std::shared_ptr<WorkflowTask>> to_return;
         for (auto const &task: this->getTasks()) {
             if ((task->getTopLevel() >= min) and (task->getTopLevel() <= max)) {
@@ -564,7 +568,7 @@ namespace wrench {
      * @param max: the high end of the range (inclusive)
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInBottomLevelRange(unsigned long min, unsigned long max) {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInBottomLevelRange(int min, int max) {
         std::vector<std::shared_ptr<WorkflowTask>> to_return;
         for (auto const &task: this->getTasks()) {
             if ((task->getBottomLevel() >= min) and (task->getBottomLevel() <= max)) {
@@ -647,7 +651,7 @@ namespace wrench {
      * @return the number of levels
      */
     unsigned long Workflow::getNumLevels() {
-        unsigned long max_top_level = 0;
+        int max_top_level = 0;
         for (auto const &t: this->tasks) {
             auto task = t.second.get();
             if (task->getNumberOfChildren() == 0) {
@@ -764,31 +768,36 @@ namespace wrench {
      * had been disabled)
      */
     void Workflow::updateAllTopBottomLevels() {
-        // Update top levels
+
+        // Compute entry tasks
         std::vector<std::shared_ptr<WorkflowTask>> entry_tasks;
         for (auto const &t: this->tasks) {
             if (t.second->getNumberOfParents() == 0) {
                 entry_tasks.push_back(t.second);
             }
         }
-        for (auto const &et: entry_tasks) {
-            et->updateTopLevel();
-            for (auto const &child: et->getChildren()) {
-                child->updateTopLevel();
-            }
-        }
-        // Update bottom levels
+        // Compute exit tasks
         std::vector<std::shared_ptr<WorkflowTask>> exit_tasks;
         for (auto const &t: this->tasks) {
             if (t.second->getNumberOfChildren() == 0) {
                 exit_tasks.push_back(t.second);
             }
         }
+
+        // Reset all levels to -1 for memoization purposes
+        for (auto const &t: this->tasks) {
+            t.second->toplevel = -1;
+            t.second->bottomlevel = -1;
+        }
+
+        // Update top levels recursively
         for (auto const &et: exit_tasks) {
-            et->updateBottomLevel();
-            for (auto const &parent: et->getParents()) {
-                parent->updateBottomLevel();
-            }
+            et->computeTopLevel();
+        }
+
+        // Update bottom levels recursively
+        for (auto const &et: entry_tasks) {
+            et->computeBottomLevel();
         }
     }
 
