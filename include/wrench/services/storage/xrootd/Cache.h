@@ -41,7 +41,9 @@ namespace wrench {
 
             std::set<std::shared_ptr<FileLocation>> operator[](std::shared_ptr<DataFile> file);
             void remove(std::shared_ptr<DataFile> file);
+#if 0
             void clean();
+#endif
         };
 
         /***********************/

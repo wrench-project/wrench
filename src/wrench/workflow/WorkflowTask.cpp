@@ -732,7 +732,7 @@ namespace wrench {
         if (parents.empty()) {
             this->toplevel = 0;
         } else {
-            unsigned long max_toplevel = 0;
+            int max_toplevel = 0;
             for (const auto &parent: parents) {
                 max_toplevel = (max_toplevel < parent->toplevel ? parent->toplevel : max_toplevel);
             }
@@ -754,7 +754,7 @@ namespace wrench {
         if (children.empty()) {
             this->bottomlevel = 0;
         } else {
-            unsigned long max_bottomlevel = 0;
+            int max_bottomlevel = 0;
             for (const auto &child: children) {
                 max_bottomlevel = (max_bottomlevel < child->bottomlevel ? child->bottomlevel : max_bottomlevel);
             }
@@ -808,7 +808,7 @@ namespace wrench {
  *        tasks have a top-level of 0)
  * @return
  */
-    unsigned long WorkflowTask::getTopLevel() const {
+    int WorkflowTask::getTopLevel() const {
         return this->toplevel;
     }
 
@@ -817,7 +817,7 @@ namespace wrench {
  *        tasks have a bottom-level of 0)
  * @return
  */
-    unsigned long WorkflowTask::getBottomLevel() const {
+    int WorkflowTask::getBottomLevel() const {
         return this->bottomlevel;
     }
 

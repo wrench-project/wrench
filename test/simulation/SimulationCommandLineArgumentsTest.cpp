@@ -144,7 +144,6 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
 
     ASSERT_GE(linecount, 2);
 
-
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);

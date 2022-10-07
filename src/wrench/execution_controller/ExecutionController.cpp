@@ -265,7 +265,7 @@ namespace wrench {
    * @param event: a CompoundJobCompletedEvent
    */
     void ExecutionController::processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent> event) {
-        WRENCH_INFO("In default event-handler: Notified that a %ld-action job has completed", event->job->getActions().size());
+        WRENCH_INFO("In default event-handler: Notified that a %zu-action job has completed", event->job->getActions().size());
     }
 
     /**

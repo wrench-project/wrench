@@ -28,7 +28,9 @@
 
 WRENCH_LOG_CATEGORY(compute_action_executor_test, "Log category for ComputeActionExecutorTest");
 
-#define EPSILON (std::numeric_limits<double>::epsilon())
+//#define EPSILON (std::numeric_limits<double>::epsilon())
+#define EPSILON (0.000001)
+
 
 class ComputeActionExecutorTest : public ::testing::Test {
 
@@ -167,7 +169,8 @@ private:
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+        } catch (wrench::ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
         }
 
@@ -297,7 +300,8 @@ private:
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+        } catch (wrench::ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
         }
 

@@ -28,7 +28,7 @@ jobs:
       
       - name: Install Simgrid
         run: |
-          curl https://framagit.org/simgrid/simgrid/-/archive/v3.31/simgrid-v3.31.tar.gz | tar -xz
+          curl https://framagit.org/simgrid/simgrid/-/archive/v3.32/simgrid-v3.32.tar.gz | tar -xz
           mv simgrid-v*.* simgrid
           cd simgrid
           cmake -Denable_smpi=off .
