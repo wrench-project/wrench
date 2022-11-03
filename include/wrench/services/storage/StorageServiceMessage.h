@@ -187,6 +187,7 @@ namespace wrench {
     class StorageServiceFileWriteRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                                              simgrid::s4u::Host *requesting_host,
                                               std::shared_ptr<DataFile> file,
                                               std::shared_ptr<FileLocation> location,
                                               double buffer_size,
@@ -194,6 +195,8 @@ namespace wrench {
 
         /** @brief Mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The requesting host */
+        simgrid::s4u::Host *requesting_host;
         /** @brief The file to write */
         std::shared_ptr<DataFile> file;
         /** @brief The location to write the file to */
@@ -232,6 +235,7 @@ namespace wrench {
     class StorageServiceFileReadRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                                             simgrid::s4u::Host *requesting_host,
                                              simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
                                              std::shared_ptr<DataFile> file,
                                              std::shared_ptr<FileLocation> location,
@@ -241,6 +245,8 @@ namespace wrench {
         StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage *other);
         /** @brief The mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The requesting host */
+        simgrid::s4u::Host *requesting_host;
         /** @brief The mailbox to which the file content should be sent */
         simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content;
         /** @brief The file to read */

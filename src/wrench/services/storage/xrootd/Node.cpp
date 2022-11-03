@@ -367,6 +367,7 @@ namespace wrench {
                     S4U_Mailbox::dputMessage(best->getStorageService()->mailbox,
                                              new StorageServiceFileReadRequestMessage(
                                                      msg->answer_mailbox,
+                                                     simgrid::s4u::this_actor::get_host(),
                                                      msg->mailbox_to_receive_the_file_content,
                                                      msg->file,
                                                      best,
@@ -383,6 +384,7 @@ namespace wrench {
                         S4U_Mailbox::dputMessage(internalStorage->mailbox,
                                                  new StorageServiceFileReadRequestMessage(
                                                          msg->answer_mailbox,
+                                                         simgrid::s4u::this_actor::get_host(),
                                                          msg->mailbox_to_receive_the_file_content,
                                                          msg->file,
                                                          FileLocation::LOCATION(internalStorage),
@@ -530,6 +532,7 @@ namespace wrench {
                             S4U_Mailbox::dputMessage(best->getStorageService()->mailbox,
                                                      new StorageServiceFileReadRequestMessage(
                                                              msg->answer_mailbox,
+                                                             simgrid::s4u::this_actor::get_host(),
                                                              msg->original->mailbox_to_receive_the_file_content,
                                                              msg->file,
                                                              best,

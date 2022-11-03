@@ -252,6 +252,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox,
                                 new StorageServiceFileWriteRequestMessage(
                                         answer_mailbox,
+                                        simgrid::s4u::this_actor::get_host(),
                                         file,
                                         wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path),
                                         this->buffer_size,
@@ -269,9 +270,11 @@ namespace wrench {
                 throw ExecutionException(msg->failure_cause);
             }
 
-            if (this->buffer_size < DBL_EPSILON) {
-                throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
+            if (this->buffer_size < 1) {
+                // Non-Bufferized: Nothing to do!
+
             } else {
+                // Bufferized
                 double remaining = file->getSize();
                 while (remaining - this->buffer_size > DBL_EPSILON) {
                     S4U_Mailbox::putMessage(msg->data_write_mailbox,
@@ -280,15 +283,14 @@ namespace wrench {
                     remaining -= this->buffer_size;
                 }
                 S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
-                                                                         file, (unsigned long) remaining, true));
+                        file, (unsigned long) remaining, true));
+            }
 
-
-                //Waiting for the final ack
-                message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-                if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
-                    throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
-                                             message->getName() + "] message instead of final ack!");
-                }
+            //Waiting for the final ack
+            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+            if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
+                throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
+                                         message->getName() + "] message instead of final ack!");
             }
 
         } else {
@@ -318,9 +320,9 @@ namespace wrench {
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         S4U_Mailbox::putMessage(this->mailbox, new StorageServiceFreeSpaceRequestMessage(
-                                                       answer_mailbox,
-                                                       this->getMessagePayloadValue(
-                                                               StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+                answer_mailbox,
+                this->getMessagePayloadValue(
+                        StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -439,6 +441,7 @@ namespace wrench {
             S4U_Mailbox::putMessage(storage_service->mailbox,
                                     new StorageServiceFileReadRequestMessage(
                                             answer_mailbox,
+                                            simgrid::s4u::this_actor::get_host(),
                                             chunk_receiving_mailbox,
                                             file,
                                             location,
@@ -468,9 +471,11 @@ namespace wrench {
                 throw ExecutionException(cause);
             }
 
-            if (msg->buffer_size < DBL_EPSILON) {
+            if (msg->buffer_size < 1) {
+                // Non-Bufferized
+                // TODO: never create this mailbox?
                 S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
-                throw std::runtime_error("StorageService::readFile(): Zero buffer size not implemented yet");
+                // Do nothing
 
             } else {
                 // Otherwise, retrieve the file chunks until the last one is received
@@ -484,7 +489,7 @@ namespace wrench {
                     }
 
                     if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage *>(
-                                file_content_message.get())) {
+                            file_content_message.get())) {
                         if (file_content_chunk_msg->last_chunk) {
                             S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                             break;
@@ -497,13 +502,13 @@ namespace wrench {
                 }
 
                 S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
+            }
 
-                //Waiting for the final ack
-                message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
-                if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
-                    throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                             message->getName() + "] message!");
-                }
+            //Waiting for the final ack
+            message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
+            if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
+                throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                         message->getName() + "] message!");
             }
 
         } else {

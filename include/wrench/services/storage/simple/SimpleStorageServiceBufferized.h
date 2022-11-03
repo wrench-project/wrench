@@ -125,14 +125,10 @@ namespace wrench {
                 simgrid::s4u::Mailbox *answer_mailbox_if_write,
                 simgrid::s4u::Mailbox *answer_mailbox_if_copy);
 
-//        unsigned long num_concurrent_connections;
-
         void startPendingFileTransferThread();
 
         std::deque<std::shared_ptr<FileTransferThread>> pending_file_transfer_threads;
         std::set<std::shared_ptr<FileTransferThread>> running_file_transfer_threads;
-
-        void validateProperties();
 
         std::shared_ptr<MemoryManager> memory_manager;
     };

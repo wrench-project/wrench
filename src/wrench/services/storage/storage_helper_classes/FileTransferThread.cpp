@@ -488,6 +488,7 @@ namespace wrench {
                     src_loc->getStorageService()->mailbox,
                     new StorageServiceFileReadRequestMessage(
                             request_answer_mailbox,
+                            simgrid::s4u::this_actor::get_host(),
                             mailbox_that_should_receive_file_content,
                             f,
                             src_loc,

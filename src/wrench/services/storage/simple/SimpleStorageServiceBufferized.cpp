@@ -172,44 +172,16 @@ namespace wrench {
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-            try {
-                S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (ExecutionException &e) {
-                return false;
-            }
-            return false;
+            return processStopDaemonRequest(msg->ack_mailbox);
 
         } else if (auto msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage *>(message.get())) {
-            std::map<std::string, double> free_space;
-
-            for (auto const &mp: this->file_systems) {
-                free_space[mp.first] = mp.second->getFreeSpace();
-            }
-
-            S4U_Mailbox::dputMessage(
-                    msg->answer_mailbox,
-                    new StorageServiceFreeSpaceAnswerMessage(
-                            free_space,
-                            this->getMessagePayloadValue(
-                                    SimpleStorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD)));
-            return true;
+            return processFreeSpaceRequest(msg->answer_mailbox);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
             return processFileDeleteRequest(msg->file, msg->location, msg->answer_mailbox);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
-            auto fs = this->file_systems[msg->location->getMountPoint()].get();
-            bool file_found = fs->isFileInDirectory(msg->file, msg->location->getAbsolutePathAtMountPoint());
-
-            S4U_Mailbox::dputMessage(
-                    msg->answer_mailbox,
-                    new StorageServiceFileLookupAnswerMessage(
-                            msg->file, file_found,
-                            this->getMessagePayloadValue(
-                                    SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-            return true;
+            return processFileLookupRequest(msg->file, msg->location, msg->answer_mailbox);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
             return processFileWriteRequest(msg->file, msg->location, msg->answer_mailbox, msg->buffer_size);
@@ -251,6 +223,11 @@ namespace wrench {
      */
     bool SimpleStorageServiceBufferized::processFileWriteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
                                                                  simgrid::s4u::Mailbox *answer_mailbox, double buffer_size) {
+
+        if (buffer_size < 1.0) {
+            throw std::runtime_error("SimpleStorageServiceBufferized::processFileWriteRequest(): Cannot process a write requests with a zero buffer size");
+        }
+
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
