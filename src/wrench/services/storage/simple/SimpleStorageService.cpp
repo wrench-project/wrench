@@ -643,6 +643,66 @@ namespace wrench {
         return true;
     }
 
+
+    /**
+     * @brief Process a file lookup request
+     * @param file: the file to delete
+     * @param location: the file location
+     * @param answer_mailbox: the mailbox to which the notification should be sent
+     * @return false if the daemon should terminate
+     */
+    bool SimpleStorageService::processFileLookupRequest(const std::shared_ptr<DataFile> &file,
+                                                        const std::shared_ptr<FileLocation> &location,
+                                                        simgrid::s4u::Mailbox *answer_mailbox) {
+        auto fs = this->file_systems[location->getMountPoint()].get();
+        bool file_found = fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint());
+
+        S4U_Mailbox::dputMessage(
+                answer_mailbox,
+                new StorageServiceFileLookupAnswerMessage(
+                        file, file_found,
+                        this->getMessagePayloadValue(
+                                SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+        return true;
+    }
+
+    /**
+     * @brief Process a free space request
+     * @param answer_mailbox: the mailbox to which the notification should be sent
+     * @return false if the daemon should terminate
+     */
+    bool SimpleStorageService::processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox) {
+        std::map<std::string, double> free_space;
+
+        for (auto const &mp: this->file_systems) {
+            free_space[mp.first] = mp.second->getFreeSpace();
+        }
+
+        S4U_Mailbox::dputMessage(
+                answer_mailbox,
+                new StorageServiceFreeSpaceAnswerMessage(
+                        free_space,
+                        this->getMessagePayloadValue(
+                                SimpleStorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD)));
+        return true;
+    }
+
+    /**
+     * @brief Process a stop daemon request
+     * @param ack_mailbox: the mailbox to which the ack should be sent
+     * @return false if the daemon should terminate
+     */
+    bool SimpleStorageService::processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox) {
+        try {
+            S4U_Mailbox::putMessage(ack_mailbox,
+                                    new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                                            SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+        } catch (ExecutionException &e) {
+            return false;
+        }
+        return false;
+    }
+
     /**
      * @brief Helper method to validate property values
      * throw std::invalid_argument

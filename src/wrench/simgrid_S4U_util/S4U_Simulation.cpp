@@ -1034,7 +1034,7 @@ namespace wrench {
 
 
     /**
- * @brief Gets the capacity of a disk attached to some host for a given mount point
+  * @brief Gets the capacity of a disk attached to some host for a given mount point
  * @param hostname: the host's name
  * @param mount_point: the mount point (e.g.,  "/home")
  * @return the capacity of the disk / mount point
@@ -1086,6 +1086,8 @@ namespace wrench {
         throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown mount point " +
                                     mount_point + " at host " + hostname);
     }
+
+
 
     /**
      * @brief Method to create, programmatically, a new disk
