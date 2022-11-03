@@ -279,7 +279,7 @@ namespace wrench {
             auto sg_iostream = simgrid::s4u::Io::streamto_init(requesting_host,
                                                                nullptr,
                                                                me_host,
-                                                               me_disk);
+                                                               me_disk)->set_size((uint64_t)file->getSize());
 
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
@@ -389,8 +389,7 @@ namespace wrench {
             auto sg_iostream = simgrid::s4u::Io::streamto_init(me_host,
                                                                me_disk,
                                                                requesting_host,
-                                                               nullptr);
-
+                                                               nullptr)->set_size((uint64_t)file->getSize());
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
                     sg_iostream,
@@ -450,12 +449,15 @@ namespace wrench {
             fs->reserveSpace(file, dst_location->getAbsolutePathAtMountPoint());
         }
 
-        WRENCH_INFO("Starting a thread to copy file %s from %s to %s",
+        WRENCH_INFO("Starting an activity to copy file %s from %s to %s",
                     file->getID().c_str(),
                     src_location->toString().c_str(),
                     dst_location->toString().c_str());
 
         // Create the streaming activity
+        std::cerr << src_location->getServerStorageService() << "\n";
+        std::cerr << src_location->getServerStorageService()->getName() << "\n";
+        std::cerr << src_location->getServerStorageService()->getHostname() << "\n";
         auto src_host = simgrid::s4u::Host::by_name(src_location->getServerStorageService()->getHostname());
         simgrid::s4u::Disk *src_disk = nullptr;
         for (auto const &d: src_host->get_disks()) {
@@ -480,7 +482,7 @@ namespace wrench {
         auto sg_iostream = simgrid::s4u::Io::streamto_init(src_host,
                                                            src_disk,
                                                            dst_host,
-                                                           dst_disk);
+                                                           dst_disk)->set_size((uint64_t)file->getSize());
 
         // Create a Transaction
         auto transaction = std::make_shared<Transaction>(
@@ -499,12 +501,14 @@ namespace wrench {
      * @brief Start pending file transfer threads if any and if possible
      */
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
+        WRENCH_INFO("Starting pending transactions");
         while ((not this->pending_sg_iostreams.empty()) and
                (this->running_sg_iostreams.size() < this->num_concurrent_connections)) {
             auto sg_iostream = this->pending_sg_iostreams.at(0);
             this->pending_sg_iostreams.pop_front();
             this->running_sg_iostreams.insert(sg_iostream);
-            sg_iostream->start();
+            WRENCH_INFO("Starting an IO stream!");
+            sg_iostream->vetoable_start();
         }
     }
 
