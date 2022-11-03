@@ -276,6 +276,7 @@ namespace wrench {
             }
 
 
+            WRENCH_INFO("Creating Streaming Activity for a write request");
             auto sg_iostream = simgrid::s4u::Io::streamto_init(requesting_host,
                                                                nullptr,
                                                                me_host,
@@ -386,10 +387,28 @@ namespace wrench {
                 throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileReadRequest(): disk not found - internal error");
             }
 
+            WRENCH_INFO("Creating Streaming Activity for a read request");
+//            auto sg_iostream = simgrid::s4u::Io::streamto_init(me_host,
+//                                                               me_disk,
+//                                                               requesting_host,
+//                                                               nullptr)->set_size((uint64_t)file->getSize());
+
+//            std::cerr << me_host->get_cname() << "\n";
+//            std::cerr << me_disk->get_cname() << "\n";
+//            std::cerr << requesting_host->get_cname() << "\n";
             auto sg_iostream = simgrid::s4u::Io::streamto_init(me_host,
                                                                me_disk,
                                                                requesting_host,
-                                                               nullptr)->set_size((uint64_t)file->getSize());
+                                                               nullptr)->set_size(666);
+
+            WRENCH_INFO("SYnCHRONOUS!");
+            simgrid::s4u::Io::streamto(me_host,
+                                       me_disk,
+                                       requesting_host,
+                                       nullptr, 666 );
+
+            WRENCH_INFO("STARTED IT NOW JUST TO TRY");
+
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
                     sg_iostream,
@@ -509,6 +528,7 @@ namespace wrench {
             this->running_sg_iostreams.insert(sg_iostream);
             WRENCH_INFO("Starting an IO stream!");
             sg_iostream->vetoable_start();
+            WRENCH_INFO("IO stream started!");
         }
     }
 
