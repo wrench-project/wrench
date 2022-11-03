@@ -219,7 +219,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
@@ -337,7 +337,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
@@ -504,7 +504,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000000.0);
@@ -630,7 +630,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000000.0);
@@ -760,7 +760,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
@@ -865,7 +865,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
@@ -1031,7 +1031,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);

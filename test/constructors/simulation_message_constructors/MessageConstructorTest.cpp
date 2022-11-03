@@ -406,7 +406,7 @@ void MessageConstructorTest::do_MessageConstruction_test() {
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create services
-    this->storage_service = simulation->add(new wrench::SimpleStorageService("Host1", {"/"}));
+    this->storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host1", {"/"}, {}, {}));
     this->network_proximity_service = simulation->add(new wrench::NetworkProximityService("Host1", {"Host1", "Host2"}));
     this->compute_service = simulation->add(new wrench::BareMetalComputeService("Host1", {"Host1"}, ""));
 

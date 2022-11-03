@@ -352,13 +352,13 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
 
     // Create src and dst storage services
     ASSERT_NO_THROW(src_storage_service = simulation->add(
-                            new wrench::SimpleStorageService("SrcHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("SrcHost", {"/"})));
 
     ASSERT_NO_THROW(src2_storage_service = simulation->add(
-                            new wrench::SimpleStorageService("WMSHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/"})));
 
     ASSERT_NO_THROW(dst_storage_service = simulation->add(
-                            new wrench::SimpleStorageService("DstHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("DstHost", {"/"})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;

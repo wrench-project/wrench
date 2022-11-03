@@ -100,7 +100,7 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
 
     // Create One Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService("StorageHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost", {"/"})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;

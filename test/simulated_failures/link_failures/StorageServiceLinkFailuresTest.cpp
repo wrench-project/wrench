@@ -366,7 +366,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
             hostname = "Host3";
         }
         storage_services.push_back(simulation->add(
-                new wrench::SimpleStorageService(hostname, {"/disk" + std::to_string(i)},
+                wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk" + std::to_string(i)},
                                                  {{}}, payloads)));
     }
 
