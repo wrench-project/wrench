@@ -43,7 +43,7 @@ namespace wrench {
      */
     class SimpleStorageService : public StorageService {
 
-    private:
+    protected:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "infinity"},
                 {SimpleStorageServiceProperty::BUFFER_SIZE, "10485760"},// 10 MEGA BYTE
@@ -111,6 +111,7 @@ namespace wrench {
 
     protected:
         static unsigned long getNewUniqueNumber();
+        unsigned long num_concurrent_connections;
 
     private:
         friend class Simulation;
@@ -149,7 +150,6 @@ namespace wrench {
                 simgrid::s4u::Mailbox *answer_mailbox_if_write,
                 simgrid::s4u::Mailbox *answer_mailbox_if_copy);
 
-        unsigned long num_concurrent_connections;
 
         void startPendingFileTransferThread();
 
