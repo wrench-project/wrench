@@ -121,8 +121,38 @@ namespace wrench {
         }
 
         /** Main loop **/
-        while (this->processNextMessage()) {
+        while (true) {
+            S4U_Simulation::computeZeroFlop();
+
             this->startPendingTransactions();
+
+            // Create an async recv
+            simgrid::s4u::CommPtr comm_ptr;
+            std::unique_ptr<SimulationMessage> simulation_message;
+            try {
+                comm_ptr = this->mailbox->get_async<void>((void **) (&(simulation_message)));
+            } catch (simgrid::NetworkFailureException &e) {
+                // oh well
+                continue;
+            }
+            // Create all activities to wait on
+            std::vector<simgrid::s4u::ActivityPtr> pending_activities;
+            pending_activities.push_back(comm_ptr);
+            for (auto const &stream : this->running_sg_iostreams) {
+                pending_activities.push_back(stream);
+            }
+            // Wait for the first one to complete
+            ssize_t activity_index = simgrid::s4u::Activity::wait_any(pending_activities);
+
+            // It's a communication
+            if (activity_index == 0) {
+                processNextMessage(simulation_message.get());
+            } else if (activity_index > 0) {
+                throw std::runtime_error("TODO: REACT TO A PENDING STREAM COMPLETING");
+            } else if (activity_index == -1) {
+                throw std::runtime_error("TODO: REACT TO WAIT_ANY RETURNING -1");
+            }
+
         }
 
         WRENCH_INFO("Simple Storage Service (Non-Bufferized) %s on host %s cleanly terminating!",
@@ -137,42 +167,31 @@ namespace wrench {
      *
      * @return false if the daemon should terminate
      */
-    bool SimpleStorageServiceNonBufferized::processNextMessage() {
-        S4U_Simulation::computeZeroFlop();
-
-        // Wait for a message
-        std::shared_ptr<SimulationMessage> message = nullptr;
-
-        try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
-        } catch (ExecutionException &e) {
-            WRENCH_INFO("Got a network error while getting some message... ignoring");
-            return true;// oh well
-        }
+    bool SimpleStorageServiceNonBufferized::processNextMessage(SimulationMessage *message) {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message)) {
             return processStopDaemonRequest(msg->ack_mailbox);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage *>(message)) {
             return processFreeSpaceRequest(msg->answer_mailbox);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message)) {
             return processFileDeleteRequest(msg->file, msg->location, msg->answer_mailbox);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message)) {
             return processFileLookupRequest(msg->file, msg->location, msg->answer_mailbox);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message)) {
             return processFileWriteRequest(msg->file, msg->location, msg->answer_mailbox,
                                            msg->requesting_host,msg->buffer_size);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message)) {
             return processFileReadRequest(msg->file, msg->location,
                                           msg->num_bytes_to_read, msg->answer_mailbox, msg->requesting_host);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message)) {
             return processFileCopyRequest(msg->file, msg->src, msg->dst, msg->answer_mailbox);
 
         } else {
