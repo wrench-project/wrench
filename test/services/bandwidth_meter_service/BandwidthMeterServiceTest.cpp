@@ -167,8 +167,8 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
 
-    client_storage_service = simulation->add(new wrench::SimpleStorageService("host1", {"/"}, {}));
-    server_storage_service = simulation->add(new wrench::SimpleStorageService("host2", {"/"}, {}));
+    client_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("host1", {"/"}, {}));
+    server_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("host2", {"/"}, {}));
 
     const double GB = 1000.0 * 1000.0 * 1000.0;
     //std::shared_ptr<wrench::DataFile> file = new wrench::DataFile("test_file", 10*GB);

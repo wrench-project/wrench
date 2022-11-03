@@ -351,7 +351,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
                          new wrench::CloudComputeService("DualCoreHost", hosts, "/scratch")),
                  std::runtime_error);
     ASSERT_THROW(simulation->add(
-                         new wrench::SimpleStorageService("DualCoreHost", {"/"})),
+                         wrench::SimpleStorageService::createSimpleStorageService("DualCoreHost", {"/"})),
                  std::runtime_error);
     ASSERT_THROW(simulation->add(
                          new wrench::NetworkProximityService("DualCoreHost", hosts)),
@@ -375,12 +375,12 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     // Create a Storage Service
     ASSERT_THROW(storage_service = simulation->add(
-                         new wrench::SimpleStorageService(hostname, {"/disk1"}, {},
+                         wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"}, {},
                                                           {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})),
                  std::invalid_argument);
 
     storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk2"},
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
                                              {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "567"},
                                               {wrench::ServiceProperty::translateString("StorageServiceProperty::BUFFER_SIZE"), "678MiB"}},
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123},

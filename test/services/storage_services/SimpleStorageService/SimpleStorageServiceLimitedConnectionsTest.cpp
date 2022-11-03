@@ -238,20 +238,20 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
 
     // Create a Local storage service with unlimited connections
     ASSERT_NO_THROW(storage_service_wms_unlimited = simulation->add(
-                            new wrench::SimpleStorageService("WMSHost", {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/disk1"})));
 
     // Create a Local storage service with limited connections
     ASSERT_NO_THROW(storage_service_wms_limited = simulation->add(
-                            new wrench::SimpleStorageService("WMSHost", {"/disk2"},
+                            wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/disk2"},
                                                              {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "3"}})));
 
     // Create a Storage service with unlimited connections
     ASSERT_NO_THROW(storage_service_unlimited = simulation->add(
-                            new wrench::SimpleStorageService("Host1", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host1", {"/"})));
 
     // Create a Storage Service limited to 3 connections
     ASSERT_NO_THROW(storage_service_limited = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"},
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"},
                                                              {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "3"}})));
 
     // Create a WMS

@@ -169,7 +169,7 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
     // Create a bunch of storage services
     for (unsigned int i = 0; i < NUM_STORAGE_SERVICES; i++) {
         storage_services.push_back(simulation->add(
-                new wrench::SimpleStorageService(hostname, {"/disk_" + std::to_string(i)})));
+                wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk_" + std::to_string(i)})));
     }
 
     // Create a file registry service

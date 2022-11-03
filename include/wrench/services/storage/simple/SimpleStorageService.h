@@ -66,12 +66,9 @@ namespace wrench {
                 {SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 1024},
         };
 
+
+
     public:
-        // Public Constructor
-        SimpleStorageService(const std::string &hostname,
-                             std::set<std::string> mount_points,
-                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -83,14 +80,27 @@ namespace wrench {
         double getLoad() override;
         double countRunningFileTransferThreads();
 
-        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
+        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) override;
+
+        static SimpleStorageService *createSimpleStorageService(const std::string &hostname,
+                                                         std::set<std::string> mount_points,
+                                                         WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+
+//        static SimpleStorageService *createSimpleStorageService(const std::string &hostname,
+//                                                                std::set<std::string> mount_points);
 
         /***********************/
         /** \endcond          **/
         /***********************/
+    protected:
 
-    private:
-        friend class Simulation;
+        // High-level Constructor
+        SimpleStorageService(const std::string &hostname,
+                             std::set<std::string> mount_points,
+                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+
 
         // Low-level Constructor
         SimpleStorageService(const std::string &hostname,
@@ -99,11 +109,16 @@ namespace wrench {
                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                              const std::string &suffix);
 
+    protected:
+        static unsigned long getNewUniqueNumber();
+
+    private:
+        friend class Simulation;
+
         int main() override;
 
         bool processNextMessage();
 
-        static unsigned long getNewUniqueNumber();
 
         bool processFileDeleteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
                                       simgrid::s4u::Mailbox *answer_mailbox);

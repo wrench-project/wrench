@@ -203,7 +203,7 @@ void FileWriteActionExecutorTest::do_FileWriteActionExecutorSuccessTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss1 = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();

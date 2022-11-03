@@ -254,11 +254,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
     // Create a Batch Service
     ASSERT_THROW(compute_service = simulation->add(
@@ -418,11 +418,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -631,11 +631,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
 
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -885,11 +885,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(

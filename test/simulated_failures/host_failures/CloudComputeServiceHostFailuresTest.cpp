@@ -209,7 +209,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
                                             {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
+    storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -354,7 +354,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
                                             {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
+    storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -512,7 +512,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
                                             {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
+    storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

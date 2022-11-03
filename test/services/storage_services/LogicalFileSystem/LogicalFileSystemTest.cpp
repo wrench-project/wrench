@@ -70,9 +70,9 @@ void LogicalFileSystemTest::do_BasicTests() {
     // Create two Storage Services
     std::shared_ptr<wrench::SimpleStorageService> storage_service1, storage_service2;
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host", {"/"})));
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService("Host", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host", {"/"})));
 
     // Create a Logical File System
     auto fs1 = new wrench::LogicalFileSystem("Host", storage_service1.get(), "/");

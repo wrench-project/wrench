@@ -157,7 +157,7 @@ namespace wrench {
         if (not scratch_space_mount_point.empty()) {
             try {
                 this->scratch_space_storage_service =
-                        std::shared_ptr<StorageService>(new SimpleStorageService(hostname, {scratch_space_mount_point}));
+                        std::shared_ptr<StorageService>(SimpleStorageService::createSimpleStorageService(hostname, {scratch_space_mount_point}, {}, {}));
                 this->scratch_space_storage_service->setScratch();
                 this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(
                         this->scratch_space_storage_service);

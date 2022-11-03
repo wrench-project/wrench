@@ -15,8 +15,11 @@
 #include <wrench/failure_causes/NetworkError.h>
 
 #include <wrench/services/storage/simple/SimpleStorageService.h>
+#include <wrench/services/storage/simple/SimpleStorageServiceBufferized.h>
+#include <wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h>
 #include <wrench/services/ServiceMessage.h>
 #include "wrench/services/storage/StorageServiceMessage.h"
+#include "wrench/services/storage/simple/SimpleStorageServiceBufferized.h"
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
@@ -25,11 +28,52 @@
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
 #include <wrench/services/memory/MemoryManager.h>
+#include <wrench/util/UnitParser.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_simple_storage_service,
                     "Log category for Simple Storage Service");
 
 namespace wrench {
+
+    /**
+     * @brief Factory method to create SimpleStorageService instances
+     *
+     * @param hostname: the name of the host on which to start the service
+     * @param mount_points: the set of mount points
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     * @return
+     */
+    SimpleStorageService *SimpleStorageService::createSimpleStorageService(const std::string &hostname,
+                                                    std::set<std::string> mount_points,
+                                                    WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                                    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
+
+        bool bufferized = false;
+        if (property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != property_list.end()) {
+            double buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
+            bufferized = buffer_size >= 1.0; // more than one byte means bufferized
+        }
+
+        if (bufferized) {
+            return (SimpleStorageService *)(new SimpleStorageServiceBufferized(hostname, mount_points, property_list, messagepayload_list));
+        } else {
+            return (SimpleStorageService *)(new SimpleStorageServiceNonBufferized(hostname, mount_points, property_list, messagepayload_list));
+        }
+    }
+
+//    /**
+//     * @brief Factory method to create SimpleStorageService instances
+//     *
+//     * @param hostname: the name of the host on which to start the service
+//     * @param mount_points: the set of mount points
+//     * @return
+//     */
+//    SimpleStorageService *SimpleStorageService::createSimpleStorageService(const std::string &hostname,
+//                                                                           std::set<std::string> mount_points) {
+//
+//        return createSimpleStorageService(hostname,mount_points,{},{});
+//    }
 
     /**
     * @brief Generate a unique number

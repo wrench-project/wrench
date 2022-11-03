@@ -365,7 +365,7 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("TwoCoreHost", {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("TwoCoreHost", {"/disk1"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -637,7 +637,7 @@ void BareMetalComputeServiceOneTaskTest::do_StandardJobConstructor_test() {
 
     // Create a Storage Service
     storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname1, {"/disk1"}));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname1, {"/disk1"}));
 
     // Start a file registry service
     simulation->add(new wrench::FileRegistryService(hostname1));
@@ -727,7 +727,7 @@ void BareMetalComputeServiceOneTaskTest::do_HostMemory_test() {
 
     // Create a Storage Service
     storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname1, {"/disk1"}));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname1, {"/disk1"}));
 
     // Start a file registry service
     simulation->add(new wrench::FileRegistryService(hostname1));
@@ -848,7 +848,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("OneCoreHost", {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("OneCoreHost", {"/disk1"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -988,11 +988,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMapMultiple_tes
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("OneCoreHost", {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("OneCoreHost", {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService("OneCoreHost", {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("OneCoreHost", {"/disk2"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1099,7 +1099,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_t
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1242,11 +1242,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service with default Storage Service #2
@@ -1383,15 +1383,15 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service3 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk3"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk3"})));
 
 
     // Create a Compute Service with default Storage Service #2
@@ -1503,11 +1503,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service with default Storage Service #2
@@ -1619,11 +1619,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service with no default Storage Service
@@ -1734,11 +1734,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk3"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk3"})));
 
 
     // Create a Compute Service with no default Storage Service
@@ -1843,11 +1843,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service with no default Storage Service
@@ -1962,7 +1962,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -2081,7 +2081,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));

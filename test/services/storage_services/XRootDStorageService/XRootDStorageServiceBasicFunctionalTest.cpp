@@ -266,7 +266,7 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     auto ss2 = this->root_supervisor->addChildStorageServer("Host2", "/disk100", {}, {});
     auto ss3 = this->root_supervisor->addChildStorageServer("Host3", "/disk100", {}, {});
 
-    this->standalone_ss = simulation->add(new wrench::SimpleStorageService(
+    this->standalone_ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "Host1", {"/disk100"}, {}, {}));
 
     // Create an execution controller

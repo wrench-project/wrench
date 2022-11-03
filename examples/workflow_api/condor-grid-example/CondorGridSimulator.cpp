@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
     }
 
     // Create a storage service on the WMS host, that will host all data
-    auto local_ss = simulation->add(new wrench::SimpleStorageService("WMSHost", {"/"}));
+    auto local_ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/"}));
 
     // Create a 4-node batch_standard_and_pilot_jobs service
     auto batch_cs = simulation->add(new wrench::BatchComputeService(
