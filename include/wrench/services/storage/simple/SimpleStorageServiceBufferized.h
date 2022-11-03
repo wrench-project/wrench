@@ -27,20 +27,7 @@ namespace wrench {
     class S4U_PendingCommunication;
 
     /**
-     * @brief A storage service that provides direct access to some storage resources (e.g., one or more disks).
-     *        An important (configurable) property of the storage service is
-     *        SimpleStorageServiceProperty::BUFFER_SIZE (see documentation thereof), which defines the
-     *        buffer size that the storage service uses. Specifically, when the storage service
-     *        receives/sends data from/to the network, it does so in a loop over data "chunks",
-     *        with pipelined network and disk I/O operations. The smaller the buffer size the more "fluid"
-     *        the model, but the more time-consuming the simulation. A large buffer size, however, may
-     *        lead to less realistic simulations. At the extreme, an infinite buffer size would correspond
-     *        to fully sequential executions (first a network receive/send, and then a disk write/read).
-     *        Setting the buffer size to "0" corresponds to a fully fluid model in which individual
-     *        data chunk operations are not simulated, thus achieving both accuracy (unless one specifically wishes
-     *        to study the effects of buffering) and quick simulation times. For now, setting the buffer
-     *        size to "0" is not implemented. The default buffer size is 10 MiB (note that the user can
-     *        always declare a disk with arbitrary bandwidth in the platform description XML).
+     * @brief The bufferized (i.e., BUFFER_SIZE > 0) implementation
      */
     class SimpleStorageServiceBufferized : public SimpleStorageService {
 
@@ -81,13 +68,13 @@ namespace wrench {
         /***********************/
 
     public:
-        ~SimpleStorageServiceBufferized() override;
+//        ~SimpleStorageServiceBufferized() override;
 
         void cleanup(bool has_returned_from_main, int return_value) override;
         double getLoad() override;
         double countRunningFileTransferThreads();
 
-        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
+//        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
 
         /***********************/
         /** \endcond          **/
@@ -96,12 +83,12 @@ namespace wrench {
     private:
         friend class Simulation;
 
-        // Low-level Constructor
-        SimpleStorageServiceBufferized(const std::string &hostname,
-                             std::set<std::string> mount_points,
-                             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-                             const std::string &suffix);
+//        // Low-level Constructor
+//        SimpleStorageServiceBufferized(const std::string &hostname,
+//                             std::set<std::string> mount_points,
+//                             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+//                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+//                             const std::string &suffix);
 
         int main() override;
 
@@ -109,8 +96,8 @@ namespace wrench {
 
 //        static unsigned long getNewUniqueNumber();
 
-        bool processFileDeleteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
-                                      simgrid::s4u::Mailbox *answer_mailbox);
+//        bool processFileDeleteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
+//                                      simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processFileWriteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &, simgrid::s4u::Mailbox *answer_mailbox,
                                      double buffer_size);
