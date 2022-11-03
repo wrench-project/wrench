@@ -8,6 +8,7 @@
  */
 
 #include <climits>
+#include <utility>
 #include <wrench/services/storage/storage_helpers/FileTransferThreadMessage.h>
 #include <wrench/failure_causes/InvalidDirectoryPath.h>
 #include <wrench/failure_causes/FileNotFound.h>
@@ -41,12 +42,12 @@ namespace wrench {
 //        return (sequence_number++);
 //    }
 
-    /**
-     * @brief Destructor
-     */
-    SimpleStorageServiceNonBufferized::~SimpleStorageServiceNonBufferized() {
-        this->default_property_values.clear();
-    }
+//    /**
+//     * @brief Destructor
+//     */
+//    SimpleStorageServiceNonBufferized::~SimpleStorageServiceNonBufferized() {
+//        this->default_property_values.clear();
+//    }
 
     /**
      * @brief Cleanup method
@@ -55,6 +56,7 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void SimpleStorageServiceNonBufferized::cleanup(bool has_returned_from_main, int return_value) {
+        //TODO: TO REPLACE FOR NON-BUFFERIZED
         this->pending_file_transfer_threads.clear();
         this->running_file_transfer_threads.clear();
         // Do nothing. It's fine to die and we'll just autorestart with our previous state
@@ -69,30 +71,31 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     SimpleStorageServiceNonBufferized::SimpleStorageServiceNonBufferized(const std::string &hostname,
-                                               std::set<std::string> mount_points,
-                                               WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, mount_points, property_list, messagepayload_list,
-                                                                                                                                 "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {}
+                                                                         std::set<std::string> mount_points,
+                                                                         WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
+            SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
+                                 "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {}
 
-    /**
-     * @brief Private constructor
-     *
-     * @param hostname: the name of the host on which to start the service
-     * @param mount_points: the set of mount points
-     * @param property_list: the property list
-     * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     * @param suffix: the suffix (for the service name)
-     *
-     * @throw std::invalid_argument
-     */
-    SimpleStorageServiceNonBufferized::SimpleStorageServiceNonBufferized(
-            const std::string &hostname,
-            std::set<std::string> mount_points,
-            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            const std::string &suffix) : SimpleStorageService(hostname, std::move(mount_points), property_list, messagepayload_list, "simple_storage" + suffix) {
-        this->buffer_size = 0;
-    }
+//    /**
+//     * @brief Private constructor
+//     *
+//     * @param hostname: the name of the host on which to start the service
+//     * @param mount_points: the set of mount points
+//     * @param property_list: the property list
+//     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+//     * @param suffix: the suffix (for the service name)
+//     *
+//     * @throw std::invalid_argument
+//     */
+//    SimpleStorageServiceNonBufferized::SimpleStorageServiceNonBufferized(
+//            const std::string &hostname,
+//            std::set<std::string> mount_points,
+//            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+//            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+//            const std::string &suffix) : SimpleStorageService(hostname, std::move(mount_points), property_list, messagepayload_list, "simple_storage" + suffix) {
+//        this->buffer_size = 0;
+//    }
 
     /**
      * @brief Main method of the daemon
@@ -100,6 +103,7 @@ namespace wrench {
      * @return 0 on termination
      */
     int SimpleStorageServiceNonBufferized::main() {
+        // TODO: RE-IMPLEMENT FOR NON-BUFFERIZED
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
         // "Start" all logical file systems
@@ -249,7 +253,7 @@ namespace wrench {
      * @return true if this process should keep running
      */
     bool SimpleStorageServiceNonBufferized::processFileWriteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
-                                                       simgrid::s4u::Mailbox *answer_mailbox, double buffer_size) {
+                                                                    simgrid::s4u::Mailbox *answer_mailbox, double buffer_size) {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
@@ -339,21 +343,21 @@ namespace wrench {
      * @return
      */
     bool SimpleStorageServiceNonBufferized::processFileReadRequest(const std::shared_ptr<DataFile> &file,
-                                                      const std::shared_ptr<FileLocation> &location,
-                                                      double num_bytes_to_read,
-                                                      simgrid::s4u::Mailbox *answer_mailbox,
-                                                      simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content) {
+                                                                   const std::shared_ptr<FileLocation> &location,
+                                                                   double num_bytes_to_read,
+                                                                   simgrid::s4u::Mailbox *answer_mailbox,
+                                                                   simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content) {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
         //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
         if (not this->file_systems[location->getMountPoint()]->doesDirectoryExist(
-                    location->getAbsolutePathAtMountPoint())) {
+                location->getAbsolutePathAtMountPoint())) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new InvalidDirectoryPath(
                             this->getSharedPtr<SimpleStorageService>(),
                             location->getMountPoint() + "/" +
-                                    location->getAbsolutePathAtMountPoint()));
+                            location->getAbsolutePathAtMountPoint()));
         } else {
             auto fs = this->file_systems[location->getMountPoint()].get();
 
@@ -410,9 +414,9 @@ namespace wrench {
      * @return
      */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequest(const std::shared_ptr<DataFile> &file,
-                                                      const std::shared_ptr<FileLocation> &src_location,
-                                                      const std::shared_ptr<FileLocation> &dst_location,
-                                                      simgrid::s4u::Mailbox *answer_mailbox) {
+                                                                   const std::shared_ptr<FileLocation> &src_location,
+                                                                   const std::shared_ptr<FileLocation> &dst_location,
+                                                                   simgrid::s4u::Mailbox *answer_mailbox) {
         //        // File System  and path at the destination exists?
         //        if (this->file_systems.find(dst_location->getMountPoint()) == this->file_systems.end())  {
         //
@@ -526,16 +530,16 @@ namespace wrench {
      * @return false if the daemon should terminate
      */
     bool SimpleStorageServiceNonBufferized::processFileTransferThreadNotification(const std::shared_ptr<FileTransferThread> &ftt,
-                                                                     const std::shared_ptr<DataFile> &file,
-                                                                     simgrid::s4u::Mailbox *src_mailbox,
-                                                                     const std::shared_ptr<FileLocation> &src_location,
-                                                                     simgrid::s4u::Mailbox *dst_mailbox,
-                                                                     const std::shared_ptr<FileLocation> &dst_location,
-                                                                     bool success,
-                                                                     std::shared_ptr<FailureCause> failure_cause,
-                                                                     simgrid::s4u::Mailbox *answer_mailbox_if_read,
-                                                                     simgrid::s4u::Mailbox *answer_mailbox_if_write,
-                                                                     simgrid::s4u::Mailbox *answer_mailbox_if_copy) {
+                                                                                  const std::shared_ptr<DataFile> &file,
+                                                                                  simgrid::s4u::Mailbox *src_mailbox,
+                                                                                  const std::shared_ptr<FileLocation> &src_location,
+                                                                                  simgrid::s4u::Mailbox *dst_mailbox,
+                                                                                  const std::shared_ptr<FileLocation> &dst_location,
+                                                                                  bool success,
+                                                                                  std::shared_ptr<FailureCause> failure_cause,
+                                                                                  simgrid::s4u::Mailbox *answer_mailbox_if_read,
+                                                                                  simgrid::s4u::Mailbox *answer_mailbox_if_write,
+                                                                                  simgrid::s4u::Mailbox *answer_mailbox_if_copy) {
         // Remove the ftt from the list of running ftt
         if (this->running_file_transfer_threads.find(ftt) == this->running_file_transfer_threads.end()) {
             WRENCH_INFO(
@@ -603,83 +607,84 @@ namespace wrench {
         return true;
     }
 
-    /**
-     * @brief Process a file deletion request
-     * @param file: the file to delete
-     * @param location: the file location
-     * @param answer_mailbox: the mailbox to which the notification should be sent
-     * @return false if the daemon should terminate
-     */
-    bool SimpleStorageServiceNonBufferized::processFileDeleteRequest(const std::shared_ptr<DataFile> &file,
-                                                        const std::shared_ptr<FileLocation> &location,
-                                                        simgrid::s4u::Mailbox *answer_mailbox) {
-        std::shared_ptr<FailureCause> failure_cause = nullptr;
+//    /**
+//     * @brief Process a file deletion request
+//     * @param file: the file to delete
+//     * @param location: the file location
+//     * @param answer_mailbox: the mailbox to which the notification should be sent
+//     * @return false if the daemon should terminate
+//     */
+//    bool SimpleStorageServiceNonBufferized::processFileDeleteRequest(const std::shared_ptr<DataFile> &file,
+//                                                                     const std::shared_ptr<FileLocation> &location,
+//                                                                     simgrid::s4u::Mailbox *answer_mailbox) {
+//        std::shared_ptr<FailureCause> failure_cause = nullptr;
+//
+//        auto fs = this->file_systems[location->getMountPoint()].get();
+//
+//        if ((not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) or
+//            (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint()))) {
+//            // If this is scratch, we don't care, perhaps it was taken care of elsewhere...
+//            if (not this->isScratch()) {
+//                failure_cause = std::shared_ptr<FailureCause>(
+//                        new FileNotFound(file, location));
+//            }
+//        } else {
+//            fs->removeFileFromDirectory(file, location->getAbsolutePathAtMountPoint());
+//        }
+//
+//        S4U_Mailbox::dputMessage(
+//                answer_mailbox,
+//                new StorageServiceFileDeleteAnswerMessage(
+//                        file,
+//                        this->getSharedPtr<SimpleStorageService>(),
+//                        (failure_cause == nullptr),
+//                        failure_cause,
+//                        this->getMessagePayloadValue(
+//                                SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
+//        return true;
+//    }
+//
+//    /**
+//     * @brief Helper method to validate property values
+//     * throw std::invalid_argument
+//     */
+//    void SimpleStorageServiceNonBufferized::validateProperties() {
+//        this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+//        this->getPropertyValueAsSizeInByte(SimpleStorageServiceProperty::BUFFER_SIZE);
+//    }
 
-        auto fs = this->file_systems[location->getMountPoint()].get();
-
-        if ((not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) or
-            (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint()))) {
-            // If this is scratch, we don't care, perhaps it was taken care of elsewhere...
-            if (not this->isScratch()) {
-                failure_cause = std::shared_ptr<FailureCause>(
-                        new FileNotFound(file, location));
-            }
-        } else {
-            fs->removeFileFromDirectory(file, location->getAbsolutePathAtMountPoint());
-        }
-
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
-                new StorageServiceFileDeleteAnswerMessage(
-                        file,
-                        this->getSharedPtr<SimpleStorageService>(),
-                        (failure_cause == nullptr),
-                        failure_cause,
-                        this->getMessagePayloadValue(
-                                SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
-        return true;
-    }
-
-    /**
-     * @brief Helper method to validate property values
-     * throw std::invalid_argument
-     */
-    void SimpleStorageServiceNonBufferized::validateProperties() {
-        this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-        this->getPropertyValueAsSizeInByte(SimpleStorageServiceProperty::BUFFER_SIZE);
-    }
-
-    /**
-     * @brief Get number of File Transfer Threads that are currently running or are pending
-     * @return The number of threads
-     */
-    double SimpleStorageServiceNonBufferized::countRunningFileTransferThreads() {
-        return this->running_file_transfer_threads.size() + this->pending_file_transfer_threads.size();
-    }
+//    /**
+//     * @brief Get number of File Transfer Threads that are currently running or are pending
+//     * @return The number of threads
+//     */
+//    double SimpleStorageServiceNonBufferized::countRunningFileTransferThreads() {
+//        return this->running_file_transfer_threads.size() + this->pending_file_transfer_threads.size();
+//    }
 
     /**
      * @brief Get the load (number of concurrent reads) on the storage service
      * @return the load on the service
      */
     double SimpleStorageServiceNonBufferized::getLoad() {
-        return countRunningFileTransferThreads();
+        // TODO: TO RE-IMPLE<MENT FOR NON-BUFFERIZED
+        return 0.0;
     }
 
-    /**
-     * @brief Get a file's last write date at a location (in zero simulated time)
-     *
-     * @param file: the file
-     * @param location: the file location
-     *
-     * @return the file's last write date, or -1 if the file is not found
-     *
-     */
-    double SimpleStorageServiceNonBufferized::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-        if ((file == nullptr) or (location == nullptr)) {
-            throw std::invalid_argument("SimpleStorageServiceNonBufferized::getFileLastWriteDate(): Invalid arguments");
-        }
-        auto fs = this->file_systems[location->getMountPoint()].get();
-        return fs->getFileLastWriteDate(file, location->getAbsolutePathAtMountPoint());
-    }
+//    /**
+//     * @brief Get a file's last write date at a location (in zero simulated time)
+//     *
+//     * @param file: the file
+//     * @param location: the file location
+//     *
+//     * @return the file's last write date, or -1 if the file is not found
+//     *
+//     */
+//    double SimpleStorageServiceNonBufferized::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
+//        if ((file == nullptr) or (location == nullptr)) {
+//            throw std::invalid_argument("SimpleStorageServiceNonBufferized::getFileLastWriteDate(): Invalid arguments");
+//        }
+//        auto fs = this->file_systems[location->getMountPoint()].get();
+//        return fs->getFileLastWriteDate(file, location->getAbsolutePathAtMountPoint());
+//    }
 
 };// namespace wrench
