@@ -297,6 +297,8 @@ private:
 
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
+        std::cerr << "1. JOB SUNMOTTED\n";
+
         // while large_input_file is being read, we delete small_input_file so that the one task job will fail
         wrench::StorageService::deleteFile(this->test->workflow->getFileByID("zz_small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
@@ -304,11 +306,14 @@ private:
 
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
+            std::cerr << "WAITING FOR EVENS\n";
             event = this->waitForNextEvent();
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
 
+        std::cerr << "GOT IT\n";
+        
         if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
             throw std::runtime_error("Job should have failed!");
         }
@@ -322,6 +327,9 @@ private:
                                                                       {this->test->t4_output_file,
                                                                        wrench::FileLocation::LOCATION(this->test->storage_service)}});
         job_manager->submitJob(job_that_will_complete, this->test->compute_service);
+
+        std::cerr << "OTHER JOB SUBMNITED\n";
+
         this->waitForAndProcessNextEvent();
 
         auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5);
@@ -329,6 +337,7 @@ private:
         wrench::S4U_Simulation::sleep(10.0);
         job_manager->terminateJob(job_that_will_be_terminated);
 
+        std::cerr << "OTHER OTHER JOB SUBMNITED\n";
 
         auto job_that_will_fail_2 = job_manager->createStandardJob(this->test->t6);
         job_manager->submitJob(job_that_will_fail_2, this->test->compute_service);
@@ -349,10 +358,10 @@ TEST_F(WorkflowTaskTest, WorkflowTaskExecutionHistoryTest) {
 
 void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-logs");
+    argv[1] = strdup("--wrench-full-logs");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -371,10 +380,10 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
                             "",
                             {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/"})));
+    ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/"}, {}, {})));
 
     ASSERT_NO_THROW(
-            backup_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/backup"})));
+            backup_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/backup"}, {}, {})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new WorkflowTaskExecutionHistoryTestWMS(
