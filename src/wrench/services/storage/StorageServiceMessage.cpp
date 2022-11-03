@@ -318,7 +318,7 @@ namespace wrench {
    *
    * @throw std::invalid_argument
    */
-    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(sgimgrid::s4u::Mailbox *answer_mailbox,
+    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                simgrid::s4u::Host *requesting_host,
                                                                                simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
                                                                                std::shared_ptr<DataFile> file,
