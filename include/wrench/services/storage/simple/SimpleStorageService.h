@@ -113,8 +113,13 @@ namespace wrench {
     protected:
         static unsigned long getNewUniqueNumber();
         unsigned long num_concurrent_connections;
+
+        bool processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox);
         bool processFileDeleteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
                                       simgrid::s4u::Mailbox *answer_mailbox);
+        bool processFileLookupRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
+                                      simgrid::s4u::Mailbox *answer_mailbox);
+        bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox);
 
     private:
         friend class Simulation;
