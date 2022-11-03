@@ -779,7 +779,8 @@ namespace wrench {
             if (internalStorage != nullptr) {
                 return false;
             }
-            internalStorage = make_shared<SimpleStorageService>(hostname, path, property_list, messagepayload_list);
+//            internalStorage = make_shared<SimpleStorageService>(hostname, path, property_list, messagepayload_list);
+            internalStorage = std::shared_ptr<SimpleStorageService>(SimpleStorageService::createSimpleStorageService(hostname, path, property_list, messagepayload_list));
             return true;
         }
 

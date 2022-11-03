@@ -421,10 +421,10 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
 
     // Create Storage Services
     if (args.find("storage1") != args.end()) {
-        this->storage_service1 = simulation->add(new wrench::SimpleStorageService("StorageHost1", {"/"}));
+        this->storage_service1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("StorageHost1", {"/"}));
     }
     if (args.find("storage2") != args.end()) {
-        this->storage_service2 = simulation->add(new wrench::SimpleStorageService("StorageHost2", {"/"}));
+        this->storage_service2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("StorageHost2", {"/"}));
     }
 
     ASSERT_TRUE((this->storage_service1 != nullptr) or (this->storage_service2 != nullptr));

@@ -216,7 +216,7 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -322,7 +322,7 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -466,7 +466,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -589,7 +589,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -722,7 +722,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -937,7 +937,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1048,7 +1048,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1167,7 +1167,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1274,7 +1274,7 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1390,7 +1390,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1521,7 +1521,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1641,7 +1641,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(

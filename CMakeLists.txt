@@ -114,6 +114,8 @@ set(HEADER_FILES
         include/wrench/services/storage/StorageServiceMessagePayload.h
         include/wrench/services/storage/StorageServiceProperty.h
         include/wrench/services/storage/simple/SimpleStorageService.h
+        include/wrench/services/storage/simple/SimpleStorageServiceBufferized.h
+        include/wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h
         include/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.h
         include/wrench/services/storage/simple/SimpleStorageServiceProperty.h
         include/wrench/services/storage/storage_helpers/FileLocation.h
@@ -291,6 +293,8 @@ set(SOURCE_FILES
         src/wrench/services/storage/StorageServiceMessagePayload.cpp
         src/wrench/services/storage/StorageServiceProperty.cpp
         src/wrench/services/storage/simple/SimpleStorageService.cpp
+        src/wrench/services/storage/simple/SimpleStorageServiceBufferized.cpp
+        src/wrench/services/storage/simple/SimpleStorageServiceNonBufferized.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/services/storage/storage_helper_classes/FileLocation.cpp

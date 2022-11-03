@@ -371,10 +371,10 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
                             "",
                             {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"})));
+    ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/"})));
 
     ASSERT_NO_THROW(
-            backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/backup"})));
+            backup_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/backup"})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new WorkflowTaskExecutionHistoryTestWMS(

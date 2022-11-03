@@ -209,7 +209,7 @@ private:
         wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 10.0, 100.0, "/foo");
 
         // Start a storage service that uses this disk
-        auto ss = this->simulation->startNewService(new wrench::SimpleStorageService("subzonehost", {"/foo"}, {}, {}));
+        auto ss = this->simulation->startNewService(wrench::SimpleStorageService::createSimpleStorageService("subzonehost", {"/foo"}, {}, {}));
 
         // Create a file on it
         auto too_big = wrench::Simulation::addFile("too_big", 200.0);

@@ -288,11 +288,11 @@ void FileRegistryTest::do_FileRegistry_Test() {
                                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/otherdisk"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/otherdisk"})));
 
     // Create a file registry service
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(hostname)));
@@ -451,13 +451,13 @@ void FileRegistryTest::do_lookupEntry_Test() {
     network_proximity_service = simulation->add(new wrench::NetworkProximityService(host1, {host1, host3, host4}));
 
     storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(host1, {"/"}));
+            wrench::SimpleStorageService::createSimpleStorageService(host1, {"/"}));
 
     storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(host2, {"/"}));
+            wrench::SimpleStorageService::createSimpleStorageService(host2, {"/"}));
 
     storage_service3 = simulation->add(
-            new wrench::SimpleStorageService(host4, {"/"}));
+            wrench::SimpleStorageService::createSimpleStorageService(host4, {"/"}));
 
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(host1));
