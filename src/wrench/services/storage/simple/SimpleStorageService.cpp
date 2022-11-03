@@ -150,54 +150,55 @@ namespace wrench {
      * @return 0 on termination
      */
     int SimpleStorageService::main() {
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
-
-        // "Start" all logical file systems
-        for (auto const &fs: this->file_systems) {
-            fs.second->init();
-        }
-
-        std::string message = "Simple Storage service " + this->getName() + "  starting on host " + this->getHostname();
-        WRENCH_INFO("%s", message.c_str());
-        for (auto const &fs: this->file_systems) {
-            message = "  - mount point " + fs.first + ": " +
-                      std::to_string(fs.second->getFreeSpace()) + "/" +
-                      std::to_string(fs.second->getTotalCapacity()) + " Bytes";
-            WRENCH_INFO("%s", message.c_str())
-        }
-
-        // If writeback device simulation is activated
-        if (Simulation::isPageCachingEnabled()) {
-            //  Find the "memory" disk (we know there is one)
-            auto host = S4U_Simulation::get_host_or_vm_by_name(this->getHostname());
-            simgrid::s4u::Disk *memory_disk = nullptr;
-            for (auto const &d: host->get_disks()) {
-                // Get the disk's mount point
-                const char *p = d->get_property("mount");
-                if (!p) {
-                    continue;
-                }
-                if (!strcmp(p, "/memory")) {
-                    memory_disk = d;
-                    break;
-                }
-            }
-
-            // Start periodical flushing via a memory manager
-            this->memory_manager = MemoryManager::initAndStart(this->simulation, memory_disk, 0.4, 5, 30, this->hostname);
-            //            memory_manager_ptr->log();
-        }
-
-        /** Main loop **/
-        while (this->processNextMessage()) {
-            this->startPendingFileTransferThread();
-        }
-
-        WRENCH_INFO("Simple Storage Service %s on host %s cleanly terminating!",
-                    this->getName().c_str(),
-                    S4U_Simulation::getHostName().c_str());
-
-        return 0;
+        std::cerr << "WTF!\n";
+//        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
+//
+//        // "Start" all logical file systems
+//        for (auto const &fs: this->file_systems) {
+//            fs.second->init();
+//        }
+//
+//        std::string message = "Simple Storage service " + this->getName() + "  starting on host " + this->getHostname();
+//        WRENCH_INFO("%s", message.c_str());
+//        for (auto const &fs: this->file_systems) {
+//            message = "  - mount point " + fs.first + ": " +
+//                      std::to_string(fs.second->getFreeSpace()) + "/" +
+//                      std::to_string(fs.second->getTotalCapacity()) + " Bytes";
+//            WRENCH_INFO("%s", message.c_str())
+//        }
+//
+//        // If writeback device simulation is activated
+//        if (Simulation::isPageCachingEnabled()) {
+//            //  Find the "memory" disk (we know there is one)
+//            auto host = S4U_Simulation::get_host_or_vm_by_name(this->getHostname());
+//            simgrid::s4u::Disk *memory_disk = nullptr;
+//            for (auto const &d: host->get_disks()) {
+//                // Get the disk's mount point
+//                const char *p = d->get_property("mount");
+//                if (!p) {
+//                    continue;
+//                }
+//                if (!strcmp(p, "/memory")) {
+//                    memory_disk = d;
+//                    break;
+//                }
+//            }
+//
+//            // Start periodical flushing via a memory manager
+//            this->memory_manager = MemoryManager::initAndStart(this->simulation, memory_disk, 0.4, 5, 30, this->hostname);
+//            //            memory_manager_ptr->log();
+//        }
+//
+//        /** Main loop **/
+//        while (this->processNextMessage()) {
+//            this->startPendingFileTransferThread();
+//        }
+//
+//        WRENCH_INFO("Simple Storage Service %s on host %s cleanly terminating!",
+//                    this->getName().c_str(),
+//                    S4U_Simulation::getHostName().c_str());
+//
+//        return 0;
     }
 
     /**
