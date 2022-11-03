@@ -69,7 +69,7 @@ namespace wrench {
 
         int main() override;
 
-        bool processNextMessage();
+        bool processNextMessage(SimulationMessage *message);
 
         bool processFileWriteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
                                      simgrid::s4u::Mailbox *answer_mailbox, simgrid::s4u::Host *requesting_host,
