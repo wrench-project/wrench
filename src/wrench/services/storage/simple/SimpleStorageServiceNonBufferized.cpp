@@ -9,11 +9,9 @@
 
 #include <climits>
 #include <utility>
-#include <wrench/services/storage/storage_helpers/FileTransferThreadMessage.h>
 #include <wrench/failure_causes/InvalidDirectoryPath.h>
 #include <wrench/failure_causes/FileNotFound.h>
 #include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 #include <wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h>
 #include <wrench/services/ServiceMessage.h>
@@ -31,23 +29,6 @@ WRENCH_LOG_CATEGORY(wrench_core_simple_storage_service_non_bufferized,
                     "Log category for Simple Storage Service Non Bufferized");
 
 namespace wrench {
-
-//    /**
-//    * @brief Generate a unique number
-//    *
-//    * @return a unique number
-//    */
-//    unsigned long SimpleStorageServiceNonBufferized::getNewUniqueNumber() {
-//        static unsigned long sequence_number = 0;
-//        return (sequence_number++);
-//    }
-
-//    /**
-//     * @brief Destructor
-//     */
-//    SimpleStorageServiceNonBufferized::~SimpleStorageServiceNonBufferized() {
-//        this->default_property_values.clear();
-//    }
 
     /**
      * @brief Cleanup method
@@ -76,6 +57,26 @@ namespace wrench {
                                                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
             SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
                                  "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {}
+
+    /**
+     * @brief Process a transaction completion
+     * @param transaction: the transaction
+     */
+    void SimpleStorageServiceNonBufferized::processTransactionCompletion(std::shared_ptr<Transaction> transaction) {
+        // Send back the relevant ack if this was a read
+        WRENCH_INFO(
+                "Sending back an ack since this was a file read and some client is waiting for me to say something");
+        S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage());
+    }
+
+    /**
+     * @brief Process a transaction failure
+     * @param transaction: the transaction
+     */
+    void SimpleStorageServiceNonBufferized::processTransactionFailure(std::shared_ptr<Transaction> transaction) {
+        throw std::runtime_error("SimpleStorageServiceNonBufferized::processTransactionFailure(): not implemented");
+    }
+
 
     /**
      * @brief Main method of the daemon
@@ -135,22 +136,44 @@ namespace wrench {
                 // oh well
                 continue;
             }
+
             // Create all activities to wait on
             std::vector<simgrid::s4u::ActivityPtr> pending_activities;
-            pending_activities.push_back(comm_ptr);
+            pending_activities.emplace_back(comm_ptr);
             for (auto const &stream : this->running_sg_iostreams) {
-                pending_activities.push_back(stream);
+                pending_activities.emplace_back(stream);
             }
             // Wait for the first one to complete
-            ssize_t activity_index = simgrid::s4u::Activity::wait_any(pending_activities);
+            WRENCH_INFO("Waiting for something via wait_any: (%zu)", pending_activities.size());
+
+            bool the_comm_failed = false;
+            bool one_stream_failed = false;
+            ssize_t finished_activity_index;
+            try {
+                finished_activity_index = simgrid::s4u::Activity::wait_any(pending_activities);
+            } catch (simgrid::NetworkFailureException &e) {
+                // the comm failed
+                continue; // oh well
+            } catch (simgrid::Exception &e) {
+                // This likely doesn't happen, but let's keep it here for now
+                for (int i = 1; i < pending_activities.size(); i++) {
+                    if (pending_activities.at(i)->get_state() == simgrid::s4u::Activity::State::FAILED) {
+                        auto stream = this->running_sg_iostreams.at(i - 1);
+                        processTransactionFailure(this->transactions[stream]);
+                        continue;
+                    }
+                }
+            }
 
             // It's a communication
-            if (activity_index == 0) {
-                processNextMessage(simulation_message.get());
-            } else if (activity_index > 0) {
-                throw std::runtime_error("TODO: REACT TO A PENDING STREAM COMPLETING");
-            } else if (activity_index == -1) {
-                throw std::runtime_error("TODO: REACT TO WAIT_ANY RETURNING -1");
+            if (finished_activity_index == 0) {
+                if (not processNextMessage(simulation_message.get())) break;
+            } else if (finished_activity_index > 0) {
+                auto finished_activity = this->running_sg_iostreams.at(finished_activity_index - 1);
+                this->running_sg_iostreams.erase(this->running_sg_iostreams.begin() + finished_activity_index - 1);
+                processTransactionCompletion(this->transactions[finished_activity]);
+            } else if (finished_activity_index == -1) {
+                throw std::runtime_error("wait_any() returned -1. Not sure what to do with this");
             }
 
         }
@@ -247,10 +270,6 @@ namespace wrench {
             // Update occupied space, in advance (will have to be decreased later in case of failure)
             fs->reserveSpace(file, location->getAbsolutePathAtMountPoint());
 
-//            // Generate a mailbox_name name on which to receive the file
-//            auto file_reception_mailbox = S4U_Mailbox::getTemporaryMailbox();
-//            //            auto file_reception_mailbox = S4U_Mailbox::generateUniqueMailbox("faa_does_not_work");
-
             // Reply with a "go ahead, send me the file" message
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
@@ -287,20 +306,6 @@ namespace wrench {
                     sg_iostream,
                     file,
                     answer_mailbox);
-
-//            // Create a FileTransferThread
-//            auto ftt = std::shared_ptr<FileTransferThread>(
-//                    new FileTransferThread(this->hostname,
-//                                           this->getSharedPtr<StorageService>(),
-//                                           file,
-//                                           file->getSize(),
-//                                           file_reception_mailbox,
-//                                           location,
-//                                           nullptr,
-//                                           answer_mailbox,
-//                                           nullptr,
-//                                           buffer_size));
-//            ftt->setSimulation(this->simulation);
 
             // Add it to the Pool of pending data communications
             this->transactions[sg_iostream] = transaction;
@@ -388,26 +393,10 @@ namespace wrench {
             }
 
             WRENCH_INFO("Creating Streaming Activity for a read request");
-//            auto sg_iostream = simgrid::s4u::Io::streamto_init(me_host,
-//                                                               me_disk,
-//                                                               requesting_host,
-//                                                               nullptr)->set_size((uint64_t)file->getSize());
-
-//            std::cerr << me_host->get_cname() << "\n";
-//            std::cerr << me_disk->get_cname() << "\n";
-//            std::cerr << requesting_host->get_cname() << "\n";
             auto sg_iostream = simgrid::s4u::Io::streamto_init(me_host,
                                                                me_disk,
                                                                requesting_host,
-                                                               nullptr)->set_size(666);
-
-            WRENCH_INFO("SYnCHRONOUS!");
-            simgrid::s4u::Io::streamto(me_host,
-                                       me_disk,
-                                       requesting_host,
-                                       nullptr, 666 );
-
-            WRENCH_INFO("STARTED IT NOW JUST TO TRY");
+                                                               nullptr)->set_size((uint64_t)file->getSize());
 
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
@@ -474,23 +463,24 @@ namespace wrench {
                     dst_location->toString().c_str());
 
         // Create the streaming activity
-        std::cerr << src_location->getServerStorageService() << "\n";
-        std::cerr << src_location->getServerStorageService()->getName() << "\n";
-        std::cerr << src_location->getServerStorageService()->getHostname() << "\n";
-        auto src_host = simgrid::s4u::Host::by_name(src_location->getServerStorageService()->getHostname());
+        // TODO: Avoid these lookups! Deal with annoying "/" etc.
+        auto src_host = simgrid::s4u::Host::by_name(src_location->getStorageService()->getHostname());
         simgrid::s4u::Disk *src_disk = nullptr;
+        auto src_location_sanitized_mount_point =  FileLocation::sanitizePath(src_location->getMountPoint() + "/");
         for (auto const &d: src_host->get_disks()) {
-            if (d->get_property("mount") == src_location->getMountPoint()) {
+            if (src_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
                 src_disk = d;
             }
         }
         if (src_disk == nullptr) {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequest(): disk not found - internal error");
         }
-        auto dst_host = simgrid::s4u::Host::by_name(dst_location->getServerStorageService()->getHostname());
+
+        auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
         simgrid::s4u::Disk *dst_disk = nullptr;
+        auto dst_location_sanitized_mount_point =  FileLocation::sanitizePath(dst_location->getMountPoint() + "/");
         for (auto const &d: dst_host->get_disks()) {
-            if (d->get_property("mount") == dst_location->getMountPoint()) {
+            if (dst_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
                 dst_disk = d;
             }
         }
@@ -520,164 +510,18 @@ namespace wrench {
      * @brief Start pending file transfer threads if any and if possible
      */
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
-        WRENCH_INFO("Starting pending transactions");
         while ((not this->pending_sg_iostreams.empty()) and
                (this->running_sg_iostreams.size() < this->num_concurrent_connections)) {
+            WRENCH_INFO("Starting pending transaction for file %s",
+                        this->transactions[this->pending_sg_iostreams.at(0)]->file->getID().c_str());
             auto sg_iostream = this->pending_sg_iostreams.at(0);
             this->pending_sg_iostreams.pop_front();
-            this->running_sg_iostreams.insert(sg_iostream);
-            WRENCH_INFO("Starting an IO stream!");
+            std::cerr << "name: " << sg_iostream->get_name() << "\n";
+            this->running_sg_iostreams.push_back(sg_iostream);
             sg_iostream->vetoable_start();
-            WRENCH_INFO("IO stream started!");
+            WRENCH_INFO("Transaction started");
         }
     }
-
-//    /**
-//     * @brief Process a notification received from a file transfer thread
-//     * @param ftt: the file transfer thread
-//     * @param file: the file
-//     * @param src_mailbox: the transfer's source mailbox (or "" if source was not a mailbox)
-//     * @param src_location: the transfer's source location (or nullptr if source was not a location)
-//     * @param dst_mailbox: the transfer's destination mailbox (or "" if source was not a mailbox)
-//     * @param dst_location: the transfer's destination location (or nullptr if destination was not a location)
-//     * @param success: whether the transfer succeeded or not
-//     * @param failure_cause: the failure cause (nullptr if success)
-//     * @param answer_mailbox_if_read: the mailbox to send a read notification ("" if not a copy)
-//     * @param answer_mailbox_if_write: the mailbox to send a write notification ("" if not a copy)
-//     * @param answer_mailbox_if_copy: the mailbox to send a copy notification ("" if not a copy)
-//     * @return false if the daemon should terminate
-//     */
-//    bool SimpleStorageServiceNonBufferized::processFileTransferThreadNotification(const std::shared_ptr<FileTransferThread> &ftt,
-//                                                                                  const std::shared_ptr<DataFile> &file,
-//                                                                                  simgrid::s4u::Mailbox *src_mailbox,
-//                                                                                  const std::shared_ptr<FileLocation> &src_location,
-//                                                                                  simgrid::s4u::Mailbox *dst_mailbox,
-//                                                                                  const std::shared_ptr<FileLocation> &dst_location,
-//                                                                                  bool success,
-//                                                                                  std::shared_ptr<FailureCause> failure_cause,
-//                                                                                  simgrid::s4u::Mailbox *answer_mailbox_if_read,
-//                                                                                  simgrid::s4u::Mailbox *answer_mailbox_if_write,
-//                                                                                  simgrid::s4u::Mailbox *answer_mailbox_if_copy) {
-//        // Remove the ftt from the list of running ftt
-//        if (this->running_file_transfer_threads.find(ftt) == this->running_file_transfer_threads.end()) {
-//            WRENCH_INFO(
-//                    "Got a notification from a non-existing File Transfer Thread. Perhaps this is from a former life... ignoring");
-//        } else {
-//            this->running_file_transfer_threads.erase(ftt);
-//        }
-//
-//        // Was the destination me?
-//        if (dst_location and (dst_location->getStorageService().get() == this)) {
-//            if (success) {
-//                WRENCH_INFO("File %s stored!", file->getID().c_str());
-//                this->file_systems[dst_location->getMountPoint()]->storeFileInDirectory(
-//                        file, dst_location->getAbsolutePathAtMountPoint());
-//                // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
-//                // May be no corresponding timestamp.
-//                try {
-//                    this->simulation->getOutput().addTimestampFileCopyCompletion(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
-//                } catch (invalid_argument &ignore) {
-//                }
-//
-//            } else {
-//                // Process the failure, meaning, just un-decrease the free space
-//                this->file_systems[dst_location->getMountPoint()]->unreserveSpace(
-//                        file, dst_location->getAbsolutePathAtMountPoint());
-//            }
-//        }
-//
-//        // Send back the relevant ack if this was a read
-//        if (answer_mailbox_if_read and success) {
-//            WRENCH_INFO(
-//                    "Sending back an ack since this was a file read and some client is waiting for me to say something");
-//            S4U_Mailbox::dputMessage(answer_mailbox_if_read, new StorageServiceAckMessage());
-//        }
-//
-//        // Send back the relevant ack if this was a write
-//        if (answer_mailbox_if_write and success) {
-//            WRENCH_INFO(
-//                    "Sending back an ack since this was a file write and some client is waiting for me to say something");
-//            S4U_Mailbox::dputMessage(answer_mailbox_if_write, new StorageServiceAckMessage());
-//        }
-//
-//        // Send back the relevant ack if this was a copy
-//        if (answer_mailbox_if_copy) {
-//            WRENCH_INFO(
-//                    "Sending back an ack since this was a file copy and some client is waiting for me to say something");
-//            if ((src_location == nullptr) or (dst_location == nullptr)) {
-//                throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileTransferThreadNotification(): "
-//                                         "src_location and dst_location must be non-null");
-//            }
-//            S4U_Mailbox::dputMessage(
-//                    answer_mailbox_if_copy,
-//                    new StorageServiceFileCopyAnswerMessage(
-//                            file,
-//                            src_location,
-//                            dst_location,
-//                            nullptr,
-//                            false,
-//                            success,
-//                            std::move(failure_cause),
-//                            this->getMessagePayloadValue(
-//                                    SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-//        }
-//
-//        return true;
-//    }
-
-//    /**
-//     * @brief Process a file deletion request
-//     * @param file: the file to delete
-//     * @param location: the file location
-//     * @param answer_mailbox: the mailbox to which the notification should be sent
-//     * @return false if the daemon should terminate
-//     */
-//    bool SimpleStorageServiceNonBufferized::processFileDeleteRequest(const std::shared_ptr<DataFile> &file,
-//                                                                     const std::shared_ptr<FileLocation> &location,
-//                                                                     simgrid::s4u::Mailbox *answer_mailbox) {
-//        std::shared_ptr<FailureCause> failure_cause = nullptr;
-//
-//        auto fs = this->file_systems[location->getMountPoint()].get();
-//
-//        if ((not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) or
-//            (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint()))) {
-//            // If this is scratch, we don't care, perhaps it was taken care of elsewhere...
-//            if (not this->isScratch()) {
-//                failure_cause = std::shared_ptr<FailureCause>(
-//                        new FileNotFound(file, location));
-//            }
-//        } else {
-//            fs->removeFileFromDirectory(file, location->getAbsolutePathAtMountPoint());
-//        }
-//
-//        S4U_Mailbox::dputMessage(
-//                answer_mailbox,
-//                new StorageServiceFileDeleteAnswerMessage(
-//                        file,
-//                        this->getSharedPtr<SimpleStorageService>(),
-//                        (failure_cause == nullptr),
-//                        failure_cause,
-//                        this->getMessagePayloadValue(
-//                                SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
-//        return true;
-//    }
-//
-//    /**
-//     * @brief Helper method to validate property values
-//     * throw std::invalid_argument
-//     */
-//    void SimpleStorageServiceNonBufferized::validateProperties() {
-//        this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-//        this->getPropertyValueAsSizeInByte(SimpleStorageServiceProperty::BUFFER_SIZE);
-//    }
-
-//    /**
-//     * @brief Get number of File Transfer Threads that are currently running or are pending
-//     * @return The number of threads
-//     */
-//    double SimpleStorageServiceNonBufferized::countRunningFileTransferThreads() {
-//        return this->running_file_transfer_threads.size() + this->pending_file_transfer_threads.size();
-//    }
 
     /**
      * @brief Get the load (number of concurrent reads) on the storage service
@@ -688,21 +532,5 @@ namespace wrench {
         return 0.0;
     }
 
-//    /**
-//     * @brief Get a file's last write date at a location (in zero simulated time)
-//     *
-//     * @param file: the file
-//     * @param location: the file location
-//     *
-//     * @return the file's last write date, or -1 if the file is not found
-//     *
-//     */
-//    double SimpleStorageServiceNonBufferized::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-//        if ((file == nullptr) or (location == nullptr)) {
-//            throw std::invalid_argument("SimpleStorageServiceNonBufferized::getFileLastWriteDate(): Invalid arguments");
-//        }
-//        auto fs = this->file_systems[location->getMountPoint()].get();
-//        return fs->getFileLastWriteDate(file, location->getAbsolutePathAtMountPoint());
-//    }
 
 };// namespace wrench
