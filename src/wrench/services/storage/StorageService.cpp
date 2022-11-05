@@ -324,6 +324,7 @@ namespace wrench {
                 this->getMessagePayloadValue(
                         StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
 
+        std::cerr << "WAITING FOR REPLY\n";
         // Wait for a reply
         std::unique_ptr<SimulationMessage> message = nullptr;
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);

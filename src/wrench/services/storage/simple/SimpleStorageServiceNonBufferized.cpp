@@ -62,18 +62,54 @@ namespace wrench {
      * @brief Process a transaction completion
      * @param transaction: the transaction
      */
-    void SimpleStorageServiceNonBufferized::processTransactionCompletion(std::shared_ptr<Transaction> transaction) {
+    void SimpleStorageServiceNonBufferized::processTransactionCompletion(const std::shared_ptr<Transaction>& transaction) {
         // Send back the relevant ack if this was a read
-        WRENCH_INFO(
-                "Sending back an ack since this was a file read and some client is waiting for me to say something");
-        S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage());
+        if (transaction->dst_location == nullptr) {
+            WRENCH_INFO("Sending back an ack for a successful file read");
+            S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage());
+        } else if (transaction->src_location == nullptr) {
+            WRENCH_INFO("File %s stored!", transaction->file->getID().c_str());
+            this->file_systems[transaction->dst_location->getMountPoint()]->storeFileInDirectory(
+                    transaction->file, transaction->dst_location->getAbsolutePathAtMountPoint());
+            // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
+            // May be no corresponding timestamp.
+            WRENCH_INFO("Sending back an ack for a successful file read");
+            S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage());
+        } else {
+            if (transaction->dst_location->getStorageService() == shared_from_this()) {
+                WRENCH_INFO("File %s stored!", transaction->file->getID().c_str());
+                this->file_systems[transaction->dst_location->getMountPoint()]->storeFileInDirectory(
+                        transaction->file, transaction->dst_location->getAbsolutePathAtMountPoint());
+                try {
+                    this->simulation->getOutput().addTimestampFileCopyCompletion(
+                            Simulation::getCurrentSimulatedDate(), transaction->file, transaction->src_location, transaction->dst_location);
+                } catch (invalid_argument &ignore) {
+                }
+            }
+
+            WRENCH_INFO("Sending back an ack for a file copy");
+            S4U_Mailbox::dputMessage(
+                    transaction->mailbox,
+                    new StorageServiceFileCopyAnswerMessage(
+                            transaction->file,
+                            transaction->src_location,
+                            transaction->dst_location,
+                            nullptr,
+                            false,
+                            true,
+                            nullptr,
+                            this->getMessagePayloadValue(
+                                    SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+
+        }
+
     }
 
     /**
      * @brief Process a transaction failure
      * @param transaction: the transaction
      */
-    void SimpleStorageServiceNonBufferized::processTransactionFailure(std::shared_ptr<Transaction> transaction) {
+    void SimpleStorageServiceNonBufferized::processTransactionFailure(const std::shared_ptr<Transaction>& transaction) {
         throw std::runtime_error("SimpleStorageServiceNonBufferized::processTransactionFailure(): not implemented");
     }
 
@@ -124,6 +160,7 @@ namespace wrench {
         /** Main loop **/
         while (true) {
             S4U_Simulation::computeZeroFlop();
+            std::cerr << " IN MAI LOOP\n";
 
             this->startPendingTransactions();
 
@@ -131,9 +168,11 @@ namespace wrench {
             simgrid::s4u::CommPtr comm_ptr;
             std::unique_ptr<SimulationMessage> simulation_message;
             try {
+                std::cerr << "DOING AN ASYNC RECEV IN STORAGE SERVICE on Mailbox:  " << this->mailbox->get_name() << "\n";
                 comm_ptr = this->mailbox->get_async<void>((void **) (&(simulation_message)));
             } catch (simgrid::NetworkFailureException &e) {
                 // oh well
+                std::cerr << "DAMN!\n";
                 continue;
             }
 
@@ -146,8 +185,6 @@ namespace wrench {
             // Wait for the first one to complete
             WRENCH_INFO("Waiting for something via wait_any: (%zu)", pending_activities.size());
 
-            bool the_comm_failed = false;
-            bool one_stream_failed = false;
             ssize_t finished_activity_index;
             try {
                 finished_activity_index = simgrid::s4u::Activity::wait_any(pending_activities);
@@ -166,6 +203,7 @@ namespace wrench {
             }
 
             // It's a communication
+            std::cerr << "finished_activity_index: " << finished_activity_index << "\n";
             if (finished_activity_index == 0) {
                 if (not processNextMessage(simulation_message.get())) break;
             } else if (finished_activity_index > 0) {
@@ -303,8 +341,9 @@ namespace wrench {
 
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
-                    sg_iostream,
                     file,
+                    nullptr,
+                    location,
                     answer_mailbox);
 
             // Add it to the Pool of pending data communications
@@ -400,8 +439,9 @@ namespace wrench {
 
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
-                    sg_iostream,
                     file,
+                    location,
+                    nullptr,
                     answer_mailbox);
 
             // Add it to the Pool of pending data communications
@@ -495,8 +535,9 @@ namespace wrench {
 
         // Create a Transaction
         auto transaction = std::make_shared<Transaction>(
-                sg_iostream,
                 file,
+                src_location,
+                dst_location,
                 answer_mailbox);
 
         // Add it to the Pool of pending data communications
