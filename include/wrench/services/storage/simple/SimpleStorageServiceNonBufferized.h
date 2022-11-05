@@ -32,15 +32,17 @@ namespace wrench {
 
     public:
         struct Transaction {
-            simgrid::s4u::IoPtr sg_io_stream;
             std::shared_ptr<DataFile> file;
+            std::shared_ptr<FileLocation> src_location;
+            std::shared_ptr<FileLocation> dst_location;
             simgrid::s4u::Mailbox *mailbox;
 
         public:
-            Transaction(simgrid::s4u::IoPtr sg_io_stream,
-                        std::shared_ptr<DataFile> file,
+            Transaction(std::shared_ptr<DataFile> file,
+                        std::shared_ptr<FileLocation> src_location,
+                        std::shared_ptr<FileLocation> dst_location,
                         simgrid::s4u::Mailbox *mailbox) :
-                    sg_io_stream(sg_io_stream), file(file), mailbox(mailbox) {}
+                    file(file), src_location(src_location), dst_location(dst_location), mailbox(mailbox) {}
 
         };
 
@@ -88,8 +90,8 @@ namespace wrench {
 
         void startPendingTransactions();
 
-        void processTransactionCompletion(std::shared_ptr<Transaction> transaction);
-        void processTransactionFailure(std::shared_ptr<Transaction> transaction);
+        void processTransactionCompletion(const std::shared_ptr<Transaction>& transaction);
+        void processTransactionFailure(const std::shared_ptr<Transaction>& transaction);
 
 
         std::deque<simgrid::s4u::IoPtr> pending_sg_iostreams;
