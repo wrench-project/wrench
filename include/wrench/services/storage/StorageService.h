@@ -82,10 +82,8 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
-        static void readFile(const std::shared_ptr<DataFile> &file,
+        static void readFileInternal(const std::shared_ptr<DataFile> &file,
                              const std::shared_ptr<FileLocation> &location,
-                             simgrid::s4u::Mailbox *answer_mailbox,
-                             simgrid::s4u::Mailbox *chunk_receiving_mailbox,
                              double num_bytes);
 
         bool isScratch() const;
