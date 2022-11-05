@@ -140,6 +140,8 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
+        std::cerr << "HERE1\n";
+
         // Do a few queries to storage services
         for (const auto &f: {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
             if ((not wrench::StorageService::lookupFile(f, wrench::FileLocation::LOCATION(this->test->storage_service_1000))) ||
@@ -148,6 +150,7 @@ private:
                 throw std::runtime_error("Some storage services do/don't have the files that they shouldn't/should have");
             }
         }
+        std::cerr << "HERE2\n";
 
         // Do a few of bogus copies
         try {
@@ -157,6 +160,7 @@ private:
             throw std::runtime_error("Should not be to able to copy a nullptr file!");
         } catch (std::invalid_argument &) {
         }
+        std::cerr << "HERE3\n";
 
         try {
             wrench::StorageService::copyFile(this->test->file_500,
@@ -165,6 +169,7 @@ private:
             throw std::runtime_error("Should not be able to copy a file to a nullptr location!");
         } catch (std::invalid_argument &) {
         }
+        std::cerr << "HERE4\n";
 
         try {
             wrench::StorageService::copyFile(this->test->file_500,
@@ -195,6 +200,7 @@ private:
                     wrench::FileLocation::LOCATION(this->test->storage_service_1000)) > 0) {
             throw std::runtime_error("Last file write date of staged file should be 0");
         }
+        std::cerr << "HERE8\n";
 
         // Copy a file to a storage service that has enough space
         double before_copy = wrench::Simulation::getCurrentSimulatedDate();
@@ -205,6 +211,7 @@ private:
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to store a file to a storage service that has enough capacity");
         }
+        std::cerr << "HERE9\n";
         double after_copy = wrench::Simulation::getCurrentSimulatedDate();
 
         double last_file_write_date = this->test->storage_service_100->getFileLastWriteDate(
