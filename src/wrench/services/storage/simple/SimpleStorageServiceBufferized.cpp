@@ -417,6 +417,10 @@ namespace wrench {
             fs->reserveSpace(file, dst_location->getAbsolutePathAtMountPoint());
         }
 
+        if (src_location->getStorageService()->getPropertyValueAsSizeInByte(SimpleStorageServiceProperty::BUFFER_SIZE) == 0) {
+            throw std::runtime_error("A bufferized storage service cannot read data from a non-bufferized storage service");
+        }
+
         WRENCH_INFO("Starting a thread to copy file %s from %s to %s",
                     file->getID().c_str(),
                     src_location->toString().c_str(),

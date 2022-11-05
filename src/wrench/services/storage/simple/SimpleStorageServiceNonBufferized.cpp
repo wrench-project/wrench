@@ -455,12 +455,12 @@ namespace wrench {
 
         WRENCH_INFO("FileCopyRequest: %s -> %s",
                     src_location->toString().c_str(),
-                    dst_location->toString().c_str()
-                    )
+                    dst_location->toString().c_str())
+
         auto fs = this->file_systems[dst_location->getMountPoint()].get();
 
         // Does the source have the file?
-        if (not src_location->getStorageService()->lookupFile(file)) {
+        if (not src_location->getStorageService()->lookupFile(file, src_location)) {
             try {
                 S4U_Mailbox::putMessage(
                         answer_mailbox,
@@ -480,6 +480,7 @@ namespace wrench {
             } catch (ExecutionException &e) {
                 return true;
             }
+            return true;
         }
 
         // Is there enough space here?
@@ -511,10 +512,10 @@ namespace wrench {
             fs->reserveSpace(file, dst_location->getAbsolutePathAtMountPoint());
         }
 
-        WRENCH_INFO("Starting an activity to copy file %s from %s to %s",
-                    file->getID().c_str(),
-                    src_location->toString().c_str(),
-                    dst_location->toString().c_str());
+//        WRENCH_INFO("Starting an activity to copy file %s from %s to %s",
+//                    file->getID().c_str(),
+//                    src_location->toString().c_str(),
+//                    dst_location->toString().c_str());
 
         // Create the streaming activity
         auto src_host = simgrid::s4u::Host::by_name(src_location->getStorageService()->getHostname());
