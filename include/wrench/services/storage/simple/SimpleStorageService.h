@@ -76,17 +76,14 @@ namespace wrench {
 
         ~SimpleStorageService() override;
 
-//        virtual void cleanup(bool has_returned_from_main, int return_value);
         double getLoad() override;
-//        double countRunningFileTransferThreads();
-
-        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) override;
 
         static SimpleStorageService *createSimpleStorageService(const std::string &hostname,
                                                          std::set<std::string> mount_points,
                                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
+        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) override;
 
         /***********************/
         /** \endcond          **/
