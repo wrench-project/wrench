@@ -122,6 +122,7 @@ private:
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
+#if 0
         // Do a few lookups from the file registry service
         for (const auto &f: {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
             std::set<std::shared_ptr<wrench::FileLocation>> result = this->test->file_registry_service->lookupEntry(f);
@@ -140,8 +141,6 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
-        std::cerr << "HERE1\n";
-
         // Do a few queries to storage services
         for (const auto &f: {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
             if ((not wrench::StorageService::lookupFile(f, wrench::FileLocation::LOCATION(this->test->storage_service_1000))) ||
@@ -150,8 +149,6 @@ private:
                 throw std::runtime_error("Some storage services do/don't have the files that they shouldn't/should have");
             }
         }
-        std::cerr << "HERE2\n";
-
         // Do a few of bogus copies
         try {
             wrench::StorageService::copyFile(nullptr,
@@ -160,7 +157,6 @@ private:
             throw std::runtime_error("Should not be to able to copy a nullptr file!");
         } catch (std::invalid_argument &) {
         }
-        std::cerr << "HERE3\n";
 
         try {
             wrench::StorageService::copyFile(this->test->file_500,
@@ -169,7 +165,6 @@ private:
             throw std::runtime_error("Should not be able to copy a file to a nullptr location!");
         } catch (std::invalid_argument &) {
         }
-        std::cerr << "HERE4\n";
 
         try {
             wrench::StorageService::copyFile(this->test->file_500,
@@ -201,6 +196,7 @@ private:
             throw std::runtime_error("Last file write date of staged file should be 0");
         }
         std::cerr << "HERE8\n";
+#endif
 
         // Copy a file to a storage service that has enough space
         double before_copy = wrench::Simulation::getCurrentSimulatedDate();
@@ -211,15 +207,17 @@ private:
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to store a file to a storage service that has enough capacity");
         }
-        std::cerr << "HERE9\n";
         double after_copy = wrench::Simulation::getCurrentSimulatedDate();
 
         double last_file_write_date = this->test->storage_service_100->getFileLastWriteDate(
                 this->test->file_10,
                 wrench::FileLocation::LOCATION(this->test->storage_service_100));
+
         if ((last_file_write_date < before_copy) or (last_file_write_date > after_copy)) {
             throw std::runtime_error("Last file write date is incoherent");
         }
+
+        std::cerr << "HERE10\n";
 
         // Send a free space request
         std::map<std::string, double> free_space;
@@ -232,6 +230,7 @@ private:
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space["/"]) + ") instead of 90.0");
         }
+        std::cerr << "HERE11\n";
 
         // Bogus read
         try {
