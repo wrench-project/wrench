@@ -57,7 +57,9 @@ namespace wrench {
                                                                    WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                                    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
             SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
-                                 "_" + std::to_string(getNewUniqueNumber())) {}
+                                 "_" + std::to_string(getNewUniqueNumber())) {
+        this->buffer_size = this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
+    }
 
     /**
      * @brief Main method of the daemon

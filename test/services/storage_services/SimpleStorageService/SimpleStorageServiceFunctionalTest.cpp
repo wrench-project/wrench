@@ -115,14 +115,12 @@ private:
         try {
             this->simulation->stageFile(this->test->file_1, this->test->storage_service_100);
             throw std::runtime_error("Should not be possible to call stageFile() from a non-maestro process");
-        } catch (std::runtime_error &e) {
+        } catch (std::runtime_error &) {
         }
-
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
-#if 0
         // Do a few lookups from the file registry service
         for (const auto &f: {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
             std::set<std::shared_ptr<wrench::FileLocation>> result = this->test->file_registry_service->lookupEntry(f);
@@ -138,7 +136,7 @@ private:
         try {
             wrench::StorageService::lookupFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service_1000));
             throw std::runtime_error("Should not be able to lookup a nullptr file!");
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &) {
         }
 
         // Do a few queries to storage services
@@ -195,8 +193,6 @@ private:
                     wrench::FileLocation::LOCATION(this->test->storage_service_1000)) > 0) {
             throw std::runtime_error("Last file write date of staged file should be 0");
         }
-        std::cerr << "HERE8\n";
-#endif
 
         // Copy a file to a storage service that has enough space
         double before_copy = wrench::Simulation::getCurrentSimulatedDate();
@@ -217,7 +213,6 @@ private:
             throw std::runtime_error("Last file write date is incoherent");
         }
 
-        std::cerr << "HERE10\n";
 
         // Send a free space request
         std::map<std::string, double> free_space;
@@ -230,7 +225,6 @@ private:
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space["/"]) + ") instead of 90.0");
         }
-        std::cerr << "HERE11\n";
 
         // Bogus read
         try {
@@ -296,7 +290,7 @@ private:
         }
 
 
-        // Delete a file on a storage service that doesnt' have it
+        // Delete a file on a storage service that doesn't have it
         try {
             wrench::StorageService::deleteFile(this->test->file_100, wrench::FileLocation::LOCATION(this->test->storage_service_100));
             throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
@@ -356,7 +350,6 @@ private:
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space["/disk100"]) + ") instead of 100.0");
         }
-
 
         // Do a bogus asynchronous file copy (file = nullptr);
         try {
@@ -423,6 +416,7 @@ private:
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space["/'"]) + ") instead of 99.0");
         }
+
 
         // Do an INVALID asynchronous file copy (file too big)
         try {

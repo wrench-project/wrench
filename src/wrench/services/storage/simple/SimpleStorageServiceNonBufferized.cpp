@@ -56,7 +56,9 @@ namespace wrench {
                                                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
             SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
-                                 "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {}
+                                 "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {
+        this->buffer_size = 0;
+    }
 
     /**
      * @brief Process a transaction completion
@@ -65,19 +67,19 @@ namespace wrench {
     void SimpleStorageServiceNonBufferized::processTransactionCompletion(const std::shared_ptr<Transaction>& transaction) {
         // Send back the relevant ack if this was a read
         if (transaction->dst_location == nullptr) {
-            WRENCH_INFO("Sending back an ack for a successful file read");
+//            WRENCH_INFO("Sending back an ack for a successful file read");
             S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage());
         } else if (transaction->src_location == nullptr) {
-            WRENCH_INFO("File %s stored!", transaction->file->getID().c_str());
+            WRENCH_INFO("File %s stored", transaction->file->getID().c_str());
             this->file_systems[transaction->dst_location->getMountPoint()]->storeFileInDirectory(
                     transaction->file, transaction->dst_location->getAbsolutePathAtMountPoint());
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // May be no corresponding timestamp.
-            WRENCH_INFO("Sending back an ack for a successful file read");
+//            WRENCH_INFO("Sending back an ack for a successful file read");
             S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage());
         } else {
             if (transaction->dst_location->getStorageService() == shared_from_this()) {
-                WRENCH_INFO("File %s stored!", transaction->file->getID().c_str());
+                WRENCH_INFO("File %s stored", transaction->file->getID().c_str());
                 this->file_systems[transaction->dst_location->getMountPoint()]->storeFileInDirectory(
                         transaction->file, transaction->dst_location->getAbsolutePathAtMountPoint());
                 try {
@@ -87,7 +89,7 @@ namespace wrench {
                 }
             }
 
-            WRENCH_INFO("Sending back an ack for a file copy");
+//            WRENCH_INFO("Sending back an ack for a file copy");
             S4U_Mailbox::dputMessage(
                     transaction->mailbox,
                     new StorageServiceFileCopyAnswerMessage(
@@ -158,22 +160,24 @@ namespace wrench {
         }
 
         /** Main loop **/
+        bool comm_ptr_has_been_posted = false;
+        simgrid::s4u::CommPtr comm_ptr;
+        std::unique_ptr<SimulationMessage> simulation_message;
         while (true) {
+
             S4U_Simulation::computeZeroFlop();
-            std::cerr << " IN MAI LOOP\n";
 
             this->startPendingTransactions();
 
-            // Create an async recv
-            simgrid::s4u::CommPtr comm_ptr;
-            std::unique_ptr<SimulationMessage> simulation_message;
-            try {
-                std::cerr << "DOING AN ASYNC RECEV IN STORAGE SERVICE on Mailbox:  " << this->mailbox->get_name() << "\n";
-                comm_ptr = this->mailbox->get_async<void>((void **) (&(simulation_message)));
-            } catch (simgrid::NetworkFailureException &e) {
-                // oh well
-                std::cerr << "DAMN!\n";
-                continue;
+            // Create an async recv if needed
+            if (not comm_ptr_has_been_posted) {
+                try {
+                    comm_ptr = this->mailbox->get_async<void>((void **) (&(simulation_message)));
+                } catch (simgrid::NetworkFailureException &e) {
+                    // oh well
+                    continue;
+                }
+                comm_ptr_has_been_posted = true;
             }
 
             // Create all activities to wait on
@@ -182,9 +186,8 @@ namespace wrench {
             for (auto const &stream : this->running_sg_iostreams) {
                 pending_activities.emplace_back(stream);
             }
-            // Wait for the first one to complete
-            WRENCH_INFO("Waiting for something via wait_any: (%zu)", pending_activities.size());
 
+            // Wait one activity to complete
             ssize_t finished_activity_index;
             try {
                 finished_activity_index = simgrid::s4u::Activity::wait_any(pending_activities);
@@ -203,15 +206,15 @@ namespace wrench {
             }
 
             // It's a communication
-            std::cerr << "finished_activity_index: " << finished_activity_index << "\n";
             if (finished_activity_index == 0) {
+                comm_ptr_has_been_posted = false;
                 if (not processNextMessage(simulation_message.get())) break;
             } else if (finished_activity_index > 0) {
                 auto finished_activity = this->running_sg_iostreams.at(finished_activity_index - 1);
                 this->running_sg_iostreams.erase(this->running_sg_iostreams.begin() + finished_activity_index - 1);
                 processTransactionCompletion(this->transactions[finished_activity]);
             } else if (finished_activity_index == -1) {
-                throw std::runtime_error("wait_any() returned -1. Not sure what to do with this");
+                throw std::runtime_error("wait_any() returned -1. Not sure what to do with this. ");
             }
 
         }
@@ -322,18 +325,9 @@ namespace wrench {
 
             // Create the streaming activity
             auto me_host = simgrid::s4u::this_actor::get_host();
-            simgrid::s4u::Disk *me_disk = nullptr;
-            for (auto const &d: me_host->get_disks()) {
-                if (d->get_property("mount") == location->getMountPoint()) {
-                    me_disk = d;
-                }
-            }
-            if (me_disk == nullptr) {
-                throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileWriteRequest(): disk not found - internal error");
-            }
+            simgrid::s4u::Disk *me_disk = fs->getDisk();
 
 
-            WRENCH_INFO("Creating Streaming Activity for a write request");
             auto sg_iostream = simgrid::s4u::Io::streamto_init(requesting_host,
                                                                nullptr,
                                                                me_host,
@@ -384,6 +378,8 @@ namespace wrench {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
+        LogicalFileSystem *fs;
+
         //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
         if (not this->file_systems[location->getMountPoint()]->doesDirectoryExist(
                 location->getAbsolutePathAtMountPoint())) {
@@ -393,7 +389,7 @@ namespace wrench {
                             location->getMountPoint() + "/" +
                             location->getAbsolutePathAtMountPoint()));
         } else {
-            auto fs = this->file_systems[location->getMountPoint()].get();
+            fs = this->file_systems[location->getMountPoint()].get();
 
             if (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint())) {
                 WRENCH_INFO(
@@ -421,17 +417,8 @@ namespace wrench {
 
             // Create the streaming activity
             auto me_host = simgrid::s4u::this_actor::get_host();
-            simgrid::s4u::Disk *me_disk = nullptr;
-            for (auto const &d: me_host->get_disks()) {
-                if (d->get_property("mount") == location->getMountPoint()) {
-                    me_disk = d;
-                }
-            }
-            if (me_disk == nullptr) {
-                throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileReadRequest(): disk not found - internal error");
-            }
+            simgrid::s4u::Disk *me_disk = fs->getDisk();
 
-            WRENCH_INFO("Creating Streaming Activity for a read request");
             auto sg_iostream = simgrid::s4u::Io::streamto_init(me_host,
                                                                me_disk,
                                                                requesting_host,
@@ -466,9 +453,36 @@ namespace wrench {
                                                                    const std::shared_ptr<FileLocation> &dst_location,
                                                                    simgrid::s4u::Mailbox *answer_mailbox) {
 
+        WRENCH_INFO("FileCopyRequest: %s -> %s",
+                    src_location->toString().c_str(),
+                    dst_location->toString().c_str()
+                    )
         auto fs = this->file_systems[dst_location->getMountPoint()].get();
 
-        // File is not already here
+        // Does the source have the file?
+        if (not src_location->getStorageService()->lookupFile(file)) {
+            try {
+                S4U_Mailbox::putMessage(
+                        answer_mailbox,
+                        new StorageServiceFileCopyAnswerMessage(
+                                file,
+                                src_location,
+                                dst_location,
+                                nullptr, false,
+                                false,
+                                std::shared_ptr<FailureCause>(
+                                        new FileNotFound(
+                                                file,
+                                                src_location)),
+                                this->getMessagePayloadValue(
+                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+
+            } catch (ExecutionException &e) {
+                return true;
+            }
+        }
+
+        // Is there enough space here?
         if (not fs->isFileInDirectory(file, dst_location->getAbsolutePathAtMountPoint())) {
             if (not fs->hasEnoughFreeSpace(file->getSize())) {
                 this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
@@ -503,8 +517,8 @@ namespace wrench {
                     dst_location->toString().c_str());
 
         // Create the streaming activity
-        // TODO: Avoid these lookups! Deal with annoying "/" etc.
         auto src_host = simgrid::s4u::Host::by_name(src_location->getStorageService()->getHostname());
+        // TODO: This disk identification is really ugly. Perhaps implement FileLocation::getDisk()?
         simgrid::s4u::Disk *src_disk = nullptr;
         auto src_location_sanitized_mount_point =  FileLocation::sanitizePath(src_location->getMountPoint() + "/");
         for (auto const &d: src_host->get_disks()) {
@@ -517,16 +531,7 @@ namespace wrench {
         }
 
         auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
-        simgrid::s4u::Disk *dst_disk = nullptr;
-        auto dst_location_sanitized_mount_point =  FileLocation::sanitizePath(dst_location->getMountPoint() + "/");
-        for (auto const &d: dst_host->get_disks()) {
-            if (dst_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
-                dst_disk = d;
-            }
-        }
-        if (dst_disk == nullptr) {
-            throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequest(): disk not found - internal error");
-        }
+        simgrid::s4u::Disk *dst_disk = fs->getDisk();
 
         auto sg_iostream = simgrid::s4u::Io::streamto_init(src_host,
                                                            src_disk,
@@ -557,10 +562,8 @@ namespace wrench {
                         this->transactions[this->pending_sg_iostreams.at(0)]->file->getID().c_str());
             auto sg_iostream = this->pending_sg_iostreams.at(0);
             this->pending_sg_iostreams.pop_front();
-            std::cerr << "name: " << sg_iostream->get_name() << "\n";
             this->running_sg_iostreams.push_back(sg_iostream);
             sg_iostream->vetoable_start();
-            WRENCH_INFO("Transaction started");
         }
     }
 

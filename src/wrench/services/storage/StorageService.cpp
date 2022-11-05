@@ -324,7 +324,6 @@ namespace wrench {
                 this->getMessagePayloadValue(
                         StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
 
-        std::cerr << "WAITING FOR REPLY\n";
         // Wait for a reply
         std::unique_ptr<SimulationMessage> message = nullptr;
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -474,8 +473,6 @@ namespace wrench {
 
             if (msg->buffer_size < 1) {
                 // Non-Bufferized
-                // TODO: never create this mailbox?
-                S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                 // Do nothing
 
             } else {

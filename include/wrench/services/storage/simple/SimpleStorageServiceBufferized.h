@@ -68,13 +68,10 @@ namespace wrench {
         /***********************/
 
     public:
-//        ~SimpleStorageServiceBufferized() override;
-
         void cleanup(bool has_returned_from_main, int return_value) override;
         double getLoad() override;
         double countRunningFileTransferThreads();
 
-//        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
 
         /***********************/
         /** \endcond          **/
@@ -83,21 +80,9 @@ namespace wrench {
     private:
         friend class Simulation;
 
-//        // Low-level Constructor
-//        SimpleStorageServiceBufferized(const std::string &hostname,
-//                             std::set<std::string> mount_points,
-//                             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-//                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-//                             const std::string &suffix);
-
         int main() override;
 
         bool processNextMessage();
-
-//        static unsigned long getNewUniqueNumber();
-
-//        bool processFileDeleteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
-//                                      simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processFileWriteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &, simgrid::s4u::Mailbox *answer_mailbox,
                                      double buffer_size);
