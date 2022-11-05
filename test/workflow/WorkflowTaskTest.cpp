@@ -349,11 +349,11 @@ TEST_F(WorkflowTaskTest, WorkflowTaskExecutionHistoryTest) {
 
 void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 3;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-full-logs");
-    argv[2] = strdup("--cfg=host/model:sio_S22");
+//    argv[2] = strdup("--cfg=host/model:sio_S22");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
