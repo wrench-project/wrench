@@ -103,7 +103,6 @@ namespace wrench {
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(
                 SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-        this->buffer_size = this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
     }
 
     /**
@@ -184,7 +183,6 @@ namespace wrench {
     bool SimpleStorageService::processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox) {
         std::map<std::string, double> free_space;
 
-        std::cerr << "WTF\n";
         for (auto const &mp: this->file_systems) {
             free_space[mp.first] = mp.second->getFreeSpace();
         }

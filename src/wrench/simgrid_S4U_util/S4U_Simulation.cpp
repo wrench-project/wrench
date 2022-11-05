@@ -976,9 +976,9 @@ namespace wrench {
  * @brief Determines whether a mount point is defined at a host
  * @param hostname: the host's name
  * @param mount_point: the mount point
- * @return true if the host has a disk attached to the specified mount point, false otherwise
+ * @return a simgrid disk if the host has a disk attached to the specified mount point, nullptr otherwise
  */
-    bool S4U_Simulation::hostHasMountPoint(const std::string &hostname, const std::string &mount_point) {
+    simgrid::s4u::Disk *S4U_Simulation::hostHasMountPoint(const std::string &hostname, const std::string &mount_point) {
         simgrid::s4u::Host *host;
         try {
             host = S4U_Simulation::get_host_or_vm_by_name(hostname);
@@ -997,12 +997,14 @@ namespace wrench {
             }
 
             if (FileLocation::sanitizePath(std::string(p)) == FileLocation::sanitizePath(mount_point)) {
-                return true;
+                return d;
             }
         }
 
-        return false;
+        return nullptr;
     }
+
+
 
     /**
      * @brief Get the list of link names on the route between two hosts

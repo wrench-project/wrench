@@ -16,6 +16,8 @@
 #include <set>
 #include <memory>
 
+#include <simgrid/disk.h>
+
 
 #include <wrench/data_file/DataFile.h>
 
@@ -60,6 +62,8 @@ namespace wrench {
         double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
         std::set<std::shared_ptr<DataFile>> listFilesInDirectory(const std::string &absolute_path);
 
+        simgrid::s4u::Disk *getDisk();
+
 
     private:
         friend class StorageService;
@@ -68,6 +72,8 @@ namespace wrench {
         static std::map<std::string, StorageService *> mount_points;
 
         std::map<std::string, std::map<std::shared_ptr<DataFile>, double>> content;
+
+        simgrid::s4u::Disk *disk;
 
         std::string hostname;
         StorageService *storage_service;

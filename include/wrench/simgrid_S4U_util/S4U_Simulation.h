@@ -68,7 +68,7 @@ namespace wrench {
 
         static double getDiskCapacity(const std::string &hostname, std::string mount_point);
         static std::vector<std::string> getDisks(const std::string &hostname);
-        static bool hostHasMountPoint(const std::string &hostname, const std::string &mount_point);
+        static simgrid::s4u::Disk *hostHasMountPoint(const std::string &hostname, const std::string &mount_point);
 
         void checkLinkBandwidths();
 
