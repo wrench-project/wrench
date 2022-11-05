@@ -85,24 +85,15 @@ namespace wrench {
                                     const std::shared_ptr<FileLocation> &dst,
                                     simgrid::s4u::Mailbox *answer_mailbox);
 
-//        bool processFileTransferThreadNotification(
-//                const std::shared_ptr<FileTransferThread> &ftt,
-//                const std::shared_ptr<DataFile> &file,
-//                simgrid::s4u::Mailbox *src_mailbox,
-//                const std::shared_ptr<FileLocation> &src_location,
-//                simgrid::s4u::Mailbox *dst_mailbox,
-//                const std::shared_ptr<FileLocation> &dst_location,
-//                bool success,
-//                std::shared_ptr<FailureCause> failure_cause,
-//                simgrid::s4u::Mailbox *answer_mailbox_if_read,
-//                simgrid::s4u::Mailbox *answer_mailbox_if_write,
-//                simgrid::s4u::Mailbox *answer_mailbox_if_copy);
 
         void startPendingTransactions();
 
+        void processTransactionCompletion(std::shared_ptr<Transaction> transaction);
+        void processTransactionFailure(std::shared_ptr<Transaction> transaction);
+
 
         std::deque<simgrid::s4u::IoPtr> pending_sg_iostreams;
-        std::set<simgrid::s4u::IoPtr> running_sg_iostreams;
+        std::vector<simgrid::s4u::IoPtr> running_sg_iostreams;
         std::unordered_map<simgrid::s4u::IoPtr, std::shared_ptr<Transaction>> transactions;
 
         std::shared_ptr<MemoryManager> memory_manager;

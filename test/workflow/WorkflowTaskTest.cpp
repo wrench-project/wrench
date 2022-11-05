@@ -289,11 +289,11 @@ private:
 
         auto job_that_will_fail = job_manager->createStandardJob(this->test->t4,
                                                                  {{this->test->small_input_file,
-                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                          wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                   {this->test->large_input_file,
-                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                          wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                   {this->test->t4_output_file,
-                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                                          wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
@@ -316,11 +316,11 @@ private:
 
         auto job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                      {{this->test->small_input_file,
-                                                                       wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
+                                                                              wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
                                                                       {this->test->large_input_file,
-                                                                       wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                              wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                       {this->test->t4_output_file,
-                                                                       wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                                              wrench::FileLocation::LOCATION(this->test->storage_service)}});
         job_manager->submitJob(job_that_will_complete, this->test->compute_service);
 
         this->waitForAndProcessNextEvent();
@@ -349,10 +349,11 @@ TEST_F(WorkflowTaskTest, WorkflowTaskExecutionHistoryTest) {
 
 void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 3;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-full-logs");
+    argv[2] = strdup("--cfg=host/model:sio_S22");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -378,7 +379,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new WorkflowTaskExecutionHistoryTestWMS(
-                            this, wms_host)));
+            this, wms_host)));
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
@@ -387,7 +388,6 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_NO_THROW(simulation->stageFile(small_input_file, backup_storage_service));
 
     ASSERT_NO_THROW(simulation->launch());
-
 
     auto t4_history = t4->getExecutionHistory();
 
@@ -458,7 +458,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_DOUBLE_EQ(t5_terminated_execution.num_cores_allocated, 2);
     ASSERT_STREQ(t5_terminated_execution.execution_host.c_str(), "ExecutionHost");
 
-    // t6 should have ran then failed right after computation started because the compute service was stopped
+    // t6 should have run then failed right after computation started because the compute service was stopped
     auto t6_history = t6->getExecutionHistory();
     ASSERT_EQ(t6_history.size(), 1);
 

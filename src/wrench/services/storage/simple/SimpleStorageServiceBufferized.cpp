@@ -550,7 +550,7 @@ namespace wrench {
      * @return The number of threads
      */
     double SimpleStorageServiceBufferized::countRunningFileTransferThreads() {
-        return this->running_file_transfer_threads.size() + this->pending_file_transfer_threads.size();
+        return (double)this->running_file_transfer_threads.size() + (double)this->pending_file_transfer_threads.size();
     }
 
     /**
