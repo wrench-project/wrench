@@ -150,6 +150,8 @@ namespace wrench {
                                                    action_executor->getThreadCreationOverhead(),
                                                    sequential_work,
                                                    parallel_per_thread_work);
+
+
         } catch (std::exception &e) {
             throw ExecutionException(std::shared_ptr<FailureCause>(new ComputationHasDied()));
         }
