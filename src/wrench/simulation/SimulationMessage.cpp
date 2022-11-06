@@ -35,10 +35,7 @@ namespace wrench {
             throw std::invalid_argument("SimulationMessage::SimulationMessage(): Invalid arguments");
         }
 #endif
-//        this->payload = payload;
-        std::cerr << "CREATING A MESSAGE WITH PAYLOAD: " << payload << "\n";
         this->payload = std::max<double>(1, payload); // TODO: ALLOW 0-byte messages AGAIN WHENEVER THAT WORKS
-        std::cerr << "FIXED THE PAYLOAD: " << this->payload << "\n";
     }
 
     /**
