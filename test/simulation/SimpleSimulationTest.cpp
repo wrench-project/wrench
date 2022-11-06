@@ -33,7 +33,7 @@ public:
     std::shared_ptr<wrench::CloudComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
-    void do_getReadyTasksTest_test();
+    void do_getReadyTasksTest_test(double buffer_size);
 
 protected:
     ~SimpleSimulationTest() override {
@@ -333,17 +333,25 @@ private:
 };
 
 TEST_F(SimpleSimulationTest, SimpleSimulationReadyTasksTestWMS) {
-    DO_TEST_WITH_FORK(do_getReadyTasksTest_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_getReadyTasksTest_test, 1000000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_getReadyTasksTest_test, 0);
 }
 
-void SimpleSimulationTest::do_getReadyTasksTest_test() {
+void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
+
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
+
+    if (buffer_size == 0) {
+        argc++;
+        argv = (char **) realloc(argv, argc * sizeof(char *));
+        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
+    }
 
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};

@@ -16,6 +16,8 @@
 
 WRENCH_LOG_CATEGORY(batch_compute_service_one_action_test, "Log category for BatchComputeServiceOneAction test");
 
+#define EPSILON 0.0001
+
 class BatchComputeServiceOneActionTest : public ::testing::Test {
 public:
     std::shared_ptr<wrench::DataFile> input_file;
@@ -726,7 +728,7 @@ private:
             throw std::runtime_error("Unexpected action failure cause " + action->getFailureCause()->toString());
         }
 
-        if ((action->getStartDate() > 0.0001) or (std::abs<double>(action->getEndDate() - 1.0) > 0)) {
+        if ((action->getStartDate() > EPSILON) or (std::abs<double>(action->getEndDate() - 1.0) > EPSILON)) {
             throw std::runtime_error("Unexpected action start/end dates");
         }
 

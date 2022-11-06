@@ -166,7 +166,7 @@ private:
 
         // Is the start-date sensible?
         if (file_delete_action->getStartDate() < 0.0 or file_delete_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_delete_action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_delete_action->getStartDate()));
         }
 
         // Is the end-date sensible?

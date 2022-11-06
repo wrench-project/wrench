@@ -166,11 +166,11 @@ private:
 
         // Is the start-date sensible?
         if (file_write_action->getStartDate() < 0.0 or file_write_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_write_action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_write_action->getStartDate()));
         }
 
         // Is the end-date sensible?
-        if (file_write_action->getEndDate() + EPSILON < 10.85743174020618617703 or file_write_action->getEndDate() > 10.85743174020618617703 + EPSILON) {
+        if (std::abs<double>(file_write_action->getEndDate() - 10.857443) > EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(file_write_action->getEndDate()));
         }
 

@@ -132,7 +132,6 @@ namespace wrench {
      * @param date: the date 
      */
     void Action::setStartDate(double date) {
-        WRENCH_INFO("SETTING ACTION START DATE: %s %.2lf", this->getName().c_str(), date);
         this->execution_history.top().start_date = date;
     }
 
