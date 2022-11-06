@@ -120,7 +120,6 @@ namespace wrench {
         WRENCH_INFO("Putting a %s message (%.2lf bytes) to mailbox '%s'",
                      msg->getName().c_str(), msg->payload,
                      mailbox->get_cname());
-        //        simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         try {
 #ifdef MESSAGE_MANAGER
             MessageManager::manageMessage(mailbox->get_name(), msg);
