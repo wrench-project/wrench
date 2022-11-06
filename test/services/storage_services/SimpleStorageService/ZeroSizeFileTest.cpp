@@ -12,10 +12,10 @@ public:
 
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
-    void do_ReadZeroSizeFileTest();
+    void do_ReadZeroSizeFileTest(double buffer_size);
 
 protected:
-    ~SimpleStorageServiceZeroSizeFileTest() {
+    ~SimpleStorageServiceZeroSizeFileTest() override {
         workflow->clear();
     }
 
@@ -82,16 +82,24 @@ private:
 };
 
 TEST_F(SimpleStorageServiceZeroSizeFileTest, ReadZeroSizeFile) {
-    DO_TEST_WITH_FORK(do_ReadZeroSizeFileTest);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ReadZeroSizeFileTest, 1000000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ReadZeroSizeFileTest, 0);
 }
 
-void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
+void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest(double buffer_size) {
     // Create and initialize the simulation
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    if (buffer_size == 0) {
+        argc++;
+        argv = (char **) realloc(argv, argc * sizeof(char *));
+        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
+    }
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -100,7 +108,8 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
 
     // Create One Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost", {"/"})));
+            wrench::SimpleStorageService::createSimpleStorageService("StorageHost", {"/"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -109,7 +118,7 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceZeroSizeFileTestWMS(
-                            this, storage_service, file_registry_service, "WMSHost")));
+            this, storage_service, file_registry_service, "WMSHost")));
 
     // Stage the file on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(file, storage_service));
