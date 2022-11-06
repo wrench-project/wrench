@@ -30,7 +30,7 @@
 WRENCH_LOG_CATEGORY(action_scheduler_test, "Log category for ActionExecutionServiceTest");
 
 //#define EPSILON (std::numeric_limits<double>::epsilon())
-#define EPSILON (0.000001)
+#define EPSILON (0.0001)
 
 
 class ActionExecutionServiceTest : public ::testing::Test {
@@ -180,7 +180,7 @@ private:
 
         // Is the start-date sensible?
         if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
@@ -298,7 +298,7 @@ private:
 
         // Is the start-date sensible?
         if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
@@ -430,12 +430,12 @@ private:
         }
 
         // Is the start-date sensible?
-        if (action->getStartDate() < 12.0 or action->getStartDate() > 12.0) {
+        if (std::abs<double>(action->getStartDate() - 12.0) > EPSILON) {
             throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
-        if (action->getEndDate() + EPSILON < 45.333333333333335701810 or action->getEndDate() > 45.33333333333333570181 + EPSILON) {
+        if (std::abs<double>(action->getEndDate() - 45.333333333333335701810) > EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
         }
 
@@ -715,9 +715,8 @@ private:
         }
 
         // Is the start-date sensible?
-        if (action->getStartDate() < 0.0 or action->getStartDate() > 0.0) {
-            std::cerr << "THOWING FOR ACTION " << action->getName() << "\n";
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
+        if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
@@ -747,11 +746,11 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
 
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
-    int argc = 3;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    argv[2] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -994,15 +993,15 @@ private:
         // Are the dates sensible?
         if (action1->getStartDate() > EPSILON)
             throw std::runtime_error("Unexpected action1 start date " + std::to_string(action1->getStartDate()));
-        if ((action1->getEndDate() < 10.0 - EPSILON) or (action1->getEndDate() > 10.0 + EPSILON))
+        if (std::abs<double>(action1->getEndDate() - 10.0) > EPSILON)
             throw std::runtime_error("Unexpected action1 end date " + std::to_string(action1->getEndDate()));
-        if ((action2->getStartDate() < 10.0 - EPSILON) or (action2->getStartDate() > 10.0 + EPSILON))
+        if (std::abs<double>(action2->getStartDate() - 10.0) > EPSILON)
             throw std::runtime_error("Unexpected action2 start date " + std::to_string(action2->getStartDate()));
-        if ((action2->getEndDate() < 55.0 - EPSILON) or (action2->getEndDate() > 55.0 + EPSILON))
+        if (std::abs<double>(action2->getEndDate() - 55.0) > EPSILON)
             throw std::runtime_error("Unexpected action2 end date " + std::to_string(action2->getEndDate()));
-        if ((action3->getStartDate() < 55.0 - EPSILON) or (action3->getStartDate() > 55.0 + EPSILON))
+        if (std::abs<double>(action3->getStartDate() - 55.0) > EPSILON)
             throw std::runtime_error("Unexpected action3 start date " + std::to_string(action3->getStartDate()));
-        if ((action3->getEndDate() < 60.0 - EPSILON) or (action3->getEndDate() > 60.0 + EPSILON))
+        if (std::abs<double>(action3->getEndDate() - 60.0) > EPSILON)
             throw std::runtime_error("Unexpected action3 end date " + std::to_string(action3->getEndDate()));
 
 
