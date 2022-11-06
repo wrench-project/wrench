@@ -57,7 +57,14 @@ namespace wrench {
                                                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
             SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
                                  "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {
+
+        if (not Simulation::isSioS22CPUModelEnabled()) {
+            throw std::runtime_error("To use a non-bufferized storage services (buffer size == 0), you need to run the simulator with the "
+                                     "'-cfg=host/model:sio_S22' command-line argument. This may lead to less realistic simulations, but "
+                                     "non-bufferized storage services typically make the simulation faster.");
+        }
         this->buffer_size = 0;
+
     }
 
     /**
@@ -459,6 +466,60 @@ namespace wrench {
 
         auto fs = this->file_systems[dst_location->getMountPoint()].get();
 
+        // Am I the source????
+        if (src_location->getStorageService() == this->shared_from_this()) {
+
+            // If the source does not exit, return a failure
+            if (not this->file_systems[src_location->getMountPoint()]->isFileInDirectory(file, src_location->getAbsolutePathAtMountPoint())) {
+                try {
+                    S4U_Mailbox::putMessage(
+                            answer_mailbox,
+                            new StorageServiceFileCopyAnswerMessage(
+                                    file,
+                                    src_location,
+                                    dst_location,
+                                    nullptr, false,
+                                    false,
+                                    std::shared_ptr<FailureCause>(
+                                            new FileNotFound(
+                                                    file,
+                                                    src_location)),
+                                    this->getMessagePayloadValue(
+                                            SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+
+                } catch (ExecutionException &e) {
+                    return true;
+                }
+                return true;
+            }
+            uint64_t transfer_size;
+            if (src_location->equal(dst_location)) {
+                WRENCH_WARN("Asked to copy file %s only itself (will take zero-ish time)", file->getID().c_str());
+                transfer_size = 1; // TODO: Change that to ZERO whenever SimGrid is fixed.
+            } else {
+                transfer_size = (uint64_t)(file->getSize());
+            }
+
+            auto sg_iostream = simgrid::s4u::Io::streamto_init(simgrid::s4u::this_actor::get_host(),
+                                                               fs->getDisk(),
+                                                               simgrid::s4u::this_actor::get_host(),
+                                                               nullptr)->set_size(transfer_size);
+
+            // Create a Transaction
+            auto transaction = std::make_shared<Transaction>(
+                    file,
+                    src_location,
+                    dst_location,
+                    answer_mailbox);
+
+            // Add it to the Pool of pending data communications
+            this->transactions[sg_iostream] = transaction;
+            this->pending_sg_iostreams.push_back(sg_iostream);
+
+            return true;
+
+        }
+
         // Does the source have the file?
         if (not src_location->getStorageService()->lookupFile(file, src_location)) {
             try {
@@ -546,16 +607,16 @@ namespace wrench {
                 dst_location,
                 answer_mailbox);
 
-        // Add it to the Pool of pending data communications
+// Add it to the Pool of pending data communications
         this->transactions[sg_iostream] = transaction;
         this->pending_sg_iostreams.push_back(sg_iostream);
 
         return true;
     }
 
-    /**
-     * @brief Start pending file transfer threads if any and if possible
-     */
+/**
+ * @brief Start pending file transfer threads if any and if possible
+ */
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
         while ((not this->pending_sg_iostreams.empty()) and
                (this->running_sg_iostreams.size() < this->num_concurrent_connections)) {
@@ -565,13 +626,14 @@ namespace wrench {
             this->pending_sg_iostreams.pop_front();
             this->running_sg_iostreams.push_back(sg_iostream);
             sg_iostream->vetoable_start();
+            WRENCH_INFO("Transaction started");
         }
     }
 
-    /**
-     * @brief Get the load (number of concurrent reads) on the storage service
-     * @return the load on the service
-     */
+/**
+ * @brief Get the load (number of concurrent reads) on the storage service
+ * @return the load on the service
+ */
     double SimpleStorageServiceNonBufferized::getLoad() {
         // TODO: TO RE-IMPLE<MENT FOR NON-BUFFERIZED
         return 0.0;

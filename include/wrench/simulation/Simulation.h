@@ -179,6 +179,8 @@ namespace wrench {
         static bool isPageCachingEnabled();
         static bool isHostShutdownSimulationEnabled();
         static bool isEnergySimulationEnabled();
+        static bool isSioS22CPUModelEnabled();
+        static bool isSurfPrecisionSetByUser();
 
 
         /***********************/
@@ -241,7 +243,9 @@ namespace wrench {
 
         static bool initialized;
 
-    private:
+        static bool surf_precision_set_by_user;
+        static bool host_model_sio_S22_set_by_user;
+
         /* Map of files */
         static std::map<std::string, std::shared_ptr<DataFile>> data_files;
     };

@@ -18,6 +18,7 @@
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/logging/TerminalOutput.h>
+#include <wrench/simulation/Simulation.h>
 
 #include <simgrid/version.h>
 
@@ -35,7 +36,9 @@ namespace wrench {
      */
     void S4U_Simulation::initialize(int *argc, char **argv) {
         this->engine = new simgrid::s4u::Engine(argc, argv);
-        simgrid::s4u::Engine::set_config("surf/precision:1e-9");
+        if (not Simulation::isSurfPrecisionSetByUser()) {
+            simgrid::s4u::Engine::set_config("surf/precision:1e-9");
+        }
         S4U_Mailbox::createMailboxPool(S4U_Mailbox::mailbox_pool_size);
         this->initialized = true;
         sg_storage_file_system_init();
