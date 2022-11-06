@@ -314,6 +314,8 @@ private:
         }
         auto t4_history = this->test->t4->getExecutionHistory();
 
+        std::cerr << "1=================\n";
+
         auto job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                      {{this->test->small_input_file,
                                                                               wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
@@ -323,12 +325,18 @@ private:
                                                                               wrench::FileLocation::LOCATION(this->test->storage_service)}});
         job_manager->submitJob(job_that_will_complete, this->test->compute_service);
 
+        std::cerr << "2=================\n";
         this->waitForAndProcessNextEvent();
 
+#if 0
+        std::cerr << "3=================\n";
         auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5);
         job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
+        std::cerr << "3.5=================\n";
         wrench::S4U_Simulation::sleep(10.0);
         job_manager->terminateJob(job_that_will_be_terminated);
+
+        std::cerr << "4=================\n";
 
         auto job_that_will_fail_2 = job_manager->createStandardJob(this->test->t6);
         job_manager->submitJob(job_that_will_fail_2, this->test->compute_service);
@@ -338,22 +346,23 @@ private:
         //        this->test->compute_service->stop();
 
         this->waitForAndProcessNextEvent();
+#endif
 
         return 0;
     }
 };
 
 TEST_F(WorkflowTaskTest, WorkflowTaskExecutionHistoryTest) {
-DO_TEST_WITH_FORK_ONE_ARG(do_WorkflowTaskExecutionHistory_test, 1000000);
+//DO_TEST_WITH_FORK_ONE_ARG(do_WorkflowTaskExecutionHistory_test, 1000000);
 DO_TEST_WITH_FORK_ONE_ARG(do_WorkflowTaskExecutionHistory_test, 0);
 }
 
 void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test(double buffer_size) {
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     if (buffer_size == 0) {
         argc++;
