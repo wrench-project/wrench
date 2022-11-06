@@ -66,7 +66,7 @@ public:
 
     void do_ShutdownComputeServiceWhileJobIsRunning_test();
 
-    void do_ShutdownStorageServiceBeforeJobIsSubmitted_test();
+    void do_ShutdownStorageServiceBeforeJobIsSubmitted_test(double buffer_size);
 
 protected:
     ~BareMetalComputeServiceTestStandardJobs() {
@@ -1586,12 +1586,15 @@ private:
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2});
 
+        std::cerr << "SHUTTING DOWN THE STORAGE SERCICE\n";
         // Shutdown the storage service
         this->test->storage_service->stop();
 
+        std::cerr << "SUBMITTING THE JOB\n";
         // Submit the 2-task1 job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
+        std::cerr << "WAITING FOR NOTIFICATION\n";
         // Wait for the job failure notification
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
@@ -1619,17 +1622,28 @@ private:
 };
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, ShutdownStorageServiceBeforeJobIsSubmitted) {
-    DO_TEST_WITH_FORK(do_ShutdownStorageServiceBeforeJobIsSubmitted_test);
+//    DO_TEST_WITH_FORK_ONE_ARG(do_ShutdownStorageServiceBeforeJobIsSubmitted_test, 100000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ShutdownStorageServiceBeforeJobIsSubmitted_test, 0);
 }
 
-void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJobIsSubmitted_test() {
+void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJobIsSubmitted_test(double buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+
+    std::cerr << "BUFFER ZIE =" << buffer_size << "\n";
+
+    int argc = 2;
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+        argv[1] = strdup("--wrench-full-log");
+
+    if (buffer_size == 0) {
+        argc++;
+        argv = (char **) realloc(argv, argc * sizeof(char *));
+        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
+    }
+
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1641,7 +1655,8 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(

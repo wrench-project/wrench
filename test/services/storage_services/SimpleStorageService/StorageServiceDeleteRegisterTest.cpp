@@ -17,10 +17,10 @@ public:
 
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
-    void do_DeleteRegisterTest();
+    void do_DeleteRegisterTest(double buffer_size);
 
 protected:
-    ~SimpleStorageServiceDeleteRegisterTest() {
+    ~SimpleStorageServiceDeleteRegisterTest() override {
         workflow->clear();
     }
 
@@ -102,7 +102,7 @@ private:
             throw std::runtime_error("StorageService should have deleted file_2");
         }
 
-        if (file_registry_service->lookupEntry(file_2).size() != 0) {
+        if (!file_registry_service->lookupEntry(file_2).empty()) {
             throw std::runtime_error("The file_2 should not be registered with the FileRegistryService");
         }
 
@@ -112,17 +112,24 @@ private:
 };
 
 TEST_F(SimpleStorageServiceDeleteRegisterTest, DeleteAndRegister) {
-    DO_TEST_WITH_FORK(do_DeleteRegisterTest);
+    DO_TEST_WITH_FORK_ONE_ARG(do_DeleteRegisterTest, 100000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_DeleteRegisterTest, 0);
 }
 
-void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
+void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest(double buffer_size) {
     // Create and initialize the simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    // ??
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    if (buffer_size == 0) {
+        argc++;
+        argv = (char **) realloc(argv, argc * sizeof(char *));
+        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
+    }
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -139,7 +146,8 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
 
     // Create One Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost", {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;

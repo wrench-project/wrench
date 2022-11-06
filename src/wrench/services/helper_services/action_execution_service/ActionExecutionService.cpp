@@ -663,6 +663,7 @@ namespace wrench {
                         this->parent_service->mailbox->get_cname());
             // NOTE: This is synchronous so that the process doesn't fall off the end
             try {
+                std::cerr << "CREATING THE ActionExecutionServiceActionDoneMessage MESSAGE\n";
                 S4U_Mailbox::putMessage(
                         this->parent_service->mailbox,
                         new ActionExecutionServiceActionDoneMessage(action, 0));
@@ -755,6 +756,7 @@ namespace wrench {
         this->action_run_specs.erase(executor->getAction());
 
         // Send the notification to the originator
+        std::cerr << "CREATING AN ActionExecutionServiceActionDoneMessage  XXXX\n";
         S4U_Mailbox::dputMessage(
                 this->parent_service->mailbox, new ActionExecutionServiceActionDoneMessage(
                                                        executor->getAction(), 0.0));
@@ -779,9 +781,12 @@ namespace wrench {
         WRENCH_INFO("Sending action failure notification to '%s'", parent_service->mailbox->get_cname());
         // NOTE: This is synchronous so that the process doesn't fall off the end
         try {
+            std::cerr << "CREATING MESSAGE ActionExecutionServiceActionDoneMessage YYYY\n";
+            auto msg = new ActionExecutionServiceActionDoneMessage(action, 0);
+            std::cerr << "WTF: " << msg->payload << "\n";
             S4U_Mailbox::putMessage(
                     this->parent_service->mailbox,
-                    new ActionExecutionServiceActionDoneMessage(action, 0));
+                    msg);
         } catch (ExecutionException &e) {
             return;
         }
@@ -1092,6 +1097,7 @@ namespace wrench {
             WRENCH_INFO("Sending action failure notification to '%s'", parent_service->mailbox->get_cname());
             // NOTE: This is synchronous so that the process doesn't fall off the end
             try {
+                std::cerr << "CREATING ActionExecutionServiceActionDoneMessage  TTTTT\n";
                 S4U_Mailbox::putMessage(
                         this->parent_service->mailbox,
                         new ActionExecutionServiceActionDoneMessage(action, 0));
