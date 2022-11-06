@@ -300,9 +300,9 @@ private:
 
         // Create/submit a standard job
         auto job = this->job_manager->createStandardJob(task, {
-                                                                      {*(task->getInputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
-                                                                      {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
-                                                              });
+                {*(task->getInputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
+                {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
+        });
         this->job_manager->submitJob(job, target_cs);
 
         //        WRENCH_INFO("Submitted task1 '%s' to '%s' with files to read from '%s",
@@ -342,63 +342,63 @@ private:
 };
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneNonFaultyStorageOneFaultyBareMetal) {
-    std::map<std::string, bool> args;
-    args["storage1"] = false;
-    args["baremetal"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
+std::map<std::string, bool> args;
+args["storage1"] = false;
+args["baremetal"] = true;
+DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneFaultyStorageOneNonFaultyBareMetal) {
-    std::map<std::string, bool> args;
-    args["storage1"] = true;
-    args["baremetal"] = false;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
+std::map<std::string, bool> args;
+args["storage1"] = true;
+args["baremetal"] = false;
+DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneFaultyStorageOneFaultyBareMetal) {
-    std::map<std::string, bool> args;
-    args["storage1"] = true;
-    args["baremetal"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
+std::map<std::string, bool> args;
+args["storage1"] = true;
+args["baremetal"] = true;
+DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, TwoFaultyStorageOneFaultyBareMetal) {
-    std::map<std::string, bool> args;
-    args["storage1"] = true;
-    args["storage2"] = true;
-    args["baremetal"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
+std::map<std::string, bool> args;
+args["storage1"] = true;
+args["storage2"] = true;
+args["baremetal"] = true;
+DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneNonFaultyStorageOneFaultyCloud) {
-    std::map<std::string, bool> args;
-    args["storage1"] = false;
-    args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
+std::map<std::string, bool> args;
+args["storage1"] = false;
+args["cloud"] = true;
+DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneFaultyStorageOneFaultyCloud) {
-    std::map<std::string, bool> args;
-    args["storage1"] = true;
-    args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
+std::map<std::string, bool> args;
+args["storage1"] = true;
+args["cloud"] = true;
+DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, TwoFaultyStorageOneFaultyCloud) {
-    std::map<std::string, bool> args;
-    args["storage1"] = true;
-    args["storage2"] = true;
-    args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
+std::map<std::string, bool> args;
+args["storage1"] = true;
+args["storage2"] = true;
+args["cloud"] = true;
+DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, WholeEnchilada) {
-    std::map<std::string, bool> args;
-    args["storage1"] = true;
-    args["storage2"] = true;
-    args["baremetal"] = true;
-    args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
+std::map<std::string, bool> args;
+args["storage1"] = true;
+args["storage2"] = true;
+args["baremetal"] = true;
+args["cloud"] = true;
+DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(std::map<std::string, bool> args) {
@@ -421,10 +421,14 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
 
     // Create Storage Services
     if (args.find("storage1") != args.end()) {
-        this->storage_service1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("StorageHost1", {"/"}));
+        this->storage_service1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+                "StorageHost1", {"/"},
+                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(1000000)}}, {}));
     }
     if (args.find("storage2") != args.end()) {
-        this->storage_service2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("StorageHost2", {"/"}));
+        this->storage_service2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+                "StorageHost2", {"/"},
+                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(1000000)}}, {}));
     }
 
     ASSERT_TRUE((this->storage_service1 != nullptr) or (this->storage_service2 != nullptr));
