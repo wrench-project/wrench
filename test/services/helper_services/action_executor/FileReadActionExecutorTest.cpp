@@ -34,7 +34,7 @@ public:
     void do_FileReadActionExecutorSuccessTest_test();
     void do_FileReadActionExecutorMultipleAttemptsSuccessTest_test();
     void do_FileReadActionExecutorMissingFileTest_test();
-    void do_FileReadActionExecutorKillingStorageServiceTest_test();
+    void do_FileReadActionExecutorKillingStorageServiceTest_test(double buffer_size);
 
 
 protected:
@@ -440,7 +440,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new FileReadActionExecutorMissingFileTestWMS(this, "Host1")));
+            new FileReadActionExecutorMissingFileTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -528,18 +528,26 @@ private:
 };
 
 TEST_F(FileReadActionExecutorTest, KillingStorageServiceTest) {
-    DO_TEST_WITH_FORK(do_FileReadActionExecutorKillingStorageServiceTest_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillingStorageServiceTest_test, 1000000);
+//    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillingStorageServiceTest_test, 0);
 }
 
-void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceTest_test() {
+void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceTest_test(double buffer_size) {
 
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+
+    int argc = 3;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    //    argv[2] = strdup("--wrench-full-log");
+    argv[2] = strdup("--wrench-full-log");
+
+    if (buffer_size == 0) {
+        argc++;
+        argv = (char **) realloc(argv, argc * sizeof(char *));
+        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
+    }
 
     simulation->init(&argc, argv);
 
@@ -547,7 +555,8 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"},
+                                                                                        {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();
@@ -560,7 +569,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new FileReadActionExecutorKillingStorageServiceTestWMS(this, "Host1")));
+            new FileReadActionExecutorKillingStorageServiceTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
