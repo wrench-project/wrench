@@ -182,6 +182,14 @@ namespace wrench {
             }
         }
 
+        // Do some sanity check
+        if (Simulation::host_model_sio_S22_set_by_user and Simulation::host_shutdown_enabled) {
+            throw std::runtime_error(
+                    "For the time being, if you're using the `--cfg=host/model:sio_S22` argument to enable non-bufferized storage services,"
+                    "then you cannot pass the `--wrench-host-shutdown-simulation` argument to also simulate host shutdowns.. sorry!");
+        }
+
+
         // Always activate VM migration plugin
         sg_vm_live_migration_plugin_init();
 
@@ -196,6 +204,7 @@ namespace wrench {
                                 " Please restart your simulation passing it the --wrench-host-shutdown-simulation command-line flag.");
                     }
                 });
+
 
         // Print help message if requested
         if (wrench_help_requested) {
