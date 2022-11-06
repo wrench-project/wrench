@@ -171,7 +171,7 @@ private:
 
         // Is the start-date sensible?
         if (file_copy_action->getStartDate() < 0.0 or file_copy_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_copy_action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_copy_action->getStartDate()));
         }
 
         // Is the end-date sensible?

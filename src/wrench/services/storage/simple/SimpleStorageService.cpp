@@ -49,7 +49,7 @@ namespace wrench {
                                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
 
-        bool bufferized = true;
+        bool bufferized = true; // By default, bufferized
         if (property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != property_list.end()) {
             double buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
             bufferized = buffer_size >= 1.0; // more than one byte means bufferized

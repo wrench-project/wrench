@@ -182,7 +182,7 @@ private:
 
         // Is the start-date sensible?
         if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
