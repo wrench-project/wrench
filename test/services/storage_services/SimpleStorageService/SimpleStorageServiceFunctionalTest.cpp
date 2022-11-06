@@ -40,13 +40,13 @@ public:
 
     void do_AsynchronousFileCopy_test(double buffer_size);
 
-    void do_SynchronousFileCopyFailures_test();
+    void do_SynchronousFileCopyFailures_test(double buffer_size);
 
-    void do_AsynchronousFileCopyFailures_test();
+    void do_AsynchronousFileCopyFailures_test(double buffer_size);
 
-    void do_Partitions_test();
+    void do_Partitions_test(double buffer_size);
 
-    void do_FileWrite_test();
+    void do_FileWrite_test(double buffer_size);
 
 
 protected:
@@ -589,19 +589,16 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc;
-    char **argv;
+    int argc = 1;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
 
-    if (buffer_size > 0) {
-        argc = 1;
-        argv = (char **) calloc(argc, sizeof(char *));
-        argv[0] = strdup("unit_test");
-    } else {
-        argc = 2;
-        argv = (char **) calloc(argc, sizeof(char *));
-        argv[0] = strdup("unit_test");
-        argv[1] = strdup("--cfg=host/model:sio_S22");
+    if (buffer_size == 0) {
+        argc++;
+        argv = (char **) realloc(argv, argc * sizeof(char *));
+        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
     }
+
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -781,19 +778,16 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test(double buff
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc;
-    char **argv;
+    int argc = 1;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
 
-    if (buffer_size > 0) {
-        argc = 1;
-        argv = (char **) calloc(argc, sizeof(char *));
-        argv[0] = strdup("unit_test");
-    } else {
-        argc = 2;
-        argv = (char **) calloc(argc, sizeof(char *));
-        argv[0] = strdup("unit_test");
-        argv[1] = strdup("--cfg=host/model:sio_S22");
+    if (buffer_size == 0) {
+        argc++;
+        argv = (char **) realloc(argv, argc * sizeof(char *));
+        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
     }
+
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -924,19 +918,16 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test(double buf
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc;
-    char **argv;
+    int argc = 1;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
 
-    if (buffer_size > 0) {
-        argc = 1;
-        argv = (char **) calloc(argc, sizeof(char *));
-        argv[0] = strdup("unit_test");
-    } else {
-        argc = 2;
-        argv = (char **) calloc(argc, sizeof(char *));
-        argv[0] = strdup("unit_test");
-        argv[1] = strdup("--cfg=host/model:sio_S22");
+    if (buffer_size == 0) {
+        argc++;
+        argv = (char **) realloc(argv, argc * sizeof(char *));
+        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
     }
+
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1033,8 +1024,8 @@ private:
         // Do a file copy from myself
         try {
             data_movement_manager->doSynchronousFileCopy(this->test->file_500,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000));
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Copying a file onto itself shouldn't lead to an exception (just a printed warning)");
         }
@@ -1120,16 +1111,23 @@ private:
 };
 
 TEST_F(SimpleStorageServiceFunctionalTest, SynchronousFileCopyFailures) {
-    DO_TEST_WITH_FORK(do_SynchronousFileCopyFailures_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_SynchronousFileCopyFailures_test, 1000000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_SynchronousFileCopyFailures_test, 0);
 }
 
-void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
+void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test(double buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+
+    if (buffer_size == 0) {
+        argc++;
+        argv = (char **) realloc(argv, argc * sizeof(char *));
+        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
+    }
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1148,13 +1146,17 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
 
     // Create 3 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1000"})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1000"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk510"})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk510"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk100"}, {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "infinity"}})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk100"},
+                                                                     {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "infinity"},
+                                                                      {wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     ASSERT_NO_THROW(storage_service_100->getPropertyValueAsDouble(wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS));
 
@@ -1320,16 +1322,23 @@ private:
 };
 
 TEST_F(SimpleStorageServiceFunctionalTest, AsynchronousFileCopyFailures) {
-    DO_TEST_WITH_FORK(do_AsynchronousFileCopyFailures_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_AsynchronousFileCopyFailures_test, 1000000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_AsynchronousFileCopyFailures_test, 0);
 }
 
-void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() {
+void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test(double buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+
+    if (buffer_size == 0) {
+        argc++;
+        argv = (char **) realloc(argv, argc * sizeof(char *));
+        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
+    }
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1348,13 +1357,16 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
 
     // Create 3 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1000"})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1000"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk510"})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk510"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk100"})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk100"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -1489,6 +1501,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
+
         // Copy storage_service_510:foo:file_10 to storage_service_510:bar
         try {
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
@@ -1570,16 +1583,25 @@ private:
 };
 
 TEST_F(SimpleStorageServiceFunctionalTest, Partitions) {
-    DO_TEST_WITH_FORK(do_Partitions_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_Partitions_test, 1000000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_Partitions_test, 0);
 }
 
-void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
+void SimpleStorageServiceFunctionalTest::do_Partitions_test(double buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
+
+    if (buffer_size == 0) {
+        argc++;
+        argv = (char **) realloc(argv, argc * sizeof(char *));
+        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
+    }
+
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1591,10 +1613,12 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
 
     // Create 2 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1000"})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1000"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk510"})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk510"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
 
     // Create a WMS
@@ -1671,16 +1695,24 @@ private:
 };
 
 TEST_F(SimpleStorageServiceFunctionalTest, FileWrite) {
-    DO_TEST_WITH_FORK(do_FileWrite_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileWrite_test, 1000000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileWrite_test, 0);
 }
 
-void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
+void SimpleStorageServiceFunctionalTest::do_FileWrite_test(double buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    if (buffer_size == 0) {
+        argc++;
+        argv = (char **) realloc(argv, argc * sizeof(char *));
+        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
+    }
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1692,7 +1724,8 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
 
     // Create 1 Storage Services
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk100", "/disk1000"})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk100", "/disk1000"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     ASSERT_THROW(storage_service_100->getMountPoint(), std::invalid_argument);
 
