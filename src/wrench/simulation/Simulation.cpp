@@ -44,6 +44,8 @@ namespace wrench {
     bool Simulation::energy_enabled = false;
     bool Simulation::host_shutdown_enabled = false;
     bool Simulation::pagecache_enabled = false;
+    bool Simulation::surf_precision_set_by_user = false;
+    bool Simulation::host_model_sio_S22_set_by_user = false;
 
     bool Simulation::initialized = false;
 
@@ -121,6 +123,16 @@ namespace wrench {
 
         // By  default, logs are disabled
         xbt_log_control_set("root.thresh:critical");
+
+        // Determine if specific --cfg arguments were passed
+        for (i = 0; i < *argc; i++) {
+            if (!strncmp(argv[i], "--cfg=surf/precision:", strlen("--cfg=surf/precision:"))) {
+                Simulation::surf_precision_set_by_user = true;
+            }
+            if (!strcmp(argv[i], "--cfg=host/model:sio_S22")) {
+                Simulation::host_model_sio_S22_set_by_user = true;
+            }
+        }
 
         std::vector<std::string> cleanedup_args;
 
@@ -249,6 +261,8 @@ namespace wrench {
             (*argc)++;
             std::cout << "\nSimgrid command-line arguments:\n\n";
         }
+
+
 
         this->s4u_simulation->initialize(argc, argv);
 
@@ -417,6 +431,15 @@ namespace wrench {
     bool Simulation::isEnergySimulationEnabled() {
         return Simulation::energy_enabled;
     }
+
+    bool Simulation::isSioS22CPUModelEnabled() {
+        return Simulation::host_model_sio_S22_set_by_user;
+    }
+
+    bool Simulation::isSurfPrecisionSetByUser() {
+        return Simulation::surf_precision_set_by_user;
+    }
+
 
     ///**
     // * @brief Method to retrieve MemoryManager by hostname
