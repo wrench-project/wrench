@@ -195,15 +195,15 @@ namespace wrench {
             }
 
             // Wait one activity to complete
-            ssize_t finished_activity_index;
+            int finished_activity_index;
             try {
-                finished_activity_index = simgrid::s4u::Activity::wait_any(pending_activities);
+                finished_activity_index = (int)simgrid::s4u::Activity::wait_any(pending_activities);
             } catch (simgrid::NetworkFailureException &e) {
                 // the comm failed
                 continue; // oh well
             } catch (simgrid::Exception &e) {
                 // This likely doesn't happen, but let's keep it here for now
-                for (int i = 1; i < pending_activities.size(); i++) {
+                for (int i = 1; i < (int)pending_activities.size(); i++) {
                     if (pending_activities.at(i)->get_state() == simgrid::s4u::Activity::State::FAILED) {
                         auto stream = this->running_sg_iostreams.at(i - 1);
                         processTransactionFailure(this->transactions[stream]);
