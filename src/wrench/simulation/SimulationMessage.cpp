@@ -36,6 +36,7 @@ namespace wrench {
         }
 #endif
         this->payload = std::max<double>(1, payload); // TODO: ALLOW 0-byte messages AGAIN WHENEVER THAT WORKS
+//        this->payload = payload;
     }
 
     /**
