@@ -246,6 +246,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
+        WRENCH_INFO("IN FWWRITE IFILE");
         // Send a  message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
@@ -271,7 +272,14 @@ namespace wrench {
             }
 
             if (this->buffer_size < 1) {
-                // Non-Bufferized: Nothing to do!
+                // just wait for the final ack (no timeout!)
+                WRENCH_INFO("IN BUFFERZIE < 1 - GETTINGA ACKZ");
+                message = S4U_Mailbox::getMessage(answer_mailbox);
+                if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
+                    throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
+                                             message->getName() + "] message instead of final ack!");
+                }
+                WRENCH_INFO("IGOT ACKZ");
 
             } else {
                 // Bufferized
@@ -284,19 +292,22 @@ namespace wrench {
                 }
                 S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
                         file, (unsigned long) remaining, true));
-            }
 
-            //Waiting for the final ack
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-            if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
-                throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
-                                         message->getName() + "] message instead of final ack!");
+                //Waiting for the final ack
+                message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+                if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
+                    throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
+                                             message->getName() + "] message instead of final ack!");
+                }
             }
 
         } else {
             throw std::runtime_error("StorageService::writeFile(): Received a totally unexpected [" +
                                      message->getName() + "] message!");
         }
+
+        WRENCH_INFO("RETURNING FWWRITE IFILE");
+
     }
 
 
@@ -421,7 +432,7 @@ namespace wrench {
      * @param num_bytes_to_read: number of bytes to read
      */
     void StorageService::readFileInternal(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
-                                  double num_bytes_to_read) {
+                                          double num_bytes_to_read) {
 
         if ((file == nullptr) or (location == nullptr) or (num_bytes_to_read < 0.0)) {
 
@@ -464,11 +475,12 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
         } catch (ExecutionException &e) {
-            S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
+            if (chunk_receiving_mailbox) S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             throw;
         }
 
         if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
+
             // If it's not a success, throw an exception
             if (not msg->success) {
                 std::shared_ptr<FailureCause> cause = msg->failure_cause;
@@ -478,7 +490,12 @@ namespace wrench {
 
             if (msg->buffer_size < 1) {
                 // Non-Bufferized
-                // Do nothing
+                // Just wait for the final ack (no timeout!)
+                message = S4U_Mailbox::getMessage(answer_mailbox);
+                if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
+                    throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                             message->getName() + "] message!");
+                }
 
             } else {
                 // Otherwise, retrieve the file chunks until the last one is received
@@ -505,56 +522,52 @@ namespace wrench {
                 }
 
                 S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
-            }
 
-            //Waiting for the final ack
-            message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
-            if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
-                throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                         message->getName() + "] message!");
+                //Waiting for the final ack
+                message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
+                if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
+                    throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                             message->getName() + "] message!");
+                }
+                S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             }
-
-        } else {
-            S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
-            throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                     message->getName() + "] message!");
         }
     }
 
 
-    /**
-     * @brief Synchronously and sequentially read a set of files from storage services
-     *
-     * @param locations: a map of files to locations
-     *
-     * @throw std::runtime_error
-     * @throw ExecutionException
-     */
+/**
+ * @brief Synchronously and sequentially read a set of files from storage services
+ *
+ * @param locations: a map of files to locations
+ *
+ * @throw std::runtime_error
+ * @throw ExecutionException
+ */
     void StorageService::readFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
         StorageService::writeOrReadFiles(READ, std::move(locations));
     }
 
-    /**
-     * @brief Synchronously and sequentially upload a set of files from storage services
-     *
-     * @param locations: a map of files to locations
-     *
-     * @throw std::runtime_error
-     * @throw ExecutionException
-     */
+/**
+ * @brief Synchronously and sequentially upload a set of files from storage services
+ *
+ * @param locations: a map of files to locations
+ *
+ * @throw std::runtime_error
+ * @throw ExecutionException
+ */
     void StorageService::writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
         StorageService::writeOrReadFiles(WRITE, std::move(locations));
     }
 
-    /**
-     * @brief Synchronously and sequentially write/read a set of files to/from storage services
-     *
-     * @param action: FileOperation::READ (download) or FileOperation::WRITE
-     * @param locations: a map of files to locations
-     *
-     * @throw std::runtime_error
-     * @throw ExecutionException
-     */
+/**
+ * @brief Synchronously and sequentially write/read a set of files to/from storage services
+ *
+ * @param action: FileOperation::READ (download) or FileOperation::WRITE
+ * @param locations: a map of files to locations
+ *
+ * @throw std::runtime_error
+ * @throw ExecutionException
+ */
     void StorageService::writeOrReadFiles(FileOperation action,
                                           std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
         for (auto const &f: locations) {
@@ -592,18 +605,18 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Synchronously delete a file at a location
-     *
-     * @param file: the file
-     * @param location: the file's location
-     * @param file_registry_service: a file registry service that should be updated once the
-     *         file deletion has (successfully) completed (none if nullptr)
-     *
-     * @throw ExecutionException
-     * @throw std::runtime_error
-     * @throw std::invalid_argument
-     */
+/**
+ * @brief Synchronously delete a file at a location
+ *
+ * @param file: the file
+ * @param location: the file's location
+ * @param file_registry_service: a file registry service that should be updated once the
+ *         file deletion has (successfully) completed (none if nullptr)
+ *
+ * @throw ExecutionException
+ * @throw std::runtime_error
+ * @throw std::invalid_argument
+ */
     void StorageService::deleteFile(const std::shared_ptr<DataFile> &file,
                                     const std::shared_ptr<FileLocation> &location,
                                     const std::shared_ptr<FileRegistryService> &file_registry_service) {
@@ -648,16 +661,16 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Synchronously ask the storage service to read a file from another storage service
-     *
-     * @param file: the file to copy
-     * @param src_location: the location where to read the file
-     * @param dst_location: the location where to write the file
-     *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     */
+/**
+ * @brief Synchronously ask the storage service to read a file from another storage service
+ *
+ * @param file: the file to copy
+ * @param src_location: the location where to read the file
+ * @param dst_location: the location where to write the file
+ *
+ * @throw ExecutionException
+ * @throw std::invalid_argument
+ */
     void StorageService::copyFile(const std::shared_ptr<DataFile> &file,
                                   const std::shared_ptr<FileLocation> &src_location,
                                   const std::shared_ptr<FileLocation> &dst_location) {
@@ -699,18 +712,18 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Asynchronously ask for a file copy between two storage services
-     *
-     * @param answer_mailbox: the mailbox to which a notification message will be sent
-     * @param file: the file
-     * @param src_location: the source location
-     * @param dst_location: the destination location
-     *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     *
-     */
+/**
+ * @brief Asynchronously ask for a file copy between two storage services
+ *
+ * @param answer_mailbox: the mailbox to which a notification message will be sent
+ * @param file: the file
+ * @param src_location: the source location
+ * @param dst_location: the destination location
+ *
+ * @throw ExecutionException
+ * @throw std::invalid_argument
+ *
+ */
     void StorageService::initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<DataFile> &file,
                                           const std::shared_ptr<FileLocation> &src_location,
                                           const std::shared_ptr<FileLocation> &dst_location) {
@@ -738,10 +751,10 @@ namespace wrench {
                                 StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
     }
 
-    /**
-     * @brief Get the total static capacity of the storage service (in zero simulation time)
-     * @return capacity of the storage service (double) for each mount point, in a map
-     */
+/**
+ * @brief Get the total static capacity of the storage service (in zero simulation time)
+ * @return capacity of the storage service (double) for each mount point, in a map
+ */
     std::map<std::string, double> StorageService::getTotalSpace() {
         std::map<std::string, double> to_return;
         for (auto const &fs: this->file_systems) {
@@ -750,10 +763,10 @@ namespace wrench {
         return to_return;
     }
 
-    /**
-     * @brief Get the mount point (will throw is more than one)
-     * @return the (sole) mount point of the service
-     */
+/**
+ * @brief Get the mount point (will throw is more than one)
+ * @return the (sole) mount point of the service
+ */
     std::string StorageService::getMountPoint() {
         if (this->hasMultipleMountPoints()) {
             throw std::invalid_argument(
@@ -762,10 +775,10 @@ namespace wrench {
         return wrench::FileLocation::sanitizePath(this->file_systems.begin()->first);
     }
 
-    /**
-     * @brief Get the set of mount points
-     * @return the set of mount points
-     */
+/**
+ * @brief Get the set of mount points
+ * @return the set of mount points
+ */
     std::set<std::string> StorageService::getMountPoints() {
         std::set<std::string> to_return;
         for (auto const &fs: this->file_systems) {
@@ -774,34 +787,34 @@ namespace wrench {
         return to_return;
     }
 
-    /**
-     * @brief Checked whether the storage service has multiple mount points
-     * @return true whether the service has multiple mount points
-     */
+/**
+ * @brief Checked whether the storage service has multiple mount points
+ * @return true whether the service has multiple mount points
+ */
     bool StorageService::hasMultipleMountPoints() {
         return (this->file_systems.size() > 1);
     }
 
-    /**
-    * @brief Checked whether the storage service has a particular mount point
-    * @param mp: a mount point
-    *
-    * @return true whether the service has that mount point
-    */
+/**
+* @brief Checked whether the storage service has a particular mount point
+* @param mp: a mount point
+*
+* @return true whether the service has that mount point
+*/
     bool StorageService::hasMountPoint(const std::string &mp) {
         return (this->file_systems.find(mp) != this->file_systems.end());
     }
 
-    /**
-     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-     * at that location.
+/**
+ * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+ * at that location.
 
-     *
-     * @param file: a file
-     * @param location: a file location, must be the same object as the function is envoked on
-     *
-     * @throw std::invalid_argument
-     */
+ *
+ * @param file: a file
+ * @param location: a file location, must be the same object as the function is envoked on
+ *
+ * @throw std::invalid_argument
+ */
     void StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
         if (location->getStorageService() != this->getSharedPtr<StorageService>()) {
             throw std::invalid_argument("StorageService::createFile(file,location) must be called on the same StorageService that the location uses");
@@ -810,26 +823,26 @@ namespace wrench {
                   location->getAbsolutePathAtMountPoint());
     }
 
-    /**
-     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-     * at that location.
+/**
+ * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+ * at that location.
 
-    *
-    * @param file: a file
-    * @param path: path to file
-    *
-    */
+*
+* @param file: a file
+* @param path: path to file
+*
+*/
     void StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
 
         createFile(file, FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path));
     }
 
-    /**
-     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-     * at that location.
-     * @param file: a file
-     *
-     */
+/**
+ * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+ * at that location.
+ * @param file: a file
+ *
+ */
     void StorageService::createFile(const std::shared_ptr<DataFile> &file) {
 
         createFile(file, FileLocation::LOCATION(this->getSharedPtr<StorageService>(), getMountPoint()));

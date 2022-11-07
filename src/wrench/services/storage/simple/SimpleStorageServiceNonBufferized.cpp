@@ -620,13 +620,13 @@ namespace wrench {
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
         while ((not this->pending_sg_iostreams.empty()) and
                (this->running_sg_iostreams.size() < this->num_concurrent_connections)) {
-            WRENCH_INFO("Starting pending transaction for file %s",
-                        this->transactions[this->pending_sg_iostreams.at(0)]->file->getID().c_str());
+//            WRENCH_INFO("Starting pending transaction for file %s",
+//                        this->transactions[this->pending_sg_iostreams.at(0)]->file->getID().c_str());
             auto sg_iostream = this->pending_sg_iostreams.at(0);
             this->pending_sg_iostreams.pop_front();
             this->running_sg_iostreams.push_back(sg_iostream);
             sg_iostream->vetoable_start();
-            WRENCH_INFO("Transaction started");
+//            WRENCH_INFO("Transaction started");
         }
     }
 
