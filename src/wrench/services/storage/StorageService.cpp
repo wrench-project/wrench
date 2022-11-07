@@ -246,7 +246,6 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        WRENCH_INFO("IN FWWRITE IFILE");
         // Send a  message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
@@ -273,13 +272,11 @@ namespace wrench {
 
             if (this->buffer_size < 1) {
                 // just wait for the final ack (no timeout!)
-                WRENCH_INFO("IN BUFFERZIE < 1 - GETTINGA ACKZ");
                 message = S4U_Mailbox::getMessage(answer_mailbox);
                 if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
                     throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
                                              message->getName() + "] message instead of final ack!");
                 }
-                WRENCH_INFO("IGOT ACKZ");
 
             } else {
                 // Bufferized
@@ -305,8 +302,6 @@ namespace wrench {
             throw std::runtime_error("StorageService::writeFile(): Received a totally unexpected [" +
                                      message->getName() + "] message!");
         }
-
-        WRENCH_INFO("RETURNING FWWRITE IFILE");
 
     }
 
