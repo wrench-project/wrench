@@ -76,7 +76,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Indicate that this storace service is a scratch service of a ComputeService
+     * @brief Indicate that this storage service is a scratch service of a ComputeService
      */
     void StorageService::setScratch() {
         this->is_scratch = true;
