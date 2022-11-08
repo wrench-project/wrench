@@ -47,10 +47,6 @@ namespace wrench {
 
         /** @brief The name of the daemon */
         std::string process_name;
-        //        /** @brief The initial name of the daemon's mailbox */
-        //        std::string initial_mailbox_name;
-        //        /** @brief The current name of the daemon's mailbox */
-        //        std::string mailbox_name;
 
         /** @brief The daemon's mailbox **/
         simgrid::s4u::Mailbox *mailbox;

@@ -240,7 +240,7 @@ namespace wrench {
      */
     bool SimpleStorageServiceNonBufferized::processNextMessage(SimulationMessage *message) {
 
-        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message)) {
             return processStopDaemonRequest(msg->ack_mailbox);
