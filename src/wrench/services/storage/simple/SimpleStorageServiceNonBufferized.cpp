@@ -459,7 +459,29 @@ namespace wrench {
                     src_location->toString().c_str(),
                     dst_location->toString().c_str())
 
-        auto fs = this->file_systems[dst_location->getMountPoint()].get();
+        auto src_host = simgrid::s4u::Host::by_name(src_location->getStorageService()->getHostname());
+        auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
+        // TODO: This disk identification is really ugly.
+        simgrid::s4u::Disk *src_disk = nullptr;
+        auto src_location_sanitized_mount_point =  FileLocation::sanitizePath(src_location->getMountPoint() + "/");
+        for (auto const &d: src_host->get_disks()) {
+            if (src_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
+                src_disk = d;
+            }
+        }
+        if (src_disk == nullptr) {
+            throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequest(): source disk not found - internal error");
+        }
+        simgrid::s4u::Disk *dst_disk = nullptr;
+        auto dst_location_sanitized_mount_point =  FileLocation::sanitizePath(dst_location->getMountPoint() + "/");
+        for (auto const &d: dst_host->get_disks()) {
+            if (dst_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
+                dst_disk = d;
+            }
+        }
+        if (dst_disk == nullptr) {
+            throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequest(): destination disk not found - internal error");
+        }
 
         // Am I the source????
         if (src_location->getStorageService() == this->shared_from_this()) {
@@ -495,11 +517,11 @@ namespace wrench {
                 transfer_size = (uint64_t)(file->getSize());
             }
 
-            auto sg_iostream = simgrid::s4u::Io::streamto_init(simgrid::s4u::this_actor::get_host(),
-                                                               fs->getDisk(),
-                                                               simgrid::s4u::this_actor::get_host(),
-                                                               nullptr)->set_size(transfer_size);
 
+            auto sg_iostream = simgrid::s4u::Io::streamto_init(src_host,
+                                                               src_disk,
+                                                               dst_host,
+                                                               dst_disk)->set_size(transfer_size);
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
                     file,
@@ -515,7 +537,11 @@ namespace wrench {
 
         }
 
+        // I am not the source
         // Does the source have the file?
+        auto fs = this->file_systems[dst_location->getMountPoint()].get();
+
+
         if (not src_location->getStorageService()->lookupFile(file, src_location)) {
             try {
                 S4U_Mailbox::putMessage(
@@ -568,27 +594,6 @@ namespace wrench {
             fs->reserveSpace(file, dst_location->getAbsolutePathAtMountPoint());
         }
 
-//        WRENCH_INFO("Starting an activity to copy file %s from %s to %s",
-//                    file->getID().c_str(),
-//                    src_location->toString().c_str(),
-//                    dst_location->toString().c_str());
-
-        // Create the streaming activity
-        auto src_host = simgrid::s4u::Host::by_name(src_location->getStorageService()->getHostname());
-        // TODO: This disk identification is really ugly. Perhaps implement FileLocation::getDisk()?
-        simgrid::s4u::Disk *src_disk = nullptr;
-        auto src_location_sanitized_mount_point =  FileLocation::sanitizePath(src_location->getMountPoint() + "/");
-        for (auto const &d: src_host->get_disks()) {
-            if (src_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
-                src_disk = d;
-            }
-        }
-        if (src_disk == nullptr) {
-            throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequest(): disk not found - internal error");
-        }
-
-        auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
-        simgrid::s4u::Disk *dst_disk = fs->getDisk();
 
         auto sg_iostream = simgrid::s4u::Io::streamto_init(src_host,
                                                            src_disk,
