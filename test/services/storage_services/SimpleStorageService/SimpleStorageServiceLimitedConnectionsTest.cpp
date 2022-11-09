@@ -225,13 +225,6 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test(d
     argv[0] = strdup("unit_test");
 //    argv[1] = strdup("--wrench-full-log");
 
-    if (buffer_size == 0) {
-        argc++;
-        argv = (char **) realloc(argv, argc * sizeof(char *));
-        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
-    }
-
-
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform

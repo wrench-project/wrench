@@ -347,12 +347,6 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     argv[0] = strdup("unit_test");
 //    argv[1] = strdup("--wrench-full-log");
 
-    if (buffer_size == 0) {
-        argc++;
-        argv = (char **) realloc(argv, argc * sizeof(char *));
-        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
-    }
-
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
     ASSERT_THROW(simulation->add(

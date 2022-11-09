@@ -123,10 +123,9 @@ void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
     // Create and initialize the simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--cfg=host/model:sio_S22");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
