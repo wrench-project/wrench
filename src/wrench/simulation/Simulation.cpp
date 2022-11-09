@@ -45,7 +45,6 @@ namespace wrench {
     bool Simulation::host_shutdown_enabled = false;
     bool Simulation::pagecache_enabled = false;
     bool Simulation::surf_precision_set_by_user = false;
-    bool Simulation::host_model_sio_S22_set_by_user = false;
 
     bool Simulation::initialized = false;
 
@@ -129,9 +128,6 @@ namespace wrench {
             if (!strncmp(argv[i], "--cfg=surf/precision:", strlen("--cfg=surf/precision:"))) {
                 Simulation::surf_precision_set_by_user = true;
             }
-            if (!strcmp(argv[i], "--cfg=host/model:sio_S22")) {
-                Simulation::host_model_sio_S22_set_by_user = true;
-            }
         }
 
         std::vector<std::string> cleanedup_args;
@@ -181,14 +177,6 @@ namespace wrench {
                 cleanedup_args.emplace_back(argv[i]);
             }
         }
-
-        // Do some sanity check
-        if (Simulation::host_model_sio_S22_set_by_user and Simulation::host_shutdown_enabled) {
-            throw std::runtime_error(
-                    "For the time being, if you're using the `--cfg=host/model:sio_S22` argument to enable non-bufferized storage services,"
-                    "then you cannot pass the `--wrench-host-shutdown-simulation` argument to also simulate host shutdowns.. sorry!");
-        }
-
 
         // Always activate VM migration plugin
         sg_vm_live_migration_plugin_init();
@@ -439,10 +427,6 @@ namespace wrench {
      */
     bool Simulation::isEnergySimulationEnabled() {
         return Simulation::energy_enabled;
-    }
-
-    bool Simulation::isSioS22CPUModelEnabled() {
-        return Simulation::host_model_sio_S22_set_by_user;
     }
 
     bool Simulation::isSurfPrecisionSetByUser() {

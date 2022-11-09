@@ -24,7 +24,7 @@
 WRENCH_LOG_CATEGORY(file_read_action_executor_test, "Log category for FileReadActionExecutorTest");
 
 //#define EPSILON (std::numeric_limits<double>::epsilon())
-#define EPSILON (0.000001)
+#define EPSILON (0.0001)
 
 class FileReadActionExecutorTest : public ::testing::Test {
 
@@ -181,7 +181,8 @@ private:
         }
 
         // Is the end-date sensible?
-        if (std::abs<double>(file_read_action->getEndDate() - 10.847443) > EPSILON) {
+
+        if (std::abs<double>(file_read_action->getEndDate() - 10.847442) > EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(file_read_action->getEndDate()));
         }
 
@@ -542,12 +543,6 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
 //    argv[2] = strdup("--wrench-full-log");
-
-    if (buffer_size == 0) {
-        argc++;
-        argv = (char **) realloc(argv, argc * sizeof(char *));
-        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
-    }
 
     simulation->init(&argc, argv);
 
