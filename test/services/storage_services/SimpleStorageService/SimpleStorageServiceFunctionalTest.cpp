@@ -593,13 +593,6 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
-    if (buffer_size == 0) {
-        argc++;
-        argv = (char **) realloc(argv, argc * sizeof(char *));
-        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
-    }
-
-
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
@@ -782,13 +775,6 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test(double buff
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
-    if (buffer_size == 0) {
-        argc++;
-        argv = (char **) realloc(argv, argc * sizeof(char *));
-        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
-    }
-
-
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
@@ -921,13 +907,6 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test(double buf
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-
-    if (buffer_size == 0) {
-        argc++;
-        argv = (char **) realloc(argv, argc * sizeof(char *));
-        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
-    }
-
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1122,12 +1101,6 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test(dou
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-
-    if (buffer_size == 0) {
-        argc++;
-        argv = (char **) realloc(argv, argc * sizeof(char *));
-        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
-    }
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1333,12 +1306,6 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test(do
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-
-    if (buffer_size == 0) {
-        argc++;
-        argv = (char **) realloc(argv, argc * sizeof(char *));
-        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
-    }
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1596,13 +1563,6 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test(double buffer_size) 
     argv[0] = strdup("unit_test");
 //    argv[1] = strdup("--wrench-full-log");
 
-    if (buffer_size == 0) {
-        argc++;
-        argv = (char **) realloc(argv, argc * sizeof(char *));
-        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
-    }
-
-
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
@@ -1707,12 +1667,6 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test(double buffer_size) {
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
-
-    if (buffer_size == 0) {
-        argc++;
-        argv = (char **) realloc(argv, argc * sizeof(char *));
-        argv[argc -1] = strdup("--cfg=host/model:sio_S22");
-    }
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

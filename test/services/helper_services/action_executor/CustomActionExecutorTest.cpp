@@ -24,7 +24,7 @@
 WRENCH_LOG_CATEGORY(custom_action_executor_test, "Log category for CustomActionExecutorTest");
 
 //#define EPSILON (std::numeric_limits<double>::epsilon())
-#define EPSILON (0.000001)
+#define EPSILON (0.0001)
 
 
 class CustomActionExecutorTest : public ::testing::Test {

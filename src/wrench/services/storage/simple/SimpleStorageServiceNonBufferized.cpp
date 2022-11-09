@@ -58,11 +58,6 @@ namespace wrench {
             SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
                                  "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {
 
-//        if (not Simulation::isSioS22CPUModelEnabled()) {
-//            throw std::runtime_error("To use a non-bufferized storage services (buffer size == 0), you need to run the simulator with the "
-//                                     "'--cfg=host/model:sio_S22' command-line argument. This may lead to less realistic simulations, but "
-//                                     "non-bufferized storage services typically make the simulation faster.");
-//        }
         this->buffer_size = 0;
 
     }
