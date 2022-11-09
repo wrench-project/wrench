@@ -464,9 +464,12 @@ namespace wrench {
     void FileTransferThread::downloadFileFromStorageService(const std::shared_ptr<DataFile> &f,
                                                             const std::shared_ptr<FileLocation> &src_loc,
                                                             const std::shared_ptr<FileLocation> &dst_loc) {
+
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (f == nullptr) {
             throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
         }
+#endif
 
         WRENCH_INFO("Downloading file  %s from location %s",
                     f->getID().c_str(), src_loc->toString().c_str());

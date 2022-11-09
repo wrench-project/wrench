@@ -669,12 +669,31 @@ namespace wrench {
     void StorageService::copyFile(const std::shared_ptr<DataFile> &file,
                                   const std::shared_ptr<FileLocation> &src_location,
                                   const std::shared_ptr<FileLocation> &dst_location) {
+
         if ((file == nullptr) || (src_location == nullptr) || (dst_location == nullptr)) {
             throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
         }
 
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
+
+        bool src_is_non_bufferized = src_location->getStorageService()->buffer_size < 1;
+        bool src_is_bufferized = not src_is_non_bufferized;
+        bool dst_is_non_bufferized = dst_location->getStorageService()->buffer_size < 1;
+        bool dst_is_bufferized = not dst_is_non_bufferized;
+
+        if (src_is_non_bufferized and dst_is_bufferized) {
+            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
+        }
+
+        simgrid::s4u::Mailbox *mailbox_to_contact;
+        if (dst_is_bufferized) {
+            mailbox_to_contact = dst_location->getStorageService()->mailbox;
+        } else if (src_is_bufferized) {
+            mailbox_to_contact = src_location->getStorageService()->mailbox;
+        } else {
+            mailbox_to_contact = dst_location->getStorageService()->mailbox;
+        }
 
         // Send a message to the daemon of the dst service
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
@@ -683,7 +702,7 @@ namespace wrench {
                                                                                              dst_location);
 
         S4U_Mailbox::putMessage(
-                dst_location->getStorageService()->mailbox,
+                mailbox_to_contact,
                 new StorageServiceFileCopyRequestMessage(
                         answer_mailbox,
                         file,
@@ -729,13 +748,31 @@ namespace wrench {
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
 
+        bool src_is_non_bufferized = src_location->getStorageService()->buffer_size < 1;
+        bool src_is_bufferized = not src_is_non_bufferized;
+        bool dst_is_non_bufferized = dst_location->getStorageService()->buffer_size < 1;
+        bool dst_is_bufferized = not dst_is_non_bufferized;
+
+        if (src_is_non_bufferized and dst_is_bufferized) {
+            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
+        }
+
+        simgrid::s4u::Mailbox *mailbox_to_contact;
+        if (dst_is_bufferized) {
+            mailbox_to_contact = dst_location->getStorageService()->mailbox;
+        } else if (src_is_bufferized) {
+            mailbox_to_contact = src_location->getStorageService()->mailbox;
+        } else {
+            mailbox_to_contact = dst_location->getStorageService()->mailbox;
+        }
+
         src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
                                                                                              src_location,
                                                                                              dst_location);
 
         // Send a message to the daemon on the dst location
         S4U_Mailbox::putMessage(
-                dst_location->getStorageService()->mailbox,
+                mailbox_to_contact,
                 new StorageServiceFileCopyRequestMessage(
                         answer_mailbox,
                         file,
