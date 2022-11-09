@@ -490,8 +490,8 @@ namespace wrench {
         } else {
 
             // TODO: Remove this after the fluid IO model in Simgrid is fixed
-//            if (true) {
-            if (not Simulation::isSioS22CPUModelEnabled()) {
+            if (true) {
+//            if (not Simulation::isSioS22CPUModelEnabled()) {
                 // Launch compute-heavy thread
                 auto bottleneck_thread = simgrid::s4u::this_actor::exec_async(sequential_work + parallel_per_thread_work);
                 // Launch all other threads
