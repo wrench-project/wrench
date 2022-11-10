@@ -24,7 +24,6 @@ namespace wrench {
      *         by these tasks
      */
     void Workflow::clear() {
-        std::cerr << "IN WORKFLOW CLEAR\n";
         this->tasks.clear();
         for (auto const &f: this->data_files) {
             //            std::cerr << "SIMULATION REMOVING FILE " << f->getID() << "\n";
@@ -84,8 +83,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Workflow::removeFile(const std::shared_ptr<DataFile> &file) {
-        std::cerr << "WORKFLOW REMOVING FILE " << file->getID() << std::endl;
-
         if (this->task_output_files.find(file) != this->task_output_files.end()) {
             throw std::invalid_argument("Workflow::removeFile(): File " +
                                         file->getID() + " cannot be removed because it is output of task " +
