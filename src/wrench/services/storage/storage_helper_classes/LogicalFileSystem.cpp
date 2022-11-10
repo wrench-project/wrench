@@ -207,10 +207,13 @@ namespace wrench {
             return false;
         }
         assertInitHasBeenCalled();
+        std::cerr << "IN isFileInDirectory() , looking for file " << file->getID() << " in " << absolute_path << "\n";
         // If directory does not exist, say "no"
         if (not doesDirectoryExist(absolute_path)) {
+            std::cerr << "DIRECTORY DOES NOT EXIST\n";
             return false;
         }
+        std::cerr << "DIRECTORY EXISTS!\n";
 
         return (this->content[absolute_path].find(file) != this->content[absolute_path].end());
     }
@@ -324,9 +327,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void LogicalFileSystem::stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
+        std::cerr << "IN STAGE FILE LFS: " << absolute_path << "\n";
         if (devnull) {
             return;
         }
+        std::cerr << "NOT DEVNULL\n";
         // If Space is not sufficient, forget it
         if (this->occupied_space + file->getSize() > this->total_capacity) {
             throw std::invalid_argument("LogicalFileSystem::stageFile(): Insufficient space to store file " +
@@ -342,9 +347,12 @@ namespace wrench {
 
         // If file does  not already exist, create it
         if (this->content.find(absolute_path) != this->content.end()) {
+            std::cerr << "DOING IT!\n";
+            std::cerr << "THIS->CONTENT[" << absolute_path << "][" << file->getID() << "] is set!\n";
             this->content[absolute_path][file] = S4U_Simulation::getClock();
             this->occupied_space += file->getSize();
         } else {
+            std::cerr << "NOT DOING IT!\n";
             return;
         }
     }
