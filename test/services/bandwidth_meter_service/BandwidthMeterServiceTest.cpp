@@ -133,11 +133,17 @@ private:
 
         //Setting up storage services to accommodate data transfer.
         auto data_manager = this->createDataMovementManager();
+
         //copying file to force link usage.
         auto file = *(this->test->workflow->getFileMap().begin());
+        std::cerr << "DOING A LOOKUP\n";
+        bool tmp = this->test->client_storage_service->lookupFile(file.second);
+        std::cerr << "DOING A LOOKUP RETURNED: " << tmp << "\n";
+        std::cerr << "DOING THE COPY\n";
         data_manager->doSynchronousFileCopy(file.second,
                                             wrench::FileLocation::LOCATION(this->test->client_storage_service),
                                             wrench::FileLocation::LOCATION(this->test->server_storage_service));
+        std::cerr << "DONE THE COPY\n";
 
         // Terminating the Bandwidth Meter Services
         bm1->stop();
