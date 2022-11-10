@@ -74,6 +74,8 @@ namespace wrench {
         virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path);
         virtual void createFile(const std::shared_ptr<DataFile> &file);
 
+        bool isBufferized();
+
         /**
          * @brief Get the theoretical load of a service
          * @return the load on the service
