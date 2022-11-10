@@ -70,7 +70,10 @@ namespace wrench {
 
         // If I was the source and the destination was bufferized, I am the one creating the file there! (yes,
         // this is ugly and lame, and one day we'll clean the storage service implementation
-        if (transaction->src_location->getStorageService() == shared_from_this() and transaction->dst_location->getStorageService()->isBufferized()) {
+        if (transaction->src_location != nullptr and
+            transaction->src_location->getStorageService() == shared_from_this() and
+            transaction->dst_location != nullptr and
+            transaction->dst_location->getStorageService()->isBufferized()) {
             transaction->dst_location->getStorageService()->createFile(transaction->file, transaction->dst_location);
         }
 
