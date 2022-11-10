@@ -16,14 +16,20 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service_non_bufferized_1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_non_bufferized_2 = nullptr;
 
-
-
     void do_CopyBufferizedNonBufferizedTest_test();
 
 protected:
+
+    ~CopyBufferizedNonBufferizedTest() {
+//        wrench::Simulation::removeFile(file_1_size_100);
+//        wrench::Simulation::removeFile(file_2_size_200);
+    }
+
     CopyBufferizedNonBufferizedTest() {
 
         // create the files
+        std::cerr << "IN CONSTRUCTOR ADDING FILE file_1_size_100 to simulation\n";
+        std::cerr << "IN CONSTRUCTOR ADDING FILE file_2_size_200 to simulation\n";
         file_1_size_100 = wrench::Simulation::addFile("file_1_size_100", 100 * 1000 * 1000);
         file_2_size_200 = wrench::Simulation::addFile("file_2_size_200", 200 * 1000 * 1000);
 
@@ -72,7 +78,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 class CopyBufferizedNonBufferizedTestWMS : public wrench::ExecutionController {
@@ -132,6 +137,7 @@ private:
 
 TEST_F(CopyBufferizedNonBufferizedTest, BufferizedNonBufferized) {
     DO_TEST_WITH_FORK(do_CopyBufferizedNonBufferizedTest_test);
+    wrench::Simulation::removeFile(this->file_1_size_100);
 }
 
 
@@ -144,6 +150,15 @@ void CopyBufferizedNonBufferizedTest::do_CopyBufferizedNonBufferizedTest_test() 
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 //    argv[1] = strdup("--wrench-full-log");
+
+    std::cerr << "PID = " << getpid() << "\n";
+    std::cerr << "FILE MAP ADDRESS: " << &wrench::Simulation::getFileMap() << "\n";
+    std::cerr << "FILE MAP SIZE: " << wrench::Simulation::getFileMap().size() << "\n";
+    for (auto const &f : wrench::Simulation::getFileMap()) {
+        std::cerr << "   - " << f.first << " " << f.second->getID() << "\n";
+    }
+    std::cerr << "RETURNING WITHOUT DOING ANYTHING\n";
+    return;
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -166,6 +181,7 @@ void CopyBufferizedNonBufferizedTest::do_CopyBufferizedNonBufferizedTest_test() 
             wrench::SimpleStorageService::createSimpleStorageService("StorageHost2", {"/disk2"},
                                                                      {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"},
                                                                       {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
+
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

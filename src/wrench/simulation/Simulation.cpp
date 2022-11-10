@@ -737,8 +737,6 @@ namespace wrench {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
         }
 
-        std::cerr << "STAGING FILE!\n";
-
         if (this->is_running) {
             throw std::runtime_error(" Simulation::stageFile(): Cannot stage a file once the simulation has started");
         }
@@ -1572,6 +1570,7 @@ namespace wrench {
      * @param file : file to remove
      */
     void Simulation::removeFile(const std::shared_ptr<DataFile> &file) {
+        std::cerr << "IN REMOVE FILE FOR FILE (total number= " << Simulation::getFileMap().size() << "): " << file->getID() << "\n";
         if (Simulation::data_files.find(file->getID()) == Simulation::data_files.end()) {
             throw std::invalid_argument("Simulation::removeFile(): Unknown file");
         }
