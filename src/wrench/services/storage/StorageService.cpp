@@ -677,19 +677,19 @@ namespace wrench {
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
 
-        bool src_is_non_bufferized = src_location->getStorageService()->buffer_size < 1;
-        bool src_is_bufferized = not src_is_non_bufferized;
-        bool dst_is_non_bufferized = dst_location->getStorageService()->buffer_size < 1;
-        bool dst_is_bufferized = not dst_is_non_bufferized;
+        bool src_is_bufferized = src_location->getStorageService()->isBufferized();
+        bool src_is_non_bufferized = not src_is_bufferized;
+        bool dst_is_bufferized = dst_location->getStorageService()->isBufferized();
+        bool dst_is_non_bufferized = not dst_is_bufferized;
 
-        if (src_is_non_bufferized and dst_is_bufferized) {
-            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
-        }
+//        if (src_is_non_bufferized and dst_is_bufferized) {
+//            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
+//        }
 
         simgrid::s4u::Mailbox *mailbox_to_contact;
-        if (dst_is_bufferized) {
+        if (dst_is_non_bufferized) {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
-        } else if (src_is_bufferized) {
+        } else if (src_is_non_bufferized) {
             mailbox_to_contact = src_location->getStorageService()->mailbox;
         } else {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
@@ -748,19 +748,19 @@ namespace wrench {
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
 
-        bool src_is_non_bufferized = src_location->getStorageService()->buffer_size < 1;
-        bool src_is_bufferized = not src_is_non_bufferized;
-        bool dst_is_non_bufferized = dst_location->getStorageService()->buffer_size < 1;
-        bool dst_is_bufferized = not dst_is_non_bufferized;
+        bool src_is_bufferized = src_location->getStorageService()->isBufferized();
+        bool src_is_non_bufferized = not src_is_bufferized;
+        bool dst_is_bufferized = dst_location->getStorageService()->isBufferized();
+        bool dst_is_non_bufferized = not dst_is_bufferized;
 
-        if (src_is_non_bufferized and dst_is_bufferized) {
-            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
-        }
+//        if (src_is_non_bufferized and dst_is_bufferized) {
+//            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
+//        }
 
         simgrid::s4u::Mailbox *mailbox_to_contact;
-        if (dst_is_bufferized) {
+        if (dst_is_non_bufferized) {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
-        } else if (src_is_bufferized) {
+        } else if (src_is_non_bufferized) {
             mailbox_to_contact = src_location->getStorageService()->mailbox;
         } else {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
@@ -879,5 +879,14 @@ namespace wrench {
 
         createFile(file, FileLocation::LOCATION(this->getSharedPtr<StorageService>(), getMountPoint()));
     }
+
+    /**
+     * @brief Determines whether the storage service is bufferized
+     * @return true if bufferized, false otherwise
+     */
+    bool StorageService::isBufferized() {
+        return this->buffer_size > 1;
+    }
+
 
 }// namespace wrench
