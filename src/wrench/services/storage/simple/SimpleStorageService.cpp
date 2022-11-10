@@ -163,8 +163,11 @@ namespace wrench {
     bool SimpleStorageService::processFileLookupRequest(const std::shared_ptr<DataFile> &file,
                                                         const std::shared_ptr<FileLocation> &location,
                                                         simgrid::s4u::Mailbox *answer_mailbox) {
+        std::cerr << "PROCESSING A FILE LOOKUP for file " << file->getID() << "\n";
         auto fs = this->file_systems[location->getMountPoint()].get();
+        std::cerr << "GOT THE FS at MP: " << location->getMountPoint() << "\n";
         bool file_found = fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint());
+        std::cerr << "FILE FOUND = " << file_found << "\n";
 
         S4U_Mailbox::dputMessage(
                 answer_mailbox,

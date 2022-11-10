@@ -737,6 +737,8 @@ namespace wrench {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
         }
 
+        std::cerr << "STAGING FILE!\n";
+
         if (this->is_running) {
             throw std::runtime_error(" Simulation::stageFile(): Cannot stage a file once the simulation has started");
         }

@@ -105,6 +105,8 @@ namespace wrench {
     void StorageService::stageFile(const std::shared_ptr<DataFile> &file, const std::string &mountpoint, std::string path) {
         auto fs = this->file_systems[mountpoint].get();
 
+        std::cerr << "IN STAGE FILE STORAGESS!\n";
+        std::cerr << "FS = " << fs << "\n";
         try {
             fs->stageFile(file, std::move(path));
         } catch (std::exception &e) {
@@ -378,6 +380,7 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
 
         if (auto msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {
+            std::cerr << "GOT A MSG = " << msg->file_is_available << "\n";
             return msg->file_is_available;
         } else {
             throw std::runtime_error("StorageService::lookupFile(): Unexpected [" + message->getName() + "] message");
@@ -686,6 +689,8 @@ namespace wrench {
 //            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
 //        }
 
+        std::cerr << "IN COPY FILE: " << src_is_bufferized << " " << dst_is_bufferized << "\n";
+
         simgrid::s4u::Mailbox *mailbox_to_contact;
         if (dst_is_non_bufferized) {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
@@ -694,6 +699,7 @@ namespace wrench {
         } else {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
         }
+        std::cerr << "HERE\n";
 
         // Send a message to the daemon of the dst service
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
@@ -716,6 +722,8 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         message = S4U_Mailbox::getMessage(answer_mailbox);
+
+        std::cerr << "GOT THE REPLY\n";
 
         if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
             if (msg->failure_cause) {

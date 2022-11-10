@@ -171,7 +171,6 @@ void CopyBufferizedNonBufferizedTest::do_CopyBufferizedNonBufferizedTest_test() 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new CopyBufferizedNonBufferizedTestWMS(this, "WMSHost")));
 
-
     ASSERT_NO_THROW(simulation->launch());
 
     for (int i = 0; i < argc; i++)
