@@ -67,6 +67,13 @@ namespace wrench {
      * @param transaction: the transaction
      */
     void SimpleStorageServiceNonBufferized::processTransactionCompletion(const std::shared_ptr<Transaction>& transaction) {
+
+        // If I was the source and the destination was bufferized, I am the one creating the file there! (yes,
+        // this is ugly and lame, and one day we'll clean the storage service implementation
+        if (transaction->src_location->getStorageService() == shared_from_this() and transaction->dst_location->getStorageService()->isBufferized()) {
+            transaction->dst_location->getStorageService()->createFile(transaction->file, transaction->dst_location);
+        }
+
         // Send back the relevant ack if this was a read
         if (transaction->dst_location == nullptr) {
 //            WRENCH_INFO("Sending back an ack for a successful file read");
