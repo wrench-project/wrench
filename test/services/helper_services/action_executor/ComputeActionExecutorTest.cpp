@@ -222,7 +222,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test(bool si
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
@@ -345,7 +345,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorFailureTest_test() {
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);

@@ -7,13 +7,11 @@
  * (at your option) any later version.
  */
 
-#include <climits>
 #include <utility>
 #include <wrench/services/storage/storage_helpers/FileTransferThreadMessage.h>
 #include <wrench/failure_causes/InvalidDirectoryPath.h>
 #include <wrench/failure_causes/FileNotFound.h>
 #include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 #include <wrench/services/storage/simple/SimpleStorageServiceBufferized.h>
 #include <wrench/services/ServiceMessage.h>
@@ -357,35 +355,6 @@ namespace wrench {
                                                                 const std::shared_ptr<FileLocation> &src_location,
                                                                 const std::shared_ptr<FileLocation> &dst_location,
                                                                 simgrid::s4u::Mailbox *answer_mailbox) {
-        //        // File System  and path at the destination exists?
-        //        if (this->file_systems.find(dst_location->getMountPoint()) == this->file_systems.end())  {
-        //
-        //            this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(
-        //                    new SimulationTimestampFileCopyFailure(start_timestamp));
-        //
-        //            try {
-        //                S4U_Mailbox::putMessage(answer_mailbox,
-        //                                        new StorageServiceFileCopyAnswerMessage(
-        //                                                file,
-        //                                                src_location,
-        //                                                dst_location,
-        //                                                nullptr, false,
-        //                                                false,
-        //                                                std::shared_ptr<FailureCause>(
-        //                                                        new InvalidDirectoryPath(
-        //                                                                this->getSharedPtr<SimpleStorageService>(),
-        //                                                                dst_location->getMountPoint()
-        //                                                                + "/" +
-        //                                                                dst_location->getAbsolutePathAtMountPoint())),
-        //                                                this->getMessagePayloadValue(
-        //                                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-        //
-        //            } catch (ExecutionException &e) {
-        //                return true;
-        //            }
-        //            return true;
-        //        }
-
         auto fs = this->file_systems[dst_location->getMountPoint()].get();
 
         // File is not already here

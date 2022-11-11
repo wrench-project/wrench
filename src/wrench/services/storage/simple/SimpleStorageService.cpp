@@ -7,22 +7,16 @@
  * (at your option) any later version.
  */
 
-#include <climits>
-#include <wrench/services/storage/storage_helpers/FileTransferThreadMessage.h>
 #include <wrench/failure_causes/InvalidDirectoryPath.h>
 #include <wrench/failure_causes/FileNotFound.h>
-#include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 #include <wrench/services/storage/simple/SimpleStorageService.h>
 #include <wrench/services/storage/simple/SimpleStorageServiceBufferized.h>
 #include <wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h>
 #include <wrench/services/ServiceMessage.h>
 #include "wrench/services/storage/StorageServiceMessage.h"
-#include "wrench/services/storage/simple/SimpleStorageServiceBufferized.h"
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
@@ -42,17 +36,29 @@ namespace wrench {
      * @param mount_points: the set of mount points
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     * @return
+     * @return a pointer to a simple storage service
      */
     SimpleStorageService *SimpleStorageService::createSimpleStorageService(const std::string &hostname,
                                                     std::set<std::string> mount_points,
                                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
 
+//        bool bufferized = false; // By default, non-bufferized
         bool bufferized = true; // By default, bufferized
+
         if (property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != property_list.end()) {
             double buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
             bufferized = buffer_size >= 1.0; // more than one byte means bufferized
+        }
+
+        if (Simulation::isHostShutdownSimulationEnabled() and (not bufferized)) {
+            throw std::runtime_error("SimpleStorageService::createSimpleStorageService(): Cannot use non-bufferized (i.e., buffer size == 0) "
+                                     "storage services and also simulate host shutdowns. This feature is not implemented yet.");
+        }
+
+        if (Simulation::isLinkShutdownSimulationEnabled() and (not bufferized)) {
+            throw std::runtime_error("SimpleStorageService::createSimpleStorageService(): Cannot use non-bufferized (i.e., buffer size == 0) "
+                                     "storage services and also simulate link shutdowns. This feature is not implemented yet.");
         }
 
         if (bufferized) {

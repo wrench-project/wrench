@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-#include <climits>
 #include <utility>
 #include <wrench/failure_causes/InvalidDirectoryPath.h>
 #include <wrench/failure_causes/FileNotFound.h>
@@ -205,6 +204,7 @@ namespace wrench {
                 finished_activity_index = (int)simgrid::s4u::Activity::wait_any(pending_activities);
             } catch (simgrid::NetworkFailureException &e) {
                 // the comm failed
+                comm_ptr_has_been_posted = false;
                 continue; // oh well
             } catch (simgrid::Exception &e) {
                 // This likely doesn't happen, but let's keep it here for now
@@ -215,7 +215,11 @@ namespace wrench {
                         continue;
                     }
                 }
+                continue;
+            } catch (std::exception &e) {
+                continue;
             }
+
 
             // It's a communication
             if (finished_activity_index == 0) {
@@ -552,7 +556,30 @@ namespace wrench {
         auto fs = this->file_systems[dst_location->getMountPoint()].get();
 
 
-        if (not src_location->getStorageService()->lookupFile(file, src_location)) {
+        bool file_is_there;
+
+        try {
+            file_is_there = src_location->getStorageService()->lookupFile(file, src_location);
+        } catch (ExecutionException &e) {
+            try {
+                S4U_Mailbox::putMessage(
+                        answer_mailbox,
+                        new StorageServiceFileCopyAnswerMessage(
+                                file,
+                                src_location,
+                                dst_location,
+                                nullptr, false,
+                                false,
+                                e.getCause(),
+                                this->getMessagePayloadValue(
+                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+            } catch (ExecutionException &e) {
+                return true;
+            }
+            return true;
+        }
+
+        if (not file_is_there) {
             try {
                 S4U_Mailbox::putMessage(
                         answer_mailbox,

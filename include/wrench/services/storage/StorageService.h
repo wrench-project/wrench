@@ -121,7 +121,7 @@ namespace wrench {
         static void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
 
         /** @brief The service's buffer size */
-        double buffer_size;
+        double buffer_size = 10000000;
 
         /** @brief File systems */
         std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
