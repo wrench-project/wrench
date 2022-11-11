@@ -208,10 +208,14 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
+    this->ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+            "Host3", {"/"},
+            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create another Storage Service
-    this->ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host1", {"/"}));
+    this->ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+            "Host1", {"/"},
+            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();

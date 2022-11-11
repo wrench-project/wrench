@@ -436,11 +436,13 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
 
     // Create a Storage Service3
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
 
     // Create a Compute Service that does not have scratch space

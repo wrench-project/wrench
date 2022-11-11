@@ -186,7 +186,8 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
 
     // Get a hostname
     std::string failed_host = "FailedHost";
-    storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(failed_host, {"/"}));
+    storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(failed_host, {"/"},
+                                                                                               {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a WMS
     std::string stable_host = "StableHost";

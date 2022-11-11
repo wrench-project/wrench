@@ -578,7 +578,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
                                                                                                                   wrench::ComputeService::ALL_RAM))},
                                                                                           {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/"})));
+    ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/"},
+                                                                                                               {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;

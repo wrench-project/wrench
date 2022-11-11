@@ -66,6 +66,7 @@ namespace wrench {
 
         static std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
         static void removeFile(const std::shared_ptr<DataFile> &file);
+        static void removeAllFiles();
         static std::shared_ptr<DataFile> getFileByID(const std::string &id);
         static std::shared_ptr<DataFile> addFile(const std::string &, double);
 
@@ -178,6 +179,7 @@ namespace wrench {
         static double getLinkBandwidth(const std::string &link_name);
         static bool isPageCachingEnabled();
         static bool isHostShutdownSimulationEnabled();
+        static bool isLinkShutdownSimulationEnabled();
         static bool isEnergySimulationEnabled();
         static bool isSurfPrecisionSetByUser();
 
@@ -238,6 +240,7 @@ namespace wrench {
 
         static bool energy_enabled;
         static bool host_shutdown_enabled;
+        static bool link_shutdown_enabled;
         static bool pagecache_enabled;
 
         static bool initialized;

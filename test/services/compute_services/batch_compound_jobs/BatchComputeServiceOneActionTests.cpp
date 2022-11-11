@@ -786,7 +786,8 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
