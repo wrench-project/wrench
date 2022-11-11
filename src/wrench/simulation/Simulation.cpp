@@ -43,6 +43,7 @@ namespace wrench {
     int Simulation::unique_disk_sequence_number = 0;
     bool Simulation::energy_enabled = false;
     bool Simulation::host_shutdown_enabled = false;
+    bool Simulation::link_shutdown_enabled = false;
     bool Simulation::pagecache_enabled = false;
     bool Simulation::surf_precision_set_by_user = false;
 
@@ -164,6 +165,8 @@ namespace wrench {
                 Simulation::energy_enabled = true;
             } else if (not strcmp(argv[i], "--wrench-host-shutdown-simulation")) {
                 Simulation::host_shutdown_enabled = true;
+            } else if (not strcmp(argv[i], "--wrench-link-shutdown-simulation")) {
+                Simulation::link_shutdown_enabled = true;
             } else if ((not strcmp(argv[i], "--help-wrench")) or
                        (not strcmp(argv[i], "--wrench-help"))) {
                 wrench_help_requested = true;
@@ -193,6 +196,18 @@ namespace wrench {
                     }
                 });
 
+        // Register a callback on link state changes to warn users
+        // that the --wrench-host-shutdown-simulation flag should have been passed
+        // to the simulator if host shutdowns are to be simulated
+        simgrid::s4u::Link::on_state_change_cb(
+                [](simgrid::s4u::Link const &l) {
+                    if (not Simulation::link_shutdown_enabled) {
+                        throw std::runtime_error(
+                                "It looks like you are simulating link failures/shutdowns during the simulated execution."
+                                " Please restart your simulation passing it the --wrench-link-shutdown-simulation command-line flag.");
+                    }
+                });
+
 
         // Print help message if requested
         if (wrench_help_requested) {
@@ -201,7 +216,9 @@ namespace wrench {
             std::cout << "   --wrench-energy-simulation: activates SimGrid's energy plugin\n";
             std::cout << "     (requires host pstate definitions in XML platform description file)\n";
             std::cout
-                    << "   --wrench-host-shutdown-simulation: activates WRENCH's capability to simulate host failures/shutdowns during execution (will slow down simulation)\n";
+                    << "   --wrench-host-shutdown-simulation: activates WRENCH's capability to simulate host failures/shutdowns during execution\n";
+            std::cout
+                    << "   --wrench-link-shutdown-simulation: activates WRENCH's capability to simulate link failures/shutdowns during execution\n";
             std::cout
                     << "   --wrench-pagecache-simulation: Activate the in-memory (Linux) page cache simulation (which ";
             std::cout
@@ -420,6 +437,15 @@ namespace wrench {
     bool Simulation::isHostShutdownSimulationEnabled() {
         return Simulation::host_shutdown_enabled;
     }
+
+    /**
+     * @brief Method to check if link shutdown simulation is activated
+     * @return true or false
+     */
+    bool Simulation::isLinkShutdownSimulationEnabled() {
+        return Simulation::link_shutdown_enabled;
+    }
+
 
     /**
      * @brief Method to check if energy simulation is activated
@@ -1575,6 +1601,15 @@ namespace wrench {
         }
         Simulation::data_files.erase(file->getID());
     }
+
+    /**
+     * @brief Remove all files from the simulation (use at your own peril if you're using the workflow API)
+     * @param file : file to remove
+     */
+    void Simulation::removeAllFiles() {
+        Simulation::data_files.clear();
+    }
+
 
     /**
      * @brief Determine if the simulation has been initialized

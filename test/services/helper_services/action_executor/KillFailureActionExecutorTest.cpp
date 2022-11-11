@@ -347,9 +347,9 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
+    this->ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
     // Create a Storage Service
-    this->ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host1", {"/"}));
+    this->ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file to read
     this->file = this->workflow->addFile("some_file", 1000000.0);
