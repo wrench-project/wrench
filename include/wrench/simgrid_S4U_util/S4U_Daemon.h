@@ -77,10 +77,10 @@ namespace wrench {
          */
         virtual int main() = 0;
 
-        bool hasReturnedFromMain();
-        int getReturnValue();
-        bool isDaemonized();
-        bool isSetToAutoRestart();
+        bool hasReturnedFromMain() const;
+        int getReturnValue() const;
+        bool isDaemonized() const;
+        bool isSetToAutoRestart() const;
         void setupOnExitFunction();
 
         std::pair<bool, int> join();
@@ -90,7 +90,7 @@ namespace wrench {
         void resumeActor();
 
 
-        std::string getName();
+        std::string getName() const;
 
         /** @brief Daemon states */
         enum State {
