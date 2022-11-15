@@ -220,8 +220,9 @@ namespace wrench {
             // Create all activities to wait on
             std::vector<simgrid::s4u::ActivityPtr> pending_activities;
             pending_activities.emplace_back(comm_ptr);
-            WRENCH_INFO("ADDING THE STREADMS: %zu", this->running_transactions.size())
+
             // TODO: DEBUGGING REMOVED THAT
+//            WRENCH_INFO("ADDING THE STREADMS: %zu", this->running_transactions.size())
 //            for (auto const &transaction : this->running_transactions) {
 //                pending_activities.emplace_back(transaction->stream);
 //            }
@@ -229,7 +230,7 @@ namespace wrench {
             // Wait one activity to complete
             int finished_activity_index;
             try {
-                WRENCH_INFO("DOING A WAIT_ANY");
+                WRENCH_INFO("DOING A WAIT_ANY pn %zu ACTIVITIS", pending_activities.size());
                 finished_activity_index = (int)simgrid::s4u::Activity::wait_any(pending_activities);
                 WRENCH_INFO("DONE A WAIT_ANY SUCCESSFULLY");
             } catch (simgrid::NetworkFailureException &e) {
