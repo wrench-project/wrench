@@ -37,23 +37,23 @@ namespace wrench {
      */
     void SimpleStorageServiceNonBufferized::cleanup(bool has_returned_from_main, int return_value) {
 
-        std::cerr << "IN CLEANUP " << this->name << "  FROM MAIN: " << has_returned_from_main << "\n";
-        std::cerr << "IS MASTRO: " << simgrid::s4u::this_actor::is_maestro() << "\n";
-        std::cerr << "IN CLEANUP PENDING = " << this->pending_transactions.size() << "\n";
-        this->pending_transactions.clear();
-
-
-        std::cerr << "IN CLEANUP RUNNING = " << this->running_transactions.size() << "\n";
-        for (auto &s : this->running_transactions) {
-            std::cerr << "RUNNING STATE == FAILED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FAILED) << "\n";
-            std::cerr << "RUNNING STATE == STARTED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::STARTED) << "\n";
-            std::cerr << "RUNNING STATE == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
-//            s->stream->cancel();
-            std::cerr << "RUNNING STATE AFTER CANCELED! == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
-        }
-        this->running_transactions.clear();
-
-        this->stream_to_transactions.clear();
+//        std::cerr << "IN CLEANUP " << this->name << "  FROM MAIN: " << has_returned_from_main << "\n";
+//        std::cerr << "IS MASTRO: " << simgrid::s4u::this_actor::is_maestro() << "\n";
+//        std::cerr << "IN CLEANUP PENDING = " << this->pending_transactions.size() << "\n";
+//        this->pending_transactions.clear();
+//
+//
+//        std::cerr << "IN CLEANUP RUNNING = " << this->running_transactions.size() << "\n";
+//        for (auto &s : this->running_transactions) {
+//            std::cerr << "RUNNING STATE == FAILED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FAILED) << "\n";
+//            std::cerr << "RUNNING STATE == STARTED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::STARTED) << "\n";
+//            std::cerr << "RUNNING STATE == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
+////            s->stream->cancel();
+//            std::cerr << "RUNNING STATE AFTER CANCELED! == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
+//        }
+//        this->running_transactions.clear();
+//
+//        this->stream_to_transactions.clear();
 
 
         std::cerr << "DONE CLEANUP\n";
@@ -157,6 +157,11 @@ namespace wrench {
             fs.second->init();
         }
 
+        // In case this was a restart!
+        this->pending_transactions.clear();
+        this->running_transactions.clear();
+        this->stream_to_transactions.clear();
+
         std::string message = "Simple Storage Service (Non-Bufferized) " + this->getName() + "  starting on host " + this->getHostname();
         WRENCH_INFO("%s", message.c_str());
         for (auto const &fs: this->file_systems) {
@@ -216,6 +221,7 @@ namespace wrench {
             std::vector<simgrid::s4u::ActivityPtr> pending_activities;
             pending_activities.emplace_back(comm_ptr);
             WRENCH_INFO("ADDING THE STREADMS: %zu", this->running_transactions.size())
+            // TODO: DEBUGGING REMOVED THAT
 //            for (auto const &transaction : this->running_transactions) {
 //                pending_activities.emplace_back(transaction->stream);
 //            }
@@ -739,7 +745,7 @@ namespace wrench {
  * @return the load on the service
  */
     double SimpleStorageServiceNonBufferized::getLoad() {
-        // TODO: TO RE-IMPLE<MENT FOR NON-BUFFERIZED
+        // TODO: TO RE-IMPLEMENT FOR NON-BUFFERIZED
         return 0.0;
     }
 
