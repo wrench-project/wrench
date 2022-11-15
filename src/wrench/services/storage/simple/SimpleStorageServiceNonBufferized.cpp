@@ -36,10 +36,27 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void SimpleStorageServiceNonBufferized::cleanup(bool has_returned_from_main, int return_value) {
-        this->transactions.clear();
-        this->pending_sg_iostreams.clear();
-        this->running_sg_iostreams.clear();
-        // Do nothing. It's fine to die. We'll just autorestart with our previous state
+
+        std::cerr << "IN CLEANUP " << this->name << "  FROM MAIN: " << has_returned_from_main << "\n";
+        std::cerr << "IS MASTRO: " << simgrid::s4u::this_actor::is_maestro() << "\n";
+        std::cerr << "IN CLEANUP PENDING = " << this->pending_transactions.size() << "\n";
+        this->pending_transactions.clear();
+
+
+        std::cerr << "IN CLEANUP RUNNING = " << this->running_transactions.size() << "\n";
+        for (auto &s : this->running_transactions) {
+            std::cerr << "RUNNING STATE == FAILED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FAILED) << "\n";
+            std::cerr << "RUNNING STATE == STARTED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::STARTED) << "\n";
+            std::cerr << "RUNNING STATE == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
+//            s->stream->cancel();
+            std::cerr << "RUNNING STATE AFTER CANCELED! == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
+        }
+        this->running_transactions.clear();
+
+        this->stream_to_transactions.clear();
+
+
+        std::cerr << "DONE CLEANUP\n";
     }
 
     /**
@@ -149,6 +166,9 @@ namespace wrench {
             WRENCH_INFO("%s", message.c_str())
         }
 
+        WRENCH_INFO("STREAMS PENDING: %zu", this->pending_transactions.size());
+        WRENCH_INFO("STREAMS RUNNING: %zu", this->pending_transactions.size());
+
         // If writeback device simulation is activated
         if (Simulation::isPageCachingEnabled()) {
             //  Find the "memory" disk (we know there is one)
@@ -182,6 +202,7 @@ namespace wrench {
 
             // Create an async recv if needed
             if (not comm_ptr_has_been_posted) {
+                WRENCH_INFO("CREATING A COMM!!");
                 try {
                     comm_ptr = this->mailbox->get_async<void>((void **) (&(simulation_message)));
                 } catch (simgrid::NetworkFailureException &e) {
@@ -194,29 +215,36 @@ namespace wrench {
             // Create all activities to wait on
             std::vector<simgrid::s4u::ActivityPtr> pending_activities;
             pending_activities.emplace_back(comm_ptr);
-            for (auto const &stream : this->running_sg_iostreams) {
-                pending_activities.emplace_back(stream);
+            WRENCH_INFO("ADDING THE STREADMS: %zu", this->running_transactions.size())
+            for (auto const &transaction : this->running_transactions) {
+                pending_activities.emplace_back(transaction->stream);
             }
 
             // Wait one activity to complete
             int finished_activity_index;
             try {
+                WRENCH_INFO("DOING A WAIT_ANY");
                 finished_activity_index = (int)simgrid::s4u::Activity::wait_any(pending_activities);
+                WRENCH_INFO("DONE A WAIT_ANY SUCCESSFULLY");
             } catch (simgrid::NetworkFailureException &e) {
+                WRENCH_INFO("WAIT_ANY: HERE1");
                 // the comm failed
                 comm_ptr_has_been_posted = false;
                 continue; // oh well
             } catch (simgrid::Exception &e) {
+                WRENCH_INFO("WAIT_ANY: HERE2: %s", e.what());
                 // This likely doesn't happen, but let's keep it here for now
                 for (int i = 1; i < (int)pending_activities.size(); i++) {
                     if (pending_activities.at(i)->get_state() == simgrid::s4u::Activity::State::FAILED) {
-                        auto stream = this->running_sg_iostreams.at(i - 1);
-                        processTransactionFailure(this->transactions[stream]);
+                        auto finished_transaction = this->running_transactions[i-1];
+                        this->stream_to_transactions.erase(finished_transaction->stream);
+                        processTransactionFailure(finished_transaction);
                         continue;
                     }
                 }
                 continue;
             } catch (std::exception &e) {
+                WRENCH_INFO("WAIT_ANY: HERE3: %s", e.what());
                 continue;
             }
 
@@ -226,9 +254,10 @@ namespace wrench {
                 comm_ptr_has_been_posted = false;
                 if (not processNextMessage(simulation_message.get())) break;
             } else if (finished_activity_index > 0) {
-                auto finished_activity = this->running_sg_iostreams.at(finished_activity_index - 1);
-                this->running_sg_iostreams.erase(this->running_sg_iostreams.begin() + finished_activity_index - 1);
-                processTransactionCompletion(this->transactions[finished_activity]);
+                auto finished_transaction = this->running_transactions.at(finished_activity_index - 1);
+                this->running_transactions.erase(this->running_transactions.begin() + finished_activity_index - 1);
+                this->stream_to_transactions.erase(finished_transaction->stream);
+                processTransactionCompletion(finished_transaction);
             } else if (finished_activity_index == -1) {
                 throw std::runtime_error("wait_any() returned -1. Not sure what to do with this. ");
             }
@@ -343,22 +372,24 @@ namespace wrench {
             auto me_host = simgrid::s4u::this_actor::get_host();
             simgrid::s4u::Disk *me_disk = fs->getDisk();
 
-
-            auto sg_iostream = simgrid::s4u::Io::streamto_init(requesting_host,
-                                                               nullptr,
-                                                               me_host,
-                                                               me_disk)->set_size((uint64_t)file->getSize());
+//            auto sg_iostream = simgrid::s4u::Io::streamto_init(requesting_host,
+//                                                               nullptr,
+//                                                               me_host,
+//                                                               me_disk)->set_size((uint64_t)file->getSize());
 
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
                     file,
                     nullptr,
+                    requesting_host,
+                    nullptr,
                     location,
+                    me_host,
+                    me_disk,
                     answer_mailbox);
 
             // Add it to the Pool of pending data communications
-            this->transactions[sg_iostream] = transaction;
-            this->pending_sg_iostreams.push_back(sg_iostream);
+            this->pending_transactions.push_back(transaction);
 
         } else {
             // Reply with a "failure" message
@@ -435,21 +466,32 @@ namespace wrench {
             auto me_host = simgrid::s4u::this_actor::get_host();
             simgrid::s4u::Disk *me_disk = fs->getDisk();
 
-            auto sg_iostream = simgrid::s4u::Io::streamto_init(me_host,
-                                                               me_disk,
-                                                               requesting_host,
-                                                               nullptr)->set_size((uint64_t)file->getSize());
+//            auto sg_iostream = simgrid::s4u::Io::streamto_init(me_host,
+//                                                               me_disk,
+//                                                               requesting_host,
+//                                                               nullptr)->set_size((uint64_t)file->getSize());
+//
+//            // Create a Transaction
+//            auto transaction = std::make_shared<Transaction>(
+//                    file,
+//                    location,
+//                    nullptr,
+//                    answer_mailbox);
 
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
                     file,
                     location,
+                    me_host,
+                    me_disk,
+                    nullptr,
+                    requesting_host,
                     nullptr,
                     answer_mailbox);
 
             // Add it to the Pool of pending data communications
-            this->transactions[sg_iostream] = transaction;
-            this->pending_sg_iostreams.push_back(sg_iostream);
+//            this->transactions[sg_iostream] = transaction;
+            this->pending_transactions.push_back(transaction);
 
         }
 
@@ -532,20 +574,23 @@ namespace wrench {
             }
 
 
-            auto sg_iostream = simgrid::s4u::Io::streamto_init(src_host,
-                                                               src_disk,
-                                                               dst_host,
-                                                               dst_disk)->set_size(transfer_size);
+//            auto sg_iostream = simgrid::s4u::Io::streamto_init(src_host,
+//                                                               src_disk,
+//                                                               dst_host,
+//                                                               dst_disk)->set_size(transfer_size);
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
                     file,
                     src_location,
+                    src_host,
+                    src_disk,
                     dst_location,
+                    dst_host,
+                    dst_disk,
                     answer_mailbox);
 
             // Add it to the Pool of pending data communications
-            this->transactions[sg_iostream] = transaction;
-            this->pending_sg_iostreams.push_back(sg_iostream);
+            this->pending_transactions.push_back(transaction);
 
             return true;
 
@@ -632,21 +677,25 @@ namespace wrench {
         }
 
 
-        auto sg_iostream = simgrid::s4u::Io::streamto_init(src_host,
-                                                           src_disk,
-                                                           dst_host,
-                                                           dst_disk)->set_size((uint64_t)file->getSize());
+//        auto sg_iostream = simgrid::s4u::Io::streamto_init(src_host,
+//                                                           src_disk,
+//                                                           dst_host,
+//                                                           dst_disk)->set_size((uint64_t)file->getSize());
 
         // Create a Transaction
         auto transaction = std::make_shared<Transaction>(
                 file,
                 src_location,
+                src_host,
+                src_disk,
                 dst_location,
+                dst_host,
+                dst_disk,
                 answer_mailbox);
 
 // Add it to the Pool of pending data communications
-        this->transactions[sg_iostream] = transaction;
-        this->pending_sg_iostreams.push_back(sg_iostream);
+//        this->transactions[sg_iostream] = transaction;
+        this->pending_transactions.push_back(transaction);
 
         return true;
     }
@@ -655,14 +704,25 @@ namespace wrench {
  * @brief Start pending file transfer threads if any and if possible
  */
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
-        while ((not this->pending_sg_iostreams.empty()) and
-               (this->running_sg_iostreams.size() < this->num_concurrent_connections)) {
+        while ((not this->pending_transactions.empty()) and
+               (this->running_transactions.size() < this->num_concurrent_connections)) {
 //            WRENCH_INFO("Starting pending transaction for file %s",
 //                        this->transactions[this->pending_sg_iostreams.at(0)]->file->getID().c_str());
-            auto sg_iostream = this->pending_sg_iostreams.at(0);
-            this->pending_sg_iostreams.pop_front();
-            this->running_sg_iostreams.push_back(sg_iostream);
+
+            auto transaction = this->pending_transactions.front();
+            this->pending_transactions.pop_front();
+
+            auto sg_iostream = simgrid::s4u::Io::streamto_init(transaction->src_host,
+                                                               transaction->src_disk,
+                                                               transaction->dst_host,
+                                                               transaction->dst_disk)->set_size((uint64_t)(transaction->file->getSize()));
+            transaction->stream = sg_iostream;
+
+            this->stream_to_transactions[sg_iostream] = transaction;
+            this->running_transactions.push_back(transaction);
+            WRENCH_INFO("STARTING A STREAM");
             sg_iostream->vetoable_start();
+            WRENCH_INFO("STREAM STARTED");
 //            WRENCH_INFO("Transaction started");
         }
     }

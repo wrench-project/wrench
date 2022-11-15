@@ -34,15 +34,27 @@ namespace wrench {
         struct Transaction {
             std::shared_ptr<DataFile> file;
             std::shared_ptr<FileLocation> src_location;
+            simgrid::s4u::Host *src_host;
+            simgrid::s4u::Disk *src_disk;
             std::shared_ptr<FileLocation> dst_location;
+            simgrid::s4u::Host *dst_host;
+            simgrid::s4u::Disk *dst_disk;
             simgrid::s4u::Mailbox *mailbox;
+            simgrid::s4u::IoPtr stream;
 
         public:
             Transaction(std::shared_ptr<DataFile> file,
                         std::shared_ptr<FileLocation> src_location,
+                        simgrid::s4u::Host *src_host,
+                        simgrid::s4u::Disk *src_disk,
                         std::shared_ptr<FileLocation> dst_location,
+                        simgrid::s4u::Host *dst_host,
+                        simgrid::s4u::Disk *dst_disk,
                         simgrid::s4u::Mailbox *mailbox) :
-                    file(file), src_location(src_location), dst_location(dst_location), mailbox(mailbox) {}
+                    file(file), src_location(src_location), src_host(src_host), src_disk(src_disk),
+                    dst_location(dst_location), dst_host(dst_host), dst_disk(dst_disk),
+                    mailbox(mailbox), stream(nullptr) {
+            }
 
         };
 
@@ -94,9 +106,13 @@ namespace wrench {
         void processTransactionFailure(const std::shared_ptr<Transaction>& transaction);
 
 
-        std::deque<simgrid::s4u::IoPtr> pending_sg_iostreams;
-        std::vector<simgrid::s4u::IoPtr> running_sg_iostreams;
-        std::unordered_map<simgrid::s4u::IoPtr, std::shared_ptr<Transaction>> transactions;
+//        std::deque<simgrid::s4u::IoPtr> pending_sg_iostreams;
+//        std::vector<simgrid::s4u::IoPtr> running_sg_iostreams;
+//        std::unordered_map<simgrid::s4u::IoPtr, std::shared_ptr<Transaction>> transactions;
+
+        std::deque<std::shared_ptr<Transaction>> pending_transactions;
+        std::vector<std::shared_ptr<Transaction>> running_transactions;
+        std::unordered_map<simgrid::s4u::IoPtr, std::shared_ptr<Transaction>> stream_to_transactions;
 
         std::shared_ptr<MemoryManager> memory_manager;
     };
