@@ -216,9 +216,9 @@ namespace wrench {
             std::vector<simgrid::s4u::ActivityPtr> pending_activities;
             pending_activities.emplace_back(comm_ptr);
             WRENCH_INFO("ADDING THE STREADMS: %zu", this->running_transactions.size())
-            for (auto const &transaction : this->running_transactions) {
-                pending_activities.emplace_back(transaction->stream);
-            }
+//            for (auto const &transaction : this->running_transactions) {
+//                pending_activities.emplace_back(transaction->stream);
+//            }
 
             // Wait one activity to complete
             int finished_activity_index;
@@ -693,8 +693,6 @@ namespace wrench {
                 dst_disk,
                 answer_mailbox);
 
-// Add it to the Pool of pending data communications
-//        this->transactions[sg_iostream] = transaction;
         this->pending_transactions.push_back(transaction);
 
         return true;
@@ -712,10 +710,19 @@ namespace wrench {
             auto transaction = this->pending_transactions.front();
             this->pending_transactions.pop_front();
 
-            auto sg_iostream = simgrid::s4u::Io::streamto_init(transaction->src_host,
-                                                               transaction->src_disk,
-                                                               transaction->dst_host,
-                                                               transaction->dst_disk)->set_size((uint64_t)(transaction->file->getSize()));
+//            auto sg_iostream = simgrid::s4u::Io::streamto_init(transaction->src_host,
+//                                                               transaction->src_disk,
+//                                                               transaction->dst_host,
+//                                                               transaction->dst_disk)->set_size((uint64_t)(transaction->file->getSize()));
+
+            // TODO: DEBUG STUFF HERE
+            simgrid::s4u::IoPtr sg_iostream;
+            if (transaction->src_disk) {
+                sg_iostream = transaction->src_disk->read_async(1000);
+            } else {
+                sg_iostream = transaction->dst_disk->read_async(1000);
+            }
+
             transaction->stream = sg_iostream;
 
             this->stream_to_transactions[sg_iostream] = transaction;
