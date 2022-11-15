@@ -37,7 +37,7 @@ namespace wrench {
      */
     void SimpleStorageServiceNonBufferized::cleanup(bool has_returned_from_main, int return_value) {
 
-//        std::cerr << "IN CLEANUP " << this->name << "  FROM MAIN: " << has_returned_from_main << "\n";
+        std::cerr << "IN CLEANUP " << this->name << "  FROM MAIN: " << has_returned_from_main << "\n";
 //        std::cerr << "IS MASTRO: " << simgrid::s4u::this_actor::is_maestro() << "\n";
 //        std::cerr << "IN CLEANUP PENDING = " << this->pending_transactions.size() << "\n";
 //        this->pending_transactions.clear();
@@ -48,7 +48,7 @@ namespace wrench {
 //            std::cerr << "RUNNING STATE == FAILED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FAILED) << "\n";
 //            std::cerr << "RUNNING STATE == STARTED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::STARTED) << "\n";
 //            std::cerr << "RUNNING STATE == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
-////            s->stream->cancel();
+//            s->stream->cancel();
 //            std::cerr << "RUNNING STATE AFTER CANCELED! == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
 //        }
 //        this->running_transactions.clear();
@@ -151,6 +151,8 @@ namespace wrench {
      */
     int SimpleStorageServiceNonBufferized::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
+        std::string message = "Simple Storage Service (Non-Bufferized) " + this->getName() + "  starting on host " + this->getHostname();
+        WRENCH_INFO("%s", message.c_str());
 
         // "Start" all logical file systems
         for (auto const &fs: this->file_systems) {
@@ -158,12 +160,10 @@ namespace wrench {
         }
 
         // In case this was a restart!
+        this->stream_to_transactions.clear();
         this->pending_transactions.clear();
         this->running_transactions.clear();
-        this->stream_to_transactions.clear();
 
-        std::string message = "Simple Storage Service (Non-Bufferized) " + this->getName() + "  starting on host " + this->getHostname();
-        WRENCH_INFO("%s", message.c_str());
         for (auto const &fs: this->file_systems) {
             message = "  - mount point " + fs.first + ": " +
                       std::to_string(fs.second->getFreeSpace()) + "/" +
