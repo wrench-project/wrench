@@ -158,9 +158,9 @@ namespace wrench {
         }
 
         // In case this was a restart!
-        this->pending_transactions.clear();
-        this->running_transactions.clear();
-        this->stream_to_transactions.clear();
+//        this->pending_transactions.clear();
+//        this->running_transactions.clear();
+//        this->stream_to_transactions.clear();
 
         std::string message = "Simple Storage Service (Non-Bufferized) " + this->getName() + "  starting on host " + this->getHostname();
         WRENCH_INFO("%s", message.c_str());
@@ -222,15 +222,16 @@ namespace wrench {
             pending_activities.emplace_back(comm_ptr);
 
             // TODO: DEBUGGING REMOVED THAT
-//            WRENCH_INFO("ADDING THE STREADMS: %zu", this->running_transactions.size())
-//            for (auto const &transaction : this->running_transactions) {
-//                pending_activities.emplace_back(transaction->stream);
-//            }
+            WRENCH_INFO("ADDING THE STREAMS: %zu", this->running_transactions.size())
+            for (auto const &transaction : this->running_transactions) {
+                WRENCH_INFO("ADDING A STREAM");
+                pending_activities.emplace_back(transaction->stream);
+            }
 
             // Wait one activity to complete
             int finished_activity_index;
             try {
-                WRENCH_INFO("DOING A WAIT_ANY pn %zu ACTIVITIS", pending_activities.size());
+                WRENCH_INFO("DOING A WAIT_ANY pn %zu ACTIVITIES", pending_activities.size());
                 finished_activity_index = (int)simgrid::s4u::Activity::wait_any(pending_activities);
                 WRENCH_INFO("DONE A WAIT_ANY SUCCESSFULLY");
             } catch (simgrid::NetworkFailureException &e) {
