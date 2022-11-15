@@ -468,7 +468,9 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
+            WRENCH_INFO("WAITING FOR THE REPLUY!");
             message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
+            WRENCH_INFO("WAITED FOR THE REPLUY!");
         } catch (ExecutionException &e) {
             if (chunk_receiving_mailbox) S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             throw;
@@ -486,7 +488,9 @@ namespace wrench {
             if (msg->buffer_size < 1) {
                 // Non-Bufferized
                 // Just wait for the final ack (no timeout!)
+                WRENCH_INFO("WAITING FOR THE FINAL ACK");
                 message = S4U_Mailbox::getMessage(answer_mailbox);
+                WRENCH_INFO("WAITED FOR THE FINAL ACK");
                 if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
                     throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                              message->getName() + "] message!");
