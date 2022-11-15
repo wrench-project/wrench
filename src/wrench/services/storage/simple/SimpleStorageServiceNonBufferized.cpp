@@ -158,9 +158,9 @@ namespace wrench {
         }
 
         // In case this was a restart!
-//        this->pending_transactions.clear();
-//        this->running_transactions.clear();
-//        this->stream_to_transactions.clear();
+        this->pending_transactions.clear();
+        this->running_transactions.clear();
+        this->stream_to_transactions.clear();
 
         std::string message = "Simple Storage Service (Non-Bufferized) " + this->getName() + "  starting on host " + this->getHostname();
         WRENCH_INFO("%s", message.c_str());
