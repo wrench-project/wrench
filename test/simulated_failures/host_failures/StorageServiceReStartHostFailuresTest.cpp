@@ -175,11 +175,12 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 3;
+    int argc = 4;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     argv[2] = strdup("--wrench-full-log");
+    argv[3] = strdup("--log=root.thresh:debug");
 
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
