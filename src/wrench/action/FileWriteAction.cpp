@@ -26,13 +26,10 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param file: the file
     * @param file_location: the location where the file should be written
     */
     FileWriteAction::FileWriteAction(const std::string &name,
-                                     std::shared_ptr<DataFile> file,
                                      std::shared_ptr<FileLocation> file_location) : Action(name, "file_write_"),
-                                                                                    file(std::move(file)),
                                                                                     file_location(std::move(file_location)) {
     }
 
@@ -77,7 +74,7 @@ namespace wrench {
   * @return true if the action uses scratch, false otherwise
   */
     bool FileWriteAction::usesScratch() const {
-        return (this->file_location == FileLocation::SCRATCH);
+        return (this->file_location->isScratch());
     }
 
 
