@@ -73,7 +73,7 @@ namespace wrench {
             // Create input file
             auto input_file = wrench::Simulation::addFile("input_file_" + std::to_string(i), mb_dist(rng));
             // Create a copy of the input file on the storage service
-            wrench::Simulation::createFile(input_file, wrench::FileLocation::LOCATION(this->storage_service));
+            wrench::Simulation::createFile(wrench::FileLocation::LOCATION(this->storage_service, input_file));
             auto output_file = wrench::Simulation::addFile("output_file_" + std::to_string(i), mb_dist(rng));
             action_specs.emplace_back(work, input_file, output_file);
         }
@@ -96,9 +96,9 @@ namespace wrench {
         for (int i = 0; i < this->num_actions; i += 2) {
             // Create a compound job and submit it to the first VM
             auto job1 = job_manager->createCompoundJob("job_" + std::to_string(i));
-            auto file_read_1 = job1->addFileReadAction("file_read_" + std::to_string(i), std::get<1>(action_specs.at(i + 1)), wrench::FileLocation::LOCATION(this->storage_service));
+            auto file_read_1 = job1->addFileReadAction("file_read_" + std::to_string(i), wrench::FileLocation::LOCATION(this->storage_service, std::get<1>(action_specs.at(i + 1))));
             auto compute_1 = job1->addComputeAction("computation_" + std::to_string(i), std::get<0>(action_specs.at(i + 1)), 0.0, 1, 10, wrench::ParallelModel::AMDAHL(0.9));
-            auto file_write_1 = job1->addFileWriteAction("file_write_" + std::to_string(i), std::get<2>(action_specs.at(i + 1)), wrench::FileLocation::LOCATION(this->storage_service));
+            auto file_write_1 = job1->addFileWriteAction("file_write_" + std::to_string(i), wrench::FileLocation::LOCATION(this->storage_service, std::get<2>(action_specs.at(i + 1))));
             job1->addActionDependency(file_read_1, compute_1);
             job1->addActionDependency(compute_1, file_write_1);
             compute_actions.push_back(compute_1);
@@ -108,9 +108,9 @@ namespace wrench {
 
             // Create a compound job and submit it to the second VM
             auto job2 = job_manager->createCompoundJob("job_" + std::to_string(i + 1));
-            auto file_read_2 = job2->addFileReadAction("file_read_" + std::to_string(i + 1), std::get<1>(action_specs.at(i + 1)), wrench::FileLocation::LOCATION(this->storage_service));
+            auto file_read_2 = job2->addFileReadAction("file_read_" + std::to_string(i + 1), wrench::FileLocation::LOCATION(this->storage_service, std::get<1>(action_specs.at(i + 1))));
             auto compute_2 = job2->addComputeAction("computation_" + std::to_string(i + 1), std::get<0>(action_specs.at(i + 1)), 0.0, 1, 10, wrench::ParallelModel::AMDAHL(0.9));
-            auto file_write_2 = job2->addFileWriteAction("file_write_" + std::to_string(i + 1), std::get<2>(action_specs.at(i + 1)), wrench::FileLocation::LOCATION(this->storage_service));
+            auto file_write_2 = job2->addFileWriteAction("file_write_" + std::to_string(i + 1), wrench::FileLocation::LOCATION(this->storage_service, std::get<2>(action_specs.at(i + 1))));
             job2->addActionDependency(file_read_2, compute_2);
             job2->addActionDependency(compute_2, file_write_2);
             compute_actions.push_back(compute_2);

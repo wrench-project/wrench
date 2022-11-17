@@ -66,9 +66,9 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new FileRegistryFileLookupRequestMessage(
-                                                       answer_mailbox, file,
-                                                       this->getMessagePayloadValue(
-                                                               FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+                answer_mailbox, file,
+                this->getMessagePayloadValue(
+                        FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         std::unique_ptr<SimulationMessage> message = nullptr;
 
@@ -136,16 +136,15 @@ namespace wrench {
 
     /**
      * @brief Add an entry
-     * @param file: a file
      * @param location: a file location
      *
      * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::addEntry(const std::shared_ptr<DataFile> &file, std::shared_ptr<FileLocation> location) {
-        if ((file == nullptr) || (location == nullptr)) {
-            throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
+    void FileRegistryService::addEntry(std::shared_ptr<FileLocation> location) {
+        if (location == nullptr) {
+            throw std::invalid_argument("FileRegistryService::addEntry(): Invalid nullptr argument");
         }
 
         assertServiceIsUp();
@@ -155,7 +154,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(
                 this->mailbox,
                 new FileRegistryAddEntryRequestMessage(
-                        answer_mailbox, file, location,
+                        answer_mailbox, location->getFile(), location,
                         this->getMessagePayloadValue(
                                 FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -172,16 +171,15 @@ namespace wrench {
 
     /**
      * @brief Remove an entry
-     * @param file: a file
      * @param location: a file location
      *
      * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::removeEntry(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-        if ((file == nullptr) || (location == nullptr)) {
-            throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
+    void FileRegistryService::removeEntry(const std::shared_ptr<FileLocation> &location) {
+        if (location == nullptr) {
+            throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid nullptr argument");
         }
 
         assertServiceIsUp();
@@ -191,7 +189,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(
                 this->mailbox,
                 new FileRegistryRemoveEntryRequestMessage(
-                        answer_mailbox, file, location,
+                        answer_mailbox, location->getFile(), location,
                         this->getMessagePayloadValue(
                                 FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -203,7 +201,7 @@ namespace wrench {
             if (!msg->success) {
                 WRENCH_WARN(
                         "Attempted to remove non-existent (%s,%s) entry from file registry service (ignored)",
-                        file->getID().c_str(), location->toString().c_str());
+                        location->getFile()->getID().c_str(), location->toString().c_str());
             }
             return;
         } else {
@@ -304,7 +302,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<FileRegistryAddEntryRequestMessage *>(message.get())) {
-            addEntryToDatabase(msg->file, msg->location);
+            addEntryToDatabase(msg->location);
 
             // Simulate an add overhead
             S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST));
@@ -315,7 +313,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<FileRegistryRemoveEntryRequestMessage *>(message.get())) {
-            bool success = removeEntryFromDatabase(msg->file, msg->location);
+            bool success = removeEntryFromDatabase(msg->location);
 
             // Simulate a removal overhead
             S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST));
@@ -336,10 +334,10 @@ namespace wrench {
 
     /**
      * Internal method to add an entry to the database
-     * @param file: a file
      * @param location: a file location
      */
-    void FileRegistryService::addEntryToDatabase(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
+    void FileRegistryService::addEntryToDatabase(const std::shared_ptr<FileLocation> &location) {
+        auto file = location->getFile();
         WRENCH_INFO("Adding file (%s) at (%s) to the file registry", file->getID().c_str(),
                     location->getStorageService()->getHostname().c_str());
         if (this->entries.find(file) == this->entries.end()) {
@@ -360,7 +358,8 @@ namespace wrench {
      *
      * @return true if an entry was removed
      */
-    bool FileRegistryService::removeEntryFromDatabase(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
+    bool FileRegistryService::removeEntryFromDatabase(const std::shared_ptr<FileLocation> &location) {
+        auto file = location->getFile();
         WRENCH_INFO("Removing file (%s) from the file registry", file->getID().c_str());
         if (this->entries.find(file) != this->entries.end()) {
             for (auto const &l: this->entries[file]) {

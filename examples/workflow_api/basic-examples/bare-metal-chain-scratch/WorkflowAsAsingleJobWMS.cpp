@@ -64,19 +64,19 @@ namespace wrench {
          * the entire workflow as a single multi-task job! */
 
         /* First, we need to create a map of file locations, stating for each file
-         * where is should be read/written */
+         * where it should be read/written */
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
         // Set each file's location to the compute service's scratch space
         for (auto const &file: this->workflow->getFileMap()) {
-            file_locations[file.second] = FileLocation::SCRATCH;
+            file_locations[file.second] = FileLocation::SCRATCH(file.second);
         }
         // For the workflow input files, in fact, set the location to the storage service
         for (auto const &f: this->workflow->getInputFiles()) {
-            file_locations[f] = FileLocation::LOCATION(storage_service);
+            file_locations[f] = FileLocation::LOCATION(storage_service, f);
         }
         // For the workflow output files, in fact, set the location to the storage service
         for (auto const &f: this->workflow->getOutputFiles()) {
-            file_locations[f] = FileLocation::LOCATION(storage_service);
+            file_locations[f] = FileLocation::LOCATION(storage_service, f);
         }
 
         /* Second, we create a job */

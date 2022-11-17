@@ -50,17 +50,17 @@ namespace wrench {
         virtual bool hasMultipleMountPoints();
         virtual bool hasMountPoint(const std::string &mp);
 
-        static bool lookupFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
+        static bool lookupFile(const std::shared_ptr<FileLocation> &location);
         virtual bool lookupFile(const std::shared_ptr<DataFile> &file);
 
         virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) = 0;
 
-        static void deleteFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
+        static void deleteFile(const std::shared_ptr<FileLocation> &location,
                                const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
         virtual void deleteFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
 
-        static void readFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
-        static void readFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location, double num_bytes);
+        static void readFile(const std::shared_ptr<FileLocation> &location);
+        static void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes);
         virtual void readFile(const std::shared_ptr<DataFile> &file);
         virtual void readFile(const std::shared_ptr<DataFile> &file, double num_bytes);
         virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path);
@@ -70,7 +70,7 @@ namespace wrench {
         virtual void writeFile(const std::shared_ptr<DataFile> &file, const std::string &path);
         virtual void writeFile(const std::shared_ptr<DataFile> &file);
 
-        virtual void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
+        virtual void createFile(const std::shared_ptr<FileLocation> &location);
         virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path);
         virtual void createFile(const std::shared_ptr<DataFile> &file);
 
@@ -82,8 +82,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
-        static void readFile(const std::shared_ptr<DataFile> &file,
-                             const std::shared_ptr<FileLocation> &location,
+        static void readFile(const std::shared_ptr<FileLocation> &location,
                              simgrid::s4u::Mailbox *answer_mailbox,
                              simgrid::s4u::Mailbox *chunk_receiving_mailbox,
                              double num_bytes);
@@ -92,13 +91,11 @@ namespace wrench {
 
         void setScratch();
 
-        static void copyFile(const std::shared_ptr<DataFile> &file,
-                             const std::shared_ptr<FileLocation> &src_location,
+        static void copyFile(const std::shared_ptr<FileLocation> &src_location,
                              const std::shared_ptr<FileLocation> &dst_location);
 
 
         static void initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox,
-                                     const std::shared_ptr<DataFile> &file,
                                      const std::shared_ptr<FileLocation> &src_location,
                                      const std::shared_ptr<FileLocation> &dst_location);
 
@@ -118,7 +115,7 @@ namespace wrench {
         friend class FileRegistryService;
         friend class FileTransferThread;
 
-        static void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
+        static void stageFile(const std::shared_ptr<FileLocation> &location);
 
         /** @brief The service's buffer size */
         double buffer_size;

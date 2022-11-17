@@ -85,11 +85,11 @@ namespace wrench {
         std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations;
 
         /** @brief The ordered file copy operations to perform before computational tasks */
-        std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
+        std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
         /** @brief The ordered file copy operations to perform after computational tasks */
-        std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
+        std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
         /** @brief The ordered file deletion operations to perform at the end */
-        std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>> cleanup_file_deletions;
+        std::vector<std::shared_ptr<FileLocation>> cleanup_file_deletions;
 
         /**
          * @brief Get the shared pointer for this object
@@ -110,9 +110,9 @@ namespace wrench {
 
         StandardJob(std::shared_ptr<JobManager> job_manager,
                     std::vector<std::shared_ptr<WorkflowTask>> tasks, std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
-                    std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &pre_file_copies,
-                    std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &post_file_copies,
-                    std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>> &cleanup_file_deletions);
+                    std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &pre_file_copies,
+                    std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &post_file_copies,
+                    std::vector<std::shared_ptr<FileLocation>> &cleanup_file_deletions);
 
         void createUnderlyingCompoundJob(const std::shared_ptr<ComputeService> &compute_service);
         void processCompoundJobOutcome(std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
