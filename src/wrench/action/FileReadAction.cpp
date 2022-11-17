@@ -32,7 +32,7 @@ namespace wrench {
     FileReadAction::FileReadAction(const std::string &name,
                                    std::vector<std::shared_ptr<FileLocation>> file_locations,
                                    double num_bytes_to_read) : Action(name, "file_read_"),
-                                                               file_locations(std::move(file_locations)) {
+                                                               file_locations(file_locations) {
 
         this->file = file_locations.at(0)->getFile();
         for (auto const &l : file_locations) {

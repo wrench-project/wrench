@@ -66,7 +66,7 @@ namespace wrench {
         virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path);
         virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes);
 
-        static void writeFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
+        static void writeFile(const std::shared_ptr<FileLocation> &location);
         virtual void writeFile(const std::shared_ptr<DataFile> &file, const std::string &path);
         virtual void writeFile(const std::shared_ptr<DataFile> &file);
 
