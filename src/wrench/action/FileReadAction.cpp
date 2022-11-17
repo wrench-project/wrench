@@ -26,15 +26,12 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param file: the file
     * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
     * @param num_bytes_to_read: the number of bytes to read (if < 0: read the whole file)
     */
     FileReadAction::FileReadAction(const std::string &name,
-                                   std::shared_ptr<DataFile> file,
                                    std::vector<std::shared_ptr<FileLocation>> file_locations,
                                    double num_bytes_to_read) : Action(name, "file_read_"),
-                                                               file(std::move(file)),
                                                                file_locations(std::move(file_locations)) {
         if (num_bytes_to_read < 0.0) {
             this->num_bytes_to_read = this->file->getSize();
@@ -72,7 +69,7 @@ namespace wrench {
         for (unsigned long i = 0; i < this->file_locations.size(); i++) {
             try {
                 this->used_location = this->file_locations[i];
-                StorageService::readFile(this->getFile(), this->file_locations[i], this->num_bytes_to_read);
+                StorageService::readFile(this->file_locations[i], this->num_bytes_to_read);
                 continue;
             } catch (ExecutionException &e) {
                 if (i == this->file_locations.size() - 1) {
@@ -109,7 +106,7 @@ namespace wrench {
         return std::any_of(this->file_locations.begin(),
                            this->file_locations.end(),
                            [](const std::shared_ptr<FileLocation> &fl) {
-                               return (fl == FileLocation::SCRATCH);
+                               return (fl->isScratch());
                            });
 
         //        for (auto const &fl: this->file_locations) {

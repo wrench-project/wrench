@@ -366,7 +366,7 @@ namespace wrench {
             if (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint())) {
                 WRENCH_INFO(
                         "Received a read request for a file I don't have (%s)", location->toString().c_str());
-                failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(file, location));
+                failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));
             }
         }
 
@@ -628,7 +628,7 @@ namespace wrench {
             // If this is scratch, we don't care, perhaps it was taken care of elsewhere...
             if (not this->isScratch()) {
                 failure_cause = std::shared_ptr<FailureCause>(
-                        new FileNotFound(file, location));
+                        new FileNotFound(location));
             }
         } else {
             fs->removeFileFromDirectory(file, location->getAbsolutePathAtMountPoint());

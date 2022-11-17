@@ -77,14 +77,11 @@ namespace wrench {
      * @param file_locations: a map that specifies locations where input/output files, if any, should be read/written.
      *         When empty, it is assumed that the ComputeService's scratch storage space will be used.
      * @param pre_file_copies: a vector of tuples that specify which file copy operations should be completed
-     *                         before task executions begin. The ComputeService::SCRATCH constant can be
-     *                         used to mean "the scratch storage space of the ComputeService".
+     *                         before task executions begin.
      * @param post_file_copies: a vector of tuples that specify which file copy operations should be completed
-     *                         after task executions end. The ComputeService::SCRATCH constant can be
-     *                         used to mean "the scratch storage space of the ComputeService".
+     *                         after task executions end.
      * @param cleanup_file_deletions: a vector of file tuples that specify file deletion operations that should be completed
-     *                                at the end of the job. The ComputeService::SCRATCH constant can be
-     *                         used to mean "the scratch storage space of the ComputeService".
+     *                                at the end of the job.
      * @return the standard job
      *
      * @throw std::invalid_argument
@@ -92,9 +89,9 @@ namespace wrench {
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             const std::vector<std::shared_ptr<WorkflowTask>> &tasks,
             const std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> &file_locations,
-            std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
-            std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies,
-            std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>> cleanup_file_deletions) {
+            std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
+            std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies,
+            std::vector<std::shared_ptr<FileLocation>> cleanup_file_deletions) {
         // Transform the non-vector file location map into a vector file location map
         std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations_vector;
         for (auto const &e: file_locations) {
@@ -120,14 +117,11 @@ namespace wrench {
      *                        input/output files should be read/written.
      *                        When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
      * @param pre_file_copies: a vector of tuples that specify which file copy operations should be completed
-     *                         before task executions begin. The ComputeService::SCRATCH constant can be
-     *                         used to mean "the scratch storage space of the ComputeService".
+     *                         before task executions begin.
      * @param post_file_copies: a vector of tuples that specify which file copy operations should be completed
-     *                         after task executions end. The ComputeService::SCRATCH constant can be
-     *                         used to mean "the scratch storage space of the ComputeService".
+     *                         after task executions end.
      * @param cleanup_file_deletions: a vector of file tuples that specify file deletion operations that should be
-     *                                completed at the end of the job. The ComputeService::SCRATCH constant can be
-     *                                used to mean "the scratch storage space of the ComputeService".
+     *                                completed at the end of the job.
      * @return the standard job
      *
      * @throw std::invalid_argument
@@ -135,9 +129,9 @@ namespace wrench {
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             const std::vector<std::shared_ptr<WorkflowTask>> &tasks,
             std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations,
-            std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
-            std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies,
-            std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>> cleanup_file_deletions) {
+            std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
+            std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies,
+            std::vector<std::shared_ptr<FileLocation>> cleanup_file_deletions) {
         // Do a sanity check of everything (looking for nullptr)
         for (const auto &t: tasks) {
             if (t == nullptr) {
@@ -165,17 +159,13 @@ namespace wrench {
         for (auto fc: pre_file_copies) {
             if (std::get<0>(fc) == nullptr) {
                 throw std::invalid_argument(
-                        "JobManager::createStandardJob(): nullptr workflow file in the pre_file_copies set");
+                        "JobManager::createStandardJob(): nullptr src location in the pre_file_copies set");
             }
             if (std::get<1>(fc) == nullptr) {
                 throw std::invalid_argument(
-                        "JobManager::createStandardJob(): nullptr src storage service in the pre_file_copies set");
+                        "JobManager::createStandardJob(): nullptr dst location in the pre_file_copies set");
             }
-            if (std::get<2>(fc) == nullptr) {
-                throw std::invalid_argument(
-                        "JobManager::createStandardJob(): nullptr dst storage service in the pre_file_copies set");
-            }
-            if ((std::get<1>(fc) == FileLocation::SCRATCH) and (std::get<2>(fc) == FileLocation::SCRATCH)) {
+            if ((std::get<0>(fc)->isScratch()) and (std::get<1>(fc)->isScratch())) {
                 throw std::invalid_argument(
                         "JobManager::createStandardJob(): cannot have FileLocation::SCRATCH as both source and "
                         "destination in the pre_file_copies set");
@@ -185,17 +175,13 @@ namespace wrench {
         for (auto fc: post_file_copies) {
             if (std::get<0>(fc) == nullptr) {
                 throw std::invalid_argument(
-                        "JobManager::createStandardJob(): nullptr workflow file in the post_file_copies set");
+                        "JobManager::createStandardJob(): nullptr src location in the post_file_copies set");
             }
             if (std::get<1>(fc) == nullptr) {
                 throw std::invalid_argument(
-                        "JobManager::createStandardJob(): nullptr src storage service in the post_file_copies set");
+                        "JobManager::createStandardJob(): nullptr dst location in the post_file_copies set");
             }
-            if (std::get<2>(fc) == nullptr) {
-                throw std::invalid_argument(
-                        "JobManager::createStandardJob(): nullptr dst storage service in the post_file_copies set");
-            }
-            if ((std::get<1>(fc) == FileLocation::SCRATCH) and (std::get<2>(fc) == FileLocation::SCRATCH)) {
+            if ((std::get<0>(fc)->isScratch()) and (std::get<1>(fc)->isScratch())) {
                 throw std::invalid_argument(
                         "JobManager::createStandardJob(): cannot have FileLocation::SCRATCH as both source and "
                         "destination in the pre_file_copies set");
@@ -203,13 +189,9 @@ namespace wrench {
         }
 
         for (auto fd: cleanup_file_deletions) {
-            if (std::get<0>(fd) == nullptr) {
+            if (fd == nullptr) {
                 throw std::invalid_argument(
-                        "JobManager::createStandardJob(): nullptr workflow file in the cleanup_file_deletions set");
-            }
-            if (std::get<1>(fd) == nullptr) {
-                throw std::invalid_argument(
-                        "JobManager::createStandardJob(): nullptr storage service in the cleanup_file_deletions set");
+                        "JobManager::createStandardJob(): nullptr file location in the cleanup_file_deletions set");
             }
         }
 

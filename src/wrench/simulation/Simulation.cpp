@@ -692,8 +692,8 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> storage_service) {
-        Simulation::stageFile(file, FileLocation::LOCATION(std::move(storage_service)));
+    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService>& storage_service) {
+        Simulation::stageFile(FileLocation::LOCATION(storage_service, file));
     }
 
     /**
@@ -706,9 +706,9 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> storage_service,
+    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService>& storage_service,
                                std::string directory_absolute_path) {
-        Simulation::stageFile(file, FileLocation::LOCATION(std::move(storage_service), std::move(directory_absolute_path)));
+        Simulation::stageFile(FileLocation::LOCATION(storage_service, directory_absolute_path, file));
     }
 
     /**
@@ -716,9 +716,9 @@ namespace wrench {
      * @param file: the file
      * @param location: the location
      */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-        if ((file == nullptr) or (location == nullptr)) {
-            throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
+    void Simulation::stageFile(const std::shared_ptr<FileLocation> &location) {
+        if (location == nullptr) {
+            throw std::invalid_argument("Simulation::stageFile(): Invalid nullptr arguments");
         }
 
         if (this->is_running) {
@@ -733,30 +733,27 @@ namespace wrench {
 
         // Put the file on the storage service (not via the service daemon)
         try {
-            StorageService::stageFile(file, location);
+            StorageService::stageFile(location);
         } catch (std::invalid_argument &e) {
             throw;
         }
 
         // Update all file registry services
         for (const auto &frs: this->file_registry_services) {
-            frs->addEntryToDatabase(file, location);
+            frs->addEntryToDatabase(location);
         }
     }
     /**
      * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
      * at that location.
      *
-     * @param file: a file
      * @param location: a file location
      *
      * @throw std::invalid_argument
      */
 
-    void Simulation::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-        //location->getStorageService()->stageFile(file, location->getMountPoint(),
-        //                                         location->getAbsolutePathAtMountPoint());
-        location->getStorageService()->createFile(file, location);
+    void Simulation::createFile(const std::shared_ptr<FileLocation> &location) {
+        location->getStorageService()->createFile(location);
     }
     /**
      * @brief Store a file on a particular file server ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
