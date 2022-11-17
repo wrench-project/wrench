@@ -33,6 +33,14 @@ namespace wrench {
                                    std::vector<std::shared_ptr<FileLocation>> file_locations,
                                    double num_bytes_to_read) : Action(name, "file_read_"),
                                                                file_locations(std::move(file_locations)) {
+
+        this->file = file_locations.at(0)->getFile();
+        for (auto const &l : file_locations) {
+              if (l->getFile() != this->file) {
+                  throw std::invalid_argument("FileReadAction::FileReadAction(): All file locations should be for the same file");
+              }
+        }
+
         if (num_bytes_to_read < 0.0) {
             this->num_bytes_to_read = this->file->getSize();
         } else if (num_bytes_to_read <= this->file->getSize()) {
