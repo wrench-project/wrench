@@ -819,12 +819,12 @@ namespace wrench {
      * @return the file's last write date, or -1 if the file is not found
      *
      */
-        double Node::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-            if ((file == nullptr) or (location == nullptr)) {
-                throw std::invalid_argument("Node::getFileLastWriteDate(): Invalid arguments");
+        double Node::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("Node::getFileLastWriteDate(): Invalid nullptr argument");
             }
             if (internalStorage) {
-                return internalStorage->getFileLastWriteDate(file, location);
+                return internalStorage->getFileLastWriteDate(location);
             } else {
                 throw std::runtime_error("Node::getFileLastWriteDate() called on non storage Node " + hostname);
             }

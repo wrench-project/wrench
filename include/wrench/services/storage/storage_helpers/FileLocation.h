@@ -54,7 +54,7 @@ namespace wrench {
         std::string getMountPoint();
         std::string getAbsolutePathAtMountPoint();
         std::string getFullAbsolutePath();
-        bool isScratch();
+        bool isScratch() const;
         std::string toString();
 
 

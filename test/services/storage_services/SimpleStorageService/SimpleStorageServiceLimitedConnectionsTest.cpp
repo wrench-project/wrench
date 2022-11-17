@@ -151,9 +151,9 @@ private:
 
             // Initiate asynchronous file copies to/from storage_service
             for (int i = 0; i < NUM_PARALLEL_TRANSFERS; i++) {
-                data_movement_manager->initiateAsynchronousFileCopy(this->test->files[i],
-                                                                    wrench::FileLocation::LOCATION(src_storage_service),
-                                                                    wrench::FileLocation::LOCATION(dst_storage_service));
+                data_movement_manager->initiateAsynchronousFileCopy(
+                                                                    wrench::FileLocation::LOCATION(src_storage_service, this->test->files[i]),
+                                                                    wrench::FileLocation::LOCATION(dst_storage_service, this->test->files[i]));
             }
 
             double elapsed[NUM_PARALLEL_TRANSFERS];

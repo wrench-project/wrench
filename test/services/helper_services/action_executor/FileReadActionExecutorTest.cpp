@@ -138,15 +138,15 @@ private:
         auto job = job_manager->createCompoundJob("");
 
         try {
-            job->addFileReadAction("", this->test->file,
-                                   wrench::FileLocation::LOCATION(this->test->ss),
+            job->addFileReadAction("",
+                                   wrench::FileLocation::LOCATION(this->test->ss, this->test->file),
                                    this->test->file->getSize() + 10);
             throw std::runtime_error("Shouldn't be able to read more bytes than the file contains");
         } catch (std::invalid_argument &ignore) {}
 
         // Add a file_read_action
-        auto file_read_action = job->addFileReadAction("", this->test->file,
-                                                       wrench::FileLocation::LOCATION(this->test->ss));
+        auto file_read_action = job->addFileReadAction("", wrench::FileLocation::LOCATION(this->test->ss, this->test->file));
+
         // coverage
         wrench::Action::getActionTypeAsString(file_read_action);
         file_read_action->getFile();
@@ -222,7 +222,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -262,9 +262,9 @@ private:
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
         // Add a file_read_action
-        auto file_read_action = job->addFileReadAction("", this->test->file,
-                                                       {wrench::FileLocation::LOCATION(this->test->ss, "/bogus/"),
-                                                        wrench::FileLocation::LOCATION(this->test->ss)});
+        auto file_read_action = job->addFileReadAction("",
+                                                       {wrench::FileLocation::LOCATION(this->test->ss, "/bogus/", this->test->file),
+                                                        wrench::FileLocation::LOCATION(this->test->ss, this->test->file)});
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_read_action, nullptr));
@@ -324,7 +324,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -365,8 +365,8 @@ private:
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
         // Add a file_read_action
-        auto file_read_action = job->addFileReadAction("", this->test->file,
-                                                       wrench::FileLocation::LOCATION(this->test->ss));
+        auto file_read_action = job->addFileReadAction("",
+                                                       wrench::FileLocation::LOCATION(this->test->ss, this->test->file));
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_read_action, nullptr));
@@ -477,8 +477,8 @@ private:
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
         // Add a file_read_action
-        auto file_read_action = job->addFileReadAction("", this->test->file,
-                                                       wrench::FileLocation::LOCATION(this->test->ss));
+        auto file_read_action = job->addFileReadAction("",
+                                                       wrench::FileLocation::LOCATION(this->test->ss, this->test->file));
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_read_action, nullptr));
@@ -555,7 +555,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

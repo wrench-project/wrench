@@ -12,6 +12,7 @@
 #define WRENCH_DATAMOVEMENTMANAGER_H
 
 #include <list>
+#include <utility>
 
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
@@ -81,10 +82,10 @@ namespace wrench {
 
             CopyRequestSpecs(std::shared_ptr<FileLocation> src,
                              std::shared_ptr<FileLocation> dst,
-                             std::shared_ptr<FileRegistryService> file_registry_service) : src(src), dst(dst), file_registry_service(file_registry_service) {}
+                             std::shared_ptr<FileRegistryService> file_registry_service) : src(std::move(src)), dst(std::move(dst)), file_registry_service(std::move(file_registry_service)) {}
 
             bool operator==(const CopyRequestSpecs &rhs) const {
-                return (dst->getFile() == dst->getFile()) &&
+                return (dst->getFile() == rhs.dst->getFile()) &&
                        (dst->getStorageService() == rhs.dst->getStorageService()) &&
                        (dst->getAbsolutePathAtMountPoint() == rhs.dst->getAbsolutePathAtMountPoint());
             }

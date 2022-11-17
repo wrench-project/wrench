@@ -1251,8 +1251,8 @@ private:
 
         // Create a compound job and submit it
         auto job = job_manager->createCompoundJob("my_job");
-        auto action = job->addFileReadAction("my_file_read", this->test->input_file,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service1));
+        auto action = job->addFileReadAction("my_file_read",
+                                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->input_file));
         job_manager->submitJob(job, this->test->compute_service, {});
 
         // Wait for the workflow execution event
@@ -1603,9 +1603,9 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("my_job");
-        auto action = job->addFileCopyAction("my_file_copy", this->test->input_file,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                             wrench::FileLocation::SCRATCH);
+        auto action = job->addFileCopyAction("my_file_copy",
+                                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->input_file),
+                                             wrench::FileLocation::SCRATCH(this->test->input_file));
 
         // Submit the job
         try {
@@ -1696,9 +1696,8 @@ private:
             // Create a compound job
             auto job = job_manager->createCompoundJob("my_job");
             auto action = job->addFileRegistryAddEntryAction("add_entry", this->test->file_registry_service,
-                                                             this->test->input_file,
                                                              wrench::FileLocation::LOCATION(
-                                                                     this->test->storage_service1));
+                                                                     this->test->storage_service1, this->test->input_file));
 
             // Submit the job
             job_manager->submitJob(job, this->test->compute_service, {});
@@ -1714,9 +1713,8 @@ private:
             // Create a compound job
             auto job = job_manager->createCompoundJob("my_job");
             auto action = job->addFileRegistryDeleteEntryAction("delete_entry", this->test->file_registry_service,
-                                                                this->test->input_file,
                                                                 wrench::FileLocation::LOCATION(
-                                                                        this->test->storage_service1));
+                                                                        this->test->storage_service1, this->test->input_file));
 
             // Submit the job
             job_manager->submitJob(job, this->test->compute_service, {});

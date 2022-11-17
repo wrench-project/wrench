@@ -135,41 +135,41 @@ private:
 
         // Do a bogus lookup
         try {
-            wrench::StorageService::lookupFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service_1000));
+            wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_1000, nullptr));
             throw std::runtime_error("Should not be able to lookup a nullptr file!");
         } catch (std::invalid_argument &e) {
         }
 
         // Do a few queries to storage services
         for (const auto &f: {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
-            if ((not wrench::StorageService::lookupFile(f, wrench::FileLocation::LOCATION(this->test->storage_service_1000))) ||
-                (wrench::StorageService::lookupFile(f, wrench::FileLocation::LOCATION(this->test->storage_service_100))) ||
-                (wrench::StorageService::lookupFile(f, wrench::FileLocation::LOCATION(this->test->storage_service_510)))) {
+            if ((not wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_1000, f))) ||
+                (wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_100, f))) ||
+                (wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_510, f)))) {
                 throw std::runtime_error("Some storage services do/don't have the files that they shouldn't/should have");
             }
         }
 
         // Do a few of bogus copies
         try {
-            wrench::StorageService::copyFile(nullptr,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                             wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::copyFile(
+                                             wrench::FileLocation::LOCATION(this->test->storage_service_1000, nullptr),
+                                             wrench::FileLocation::LOCATION(this->test->storage_service_100, nullptr));
             throw std::runtime_error("Should not be to able to copy a nullptr file!");
         } catch (std::invalid_argument &) {
         }
 
         try {
-            wrench::StorageService::copyFile(this->test->file_500,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service_100),
+            wrench::StorageService::copyFile(
+                                             wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_500),
                                              nullptr);
             throw std::runtime_error("Should not be able to copy a file to a nullptr location!");
         } catch (std::invalid_argument &) {
         }
 
         try {
-            wrench::StorageService::copyFile(this->test->file_500,
+            wrench::StorageService::copyFile(
                                              nullptr,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service_100));
+                                             wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_500));
             throw std::runtime_error("Should not be able to copy a file from a nullptr location!");
         } catch (std::invalid_argument &) {
         }
@@ -177,39 +177,37 @@ private:
 
         // Copy a file to a storage service that doesn't have enough space
         try {
-            wrench::StorageService::copyFile(this->test->file_500,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                             wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::copyFile(
+                                             wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
+                                             wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_500));
             throw std::runtime_error(
                     "Should not be able to store a file to a storage service that doesn't have enough capacity");
         } catch (wrench::ExecutionException &e) {
         }
 
         // Make sure the copy didn't happen
-        if (wrench::StorageService::lookupFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_100))) {
+        if (wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_500))) {
             throw std::runtime_error("File copy to a storage service without enough space shouldn't have succeeded");
         }
 
         if (this->test->storage_service_1000->getFileLastWriteDate(
-                    this->test->file_10,
-                    wrench::FileLocation::LOCATION(this->test->storage_service_1000)) > 0) {
+                    wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_10)) > 0) {
             throw std::runtime_error("Last file write date of staged file should be 0");
         }
 
         // Copy a file to a storage service that has enough space
         double before_copy = wrench::Simulation::getCurrentSimulatedDate();
         try {
-            wrench::StorageService::copyFile(this->test->file_10,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                             wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::copyFile(
+                                             wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_10),
+                                             wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_10));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to store a file to a storage service that has enough capacity");
         }
         double after_copy = wrench::Simulation::getCurrentSimulatedDate();
 
         double last_file_write_date = this->test->storage_service_100->getFileLastWriteDate(
-                this->test->file_10,
-                wrench::FileLocation::LOCATION(this->test->storage_service_100));
+                wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_10));
         if ((last_file_write_date < before_copy) or (last_file_write_date > after_copy)) {
             throw std::runtime_error("Last file write date is incoherent");
         }
@@ -228,21 +226,21 @@ private:
 
         // Bogus read
         try {
-            wrench::StorageService::readFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::readFile(wrench::FileLocation::LOCATION(this->test->storage_service_100, nullptr));
             throw std::runtime_error("Should not be able to read nullptr file");
         } catch (std::invalid_argument &e) {
         }
 
         // Read a file on a storage service
         try {
-            wrench::StorageService::readFile(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::readFile(wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_10));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to read a file available on a storage service");
         }
 
         // Read a file on a storage service that doesn't have that file
         try {
-            wrench::StorageService::readFile(this->test->file_100, wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::readFile(wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_100));
             throw std::runtime_error("Should not be able to read a file unavailable a storage service");
         } catch (wrench::ExecutionException &e) {
         }
@@ -252,7 +250,7 @@ private:
             // Bogus read
             try {
                 std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> locations;
-                locations[nullptr] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
+                locations[nullptr] = wrench::FileLocation::LOCATION(this->test->storage_service_100, nullptr);
                 wrench::StorageService::readFiles(locations);
                 throw std::runtime_error("Should not be able to read nullptr file");
             } catch (std::invalid_argument &e) {
@@ -261,7 +259,7 @@ private:
             // Read a file on a storage service
             try {
                 std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> locations;
-                locations[this->test->file_10] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
+                locations[this->test->file_10] = wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_10);
                 wrench::StorageService::readFiles(locations);
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Should be able to read a file available on a storage service");
@@ -270,7 +268,7 @@ private:
             // Read a file on a storage service that doesn't have that file
             try {
                 std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> locations;
-                locations[this->test->file_100] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
+                locations[this->test->file_100] = wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_100);
                 wrench::StorageService::readFiles(locations);
                 throw std::runtime_error("Should not be able to read a file unavailable a storage service");
             } catch (wrench::ExecutionException &e) {
@@ -282,7 +280,7 @@ private:
             // Bogus write
             try {
                 std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> locations;
-                locations[nullptr] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
+                locations[nullptr] = wrench::FileLocation::LOCATION(this->test->storage_service_100, nullptr);
                 wrench::StorageService::writeFiles(locations);
                 throw std::runtime_error("Should not be able to write nullptr file");
             } catch (std::invalid_argument &e) {
@@ -290,9 +288,9 @@ private:
         }
 
 
-        // Delete a file on a storage service that doesnt' have it
+        // Delete a file on a storage service that doesn't have it
         try {
-            wrench::StorageService::deleteFile(this->test->file_100, wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::deleteFile(wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_100));
             throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause());
@@ -312,8 +310,7 @@ private:
 
         // Delete a file in a bogus path
         try {
-            wrench::StorageService::deleteFile(this->test->file_100,
-                                               wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100/bogus"));
+            wrench::StorageService::deleteFile(wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100/bogus", this->test->file_100));
             throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause());
@@ -333,8 +330,8 @@ private:
 
         // Delete a file on a storage service that has it
         try {
-            wrench::StorageService::deleteFile(this->test->file_10,
-                                               wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::deleteFile(
+                                               wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_10));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should  be able to delete a file available a storage service");
         }
@@ -354,9 +351,9 @@ private:
 
         // Do a bogus asynchronous file copy (file = nullptr);
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(nullptr,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, nullptr),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100, nullptr));
             throw std::runtime_error("Shouldn't be able to do an initiateAsynchronousFileCopy with a nullptr file");
         } catch (std::invalid_argument &e) {
         }
@@ -364,17 +361,17 @@ private:
 
         // Do a bogus asynchronous file copy (src = nullptr);
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
+            data_movement_manager->initiateAsynchronousFileCopy(
                                                                 nullptr,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100));
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_1));
             throw std::runtime_error("Shouldn't be able to do an initiateAsynchronousFileCopy with a nullptr src");
         } catch (std::invalid_argument &e) {
         }
 
         // Do a bogus asynchronous file copy (dst = nullptr);
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000),
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_1),
                                                                 nullptr);
             throw std::runtime_error("Shouldn't be able to do an initiateAsynchronousFileCopy with a nullptr dst");
         } catch (std::invalid_argument &e) {
@@ -382,9 +379,9 @@ private:
 
         // Do a valid asynchronous file copy
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_1),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_1));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while submitting a file copy operations");
         }
@@ -403,7 +400,7 @@ private:
         }
 
         // Check that the copy has happened
-        if (!wrench::StorageService::lookupFile(this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service_100))) {
+        if (!wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_1))) {
             throw std::runtime_error("Asynchronous file copy operation didn't copy the file");
         }
 
@@ -420,9 +417,9 @@ private:
 
         // Do an INVALID asynchronous file copy (file too big)
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_500));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while submitting a file copy operations");
         }
@@ -446,9 +443,9 @@ private:
 
         // Do an INVALID asynchronous file copy (file not there)
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_500),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_500));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while submitting a file copy operations");
         }
@@ -473,8 +470,8 @@ private:
 
         // Do a really bogus file removal
         try {
-            wrench::StorageService::deleteFile(nullptr,
-                                               wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::deleteFile(
+                                               wrench::FileLocation::LOCATION(this->test->storage_service_100, nullptr));
             throw std::runtime_error("Should not be able to delete a nullptr file from a location");
         } catch (std::invalid_argument &e) {
         }
@@ -484,8 +481,8 @@ private:
 
         // Try to do stuff with a shutdown service
         try {
-            wrench::StorageService::lookupFile(this->test->file_1,
-                                               wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::lookupFile(
+                                               wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_1));
             throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
         } catch (wrench::ExecutionException &e) {
             // Check Exception
@@ -503,8 +500,8 @@ private:
 
 
         try {
-            wrench::StorageService::lookupFile(this->test->file_1,
-                                               wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100"));
+            wrench::StorageService::lookupFile(
+                                               wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100", this->test->file_1));
             throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
         } catch (wrench::ExecutionException &e) {
             // Check Exception
@@ -522,8 +519,8 @@ private:
 
 
         try {
-            wrench::StorageService::readFile(this->test->file_1,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::readFile(
+                                             wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_1));
             throw std::runtime_error("Should not be able to read a file from a down service");
         } catch (wrench::ExecutionException &e) {
             // Check Exception
@@ -540,8 +537,8 @@ private:
         }
 
         try {
-            wrench::StorageService::writeFile(this->test->file_1,
-                                              wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::writeFile(
+                                              wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_1));
             throw std::runtime_error("Should not be able to write a file from a DOWN service");
         } catch (wrench::ExecutionException &e) {
             // Check Exception
@@ -683,23 +680,23 @@ private:
 
         // Do a bogus file copy (file = nullptr)
         try {
-            data_movement_manager->doSynchronousFileCopy(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->doSynchronousFileCopy(wrench::FileLocation::LOCATION(this->test->storage_service_1000, nullptr),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, nullptr));
             throw std::runtime_error("Shouldn't be able to do a synchronous file copy with a nullptr file");
         } catch (std::invalid_argument &e) {
         }
 
         // Do a bogus file copy (src = nullptr)
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500, nullptr,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->doSynchronousFileCopy(nullptr,
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_500));
             throw std::runtime_error("Shouldn't be able to do a synchronous file copy with a nullptr src");
         } catch (std::invalid_argument &e) {
         }
 
         // Do a bogus file copy (dst = nullptr)
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_1000),
+            data_movement_manager->doSynchronousFileCopy(wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
                                                          nullptr);
             throw std::runtime_error("Shouldn't be able to do a synchronous file copy with a nullptr src");
         } catch (std::invalid_argument &e) {
@@ -707,9 +704,9 @@ private:
 
         // Do the file copy with a bogus path
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/whatever/"),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->doSynchronousFileCopy(
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/whatever/", this->test->file_500),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_500));
             throw std::runtime_error("Should not be able to do a file copy with a bogus path");
         } catch (wrench::ExecutionException &e) {
             auto cause = e.getCause();
@@ -724,27 +721,27 @@ private:
 
         // Do the file copy
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->doSynchronousFileCopy(
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_500));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an exception while doing a synchronous file copy: " + std::string(e.what()));
         }
 
         // Do the file copy again, which should fail
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo/"));
+            data_movement_manager->doSynchronousFileCopy(
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo/", this->test->file_500));
             throw std::runtime_error("Should not be able to write a file beyond the storage capacity");
         } catch (wrench::ExecutionException &e) {
         }
 
         // Do another file copy with empty src dir and empty dst dir
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_1,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000"),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510"));
+            data_movement_manager->doSynchronousFileCopy(
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000", this->test->file_1),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510", this->test->file_1));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an exception while doing a synchronous file copy: " + std::string(e.what()));
         }
@@ -832,18 +829,18 @@ private:
 
         // Initiate a file copy
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_500));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an exception while trying to initiate a file copy: " + std::string(e.what()));
         }
 
         // Initiate it again which should fail
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_500));
             throw std::runtime_error("A duplicate asynchronous file copy should fail!");
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::FileAlreadyBeingCopied>(e.getCause());
@@ -962,9 +959,9 @@ private:
 
         // Do the file copy while space doesn't fit
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            data_movement_manager->doSynchronousFileCopy(
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_500));
             throw std::runtime_error("Should have gotten a 'not enough space' exception");
         } catch (wrench::ExecutionException &e) {
             // Check Exception
@@ -987,9 +984,9 @@ private:
 
         // Do a file copy from myself
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->doSynchronousFileCopy(
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_500),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_500));
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Copying a file onto itself shouldn't lead to an exception (just a printed warning)");
         }
@@ -998,12 +995,12 @@ private:
 
 
         // First delete the file on the 1000 storage service
-        wrench::StorageService::deleteFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_1000));
+        wrench::StorageService::deleteFile(wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500));
 
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->doSynchronousFileCopy(
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_500));
             throw std::runtime_error("Should have gotten a 'file not found' exception");
         } catch (wrench::ExecutionException &e) {
             // Check Exception
@@ -1027,9 +1024,9 @@ private:
         this->test->storage_service_1000->stop();
 
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->doSynchronousFileCopy(
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_500));
             throw std::runtime_error("Should have gotten a 'service is down' exception");
         } catch (wrench::ExecutionException &e) {
             // Check Exception
@@ -1051,9 +1048,9 @@ private:
         this->test->storage_service_510->stop();
 
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_1,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_100),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->doSynchronousFileCopy(
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_1),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_1));
             throw std::runtime_error("Should have gotten a 'service is down' exception");
         } catch (wrench::ExecutionException &e) {
             // Check Exception
@@ -1156,9 +1153,9 @@ private:
 
         // Do the file copy while space doesn't fit
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_500));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
@@ -1194,9 +1191,9 @@ private:
 
         // Do the file copy for a file that's not there
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_100,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_100),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_100));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
@@ -1231,9 +1228,9 @@ private:
         this->test->storage_service_1000->stop();
 
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_100,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_100),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_100));
             throw std::runtime_error("Should have gotten a 'service is down' exception");
 
         } catch (wrench::ExecutionException &e) {
@@ -1252,9 +1249,9 @@ private:
 
         // Do the file copy from a dst storage service that's down
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_500),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500));
             throw std::runtime_error("Should have gotten a 'service is down' exception");
         } catch (wrench::ExecutionException &e) {
             // Check Exception
@@ -1355,9 +1352,9 @@ private:
 
         // Copy storage_service_1000:/:file_10 to storage_service_510:foo:file_10
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000"),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo/"));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000", this->test->file_10),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo/", this->test->file_10));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
@@ -1378,9 +1375,9 @@ private:
         // Do a very similar copy, but with "empty" partitions that default to "/"
         // Copy storage_service_1000:/:file_10 to storage_service_510:/:file_10
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/"),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510"));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/", this->test->file_10),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510", this->test->file_10));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
@@ -1398,7 +1395,7 @@ private:
 
         // Remove the file at storage_service_510:/:file_10
         try {
-            wrench::StorageService::deleteFile(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510"));
+            wrench::StorageService::deleteFile(wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510", this->test->file_10));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to delete file storage_service_510:/:file_10");
         }
@@ -1406,9 +1403,9 @@ private:
 
         // Copy storage_service_510:/:file_10 to storage_service_1000:foo:file_10: SHOULD NOT WORK
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/foo"));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_10),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/foo", this->test->file_10));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
@@ -1426,9 +1423,9 @@ private:
 
         // Copy storage_service_510:foo:file_10 to storage_service_1000:foo
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo"),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/foo"));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo", this->test->file_10),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/foo", this->test->file_10));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
@@ -1446,9 +1443,9 @@ private:
 
         // Copy storage_service_510:foo:file_10 to storage_service_510:bar
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo/../foo"),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/bar"));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo/../foo", this->test->file_10),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/bar", this->test->file_10));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
@@ -1467,45 +1464,44 @@ private:
         // Copy storage_service_510:foo:file_10 to storage_service_510:foo    SHOULD NOT WORK
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
-                    this->test->file_10,
-                    wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo"),
-                    wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo"));
+                    wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo", this->test->file_10),
+                    wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo", this->test->file_10));
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Should be able to copy a file onto itself (no-op)");
         }
 
         // Check all lookups
-        if (not wrench::StorageService::lookupFile(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_1000))) {
+        if (not wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_10))) {
             throw std::runtime_error("File should be in storage_service_1000 at the mount point root");
         }
-        if (not wrench::StorageService::lookupFile(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000"))) {
+        if (not wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000", this->test->file_10))) {
             throw std::runtime_error("File should be in storage_service_1000 at the mount point root");
         }
-        if (not wrench::StorageService::lookupFile(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo"))) {
+        if (not wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo", this->test->file_10))) {
             throw std::runtime_error("File should be in storage_service_510 at path /large_disk/foo/");
         }
-        if (not wrench::StorageService::lookupFile(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/foo"))) {
+        if (not wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/foo", this->test->file_10))) {
             throw std::runtime_error("File should be in storage_service_1000 at path /large_disk/foo");
         }
 
         // Bogus lookup
         try {
-            wrench::StorageService::lookupFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service_1000));
+            wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_1000, nullptr));
             throw std::runtime_error("Should not be able to lookup a nullptr file");
         } catch (std::invalid_argument &e) {
         }
 
         try {
-            wrench::StorageService::lookupFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000"));
+            wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000", nullptr));
             throw std::runtime_error("Should not be able to lookup a nullptr file");
         } catch (std::invalid_argument &e) {
         }
 
         // File copy from oneself to oneself!
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo"),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/faa"));
+            data_movement_manager->initiateAsynchronousFileCopy(
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo", this->test->file_10),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/faa", this->test->file_10));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
@@ -1596,13 +1592,13 @@ private:
 
 
         try {
-            wrench::StorageService::writeFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100"));
+            wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100", nullptr));
             throw std::runtime_error("Should not be able to write a nullptr file to a service");
         } catch (std::invalid_argument &ignore) {
         }
 
         try {
-            wrench::StorageService::writeFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100"));
+            wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100", this->test->file_500));
             throw std::runtime_error("Should not be able to write to a storage service with not enough space");
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(e.getCause());
@@ -1652,15 +1648,15 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
     ASSERT_THROW(storage_service_100->getMountPoint(), std::invalid_argument);
 
     // FileLocation Testing
-    ASSERT_THROW(wrench::FileLocation::LOCATION(nullptr), std::invalid_argument);
-    ASSERT_THROW(wrench::FileLocation::LOCATION(nullptr, "/disk100"), std::invalid_argument);
-    ASSERT_THROW(wrench::FileLocation::LOCATION(storage_service_100, ""), std::invalid_argument);
-    ASSERT_THROW(wrench::FileLocation::LOCATION(storage_service_100, "/bogus"), std::invalid_argument);
-    ASSERT_THROW(wrench::FileLocation::LOCATION(storage_service_100), std::invalid_argument);
-    ASSERT_THROW(wrench::FileLocation::SCRATCH->getStorageService(), std::invalid_argument);
-    ASSERT_THROW(wrench::FileLocation::SCRATCH->getMountPoint(), std::invalid_argument);
-    ASSERT_THROW(wrench::FileLocation::SCRATCH->getAbsolutePathAtMountPoint(), std::invalid_argument);
-    ASSERT_THROW(wrench::FileLocation::SCRATCH->getFullAbsolutePath(), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::LOCATION(nullptr, file_1), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::LOCATION(storage_service_100, file_1), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::LOCATION(nullptr, "/disk100", file_1), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::LOCATION(storage_service_100, "", file_1), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::LOCATION(storage_service_100, "/bogus", file_1), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::SCRATCH(file_1)->getStorageService(), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::SCRATCH(file_1)->getMountPoint(), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::SCRATCH(file_1)->getAbsolutePathAtMountPoint(), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::SCRATCH(file_1)->getFullAbsolutePath(), std::invalid_argument);
     ASSERT_THROW(wrench::FileLocation::sanitizePath(""), std::invalid_argument);
     //    ASSERT_THROW(wrench::FileLocation::sanitizePath(" "), std::invalid_argument);
     //    ASSERT_THROW(wrench::FileLocation::sanitizePath("../.."), std::invalid_argument);

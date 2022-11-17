@@ -183,25 +183,25 @@ private:
             num_cores = 2;
             ram = 200;
         } else if (this->action_type == "file_read") {
-            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileReadAction("", this->test->file, wrench::FileLocation::LOCATION(this->test->ss1)));
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileReadAction("", wrench::FileLocation::LOCATION(this->test->ss1, this->test->file)));
             thread_overhead = 0.1;
             expected_completion_date = 10.84743174020618639020;
             num_cores = 0;
             ram = 0.0;
         } else if (this->action_type == "file_write") {
-            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileWriteAction("", this->test->file_to_write, wrench::FileLocation::LOCATION(this->test->ss1)));
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileWriteAction("", wrench::FileLocation::LOCATION(this->test->ss1, this->test->file_to_write)));
             thread_overhead = 0.1;
             expected_completion_date = 10.85743174020618617703;
             num_cores = 0;
             ram = 0.0;
         } else if (this->action_type == "file_copy") {
-            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileCopyAction("", this->test->file, wrench::FileLocation::LOCATION(this->test->ss1), wrench::FileLocation::LOCATION(this->test->ss2)));
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileCopyAction("", wrench::FileLocation::LOCATION(this->test->ss1, this->test->file), wrench::FileLocation::LOCATION(this->test->ss2, this->test->file)));
             thread_overhead = 0.1;
             expected_completion_date = 10.97973091237113507646;
             num_cores = 0;
             ram = 0.0;
         } else if (this->action_type == "file_delete") {
-            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileDeleteAction("", this->test->file, wrench::FileLocation::LOCATION(this->test->ss1)));
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileDeleteAction("", wrench::FileLocation::LOCATION(this->test->ss1, this->test->file)));
             thread_overhead = 0.1;
             expected_completion_date = 0.12242927216494845083;
             num_cores = 0;
@@ -210,7 +210,7 @@ private:
             auto storage_service = this->test->ss1;
             auto file = this->test->file;
             auto lambda_execute = [storage_service, file](std::shared_ptr<wrench::ActionExecutor> action_executor) {
-                storage_service->readFile(file, wrench::FileLocation::LOCATION(storage_service));
+                storage_service->readFile(wrench::FileLocation::LOCATION(storage_service, file));
                 wrench::Simulation::sleep(10.0); };
             auto lambda_terminate = [](std::shared_ptr<wrench::ActionExecutor> action_executor) {};
 
@@ -351,7 +351,7 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
 
     // Create a file to read
     this->file = this->workflow->addFile("some_file", 1000000.0);
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss1));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss1, file));
 
     // Create a file to write
     this->file_to_write = this->workflow->addFile("some_file_to_write", 1000000.0);

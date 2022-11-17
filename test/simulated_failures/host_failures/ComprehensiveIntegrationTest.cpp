@@ -300,8 +300,8 @@ private:
 
         // Create/submit a standard job
         auto job = this->job_manager->createStandardJob(task, {
-                                                                      {*(task->getInputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
-                                                                      {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
+                                                                      {task->getInputFiles().at(0), wrench::FileLocation::LOCATION(target_storage_service, task->getInputFiles().at(0))},
+                                                                      {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(target_storage_service, task->getOutputFiles().at(0))},
                                                               });
         this->job_manager->submitJob(job, target_cs);
 

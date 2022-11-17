@@ -289,17 +289,17 @@ private:
 
         auto job_that_will_fail = job_manager->createStandardJob(this->test->t4,
                                                                  {{this->test->small_input_file,
-                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->small_input_file)},
                                                                   {this->test->large_input_file,
-                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->large_input_file)},
                                                                   {this->test->t4_output_file,
-                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->t4_output_file)}});
 
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
         // while large_input_file is being read, we delete small_input_file so that the one task job will fail
-        wrench::StorageService::deleteFile(this->test->workflow->getFileByID("zz_small_input_file"),
-                                           wrench::FileLocation::LOCATION(this->test->storage_service),
+        wrench::StorageService::deleteFile(
+                                           wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("zz_small_input_file")),
                                            this->test->file_registry_service);
 
         std::shared_ptr<wrench::ExecutionEvent> event;
@@ -316,11 +316,11 @@ private:
 
         auto job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                      {{this->test->small_input_file,
-                                                                       wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
+                                                                       wrench::FileLocation::LOCATION(this->test->backup_storage_service, this->test->small_input_file)},
                                                                       {this->test->large_input_file,
-                                                                       wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                       wrench::FileLocation::LOCATION(this->test->storage_service, this->test->large_input_file)},
                                                                       {this->test->t4_output_file,
-                                                                       wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                                       wrench::FileLocation::LOCATION(this->test->storage_service, this->test->t4_output_file)}});
         job_manager->submitJob(job_that_will_complete, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
