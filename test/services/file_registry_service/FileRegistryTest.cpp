@@ -144,13 +144,13 @@ private:
         std::set<std::shared_ptr<wrench::FileLocation>> locations;
 
         try {
-            frs->addEntry(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service1));
+            frs->addEntry(wrench::FileLocation::LOCATION(this->test->storage_service1, nullptr));
             throw std::runtime_error("Should not be able to add an entry with a nullptr file");
         } catch (std::invalid_argument &e) {
         }
 
         try {
-            frs->addEntry(file1, nullptr);
+            frs->addEntry(wrench::FileLocation::LOCATION(nullptr, file1));
             throw std::runtime_error("Should not be able to add an entry with a nullptr storage service");
         } catch (std::invalid_argument &e) {
         }
@@ -162,8 +162,8 @@ private:
         }
 
         // Adding twice file1
-        frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
-        frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
+        frs->addEntry(wrench::FileLocation::LOCATION(this->test->storage_service1, file1));
+        frs->addEntry(wrench::FileLocation::LOCATION(this->test->storage_service1, file1));
 
         // Getting file1
         try {
@@ -182,7 +182,7 @@ private:
         }
 
         // Adding another location for file1
-        frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service2));
+        frs->addEntry(wrench::FileLocation::LOCATION(this->test->storage_service2, file1));
 
         // Getting file1
         locations = frs->lookupEntry(file1);
@@ -207,21 +207,21 @@ private:
         }
 
         try {
-            frs->removeEntry(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service1));
+            frs->removeEntry(wrench::FileLocation::LOCATION(this->test->storage_service1, nullptr));
             throw std::runtime_error("Should not be able to remove an entry with a nullptr file");
         } catch (std::invalid_argument &e) {
         }
 
         try {
-            frs->removeEntry(file1, nullptr);
+            frs->removeEntry(wrench::FileLocation::LOCATION(nullptr, file1));
             throw std::runtime_error("Should not be able to remove an entry with a nullptr storage service");
         } catch (std::invalid_argument &e) {
         }
 
-        frs->removeEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
+        frs->removeEntry(wrench::FileLocation::LOCATION(this->test->storage_service1, file1));
 
         // Doing it again, which does nothing (coverage)
-        frs->removeEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
+        frs->removeEntry(wrench::FileLocation::LOCATION(this->test->storage_service1, file1));
 
         // Getting file1
         locations = frs->lookupEntry(file1);
@@ -234,14 +234,14 @@ private:
         }
 
         // Remove an already removed entry
-        frs->removeEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
+        frs->removeEntry(wrench::FileLocation::LOCATION(this->test->storage_service1, file1));
 
         // Shutting down the service
         frs->stop();
 
         // Trying a removeEntry
         try {
-            frs->removeEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
+            frs->removeEntry(wrench::FileLocation::LOCATION(this->test->storage_service1, file1));
             throw std::runtime_error("Should not be able to remove an entry from a service that is down");
         } catch (wrench::ExecutionException &e) {
             // Check Exception
@@ -333,9 +333,9 @@ private:
         auto frs = this->test->file_registry_service;
         auto nps = this->test->network_proximity_service;
 
-        frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
-        frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service2));
-        frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service3));
+        frs->addEntry(wrench::FileLocation::LOCATION(this->test->storage_service1, file1));
+        frs->addEntry(wrench::FileLocation::LOCATION(this->test->storage_service2, file1));
+        frs->addEntry(wrench::FileLocation::LOCATION(this->test->storage_service3, file1));
 
         wrench::S4U_Simulation::sleep(600.0);
 

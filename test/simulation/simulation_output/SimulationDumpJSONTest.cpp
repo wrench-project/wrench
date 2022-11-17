@@ -1034,9 +1034,9 @@ private:
         auto data_manager = this->createDataMovementManager();
         //copying file to force link usage.
         auto file = *(this->test->workflow->getFileMap().begin());
-        data_manager->doSynchronousFileCopy(file.second,
-                                            wrench::FileLocation::LOCATION(this->test->client_storage_service),
-                                            wrench::FileLocation::LOCATION(this->test->server_storage_service));
+        data_manager->doSynchronousFileCopy(
+                                            wrench::FileLocation::LOCATION(this->test->client_storage_service, file.second),
+                                            wrench::FileLocation::LOCATION(this->test->server_storage_service, file.second));
         return 0;
     }
 };
@@ -1219,9 +1219,9 @@ private:
 
         auto file_1 = this->test->workflow->addFile("file_1", 1.00 * 1000 * 1000);
 
-        wrench::StorageService::writeFile(file_1, wrench::FileLocation::LOCATION(this->test->ss1));
-        wrench::StorageService::writeFile(file_1, wrench::FileLocation::LOCATION(this->test->ss2));
-        wrench::StorageService::readFile(file_1, wrench::FileLocation::LOCATION(this->test->ss1));
+        wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
+        wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(this->test->ss2, file_1));
+        wrench::StorageService::readFile(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
         return 0;
     }
 };

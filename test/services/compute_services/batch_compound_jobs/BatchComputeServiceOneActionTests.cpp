@@ -1102,8 +1102,8 @@ private:
 
         // Create a compound job and submit it
         auto job = job_manager->createCompoundJob("my_job");
-        auto action = job->addFileReadAction("my_file_read", this->test->input_file,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service1));
+        auto action = job->addFileReadAction("my_file_read",
+                                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->input_file));
 
         std::map<std::string, std::string> service_specific_args;
         service_specific_args["-t"] = "60";
@@ -1456,9 +1456,9 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("my_job");
-        auto action = job->addFileCopyAction("my_file_copy", this->test->input_file,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                             wrench::FileLocation::SCRATCH);
+        auto action = job->addFileCopyAction("my_file_copy",
+                                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->input_file),
+                                             wrench::FileLocation::SCRATCH(this->test->input_file));
 
         // Submit the job
         try {

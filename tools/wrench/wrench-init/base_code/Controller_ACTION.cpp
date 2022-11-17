@@ -51,20 +51,20 @@ namespace wrench {
         /* Create a files */
         auto some_file = wrench::Simulation::addFile("some_file", 1 * GBYTE);
         auto some_other_file = wrench::Simulation::addFile("some_other_file", 2 * GBYTE);
-        wrench::Simulation::createFile(some_file, wrench::FileLocation::LOCATION(this->storage_service));
+        wrench::Simulation::createFile(wrench::FileLocation::LOCATION(this->storage_service, some_file));
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
         WRENCH_INFO("Creating a compound job with a file read action followed by a compute action");
         auto job1 = job_manager->createCompoundJob("job1");
-        auto fileread = job1->addFileReadAction("fileread", some_file, wrench::FileLocation::LOCATION(this->storage_service));
+        auto fileread = job1->addFileReadAction("fileread", wrench::FileLocation::LOCATION(this->storage_service, some_file));
         auto compute = job1->addComputeAction("compute", 100 * GFLOP, 50 * MBYTE, 1, 3, wrench::ParallelModel::AMDAHL(0.8));
         job1->addActionDependency(fileread, compute);
 
         WRENCH_INFO("Creating a compound job with a file write action and a (simultaneous) sleep action");
         auto job2 = job_manager->createCompoundJob("job2");
-        auto filewrite = job2->addFileWriteAction("filewrite", some_other_file, wrench::FileLocation::LOCATION(this->storage_service));
+        auto filewrite = job2->addFileWriteAction("filewrite", wrench::FileLocation::LOCATION(this->storage_service, some_other_file));
         auto sleep = job2->addSleepAction("sleep", 20.0);
 
         WRENCH_INFO("Making the second job depend on the first one");

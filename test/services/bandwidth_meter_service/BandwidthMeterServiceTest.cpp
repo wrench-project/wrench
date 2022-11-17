@@ -135,9 +135,9 @@ private:
         auto data_manager = this->createDataMovementManager();
         //copying file to force link usage.
         auto file = *(this->test->workflow->getFileMap().begin());
-        data_manager->doSynchronousFileCopy(file.second,
-                                            wrench::FileLocation::LOCATION(this->test->client_storage_service),
-                                            wrench::FileLocation::LOCATION(this->test->server_storage_service));
+        data_manager->doSynchronousFileCopy(
+                                            wrench::FileLocation::LOCATION(this->test->client_storage_service, file.second),
+                                            wrench::FileLocation::LOCATION(this->test->server_storage_service, file.second));
 
         // Terminating the Bandwidth Meter Services
         bm1->stop();

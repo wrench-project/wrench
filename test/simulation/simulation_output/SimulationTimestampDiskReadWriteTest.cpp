@@ -93,11 +93,11 @@ private:
     int main() {
 
 
-        wrench::StorageService::readFile(this->test->file_1,
-                                         wrench::FileLocation::LOCATION(this->test->storage_service_1));
+        wrench::StorageService::readFile(
+                                         wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_1));
 
-        wrench::StorageService::writeFile(this->test->file_1,
-                                          wrench::FileLocation::LOCATION(this->test->storage_service_2));
+        wrench::StorageService::writeFile(
+                                          wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_1));
 
 
         return 0;

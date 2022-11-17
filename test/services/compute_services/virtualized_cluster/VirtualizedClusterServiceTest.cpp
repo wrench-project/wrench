@@ -271,10 +271,10 @@ private:
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                                                           {std::make_tuple(this->test->input_file,
+                                                           {std::make_tuple(
                                                                             wrench::FileLocation::LOCATION(
-                                                                                    this->test->storage_service),
-                                                                            wrench::FileLocation::SCRATCH)},
+                                                                                    this->test->storage_service, this->test->input_file),
+                                                                            wrench::FileLocation::SCRATCH(this->test->input_file))},
                                                            {}, {});
 
         // Try to submit the job directly to the CloudComputeService (which fails)
@@ -474,10 +474,10 @@ private:
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1, this->test->task2}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                {std::make_tuple(this->test->input_file,
+                {std::make_tuple(
                                  wrench::FileLocation::LOCATION(
-                                         this->test->storage_service),
-                                 wrench::FileLocation::SCRATCH)},
+                                         this->test->storage_service, this->test->input_file),
+                                 wrench::FileLocation::SCRATCH(this->test->input_file))},
                 {}, {});
 
         // Submit the 2-task1 job for execution
@@ -578,9 +578,9 @@ private:
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1, this->test->task2}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                {std::make_tuple(this->test->input_file,
-                                 wrench::FileLocation::LOCATION(this->test->storage_service),
-                                 wrench::FileLocation::SCRATCH)},
+                {std::make_tuple(
+                                 wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                 wrench::FileLocation::SCRATCH(this->test->input_file))},
                 {}, {});
 
         // Submit the 2-task1 job for execution
@@ -978,8 +978,8 @@ private:
 
         // Create a one-task1 job
         std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> file_locations;
-        file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
-        file_locations[this->test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service);
+        file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file);
+        file_locations[this->test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file1);
         auto job = job_manager->createStandardJob(this->test->task1, file_locations);
 
         // Submit a job
@@ -1053,8 +1053,8 @@ private:
 
         // Submit a job and suspend the VM before that job finishes
         file_locations.clear();
-        file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
-        file_locations[this->test->output_file2] = wrench::FileLocation::LOCATION(this->test->storage_service);
+        file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file);
+        file_locations[this->test->output_file2] = wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file2);
         auto other_job = job_manager->createStandardJob(this->test->task2, file_locations);
 
         try {
@@ -1327,10 +1327,10 @@ private:
                 cs->shutdownVM(vm);
             }
             auto job1 = job_manager->createStandardJob({this->test->task1}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                                                       {std::make_tuple(this->test->input_file,
+                                                       {std::make_tuple(
                                                                         wrench::FileLocation::LOCATION(
-                                                                                this->test->storage_service),
-                                                                        wrench::FileLocation::SCRATCH)},
+                                                                                this->test->storage_service, this->test->input_file),
+                                                                        wrench::FileLocation::SCRATCH(this->test->input_file))},
                                                        {}, {});
             // Trying to submit to a VM that has been shutdown
             job_manager->submitJob(job1, cs->getVMComputeService(vm_list[0]));
@@ -1351,10 +1351,10 @@ private:
         }
 
         auto job1 = job_manager->createStandardJob({this->test->task1}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                                                   {std::make_tuple(this->test->input_file,
+                                                   {std::make_tuple(
                                                                     wrench::FileLocation::LOCATION(
-                                                                            this->test->storage_service),
-                                                                    wrench::FileLocation::SCRATCH)},
+                                                                            this->test->storage_service, this->test->input_file),
+                                                                    wrench::FileLocation::SCRATCH(this->test->input_file))},
                                                    {}, {});
 
         try {
@@ -1558,9 +1558,8 @@ private:
         auto job = job_manager->createStandardJob(
                 {this->test->task1}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(
-                        this->test->input_file,
-                        wrench::FileLocation::LOCATION(this->test->storage_service),
-                        wrench::FileLocation::SCRATCH)},
+                        wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                        wrench::FileLocation::SCRATCH(this->test->input_file))},
                 {}, {});
 
         // Submit the job to the vm
@@ -1683,9 +1682,9 @@ private:
         // Create a job
         auto job = job_manager->createStandardJob(
                 {this->test->task1}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                {std::make_tuple(this->test->input_file,
-                                 wrench::FileLocation::LOCATION(this->test->storage_service),
-                                 wrench::FileLocation::SCRATCH)},
+                {std::make_tuple(
+                                 wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                 wrench::FileLocation::SCRATCH(this->test->input_file))},
                 {}, {});
 
         // Submit the job to the VM

@@ -139,7 +139,7 @@ private:
         auto storage_service = this->test->ss;
         auto file = this->test->file;
         auto lambda_execute = [storage_service, file](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
-            storage_service->readFile(file, wrench::FileLocation::LOCATION(storage_service));
+            storage_service->readFile(wrench::FileLocation::LOCATION(storage_service, file));
             wrench::Simulation::sleep(10.0);
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
@@ -228,7 +228,7 @@ void CustomActionExecutorTest::do_CustomActionExecutorSuccessTest_test() {
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

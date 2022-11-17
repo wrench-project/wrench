@@ -220,7 +220,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     this->file = workflow->addFile("some_file", 1000000.0);
 
     // Put it on ss1
-    wrench::Simulation::createFile(this->file, wrench::FileLocation::LOCATION(this->ss1));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -259,9 +259,9 @@ private:
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
         // Add a file_copy_action
-        auto file_copy_action = job->addFileCopyAction("", this->test->file,
-                                                       wrench::FileLocation::LOCATION(this->test->ss1, "/"),
-                                                       wrench::FileLocation::LOCATION(this->test->ss1, "/disk2"));
+        auto file_copy_action = job->addFileCopyAction("",
+                                                       wrench::FileLocation::LOCATION(this->test->ss1, "/", this->test->file),
+                                                       wrench::FileLocation::LOCATION(this->test->ss1, "/disk2", this->test->file));
 
         // Create a file copy action executor
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
@@ -321,7 +321,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessSameHostTest_te
     this->file = workflow->addFile("some_file", 1000000000.0);
 
     // Put it on ss1
-    wrench::Simulation::createFile(this->file, wrench::FileLocation::LOCATION(this->ss1));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

@@ -224,7 +224,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -342,7 +342,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -509,7 +509,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -563,7 +563,7 @@ private:
         auto job = job_manager->createCompoundJob("my_job");
 
         // Add a sleep action to it
-        auto action = job->addFileReadAction("my_file_read", this->test->file, wrench::FileLocation::LOCATION(this->test->ss));
+        auto action = job->addFileReadAction("my_file_read", wrench::FileLocation::LOCATION(this->test->ss, this->test->file));
 
         // Submit the action to the action executor
         action_execution_service->submitAction(action);
@@ -635,7 +635,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -688,7 +688,7 @@ private:
         auto job = job_manager->createCompoundJob("my_job");
 
         // Add a sleep action to it
-        auto action = job->addFileReadAction("my_file_read", this->test->file, wrench::FileLocation::LOCATION(this->test->ss));
+        auto action = job->addFileReadAction("my_file_read", wrench::FileLocation::LOCATION(this->test->ss, this->test->file));
 
         // Submit the action to the action executor
         action_execution_service->submitAction(action);
@@ -765,7 +765,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -870,7 +870,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -1036,7 +1036,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
