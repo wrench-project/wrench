@@ -113,10 +113,10 @@ private:
         this->test->task->addOutputFile(this->test->file_3);
         this->test->task->addOutputFile(this->test->xl_file);
         auto job1 = job_manager->createStandardJob(this->test->task,
-                                                   {{this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                                                    {this->test->file_2, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                                                    {this->test->file_3, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                                                    {this->test->xl_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                   {{this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->file_1)},
+                                                    {this->test->file_2, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->file_2)},
+                                                    {this->test->file_3, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->file_3)},
+                                                    {this->test->xl_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->xl_file)}});
         job_manager->submitJob(job1, this->test->compute_service);
 
         this->waitForAndProcessNextEvent();

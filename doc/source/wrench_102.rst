@@ -277,11 +277,11 @@ Adding/removing an entry to a file registry service is done as follows:
 
    [...]
 
-   file_registry->addEntry(some_file, wrench::FileLocation::LOCATION(some_storage_service));
-   file_registry->removeEntry(some_file, wrench::FileLocatio::LOCATION(some_storage_service));
+   file_registry->addEntry(wrench::FileLocation::LOCATION(some_storage_service, some_file));
+   file_registry->removeEntry(wrench::FileLocatio::LOCATION(some_storage_service, some_file));
 
 The :cpp:class:`wrench::FileLocation` class is a convenient abstraction for a
-file copy available at some storage service (with optionally a directory
+file that is available at some storage service (with optionally a directory
 path at that service).
 
 Retrieving all entries for a given file is done as follows:

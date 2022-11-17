@@ -73,8 +73,8 @@ private:
     int main() {
 
         // read the file
-        wrench::StorageService::readFile(this->test->file,
-                                         wrench::FileLocation::LOCATION(storage_service));
+        wrench::StorageService::readFile(
+                                         wrench::FileLocation::LOCATION(storage_service, this->test->file));
 
 
         return 0;

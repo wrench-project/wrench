@@ -201,11 +201,10 @@ private:
             try {
                 one_task_jobs[job_index] = job_manager->createStandardJob(
                         {task},
-                        {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}},
+                        {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)}},
                         {},
-                        {std::make_tuple(this->test->input_file,
-                                         wrench::FileLocation::LOCATION(this->test->storage_service),
-                                         wrench::FileLocation::LOCATION(dynamically_created_storage_service))},
+                        {std::make_tuple(wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                         wrench::FileLocation::LOCATION(dynamically_created_storage_service, this->test->input_file))},
                         {});
 
                 if (one_task_jobs[job_index]->getNumTasks() != 1) {

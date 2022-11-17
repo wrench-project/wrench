@@ -79,27 +79,24 @@ private:
 
         if (mode == "reading") {
             wrench::StorageService::readFile(
-                    this->test->file_size_0,
-                    wrench::FileLocation::LOCATION(this->test->storage_service_1));
+
+                    wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_size_0));
             wrench::StorageService::readFile(
-                    this->test->file_size_100,
-                    wrench::FileLocation::LOCATION(this->test->storage_service_1));
+                    wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_size_100));
 
         } else if (mode == "writing") {
             wrench::StorageService::writeFile(
-                    this->test->file_size_0,
-                    wrench::FileLocation::LOCATION(this->test->storage_service_2));
+                    wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_size_0));
             wrench::StorageService::writeFile(
-                    this->test->file_size_100,
-                    wrench::FileLocation::LOCATION(this->test->storage_service_2));
+                    wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_size_100));
 
         } else if (mode == "copying") {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_size_0,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_2));
-            data_movement_manager->doSynchronousFileCopy(this->test->file_size_100,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_2));
+            data_movement_manager->doSynchronousFileCopy(
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_size_0),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_size_0));
+            data_movement_manager->doSynchronousFileCopy(
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_size_100),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_size_100));
         }
 
         return 0;

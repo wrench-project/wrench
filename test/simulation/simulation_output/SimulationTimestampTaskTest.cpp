@@ -140,13 +140,13 @@ private:
 
         auto failed_job = job_manager->createStandardJob(
                 this->test->failed_task,
-                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->small_input_file)},
+                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->large_input_file)}});
 
         job_manager->submitJob(failed_job, this->test->compute_service);
 
-        wrench::StorageService::deleteFile(this->test->workflow->getFileByID("small_input_file"),
-                                           wrench::FileLocation::LOCATION(this->test->storage_service),
+        wrench::StorageService::deleteFile(
+                                           wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("small_input_file")),
                                            this->test->file_registry_service);
 
 
@@ -333,20 +333,20 @@ private:
 
         auto failed_job = job_manager->createStandardJob(
                 this->test->failed_task,
-                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->small_input_file)},
+                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->large_input_file)}});
 
 
         job_manager->submitJob(failed_job, this->test->compute_service);
-        wrench::StorageService::deleteFile(this->test->workflow->getFileByID("small_input_file"),
-                                           wrench::FileLocation::LOCATION(this->test->storage_service));
+        wrench::StorageService::deleteFile(
+                                           wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("small_input_file")));
 
         this->waitForAndProcessNextEvent();
 
         auto passing_job = job_manager->createStandardJob(
                 this->test->failed_task,
-                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
-                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->backup_storage_service, this->test->small_input_file)},
+                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->large_input_file)}});
         job_manager->submitJob(passing_job, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 

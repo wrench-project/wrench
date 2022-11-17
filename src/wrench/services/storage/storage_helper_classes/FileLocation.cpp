@@ -155,9 +155,12 @@ namespace wrench {
 
     /**
      * @brief Get the location's storage service
-     * @return a storage service (will return nullptr if the location is SCRATCH)
+     * @return a storage service
      */
     std::shared_ptr<StorageService> FileLocation::getStorageService() {
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getStorageService(): No storage service for a SCRATCH location");
+        }
         return this->storage_service;
     }
 
@@ -171,33 +174,45 @@ namespace wrench {
 
     /**
      * @brief Get the location's server storage service
-     * @return a storage service (will return nullptr if the location is SCRATCH)
+     * @return a storage service
      */
     std::shared_ptr<StorageService> FileLocation::getServerStorageService() {
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getServerStorageService(): No server storage service for a SCRATCH location");
+        }
         return this->server_storage_service;
     }
 
     /**
      * @brief Get the location's mount point
-     * @return a mount point (will return "" if the location is SCRATCH)
+     * @return a mount point
      */
     std::string FileLocation::getMountPoint() {
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getMountPoint(): No mount point for a SCRATCH location");
+        }
         return this->mount_point;
     }
 
     /**
      * @brief Get the location's path at mount point
-     * @return a path (will return "" if the location is SCRATCH)
+     * @return a path
      */
     std::string FileLocation::getAbsolutePathAtMountPoint() {
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getAbsolutePathAtMountPoint(): No path at mount point for a SCRATCH location");
+        }
         return this->absolute_path_at_mount_point;
     }
 
     /**
      * @brief Get the location's full absolute path
-     * @return a path (will return "" if the location is SCRATCH)
+     * @return a path
      */
     std::string FileLocation::getFullAbsolutePath() {
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getFullAbsolutePath(): No full absolute path for a SCRATCH location");
+        }
         return FileLocation::sanitizePath(this->mount_point + "/" + this->absolute_path_at_mount_point);
     }
 
@@ -205,7 +220,7 @@ namespace wrench {
      * @brief Get the location's scratch-ness
      * @return true if the location is SCRATCH
      */
-    bool FileLocation::isScratch() {
+    bool FileLocation::isScratch() const {
         return this->is_scratch;
     }
 

@@ -83,12 +83,12 @@ private:
         std::shared_ptr<wrench::DataFile> file_1 = this->test->file_1;
         std::shared_ptr<wrench::DataFile> file_2 = this->test->file_2;
 
-        file_registry_service->addEntry(file_1, wrench::FileLocation::LOCATION(storage_service));
-        file_registry_service->addEntry(file_2, wrench::FileLocation::LOCATION(storage_service));
+        file_registry_service->addEntry(wrench::FileLocation::LOCATION(storage_service, file_1));
+        file_registry_service->addEntry(wrench::FileLocation::LOCATION(storage_service, file_2));
 
         // delete file and don't unregister
-        wrench::StorageService::deleteFile(file_1, wrench::FileLocation::LOCATION(storage_service));
-        if (wrench::StorageService::lookupFile(file_1, wrench::FileLocation::LOCATION(storage_service))) {
+        wrench::StorageService::deleteFile(wrench::FileLocation::LOCATION(storage_service, file_1));
+        if (wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(storage_service, file_1))) {
             throw std::runtime_error("StorageService should have deleted file_1");
         }
 
@@ -97,8 +97,8 @@ private:
         }
 
         // delete file and unregister
-        wrench::StorageService::deleteFile(file_2, wrench::FileLocation::LOCATION(storage_service), file_registry_service);
-        if (wrench::StorageService::lookupFile(file_2, wrench::FileLocation::LOCATION(storage_service))) {
+        wrench::StorageService::deleteFile(wrench::FileLocation::LOCATION(storage_service, file_2), file_registry_service);
+        if (wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(storage_service, file_2))) {
             throw std::runtime_error("StorageService should have deleted file_2");
         }
 

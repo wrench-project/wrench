@@ -133,9 +133,8 @@ private:
             auto job = job_manager->createCompoundJob("");
             // Add a file_read_action
             auto file_registry_add_entry_action = job->addFileRegistryAddEntryAction("", this->test->fr,
-                                                                                     this->test->file,
                                                                                      wrench::FileLocation::LOCATION(
-                                                                                             this->test->ss));
+                                                                                             this->test->ss, this->test->file));
             // coverage
             wrench::Action::getActionTypeAsString(file_registry_add_entry_action);
 
@@ -174,9 +173,8 @@ private:
             auto job = job_manager->createCompoundJob("");
             // Add a file_read_action
             auto file_registry_delete_entry_action = job->addFileRegistryDeleteEntryAction("", this->test->fr,
-                                                                                           this->test->file,
                                                                                            wrench::FileLocation::LOCATION(
-                                                                                                   this->test->ss));
+                                                                                                   this->test->ss, this->test->file));
             // coverage
             wrench::Action::getActionTypeAsString(file_registry_delete_entry_action);
             file_registry_delete_entry_action->getFile();
@@ -246,7 +244,7 @@ void FileRegistryActionExecutorTest::do_FileRegistryActionExecutorSuccessTest_te
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a file registry
     this->fr = simulation->add(new wrench::FileRegistryService("Host1"));

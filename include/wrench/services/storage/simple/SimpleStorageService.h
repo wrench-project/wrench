@@ -83,7 +83,7 @@ namespace wrench {
         double getLoad() override;
         double countRunningFileTransferThreads();
 
-        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) override;
+        double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
 
         /***********************/
         /** \endcond          **/

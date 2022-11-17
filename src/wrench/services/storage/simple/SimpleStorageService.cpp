@@ -680,12 +680,12 @@ namespace wrench {
      * @return the file's last write date, or -1 if the file is not found
      *
      */
-    double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-        if ((file == nullptr) or (location == nullptr)) {
-            throw std::invalid_argument("SimpleStorageService::getFileLastWriteDate(): Invalid arguments");
+    double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+        if (location == nullptr) {
+            throw std::invalid_argument("SimpleStorageService::getFileLastWriteDate(): Invalid nullptr argument");
         }
         auto fs = this->file_systems[location->getMountPoint()].get();
-        return fs->getFileLastWriteDate(file, location->getAbsolutePathAtMountPoint());
+        return fs->getFileLastWriteDate(location->getFile(), location->getAbsolutePathAtMountPoint());
     }
 
 };// namespace wrench

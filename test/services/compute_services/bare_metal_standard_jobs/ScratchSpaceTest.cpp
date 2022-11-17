@@ -173,9 +173,9 @@ private:
             auto job = job_manager->createStandardJob(
                     {task},
                     (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                    {std::make_tuple(this->test->workflow->getFileByID("input_file"),
-                                     wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                     wrench::FileLocation::SCRATCH)},
+                    {std::make_tuple(
+                                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file")),
+                                     wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file")))},
                     {},
                     {});
 
@@ -304,9 +304,9 @@ private:
             auto job1 = job_manager->createStandardJob(
                     {task1},
                     (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                    {std::make_tuple(this->test->workflow->getFileByID("input_file1"),
-                                     wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                     wrench::FileLocation::SCRATCH)},
+                    {std::make_tuple(
+                                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file1")),
+                                     wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file1")))},
                     {},
                     {});
 
@@ -315,9 +315,9 @@ private:
             auto job2 = job_manager->createStandardJob(
                     {task2},
                     (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                    {std::make_tuple(this->test->workflow->getFileByID("input_file2"),
-                                     wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                     wrench::FileLocation::SCRATCH)},
+                    {std::make_tuple(
+                                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file2")),
+                                     wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file2")))},
                     {},
                     {});
 
@@ -332,9 +332,9 @@ private:
             job1 = job_manager->createStandardJob(
                     {task1},
                     (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                    {std::make_tuple(this->test->workflow->getFileByID("input_file1"),
-                                     wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                     wrench::FileLocation::SCRATCH)},
+                    {std::make_tuple(
+                                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file1")),
+                                     wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file1")))},
                     {},
                     {});
             job_manager->submitJob(job1, this->test->compute_service1);
@@ -362,9 +362,9 @@ private:
             job1 = job_manager->createStandardJob(
                     {task1},
                     (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                    {std::make_tuple(this->test->workflow->getFileByID("input_file1"),
-                                     wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                     wrench::FileLocation::SCRATCH)},
+                    {std::make_tuple(
+                                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file1")),
+                                     wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file1")))},
                     {},
                     {});
             job_manager->submitJob(job1, this->test->compute_service2);
@@ -551,9 +551,9 @@ private:
         auto job1 = job_manager->createStandardJob(
                 {task1},
                 (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                {std::make_tuple(this->test->workflow->getFileByID("input_file1"),
-                                 wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                 wrench::FileLocation::SCRATCH)},
+                {std::make_tuple(
+                                 wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file1")),
+                                 wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file1")))},
                 {},
                 {});
 
@@ -561,9 +561,9 @@ private:
         auto job2 = job_manager->createStandardJob(
                 {task2},
                 (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                {std::make_tuple(this->test->workflow->getFileByID("input_file2"),
-                                 wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                 wrench::FileLocation::SCRATCH)},
+                {std::make_tuple(
+                                 wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file2")),
+                                 wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file2")))},
                 {},
                 {});
 
@@ -571,9 +571,9 @@ private:
         auto job3 = job_manager->createStandardJob(
                 {task3},
                 (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                {std::make_tuple(this->test->workflow->getFileByID("input_file3"),
-                                 wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                 wrench::FileLocation::SCRATCH)},
+                {std::make_tuple(
+                                 wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file3")),
+                                 wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file3")))},
                 {},
                 {});
 
@@ -740,9 +740,9 @@ private:
         //   - (task 2 needs "input")
         auto job1 = job_manager->createStandardJob(
                 {task1, task2}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                {std::make_tuple(file,
-                                 wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                 wrench::FileLocation::SCRATCH)},
+                {std::make_tuple(
+                                 wrench::FileLocation::LOCATION(this->test->storage_service1, file),
+                                 wrench::FileLocation::SCRATCH(file))},
                 {}, {});
 
         // Create a second job that:
@@ -750,9 +750,9 @@ private:
         //    - runs task3 (1 second)
         auto job2 = job_manager->createStandardJob(
                 {task3}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                {std::make_tuple(file,
-                                 wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                 wrench::FileLocation::SCRATCH)},
+                {std::make_tuple(
+                                 wrench::FileLocation::LOCATION(this->test->storage_service1, file),
+                                 wrench::FileLocation::SCRATCH(file))},
                 {}, {});
 
         // Submit both jobs
@@ -864,15 +864,13 @@ private:
 
         //check if this file is staged at mount point of non-scratch
         if (not wrench::StorageService::lookupFile(
-                    file1,
-                    wrench::FileLocation::LOCATION(test->storage_service1))) {
+                    wrench::FileLocation::LOCATION(test->storage_service1, file1))) {
             throw std::runtime_error(
                     "The file1 was supposed to be staged at the mount point but is not");
         }
         //check if this file is staged at mount point of non-scratch
         if (not wrench::StorageService::lookupFile(
-                    file2,
-                    wrench::FileLocation::LOCATION(test->storage_service2))) {
+                    wrench::FileLocation::LOCATION(test->storage_service2, file2))) {
             throw std::runtime_error(
                     "The file2 was supposed to be staged in / partition but is not");
         }
@@ -886,9 +884,9 @@ private:
         //   - runs task1
         auto job1 = job_manager->createStandardJob(
                 {task1}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                {std::make_tuple(file1,
-                                 wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                 wrench::FileLocation::SCRATCH)},
+                {std::make_tuple(
+                                 wrench::FileLocation::LOCATION(this->test->storage_service1, file1),
+                                 wrench::FileLocation::SCRATCH(file1))},
                 {}, {});
 
         // Submit job1
@@ -910,18 +908,17 @@ private:
         //the file1 should still be non-scratch space, the job should only delete file from it's scratch job's partition
         //check if this file is staged in mount point of non-scratch
         if (not wrench::StorageService::lookupFile(
-                    file1,
-                    wrench::FileLocation::LOCATION(test->storage_service1))) {
+                    wrench::FileLocation::LOCATION(test->storage_service1, file1))) {
             throw std::runtime_error(
                     "The file1 again was supposed to be staged in / partition but is not");
         }
 
         //try to copy file1 from job1's partition of storage service1 into storage service2 in / partition, this should fail
         try {
-            wrench::StorageService::copyFile(file1,
+            wrench::StorageService::copyFile(
                                              wrench::FileLocation::LOCATION(this->test->storage_service1,
-                                                                            this->test->storage_service1->getMountPoint() + job1->getName()),
-                                             wrench::FileLocation::LOCATION(this->test->storage_service2));
+                                                                            this->test->storage_service1->getMountPoint() + job1->getName(), file1),
+                                             wrench::FileLocation::LOCATION(this->test->storage_service2, file1));
             throw std::runtime_error(
                     "Non-scratch space have / partition unless created by copying something into a new partition name");
         } catch (wrench::ExecutionException &e) {
@@ -929,10 +926,10 @@ private:
 
         //try to copy file1 from / partition of storage service1 into storage service2 in job1's partition, this should succeed
         try {
-            wrench::StorageService::copyFile(file1,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service1),
+            wrench::StorageService::copyFile(
+                                             wrench::FileLocation::LOCATION(this->test->storage_service1, file1),
                                              wrench::FileLocation::LOCATION(this->test->storage_service2,
-                                                                            this->test->storage_service2->getMountPoint() + job1->getName()));
+                                                                            this->test->storage_service2->getMountPoint() + job1->getName(), file1));
 
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
@@ -941,9 +938,9 @@ private:
 
         //try to copy file2 from / partition of storage service2 into storage service1 at mount point, it should succeed
         try {
-            wrench::StorageService::copyFile(file2,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service2),
-                                             wrench::FileLocation::LOCATION(this->test->storage_service1));
+            wrench::StorageService::copyFile(
+                                             wrench::FileLocation::LOCATION(this->test->storage_service2, file2),
+                                             wrench::FileLocation::LOCATION(this->test->storage_service1, file2));
 
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
@@ -952,10 +949,10 @@ private:
 
         //try to copy file2 from / partition of storage service2 into storage service2 in /test directory, it should succeed
         try {
-            wrench::StorageService::copyFile(file2,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service2),
+            wrench::StorageService::copyFile(
+                                             wrench::FileLocation::LOCATION(this->test->storage_service2, file2),
                                              wrench::FileLocation::LOCATION(this->test->storage_service2,
-                                                                            this->test->storage_service2->getMountPoint() + "/test"));
+                                                                            this->test->storage_service2->getMountPoint() + "/test", file2));
 
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
@@ -964,9 +961,7 @@ private:
 
         //we just copied file to /test partition of storage service2, so it must be there
         if (not wrench::StorageService::lookupFile(
-                    file2,
-                    wrench::FileLocation::LOCATION(this->test->storage_service2,
-                                                   this->test->storage_service2->getMountPoint() + "/test"))) {
+                    wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->storage_service2->getMountPoint() + "/test", file2))) {
 
             throw std::runtime_error(
                     "The file2 was supposed to be stored in /test partition but is not");

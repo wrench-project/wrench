@@ -128,12 +128,12 @@ private:
         // Get the cloud service
         auto cs = this->test->compute_service;
 
-        std::vector<std::tuple<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_copies = {};
+        std::vector<std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_copies = {};
         for (auto it: this->workflow->getInputFileMap()) {
-            std::tuple<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> each_copy =
-                    std::make_tuple(it.second,
-                                    wrench::FileLocation::LOCATION(this->test->storage_service),
-                                    wrench::FileLocation::SCRATCH);
+            std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> each_copy =
+                    std::make_tuple(
+                                    wrench::FileLocation::LOCATION(this->test->storage_service, it.second),
+                                    wrench::FileLocation::SCRATCH(it.second));
             pre_copies.push_back(each_copy);
         }
 
