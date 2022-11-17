@@ -39,6 +39,8 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::SCRATCH(): Cannot pass nullptr file");
         }
 
+        XXX
+
         return std::shared_ptr<FileLocation>(new FileLocation(nullptr, "", "", file, true));
     }
 
