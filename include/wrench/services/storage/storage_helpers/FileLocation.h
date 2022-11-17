@@ -13,6 +13,7 @@
 #include <memory>
 #include <iostream>
 #include <utility>
+#include <unordered_map>
 
 
 namespace wrench {
@@ -98,6 +99,7 @@ namespace wrench {
     private:
         friend class LogicalFileSystem;
 
+
         /**
          * @brief Constructor
          * @param ss: the storage service
@@ -117,6 +119,17 @@ namespace wrench {
         std::string absolute_path_at_mount_point;
         std::shared_ptr<DataFile> file;
         bool is_scratch;
+
+        static std::shared_ptr<FileLocation> createFileLocation(const std::shared_ptr<StorageService>& ss,
+                                                         const std::string& mp,
+                                                         const std::string& apamp,
+                                                         const std::shared_ptr<DataFile>& file,
+                                                         bool is_scratch);
+
+        static void reclaimFileLocations();
+
+        static std::unordered_map<std::string, std::shared_ptr<FileLocation>> file_location_map;
+        static size_t  file_location_map_previous_size;
     };
 
     /***********************/

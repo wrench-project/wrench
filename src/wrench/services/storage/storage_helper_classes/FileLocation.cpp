@@ -21,9 +21,60 @@
 
 WRENCH_LOG_CATEGORY(wrench_core_file_location, "Log category for FileLocation");
 
+#define RECLAIM_TRIGGER 1000
+
 namespace wrench {
 
+    std::unordered_map<std::string, std::shared_ptr<FileLocation>> FileLocation::file_location_map;
+    size_t FileLocation::file_location_map_previous_size = 0;
+
+
     FileLocation::~FileLocation() {
+    }
+
+
+
+    /**
+     * @brief Factory to create a new file location
+     * @param ss: a storage service
+     * @param mp: a mount point
+     * @param apamp: an path at the mount point
+     * @param file: a file
+     * @param is_scratch: whether scratch or not
+     * @return a shared pointer to a file location
+     */
+    std::shared_ptr<FileLocation> FileLocation::createFileLocation(const std::shared_ptr<StorageService>& ss,
+                                                                   const std::string& mp,
+                                                                   const std::string& apamp,
+                                                                   const std::shared_ptr<DataFile>& file,
+                                                                   bool is_scratch) {
+        // TODO: Find a more efficiency key
+        std::string key = (ss? ss->getName(): "") + "|" + mp + "|" + apamp + "|" + file->getID() + "|" + (is_scratch ? "1" : "0");
+        if (FileLocation::file_location_map.find(key) != FileLocation::file_location_map.end()) {
+            return FileLocation::file_location_map[key];
+        }
+        auto new_location = std::shared_ptr<FileLocation>(new FileLocation(ss, mp, apamp, file, is_scratch));
+
+        if (FileLocation::file_location_map.size() - FileLocation::file_location_map_previous_size > RECLAIM_TRIGGER) {
+            FileLocation::reclaimFileLocations();
+            FileLocation::file_location_map_previous_size = FileLocation::file_location_map.size();
+        }
+        FileLocation::file_location_map[key] = new_location;
+        return new_location;
+    }
+
+
+    /**
+     * @brief Reclaim file locations that are no longer used
+     */
+    void FileLocation::reclaimFileLocations() {
+        for (auto it = FileLocation::file_location_map.cbegin(); it != FileLocation::file_location_map.cend();) {
+            if ((*it).second.use_count() == 1) {
+                it = FileLocation::file_location_map.erase(it);
+            } else {
+                ++it;
+            }
+        }
     }
 
     /**
@@ -39,9 +90,7 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::SCRATCH(): Cannot pass nullptr file");
         }
 
-        XXX
-
-        return std::shared_ptr<FileLocation>(new FileLocation(nullptr, "", "", file, true));
+        return FileLocation::createFileLocation(nullptr, "", "", file, true);
     }
 
     /**
@@ -138,7 +187,7 @@ namespace wrench {
         absolute_path.replace(0, mount_point.length(), "/");
         absolute_path = sanitizePath(absolute_path);
 
-        return std::shared_ptr<FileLocation>(new FileLocation(ss, mount_point, absolute_path, file, false));
+        return FileLocation::createFileLocation(ss, mount_point, absolute_path, file, false);
     }
 
     /**
@@ -327,4 +376,6 @@ namespace wrench {
 
         return true;
     }
+
+
 }// namespace wrench
