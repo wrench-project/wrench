@@ -945,7 +945,7 @@ private:
 
         // bogus lookup #2
         try {
-            wrench::StorageService::lookupFile(nullptr);
+            wrench::StorageService::lookupFile((std::shared_ptr<wrench::FileLocation>)nullptr);
             throw std::runtime_error("Should not have been able to lookup a nullptr location");
         } catch (std::invalid_argument &e) {
         }
