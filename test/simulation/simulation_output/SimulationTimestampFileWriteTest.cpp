@@ -254,21 +254,21 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
     // test constructors for invalid arguments
     ASSERT_THROW(simulation->getOutput().addTimestampFileWriteStart(0.0,
                                                                     nullptr,
-                                                                    wrench::FileLocation::LOCATION(this->storage_service),
+                                                                    wrench::FileLocation::LOCATION(this->storage_service, file_1),
                                                                     service,
                                                                     task),
                  std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileWriteStart(0.0,
-                                                                    this->file_1,
+                                                                    file_1,
                                                                     nullptr,
                                                                     service,
                                                                     task),
                  std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileWriteStart(0.0,
-                                                                    this->file_1,
-                                                                    wrench::FileLocation::LOCATION(this->storage_service),
+                                                                    file_1,
+                                                                    wrench::FileLocation::LOCATION(this->storage_service, file_1),
                                                                     nullptr,
                                                                     task),
                  std::invalid_argument);
@@ -276,21 +276,21 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileWriteFailure(0.0,
                                                                       nullptr,
-                                                                      wrench::FileLocation::LOCATION(this->storage_service),
+                                                                      wrench::FileLocation::LOCATION(this->storage_service, file_1),
                                                                       service,
                                                                       task),
                  std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileWriteFailure(0.0,
-                                                                      this->file_1,
+                                                                      file_1,
                                                                       nullptr,
                                                                       service,
                                                                       task),
                  std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileWriteFailure(0.0,
-                                                                      this->file_1,
-                                                                      wrench::FileLocation::LOCATION(this->storage_service),
+                                                                      file_1,
+                                                                      wrench::FileLocation::LOCATION(this->storage_service, file_1),
                                                                       nullptr,
                                                                       task),
                  std::invalid_argument);
@@ -298,21 +298,21 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileWriteCompletion(0.0,
                                                                          nullptr,
-                                                                         wrench::FileLocation::LOCATION(this->storage_service),
+                                                                         wrench::FileLocation::LOCATION(this->storage_service, file_1),
                                                                          service,
                                                                          task),
                  std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileWriteCompletion(0.0,
-                                                                         this->file_1,
+                                                                         file_1,
                                                                          nullptr,
                                                                          service,
                                                                          task),
                  std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileWriteCompletion(0.0,
-                                                                         this->file_1,
-                                                                         wrench::FileLocation::LOCATION(this->storage_service),
+                                                                         file_1,
+                                                                         wrench::FileLocation::LOCATION(this->storage_service, file_1),
                                                                          nullptr,
                                                                          task),
                  std::invalid_argument);

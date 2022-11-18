@@ -154,7 +154,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(
                 this->mailbox,
                 new FileRegistryAddEntryRequestMessage(
-                        answer_mailbox, location->getFile(), location,
+                        answer_mailbox, location,
                         this->getMessagePayloadValue(
                                 FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -165,7 +165,7 @@ namespace wrench {
         if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
             return;
         } else {
-            std::runtime_error("FileRegistryService::addEntry(): Unexpected [" + message->getName() + "] message");
+            throw std::runtime_error("FileRegistryService::addEntry(): Unexpected [" + message->getName() + "] message");
         }
     }
 
@@ -189,7 +189,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(
                 this->mailbox,
                 new FileRegistryRemoveEntryRequestMessage(
-                        answer_mailbox, location->getFile(), location,
+                        answer_mailbox, location,
                         this->getMessagePayloadValue(
                                 FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -205,7 +205,7 @@ namespace wrench {
             }
             return;
         } else {
-            std::runtime_error("FileRegistryService::removeEntry(): Unexpected [" + message->getName() + "] message");
+            throw std::runtime_error("FileRegistryService::removeEntry(): Unexpected [" + message->getName() + "] message");
         }
     }
 
@@ -267,7 +267,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     msg->answer_mailbox,
                     new FileRegistryFileLookupAnswerMessage(
-                            msg->file, locations,
+                            locations,
                             this->getMessagePayloadValue(
                                     FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
             return true;

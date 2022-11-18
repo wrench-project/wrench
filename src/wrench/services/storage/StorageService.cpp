@@ -251,7 +251,6 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox,
                                 new StorageServiceFileWriteRequestMessage(
                                         answer_mailbox,
-                                        file,
                                         wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file),
                                         this->buffer_size,
                                         this->getMessagePayloadValue(
@@ -359,7 +358,6 @@ namespace wrench {
                 location->getStorageService()->mailbox,
                 new StorageServiceFileLookupRequestMessage(
                         answer_mailbox,
-                        file,
                         location,
                         storage_service->getMessagePayloadValue(
                                 StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
@@ -437,7 +435,6 @@ namespace wrench {
                                     new StorageServiceFileReadRequestMessage(
                                             answer_mailbox,
                                             chunk_receiving_mailbox,
-                                            file,
                                             location,
                                             num_bytes_to_read,
                                             storage_service->getMessagePayloadValue(
@@ -609,7 +606,6 @@ namespace wrench {
         S4U_Mailbox::putMessage(storage_service->mailbox,
                                 new StorageServiceFileDeleteRequestMessage(
                                         answer_mailbox,
-                                        file,
                                         location,
                                         storage_service->getMessagePayloadValue(
                                                 StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
@@ -669,7 +665,6 @@ namespace wrench {
                 dst_location->getStorageService()->mailbox,
                 new StorageServiceFileCopyRequestMessage(
                         answer_mailbox,
-                        file,
                         src_location,
                         dst_location,
                         nullptr,
@@ -725,7 +720,6 @@ namespace wrench {
                 dst_location->getStorageService()->mailbox,
                 new StorageServiceFileCopyRequestMessage(
                         answer_mailbox,
-                        src_location->getFile(),
                         src_location,
                         dst_location,
                         nullptr,

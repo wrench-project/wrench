@@ -508,7 +508,7 @@ namespace wrench {
         switch (this->state) {
             case StandardJob::State::PENDING:
             case StandardJob::State::RUNNING:
-                throw std::rBuntime_error("StandardJob::processCompoundJobOutcome(): Cannot be called on a RUNNING/PENDING job");
+                throw std::runtime_error("StandardJob::processCompoundJobOutcome(): Cannot be called on a RUNNING/PENDING job");
             default:
                 break;
         }
