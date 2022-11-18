@@ -192,7 +192,7 @@ namespace wrench {
                 sendLocalFileToNetwork(this->file, this->src_location, num_bytes_to_transfer, this->dst_mailbox);
             } catch (ExecutionException &e) {
                 WRENCH_INFO(
-                        "FileTransferThread::main(): Network error (%s)", failure_cause->toString().c_str());
+                        "FileTransferThread::main(): Network error (%s)", e.getCause()->toString().c_str());
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
             }
@@ -204,7 +204,7 @@ namespace wrench {
                 receiveFileFromNetwork(this->file, this->src_mailbox, this->dst_location);
             } catch (ExecutionException &e) {
                 WRENCH_INFO(
-                        "FileTransferThread::main() Network error (%s)", failure_cause->toString().c_str());
+                        "FileTransferThread::main() Network error (%s)", e.getCause()->toString().c_str());
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
             }
@@ -221,7 +221,7 @@ namespace wrench {
                 downloadFileFromStorageService(this->file, this->src_location, this->dst_location);
             } catch (ExecutionException &e) {
                 msg_to_send_back->success = false;
-                msg_to_send_back->failure_cause = failure_cause;
+                msg_to_send_back->failure_cause = e.getCause();
             } catch (std::shared_ptr<FailureCause> &failure_cause) {
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
@@ -489,7 +489,6 @@ namespace wrench {
                     new StorageServiceFileReadRequestMessage(
                             request_answer_mailbox,
                             mailbox_that_should_receive_file_content,
-                            f,
                             src_loc,
                             f->getSize(),
                             src_loc->getStorageService()->getMessagePayloadValue(

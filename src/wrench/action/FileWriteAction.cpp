@@ -38,7 +38,7 @@ namespace wrench {
      * @return the file
      */
     std::shared_ptr<DataFile> FileWriteAction::getFile() const {
-        return this->file;
+        return this->file_location->getFile();
     }
 
     /**

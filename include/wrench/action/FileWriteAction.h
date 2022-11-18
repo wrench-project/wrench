@@ -43,7 +43,6 @@ namespace wrench {
         void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
     private:
-        std::shared_ptr<DataFile> file;
         std::shared_ptr<FileLocation> file_location;
     };
 

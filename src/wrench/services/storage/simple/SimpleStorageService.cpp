@@ -202,29 +202,29 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
-            return processFileDeleteRequest(msg->file, msg->location, msg->answer_mailbox);
+            return processFileDeleteRequest(msg->location->getFile(), msg->location, msg->answer_mailbox);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
             auto fs = this->file_systems[msg->location->getMountPoint()].get();
-            bool file_found = fs->isFileInDirectory(msg->file, msg->location->getAbsolutePathAtMountPoint());
+            bool file_found = fs->isFileInDirectory(msg->location->getFile(), msg->location->getAbsolutePathAtMountPoint());
 
             S4U_Mailbox::dputMessage(
                     msg->answer_mailbox,
                     new StorageServiceFileLookupAnswerMessage(
-                            msg->file, file_found,
+                            msg->location->getFile(), file_found,
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
             return true;
 
         } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
-            return processFileWriteRequest(msg->file, msg->location, msg->answer_mailbox, msg->buffer_size);
+            return processFileWriteRequest(msg->location->getFile(), msg->location, msg->answer_mailbox, msg->buffer_size);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
-            return processFileReadRequest(msg->file, msg->location, msg->num_bytes_to_read, msg->answer_mailbox,
+            return processFileReadRequest(msg->location->getFile(), msg->location, msg->num_bytes_to_read, msg->answer_mailbox,
                                           msg->mailbox_to_receive_the_file_content);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
-            return processFileCopyRequest(msg->file, msg->src, msg->dst, msg->answer_mailbox);
+            return processFileCopyRequest(msg->src->getFile(), msg->src, msg->dst, msg->answer_mailbox);
 
         } else if (auto msg = dynamic_cast<FileTransferThreadNotificationMessage *>(message.get())) {
             return processFileTransferThreadNotification(
@@ -293,7 +293,6 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new StorageServiceFileWriteAnswerMessage(
-                            file,
                             location,
                             true,
                             nullptr,
@@ -323,7 +322,6 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new StorageServiceFileWriteAnswerMessage(
-                            file,
                             location,
                             false,
                             failure_cause,
@@ -376,7 +374,6 @@ namespace wrench {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new StorageServiceFileReadAnswerMessage(
-                        file,
                         location,
                         success,
                         failure_cause,
@@ -428,7 +425,6 @@ namespace wrench {
         //            try {
         //                S4U_Mailbox::putMessage(answer_mailbox,
         //                                        new StorageServiceFileCopyAnswerMessage(
-        //                                                file,
         //                                                src_location,
         //                                                dst_location,
         //                                                nullptr, false,
@@ -459,7 +455,6 @@ namespace wrench {
                     S4U_Mailbox::putMessage(
                             answer_mailbox,
                             new StorageServiceFileCopyAnswerMessage(
-                                    file,
                                     src_location,
                                     dst_location,
                                     nullptr, false,
@@ -542,6 +537,7 @@ namespace wrench {
                                                                      simgrid::s4u::Mailbox *answer_mailbox_if_read,
                                                                      simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                                                      simgrid::s4u::Mailbox *answer_mailbox_if_copy) {
+
         // Remove the ftt from the list of running ftt
         if (this->running_file_transfer_threads.find(ftt) == this->running_file_transfer_threads.end()) {
             WRENCH_INFO(
@@ -595,7 +591,6 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     answer_mailbox_if_copy,
                     new StorageServiceFileCopyAnswerMessage(
-                            file,
                             src_location,
                             dst_location,
                             nullptr,
