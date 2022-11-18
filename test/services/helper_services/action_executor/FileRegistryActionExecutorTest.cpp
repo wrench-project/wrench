@@ -139,9 +139,9 @@ private:
             wrench::Action::getActionTypeAsString(file_registry_add_entry_action);
 
             // Create a file read action executor
-            auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                    new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_registry_add_entry_action,
-                                               nullptr));
+            auto file_read_action_executor = std::make_shared<wrench::ActionExecutor>(
+                    "Host2", 0, 0.0, 0, false, this->mailbox, file_registry_add_entry_action,
+                                               nullptr);
 
             // Start it
             file_read_action_executor->setSimulation(this->simulation);

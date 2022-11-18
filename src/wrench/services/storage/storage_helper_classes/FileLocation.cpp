@@ -129,7 +129,7 @@ namespace wrench {
      */
     std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService>& ss,
                                                          std::shared_ptr<StorageService> server_ss,
-                                                         std::shared_ptr<DataFile> file) {
+                                                         const std::shared_ptr<DataFile>& file) {
         if (ss == nullptr) {
             throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr storage service");
         }
@@ -302,7 +302,7 @@ namespace wrench {
         char unallowed_characters[] = {'\\', ' ', '~', '`', '\'', '&', '*', '?'};
         for (auto const &c: unallowed_characters) {
             if (path.find(c) != std::string::npos) {
-                throw std::invalid_argument("FileLocation::sanitizePath(): Unallowed character '" + std::to_string(c) + "' in path (" + path + ")");
+                throw std::invalid_argument("FileLocation::sanitizePath(): Disallowed character '" + std::to_string(c) + "' in path (" + path + ")");
             }
         }
 

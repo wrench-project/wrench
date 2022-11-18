@@ -37,7 +37,7 @@ namespace wrench {
      */
     class FileRegistryFileLookupRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file, double payload);
+        FileRegistryFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<DataFile> &file, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
@@ -50,11 +50,9 @@ namespace wrench {
      */
     class FileRegistryFileLookupAnswerMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupAnswerMessage(std::shared_ptr<DataFile> file, std::set<std::shared_ptr<FileLocation>> locations,
+        FileRegistryFileLookupAnswerMessage(std::set<std::shared_ptr<FileLocation>> locations,
                                             double payload);
 
-        /** @brief The file that was looked up */
-        std::shared_ptr<DataFile> file;
         /** @brief A (possibly empty) set of file locations */
         std::set<std::shared_ptr<FileLocation>> locations;
     };
@@ -122,13 +120,11 @@ namespace wrench {
      */
     class FileRegistryRemoveEntryRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryRemoveEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file,
+        FileRegistryRemoveEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                               std::shared_ptr<FileLocation> location, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
-        /** @brief The file for which one entry should be removed */
-        std::shared_ptr<DataFile> file;
         /** @brief The location to remove */
         std::shared_ptr<FileLocation> location;
     };
@@ -149,13 +145,11 @@ namespace wrench {
      */
     class FileRegistryAddEntryRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryAddEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file,
+        FileRegistryAddEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                            std::shared_ptr<FileLocation> location, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
-        /** @brief The file for which to add an entry */
-        std::shared_ptr<DataFile> file;
         /** @brief The location in that entry */
         std::shared_ptr<FileLocation> location;
     };

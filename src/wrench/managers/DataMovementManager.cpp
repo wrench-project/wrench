@@ -212,8 +212,7 @@ namespace wrench {
             WRENCH_INFO("Forwarding status message");
             // Forward it back
             S4U_Mailbox::dputMessage(this->creator_mailbox,
-                                     new StorageServiceFileCopyAnswerMessage(msg->file,
-                                                                             msg->src,
+                                     new StorageServiceFileCopyAnswerMessage(msg->src,
                                                                              msg->dst,
                                                                              request.file_registry_service,
                                                                              file_registry_service_updated,

@@ -41,7 +41,7 @@ namespace wrench {
 
         static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService>& ss,
                                                       std::shared_ptr<StorageService> server_ss,
-                                                      std::shared_ptr<DataFile> file);
+                                                      const std::shared_ptr<DataFile>& file);
 
         static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService>& ss,
                                                       std::string absolute_path,
