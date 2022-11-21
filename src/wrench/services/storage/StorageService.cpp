@@ -397,7 +397,8 @@ namespace wrench {
     void StorageService::readFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
-        }//This check DOES need to exist, becasue we call file->getSize()
+        } //This check DOES need to exist, because  we call file->getSize()
+
         readFileInternal(file, location, file->getSize());
     }
 

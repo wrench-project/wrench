@@ -39,7 +39,7 @@ namespace wrench {
     void SimpleStorageServiceBufferized::cleanup(bool has_returned_from_main, int return_value) {
         this->pending_file_transfer_threads.clear();
         this->running_file_transfer_threads.clear();
-        // Do nothing. It's fine to die and we'll just autorestart with our previous state
+        // Do nothing. It's fine to die, and we'll just autorestart with our previous state
     }
 
     /**

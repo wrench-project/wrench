@@ -160,6 +160,7 @@ namespace wrench {
         }
 
         // In case this was a restart!
+        std::cerr << "CLEARING STUFF\n";
         this->stream_to_transactions.clear();
         this->pending_transactions.clear();
         this->running_transactions.clear();
@@ -718,18 +719,11 @@ namespace wrench {
             auto transaction = this->pending_transactions.front();
             this->pending_transactions.pop_front();
 
-//            auto sg_iostream = simgrid::s4u::Io::streamto_init(transaction->src_host,
-//                                                               transaction->src_disk,
-//                                                               transaction->dst_host,
-//                                                               transaction->dst_disk)->set_size((uint64_t)(transaction->file->getSize()));
+            auto sg_iostream = simgrid::s4u::Io::streamto_init(transaction->src_host,
+                                                               transaction->src_disk,
+                                                               transaction->dst_host,
+                                                               transaction->dst_disk)->set_size((uint64_t)(transaction->file->getSize()));
 
-            // TODO: DEBUG STUFF HERE
-            simgrid::s4u::IoPtr sg_iostream;
-            if (transaction->src_disk) {
-                sg_iostream = transaction->src_disk->read_async(1000);
-            } else {
-                sg_iostream = transaction->dst_disk->read_async(1000);
-            }
 
             transaction->stream = sg_iostream;
 
