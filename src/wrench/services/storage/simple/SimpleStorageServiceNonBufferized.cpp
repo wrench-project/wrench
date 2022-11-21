@@ -37,7 +37,7 @@ namespace wrench {
      */
     void SimpleStorageServiceNonBufferized::cleanup(bool has_returned_from_main, int return_value) {
 
-        std::cerr << "IN CLEANUP " << this->name << "  FROM MAIN: " << has_returned_from_main << "\n";
+//        std::cerr << "IN CLEANUP " << this->name << "  FROM MAIN: " << has_returned_from_main << "\n";
 //        std::cerr << "IS MASTRO: " << simgrid::s4u::this_actor::is_maestro() << "\n";
 //        std::cerr << "IN CLEANUP PENDING = " << this->pending_transactions.size() << "\n";
 //        this->pending_transactions.clear();
@@ -56,7 +56,7 @@ namespace wrench {
 //        this->stream_to_transactions.clear();
 
 
-        std::cerr << "DONE CLEANUP\n";
+//        std::cerr << "DONE CLEANUP\n";
     }
 
     /**
