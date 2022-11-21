@@ -143,14 +143,14 @@ private:
         }
 
         // Starting a FailedHost murderer!!
-        murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost",
-                                                                                          wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
+        murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost",
+                                                                                          wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
         murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost resurector!!
-        resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 500, "FailedHost",
-                                                                                            wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
+        resurector = std::make_shared<wrench::ResourceSwitcher>("StableHost", 500, "FailedHost",
+                                                                                            wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
         resurector->setSimulation(this->simulation);
         resurector->start(murderer, true, false);// Daemonized, no auto-restart
 
