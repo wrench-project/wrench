@@ -472,7 +472,7 @@ namespace wrench {
             action_executor->setSimulation(this->simulation);
             try {
                 action_executor->start(action_executor, true, false);// Daemonized, no auto-restart
-            } catch (std::shared_ptr<HostError> &e) {
+            } catch (ExecutionException &e) {
                 // This is an error on the target host!!
                 throw std::runtime_error(
                         "ActionSchedule::dispatchReadyActions(): got a host error on the target host - this shouldn't happen");
