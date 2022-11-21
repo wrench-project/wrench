@@ -502,8 +502,11 @@ namespace wrench {
                 while (true) {
                     std::shared_ptr<SimulationMessage> file_content_message = nullptr;
                     try {
+                        std::cerr << "GTTING A FILE CHN\n";
                         file_content_message = S4U_Mailbox::getMessage(chunk_receiving_mailbox);
+                        std::cerr << "GOT IT\n";
                     } catch (ExecutionException &e) {
+                        std::cerr << "PROBLEM\n";
                         S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                         throw;
                     }
