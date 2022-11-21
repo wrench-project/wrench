@@ -474,12 +474,14 @@ namespace wrench {
 
             } else {
                 // Otherwise, retrieve the file chunks until the last one is received
+                std::cerr << "STARTING RECEIVING STUFF\n";
                 while (true) {
                     std::shared_ptr<SimulationMessage> file_content_message = nullptr;
                     try {
                         file_content_message = S4U_Mailbox::getMessage(chunk_receiving_mailbox);
                     } catch (ExecutionException &e) {
                         S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
+                        std::cerr << "THROWING DUE TO GET MESSAGE\n";
                         throw;
                     }
 
