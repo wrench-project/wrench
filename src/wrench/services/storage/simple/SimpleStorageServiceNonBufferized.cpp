@@ -160,7 +160,6 @@ namespace wrench {
         }
 
         // In case this was a restart!
-        std::cerr << "CLEARING STUFF\n";
         this->stream_to_transactions.clear();
         this->pending_transactions.clear();
         this->running_transactions.clear();

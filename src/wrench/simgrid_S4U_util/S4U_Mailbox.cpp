@@ -201,6 +201,7 @@ namespace wrench {
         return pending_communication;
     }
 
+
     /**
     * @brief Asynchronously receive a message from a mailbox
     *
