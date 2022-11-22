@@ -105,11 +105,9 @@ protected:
                                           wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->xl_file),
                                           wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->xl_file));
 
-        std::cerr << "DOING ASYN\n";
         dmm->doSynchronousFileCopy(
                                    wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->file_2),
                                    wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->file_2));
-        std::cerr << "DONE ASYN\n";
 
         dmm->doSynchronousFileCopy(
                                    wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->file_3),
