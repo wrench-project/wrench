@@ -1,6 +1,5 @@
 #include <iomanip>
 #include <algorithm>
-#include <map>
 #include <cmath>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
@@ -27,7 +26,7 @@ public:
     void do_SimulationTimestampFileCopyBasic_test();
 
 protected:
-    ~SimulationTimestampFileCopyTest() {
+    ~SimulationTimestampFileCopyTest() override {
         workflow->clear();
     }
 
