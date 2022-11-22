@@ -292,7 +292,7 @@ namespace wrench {
             //                Service::cleanupTrackedServices();
             //                Service::num_terminated_services = 0;
             //            }
-        } catch (std::shared_ptr<HostError> &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
     }

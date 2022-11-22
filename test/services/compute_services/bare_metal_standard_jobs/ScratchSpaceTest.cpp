@@ -230,11 +230,11 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
@@ -436,11 +436,13 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
 
     // Create a Storage Service3
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
 
     // Create a Compute Service that does not have scratch space
@@ -658,11 +660,11 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service that does not have scratch space
@@ -799,7 +801,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"},
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
                                                              {},
                                                              {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
 
@@ -999,13 +1001,13 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"},
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
                                                              {},
                                                              {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1.0}})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"},
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
                                                              {},
                                                              {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
 

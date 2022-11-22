@@ -98,7 +98,7 @@ namespace wrench {
                     const auto &target_ss = ss_to_use.at(execution_host);
                     WRENCH_INFO("Custom action about to read file from storage service on host %s",
                                 target_ss->getHostname().c_str());
-                    // Read a input_file from the target storage service (which takes some time)
+                    // Read an input_file from the target storage service (which takes some time)
                     target_ss->readFile(input_file, wrench::FileLocation::LOCATION(target_ss, "/data/"));
                     // Sleep for 5 seconds
                     WRENCH_INFO("Custom action got the file and now is sleeping for 5 seconds");
