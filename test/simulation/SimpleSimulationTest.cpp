@@ -33,7 +33,7 @@ public:
     std::shared_ptr<wrench::CloudComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
-    void do_getReadyTasksTest_test();
+    void do_getReadyTasksTest_test(double buffer_size);
 
 protected:
     ~SimpleSimulationTest() override {
@@ -333,17 +333,19 @@ private:
 };
 
 TEST_F(SimpleSimulationTest, SimpleSimulationReadyTasksTestWMS) {
-    DO_TEST_WITH_FORK(do_getReadyTasksTest_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_getReadyTasksTest_test, 1000000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_getReadyTasksTest_test, 0);
 }
 
-void SimpleSimulationTest::do_getReadyTasksTest_test() {
+void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
+
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
@@ -351,7 +353,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
                          new wrench::CloudComputeService("DualCoreHost", hosts, "/scratch")),
                  std::runtime_error);
     ASSERT_THROW(simulation->add(
-                         new wrench::SimpleStorageService("DualCoreHost", {"/"})),
+                         wrench::SimpleStorageService::createSimpleStorageService("DualCoreHost", {"/"})),
                  std::runtime_error);
     ASSERT_THROW(simulation->add(
                          new wrench::NetworkProximityService("DualCoreHost", hosts)),
@@ -375,12 +377,12 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     // Create a Storage Service
     ASSERT_THROW(storage_service = simulation->add(
-                         new wrench::SimpleStorageService(hostname, {"/disk1"}, {},
+                         wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"}, {},
                                                           {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})),
                  std::invalid_argument);
 
     storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk2"},
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
                                              {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "567"},
                                               {wrench::ServiceProperty::translateString("StorageServiceProperty::BUFFER_SIZE"), "678MiB"}},
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123},

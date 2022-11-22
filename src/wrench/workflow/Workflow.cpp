@@ -83,8 +83,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Workflow::removeFile(const std::shared_ptr<DataFile> &file) {
-        //        std::cerr << "REMOVING FILE " << file->getID() << "\n";
-
         if (this->task_output_files.find(file) != this->task_output_files.end()) {
             throw std::invalid_argument("Workflow::removeFile(): File " +
                                         file->getID() + " cannot be removed because it is output of task " +

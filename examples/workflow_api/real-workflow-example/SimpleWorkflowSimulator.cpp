@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
      * in this storage service.
      */
     std::cerr << "Instantiating a SimpleStorageService on WMSHost " << std::endl;
-    auto storage_service = simulation->add(new wrench::SimpleStorageService({"WMSHost"}, {"/"}));
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService({"WMSHost"}, {"/"}));
     storage_services.insert(storage_service);
 
 

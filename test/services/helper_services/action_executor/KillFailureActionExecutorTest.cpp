@@ -319,11 +319,13 @@ TEST_F(KillFailActionExecutorTest, FailFileDelete) {
 }
 
 TEST_F(KillFailActionExecutorTest, KillCustom) {
-    loopThroughTestCases({0.0, 20.84743174020618639020}, true, "custom");
+//    loopThroughTestCases({0.0, 20.84743174020618639020}, true, "custom");
+    loopThroughTestCases({0.0, 20.8474}, true, "custom");
 }
 
 TEST_F(KillFailActionExecutorTest, FailCustom) {
-    loopThroughTestCases({0.0, 20.84743174020618639020}, false, "custom");
+//    loopThroughTestCases({0.0, 20.84743174020618639020}, false, "custom");
+    loopThroughTestCases({0.0, 20.8474}, false, "custom");
 }
 
 
@@ -345,9 +347,9 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss1 = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
     // Create a Storage Service
-    this->ss2 = simulation->add(new wrench::SimpleStorageService("Host1", {"/"}));
+    this->ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file to read
     this->file = this->workflow->addFile("some_file", 1000000.0);

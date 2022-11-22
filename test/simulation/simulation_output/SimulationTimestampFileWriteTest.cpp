@@ -164,7 +164,7 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
                                                                                                                   wrench::ComputeService::ALL_RAM))},
                                                                                           {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(host1, {"/"},
+    ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(host1, {"/"},
                                                                                        {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
 
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;

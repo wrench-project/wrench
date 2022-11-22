@@ -145,10 +145,10 @@ int main(int argc, char **argv) {
                                          file_size_gb * 1000000000, mem_req_gb * 1000000000);
 
     std::cerr << "Instantiating a SimpleStorageService on storage_host..." << std::endl;
-    auto server_storage_service = simulation->add(new wrench::SimpleStorageService(
+    auto server_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "storage_host", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100MB"}}, {}));
 
-    auto client_storage_service = simulation->add(new wrench::SimpleStorageService(
+    auto client_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "compute_host", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100MB"}}, {}));
 
     std::cerr << "Instantiating a bare-metal compute service on compute_host..." << std::endl;

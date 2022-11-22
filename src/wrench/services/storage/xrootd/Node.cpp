@@ -22,6 +22,7 @@
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/helper_services/alarm/Alarm.h>
 #include <wrench/failure_causes/NotAllowed.h>
+#include <wrench/util/UnitParser.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_xrootd_data_server,
                     "Log category for XRootD");
@@ -367,6 +368,7 @@ namespace wrench {
                     S4U_Mailbox::dputMessage(best->getStorageService()->mailbox,
                                              new StorageServiceFileReadRequestMessage(
                                                      msg->answer_mailbox,
+                                                     simgrid::s4u::this_actor::get_host(),
                                                      msg->mailbox_to_receive_the_file_content,
                                                      msg->file,
                                                      best,
@@ -383,6 +385,7 @@ namespace wrench {
                         S4U_Mailbox::dputMessage(internalStorage->mailbox,
                                                  new StorageServiceFileReadRequestMessage(
                                                          msg->answer_mailbox,
+                                                         simgrid::s4u::this_actor::get_host(),
                                                          msg->mailbox_to_receive_the_file_content,
                                                          msg->file,
                                                          FileLocation::LOCATION(internalStorage),
@@ -530,6 +533,7 @@ namespace wrench {
                             S4U_Mailbox::dputMessage(best->getStorageService()->mailbox,
                                                      new StorageServiceFileReadRequestMessage(
                                                              msg->answer_mailbox,
+                                                             simgrid::s4u::this_actor::get_host(),
                                                              msg->original->mailbox_to_receive_the_file_content,
                                                              msg->file,
                                                              best,
@@ -779,7 +783,8 @@ namespace wrench {
             if (internalStorage != nullptr) {
                 return false;
             }
-            internalStorage = make_shared<SimpleStorageService>(hostname, path, property_list, messagepayload_list);
+//            internalStorage = make_shared<SimpleStorageService>(hostname, path, property_list, messagepayload_list);
+            internalStorage = std::shared_ptr<SimpleStorageService>(SimpleStorageService::createSimpleStorageService(hostname, path, property_list, messagepayload_list));
             return true;
         }
 
@@ -969,6 +974,11 @@ namespace wrench {
                                                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,
                                                           WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
                                                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list) {
+            if (storage_property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != storage_property_list.end()) {
+                if (UnitParser::parse_size(storage_property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE])  < 1) {
+                    throw std::invalid_argument("Node::addChildStorageServer(): XRootD current does not support 0 buffer_size");
+                }
+            }
             return this->addChild(this->deployment->createStorageServer(hostname, mount_point,
                                                                         storage_property_list, storage_messagepayload_list,
                                                                         node_property_list, node_messagepayload_list));

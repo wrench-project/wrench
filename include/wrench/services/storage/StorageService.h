@@ -74,6 +74,8 @@ namespace wrench {
         virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path);
         virtual void createFile(const std::shared_ptr<DataFile> &file);
 
+        bool isBufferized();
+
         /**
          * @brief Get the theoretical load of a service
          * @return the load on the service
@@ -82,10 +84,8 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
-        static void readFile(const std::shared_ptr<DataFile> &file,
+        static void readFileInternal(const std::shared_ptr<DataFile> &file,
                              const std::shared_ptr<FileLocation> &location,
-                             simgrid::s4u::Mailbox *answer_mailbox,
-                             simgrid::s4u::Mailbox *chunk_receiving_mailbox,
                              double num_bytes);
 
         bool isScratch() const;
@@ -121,7 +121,7 @@ namespace wrench {
         static void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
 
         /** @brief The service's buffer size */
-        double buffer_size;
+        double buffer_size = 10000000;
 
         /** @brief File systems */
         std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
