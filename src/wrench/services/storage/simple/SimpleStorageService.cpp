@@ -51,11 +51,6 @@ namespace wrench {
             bufferized = buffer_size >= 1.0; // more than one byte means bufferized
         }
 
-//        if (Simulation::isHostShutdownSimulationEnabled() and (not bufferized)) {
-//            throw std::runtime_error("SimpleStorageService::createSimpleStorageService(): Cannot use non-bufferized (i.e., buffer size == 0) "
-//                                     "storage services and also simulate host shutdowns. This feature is not implemented yet.");
-//        }
-
         if (Simulation::isLinkShutdownSimulationEnabled() and (not bufferized)) {
             throw std::runtime_error("SimpleStorageService::createSimpleStorageService(): Cannot use non-bufferized (i.e., buffer size == 0) "
                                      "storage services and also simulate link shutdowns. This feature is not implemented yet.");
