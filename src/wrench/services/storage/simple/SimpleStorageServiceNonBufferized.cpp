@@ -36,7 +36,6 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void SimpleStorageServiceNonBufferized::cleanup(bool has_returned_from_main, int return_value) {
-
     }
 
     /**
@@ -396,12 +395,12 @@ namespace wrench {
 
         //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
         if (not this->file_systems[location->getMountPoint()]->doesDirectoryExist(
-                location->getAbsolutePathAtMountPoint())) {
+                    location->getAbsolutePathAtMountPoint())) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new InvalidDirectoryPath(
                             this->getSharedPtr<SimpleStorageService>(),
                             location->getMountPoint() + "/" +
-                            location->getAbsolutePathAtMountPoint()));
+                                    location->getAbsolutePathAtMountPoint()));
         } else {
             fs = this->file_systems[location->getMountPoint()].get();
 
@@ -645,7 +644,7 @@ namespace wrench {
                                                                transaction->src_disk,
                                                                transaction->dst_host,
                                                                transaction->dst_disk)
-                    ->set_size((uint64_t) (transaction->transfer_size));
+                                       ->set_size((uint64_t) (transaction->transfer_size));
 
             transaction->stream = sg_iostream;
 
