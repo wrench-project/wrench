@@ -66,9 +66,9 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new FileRegistryFileLookupRequestMessage(
-                answer_mailbox, file,
-                this->getMessagePayloadValue(
-                        FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+                                                       answer_mailbox, file,
+                                                       this->getMessagePayloadValue(
+                                                               FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         std::unique_ptr<SimulationMessage> message = nullptr;
 

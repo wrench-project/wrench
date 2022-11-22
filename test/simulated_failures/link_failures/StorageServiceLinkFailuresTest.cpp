@@ -337,7 +337,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-link-shutdown-simulation");
     argv[2] = strdup("--wrench-mailbox-pool-size=100000");
-//    argv[3] = strdup("--wrench-full-log");
+    //    argv[3] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 

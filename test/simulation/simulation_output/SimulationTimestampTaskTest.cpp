@@ -148,8 +148,8 @@ private:
         job_manager->submitJob(failed_job, this->test->compute_service);
 
         wrench::StorageService::deleteFile(
-                                           wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("small_input_file")),
-                                           this->test->file_registry_service);
+                wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("small_input_file")),
+                this->test->file_registry_service);
 
 
         std::shared_ptr<wrench::ExecutionEvent> workflow_execution_event;
@@ -341,7 +341,7 @@ private:
 
         job_manager->submitJob(failed_job, this->test->compute_service);
         wrench::StorageService::deleteFile(
-                                           wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("small_input_file")));
+                wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("small_input_file")));
 
         this->waitForAndProcessNextEvent();
 

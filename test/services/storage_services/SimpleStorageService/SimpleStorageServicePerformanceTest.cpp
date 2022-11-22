@@ -167,8 +167,8 @@ private:
         // Time the time it takes to transfer a file from Src to Dst
         double copy1_start = wrench::Simulation::getCurrentSimulatedDate();
         data_movement_manager->initiateAsynchronousFileCopy(
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_1),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_1));
+                wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_1),
+                wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_1));
 
         std::shared_ptr<wrench::ExecutionEvent> event1 = this->waitForNextEvent();
         double event1_arrival = wrench::Simulation::getCurrentSimulatedDate();
@@ -176,13 +176,13 @@ private:
         // Now do 2 of them in parallel
         double copy2_start = wrench::Simulation::getCurrentSimulatedDate();
         data_movement_manager->initiateAsynchronousFileCopy(
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_2),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_2));
+                wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_2),
+                wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_2));
 
         double copy3_start = wrench::Simulation::getCurrentSimulatedDate();
         data_movement_manager->initiateAsynchronousFileCopy(
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_3),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_3));
+                wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_3),
+                wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_3));
 
 
         std::shared_ptr<wrench::ExecutionEvent> event2 = this->waitForNextEvent();

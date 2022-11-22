@@ -39,12 +39,12 @@ namespace wrench {
                              std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &pre_file_copies,
                              std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &post_file_copies,
                              std::vector<std::shared_ptr<FileLocation>> &cleanup_file_deletions)
-            : Job("", std::move(job_manager)),
-              file_locations(file_locations),
-              pre_file_copies(pre_file_copies),
-              post_file_copies(post_file_copies),
-              cleanup_file_deletions(cleanup_file_deletions),
-              state(StandardJob::State::NOT_SUBMITTED) {
+        : Job("", std::move(job_manager)),
+          file_locations(file_locations),
+          pre_file_copies(pre_file_copies),
+          post_file_copies(post_file_copies),
+          cleanup_file_deletions(cleanup_file_deletions),
+          state(StandardJob::State::NOT_SUBMITTED) {
         // Check that this is a ready sub-graph
         for (const auto &t: tasks) {
             if (t->getState() != WorkflowTask::State::READY) {
@@ -318,28 +318,28 @@ namespace wrench {
         if (need_scratch_clean) {
             // Does the lambda capture of cjob_file_locations work?
             auto lambda_execute = [this](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
-              for (auto const &task: this->tasks) {
-                  for (auto const &f: task->getInputFiles()) {
-                      if (this->file_locations.find(f) == this->file_locations.end()) {
-                          try {
-                              auto scratch = this->getParentComputeService()->getScratch();
-                              scratch->deleteFile(FileLocation::LOCATION(scratch, f));
-                          } catch (ExecutionException &ignore) {
-                              // ignore
-                          }
-                      }
-                  }
-                  for (auto const &f: task->getOutputFiles()) {
-                      if (this->file_locations.find(f) == this->file_locations.end()) {
-                          try {
-                              auto scratch = this->getParentComputeService()->getScratch();
-                              scratch->deleteFile(FileLocation::LOCATION(scratch, f));
-                          } catch (ExecutionException &ignore) {
-                              // ignore
-                          }
-                      }
-                  }
-              }
+                for (auto const &task: this->tasks) {
+                    for (auto const &f: task->getInputFiles()) {
+                        if (this->file_locations.find(f) == this->file_locations.end()) {
+                            try {
+                                auto scratch = this->getParentComputeService()->getScratch();
+                                scratch->deleteFile(FileLocation::LOCATION(scratch, f));
+                            } catch (ExecutionException &ignore) {
+                                // ignore
+                            }
+                        }
+                    }
+                    for (auto const &f: task->getOutputFiles()) {
+                        if (this->file_locations.find(f) == this->file_locations.end()) {
+                            try {
+                                auto scratch = this->getParentComputeService()->getScratch();
+                                scratch->deleteFile(FileLocation::LOCATION(scratch, f));
+                            } catch (ExecutionException &ignore) {
+                                // ignore
+                            }
+                        }
+                    }
+                }
             };
             auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
             scratch_cleanup = cjob->addCustomAction("", 0, 0, lambda_execute, lambda_terminate);

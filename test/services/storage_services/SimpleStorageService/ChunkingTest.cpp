@@ -92,11 +92,11 @@ private:
 
         } else if (mode == "copying") {
             data_movement_manager->doSynchronousFileCopy(
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_size_0),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_size_0));
+                    wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_size_0),
+                    wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_size_0));
             data_movement_manager->doSynchronousFileCopy(
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_size_100),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_size_100));
+                    wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_size_100),
+                    wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_size_100));
         }
 
         return 0;

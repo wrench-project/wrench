@@ -74,7 +74,7 @@ private:
 
         // read the file
         wrench::StorageService::readFile(
-                                         wrench::FileLocation::LOCATION(storage_service, this->test->file));
+                wrench::FileLocation::LOCATION(storage_service, this->test->file));
 
 
         return 0;

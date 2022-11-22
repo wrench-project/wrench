@@ -93,9 +93,9 @@ namespace wrench {
                                simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content);
 
         bool processFileCopyRequest(
-                                    const std::shared_ptr<FileLocation> &src,
-                                    const std::shared_ptr<FileLocation> &dst,
-                                    simgrid::s4u::Mailbox *answer_mailbox);
+                const std::shared_ptr<FileLocation> &src,
+                const std::shared_ptr<FileLocation> &dst,
+                simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processFileTransferThreadNotification(
                 const std::shared_ptr<FileTransferThread> &ftt,

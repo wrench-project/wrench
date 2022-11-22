@@ -95,35 +95,35 @@ private:
 
         auto data_movement_manager = this->createDataMovementManager();
 
-//        std::cerr << "DOING BUFFERIZED TO BUFFERIZED\n";
+        //        std::cerr << "DOING BUFFERIZED TO BUFFERIZED\n";
         data_movement_manager->doSynchronousFileCopy(
-                                                     wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_1, this->test->file_1_size_100),
-                                                     wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_2, this->test->file_1_size_100));
+                wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_1, this->test->file_1_size_100),
+                wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_2, this->test->file_1_size_100));
 
         if (not this->test->storage_service_bufferized_2->lookupFile(this->test->file_1_size_100)) {
             throw std::runtime_error("Cannot find copied file after bufferized to bufferized");
         }
 
-//        std::cerr << "DOING BUFFERIZED TO NON-BUFFERIZED\n";
+        //        std::cerr << "DOING BUFFERIZED TO NON-BUFFERIZED\n";
         data_movement_manager->doSynchronousFileCopy(
-                                                     wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_1, this->test->file_1_size_100),
-                                                     wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_2, this->test->file_1_size_100));
+                wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_1, this->test->file_1_size_100),
+                wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_2, this->test->file_1_size_100));
         if (not this->test->storage_service_non_bufferized_2->lookupFile(this->test->file_1_size_100)) {
             throw std::runtime_error("Cannot find copied file after bufferized to non-bufferized");
         }
 
-//        std::cerr << "DOING NON-BUFFERIZED TO BUFFERIZED\n";
+        //        std::cerr << "DOING NON-BUFFERIZED TO BUFFERIZED\n";
         data_movement_manager->doSynchronousFileCopy(
-                                                     wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_1, this->test->file_2_size_200),
-                                                     wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_2, this->test->file_2_size_200));
+                wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_1, this->test->file_2_size_200),
+                wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_2, this->test->file_2_size_200));
         if (not this->test->storage_service_bufferized_2->lookupFile(this->test->file_2_size_200)) {
             throw std::runtime_error("Cannot find copied file after non-bufferized to bufferized");
         }
 
-//        std::cerr << "DOING NON-BUFFERIZED TO NON-BUFFERIZED\n";
+        //        std::cerr << "DOING NON-BUFFERIZED TO NON-BUFFERIZED\n";
         data_movement_manager->doSynchronousFileCopy(
-                                                     wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_1, this->test->file_2_size_200),
-                                                     wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_2, this->test->file_2_size_200));
+                wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_1, this->test->file_2_size_200),
+                wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_2, this->test->file_2_size_200));
         if (not this->test->storage_service_non_bufferized_2->lookupFile(this->test->file_2_size_200)) {
             throw std::runtime_error("Cannot find copied file after non-bufferized to non-bufferized");
         }
