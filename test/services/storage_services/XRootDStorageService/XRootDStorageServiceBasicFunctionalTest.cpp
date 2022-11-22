@@ -263,11 +263,11 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1");
     ASSERT_THROW(this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1"), std::runtime_error);
 
-    auto ss2 = this->root_supervisor->addChildStorageServer("Host2", "/disk100", {}, {});
-    auto ss3 = this->root_supervisor->addChildStorageServer("Host3", "/disk100", {}, {});
+    auto ss2 = this->root_supervisor->addChildStorageServer("Host2", "/disk100", {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}, {});
+    auto ss3 = this->root_supervisor->addChildStorageServer("Host3", "/disk100", {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}, {});
 
-    this->standalone_ss = simulation->add(new wrench::SimpleStorageService(
-            "Host1", {"/disk100"}, {}, {}));
+    this->standalone_ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+            "Host1", {"/disk100"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}, {}));
 
     // Create an execution controller
     auto controller = simulation->add(new XRootDServiceBasicFunctionalityTestExecutionController(this, "Host1"));

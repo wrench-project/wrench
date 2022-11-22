@@ -16,6 +16,8 @@
 
 WRENCH_LOG_CATEGORY(batch_compute_service_one_action_test, "Log category for BatchComputeServiceOneAction test");
 
+#define EPSILON 0.0001
+
 class BatchComputeServiceOneActionTest : public ::testing::Test {
 public:
     std::shared_ptr<wrench::DataFile> input_file;
@@ -345,7 +347,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -505,7 +507,7 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_tes
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -631,7 +633,7 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificAr
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -726,7 +728,7 @@ private:
             throw std::runtime_error("Unexpected action failure cause " + action->getFailureCause()->toString());
         }
 
-        if ((action->getStartDate() > 0.0001) or (std::abs<double>(action->getEndDate() - 1.0) > 0)) {
+        if ((action->getStartDate() > EPSILON) or (std::abs<double>(action->getEndDate() - 1.0) > EPSILON)) {
             throw std::runtime_error("Unexpected action start/end dates");
         }
 
@@ -784,7 +786,8 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -911,7 +914,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1051,7 +1054,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobExpiration_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1203,7 +1206,7 @@ void BatchComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1308,7 +1311,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1413,7 +1416,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1504,7 +1507,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);

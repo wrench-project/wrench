@@ -43,7 +43,8 @@ namespace wrench {
             devnull = false;
             mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
             // Check validity
-            if (not S4U_Simulation::hostHasMountPoint(hostname, mount_point)) {
+            this->disk = S4U_Simulation::hostHasMountPoint(hostname, mount_point);
+            if (not this->disk) {
                 throw std::invalid_argument("LogicalFileSystem::LogicalFileSystem(): Host " +
                                             hostname + " does not have a disk mounted at " + mount_point);
             }
@@ -371,5 +372,14 @@ namespace wrench {
             return -1;
         }
     }
+
+    /**
+     * @brief
+     * @return The SimGrid disk on which this file system is mounted
+     */
+    simgrid::s4u::Disk *LogicalFileSystem::getDisk() {
+        return this->disk;
+    }
+
 
 }// namespace wrench

@@ -24,7 +24,7 @@
 WRENCH_LOG_CATEGORY(custom_action_executor_test, "Log category for CustomActionExecutorTest");
 
 //#define EPSILON (std::numeric_limits<double>::epsilon())
-#define EPSILON (0.000001)
+#define EPSILON (0.0001)
 
 
 class CustomActionExecutorTest : public ::testing::Test {
@@ -184,11 +184,11 @@ private:
 
         // Is the start-date sensible?
         if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
-        if (action->getEndDate() + EPSILON < 20.84743174020618639020 or action->getEndDate() > 20.84743174020618639020 + EPSILON) {
+        if (std::abs<double>(action->getEndDate() - 20.847443) > EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
         }
 
@@ -223,7 +223,7 @@ void CustomActionExecutorTest::do_CustomActionExecutorSuccessTest_test() {
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);

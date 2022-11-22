@@ -207,7 +207,6 @@ namespace wrench {
                 }
             }
 
-            WRENCH_INFO("Forwarding status message");
             // Forward it back
             S4U_Mailbox::dputMessage(this->creator_mailbox,
                                      new StorageServiceFileCopyAnswerMessage(msg->file,

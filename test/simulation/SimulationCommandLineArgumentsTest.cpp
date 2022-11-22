@@ -196,7 +196,7 @@ void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
     fclose(stdout_file);
 
     ASSERT_GE(linecount, 5);
-    ASSERT_LE(linecount, 15);
+    ASSERT_LE(linecount, 17);
 
 
     for (int i = 0; i < argc; i++)
