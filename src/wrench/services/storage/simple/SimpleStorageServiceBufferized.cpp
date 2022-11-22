@@ -53,9 +53,8 @@ namespace wrench {
     SimpleStorageServiceBufferized::SimpleStorageServiceBufferized(const std::string &hostname,
                                                                    std::set<std::string> mount_points,
                                                                    WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
-            SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
-                                 "_" + std::to_string(getNewUniqueNumber())) {
+                                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
+                                                                                                                                                     "_" + std::to_string(getNewUniqueNumber())) {
         this->buffer_size = this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
     }
 
@@ -290,12 +289,12 @@ namespace wrench {
 
         //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
         if (not this->file_systems[location->getMountPoint()]->doesDirectoryExist(
-                location->getAbsolutePathAtMountPoint())) {
+                    location->getAbsolutePathAtMountPoint())) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new InvalidDirectoryPath(
                             this->getSharedPtr<SimpleStorageService>(),
                             location->getMountPoint() + "/" +
-                            location->getAbsolutePathAtMountPoint()));
+                                    location->getAbsolutePathAtMountPoint()));
         } else {
             auto fs = this->file_systems[location->getMountPoint()].get();
 
@@ -386,9 +385,9 @@ namespace wrench {
             fs->reserveSpace(file, dst_location->getAbsolutePathAtMountPoint());
         }
 
-//        if (src_location->getStorageService()->getPropertyValueAsSizeInByte(SimpleStorageServiceProperty::BUFFER_SIZE) == 0) {
-//            throw std::runtime_error("A bufferized storage service cannot read data from a non-bufferized storage service");
-//        }
+        //        if (src_location->getStorageService()->getPropertyValueAsSizeInByte(SimpleStorageServiceProperty::BUFFER_SIZE) == 0) {
+        //            throw std::runtime_error("A bufferized storage service cannot read data from a non-bufferized storage service");
+        //        }
 
         WRENCH_INFO("Starting a thread to copy file %s from %s to %s",
                     file->getID().c_str(),
@@ -525,7 +524,7 @@ namespace wrench {
      * @return The number of threads
      */
     double SimpleStorageServiceBufferized::countRunningFileTransferThreads() {
-        return (double)this->running_file_transfer_threads.size() + (double)this->pending_file_transfer_threads.size();
+        return (double) this->running_file_transfer_threads.size() + (double) this->pending_file_transfer_threads.size();
     }
 
     /**

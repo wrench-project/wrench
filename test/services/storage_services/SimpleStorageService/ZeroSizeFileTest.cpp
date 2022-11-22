@@ -102,8 +102,8 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest(double buffer
 
     // Create One Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("StorageHost", {"/"},
-                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
+                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost", {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -112,7 +112,7 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest(double buffer
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceZeroSizeFileTestWMS(
-            this, storage_service, file_registry_service, "WMSHost")));
+                            this, storage_service, file_registry_service, "WMSHost")));
 
     // Stage the file on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(file, storage_service));
