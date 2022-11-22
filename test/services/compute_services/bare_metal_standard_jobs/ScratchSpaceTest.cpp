@@ -802,8 +802,8 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
-                                                             {},
-                                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
+                                                                                     {},
+                                                                                     {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
 
     // Create a Cloud Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -997,14 +997,14 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
-                                                             {},
-                                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1.0}})));
+                                                                                     {},
+                                                                                     {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1.0}})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
-                                                             {},
-                                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
+                                                                                     {},
+                                                                                     {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
 
     // Create a Cloud Service
     ASSERT_NO_THROW(compute_service = simulation->add(

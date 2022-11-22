@@ -37,26 +37,26 @@ namespace wrench {
      */
     void SimpleStorageServiceNonBufferized::cleanup(bool has_returned_from_main, int return_value) {
 
-//        std::cerr << "IN CLEANUP " << this->name << "  FROM MAIN: " << has_returned_from_main << "\n";
-//        std::cerr << "IS MASTRO: " << simgrid::s4u::this_actor::is_maestro() << "\n";
-//        std::cerr << "IN CLEANUP PENDING = " << this->pending_transactions.size() << "\n";
-//        this->pending_transactions.clear();
-//
-//
-//        std::cerr << "IN CLEANUP RUNNING = " << this->running_transactions.size() << "\n";
-//        for (auto &s : this->running_transactions) {
-//            std::cerr << "RUNNING STATE == FAILED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FAILED) << "\n";
-//            std::cerr << "RUNNING STATE == STARTED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::STARTED) << "\n";
-//            std::cerr << "RUNNING STATE == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
-//            s->stream->cancel();
-//            std::cerr << "RUNNING STATE AFTER CANCELED! == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
-//        }
-//        this->running_transactions.clear();
-//
-//        this->stream_to_transactions.clear();
+        //        std::cerr << "IN CLEANUP " << this->name << "  FROM MAIN: " << has_returned_from_main << "\n";
+        //        std::cerr << "IS MASTRO: " << simgrid::s4u::this_actor::is_maestro() << "\n";
+        //        std::cerr << "IN CLEANUP PENDING = " << this->pending_transactions.size() << "\n";
+        //        this->pending_transactions.clear();
+        //
+        //
+        //        std::cerr << "IN CLEANUP RUNNING = " << this->running_transactions.size() << "\n";
+        //        for (auto &s : this->running_transactions) {
+        //            std::cerr << "RUNNING STATE == FAILED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FAILED) << "\n";
+        //            std::cerr << "RUNNING STATE == STARTED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::STARTED) << "\n";
+        //            std::cerr << "RUNNING STATE == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
+        //            s->stream->cancel();
+        //            std::cerr << "RUNNING STATE AFTER CANCELED! == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
+        //        }
+        //        this->running_transactions.clear();
+        //
+        //        this->stream_to_transactions.clear();
 
 
-//        std::cerr << "DONE CLEANUP\n";
+        //        std::cerr << "DONE CLEANUP\n";
     }
 
     /**
@@ -70,19 +70,17 @@ namespace wrench {
     SimpleStorageServiceNonBufferized::SimpleStorageServiceNonBufferized(const std::string &hostname,
                                                                          std::set<std::string> mount_points,
                                                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
-            SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
-                                 "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {
+                                                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
+                                                                                                                                                           "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {
 
         this->buffer_size = 0;
-
     }
 
     /**
      * @brief Process a transaction completion
      * @param transaction: the transaction
      */
-    void SimpleStorageServiceNonBufferized::processTransactionCompletion(const std::shared_ptr<Transaction>& transaction) {
+    void SimpleStorageServiceNonBufferized::processTransactionCompletion(const std::shared_ptr<Transaction> &transaction) {
 
         // If I was the source and the destination was bufferized, I am the one creating the file there! (yes,
         // this is ugly and lame, and one day we'll clean the storage service implementation
@@ -96,7 +94,7 @@ namespace wrench {
 
         // Send back the relevant ack if this was a read
         if (transaction->dst_location == nullptr) {
-//            WRENCH_INFO("Sending back an ack for a successful file read");
+            //            WRENCH_INFO("Sending back an ack for a successful file read");
             S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage());
         } else if (transaction->src_location == nullptr) {
             WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
@@ -104,7 +102,7 @@ namespace wrench {
                     transaction->dst_location->getFile(), transaction->dst_location->getAbsolutePathAtMountPoint());
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // May be no corresponding timestamp.
-//            WRENCH_INFO("Sending back an ack for a successful file read");
+            //            WRENCH_INFO("Sending back an ack for a successful file read");
             S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage());
         } else {
             if (transaction->dst_location->getStorageService() == shared_from_this()) {
@@ -118,7 +116,7 @@ namespace wrench {
                 }
             }
 
-//            WRENCH_INFO("Sending back an ack for a file copy");
+            //            WRENCH_INFO("Sending back an ack for a file copy");
             S4U_Mailbox::dputMessage(
                     transaction->mailbox,
                     new StorageServiceFileCopyAnswerMessage(
@@ -130,16 +128,14 @@ namespace wrench {
                             nullptr,
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-
         }
-
     }
 
     /**
      * @brief Process a transaction failure
      * @param transaction: the transaction
      */
-    void SimpleStorageServiceNonBufferized::processTransactionFailure(const std::shared_ptr<Transaction>& transaction) {
+    void SimpleStorageServiceNonBufferized::processTransactionFailure(const std::shared_ptr<Transaction> &transaction) {
         throw std::runtime_error("SimpleStorageServiceNonBufferized::processTransactionFailure(): not implemented");
     }
 
@@ -221,7 +217,7 @@ namespace wrench {
             pending_activities.emplace_back(comm_ptr);
 
             // TODO: DEBUGGING REMOVED THAT
-            for (auto const &transaction : this->running_transactions) {
+            for (auto const &transaction: this->running_transactions) {
                 pending_activities.emplace_back(transaction->stream);
             }
 
@@ -232,12 +228,12 @@ namespace wrench {
             } catch (simgrid::NetworkFailureException &e) {
                 // the comm failed
                 comm_ptr_has_been_posted = false;
-                continue; // oh well
+                continue;// oh well
             } catch (simgrid::Exception &e) {
                 // This likely doesn't happen, but let's keep it here for now
-                for (int i = 1; i < (int)pending_activities.size(); i++) {
+                for (int i = 1; i < (int) pending_activities.size(); i++) {
                     if (pending_activities.at(i)->get_state() == simgrid::s4u::Activity::State::FAILED) {
-                        auto finished_transaction = this->running_transactions[i-1];
+                        auto finished_transaction = this->running_transactions[i - 1];
                         this->stream_to_transactions.erase(finished_transaction->stream);
                         processTransactionFailure(finished_transaction);
                         continue;
@@ -245,7 +241,6 @@ namespace wrench {
                 }
                 continue;
             } catch (std::exception &e) {
-                WRENCH_INFO("WAIT_ANY: HERE3: %s", e.what());
                 continue;
             }
 
@@ -262,7 +257,6 @@ namespace wrench {
             } else if (finished_activity_index == -1) {
                 throw std::runtime_error("wait_any() returned -1. Not sure what to do with this. ");
             }
-
         }
 
         WRENCH_INFO("Simple Storage Service (Non-Bufferized) %s on host %s cleanly terminating!",
@@ -372,10 +366,10 @@ namespace wrench {
             auto me_host = simgrid::s4u::this_actor::get_host();
             simgrid::s4u::Disk *me_disk = fs->getDisk();
 
-//            auto sg_iostream = simgrid::s4u::Io::streamto_init(requesting_host,
-//                                                               nullptr,
-//                                                               me_host,
-//                                                               me_disk)->set_size((uint64_t)file->getSize());
+            //            auto sg_iostream = simgrid::s4u::Io::streamto_init(requesting_host,
+            //                                                               nullptr,
+            //                                                               me_host,
+            //                                                               me_disk)->set_size((uint64_t)file->getSize());
 
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
@@ -428,12 +422,12 @@ namespace wrench {
 
         //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
         if (not this->file_systems[location->getMountPoint()]->doesDirectoryExist(
-                location->getAbsolutePathAtMountPoint())) {
+                    location->getAbsolutePathAtMountPoint())) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new InvalidDirectoryPath(
                             this->getSharedPtr<SimpleStorageService>(),
                             location->getMountPoint() + "/" +
-                            location->getAbsolutePathAtMountPoint()));
+                                    location->getAbsolutePathAtMountPoint()));
         } else {
             fs = this->file_systems[location->getMountPoint()].get();
 
@@ -476,9 +470,8 @@ namespace wrench {
                     location->getFile()->getSize());
 
             // Add it to the Pool of pending data communications
-//            this->transactions[sg_iostream] = transaction;
+            //            this->transactions[sg_iostream] = transaction;
             this->pending_transactions.push_back(transaction);
-
         }
 
         return true;
@@ -504,7 +497,7 @@ namespace wrench {
         auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
         // TODO: This disk identification is really ugly.
         simgrid::s4u::Disk *src_disk = nullptr;
-        auto src_location_sanitized_mount_point =  FileLocation::sanitizePath(src_location->getMountPoint() + "/");
+        auto src_location_sanitized_mount_point = FileLocation::sanitizePath(src_location->getMountPoint() + "/");
         for (auto const &d: src_host->get_disks()) {
             if (src_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
                 src_disk = d;
@@ -514,7 +507,7 @@ namespace wrench {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequest(): source disk not found - internal error");
         }
         simgrid::s4u::Disk *dst_disk = nullptr;
-        auto dst_location_sanitized_mount_point =  FileLocation::sanitizePath(dst_location->getMountPoint() + "/");
+        auto dst_location_sanitized_mount_point = FileLocation::sanitizePath(dst_location->getMountPoint() + "/");
         for (auto const &d: dst_host->get_disks()) {
             if (dst_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
                 dst_disk = d;
@@ -552,8 +545,7 @@ namespace wrench {
             }
 
             uint64_t transfer_size;
-                transfer_size = (uint64_t)(file->getSize());
-
+            transfer_size = (uint64_t)(file->getSize());
 
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
@@ -570,7 +562,6 @@ namespace wrench {
             this->pending_transactions.push_back(transaction);
 
             return true;
-
         }
 
         // I am not the source
@@ -664,14 +655,14 @@ namespace wrench {
         return true;
     }
 
-/**
+    /**
  * @brief Start pending file transfer threads if any and if possible
  */
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
         while ((not this->pending_transactions.empty()) and
                (this->running_transactions.size() < this->num_concurrent_connections)) {
-//            WRENCH_INFO("Starting pending transaction for file %s",
-//                        this->transactions[this->pending_sg_iostreams.at(0)]->file->getID().c_str());
+            //            WRENCH_INFO("Starting pending transaction for file %s",
+            //                        this->transactions[this->pending_sg_iostreams.at(0)]->file->getID().c_str());
 
             auto transaction = this->pending_transactions.front();
             this->pending_transactions.pop_front();
@@ -689,7 +680,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
  * @brief Get the load (number of concurrent reads) on the storage service
  * @return the load on the service
  */

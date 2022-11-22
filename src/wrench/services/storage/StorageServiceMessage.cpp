@@ -247,11 +247,7 @@ namespace wrench {
                                                                                  double payload)
         : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-<<<<<<< HEAD
-        if ((answer_mailbox == nullptr) || (location == nullptr)) {
-=======
-        if ((answer_mailbox == nullptr) || (requesting_host == nullptr) || (file == nullptr) || (location == nullptr)) {
->>>>>>> master
+        if ((answer_mailbox == nullptr) || (requesting_host == nullptr)  || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(): Invalid arguments");
         }
@@ -311,13 +307,8 @@ namespace wrench {
                                                                                double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
 
-<<<<<<< HEAD
         if ((answer_mailbox == nullptr) || (mailbox_to_receive_the_file_content == nullptr) ||
             (location == nullptr) || (num_bytes_to_read == -1)) {
-=======
-        if ((answer_mailbox == nullptr) || (requesting_host == nullptr) || (mailbox_to_receive_the_file_content == nullptr) ||
-            (file == nullptr) || (location == nullptr) || (num_bytes_to_read == -1)) {
->>>>>>> master
             throw std::invalid_argument(
                     "StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(): Invalid arguments");
         }

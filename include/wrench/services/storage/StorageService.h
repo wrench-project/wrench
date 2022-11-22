@@ -84,7 +84,6 @@ namespace wrench {
         /**
          * @brief Get the theoretical load of a service
          * @return the load on the service
-         */
         virtual double getLoad() = 0;
         /***********************/
         /** \cond INTERNAL    **/
