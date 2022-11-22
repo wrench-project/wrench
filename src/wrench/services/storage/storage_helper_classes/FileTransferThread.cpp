@@ -406,7 +406,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to copy a f localy
+     * @brief Method to copy a f locally
      * @param f: the f to copy
      * @param src_loc: the source location
      * @param dst_loc: the destination location
@@ -464,9 +464,12 @@ namespace wrench {
     void FileTransferThread::downloadFileFromStorageService(const std::shared_ptr<DataFile> &f,
                                                             const std::shared_ptr<FileLocation> &src_loc,
                                                             const std::shared_ptr<FileLocation> &dst_loc) {
+
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (f == nullptr) {
             throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
         }
+#endif
 
         WRENCH_INFO("Downloading file  %s from location %s",
                     f->getID().c_str(), src_loc->toString().c_str());
@@ -488,6 +491,7 @@ namespace wrench {
                     src_loc->getStorageService()->mailbox,
                     new StorageServiceFileReadRequestMessage(
                             request_answer_mailbox,
+                            simgrid::s4u::this_actor::get_host(),
                             mailbox_that_should_receive_file_content,
                             src_loc,
                             f->getSize(),

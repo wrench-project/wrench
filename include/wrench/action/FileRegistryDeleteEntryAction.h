@@ -38,7 +38,6 @@ namespace wrench {
         * @brief Constructor
         * @param name: the action's name
         * @param file_registry_service: the file registry service to update
-        * @param file: the file
         * @param file_location: the file location
         */
         FileRegistryDeleteEntryAction(const std::string &name,

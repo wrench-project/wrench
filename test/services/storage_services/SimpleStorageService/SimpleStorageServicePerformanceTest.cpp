@@ -270,10 +270,10 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
 
     // Create Two Storage Services
     ASSERT_NO_THROW(storage_service_1 = simulation->add(
-                            new wrench::SimpleStorageService("SrcHost", {"/"},
+                            wrench::SimpleStorageService::createSimpleStorageService("SrcHost", {"/"},
                                                              {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
     ASSERT_NO_THROW(storage_service_2 = simulation->add(
-                            new wrench::SimpleStorageService("DstHost", {"/"},
+                            wrench::SimpleStorageService::createSimpleStorageService("DstHost", {"/"},
                                                              {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
 
     // Create a WMS
@@ -377,7 +377,7 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
 
     // Create A Storage Service
     ASSERT_NO_THROW(storage_service_1 = simulation->add(
-                            new wrench::SimpleStorageService("SrcHost", {"/"}, {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
+                            wrench::SimpleStorageService::createSimpleStorageService("SrcHost", {"/"}, {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
 
     auto file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost"));
     // Create a WMS

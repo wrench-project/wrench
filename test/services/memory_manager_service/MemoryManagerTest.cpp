@@ -220,7 +220,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"},
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"},
                                                              {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000.0"}},
                                                              {})));
 

@@ -77,11 +77,11 @@ int main(int argc, char **argv) {
      * storage service is configured to use a buffer size of 50MB when transferring data over
      * the network (i.e., to pipeline disk reads/writes and network revs/sends). */
     std::cerr << "Instantiating a SimpleStorageService on StorageHost1..." << std::endl;
-    auto storage_service_1 = simulation->add(new wrench::SimpleStorageService(
+    auto storage_service_1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "StorageHost1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
     /* Start another storage service on StorageHost2 */
     std::cerr << "Instantiating a SimpleStorageService on StorageHost2..." << std::endl;
-    auto storage_service_2 = simulation->add(new wrench::SimpleStorageService(
+    auto storage_service_2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "StorageHost2", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
 
