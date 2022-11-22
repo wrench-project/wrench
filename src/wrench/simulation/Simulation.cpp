@@ -277,7 +277,6 @@ namespace wrench {
         }
 
 
-
         this->s4u_simulation->initialize(argc, argv);
 
         if (wrench_help_requested) {

@@ -59,9 +59,9 @@ namespace wrench {
 
         // Public Constructor
         SimpleStorageServiceBufferized(const std::string &hostname,
-                             std::set<std::string> mount_points,
-                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                                       std::set<std::string> mount_points,
+                                       WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                       WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         /***********************/
         /** \cond INTERNAL    **/

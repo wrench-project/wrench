@@ -1244,10 +1244,10 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     std::string host2 = "host2";
 
     ASSERT_NO_THROW(ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(host1, {"/"},
-                                                                           {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "400000"}})));
+                                                                                                   {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "400000"}})));
 
     ASSERT_NO_THROW(ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(host2, {"/"},
-                                                                           {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
+                                                                                                   {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;

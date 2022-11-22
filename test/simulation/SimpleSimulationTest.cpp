@@ -347,7 +347,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
@@ -379,8 +379,8 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
 
     // Create a Storage Service
     ASSERT_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"}, {},
-                                                                     {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})),
+                         wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"}, {},
+                                                                                  {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})),
                  std::invalid_argument);
 
     storage_service = simulation->add(

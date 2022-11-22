@@ -113,13 +113,13 @@ private:
 
         // Starting a FailedHost murderer!!
         auto murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost",
-                                                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
+                                                                   wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
         murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost resurector!!
         auto resurector = std::make_shared<wrench::ResourceSwitcher>("StableHost", 500, "FailedHost",
-                                                                                                 wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
+                                                                     wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
         resurector->setSimulation(this->simulation);
         resurector->start(murderer, true, false);// Daemonized, no auto-restart
 
@@ -141,13 +141,13 @@ private:
 
         // Starting a FailedHost murderer!!
         murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost",
-                                                                                          wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
+                                                              wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
         murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost resurector!!
         resurector = std::make_shared<wrench::ResourceSwitcher>("StableHost", 500, "FailedHost",
-                                                                                            wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
+                                                                wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
         resurector->setSimulation(this->simulation);
         resurector->start(murderer, true, false);// Daemonized, no auto-restart
 
@@ -180,8 +180,8 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
-//    argv[3] = strdup("--log=root.thresh:debug");
+    //    argv[2] = strdup("--wrench-full-log");
+    //    argv[3] = strdup("--log=root.thresh:debug");
 
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -193,7 +193,7 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
     std::string failed_host = "FailedHost";
     storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(failed_host, {"/"},
                                                                                                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10000000"}}));
-//                                                                                               {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}));
+    //                                                                                               {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}));
 
     // Create a WMS
     std::string stable_host = "StableHost";
