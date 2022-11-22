@@ -135,16 +135,16 @@ private:
 
         // Get a "FILE COPY COMPLETION" event (default handler)
         data_movement_manager->initiateAsynchronousFileCopy(
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->small_file),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->small_file),
-                                                            nullptr);
+                wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->small_file),
+                wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->small_file),
+                nullptr);
         this->waitForAndProcessNextEvent();
 
         // Get a "FILE COPY FAILURE" event (default handler)
         data_movement_manager->initiateAsynchronousFileCopy(
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->big_file),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->big_file),
-                                                            nullptr);
+                wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->big_file),
+                wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->big_file),
+                nullptr);
         this->waitForAndProcessNextEvent();
 
         // Set a timer
@@ -301,8 +301,8 @@ private:
 
         // Get a "FILE COPY COMPLETION" event (default handler)
         data_movement_manager->initiateAsynchronousFileCopy(
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->small_file),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->small_file), nullptr);
+                wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->small_file),
+                wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->small_file), nullptr);
         this->waitForAndProcessNextEvent();
         if (this->counter != 5) {
             throw std::runtime_error("Did not get expected FileCompletedEvent");
@@ -310,8 +310,8 @@ private:
 
         // Get a "FILE COPY FAILURE" event (default handler)
         data_movement_manager->initiateAsynchronousFileCopy(
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->big_file),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->big_file), nullptr);
+                wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->big_file),
+                wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->big_file), nullptr);
         this->waitForAndProcessNextEvent();
         if (this->counter != 6) {
             throw std::runtime_error("Did not get expected FileCopyFailureEvent");

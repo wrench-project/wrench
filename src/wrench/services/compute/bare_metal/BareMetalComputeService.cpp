@@ -702,9 +702,10 @@ namespace wrench {
             for (auto const &f: j.second) {
                 try {
                     StorageService::deleteFile(FileLocation::LOCATION(
-                                                          this->getScratch(),
-                                                          this->getScratch()->getMountPoint() +
-                                                                  j.first->getName(), f));
+                            this->getScratch(),
+                            this->getScratch()->getMountPoint() +
+                                    j.first->getName(),
+                            f));
                 } catch (ExecutionException &e) {
                     throw;
                 }

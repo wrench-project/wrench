@@ -671,8 +671,8 @@ private:
                 {this->test->task1},
                 (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(
-                                 wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
-                                 wrench::FileLocation::SCRATCH(this->test->input_file))},
+                        wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                        wrench::FileLocation::SCRATCH(this->test->input_file))},
                 {}, {});
 
         // Submit the job for execution
@@ -795,8 +795,8 @@ private:
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(
-                                 wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService(), this->test->input_file),
-                                 wrench::FileLocation::SCRATCH(this->test->input_file))},
+                        wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService(), this->test->input_file),
+                        wrench::FileLocation::SCRATCH(this->test->input_file))},
                 {}, {});
 
         // Submit the job for execution
@@ -901,8 +901,8 @@ private:
                 {this->test->task7},
                 file_locations,
                 {std::make_tuple(
-                                 wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file2),
-                                 wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService(), this->test->input_file2))},
+                        wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file2),
+                        wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService(), this->test->input_file2))},
                 {}, {});
 
 
@@ -1041,8 +1041,8 @@ private:
                 {this->test->task7},
                 (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(
-                                 wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService(), this->test->input_file2),
-                                 wrench::FileLocation::SCRATCH(this->test->input_file2))},
+                        wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService(), this->test->input_file2),
+                        wrench::FileLocation::SCRATCH(this->test->input_file2))},
                 {}, {});
 
 
@@ -1161,8 +1161,8 @@ private:
                 {this->test->task7},
                 (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(
-                                 wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService(), this->test->input_file2),
-                                 wrench::FileLocation::SCRATCH(this->test->input_file2))},
+                        wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService(), this->test->input_file2),
+                        wrench::FileLocation::SCRATCH(this->test->input_file2))},
                 {}, {});
 
 

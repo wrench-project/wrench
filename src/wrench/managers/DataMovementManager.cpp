@@ -62,9 +62,9 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw ExecutionException
      */
-    void DataMovementManager::initiateAsynchronousFileCopy(const std::shared_ptr<FileLocation>& src,
-                                                           const std::shared_ptr<FileLocation>& dst,
-                                                           const std::shared_ptr<FileRegistryService>& file_registry_service) {
+    void DataMovementManager::initiateAsynchronousFileCopy(const std::shared_ptr<FileLocation> &src,
+                                                           const std::shared_ptr<FileLocation> &dst,
+                                                           const std::shared_ptr<FileRegistryService> &file_registry_service) {
         if ((src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument("DataMovementManager::initiateAsynchronousFileCopy(): Invalid nullptr arguments");
         }
@@ -103,9 +103,9 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw ExecutionException
      */
-    void DataMovementManager::doSynchronousFileCopy(const std::shared_ptr<FileLocation>& src,
-                                                    const std::shared_ptr<FileLocation>& dst,
-                                                    const std::shared_ptr<FileRegistryService>& file_registry_service) {
+    void DataMovementManager::doSynchronousFileCopy(const std::shared_ptr<FileLocation> &src,
+                                                    const std::shared_ptr<FileLocation> &dst,
+                                                    const std::shared_ptr<FileRegistryService> &file_registry_service) {
         if ((src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument("DataMovementManager::doSynchronousFileCopy(): Invalid nullptr arguments");
         }

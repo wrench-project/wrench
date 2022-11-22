@@ -167,8 +167,8 @@ namespace wrench {
             WRENCH_INFO("%s", message.c_str())
         }
 
-//        WRENCH_INFO("STREAMS PENDING: %zu", this->pending_transactions.size());
-//        WRENCH_INFO("STREAMS RUNNING: %zu", this->pending_transactions.size());
+        //        WRENCH_INFO("STREAMS PENDING: %zu", this->pending_transactions.size());
+        //        WRENCH_INFO("STREAMS RUNNING: %zu", this->pending_transactions.size());
 
         // If writeback device simulation is activated
         if (Simulation::isPageCachingEnabled()) {
@@ -224,7 +224,7 @@ namespace wrench {
             // Wait one activity to complete
             int finished_activity_index;
             try {
-                finished_activity_index = (int)simgrid::s4u::Activity::wait_any(pending_activities);
+                finished_activity_index = (int) simgrid::s4u::Activity::wait_any(pending_activities);
             } catch (simgrid::NetworkFailureException &e) {
                 // the comm failed
                 comm_ptr_has_been_posted = false;
@@ -289,7 +289,7 @@ namespace wrench {
 
         } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message)) {
             return processFileWriteRequest(msg->location, msg->answer_mailbox,
-                                           msg->requesting_host,msg->buffer_size);
+                                           msg->requesting_host, msg->buffer_size);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message)) {
             return processFileReadRequest(msg->location,
@@ -410,10 +410,10 @@ namespace wrench {
      * @return
      */
     bool SimpleStorageServiceNonBufferized::processFileReadRequest(
-                                                                   const std::shared_ptr<FileLocation> &location,
-                                                                   double num_bytes_to_read,
-                                                                   simgrid::s4u::Mailbox *answer_mailbox,
-                                                                   simgrid::s4u::Host *requesting_host) {
+            const std::shared_ptr<FileLocation> &location,
+            double num_bytes_to_read,
+            simgrid::s4u::Mailbox *answer_mailbox,
+            simgrid::s4u::Host *requesting_host) {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
@@ -485,9 +485,9 @@ namespace wrench {
      * @return
      */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequest(
-                                                                   const std::shared_ptr<FileLocation> &src_location,
-                                                                   const std::shared_ptr<FileLocation> &dst_location,
-                                                                   simgrid::s4u::Mailbox *answer_mailbox) {
+            const std::shared_ptr<FileLocation> &src_location,
+            const std::shared_ptr<FileLocation> &dst_location,
+            simgrid::s4u::Mailbox *answer_mailbox) {
 
         WRENCH_INFO("FileCopyRequest: %s -> %s",
                     src_location->toString().c_str(),
@@ -545,7 +545,7 @@ namespace wrench {
             }
 
             uint64_t transfer_size;
-            transfer_size = (uint64_t)(file->getSize());
+            transfer_size = (uint64_t) (file->getSize());
 
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
@@ -670,7 +670,8 @@ namespace wrench {
             auto sg_iostream = simgrid::s4u::Io::streamto_init(transaction->src_host,
                                                                transaction->src_disk,
                                                                transaction->dst_host,
-                                                               transaction->dst_disk)->set_size((uint64_t)(transaction->transfer_size));
+                                                               transaction->dst_disk)
+                                       ->set_size((uint64_t) (transaction->transfer_size));
 
             transaction->stream = sg_iostream;
 

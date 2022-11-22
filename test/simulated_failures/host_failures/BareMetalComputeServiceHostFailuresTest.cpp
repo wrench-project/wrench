@@ -130,13 +130,13 @@ private:
 
         // Starting a FailedHost1 murderer!!
         auto murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost1",
-                                                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
+                                                                   wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
         murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
         auto resurector = std::make_shared<wrench::ResourceSwitcher>("StableHost", 1000, "FailedHost1",
-                                                                                                 wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
+                                                                     wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
         resurector->setSimulation(this->simulation);
         resurector->start(resurector, true, false);// Daemonized, no auto-restart
 
@@ -162,7 +162,7 @@ private:
 
         // Paranoid check
         if (not wrench::StorageService::lookupFile(
-                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file))) {
+                    wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file))) {
             throw std::runtime_error("Output file not written to storage service");
         }
 
@@ -244,13 +244,13 @@ private:
 
         // Starting a FailedHost1 murderer!!
         auto murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost1",
-                                                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
+                                                                   wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
         murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
         auto resurector = std::make_shared<wrench::ResourceSwitcher>("StableHost", 1000, "FailedHost1",
-                                                                                                 wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
+                                                                     wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
         resurector->setSimulation(this->simulation);
         resurector->start(resurector, true, false);// Daemonized, no auto-restart
 
@@ -273,7 +273,7 @@ private:
 
         // Paranoid check
         if (not wrench::StorageService::lookupFile(
-                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file))) {
+                    wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file))) {
             throw std::runtime_error("Output file not written to storage service");
         }
 
@@ -368,7 +368,7 @@ private:
             unsigned long seed1 = trial * 2 + 37;
             auto switch1 = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(
                     "StableHost", seed1, 10, 100, 10, 100,
-                                                             "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
+                    "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
             switch1->setSimulation(this->simulation);
             switch1->start(switch1, true, false);// Daemonized, no auto-restart
 
@@ -376,7 +376,7 @@ private:
             unsigned long seed2 = trial * 7 + 417;
             auto switch2 = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(
                     "StableHost", seed2, 10, 100, 10, 100,
-                                                             "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
+                    "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
             switch2->setSimulation(this->simulation);
             switch2->start(switch2, true, false);// Daemonized, no auto-restart
 

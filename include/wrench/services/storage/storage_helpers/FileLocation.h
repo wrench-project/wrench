@@ -37,17 +37,17 @@ namespace wrench {
         /**
          * @brief Static location that denotes a compute service's scratch space
          */
-        static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService>& ss, const std::shared_ptr<DataFile>& file);
+        static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService> &ss, const std::shared_ptr<DataFile> &file);
 
-        static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService>& ss,
+        static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService> &ss,
                                                       std::shared_ptr<StorageService> server_ss,
-                                                      const std::shared_ptr<DataFile>& file);
+                                                      const std::shared_ptr<DataFile> &file);
 
-        static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService>& ss,
+        static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService> &ss,
                                                       std::string absolute_path,
-                                                      const std::shared_ptr<DataFile>& file);
+                                                      const std::shared_ptr<DataFile> &file);
 
-        static std::shared_ptr<FileLocation> SCRATCH(const std::shared_ptr<DataFile>& file);
+        static std::shared_ptr<FileLocation> SCRATCH(const std::shared_ptr<DataFile> &file);
 
         std::shared_ptr<DataFile> getFile();
         std::shared_ptr<StorageService> getStorageService();
@@ -108,12 +108,11 @@ namespace wrench {
          * @param file: the file
 	 * @param is_scratch: whether the location is a SCRATCH location
          */
-        FileLocation(std::shared_ptr<StorageService> ss, std::string mp, std::string apamp, std::shared_ptr<DataFile> file, bool is_scratch) :
-                storage_service(std::move(ss)),
-                mount_point(std::move(mp)),
-                absolute_path_at_mount_point(std::move(apamp)),
-                file(std::move(std::move(file))),
-                is_scratch(is_scratch) {}
+        FileLocation(std::shared_ptr<StorageService> ss, std::string mp, std::string apamp, std::shared_ptr<DataFile> file, bool is_scratch) : storage_service(std::move(ss)),
+                                                                                                                                               mount_point(std::move(mp)),
+                                                                                                                                               absolute_path_at_mount_point(std::move(apamp)),
+                                                                                                                                               file(std::move(std::move(file))),
+                                                                                                                                               is_scratch(is_scratch) {}
 
         std::shared_ptr<StorageService> storage_service;
         std::shared_ptr<StorageService> server_storage_service;
@@ -122,16 +121,16 @@ namespace wrench {
         std::shared_ptr<DataFile> file;
         bool is_scratch;
 
-        static std::shared_ptr<FileLocation> createFileLocation(const std::shared_ptr<StorageService>& ss,
-                                                         const std::string& mp,
-                                                         const std::string& apamp,
-                                                         const std::shared_ptr<DataFile>& file,
-                                                         bool is_scratch);
+        static std::shared_ptr<FileLocation> createFileLocation(const std::shared_ptr<StorageService> &ss,
+                                                                const std::string &mp,
+                                                                const std::string &apamp,
+                                                                const std::shared_ptr<DataFile> &file,
+                                                                bool is_scratch);
 
         static void reclaimFileLocations();
 
         static std::unordered_map<std::string, std::shared_ptr<FileLocation>> file_location_map;
-        static size_t  file_location_map_previous_size;
+        static size_t file_location_map_previous_size;
     };
 
     /***********************/

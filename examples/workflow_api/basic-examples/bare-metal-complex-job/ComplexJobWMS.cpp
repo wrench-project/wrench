@@ -70,8 +70,8 @@ namespace wrench {
          * where it should be read/written while the task executes */
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
 
-        file_locations[infile_1] = FileLocation::LOCATION(storage_service2, infile_1); // read from storage service #2
-        file_locations[infile_2] = FileLocation::LOCATION(storage_service1, infile_2); // read from storage service #1
+        file_locations[infile_1] = FileLocation::LOCATION(storage_service2, infile_1);  // read from storage service #2
+        file_locations[infile_2] = FileLocation::LOCATION(storage_service1, infile_2);  // read from storage service #1
         file_locations[outfile_1] = FileLocation::LOCATION(storage_service2, outfile_1);// written to storage service #2
         file_locations[outfile_2] = FileLocation::LOCATION(storage_service2, outfile_2);// written to storage service #2
 
