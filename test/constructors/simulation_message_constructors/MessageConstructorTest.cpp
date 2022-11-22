@@ -306,9 +306,10 @@ private:
         CUSTOM_THROW(new wrench::StorageServiceFileCopyAnswerMessage(location, nullptr, nullptr, false, false, nullptr, 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::StorageServiceFileCopyAnswerMessage(location, nullptr, nullptr, false, true, failure_cause, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), location, 10, 666));
-        CUSTOM_THROW(new wrench::StorageServiceFileWriteRequestMessage(nullptr, location, 10, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), nullptr, 10, 666), std::invalid_argument);
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), (simgrid::s4u::Host *)666, location, 10, 666));
+        CUSTOM_THROW(new wrench::StorageServiceFileWriteRequestMessage(nullptr, (simgrid::s4u::Host *)666, location, 10, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), nullptr, location, 10, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), (simgrid::s4u::Host *)666, nullptr, 10, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, true, nullptr, simgrid::s4u::Mailbox::by_name("mailbox"), 666));
         CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, false, failure_cause, nullptr, 666));
@@ -317,11 +318,12 @@ private:
         CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, true, failure_cause, simgrid::s4u::Mailbox::by_name("mailbox"), 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, false, nullptr, simgrid::s4u::Mailbox::by_name("mailbox"), 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), simgrid::s4u::Mailbox::by_name("mailbox"), location, 10, 666));
-        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(nullptr, simgrid::s4u::Mailbox::by_name("mailbox"), location, 10, 10), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), nullptr, location, 10, 10), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), simgrid::s4u::Mailbox::by_name("mailbox"), nullptr, 10, 10), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), simgrid::s4u::Mailbox::by_name("mailbox"), location, -1.0, 10), std::invalid_argument);
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), (simgrid::s4u::Host *)666, simgrid::s4u::Mailbox::by_name("mailbox"), location, 10, 666));
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(nullptr, (simgrid::s4u::Host *)666, simgrid::s4u::Mailbox::by_name("mailbox"), location, 10, 10), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), nullptr, simgrid::s4u::Mailbox::by_name("mailbox"), location, 10, 10), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), (simgrid::s4u::Host *)666, nullptr, location, 10, 10), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), (simgrid::s4u::Host *)666, simgrid::s4u::Mailbox::by_name("mailbox"), nullptr, 10, 10), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), (simgrid::s4u::Host *)666, simgrid::s4u::Mailbox::by_name("mailbox"), location, -1.0, 10), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::StorageServiceFileReadAnswerMessage(location, true, nullptr, 10, 666));
         CUSTOM_NO_THROW(new wrench::StorageServiceFileReadAnswerMessage(location, false, failure_cause, 0, 666));
@@ -397,7 +399,7 @@ void MessageConstructorTest::do_MessageConstruction_test() {
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create services
-    this->storage_service = simulation->add(new wrench::SimpleStorageService("Host1", {"/"}));
+    this->storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host1", {"/"}, {}, {}));
     this->network_proximity_service = simulation->add(new wrench::NetworkProximityService("Host1", {"Host1", "Host2"}));
     this->compute_service = simulation->add(new wrench::BareMetalComputeService("Host1", {"Host1"}, ""));
 

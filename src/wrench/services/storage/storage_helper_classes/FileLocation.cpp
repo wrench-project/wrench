@@ -28,11 +28,8 @@ namespace wrench {
     std::unordered_map<std::string, std::shared_ptr<FileLocation>> FileLocation::file_location_map;
     size_t FileLocation::file_location_map_previous_size = 0;
 
-
     FileLocation::~FileLocation() {
     }
-
-
 
     /**
      * @brief Factory to create a new file location

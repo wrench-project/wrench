@@ -105,6 +105,8 @@ namespace wrench {
          * @param ss: the storage service
          * @param mp: the mount point path
          * @param apamp: the absolute path
+         * @param file: the file
+	 * @param is_scratch: whether the location is a SCRATCH location
          */
         FileLocation(std::shared_ptr<StorageService> ss, std::string mp, std::string apamp, std::shared_ptr<DataFile> file, bool is_scratch) :
                 storage_service(std::move(ss)),

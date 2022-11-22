@@ -53,6 +53,11 @@ namespace wrench {
         static bool lookupFile(const std::shared_ptr<FileLocation> &location);
         virtual bool lookupFile(const std::shared_ptr<DataFile> &file);
 
+	/**
+	 * @brief Get the last write date of a file
+	 * @param location: the file location
+	 * @return a (simulated) date in seconds
+	 */
         virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) = 0;
 
         static void deleteFile(const std::shared_ptr<FileLocation> &location,
@@ -73,6 +78,8 @@ namespace wrench {
         virtual void createFile(const std::shared_ptr<FileLocation> &location);
         virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path);
         virtual void createFile(const std::shared_ptr<DataFile> &file);
+
+        bool isBufferized() const;
 
         /**
          * @brief Get the theoretical load of a service
@@ -118,7 +125,7 @@ namespace wrench {
         static void stageFile(const std::shared_ptr<FileLocation> &location);
 
         /** @brief The service's buffer size */
-        double buffer_size;
+        double buffer_size = 10000000;
 
         /** @brief File systems */
         std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;

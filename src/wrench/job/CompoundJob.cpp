@@ -291,7 +291,6 @@ namespace wrench {
      * @brief Add a file registry add entry action
      * @param name: the action's name
      * @param file_registry: the file registry
-     * @param file: the file
      * @param file_location: the file location
      * @return
      */

@@ -353,7 +353,6 @@ namespace wrench {
 
     /**
      * Internal method to remove an entry from the database
-     * @param file: a file
      * @param location: a file location
      *
      * @return true if an entry was removed
