@@ -27,8 +27,8 @@ namespace wrench {
          *  - "infinity": read/write and forward model
          *  - "0": an ideal fluid model (very fast simulation)
          *
-         *  - Default value: "10000000" (10MB)
-         *  - Example values: "0", "infinity", "42", "42B", "56MB", "100KiB", etc.
+         *  - Default value: "0" (fluid)
+         *  - Example values: "0", "infinity", "42", "10000000", "42B", "56MB", "100KiB", etc.
          **/
         DECLARE_PROPERTY_NAME(BUFFER_SIZE);
     };
