@@ -443,7 +443,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FileReadActionExecutorMissingFileTestWMS(this, "Host1")));
+                            new FileReadActionExecutorMissingFileTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -532,7 +532,7 @@ private:
 
 TEST_F(FileReadActionExecutorTest, KillingStorageServiceTest) {
     DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillingStorageServiceTest_test, 1000000);
-//    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillingStorageServiceTest_test, 0);
+    //    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillingStorageServiceTest_test, 0);
 }
 
 void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceTest_test(double buffer_size) {
@@ -544,7 +544,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -566,7 +566,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FileReadActionExecutorKillingStorageServiceTestWMS(this, "Host1")));
+                            new FileReadActionExecutorKillingStorageServiceTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

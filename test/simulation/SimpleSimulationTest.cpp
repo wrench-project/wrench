@@ -345,7 +345,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
@@ -378,15 +378,15 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     // Create a Storage Service
     ASSERT_THROW(storage_service = simulation->add(
                          wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"}, {},
-                                                          {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})),
+                                                                                  {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})),
                  std::invalid_argument);
 
     storage_service = simulation->add(
             wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
-                                             {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "567"},
-                                              {wrench::ServiceProperty::translateString("StorageServiceProperty::BUFFER_SIZE"), "678MiB"}},
-                                             {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123},
-                                              {wrench::ServiceMessagePayload::translateString("StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD"), 234}}));
+                                                                     {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "567"},
+                                                                      {wrench::ServiceProperty::translateString("StorageServiceProperty::BUFFER_SIZE"), "678MiB"}},
+                                                                     {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123},
+                                                                      {wrench::ServiceMessagePayload::translateString("StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD"), 234}}));
 
     ASSERT_DOUBLE_EQ(678 * 1024 * 1024,
                      storage_service->getPropertyValueAsSizeInByte(wrench::SimpleStorageServiceProperty::BUFFER_SIZE));

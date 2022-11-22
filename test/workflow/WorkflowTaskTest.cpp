@@ -108,166 +108,166 @@ protected:
 TEST_F(WorkflowTaskTest, TaskStructure) {
 
 
-// WorkflowTask structure sanity check
-ASSERT_EQ(t1->getWorkflow(), workflow);
+    // WorkflowTask structure sanity check
+    ASSERT_EQ(t1->getWorkflow(), workflow);
 
-ASSERT_NE(t1->getID(), t2->getID());
-ASSERT_EQ(t1->getID(), "task1-01");
-ASSERT_NE(t2->getID(), "task1-01");
+    ASSERT_NE(t1->getID(), t2->getID());
+    ASSERT_EQ(t1->getID(), "task1-01");
+    ASSERT_NE(t2->getID(), "task1-01");
 
-ASSERT_GT(t1->getFlops(), t2->getFlops());
-auto old_flops = t1->getFlops();
-ASSERT_NO_THROW(t1->setFlops(old_flops + 1));
-ASSERT_EQ(t1->getFlops(), old_flops + 1);
+    ASSERT_GT(t1->getFlops(), t2->getFlops());
+    auto old_flops = t1->getFlops();
+    ASSERT_NO_THROW(t1->setFlops(old_flops + 1));
+    ASSERT_EQ(t1->getFlops(), old_flops + 1);
 
-ASSERT_EQ(t1->getMinNumCores(), 1);
-ASSERT_EQ(t1->getMaxNumCores(), 1);
-ASSERT_EQ(t2->getMinNumCores(), 2);
-ASSERT_EQ(t2->getMaxNumCores(), 4);
+    ASSERT_EQ(t1->getMinNumCores(), 1);
+    ASSERT_EQ(t1->getMaxNumCores(), 1);
+    ASSERT_EQ(t2->getMinNumCores(), 2);
+    ASSERT_EQ(t2->getMaxNumCores(), 4);
 
-ASSERT_EQ(t1->getState(), wrench::WorkflowTask::State::READY);
-ASSERT_EQ(t2->getState(), wrench::WorkflowTask::State::NOT_READY);// due to control dependency
+    ASSERT_EQ(t1->getState(), wrench::WorkflowTask::State::READY);
+    ASSERT_EQ(t2->getState(), wrench::WorkflowTask::State::NOT_READY);// due to control dependency
 
-ASSERT_EQ(t1->getJob(), nullptr);
-ASSERT_EQ(t2->getJob(), nullptr);
+    ASSERT_EQ(t1->getJob(), nullptr);
+    ASSERT_EQ(t2->getJob(), nullptr);
 
-ASSERT_EQ(t1->getNumberOfParents(), 0);
-ASSERT_EQ(t1->getParents().size(), 0);
-ASSERT_EQ(t2->getNumberOfParents(), 1);
-ASSERT_EQ(t2->getParents().size(), 1);
-ASSERT_EQ(t1->getNumberOfChildren(), 1);
-ASSERT_EQ(t1->getChildren().size(), 1);
-ASSERT_EQ(t2->getNumberOfChildren(), 0);
-ASSERT_EQ(t2->getChildren().size(), 0);
+    ASSERT_EQ(t1->getNumberOfParents(), 0);
+    ASSERT_EQ(t1->getParents().size(), 0);
+    ASSERT_EQ(t2->getNumberOfParents(), 1);
+    ASSERT_EQ(t2->getParents().size(), 1);
+    ASSERT_EQ(t1->getNumberOfChildren(), 1);
+    ASSERT_EQ(t1->getChildren().size(), 1);
+    ASSERT_EQ(t2->getNumberOfChildren(), 0);
+    ASSERT_EQ(t2->getChildren().size(), 0);
 
-ASSERT_EQ(t1->getClusterID(), "");
+    ASSERT_EQ(t1->getClusterID(), "");
 }
 
 TEST_F(WorkflowTaskTest, GetSet) {
 
-t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_NOT_READY);
-ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_NOT_READY);
+    t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_NOT_READY);
+    ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_NOT_READY);
 
-t1->setClusterID("my-cluster-id");
-ASSERT_EQ(t1->getClusterID(), "my-cluster-id");
+    t1->setClusterID("my-cluster-id");
+    ASSERT_EQ(t1->getClusterID(), "my-cluster-id");
 
-t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
-ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_READY);
-ASSERT_EQ(t2->getInternalState(), wrench::WorkflowTask::InternalState::TASK_NOT_READY);
+    t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
+    ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_READY);
+    ASSERT_EQ(t2->getInternalState(), wrench::WorkflowTask::InternalState::TASK_NOT_READY);
 
 
-t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_RUNNING);
-ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_RUNNING);
+    t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_RUNNING);
+    ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_RUNNING);
 
-t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_COMPLETED);
-ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_COMPLETED);
-t2->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
-ASSERT_EQ(t2->getInternalState(), wrench::WorkflowTask::InternalState::TASK_READY);
+    t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_COMPLETED);
+    ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_COMPLETED);
+    t2->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
+    ASSERT_EQ(t2->getInternalState(), wrench::WorkflowTask::InternalState::TASK_READY);
 
-// without setting a start date first, the following 10 'setXXXXXX' should fail
-ASSERT_THROW(t1->setReadInputStartDate(1.0), std::runtime_error);
-ASSERT_THROW(t1->setReadInputEndDate(1.0), std::runtime_error);
-ASSERT_THROW(t1->setComputationStartDate(1.0), std::runtime_error);
-ASSERT_THROW(t1->setComputationEndDate(1.0), std::runtime_error);
-ASSERT_THROW(t1->setWriteOutputStartDate(1.0), std::runtime_error);
-ASSERT_THROW(t1->setWriteOutputEndDate(1.0), std::runtime_error);
-ASSERT_THROW(t1->setEndDate(1.0), std::runtime_error);
-ASSERT_THROW(t1->setFailureDate(1.0), std::runtime_error);
-ASSERT_THROW(t1->setNumCoresAllocated(10), std::runtime_error);
-ASSERT_THROW(t1->setExecutionHost("host"), std::runtime_error);
+    // without setting a start date first, the following 10 'setXXXXXX' should fail
+    ASSERT_THROW(t1->setReadInputStartDate(1.0), std::runtime_error);
+    ASSERT_THROW(t1->setReadInputEndDate(1.0), std::runtime_error);
+    ASSERT_THROW(t1->setComputationStartDate(1.0), std::runtime_error);
+    ASSERT_THROW(t1->setComputationEndDate(1.0), std::runtime_error);
+    ASSERT_THROW(t1->setWriteOutputStartDate(1.0), std::runtime_error);
+    ASSERT_THROW(t1->setWriteOutputEndDate(1.0), std::runtime_error);
+    ASSERT_THROW(t1->setEndDate(1.0), std::runtime_error);
+    ASSERT_THROW(t1->setFailureDate(1.0), std::runtime_error);
+    ASSERT_THROW(t1->setNumCoresAllocated(10), std::runtime_error);
+    ASSERT_THROW(t1->setExecutionHost("host"), std::runtime_error);
 
-// getting the execution_host before a task has run at least once should return an empty string
-ASSERT_TRUE(t1->getExecutionHost().empty());
-ASSERT_TRUE(t1->getPhysicalExecutionHost().empty());
+    // getting the execution_host before a task has run at least once should return an empty string
+    ASSERT_TRUE(t1->getExecutionHost().empty());
+    ASSERT_TRUE(t1->getPhysicalExecutionHost().empty());
 
-ASSERT_NO_THROW(t1->setStartDate(1.0));// need to set start date first before anything else
-ASSERT_DOUBLE_EQ(t1->getStartDate(), 1.0);
+    ASSERT_NO_THROW(t1->setStartDate(1.0));// need to set start date first before anything else
+    ASSERT_DOUBLE_EQ(t1->getStartDate(), 1.0);
 
-ASSERT_NO_THROW(t1->setEndDate(1.0));
-ASSERT_DOUBLE_EQ(t1->getEndDate(), 1.0);
+    ASSERT_NO_THROW(t1->setEndDate(1.0));
+    ASSERT_DOUBLE_EQ(t1->getEndDate(), 1.0);
 
-ASSERT_NO_THROW(t1->setTerminationDate(1.0));
-ASSERT_DOUBLE_EQ(t1->getTerminationDate(), 1.0);
+    ASSERT_NO_THROW(t1->setTerminationDate(1.0));
+    ASSERT_DOUBLE_EQ(t1->getTerminationDate(), 1.0);
 
-ASSERT_NO_THROW(t1->setReadInputStartDate(1.0));
-ASSERT_DOUBLE_EQ(t1->getReadInputStartDate(), 1.0);
+    ASSERT_NO_THROW(t1->setReadInputStartDate(1.0));
+    ASSERT_DOUBLE_EQ(t1->getReadInputStartDate(), 1.0);
 
-ASSERT_NO_THROW(t1->setReadInputEndDate(1.0));
-ASSERT_DOUBLE_EQ(t1->getReadInputEndDate(), 1.0);
+    ASSERT_NO_THROW(t1->setReadInputEndDate(1.0));
+    ASSERT_DOUBLE_EQ(t1->getReadInputEndDate(), 1.0);
 
-ASSERT_NO_THROW(t1->setComputationStartDate(1.0));
-ASSERT_DOUBLE_EQ(t1->getComputationStartDate(), 1.0);
+    ASSERT_NO_THROW(t1->setComputationStartDate(1.0));
+    ASSERT_DOUBLE_EQ(t1->getComputationStartDate(), 1.0);
 
-ASSERT_NO_THROW(t1->setComputationEndDate(1.0));
-ASSERT_DOUBLE_EQ(t1->getComputationEndDate(), 1.0);
+    ASSERT_NO_THROW(t1->setComputationEndDate(1.0));
+    ASSERT_DOUBLE_EQ(t1->getComputationEndDate(), 1.0);
 
-ASSERT_NO_THROW(t1->setWriteOutputStartDate(1.0));
-ASSERT_DOUBLE_EQ(t1->getWriteOutputStartDate(), 1.0);
+    ASSERT_NO_THROW(t1->setWriteOutputStartDate(1.0));
+    ASSERT_DOUBLE_EQ(t1->getWriteOutputStartDate(), 1.0);
 
-ASSERT_NO_THROW(t1->setWriteOutputEndDate(1.0));
-ASSERT_DOUBLE_EQ(t1->getWriteOutputEndDate(), 1.0);
+    ASSERT_NO_THROW(t1->setWriteOutputEndDate(1.0));
+    ASSERT_DOUBLE_EQ(t1->getWriteOutputEndDate(), 1.0);
 
-ASSERT_NO_THROW(t1->setExecutionHost("hostname"));
-ASSERT_STREQ(t1->getExecutionHost().c_str(), "hostname");
-ASSERT_STREQ(t1->getPhysicalExecutionHost().c_str(), "hostname");
+    ASSERT_NO_THROW(t1->setExecutionHost("hostname"));
+    ASSERT_STREQ(t1->getExecutionHost().c_str(), "hostname");
+    ASSERT_STREQ(t1->getPhysicalExecutionHost().c_str(), "hostname");
 
-ASSERT_NO_THROW(t1->setNumCoresAllocated(10));
-ASSERT_EQ(t1->getNumCoresAllocated(), 10);
+    ASSERT_NO_THROW(t1->setNumCoresAllocated(10));
+    ASSERT_EQ(t1->getNumCoresAllocated(), 10);
 
-ASSERT_EQ(t1->getFailureCount(), 0);
-t1->incrementFailureCount();
-ASSERT_EQ(t1->getFailureCount(), 1);
-t1->getFailureDate();
+    ASSERT_EQ(t1->getFailureCount(), 0);
+    t1->incrementFailureCount();
+    ASSERT_EQ(t1->getFailureCount(), 1);
+    t1->getFailureDate();
 
-//  ASSERT_EQ(t1->getTaskType(), wrench::WorkflowTask::TaskType::COMPUTE);
+    //  ASSERT_EQ(t1->getTaskType(), wrench::WorkflowTask::TaskType::COMPUTE);
 
-ASSERT_EQ(t1->getBytesWritten(), -1);
-ASSERT_EQ(t4->getBytesRead(), 1000010);
-ASSERT_EQ(t4->getBytesWritten(), 1000);
+    ASSERT_EQ(t1->getBytesWritten(), -1);
+    ASSERT_EQ(t4->getBytesRead(), 1000010);
+    ASSERT_EQ(t4->getBytesWritten(), 1000);
 
-ASSERT_EQ(t1->getAverageCPU(), -1.0);
-ASSERT_EQ(t2->getAverageCPU(), 90.2);
-ASSERT_EQ(t4->getAverageCPU(), 50.5);
+    ASSERT_EQ(t1->getAverageCPU(), -1.0);
+    ASSERT_EQ(t2->getAverageCPU(), 90.2);
+    ASSERT_EQ(t4->getAverageCPU(), 50.5);
 }
 
 TEST_F(WorkflowTaskTest, InputOutputFile) {
 
-std::shared_ptr<wrench::DataFile> f1 = workflow->addFile("file-01", 10);
-std::shared_ptr<wrench::DataFile> f2 = workflow->addFile("file-02", 100);
+    std::shared_ptr<wrench::DataFile> f1 = workflow->addFile("file-01", 10);
+    std::shared_ptr<wrench::DataFile> f2 = workflow->addFile("file-02", 100);
 
-t1->addInputFile(f1);
-t1->addOutputFile(f2);
+    t1->addInputFile(f1);
+    t1->addOutputFile(f2);
 
-ASSERT_THROW(t1->addInputFile(f1), std::invalid_argument);
-ASSERT_THROW(t1->addOutputFile(f2), std::invalid_argument);
+    ASSERT_THROW(t1->addInputFile(f1), std::invalid_argument);
+    ASSERT_THROW(t1->addOutputFile(f2), std::invalid_argument);
 
-ASSERT_THROW(t1->addInputFile(f2), std::invalid_argument);
-ASSERT_THROW(t1->addOutputFile(f1), std::invalid_argument);
+    ASSERT_THROW(t1->addInputFile(f2), std::invalid_argument);
+    ASSERT_THROW(t1->addOutputFile(f1), std::invalid_argument);
 
-ASSERT_THROW(workflow->removeFile(f1), std::invalid_argument);
-ASSERT_THROW(workflow->removeFile(f2), std::invalid_argument);
+    ASSERT_THROW(workflow->removeFile(f1), std::invalid_argument);
+    ASSERT_THROW(workflow->removeFile(f2), std::invalid_argument);
 
-std::shared_ptr<wrench::WorkflowTask> t3 = workflow->addTask("task1-03", 50, 2, 4, 0);
-t3->addInputFile(f2);
+    std::shared_ptr<wrench::WorkflowTask> t3 = workflow->addTask("task1-03", 50, 2, 4, 0);
+    t3->addInputFile(f2);
 
-ASSERT_EQ(t3->getNumberOfParents(), 1);
+    ASSERT_EQ(t3->getNumberOfParents(), 1);
 }
 
 TEST_F(WorkflowTaskTest, StateToString) {
 
-ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::NOT_READY), "NOT READY");
-ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::READY), "READY");
-ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::PENDING), "PENDING");
-ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::COMPLETED), "COMPLETED");
-ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::UNKNOWN), "UNKNOWN");
-ASSERT_EQ(wrench::WorkflowTask::stateToString((wrench::WorkflowTask::State) 100), "INVALID");
+    ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::NOT_READY), "NOT READY");
+    ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::READY), "READY");
+    ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::PENDING), "PENDING");
+    ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::COMPLETED), "COMPLETED");
+    ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::UNKNOWN), "UNKNOWN");
+    ASSERT_EQ(wrench::WorkflowTask::stateToString((wrench::WorkflowTask::State) 100), "INVALID");
 
-ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_NOT_READY), "NOT READY");
-ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_READY), "READY");
-ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_RUNNING), "RUNNING");
-ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_COMPLETED), "COMPLETED");
-ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_FAILED), "FAILED");
-ASSERT_EQ(wrench::WorkflowTask::stateToString((wrench::WorkflowTask::InternalState) 100), "UNKNOWN STATE");
+    ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_NOT_READY), "NOT READY");
+    ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_READY), "READY");
+    ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_RUNNING), "RUNNING");
+    ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_COMPLETED), "COMPLETED");
+    ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_FAILED), "FAILED");
+    ASSERT_EQ(wrench::WorkflowTask::stateToString((wrench::WorkflowTask::InternalState) 100), "UNKNOWN STATE");
 }
 
 /**********************************************************************/
@@ -289,11 +289,11 @@ private:
 
         auto job_that_will_fail = job_manager->createStandardJob(this->test->t4,
                                                                  {{this->test->small_input_file,
-                                                                          wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                   {this->test->large_input_file,
-                                                                          wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                   {this->test->t4_output_file,
-                                                                          wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
@@ -317,11 +317,11 @@ private:
 
         auto job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                      {{this->test->small_input_file,
-                                                                              wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
+                                                                       wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
                                                                       {this->test->large_input_file,
-                                                                              wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                       wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                       {this->test->t4_output_file,
-                                                                              wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                                       wrench::FileLocation::LOCATION(this->test->storage_service)}});
         job_manager->submitJob(job_that_will_complete, this->test->compute_service);
 
         this->waitForAndProcessNextEvent();
@@ -346,8 +346,8 @@ private:
 };
 
 TEST_F(WorkflowTaskTest, WorkflowTaskExecutionHistoryTest) {
-DO_TEST_WITH_FORK_ONE_ARG(do_WorkflowTaskExecutionHistory_test, 1000000);
-DO_TEST_WITH_FORK_ONE_ARG(do_WorkflowTaskExecutionHistory_test, 0);
+    DO_TEST_WITH_FORK_ONE_ARG(do_WorkflowTaskExecutionHistory_test, 1000000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_WorkflowTaskExecutionHistory_test, 0);
 }
 
 void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test(double buffer_size) {
@@ -355,7 +355,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test(double buffer_size) 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -365,18 +365,18 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test(double buffer_size) 
     std::string execution_host = "ExecutionHost";
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(
-            wms_host,
-            {std::make_pair(
-                    execution_host,
-                    std::make_tuple(
-                            wrench::ComputeService::ALL_CORES,
-                            wrench::ComputeService::ALL_RAM))},
-            "",
-            {})));
+                            wms_host,
+                            {std::make_pair(
+                                    execution_host,
+                                    std::make_tuple(
+                                            wrench::ComputeService::ALL_CORES,
+                                            wrench::ComputeService::ALL_RAM))},
+                            "",
+                            {})));
 
     ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
-            wms_host, {"/"},
-            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
+                            wms_host, {"/"},
+                            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     ASSERT_NO_THROW(
             backup_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
@@ -385,7 +385,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test(double buffer_size) 
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new WorkflowTaskExecutionHistoryTestWMS(
-            this, wms_host)));
+                            this, wms_host)));
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 

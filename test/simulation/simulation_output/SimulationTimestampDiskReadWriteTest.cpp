@@ -122,10 +122,10 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     std::string host2 = "Host2";
 
     ASSERT_NO_THROW(storage_service_1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(host1, {"/"},
-                                                                                         {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10"}})));
+                                                                                                                 {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10"}})));
 
     ASSERT_NO_THROW(storage_service_2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(host2, {"/"},
-                                                                                         {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "20"}})));
+                                                                                                                 {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "20"}})));
 
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));

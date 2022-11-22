@@ -85,8 +85,8 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
         static void readFileInternal(const std::shared_ptr<DataFile> &file,
-                             const std::shared_ptr<FileLocation> &location,
-                             double num_bytes);
+                                     const std::shared_ptr<FileLocation> &location,
+                                     double num_bytes);
 
         bool isScratch() const;
 

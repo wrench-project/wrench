@@ -19,7 +19,6 @@ public:
     void do_CopyBufferizedNonBufferizedTest_test();
 
 protected:
-
     ~CopyBufferizedNonBufferizedTest() {
         wrench::Simulation::removeFile(file_1_size_100);
         wrench::Simulation::removeFile(file_2_size_200);
@@ -96,7 +95,7 @@ private:
 
         auto data_movement_manager = this->createDataMovementManager();
 
-//        std::cerr << "DOING BUFFERIZED TO BUFFERIZED\n";
+        //        std::cerr << "DOING BUFFERIZED TO BUFFERIZED\n";
         data_movement_manager->doSynchronousFileCopy(this->test->file_1_size_100,
                                                      wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_1),
                                                      wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_2));
@@ -105,7 +104,7 @@ private:
             throw std::runtime_error("Cannot find copied file after bufferized to bufferized");
         }
 
-//        std::cerr << "DOING BUFFERIZED TO NON-BUFFERIZED\n";
+        //        std::cerr << "DOING BUFFERIZED TO NON-BUFFERIZED\n";
         data_movement_manager->doSynchronousFileCopy(this->test->file_1_size_100,
                                                      wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_1),
                                                      wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_2));
@@ -113,7 +112,7 @@ private:
             throw std::runtime_error("Cannot find copied file after bufferized to non-bufferized");
         }
 
-//        std::cerr << "DOING NON-BUFFERIZED TO BUFFERIZED\n";
+        //        std::cerr << "DOING NON-BUFFERIZED TO BUFFERIZED\n";
         data_movement_manager->doSynchronousFileCopy(this->test->file_2_size_200,
                                                      wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_1),
                                                      wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_2));
@@ -121,7 +120,7 @@ private:
             throw std::runtime_error("Cannot find copied file after non-bufferized to bufferized");
         }
 
-//        std::cerr << "DOING NON-BUFFERIZED TO NON-BUFFERIZED\n";
+        //        std::cerr << "DOING NON-BUFFERIZED TO NON-BUFFERIZED\n";
         data_movement_manager->doSynchronousFileCopy(this->test->file_2_size_200,
                                                      wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_1),
                                                      wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_2));
@@ -146,7 +145,7 @@ void CopyBufferizedNonBufferizedTest::do_CopyBufferizedNonBufferizedTest_test() 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -154,21 +153,21 @@ void CopyBufferizedNonBufferizedTest::do_CopyBufferizedNonBufferizedTest_test() 
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     ASSERT_NO_THROW(storage_service_bufferized_1 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("StorageHost1", {"/disk1"},
-                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "1MB"},
-                                                                      {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
+                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost1", {"/disk1"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "1MB"},
+                                                                                      {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
     ASSERT_NO_THROW(storage_service_non_bufferized_1 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("StorageHost1", {"/disk2"},
-                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"},
-                                                                      {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
+                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost1", {"/disk2"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"},
+                                                                                      {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
     ASSERT_NO_THROW(storage_service_bufferized_2 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("StorageHost2", {"/disk1"},
-                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "2MB"},
-                                                                      {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
+                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost2", {"/disk1"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "2MB"},
+                                                                                      {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
     ASSERT_NO_THROW(storage_service_non_bufferized_2 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("StorageHost2", {"/disk2"},
-                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"},
-                                                                      {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
+                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost2", {"/disk2"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"},
+                                                                                      {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
