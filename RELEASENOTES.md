@@ -1,6 +1,15 @@
 WRENCH Release Notes
 ------
 
+### current master branch
+
+- Implementation of non-bufferized (i.e., buffer size of zero) storage services, which is transparent to the user but can vastly reduce simulation time by using a fluid (rather than message-based) model for how storage services read/write data to/from disk while sending/receiving that same data to/from the network. 
+- API change by which a `FileLocation` now includes a `DataFile`.
+- Minor bug fixes and scalability improvements.
+
+**note**: master requires [simgrid](https://simgrid.org) master
+
+
 ### wrench 2.1
 
 (october 7, 2022) this release include **a new storage service implementation**, **performance enhancements**, and **minor bug fixes**. More specifically:
