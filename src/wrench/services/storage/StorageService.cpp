@@ -288,7 +288,7 @@ namespace wrench {
                     remaining -= this->buffer_size;
                 }
                 S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
-                        file, (unsigned long) remaining, true));
+                                                                         file, (unsigned long) remaining, true));
 
                 //Waiting for the final ack
                 message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -302,7 +302,6 @@ namespace wrench {
             throw std::runtime_error("StorageService::writeFile(): Received a totally unexpected [" +
                                      message->getName() + "] message!");
         }
-
     }
 
 
@@ -326,9 +325,9 @@ namespace wrench {
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         S4U_Mailbox::putMessage(this->mailbox, new StorageServiceFreeSpaceRequestMessage(
-                answer_mailbox,
-                this->getMessagePayloadValue(
-                        StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+                                                       answer_mailbox,
+                                                       this->getMessagePayloadValue(
+                                                               StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -397,7 +396,7 @@ namespace wrench {
     void StorageService::readFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
-        } //This check DOES need to exist, because  we call file->getSize()
+        }//This check DOES need to exist, because  we call file->getSize()
 
         readFileInternal(file, location, file->getSize());
     }
@@ -507,7 +506,7 @@ namespace wrench {
                     }
 
                     if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage *>(
-                            file_content_message.get())) {
+                                file_content_message.get())) {
                         if (file_content_chunk_msg->last_chunk) {
                             S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                             break;
@@ -533,7 +532,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
  * @brief Synchronously and sequentially read a set of files from storage services
  *
  * @param locations: a map of files to locations
@@ -545,7 +544,7 @@ namespace wrench {
         StorageService::writeOrReadFiles(READ, std::move(locations));
     }
 
-/**
+    /**
  * @brief Synchronously and sequentially upload a set of files from storage services
  *
  * @param locations: a map of files to locations
@@ -557,7 +556,7 @@ namespace wrench {
         StorageService::writeOrReadFiles(WRITE, std::move(locations));
     }
 
-/**
+    /**
  * @brief Synchronously and sequentially write/read a set of files to/from storage services
  *
  * @param action: FileOperation::READ (download) or FileOperation::WRITE
@@ -603,7 +602,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
  * @brief Synchronously delete a file at a location
  *
  * @param file: the file
@@ -659,7 +658,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
  * @brief Synchronously ask the storage service to read a file from another storage service
  *
  * @param file: the file to copy
@@ -685,9 +684,9 @@ namespace wrench {
         bool dst_is_bufferized = dst_location->getStorageService()->isBufferized();
         bool dst_is_non_bufferized = not dst_is_bufferized;
 
-//        if (src_is_non_bufferized and dst_is_bufferized) {
-//            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
-//        }
+        //        if (src_is_non_bufferized and dst_is_bufferized) {
+        //            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
+        //        }
 
         simgrid::s4u::Mailbox *mailbox_to_contact;
         if (dst_is_non_bufferized) {
@@ -729,7 +728,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
  * @brief Asynchronously ask for a file copy between two storage services
  *
  * @param answer_mailbox: the mailbox to which a notification message will be sent
@@ -756,9 +755,9 @@ namespace wrench {
         bool dst_is_bufferized = dst_location->getStorageService()->isBufferized();
         bool dst_is_non_bufferized = not dst_is_bufferized;
 
-//        if (src_is_non_bufferized and dst_is_bufferized) {
-//            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
-//        }
+        //        if (src_is_non_bufferized and dst_is_bufferized) {
+        //            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
+        //        }
 
         simgrid::s4u::Mailbox *mailbox_to_contact;
         if (dst_is_non_bufferized) {
@@ -786,7 +785,7 @@ namespace wrench {
                                 StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
     }
 
-/**
+    /**
  * @brief Get the total static capacity of the storage service (in zero simulation time)
  * @return capacity of the storage service (double) for each mount point, in a map
  */
@@ -798,7 +797,7 @@ namespace wrench {
         return to_return;
     }
 
-/**
+    /**
  * @brief Get the mount point (will throw is more than one)
  * @return the (sole) mount point of the service
  */
@@ -810,7 +809,7 @@ namespace wrench {
         return wrench::FileLocation::sanitizePath(this->file_systems.begin()->first);
     }
 
-/**
+    /**
  * @brief Get the set of mount points
  * @return the set of mount points
  */
@@ -822,7 +821,7 @@ namespace wrench {
         return to_return;
     }
 
-/**
+    /**
  * @brief Checked whether the storage service has multiple mount points
  * @return true whether the service has multiple mount points
  */
@@ -830,7 +829,7 @@ namespace wrench {
         return (this->file_systems.size() > 1);
     }
 
-/**
+    /**
 * @brief Checked whether the storage service has a particular mount point
 * @param mp: a mount point
 *
@@ -840,7 +839,7 @@ namespace wrench {
         return (this->file_systems.find(mp) != this->file_systems.end());
     }
 
-/**
+    /**
  * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
  * at that location.
 
@@ -858,7 +857,7 @@ namespace wrench {
                   location->getAbsolutePathAtMountPoint());
     }
 
-/**
+    /**
  * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
  * at that location.
 
@@ -872,7 +871,7 @@ namespace wrench {
         createFile(file, FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path));
     }
 
-/**
+    /**
  * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
  * at that location.
  * @param file: a file

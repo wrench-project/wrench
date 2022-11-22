@@ -67,9 +67,7 @@ namespace wrench {
         };
 
 
-
     public:
-
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
@@ -79,9 +77,9 @@ namespace wrench {
         double getLoad() override;
 
         static SimpleStorageService *createSimpleStorageService(const std::string &hostname,
-                                                         std::set<std::string> mount_points,
-                                                         WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                                                                std::set<std::string> mount_points,
+                                                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) override;
 

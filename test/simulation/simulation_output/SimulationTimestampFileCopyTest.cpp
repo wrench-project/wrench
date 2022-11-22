@@ -175,9 +175,9 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
                                                                                           {})));
 
     ASSERT_NO_THROW(source_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(host1, {"/"},
-                                                                                              {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
+                                                                                                                      {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
     ASSERT_NO_THROW(destination_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(host2, {"/"},
-                                                                                                   {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
+                                                                                                                           {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
 
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
