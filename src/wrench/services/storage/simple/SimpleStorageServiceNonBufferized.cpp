@@ -681,7 +681,6 @@ namespace wrench {
                                                                transaction->dst_host,
                                                                transaction->dst_disk)->set_size((uint64_t)(transaction->transfer_size));
 
-
             transaction->stream = sg_iostream;
 
             this->stream_to_transactions[sg_iostream] = transaction;
@@ -695,8 +694,7 @@ namespace wrench {
  * @return the load on the service
  */
     double SimpleStorageServiceNonBufferized::getLoad() {
-        // TODO: TO RE-IMPLEMENT FOR NON-BUFFERIZED
-        return 0.0;
+        return (double) this->running_transactions.size() + (double) this->pending_transactions.size();
     }
 
 
