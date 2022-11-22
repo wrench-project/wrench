@@ -37,26 +37,6 @@ namespace wrench {
      */
     void SimpleStorageServiceNonBufferized::cleanup(bool has_returned_from_main, int return_value) {
 
-        //        std::cerr << "IN CLEANUP " << this->name << "  FROM MAIN: " << has_returned_from_main << "\n";
-        //        std::cerr << "IS MASTRO: " << simgrid::s4u::this_actor::is_maestro() << "\n";
-        //        std::cerr << "IN CLEANUP PENDING = " << this->pending_transactions.size() << "\n";
-        //        this->pending_transactions.clear();
-        //
-        //
-        //        std::cerr << "IN CLEANUP RUNNING = " << this->running_transactions.size() << "\n";
-        //        for (auto &s : this->running_transactions) {
-        //            std::cerr << "RUNNING STATE == FAILED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FAILED) << "\n";
-        //            std::cerr << "RUNNING STATE == STARTED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::STARTED) << "\n";
-        //            std::cerr << "RUNNING STATE == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
-        //            s->stream->cancel();
-        //            std::cerr << "RUNNING STATE AFTER CANCELED! == FINISHED: " << (s->stream->get_state() == simgrid::s4u::Activity::State::FINISHED) << "\n";
-        //        }
-        //        this->running_transactions.clear();
-        //
-        //        this->stream_to_transactions.clear();
-
-
-        //        std::cerr << "DONE CLEANUP\n";
     }
 
     /**
@@ -101,7 +81,7 @@ namespace wrench {
             this->file_systems[transaction->dst_location->getMountPoint()]->storeFileInDirectory(
                     transaction->dst_location->getFile(), transaction->dst_location->getAbsolutePathAtMountPoint());
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
-            // May be no corresponding timestamp.
+            // Maybe no corresponding timestamp.
             //            WRENCH_INFO("Sending back an ack for a successful file read");
             S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage());
         } else {
@@ -244,7 +224,6 @@ namespace wrench {
                 continue;
             }
 
-
             // It's a communication
             if (finished_activity_index == 0) {
                 comm_ptr_has_been_posted = false;
@@ -340,7 +319,6 @@ namespace wrench {
                                 this->getSharedPtr<SimpleStorageService>()));
             }
         }
-        //        }
 
         if (failure_cause == nullptr) {
 
@@ -365,11 +343,6 @@ namespace wrench {
             // Create the streaming activity
             auto me_host = simgrid::s4u::this_actor::get_host();
             simgrid::s4u::Disk *me_disk = fs->getDisk();
-
-            //            auto sg_iostream = simgrid::s4u::Io::streamto_init(requesting_host,
-            //                                                               nullptr,
-            //                                                               me_host,
-            //                                                               me_disk)->set_size((uint64_t)file->getSize());
 
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
@@ -414,6 +387,7 @@ namespace wrench {
             double num_bytes_to_read,
             simgrid::s4u::Mailbox *answer_mailbox,
             simgrid::s4u::Host *requesting_host) {
+
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
@@ -422,12 +396,12 @@ namespace wrench {
 
         //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
         if (not this->file_systems[location->getMountPoint()]->doesDirectoryExist(
-                    location->getAbsolutePathAtMountPoint())) {
+                location->getAbsolutePathAtMountPoint())) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new InvalidDirectoryPath(
                             this->getSharedPtr<SimpleStorageService>(),
                             location->getMountPoint() + "/" +
-                                    location->getAbsolutePathAtMountPoint()));
+                            location->getAbsolutePathAtMountPoint()));
         } else {
             fs = this->file_systems[location->getMountPoint()].get();
 
@@ -671,7 +645,7 @@ namespace wrench {
                                                                transaction->src_disk,
                                                                transaction->dst_host,
                                                                transaction->dst_disk)
-                                       ->set_size((uint64_t) (transaction->transfer_size));
+                    ->set_size((uint64_t) (transaction->transfer_size));
 
             transaction->stream = sg_iostream;
 
