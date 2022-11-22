@@ -39,16 +39,16 @@ namespace wrench {
      * @return a pointer to a simple storage service
      */
     SimpleStorageService *SimpleStorageService::createSimpleStorageService(const std::string &hostname,
-                                                    std::set<std::string> mount_points,
-                                                    WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
+                                                                           std::set<std::string> mount_points,
+                                                                           WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                                                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
 
-        bool bufferized = false; // By default, non-bufferized
-//        bool bufferized = true; // By default, bufferized
+        bool bufferized = false;// By default, non-bufferized
+                                //        bool bufferized = true; // By default, bufferized
 
         if (property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != property_list.end()) {
             double buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
-            bufferized = buffer_size >= 1.0; // more than one byte means bufferized
+            bufferized = buffer_size >= 1.0;// more than one byte means bufferized
         }
 
         if (Simulation::isLinkShutdownSimulationEnabled() and (not bufferized)) {
@@ -57,9 +57,9 @@ namespace wrench {
         }
 
         if (bufferized) {
-            return (SimpleStorageService *)(new SimpleStorageServiceBufferized(hostname, mount_points, property_list, messagepayload_list));
+            return (SimpleStorageService *) (new SimpleStorageServiceBufferized(hostname, mount_points, property_list, messagepayload_list));
         } else {
-            return (SimpleStorageService *)(new SimpleStorageServiceNonBufferized(hostname, mount_points, property_list, messagepayload_list));
+            return (SimpleStorageService *) (new SimpleStorageServiceNonBufferized(hostname, mount_points, property_list, messagepayload_list));
         }
     }
 

@@ -780,7 +780,7 @@ namespace wrench {
             if (internalStorage != nullptr) {
                 return false;
             }
-//            internalStorage = make_shared<SimpleStorageService>(hostname, path, property_list, messagepayload_list);
+            //            internalStorage = make_shared<SimpleStorageService>(hostname, path, property_list, messagepayload_list);
             internalStorage = std::shared_ptr<SimpleStorageService>(SimpleStorageService::createSimpleStorageService(hostname, path, property_list, messagepayload_list));
             return true;
         }
@@ -970,7 +970,7 @@ namespace wrench {
                                                           WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
                                                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list) {
             if (storage_property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != storage_property_list.end()) {
-                if (UnitParser::parse_size(storage_property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE])  < 1) {
+                if (UnitParser::parse_size(storage_property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]) < 1) {
                     throw std::invalid_argument("Node::addChildStorageServer(): XRootD current does not support 0 buffer_size");
                 }
             }

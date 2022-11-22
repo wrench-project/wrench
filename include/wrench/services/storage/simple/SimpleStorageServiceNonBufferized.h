@@ -88,7 +88,6 @@ namespace wrench {
                     dst_location(std::move(dst_location)), dst_host(dst_host), dst_disk(dst_disk),
                     mailbox(mailbox), transfer_size(transfer_size), stream(nullptr) {
             }
-
         };
         /***********************/
         /** \endcond          **/
@@ -103,6 +102,7 @@ namespace wrench {
                                           std::set<std::string> mount_points,
                                           WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+
     private:
         friend class Simulation;
 
@@ -138,8 +138,8 @@ namespace wrench {
 
         void startPendingTransactions();
 
-        void processTransactionCompletion(const std::shared_ptr<Transaction>& transaction);
-        void processTransactionFailure(const std::shared_ptr<Transaction>& transaction);
+        void processTransactionCompletion(const std::shared_ptr<Transaction> &transaction);
+        void processTransactionFailure(const std::shared_ptr<Transaction> &transaction);
 
 
         std::deque<std::shared_ptr<Transaction>> pending_transactions;

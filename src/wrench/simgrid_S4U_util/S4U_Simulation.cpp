@@ -497,7 +497,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
 * @brief Simulates a disk write
 *
 * @param num_bytes: number of bytes to write
@@ -528,7 +528,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
 * @brief Read from a local disk and write to a local disk concurrently
 *
 * @param num_bytes_to_read: number of bytes to read
@@ -570,7 +570,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
 * @brief Simulates a disk read
 *
 * @param num_bytes: number of bytes to read
@@ -602,7 +602,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
 * @brief Simulates a sleep
 * @param duration: the number of seconds to sleep
 */
@@ -610,14 +610,14 @@ namespace wrench {
         simgrid::s4u::this_actor::sleep_for(duration);
     }
 
-/**
+    /**
 * @brief Simulates a yield
 */
     void S4U_Simulation::yield() {
         simgrid::s4u::this_actor::yield();
     }
 
-/**
+    /**
 * @brief Get the memory_manager_service capacity of a host given a hostname
 * @param hostname: the name of the host
 * @return a memory_manager_service capacity in bytes
@@ -630,7 +630,7 @@ namespace wrench {
         return getHostMemoryCapacity(host);
     }
 
-/**
+    /**
 * @brief Get the memory_manager_service capacity of the current host
 * @return a memory_manager_service capacity in bytes
 */
@@ -638,7 +638,7 @@ namespace wrench {
         return getHostMemoryCapacity(simgrid::s4u::Host::current());
     }
 
-/**
+    /**
 * @brief Get the memory_manager_service capacity of a S4U host
 * @param host: the host
 * @return a memory_manager_service capacity in bytes
@@ -675,7 +675,7 @@ namespace wrench {
         return capacity_value;
     }
 
-/**
+    /**
 * @brief Get the property associated to a host specified in the platform file
 * @param hostname: the host name
 * @param property_name: the property name
@@ -692,7 +692,7 @@ namespace wrench {
         return host->get_property(property_name);
     }
 
-/**
+    /**
 * @brief Get the property associated to a cluster specified in the platform file
 * @param cluster_id: the cluster id
 * @param property_name: the property name
@@ -713,7 +713,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
 * @brief Set a property associated to a host specified in the platform file (does not include VMs)
 * @param hostname: the host name
 * @param property_name: the property name
@@ -727,7 +727,7 @@ namespace wrench {
         host->set_property(property_name, property_value);
     }
 
-/**
+    /**
 * @brief Get the energy consumed by the host up to now
 * @param hostname: the host name
 * @return the energy consumed by the host in Joules
@@ -774,7 +774,7 @@ namespace wrench {
     }
 #endif
 
-/**
+    /**
 * @brief Set the power state of the host
 *
 * @param hostname: the host name
@@ -802,7 +802,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
 * @brief Get the total number of power states of a host
 * @param hostname: the host name
 * @return The number of power states available for the host (as specified in the platform xml description file)
@@ -824,7 +824,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
 * @brief Get the current power state of a host
 * @param hostname: the host name
 * @return The index of the current pstate of the host (as specified in the platform xml description file)
@@ -845,7 +845,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
 * @brief Get the minimum power consumption (i.e., idling) for a host at its current pstate
 * @param hostname: the host name
 * @return The power consumption for this host if idle (as specified in the platform xml description file)
@@ -867,7 +867,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
 * @brief Get the maximum power consumption (i.e., 100% load) for a host at its current pstate
 * @param hostname: the host name
 * @return The power consumption for this host if 100% used (as specified in the platform xml description file)
@@ -892,7 +892,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
 * @brief Get the list of power states available for a host
 * @param hostname: the host name
 * @return a list of power states available for the host (as specified in the platform xml description file)
@@ -920,7 +920,7 @@ namespace wrench {
         return list;
     }
 
-/**
+    /**
 * @brief Compute zero flop, which take zero time but will block if the host's pstate
 *        has a zero flop/sec speed, until the host's pstate is changed to a pstate with
 *        non-zero flop/sec speed.
@@ -932,7 +932,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
 * @brief Gets set of disks, i.e., mount points, available at a host
 * @param hostname: the host's name
 * @return a vector of mount points
@@ -961,7 +961,7 @@ namespace wrench {
         return mount_points;
     }
 
-/**
+    /**
 * @brief Determines whether a mount point is defined at a host
 * @param hostname: the host's name
 * @param mount_point: the mount point
@@ -994,8 +994,7 @@ namespace wrench {
     }
 
 
-
-/**
+    /**
  * @brief Get the list of link names on the route between two hosts
  * @param src_host: src hostname
  * @param dst_host: dst hostname
@@ -1024,7 +1023,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
 * @brief Gets the capacity of a disk attached to some host for a given mount point
 * @param hostname: the host's name
 * @param mount_point: the mount point (e.g.,  "/home")
@@ -1079,8 +1078,7 @@ namespace wrench {
     }
 
 
-
-/**
+    /**
  * @brief Method to create, programmatically, a new disk
  * @param hostname: the name of the host to which the disk should be attached
  * @param disk_id: the nae of the disk
@@ -1122,7 +1120,7 @@ namespace wrench {
         disk->set_property("mount", mount_point);
     }
 
-/**
+    /**
  * @brief Convenient s4u wrapper to retrieve a Host (which can be a VM) based on a name
  * @param name: the host/vm name or null if none
  * @return a SimGrid host
@@ -1139,7 +1137,7 @@ namespace wrench {
         return host;
     }
 
-/**
+    /**
  * @brief Convenient s4u wrapper to retrieve a Host (which can be a VM) based on a name
  * @param name: the host/vm name
  * @return a SimGrid host

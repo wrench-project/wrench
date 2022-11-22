@@ -319,12 +319,12 @@ TEST_F(KillFailActionExecutorTest, FailFileDelete) {
 }
 
 TEST_F(KillFailActionExecutorTest, KillCustom) {
-//    loopThroughTestCases({0.0, 20.84743174020618639020}, true, "custom");
+    //    loopThroughTestCases({0.0, 20.84743174020618639020}, true, "custom");
     loopThroughTestCases({0.0, 20.8474}, true, "custom");
 }
 
 TEST_F(KillFailActionExecutorTest, FailCustom) {
-//    loopThroughTestCases({0.0, 20.84743174020618639020}, false, "custom");
+    //    loopThroughTestCases({0.0, 20.84743174020618639020}, false, "custom");
     loopThroughTestCases({0.0, 20.8474}, false, "custom");
 }
 

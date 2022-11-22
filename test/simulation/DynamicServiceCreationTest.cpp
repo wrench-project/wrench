@@ -180,8 +180,8 @@ private:
         // Dynamically create a Storage Service on this host
         auto dynamically_created_storage_service = simulation->startNewService(
                 wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
-                                                 {},
-                                                 {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
+                                                                         {},
+                                                                         {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
 
         // Dynamically create a Cloud Service
@@ -279,8 +279,8 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     // Create a Storage Service
     storage_service = simulation->add(
             wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
-                                             {},
-                                             {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
+                                                                     {},
+                                                                     {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
