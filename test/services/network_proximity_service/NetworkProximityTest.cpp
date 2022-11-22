@@ -220,7 +220,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
 
     // Create a file registry service
@@ -412,7 +412,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -568,7 +568,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
                                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
 
     // Create a file registry service
@@ -662,7 +662,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
                                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a file registry service
     simulation->add(new wrench::FileRegistryService(hostname));

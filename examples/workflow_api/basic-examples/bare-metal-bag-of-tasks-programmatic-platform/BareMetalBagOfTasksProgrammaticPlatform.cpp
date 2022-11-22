@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
      * storage service is configured to use a buffer size of 50MB when transferring data over
      * the network (i.e., to pipeline disk reads/writes and network revs/sends). */
     std::cerr << "Instantiating a SimpleStorageService on WMSHost..." << std::endl;
-    auto storage_service = simulation->add(new wrench::SimpleStorageService(
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
     /* Instantiate a bare-metal compute service, and add it to the simulation.

@@ -24,7 +24,7 @@
 WRENCH_LOG_CATEGORY(file_read_action_executor_test, "Log category for FileReadActionExecutorTest");
 
 //#define EPSILON (std::numeric_limits<double>::epsilon())
-#define EPSILON (0.000001)
+#define EPSILON (0.0001)
 
 class FileReadActionExecutorTest : public ::testing::Test {
 
@@ -34,7 +34,7 @@ public:
     void do_FileReadActionExecutorSuccessTest_test();
     void do_FileReadActionExecutorMultipleAttemptsSuccessTest_test();
     void do_FileReadActionExecutorMissingFileTest_test();
-    void do_FileReadActionExecutorKillingStorageServiceTest_test();
+    void do_FileReadActionExecutorKillingStorageServiceTest_test(double buffer_size);
 
 
 protected:
@@ -177,11 +177,12 @@ private:
 
         // Is the start-date sensible?
         if (file_read_action->getStartDate() < 0.0 or file_read_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_read_action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_read_action->getStartDate()));
         }
 
         // Is the end-date sensible?
-        if (file_read_action->getEndDate() + EPSILON < 10.84743174020618639020 or file_read_action->getEndDate() > 10.84743174020618639020 + EPSILON) {
+
+        if (std::abs<double>(file_read_action->getEndDate() - 10.847442) > EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(file_read_action->getEndDate()));
         }
 
@@ -214,7 +215,9 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+            "Host3", {"/"},
+            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();
@@ -316,7 +319,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();
@@ -429,7 +432,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();
@@ -440,7 +443,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new FileReadActionExecutorMissingFileTestWMS(this, "Host1")));
+            new FileReadActionExecutorMissingFileTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -528,18 +531,20 @@ private:
 };
 
 TEST_F(FileReadActionExecutorTest, KillingStorageServiceTest) {
-    DO_TEST_WITH_FORK(do_FileReadActionExecutorKillingStorageServiceTest_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillingStorageServiceTest_test, 1000000);
+//    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillingStorageServiceTest_test, 0);
 }
 
-void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceTest_test() {
+void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceTest_test(double buffer_size) {
 
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
+
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    //    argv[2] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -547,7 +552,8 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"},
+                                                                                        {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();
@@ -560,7 +566,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new FileReadActionExecutorKillingStorageServiceTestWMS(this, "Host1")));
+            new FileReadActionExecutorKillingStorageServiceTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

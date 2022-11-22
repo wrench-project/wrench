@@ -60,6 +60,7 @@ namespace wrench {
                     {Property::SEARCH_BROADCAST_OVERHEAD, "1"},
                     {Property::UPDATE_CACHE_OVERHEAD, "1"},
                     {Property::CACHE_MAX_LIFETIME, "infinity"},
+                    {StorageServiceProperty::BUFFER_SIZE, "1000000"},
                     {Property::REDUCED_SIMULATION, "false"},
                     {Property::FILE_NOT_FOUND_TIMEOUT, "30"}};
 

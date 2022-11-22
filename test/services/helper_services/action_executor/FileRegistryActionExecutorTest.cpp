@@ -236,7 +236,7 @@ void FileRegistryActionExecutorTest::do_FileRegistryActionExecutorSuccessTest_te
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();

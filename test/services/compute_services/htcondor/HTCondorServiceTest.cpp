@@ -314,7 +314,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a BareMetalComputeService
     std::string execution_host = wrench::Simulation::getHostnameList()[1];
@@ -454,7 +454,7 @@ void HTCondorServiceTest::do_StandardJobTaskFailureTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a BareMetalComputeService
     std::string execution_host = wrench::Simulation::getHostnameList()[1];
@@ -584,7 +584,7 @@ void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a BareMetalComputeService
     std::string execution_host = wrench::Simulation::getHostnameList()[1];
@@ -721,7 +721,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a bare-metal compute service
     std::string execution_host = wrench::Simulation::getHostnameList()[1];
@@ -845,7 +845,7 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
-    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(hostname, {"/"})));
+    ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     {
         // Create list of invalid compute services
@@ -961,10 +961,10 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     //ASSERT_NO_THROW(storage_service2 = simulation->add(
-    //       new wrench::SimpleStorageService(batchhostname, {"/"})));
+    //       wrench::SimpleStorageService::createSimpleStorageService(batchhostname, {"/"})));
 
     // Create list of compute services
     std::string execution_host = wrench::Simulation::getHostnameList()[1];
@@ -1085,7 +1085,7 @@ void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create list of compute services
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
@@ -1202,7 +1202,7 @@ void HTCondorServiceTest::do_NoNonGridUniverseSupportTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create list of compute services
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
@@ -1312,7 +1312,7 @@ void HTCondorServiceTest::do_NoGridJobSupportTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create list of compute services
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
@@ -1468,7 +1468,7 @@ void HTCondorServiceTest::do_NotEnoughResourcesTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create list of compute services
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;

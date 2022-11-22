@@ -246,10 +246,11 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-log-full");
+    argv[1] = strdup("--wrench-link-shutdown-simulation");
+    //    argv[2] = strdup("--wrench-log-full");
 
     simulation->init(&argc, argv);
 

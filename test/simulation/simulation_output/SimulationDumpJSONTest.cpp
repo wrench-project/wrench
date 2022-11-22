@@ -1065,8 +1065,8 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
 
-    client_storage_service = simulation->add(new wrench::SimpleStorageService("host1", {"/"}, {}));
-    server_storage_service = simulation->add(new wrench::SimpleStorageService("host2", {"/"}, {}));
+    client_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("host1", {"/"}, {}));
+    server_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("host2", {"/"}, {}));
     storage_services_list.insert(client_storage_service);
     storage_services_list.insert(server_storage_service);
 
@@ -1243,10 +1243,10 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     std::string host1 = "host1";
     std::string host2 = "host2";
 
-    ASSERT_NO_THROW(ss1 = simulation->add(new wrench::SimpleStorageService(host1, {"/"},
+    ASSERT_NO_THROW(ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(host1, {"/"},
                                                                            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "400000"}})));
 
-    ASSERT_NO_THROW(ss2 = simulation->add(new wrench::SimpleStorageService(host2, {"/"},
+    ASSERT_NO_THROW(ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(host2, {"/"},
                                                                            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

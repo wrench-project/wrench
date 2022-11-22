@@ -184,11 +184,11 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname1, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname1, {"/"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname2, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname2, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> cloud_hosts;
@@ -416,11 +416,11 @@ void WMSTest::do_CustomHandlerWMS_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname1, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname1, {"/"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname2, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname2, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> cloud_hosts;
