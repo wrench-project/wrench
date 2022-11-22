@@ -295,7 +295,7 @@ private:
             job1 = job_manager->createStandardJob(
                     {task1},
                     {{task1->getInputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                 this->test->storage_service1, task1->getInputFiles().at(0))}},
+                                                            this->test->storage_service1, task1->getInputFiles().at(0))}},
                     {std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file")),
                             wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->workflow->getFileByID("input_file")))},
@@ -644,9 +644,9 @@ private:
             auto job = job_manager->createStandardJob(
                     {task},
                     {{task->getInputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                this->test->storage_service1, task->getInputFiles().at(0))},
+                                                           this->test->storage_service1, task->getInputFiles().at(0))},
                      {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                 this->test->storage_service1, task->getOutputFiles().at(0))}},
+                                                            this->test->storage_service1, task->getOutputFiles().at(0))}},
                     {std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file")),
                             wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->workflow->getFileByID("input_file")))},
@@ -788,9 +788,9 @@ private:
             auto job = job_manager->createStandardJob(
                     {task},
                     {{task->getInputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                this->test->storage_service1, task->getInputFiles().at(0))},
+                                                           this->test->storage_service1, task->getInputFiles().at(0))},
                      {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                 this->test->storage_service1, task->getOutputFiles().at(0))}},
+                                                            this->test->storage_service1, task->getOutputFiles().at(0))}},
                     {std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->workflow->getFileByID("input_file")),
                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file")))},
@@ -1248,9 +1248,9 @@ private:
             auto job = job_manager->createStandardJob(
                     {task},
                     {{task->getInputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                this->test->storage_service1, task->getInputFiles().at(0))},
+                                                           this->test->storage_service1, task->getInputFiles().at(0))},
                      {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                 this->test->storage_service1, task->getOutputFiles().at(0))}},
+                                                            this->test->storage_service1, task->getOutputFiles().at(0))}},
                     {std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file")),
                             wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->workflow->getFileByID("input_file")))},
@@ -1547,9 +1547,9 @@ private:
             auto job = job_manager->createStandardJob(
                     {task},
                     {{task->getInputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                this->test->storage_service1, task->getInputFiles().at(0))},
+                                                           this->test->storage_service1, task->getInputFiles().at(0))},
                      {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                 this->test->storage_service1, task->getOutputFiles().at(0))}},
+                                                            this->test->storage_service1, task->getOutputFiles().at(0))}},
                     {std::tuple<std::shared_ptr<wrench::FileLocation>,
                                 std::shared_ptr<wrench::FileLocation>>(
                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file")),
@@ -1660,9 +1660,9 @@ private:
             auto job = job_manager->createStandardJob(
                     {task},
                     {{task->getInputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                this->test->storage_service1, task->getInputFiles().at(0))},
+                                                           this->test->storage_service1, task->getInputFiles().at(0))},
                      {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                 this->test->storage_service1, task->getOutputFiles().at(0))}},
+                                                            this->test->storage_service1, task->getOutputFiles().at(0))}},
                     {std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file")),
                             wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->workflow->getFileByID("input_file")))},
@@ -1936,9 +1936,9 @@ private:
             auto job = job_manager->createStandardJob(
                     {task},
                     {{task->getInputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                this->test->storage_service1, task->getInputFiles().at(0))},
+                                                           this->test->storage_service1, task->getInputFiles().at(0))},
                      {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                 this->test->storage_service1, task->getOutputFiles().at(0))}},
+                                                            this->test->storage_service1, task->getOutputFiles().at(0))}},
                     {std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file")),
                             wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->workflow->getFileByID("input_file")))},
@@ -1960,9 +1960,9 @@ private:
             auto job1 = job_manager->createStandardJob(
                     {task1},
                     {{task1->getInputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                 this->test->storage_service1, task1->getInputFiles().at(0))},
+                                                            this->test->storage_service1, task1->getInputFiles().at(0))},
                      {task1->getOutputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                  this->test->storage_service1, task1->getOutputFiles().at(0))}},
+                                                             this->test->storage_service1, task1->getOutputFiles().at(0))}},
                     {std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file_1")),
                             wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->workflow->getFileByID("input_file_1")))},
@@ -1984,9 +1984,9 @@ private:
             auto job2 = job_manager->createStandardJob(
                     {task2},
                     {{task2->getInputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                 this->test->storage_service1, task2->getInputFiles().at(0))},
+                                                            this->test->storage_service1, task2->getInputFiles().at(0))},
                      {task2->getOutputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                  this->test->storage_service1, task2->getOutputFiles().at(0))}},
+                                                             this->test->storage_service1, task2->getOutputFiles().at(0))}},
                     {std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file_2")),
                             wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->workflow->getFileByID("input_file_2")))},
@@ -2730,9 +2730,9 @@ private:
             auto job = job_manager->createStandardJob(
                     {task},
                     {{task->getInputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                this->test->storage_service1, task->getInputFiles().at(0))},
+                                                           this->test->storage_service1, task->getInputFiles().at(0))},
                      {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                 this->test->storage_service1, task->getOutputFiles().at(0))}},
+                                                            this->test->storage_service1, task->getOutputFiles().at(0))}},
                     {std::tuple<std::shared_ptr<wrench::FileLocation>,
                                 std::shared_ptr<wrench::FileLocation>>(
                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file")),
@@ -2882,9 +2882,9 @@ private:
             auto job = job_manager->createStandardJob(
                     {task},
                     {{task->getInputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                this->test->storage_service1, task->getInputFiles().at(0))},
+                                                           this->test->storage_service1, task->getInputFiles().at(0))},
                      {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                 this->test->storage_service1, task->getOutputFiles().at(0))}},
+                                                            this->test->storage_service1, task->getOutputFiles().at(0))}},
                     {std::tuple<std::shared_ptr<wrench::FileLocation>,
                                 std::shared_ptr<wrench::FileLocation>>(
                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file")),
@@ -3122,9 +3122,9 @@ private:
             auto job = job_manager->createStandardJob(
                     {task},
                     {{task->getInputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                this->test->storage_service1, task->getInputFiles().at(0))},
+                                                           this->test->storage_service1, task->getInputFiles().at(0))},
                      {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(
-                                                                 this->test->storage_service1, task->getOutputFiles().at(0))}},
+                                                            this->test->storage_service1, task->getOutputFiles().at(0))}},
                     {std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file")),
                             wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->workflow->getFileByID("input_file")))},

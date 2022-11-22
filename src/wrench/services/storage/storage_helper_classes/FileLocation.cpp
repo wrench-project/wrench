@@ -40,13 +40,13 @@ namespace wrench {
      * @param is_scratch: whether scratch or not
      * @return a shared pointer to a file location
      */
-    std::shared_ptr<FileLocation> FileLocation::createFileLocation(const std::shared_ptr<StorageService>& ss,
-                                                                   const std::string& mp,
-                                                                   const std::string& apamp,
-                                                                   const std::shared_ptr<DataFile>& file,
+    std::shared_ptr<FileLocation> FileLocation::createFileLocation(const std::shared_ptr<StorageService> &ss,
+                                                                   const std::string &mp,
+                                                                   const std::string &apamp,
+                                                                   const std::shared_ptr<DataFile> &file,
                                                                    bool is_scratch) {
         // TODO: Find a more efficiency key
-        std::string key = (ss? ss->getName(): "") + "|" + mp + "|" + apamp + "|" + file->getID() + "|" + (is_scratch ? "1" : "0");
+        std::string key = (ss ? ss->getName() : "") + "|" + mp + "|" + apamp + "|" + file->getID() + "|" + (is_scratch ? "1" : "0");
         if (FileLocation::file_location_map.find(key) != FileLocation::file_location_map.end()) {
             return FileLocation::file_location_map[key];
         }
@@ -82,7 +82,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<FileLocation> FileLocation::SCRATCH(const std::shared_ptr<DataFile>& file) {
+    std::shared_ptr<FileLocation> FileLocation::SCRATCH(const std::shared_ptr<DataFile> &file) {
         if (file == nullptr) {
             throw std::invalid_argument("FileLocation::SCRATCH(): Cannot pass nullptr file");
         }
@@ -99,7 +99,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService>& ss, const std::shared_ptr<DataFile>& file) {
+    std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss, const std::shared_ptr<DataFile> &file) {
         if (ss == nullptr) {
             throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr storage service");
         }
@@ -124,9 +124,9 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService>& ss,
+    std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss,
                                                          std::shared_ptr<StorageService> server_ss,
-                                                         const std::shared_ptr<DataFile>& file) {
+                                                         const std::shared_ptr<DataFile> &file) {
         if (ss == nullptr) {
             throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr storage service");
         }
@@ -150,9 +150,9 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService>& ss,
+    std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss,
                                                          std::string absolute_path,
-                                                         const std::shared_ptr<DataFile>& file) {
+                                                         const std::shared_ptr<DataFile> &file) {
         if (ss == nullptr) {
             throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr storage service");
         }

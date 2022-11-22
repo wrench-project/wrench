@@ -127,13 +127,13 @@ private:
                 wrench::Simulation::sleep(1.0);
                 auto file = files.at(dist_files(rng));
                 this->test->file_registry_service->addEntry(
-                                                            wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)), file));
+                        wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)), file));
 
                 // Do a random delete
                 wrench::Simulation::sleep(1.0);
                 file = files.at(dist_files(rng));
                 this->test->file_registry_service->removeEntry(
-                                                               wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)), file));
+                        wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)), file));
 
                 // Do a random lookup
                 wrench::Simulation::sleep(1.0);

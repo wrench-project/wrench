@@ -33,8 +33,6 @@ namespace wrench {
     class SimpleStorageServiceNonBufferized : public SimpleStorageService {
 
     public:
-
-
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
@@ -76,17 +74,16 @@ namespace wrench {
              * @param transfer_size: transfer size
              */
             Transaction(
-                        std::shared_ptr<FileLocation> src_location,
-                        simgrid::s4u::Host *src_host,
-                        simgrid::s4u::Disk *src_disk,
-                        std::shared_ptr<FileLocation> dst_location,
-                        simgrid::s4u::Host *dst_host,
-                        simgrid::s4u::Disk *dst_disk,
-                        simgrid::s4u::Mailbox *mailbox,
-                        double transfer_size) :
-                    src_location(std::move(src_location)), src_host(src_host), src_disk(src_disk),
-                    dst_location(std::move(dst_location)), dst_host(dst_host), dst_disk(dst_disk),
-                    mailbox(mailbox), transfer_size(transfer_size), stream(nullptr) {
+                    std::shared_ptr<FileLocation> src_location,
+                    simgrid::s4u::Host *src_host,
+                    simgrid::s4u::Disk *src_disk,
+                    std::shared_ptr<FileLocation> dst_location,
+                    simgrid::s4u::Host *dst_host,
+                    simgrid::s4u::Disk *dst_disk,
+                    simgrid::s4u::Mailbox *mailbox,
+                    double transfer_size) : src_location(std::move(src_location)), src_host(src_host), src_disk(src_disk),
+                                            dst_location(std::move(dst_location)), dst_host(dst_host), dst_disk(dst_disk),
+                                            mailbox(mailbox), transfer_size(transfer_size), stream(nullptr) {
             }
         };
         /***********************/
@@ -131,9 +128,9 @@ namespace wrench {
                                simgrid::s4u::Host *requesting_host);
 
         bool processFileCopyRequest(
-                                    const std::shared_ptr<FileLocation> &src,
-                                    const std::shared_ptr<FileLocation> &dst,
-                                    simgrid::s4u::Mailbox *answer_mailbox);
+                const std::shared_ptr<FileLocation> &src,
+                const std::shared_ptr<FileLocation> &dst,
+                simgrid::s4u::Mailbox *answer_mailbox);
 
 
         void startPendingTransactions();

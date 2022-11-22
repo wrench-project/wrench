@@ -572,8 +572,8 @@ namespace wrench {
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFileDeleteRequest(
-                                                        const std::shared_ptr<FileLocation> &location,
-                                                        simgrid::s4u::Mailbox *answer_mailbox) {
+            const std::shared_ptr<FileLocation> &location,
+            simgrid::s4u::Mailbox *answer_mailbox) {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
         auto fs = this->file_systems[location->getMountPoint()].get();
@@ -610,8 +610,8 @@ namespace wrench {
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFileLookupRequest(
-                                                        const std::shared_ptr<FileLocation> &location,
-                                                        simgrid::s4u::Mailbox *answer_mailbox) {
+            const std::shared_ptr<FileLocation> &location,
+            simgrid::s4u::Mailbox *answer_mailbox) {
         auto fs = this->file_systems[location->getMountPoint()].get();
         auto file = location->getFile();
         bool file_found = fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint());

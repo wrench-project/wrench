@@ -126,7 +126,7 @@ private:
                                                    10.0, 1.0,
                                                    1.0, 0, {}));
         auto batch_job = std::make_shared<wrench::BatchJob>(compound_job, 1, 10, 1,
-                                                                                1, "me", 10.0, 0.0);
+                                                            1, "me", 10.0, 0.0);
 
 
         auto msg = new wrench::SimulationMessage(666);
@@ -146,7 +146,7 @@ private:
         CUSTOM_THROW(new wrench::FileRegistryFileLookupRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), nullptr, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::FileRegistryFileLookupAnswerMessage({location}, 666));
-//        CUSTOM_THROW(new wrench::FileRegistryFileLookupAnswerMessage({}, 666), std::invalid_argument);
+        //        CUSTOM_THROW(new wrench::FileRegistryFileLookupAnswerMessage({}, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::FileRegistryRemoveEntryRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), location, 666));
         CUSTOM_THROW(new wrench::FileRegistryRemoveEntryRequestMessage(nullptr, location, 666), std::invalid_argument);

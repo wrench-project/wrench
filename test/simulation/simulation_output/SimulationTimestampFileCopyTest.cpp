@@ -98,30 +98,30 @@ protected:
 
         // regular copy with successful completion
         dmm->doSynchronousFileCopy(
-                                   wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->file_1),
-                                   wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->file_1));
+                wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->file_1),
+                wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->file_1));
 
         dmm->initiateAsynchronousFileCopy(
-                                          wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->xl_file),
-                                          wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->xl_file));
+                wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->xl_file),
+                wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->xl_file));
 
         dmm->doSynchronousFileCopy(
-                                   wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->file_2),
-                                   wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->file_2));
+                wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->file_2),
+                wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->file_2));
 
         dmm->doSynchronousFileCopy(
-                                   wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->file_3),
-                                   wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->file_3));
+                wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->file_3),
+                wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->file_3));
 
         dmm->doSynchronousFileCopy(
-                                   wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->file_3),
-                                   wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->file_3));
+                wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->file_3),
+                wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->file_3));
 
         // this should fail and a SimulationTimestampFileCopyFailure should be created
         try {
             dmm->doSynchronousFileCopy(
-                                       wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->too_large_file),
-                                       wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->too_large_file));
+                    wrench::FileLocation::LOCATION(this->test->source_storage_service, this->test->too_large_file),
+                    wrench::FileLocation::LOCATION(this->test->destination_storage_service, this->test->too_large_file));
 
             throw std::runtime_error("file copy should have failed");
         } catch (wrench::ExecutionException &e) {

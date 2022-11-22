@@ -40,13 +40,13 @@ namespace wrench {
 
         void kill();
 
-        void initiateAsynchronousFileCopy(const std::shared_ptr<FileLocation>& src,
-                                          const std::shared_ptr<FileLocation>& dst,
-                                          const std::shared_ptr<FileRegistryService>& file_registry_service = nullptr);
+        void initiateAsynchronousFileCopy(const std::shared_ptr<FileLocation> &src,
+                                          const std::shared_ptr<FileLocation> &dst,
+                                          const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
 
-        void doSynchronousFileCopy(const std::shared_ptr<FileLocation>& src,
-                                   const std::shared_ptr<FileLocation>& dst,
-                                   const std::shared_ptr<FileRegistryService>& file_registry_service = nullptr);
+        void doSynchronousFileCopy(const std::shared_ptr<FileLocation> &src,
+                                   const std::shared_ptr<FileLocation> &dst,
+                                   const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
 
 
     protected:

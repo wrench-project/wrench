@@ -111,8 +111,8 @@ namespace wrench {
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
 
-        void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService>& ss);
-        void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService>& ss, std::string directory_absolute_path);
+        void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &ss);
+        void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &ss, std::string directory_absolute_path);
 
         static void createFile(const std::shared_ptr<FileLocation> &location);
         static void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &server);

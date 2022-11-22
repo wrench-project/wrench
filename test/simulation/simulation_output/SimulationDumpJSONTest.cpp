@@ -1035,8 +1035,8 @@ private:
         //copying file to force link usage.
         auto file = *(this->test->workflow->getFileMap().begin());
         data_manager->doSynchronousFileCopy(
-                                            wrench::FileLocation::LOCATION(this->test->client_storage_service, file.second),
-                                            wrench::FileLocation::LOCATION(this->test->server_storage_service, file.second));
+                wrench::FileLocation::LOCATION(this->test->client_storage_service, file.second),
+                wrench::FileLocation::LOCATION(this->test->server_storage_service, file.second));
         return 0;
     }
 };

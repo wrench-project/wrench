@@ -132,8 +132,8 @@ private:
         for (auto it: this->workflow->getInputFileMap()) {
             std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> each_copy =
                     std::make_tuple(
-                                    wrench::FileLocation::LOCATION(this->test->storage_service, it.second),
-                                    wrench::FileLocation::SCRATCH(it.second));
+                            wrench::FileLocation::LOCATION(this->test->storage_service, it.second),
+                            wrench::FileLocation::SCRATCH(it.second));
             pre_copies.push_back(each_copy);
         }
 

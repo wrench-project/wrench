@@ -226,7 +226,7 @@ private:
         }
         try {
             std::vector<std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_file_copies;
-            pre_file_copies.push_back(std::make_tuple( nullptr, wrench::FileLocation::SCRATCH(f)));
+            pre_file_copies.push_back(std::make_tuple(nullptr, wrench::FileLocation::SCRATCH(f)));
             job_manager->createStandardJob({}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
             throw std::runtime_error("Should not be able to create a standard job with a (*, nullptr, *) pre file copy");
         } catch (std::invalid_argument &e) {
@@ -250,7 +250,7 @@ private:
         }
         try {
             std::vector<std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> post_file_copies;
-            post_file_copies.push_back(std::make_tuple( nullptr, wrench::FileLocation::SCRATCH(f)));
+            post_file_copies.push_back(std::make_tuple(nullptr, wrench::FileLocation::SCRATCH(f)));
             job_manager->createStandardJob({}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
             throw std::runtime_error("Should not be able to create a standard job with a (*, nullptr, *) post file copy");
         } catch (std::invalid_argument &e) {

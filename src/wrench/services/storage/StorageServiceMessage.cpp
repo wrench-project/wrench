@@ -247,7 +247,7 @@ namespace wrench {
                                                                                  double payload)
         : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || (requesting_host == nullptr)  || (location == nullptr)) {
+        if ((answer_mailbox == nullptr) || (requesting_host == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(): Invalid arguments");
         }

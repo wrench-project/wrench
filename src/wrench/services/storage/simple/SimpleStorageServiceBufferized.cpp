@@ -238,15 +238,15 @@ namespace wrench {
             // Create a FileTransferThread
             auto ftt = std::make_shared<FileTransferThread>(
                     this->hostname,
-                                           this->getSharedPtr<StorageService>(),
-                                           file,
-                                           file->getSize(),
-                                           file_reception_mailbox,
-                                           location,
-                                           nullptr,
-                                           answer_mailbox,
-                                           nullptr,
-                                           buffer_size);
+                    this->getSharedPtr<StorageService>(),
+                    file,
+                    file->getSize(),
+                    file_reception_mailbox,
+                    location,
+                    nullptr,
+                    answer_mailbox,
+                    nullptr,
+                    buffer_size);
             ftt->setSimulation(this->simulation);
 
             // Add it to the Pool of pending data communications
@@ -277,10 +277,10 @@ namespace wrench {
      * @return
      */
     bool SimpleStorageServiceBufferized::processFileReadRequest(
-                                                                const std::shared_ptr<FileLocation> &location,
-                                                                double num_bytes_to_read,
-                                                                simgrid::s4u::Mailbox *answer_mailbox,
-                                                                simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content) {
+            const std::shared_ptr<FileLocation> &location,
+            double num_bytes_to_read,
+            simgrid::s4u::Mailbox *answer_mailbox,
+            simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content) {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
         auto file = location->getFile();
@@ -321,15 +321,15 @@ namespace wrench {
             // Create a FileTransferThread
             auto ftt = std::make_shared<FileTransferThread>(
                     this->hostname,
-                                           this->getSharedPtr<StorageService>(),
-                                           file,
-                                           num_bytes_to_read,
-                                           location,
-                                           mailbox_to_receive_the_file_content,
-                                           answer_mailbox,
-                                           nullptr,
-                                           nullptr,
-                                           buffer_size);
+                    this->getSharedPtr<StorageService>(),
+                    file,
+                    num_bytes_to_read,
+                    location,
+                    mailbox_to_receive_the_file_content,
+                    answer_mailbox,
+                    nullptr,
+                    nullptr,
+                    buffer_size);
             ftt->setSimulation(this->simulation);
 
             // Add it to the Pool of pending data communications
@@ -347,14 +347,14 @@ namespace wrench {
      * @return
      */
     bool SimpleStorageServiceBufferized::processFileCopyRequest(
-                                                                const std::shared_ptr<FileLocation> &src_location,
-                                                                const std::shared_ptr<FileLocation> &dst_location,
-                                                                simgrid::s4u::Mailbox *answer_mailbox) {
+            const std::shared_ptr<FileLocation> &src_location,
+            const std::shared_ptr<FileLocation> &dst_location,
+            simgrid::s4u::Mailbox *answer_mailbox) {
         auto fs = this->file_systems[dst_location->getMountPoint()].get();
         auto file = src_location->getFile();
 
         if (src_location->getStorageService() == getSharedPtr<wrench::StorageService>() and
-                not fs->isFileInDirectory(src_location->getFile(), src_location->getAbsolutePathAtMountPoint())) {
+            not fs->isFileInDirectory(src_location->getFile(), src_location->getAbsolutePathAtMountPoint())) {
             try {
                 S4U_Mailbox::putMessage(
                         answer_mailbox,

@@ -737,7 +737,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService>& storage_service) {
+    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &storage_service) {
         Simulation::stageFile(FileLocation::LOCATION(storage_service, file));
     }
 
@@ -751,7 +751,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService>& storage_service,
+    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &storage_service,
                                std::string directory_absolute_path) {
         Simulation::stageFile(FileLocation::LOCATION(storage_service, directory_absolute_path, file));
     }
