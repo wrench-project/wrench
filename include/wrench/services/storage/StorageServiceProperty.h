@@ -23,9 +23,9 @@ namespace wrench {
 
     public:
         /** @brief Buffer size used when copying/communicating data:
-         *  - any integral value in between: an actual buffer size (the smaller the buffer size, the slower the simulation)
-         *  - "infinity": read/write and forward model
          *  - "0": an ideal fluid model (very fast simulation)
+         *  - "infinity": read/write and forward model (very fast, but likely less realistic simulation)
+         *  - any integral value in between: an actual buffer size (the smaller the buffer size, the slower the simulation)
          *
          *  - Default value: "0" (fluid)
          *  - Example values: "0", "infinity", "42", "10000000", "42B", "56MB", "100KiB", etc.
