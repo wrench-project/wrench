@@ -7,8 +7,7 @@ WRENCH Release Notes
 - API change by which a `FileLocation` now includes a `DataFile`.
 - Minor bug fixes and scalability improvements.
 
-**note**: master requires [simgrid](https://simgrid.org) master
-
+**note**: master requires [simgrid](https://simgrid.org) master, commit tag 17ac6c61bd407825851b824adbfa28d64fb69587. 
 
 ### wrench 2.1
 
