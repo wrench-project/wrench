@@ -484,7 +484,13 @@ namespace wrench {
         // Send a message to the source
         auto request_answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         //        auto mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailbox("works_by_itself");
-        auto mailbox_that_should_receive_file_content = S4U_Mailbox::getTemporaryMailbox();
+
+        simgrid::s4u::Mailbox *mailbox_that_should_receive_file_content;
+        if (src_loc->getStorageService()->buffer_size > DBL_EPSILON) {
+            mailbox_that_should_receive_file_content = S4U_Mailbox::getTemporaryMailbox();
+        } else {
+            mailbox_that_should_receive_file_content = nullptr;
+        }
 
         try {
             S4U_Mailbox::putMessage(
@@ -516,7 +522,7 @@ namespace wrench {
             // If it's not a success, throw an exception
             if (not msg->success) {
                 S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
-                throw msg->failure_cause;
+                throw ExecutionException(msg->failure_cause);
             }
         } else {
             S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
