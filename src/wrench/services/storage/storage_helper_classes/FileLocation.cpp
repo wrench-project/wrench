@@ -45,7 +45,7 @@ namespace wrench {
                                                                    const std::string &apamp,
                                                                    const std::shared_ptr<DataFile> &file,
                                                                    bool is_scratch) {
-        // TODO: Find a more efficiency key
+        // TODO: Find a more efficiency key?
         std::string key = (ss ? ss->getName() : "") + "|" + mp + "|" + apamp + "|" + file->getID() + "|" + (is_scratch ? "1" : "0");
         if (FileLocation::file_location_map.find(key) != FileLocation::file_location_map.end()) {
             return FileLocation::file_location_map[key];
