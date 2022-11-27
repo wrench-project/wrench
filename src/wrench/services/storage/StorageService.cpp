@@ -452,7 +452,7 @@ namespace wrench {
                                             storage_service->getMessagePayloadValue(
                                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &e) {
-            S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
+            if (chunk_receiving_mailbox) S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             throw;
         }
 
@@ -471,7 +471,7 @@ namespace wrench {
             // If it's not a success, throw an exception
             if (not msg->success) {
                 std::shared_ptr<FailureCause> cause = msg->failure_cause;
-                S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
+                if (chunk_receiving_mailbox) S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                 throw ExecutionException(cause);
             }
 
@@ -516,7 +516,6 @@ namespace wrench {
                     throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                              message->getName() + "] message!");
                 }
-                S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             }
         }
     }
