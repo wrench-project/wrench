@@ -393,8 +393,7 @@ namespace wrench {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
         }//This check DOES need to exist, becasue we call file->getSize()
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-        auto chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
-        readFile(location, answer_mailbox, chunk_receiving_mailbox, location->getFile()->getSize());
+        readFile(location, answer_mailbox, location->getFile()->getSize());
     }
 
     /**
@@ -410,20 +409,17 @@ namespace wrench {
     void StorageService::readFile(const std::shared_ptr<FileLocation> &location, double num_bytes_to_read) {
         // Get mailbox to send message too
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-        auto chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
-        readFile(location, answer_mailbox, chunk_receiving_mailbox, num_bytes_to_read);
+        readFile(location, answer_mailbox, num_bytes_to_read);
     }
 
     /**
      * @brief Synchronously read a file from the storage service
      * @param location: the file location
      * @param answer_mailbox: the answer mailbox
-     * @param chunk_receiving_mailbox: the chunk receiving mailbox (WILL BE RETIRED BY THIS FUNCTION)
      * @param num_bytes_to_read: number of bytes to read
      */
     void StorageService::readFile(const std::shared_ptr<FileLocation> &location,
                                   simgrid::s4u::Mailbox *answer_mailbox,
-                                  simgrid::s4u::Mailbox *chunk_receiving_mailbox,
                                   double num_bytes_to_read) {
 
         if ((location == nullptr) or (answer_mailbox == nullptr) or (num_bytes_to_read < 0.0)) {
@@ -435,6 +431,7 @@ namespace wrench {
 
         assertServiceIsUp(storage_service);
 
+        simgrid::s4u::Mailbox *chunk_receiving_mailbox;
         if (storage_service->buffer_size == 0) {
             chunk_receiving_mailbox = nullptr;
         } else {
