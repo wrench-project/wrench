@@ -9,14 +9,15 @@
 
 #include <wrench/services/ServiceMessagePayload.h>
 #include <iostream>
+#include <unordered_map>
 
 namespace wrench {
     /**
      * @brief message payload count
      */
     WRENCH_MESSAGEPAYLOAD_TYPE WRENCH_MESSAGEPAYLOAD_COUNT = 0;
-    std::map<std::string, WRENCH_MESSAGEPAYLOAD_TYPE> ServiceMessagePayload::stringToPayloadMap = {};
-    std::map<WRENCH_MESSAGEPAYLOAD_TYPE, std::string> ServiceMessagePayload::payloadToString = {};
+    std::unordered_map<std::string, WRENCH_MESSAGEPAYLOAD_TYPE> ServiceMessagePayload::stringToPayloadMap = {};
+    std::unordered_map<WRENCH_MESSAGEPAYLOAD_TYPE, std::string> ServiceMessagePayload::payloadToString = {};
 
     SET_MESSAGEPAYLOAD_NAME(ServiceMessagePayload, STOP_DAEMON_MESSAGE_PAYLOAD);
     SET_MESSAGEPAYLOAD_NAME(ServiceMessagePayload, DAEMON_STOPPED_MESSAGE_PAYLOAD);
