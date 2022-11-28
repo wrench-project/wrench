@@ -66,6 +66,7 @@ namespace wrench {
 
         static std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
         static void removeFile(const std::shared_ptr<DataFile> &file);
+        static void removeAllFiles();
         static std::shared_ptr<DataFile> getFileByID(const std::string &id);
         static std::shared_ptr<DataFile> addFile(const std::string &, double);
 
@@ -110,10 +111,10 @@ namespace wrench {
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
 
-        void stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> ss);
-        void stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
+        void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &ss);
+        void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &ss, std::string directory_absolute_path);
 
-        static void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
+        static void createFile(const std::shared_ptr<FileLocation> &location);
         static void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &server);
 
         /***********************/
@@ -178,7 +179,9 @@ namespace wrench {
         static double getLinkBandwidth(const std::string &link_name);
         static bool isPageCachingEnabled();
         static bool isHostShutdownSimulationEnabled();
+        static bool isLinkShutdownSimulationEnabled();
         static bool isEnergySimulationEnabled();
+        static bool isSurfPrecisionSetByUser();
 
 
         /***********************/
@@ -210,7 +213,7 @@ namespace wrench {
 
         static int unique_disk_sequence_number;
 
-        void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
+        void stageFile(const std::shared_ptr<FileLocation> &location);
 
         void platformSanityCheck();
         void checkSimulationSetup();
@@ -237,11 +240,13 @@ namespace wrench {
 
         static bool energy_enabled;
         static bool host_shutdown_enabled;
+        static bool link_shutdown_enabled;
         static bool pagecache_enabled;
 
         static bool initialized;
 
-    private:
+        static bool surf_precision_set_by_user;
+
         /* Map of files */
         static std::map<std::string, std::shared_ptr<DataFile>> data_files;
     };

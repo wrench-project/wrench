@@ -30,7 +30,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "2")
-set(WRENCH_VERSION_MINOR "1")
+set(WRENCH_VERSION_MINOR "2")
 set(WRENCH_VERSION_PATCH "0")
 set(WRENCH_VERSION_EXTRA "dev")
 
@@ -114,6 +114,8 @@ set(HEADER_FILES
         include/wrench/services/storage/StorageServiceMessagePayload.h
         include/wrench/services/storage/StorageServiceProperty.h
         include/wrench/services/storage/simple/SimpleStorageService.h
+        include/wrench/services/storage/simple/SimpleStorageServiceBufferized.h
+        include/wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h
         include/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.h
         include/wrench/services/storage/simple/SimpleStorageServiceProperty.h
         include/wrench/services/storage/storage_helpers/FileLocation.h
@@ -291,6 +293,8 @@ set(SOURCE_FILES
         src/wrench/services/storage/StorageServiceMessagePayload.cpp
         src/wrench/services/storage/StorageServiceProperty.cpp
         src/wrench/services/storage/simple/SimpleStorageService.cpp
+        src/wrench/services/storage/simple/SimpleStorageServiceBufferized.cpp
+        src/wrench/services/storage/simple/SimpleStorageServiceNonBufferized.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/services/storage/storage_helper_classes/FileLocation.cpp
@@ -390,6 +394,7 @@ set(TEST_FILES
         test/services/storage_services/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
         test/services/storage_services/SimpleStorageService/ZeroSizeFileTest.cpp
         test/services/storage_services/SimpleStorageService/ChunkingTest.cpp
+        test/services/storage_services/SimpleStorageService/CopyBufferizedNonBufferizedTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceTestStandardJobs.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceTestPilotJobs.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceSchedulingTest.cpp

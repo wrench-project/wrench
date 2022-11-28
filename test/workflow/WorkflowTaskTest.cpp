@@ -29,7 +29,7 @@ public:
     std::shared_ptr<wrench::WorkflowTask> t1, t2, t4, t5, t6;
     std::shared_ptr<wrench::DataFile> large_input_file, small_input_file, t4_output_file;
 
-    void do_WorkflowTaskExecutionHistory_test();
+    void do_WorkflowTaskExecutionHistory_test(double buffer_size);
 
 protected:
     ~WorkflowTaskTest() {
@@ -289,18 +289,18 @@ private:
 
         auto job_that_will_fail = job_manager->createStandardJob(this->test->t4,
                                                                  {{this->test->small_input_file,
-                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->small_input_file)},
                                                                   {this->test->large_input_file,
-                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->large_input_file)},
                                                                   {this->test->t4_output_file,
-                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->t4_output_file)}});
 
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
         // while large_input_file is being read, we delete small_input_file so that the one task job will fail
-        wrench::StorageService::deleteFile(this->test->workflow->getFileByID("zz_small_input_file"),
-                                           wrench::FileLocation::LOCATION(this->test->storage_service),
-                                           this->test->file_registry_service);
+        wrench::StorageService::deleteFile(
+                wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("zz_small_input_file")),
+                this->test->file_registry_service);
 
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
@@ -314,14 +314,16 @@ private:
         }
         auto t4_history = this->test->t4->getExecutionHistory();
 
+
         auto job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                      {{this->test->small_input_file,
-                                                                       wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
+                                                                       wrench::FileLocation::LOCATION(this->test->backup_storage_service, this->test->small_input_file)},
                                                                       {this->test->large_input_file,
-                                                                       wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                       wrench::FileLocation::LOCATION(this->test->storage_service, this->test->large_input_file)},
                                                                       {this->test->t4_output_file,
-                                                                       wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                                       wrench::FileLocation::LOCATION(this->test->storage_service, this->test->t4_output_file)}});
         job_manager->submitJob(job_that_will_complete, this->test->compute_service);
+
         this->waitForAndProcessNextEvent();
 
         auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5);
@@ -344,15 +346,16 @@ private:
 };
 
 TEST_F(WorkflowTaskTest, WorkflowTaskExecutionHistoryTest) {
-    DO_TEST_WITH_FORK(do_WorkflowTaskExecutionHistory_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_WorkflowTaskExecutionHistory_test, 1000000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_WorkflowTaskExecutionHistory_test, 0);
 }
 
-void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
+void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test(double buffer_size) {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-logs");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -371,10 +374,14 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
                             "",
                             {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"})));
+    ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+                            wms_host, {"/"},
+                            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     ASSERT_NO_THROW(
-            backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/backup"})));
+            backup_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+                    wms_host, {"/backup"},
+                    {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new WorkflowTaskExecutionHistoryTestWMS(
@@ -387,7 +394,6 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_NO_THROW(simulation->stageFile(small_input_file, backup_storage_service));
 
     ASSERT_NO_THROW(simulation->launch());
-
 
     auto t4_history = t4->getExecutionHistory();
 
@@ -458,7 +464,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_DOUBLE_EQ(t5_terminated_execution.num_cores_allocated, 2);
     ASSERT_STREQ(t5_terminated_execution.execution_host.c_str(), "ExecutionHost");
 
-    // t6 should have ran then failed right after computation started because the compute service was stopped
+    // t6 should have run then failed right after computation started because the compute service was stopped
     auto t6_history = t6->getExecutionHistory();
     ASSERT_EQ(t6_history.size(), 1);
 

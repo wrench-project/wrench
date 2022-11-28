@@ -143,8 +143,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                                                                     {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)},
+                                                                     {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file)}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         job_manager->submitJob(job, vm_cs);
@@ -209,7 +209,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
                                             {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
+    storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(stable_host, {"/"},
+                                                                                               {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -272,8 +273,8 @@ private:
 
         // Create a standard job
         auto job = job_manager->createStandardJob(this->test->task,
-                                                  {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                                                   {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                  {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)},
+                                                   {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file)}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         job_manager->submitJob(job, vm_cs);
@@ -305,8 +306,8 @@ private:
         wrench::Simulation::sleep(2000);
 
         job = job_manager->createStandardJob(this->test->task,
-                                             {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                                              {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                             {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)},
+                                              {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file)}});
 
         auto vm_cs2 = cloud_service->startVM(vm_name);
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
@@ -354,7 +355,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
                                             {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
+    storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(stable_host, {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -439,8 +440,8 @@ private:
 
                 // Create a standard job
                 auto job = job_manager->createStandardJob(task, {{this->test->input_file,
-                                                                  wrench::FileLocation::LOCATION(this->test->storage_service)},
-                                                                 {output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                                  wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)},
+                                                                 {output_file, wrench::FileLocation::LOCATION(this->test->storage_service, output_file)}});
 
                 // Start the VM (sleep 10 and retry if unsuccessful)
                 std::shared_ptr<wrench::BareMetalComputeService> vm_cs;
@@ -512,7 +513,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
                                             {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
+    storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(stable_host, {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

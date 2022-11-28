@@ -282,7 +282,7 @@ void BareMetalComputeServiceMultiActionTest::do_DAGOfSleeps_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -394,7 +394,7 @@ void BareMetalComputeServiceMultiActionTest::do_NonDAG_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -528,7 +528,7 @@ void BareMetalComputeServiceMultiActionTest::do_RAMConstraintsAndPriorities_test
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -585,7 +585,7 @@ private:
         auto job = job_manager->createCompoundJob("my_job");
 
         auto sleep1 = job->addSleepAction("sleep1", 10.0);
-        auto file_read = job->addFileReadAction("file_read", this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service1));
+        auto file_read = job->addFileReadAction("file_read", wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->input_file));
         auto sleep_after_file_read = job->addSleepAction("sleep_after_file_read", 10.0);
         auto compute = job->addComputeAction("compute", 10000.0, 100.0, 1, 1, wrench::ParallelModel::AMDAHL(1.0));
         auto sleep_after_compute = job->addSleepAction("sleep_after_compute", 10.0);
@@ -675,7 +675,7 @@ void BareMetalComputeServiceMultiActionTest::do_PartialFailure_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -815,7 +815,7 @@ void BareMetalComputeServiceMultiActionTest::do_PartialTermination_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
