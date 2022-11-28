@@ -143,9 +143,10 @@ void NetworkProximityLinkFailuresTest::do_NetworkProximityLinkFailures_Test() {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-link-shutdown-simulation");
 
     simulation->init(&argc, argv);
 
@@ -156,7 +157,6 @@ void NetworkProximityLinkFailuresTest::do_NetworkProximityLinkFailures_Test() {
     std::string stable_hostname = "StableHost";
 
     std::vector<std::string> hosts_in_network = {"Host1", "Host2", "Host3"};
-
 
     ASSERT_NO_THROW(network_proximity_service = simulation->add(new wrench::NetworkProximityService(stable_hostname, hosts_in_network,
                                                                                                     {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "100"},

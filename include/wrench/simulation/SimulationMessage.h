@@ -28,7 +28,7 @@ namespace wrench {
     class SimulationMessage {
 
     public:
-        SimulationMessage(double payload);
+        explicit SimulationMessage(double payload);
         virtual ~SimulationMessage();
 
         virtual std::string getName();

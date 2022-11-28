@@ -16,6 +16,8 @@
 #include <set>
 #include <memory>
 
+#include <simgrid/disk.h>
+
 
 #include <wrench/data_file/DataFile.h>
 
@@ -46,18 +48,21 @@ namespace wrench {
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
         double getFreeSpace();
-        void reserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path);
+        void reserveSpace(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
         void unreserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path);
 
         void createDirectory(const std::string &absolute_path);
         bool doesDirectoryExist(const std::string &absolute_path);
         bool isDirectoryEmpty(const std::string &absolute_path);
         void removeEmptyDirectory(const std::string &absolute_path);
-        void storeFileInDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path);
-        void removeFileFromDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path);
+        void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
+        void removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
         void removeAllFilesInDirectory(const std::string &absolute_path);
-        bool isFileInDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path);
+        bool isFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
+        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
         std::set<std::shared_ptr<DataFile>> listFilesInDirectory(const std::string &absolute_path);
+
+        simgrid::s4u::Disk *getDisk();
 
 
     private:
@@ -66,7 +71,9 @@ namespace wrench {
 
         static std::map<std::string, StorageService *> mount_points;
 
-        std::map<std::string, std::set<std::shared_ptr<DataFile>>> content;
+        std::map<std::string, std::map<std::shared_ptr<DataFile>, double>> content;
+
+        simgrid::s4u::Disk *disk;
 
         std::string hostname;
         StorageService *storage_service;
@@ -78,31 +85,31 @@ namespace wrench {
 
         bool initialized;
 
-        void assertInitHasBeenCalled() {
+        void assertInitHasBeenCalled() const {
             if (not this->initialized) {
                 throw std::runtime_error("LogicalFileSystem::assertInitHasBeenCalled(): A logical file system needs to be initialized before it's been called");
             }
         }
-        void assertDirectoryExist(std::string absolute_path) {
+        void assertDirectoryExist(const std::string &absolute_path) {
             if (not this->doesDirectoryExist(absolute_path)) {
                 throw std::invalid_argument("LogicalFileSystem::assertDirectoryExists(): directory " + absolute_path + " does not exist");
             }
         }
 
-        void assertDirectoryDoesNotExist(std::string absolute_path) {
+        void assertDirectoryDoesNotExist(const std::string &absolute_path) {
             if (this->doesDirectoryExist(absolute_path)) {
                 throw std::invalid_argument("LogicalFileSystem::assertDirectoryExists(): directory " + absolute_path + " already exists");
             }
         }
 
-        void assertDirectoryIsEmpty(std::string absolute_path) {
+        void assertDirectoryIsEmpty(const std::string &absolute_path) {
             assertDirectoryExist(absolute_path);
             if (not this->isDirectoryEmpty(absolute_path)) {
                 throw std::invalid_argument("LogicalFileSystem::assertDirectoryIsEmpty(): directory " + absolute_path + "is not empty");
             }
         }
 
-        void assertFileIsInDirectory(std::shared_ptr<DataFile> file, std::string absolute_path) {
+        void assertFileIsInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
             assertDirectoryExist(absolute_path);
             if (this->content[absolute_path].find(file) == this->content[absolute_path].end()) {
                 throw std::invalid_argument("LogicalFileSystem::assertFileIsInDirectory(): File " + file->getID() +

@@ -90,7 +90,7 @@ namespace wrench {
         alarm_ptr->simulation = simulation;
         try {
             alarm_ptr->start(alarm_ptr, true, false);// Daemonized, no auto-restart
-        } catch (std::shared_ptr<HostError> &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
         return alarm_ptr;
