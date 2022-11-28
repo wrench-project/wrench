@@ -17,10 +17,10 @@ public:
 
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
-    void do_DeleteRegisterTest();
+    void do_DeleteRegisterTest(double buffer_size);
 
 protected:
-    ~SimpleStorageServiceDeleteRegisterTest() {
+    ~SimpleStorageServiceDeleteRegisterTest() override {
         workflow->clear();
     }
 
@@ -83,12 +83,12 @@ private:
         std::shared_ptr<wrench::DataFile> file_1 = this->test->file_1;
         std::shared_ptr<wrench::DataFile> file_2 = this->test->file_2;
 
-        file_registry_service->addEntry(file_1, wrench::FileLocation::LOCATION(storage_service));
-        file_registry_service->addEntry(file_2, wrench::FileLocation::LOCATION(storage_service));
+        file_registry_service->addEntry(wrench::FileLocation::LOCATION(storage_service, file_1));
+        file_registry_service->addEntry(wrench::FileLocation::LOCATION(storage_service, file_2));
 
         // delete file and don't unregister
-        wrench::StorageService::deleteFile(file_1, wrench::FileLocation::LOCATION(storage_service));
-        if (wrench::StorageService::lookupFile(file_1, wrench::FileLocation::LOCATION(storage_service))) {
+        wrench::StorageService::deleteFile(wrench::FileLocation::LOCATION(storage_service, file_1));
+        if (wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(storage_service, file_1))) {
             throw std::runtime_error("StorageService should have deleted file_1");
         }
 
@@ -97,12 +97,12 @@ private:
         }
 
         // delete file and unregister
-        wrench::StorageService::deleteFile(file_2, wrench::FileLocation::LOCATION(storage_service), file_registry_service);
-        if (wrench::StorageService::lookupFile(file_2, wrench::FileLocation::LOCATION(storage_service))) {
+        wrench::StorageService::deleteFile(wrench::FileLocation::LOCATION(storage_service, file_2), file_registry_service);
+        if (wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(storage_service, file_2))) {
             throw std::runtime_error("StorageService should have deleted file_2");
         }
 
-        if (file_registry_service->lookupEntry(file_2).size() != 0) {
+        if (!file_registry_service->lookupEntry(file_2).empty()) {
             throw std::runtime_error("The file_2 should not be registered with the FileRegistryService");
         }
 
@@ -112,17 +112,18 @@ private:
 };
 
 TEST_F(SimpleStorageServiceDeleteRegisterTest, DeleteAndRegister) {
-    DO_TEST_WITH_FORK(do_DeleteRegisterTest);
+    DO_TEST_WITH_FORK_ONE_ARG(do_DeleteRegisterTest, 100000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_DeleteRegisterTest, 0);
 }
 
-void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
+void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest(double buffer_size) {
     // Create and initialize the simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    // ??
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -139,7 +140,8 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
 
     // Create One Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService("StorageHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost", {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;

@@ -21,31 +21,97 @@
 
 WRENCH_LOG_CATEGORY(wrench_core_file_location, "Log category for FileLocation");
 
+#define RECLAIM_TRIGGER 1000
+
 namespace wrench {
 
-    std::shared_ptr<FileLocation> FileLocation::SCRATCH = std::shared_ptr<FileLocation>(new FileLocation(nullptr, "", ""));
+    std::unordered_map<std::string, std::shared_ptr<FileLocation>> FileLocation::file_location_map;
+    size_t FileLocation::file_location_map_previous_size = 0;
 
     FileLocation::~FileLocation() {
+    }
+
+    /**
+     * @brief Factory to create a new file location
+     * @param ss: a storage service
+     * @param mp: a mount point
+     * @param apamp: an path at the mount point
+     * @param file: a file
+     * @param is_scratch: whether scratch or not
+     * @return a shared pointer to a file location
+     */
+    std::shared_ptr<FileLocation> FileLocation::createFileLocation(const std::shared_ptr<StorageService> &ss,
+                                                                   const std::string &mp,
+                                                                   const std::string &apamp,
+                                                                   const std::shared_ptr<DataFile> &file,
+                                                                   bool is_scratch) {
+        // TODO: Find a more efficiency key?
+        std::string key = (ss ? ss->getName() : "") + "|" + mp + "|" + apamp + "|" + file->getID() + "|" + (is_scratch ? "1" : "0");
+        if (FileLocation::file_location_map.find(key) != FileLocation::file_location_map.end()) {
+            return FileLocation::file_location_map[key];
+        }
+        auto new_location = std::shared_ptr<FileLocation>(new FileLocation(ss, mp, apamp, file, is_scratch));
+
+        if (FileLocation::file_location_map.size() - FileLocation::file_location_map_previous_size > RECLAIM_TRIGGER) {
+            FileLocation::reclaimFileLocations();
+            FileLocation::file_location_map_previous_size = FileLocation::file_location_map.size();
+        }
+        FileLocation::file_location_map[key] = new_location;
+        return new_location;
+    }
+
+
+    /**
+     * @brief Reclaim file locations that are no longer used
+     */
+    void FileLocation::reclaimFileLocations() {
+        for (auto it = FileLocation::file_location_map.cbegin(); it != FileLocation::file_location_map.cend();) {
+            if ((*it).second.use_count() == 1) {
+                it = FileLocation::file_location_map.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+
+    /**
+     * @brief File location specifier for a scratch storage
+     *
+     * @param file: a file
+     * @return a file location specification
+     *
+     * @throw std::invalid_argument
+     */
+    std::shared_ptr<FileLocation> FileLocation::SCRATCH(const std::shared_ptr<DataFile> &file) {
+        if (file == nullptr) {
+            throw std::invalid_argument("FileLocation::SCRATCH(): Cannot pass nullptr file");
+        }
+
+        return FileLocation::createFileLocation(nullptr, "", "", file, true);
     }
 
     /**
      * @brief File location specifier for a storage service's (single) mount point root
      *
      * @param ss: a storage service (that has a single mount point)
+     * @param file: a file
      * @return a file location specification
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<FileLocation> FileLocation::LOCATION(std::shared_ptr<StorageService> ss) {
+    std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss, const std::shared_ptr<DataFile> &file) {
         if (ss == nullptr) {
             throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr storage service");
+        }
+        if (file == nullptr) {
+            throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr file");
         }
 
         if (ss->hasMultipleMountPoints()) {
             throw std::invalid_argument("FileLocation::LOCATION(): Storage Service has multiple mount points. "
                                         "Call the version of this method that takes a mount point argument");
         }
-        return LOCATION(ss, *(ss->getMountPoints().begin()));
+        return LOCATION(ss, *(ss->getMountPoints().begin()), file);
     }
 
     /**
@@ -53,12 +119,14 @@ namespace wrench {
      * Used in case of NFS with page cache.
      * @param ss: storage service on the client (whose the page cache that data is written to)
      * @param server_ss: a server storage service in NFS that stores the file on disk
+     * @param file: a file
      * @return a file location specification
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<FileLocation> FileLocation::LOCATION(std::shared_ptr<StorageService> ss,
-                                                         std::shared_ptr<StorageService> server_ss) {
+    std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss,
+                                                         std::shared_ptr<StorageService> server_ss,
+                                                         const std::shared_ptr<DataFile> &file) {
         if (ss == nullptr) {
             throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr storage service");
         }
@@ -67,7 +135,7 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::LOCATION(): Storage Service has multiple mount points. "
                                         "Call the version of this method that takes a mount point argument");
         }
-        std::shared_ptr<FileLocation> location = LOCATION(ss, *(ss->getMountPoints().begin()));
+        std::shared_ptr<FileLocation> location = LOCATION(ss, *(ss->getMountPoints().begin()), file);
         location->server_storage_service = server_ss;
         return location;
     }
@@ -75,16 +143,21 @@ namespace wrench {
     /**
      * @brief File location specifier given an absolute path at a storage service
      *
-     * @param ss: a storage service or ComputeService::SCRATCH
+     * @param ss: a storage service
      * @param absolute_path: an absolute path at the storage service to a directory (that may contain files)
+     * @param file: a file
      * @return a file location specification
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<FileLocation> FileLocation::LOCATION(std::shared_ptr<StorageService> ss,
-                                                         std::string absolute_path) {
+    std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss,
+                                                         std::string absolute_path,
+                                                         const std::shared_ptr<DataFile> &file) {
         if (ss == nullptr) {
-            throw std::invalid_argument("FileLocation::LOCATION(): Invalid storage service argument");
+            throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr storage service");
+        }
+        if (file == nullptr) {
+            throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr file");
         }
         if (absolute_path.empty()) {
             throw std::invalid_argument("FileLocation::LOCATION(): must specify a non-empty path");
@@ -111,7 +184,7 @@ namespace wrench {
         absolute_path.replace(0, mount_point.length(), "/");
         absolute_path = sanitizePath(absolute_path);
 
-        return std::shared_ptr<FileLocation>(new FileLocation(ss, mount_point, absolute_path));
+        return FileLocation::createFileLocation(ss, mount_point, absolute_path, file, false);
     }
 
     /**
@@ -120,11 +193,11 @@ namespace wrench {
      * @return A string
      */
     std::string FileLocation::toString() {
-        if (this == FileLocation::SCRATCH.get()) {
-            return "scratch";
+        if (this->is_scratch) {
+            return "SCRATCH:" + this->file->getID();
         } else {
             return this->storage_service->getName() + ":" +
-                   sanitizePath(this->mount_point + this->absolute_path_at_mount_point);
+                   sanitizePath(this->mount_point + this->absolute_path_at_mount_point) + ":" + this->file->getID();
         }
     }
 
@@ -133,10 +206,18 @@ namespace wrench {
      * @return a storage service
      */
     std::shared_ptr<StorageService> FileLocation::getStorageService() {
-        if (this == FileLocation::SCRATCH.get()) {
-            throw std::invalid_argument("FileLocation::getStorageService(): Method cannot be called on FileLocation::SCRATCH");
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getStorageService(): No storage service for a SCRATCH location");
         }
         return this->storage_service;
+    }
+
+    /**
+     * @brief Get the location's file
+     * @return a file
+     */
+    std::shared_ptr<DataFile> FileLocation::getFile() {
+        return this->file;
     }
 
     /**
@@ -144,6 +225,9 @@ namespace wrench {
      * @return a storage service
      */
     std::shared_ptr<StorageService> FileLocation::getServerStorageService() {
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getServerStorageService(): No server storage service for a SCRATCH location");
+        }
         return this->server_storage_service;
     }
 
@@ -152,39 +236,46 @@ namespace wrench {
      * @return a mount point
      */
     std::string FileLocation::getMountPoint() {
-        if (this == FileLocation::SCRATCH.get()) {
-            throw std::invalid_argument("FileLocation::getMountPoint(): Method cannot be called on FileLocation::SCRATCH");
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getMountPoint(): No mount point for a SCRATCH location");
         }
         return this->mount_point;
     }
 
     /**
      * @brief Get the location's path at mount point
-     * @return
+     * @return a path
      */
     std::string FileLocation::getAbsolutePathAtMountPoint() {
-        if (this == FileLocation::SCRATCH.get()) {
-            throw std::invalid_argument("FileLocation::getAbsolutePathAtMountPoint(): Method cannot be called on FileLocation::SCRATCH");
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getAbsolutePathAtMountPoint(): No path at mount point for a SCRATCH location");
         }
         return this->absolute_path_at_mount_point;
     }
 
     /**
      * @brief Get the location's full absolute path
-     * @return
+     * @return a path
      */
     std::string FileLocation::getFullAbsolutePath() {
-        if (this == FileLocation::SCRATCH.get()) {
-            throw std::invalid_argument("FileLocation::getFullAbsolutePath(): Method cannot be called on FileLocation::SCRATCH");
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getFullAbsolutePath(): No full absolute path for a SCRATCH location");
         }
         return FileLocation::sanitizePath(this->mount_point + "/" + this->absolute_path_at_mount_point);
     }
 
+    /**
+     * @brief Get the location's scratch-ness
+     * @return true if the location is SCRATCH
+     */
+    bool FileLocation::isScratch() const {
+        return this->is_scratch;
+    }
 
     /**
      * @brief Method to sanitize an absolute path (and make it absolute if it's not)
      * @param path: an absolute path
-     * @return
+     * @return a sanitized path
      */
     std::string FileLocation::sanitizePath(std::string path) {
         if (path == "/") return "/";// make the common case fast
@@ -208,7 +299,7 @@ namespace wrench {
         char unallowed_characters[] = {'\\', ' ', '~', '`', '\'', '&', '*', '?'};
         for (auto const &c: unallowed_characters) {
             if (path.find(c) != std::string::npos) {
-                throw std::invalid_argument("FileLocation::sanitizePath(): Unallowed character '" + std::to_string(c) + "' in path (" + path + ")");
+                throw std::invalid_argument("FileLocation::sanitizePath(): Disallowed character '" + std::to_string(c) + "' in path (" + path + ")");
             }
         }
 
@@ -282,4 +373,6 @@ namespace wrench {
 
         return true;
     }
+
+
 }// namespace wrench

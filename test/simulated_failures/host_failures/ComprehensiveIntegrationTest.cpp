@@ -300,8 +300,8 @@ private:
 
         // Create/submit a standard job
         auto job = this->job_manager->createStandardJob(task, {
-                                                                      {*(task->getInputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
-                                                                      {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
+                                                                      {task->getInputFiles().at(0), wrench::FileLocation::LOCATION(target_storage_service, task->getInputFiles().at(0))},
+                                                                      {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(target_storage_service, task->getOutputFiles().at(0))},
                                                               });
         this->job_manager->submitJob(job, target_cs);
 
@@ -421,10 +421,14 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
 
     // Create Storage Services
     if (args.find("storage1") != args.end()) {
-        this->storage_service1 = simulation->add(new wrench::SimpleStorageService("StorageHost1", {"/"}));
+        this->storage_service1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+                "StorageHost1", {"/"},
+                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(1000000)}}, {}));
     }
     if (args.find("storage2") != args.end()) {
-        this->storage_service2 = simulation->add(new wrench::SimpleStorageService("StorageHost2", {"/"}));
+        this->storage_service2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+                "StorageHost2", {"/"},
+                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(1000000)}}, {}));
     }
 
     ASSERT_TRUE((this->storage_service1 != nullptr) or (this->storage_service2 != nullptr));

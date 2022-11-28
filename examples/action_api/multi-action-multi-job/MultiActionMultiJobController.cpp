@@ -64,7 +64,7 @@ namespace wrench {
 
         /* Creates an instance of input_file on both storage services. This takes zero simulation time. After
          * all, that file needs to be there somewhere initially if it's indeed some input file */
-        wrench::Simulation::createFile(input_file, wrench::FileLocation::LOCATION(ss_1, "/data/"));
+        wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss_1, "/data/", input_file));
 
         /* Create a one-action job with one action that simply sleeps for 10 seconds */
         auto job1 = job_manager->createCompoundJob("job1");
@@ -75,7 +75,7 @@ namespace wrench {
         auto job2 = job_manager->createCompoundJob("job2");
         auto job2_compute_action = job2->addComputeAction("compute", 1000 * GFLOP, 5 * MB, 2, 8, wrench::ParallelModel::AMDAHL(0.8));
         // If no action name is given, a unique name will be picked
-        auto job2_file_write_action = job2->addFileWriteAction("", output_file, wrench::FileLocation::LOCATION(ss_1));
+        auto job2_file_write_action = job2->addFileWriteAction("", wrench::FileLocation::LOCATION(ss_1, output_file));
         job2->addActionDependency(job2_compute_action, job2_file_write_action);
 
         /* Create a one-action job with a file-copy action */
@@ -99,13 +99,13 @@ namespace wrench {
                     WRENCH_INFO("Custom action about to read file from storage service on host %s",
                                 target_ss->getHostname().c_str());
                     // Read a input_file from the target storage service (which takes some time)
-                    target_ss->readFile(input_file, wrench::FileLocation::LOCATION(target_ss, "/data/"));
+                    target_ss->readFile(wrench::FileLocation::LOCATION(target_ss, "/data/", input_file));
                     // Sleep for 5 seconds
                     WRENCH_INFO("Custom action got the file and now is sleeping for 5 seconds");
                     Simulation::sleep(5.0);
                     WRENCH_INFO("Custom action deleting the file!");
                     // Deleted the input file from the target storage service!
-                    target_ss->deleteFile(input_file, wrench::FileLocation::LOCATION(target_ss, "/data/"));
+                    target_ss->deleteFile(wrench::FileLocation::LOCATION(target_ss, "/data/", input_file));
                 },
                 [](const std::shared_ptr<ActionExecutor> &action_executor) {
                     WRENCH_INFO("Custom action terminating");
