@@ -200,13 +200,13 @@ namespace wrench {
         std::vector<std::string> execution_hosts;
 
         /** @brief Map of used RAM at the hosts */
-        std::map<std::string, double> used_ram_per_execution_host;
+        std::unordered_map<std::string, double> used_ram_per_execution_host;
 
         /** @brief Map of number of used cores at the hosts */
-        std::map<std::string, unsigned long> used_cores_per_execution_host;
+        std::unordered_map<std::string, unsigned long> used_cores_per_execution_host;
 
         /** @brief A map of VMs */
-        std::map<std::string, std::pair<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<BareMetalComputeService>>> vm_list;
+        std::unordered_map<std::string, std::pair<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<BareMetalComputeService>>> vm_list;
 
         /***********************/
         /** \endcond           */

@@ -31,7 +31,7 @@ namespace wrench {
         std::set<std::shared_ptr<BatchJob>> jobs;
 
         /** @brief Core utilization **/
-        std::map<int, unsigned long> core_utilization;
+        std::unordered_map<int, unsigned long> core_utilization;
 
         /**
          * @brief Overloaded += operator

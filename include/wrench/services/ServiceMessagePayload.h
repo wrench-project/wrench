@@ -13,6 +13,7 @@
 
 #include <string>
 #include <map>
+#include <unordered_map>
 
 namespace wrench {
 
@@ -45,8 +46,8 @@ namespace wrench {
      * @brief Configurable message payloads for a Service
      */
     class ServiceMessagePayload {
-        static std::map<std::string, WRENCH_MESSAGEPAYLOAD_TYPE> stringToPayloadMap;
-        static std::map<WRENCH_MESSAGEPAYLOAD_TYPE, std::string> payloadToString;
+        static std::unordered_map<std::string, WRENCH_MESSAGEPAYLOAD_TYPE> stringToPayloadMap;
+        static std::unordered_map<WRENCH_MESSAGEPAYLOAD_TYPE, std::string> payloadToString;
 
     public:
         static WRENCH_MESSAGEPAYLOAD_TYPE addMessagePayload(std::string classname, std::string messagePayload);

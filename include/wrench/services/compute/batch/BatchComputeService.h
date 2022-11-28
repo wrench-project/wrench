@@ -171,10 +171,10 @@ namespace wrench {
         /* Resources information in batch */
         unsigned long total_num_of_nodes;
         unsigned long num_cores_per_node;
-        std::map<std::string, unsigned long> nodes_to_cores_map;
+        std::unordered_map<std::string, unsigned long> nodes_to_cores_map;
         std::vector<double> timeslots;
         std::map<std::string, unsigned long> available_nodes_to_cores;
-        std::map<unsigned long, std::string> host_id_to_names;
+        std::unordered_map<unsigned long, std::string> host_id_to_names;
         std::vector<std::string> compute_hosts;
         /* End Resources information in batch */
 
