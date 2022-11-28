@@ -191,7 +191,7 @@ namespace wrench {
         /**
          * @brief Map of action names to actions
          */
-        std::map<std::string, std::shared_ptr<Action>> name_map;
+        std::unordered_map<std::string, std::shared_ptr<Action>> name_map;
 
         /**
          * @brief Job state
