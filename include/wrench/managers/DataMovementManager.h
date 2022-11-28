@@ -12,6 +12,7 @@
 #define WRENCH_DATAMOVEMENTMANAGER_H
 
 #include <list>
+#include <utility>
 
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
@@ -39,15 +40,13 @@ namespace wrench {
 
         void kill();
 
-        void initiateAsynchronousFileCopy(std::shared_ptr<DataFile> file,
-                                          std::shared_ptr<FileLocation> src,
-                                          std::shared_ptr<FileLocation> dst,
-                                          std::shared_ptr<FileRegistryService> file_registry_service = nullptr);
+        void initiateAsynchronousFileCopy(const std::shared_ptr<FileLocation> &src,
+                                          const std::shared_ptr<FileLocation> &dst,
+                                          const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
 
-        void doSynchronousFileCopy(std::shared_ptr<DataFile> file,
-                                   std::shared_ptr<FileLocation> src,
-                                   std::shared_ptr<FileLocation> dst,
-                                   std::shared_ptr<FileRegistryService> file_registry_service = nullptr);
+        void doSynchronousFileCopy(const std::shared_ptr<FileLocation> &src,
+                                   const std::shared_ptr<FileLocation> &dst,
+                                   const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
 
 
     protected:
@@ -74,7 +73,6 @@ namespace wrench {
         bool processNextMessage();
 
         struct CopyRequestSpecs {
-            std::shared_ptr<DataFile> file;
             std::shared_ptr<FileLocation> src;
             std::shared_ptr<FileLocation> dst;
             std::shared_ptr<FileRegistryService> file_registry_service;
@@ -82,13 +80,12 @@ namespace wrench {
             ~CopyRequestSpecs() {
             }
 
-            CopyRequestSpecs(std::shared_ptr<DataFile> file,
-                             std::shared_ptr<FileLocation> src,
+            CopyRequestSpecs(std::shared_ptr<FileLocation> src,
                              std::shared_ptr<FileLocation> dst,
-                             std::shared_ptr<FileRegistryService> file_registry_service) : file(file), src(src), dst(dst), file_registry_service(file_registry_service) {}
+                             std::shared_ptr<FileRegistryService> file_registry_service) : src(std::move(src)), dst(std::move(dst)), file_registry_service(std::move(file_registry_service)) {}
 
             bool operator==(const CopyRequestSpecs &rhs) const {
-                return (file == rhs.file) &&
+                return (dst->getFile() == rhs.dst->getFile()) &&
                        (dst->getStorageService() == rhs.dst->getStorageService()) &&
                        (dst->getAbsolutePathAtMountPoint() == rhs.dst->getAbsolutePathAtMountPoint());
             }

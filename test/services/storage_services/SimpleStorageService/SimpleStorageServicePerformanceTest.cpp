@@ -166,23 +166,23 @@ private:
 
         // Time the time it takes to transfer a file from Src to Dst
         double copy1_start = wrench::Simulation::getCurrentSimulatedDate();
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service_1),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service_2));
+        data_movement_manager->initiateAsynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_1),
+                wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_1));
 
         std::shared_ptr<wrench::ExecutionEvent> event1 = this->waitForNextEvent();
         double event1_arrival = wrench::Simulation::getCurrentSimulatedDate();
 
         // Now do 2 of them in parallel
         double copy2_start = wrench::Simulation::getCurrentSimulatedDate();
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_2,
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service_1),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service_2));
+        data_movement_manager->initiateAsynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_2),
+                wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_2));
 
         double copy3_start = wrench::Simulation::getCurrentSimulatedDate();
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_3,
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service_1),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service_2));
+        data_movement_manager->initiateAsynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_3),
+                wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_3));
 
 
         std::shared_ptr<wrench::ExecutionEvent> event2 = this->waitForNextEvent();
@@ -270,11 +270,11 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
 
     // Create Two Storage Services
     ASSERT_NO_THROW(storage_service_1 = simulation->add(
-                            new wrench::SimpleStorageService("SrcHost", {"/"},
-                                                             {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
+                            wrench::SimpleStorageService::createSimpleStorageService("SrcHost", {"/"},
+                                                                                     {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
     ASSERT_NO_THROW(storage_service_2 = simulation->add(
-                            new wrench::SimpleStorageService("DstHost", {"/"},
-                                                             {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
+                            wrench::SimpleStorageService::createSimpleStorageService("DstHost", {"/"},
+                                                                                     {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -325,7 +325,7 @@ private:
 
         double before_read = wrench::Simulation::getCurrentSimulatedDate();
         try {
-            wrench::StorageService::readFile(this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service_1));
+            wrench::StorageService::readFile(wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_1));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
@@ -377,7 +377,7 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
 
     // Create A Storage Service
     ASSERT_NO_THROW(storage_service_1 = simulation->add(
-                            new wrench::SimpleStorageService("SrcHost", {"/"}, {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
+                            wrench::SimpleStorageService::createSimpleStorageService("SrcHost", {"/"}, {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
 
     auto file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost"));
     // Create a WMS

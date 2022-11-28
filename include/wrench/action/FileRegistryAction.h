@@ -49,7 +49,6 @@ namespace wrench {
         FileRegistryAction(FileRegistryAction::Type type,
                            const std::string &name,
                            std::shared_ptr<FileRegistryService> file_registry_service,
-                           std::shared_ptr<DataFile> file,
                            std::shared_ptr<FileLocation> file_location);
 
 
@@ -59,7 +58,6 @@ namespace wrench {
     private:
         FileRegistryAction::Type type;
         std::shared_ptr<FileRegistryService> file_registry_service;
-        std::shared_ptr<DataFile> file;
         std::shared_ptr<FileLocation> file_location;
     };
 

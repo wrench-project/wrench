@@ -71,23 +71,23 @@ namespace wrench {
                 WRENCH_INFO("Creating a job for task %s", ready_task->getID().c_str());
 
                 /* First, we need to create a map of file locations, stating for each file
-                 * where is should be read/written */
+                 * where it should be read/written */
                 std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
-                std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
-                std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
+                std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
+                std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
 
                 for (const auto &input_file: ready_task->getInputFiles()) {
                     if (Simulation::isPageCachingEnabled()) {
-                        file_locations[input_file] = FileLocation::LOCATION(this->client_storage_service, this->server_storage_service);
+                        file_locations[input_file] = FileLocation::LOCATION(this->client_storage_service, this->server_storage_service, input_file);
                     } else {
-                        file_locations[input_file] = FileLocation::LOCATION(this->server_storage_service);
+                        file_locations[input_file] = FileLocation::LOCATION(this->server_storage_service, input_file);
                     }
                 }
                 for (const auto &output_file: ready_task->getOutputFiles()) {
                     if (Simulation::isPageCachingEnabled()) {
-                        file_locations[output_file] = FileLocation::LOCATION(this->server_storage_service, this->server_storage_service);
+                        file_locations[output_file] = FileLocation::LOCATION(this->server_storage_service, this->server_storage_service, output_file);
                     } else {
-                        file_locations[output_file] = FileLocation::LOCATION(this->server_storage_service);
+                        file_locations[output_file] = FileLocation::LOCATION(this->server_storage_service, output_file);
                     }
                 }
 

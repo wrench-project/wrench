@@ -210,7 +210,7 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
         this->service = simulation->add(new wrench::FileRegistryService(hostname));
         this->dst_mailbox = this->service->mailbox;
     } else if (service_type == "simple_storage") {
-        this->service = simulation->add(new wrench::SimpleStorageService(hostname, {"/"}));
+        this->service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"}));
         this->dst_mailbox = this->service->mailbox;
     } else if (service_type == "wms") {
         auto wms = new NoopWMS(this, hostname, false);

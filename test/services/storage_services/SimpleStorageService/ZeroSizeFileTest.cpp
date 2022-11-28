@@ -12,10 +12,10 @@ public:
 
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
-    void do_ReadZeroSizeFileTest();
+    void do_ReadZeroSizeFileTest(double buffer_size);
 
 protected:
-    ~SimpleStorageServiceZeroSizeFileTest() {
+    ~SimpleStorageServiceZeroSizeFileTest() override {
         workflow->clear();
     }
 
@@ -73,8 +73,8 @@ private:
     int main() {
 
         // read the file
-        wrench::StorageService::readFile(this->test->file,
-                                         wrench::FileLocation::LOCATION(storage_service));
+        wrench::StorageService::readFile(
+                wrench::FileLocation::LOCATION(storage_service, this->test->file));
 
 
         return 0;
@@ -82,16 +82,18 @@ private:
 };
 
 TEST_F(SimpleStorageServiceZeroSizeFileTest, ReadZeroSizeFile) {
-    DO_TEST_WITH_FORK(do_ReadZeroSizeFileTest);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ReadZeroSizeFileTest, 1000000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ReadZeroSizeFileTest, 0);
 }
 
-void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
+void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest(double buffer_size) {
     // Create and initialize the simulation
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -100,7 +102,8 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
 
     // Create One Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService("StorageHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost", {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
