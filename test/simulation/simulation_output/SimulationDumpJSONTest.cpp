@@ -1034,9 +1034,9 @@ private:
         auto data_manager = this->createDataMovementManager();
         //copying file to force link usage.
         auto file = *(this->test->workflow->getFileMap().begin());
-        data_manager->doSynchronousFileCopy(file.second,
-                                            wrench::FileLocation::LOCATION(this->test->client_storage_service),
-                                            wrench::FileLocation::LOCATION(this->test->server_storage_service));
+        data_manager->doSynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->client_storage_service, file.second),
+                wrench::FileLocation::LOCATION(this->test->server_storage_service, file.second));
         return 0;
     }
 };
@@ -1065,8 +1065,8 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
 
-    client_storage_service = simulation->add(new wrench::SimpleStorageService("host1", {"/"}, {}));
-    server_storage_service = simulation->add(new wrench::SimpleStorageService("host2", {"/"}, {}));
+    client_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("host1", {"/"}, {}));
+    server_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("host2", {"/"}, {}));
     storage_services_list.insert(client_storage_service);
     storage_services_list.insert(server_storage_service);
 
@@ -1219,9 +1219,9 @@ private:
 
         auto file_1 = this->test->workflow->addFile("file_1", 1.00 * 1000 * 1000);
 
-        wrench::StorageService::writeFile(file_1, wrench::FileLocation::LOCATION(this->test->ss1));
-        wrench::StorageService::writeFile(file_1, wrench::FileLocation::LOCATION(this->test->ss2));
-        wrench::StorageService::readFile(file_1, wrench::FileLocation::LOCATION(this->test->ss1));
+        wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
+        wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(this->test->ss2, file_1));
+        wrench::StorageService::readFile(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
         return 0;
     }
 };
@@ -1243,11 +1243,11 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     std::string host1 = "host1";
     std::string host2 = "host2";
 
-    ASSERT_NO_THROW(ss1 = simulation->add(new wrench::SimpleStorageService(host1, {"/"},
-                                                                           {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "400000"}})));
+    ASSERT_NO_THROW(ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(host1, {"/"},
+                                                                                                   {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "400000"}})));
 
-    ASSERT_NO_THROW(ss2 = simulation->add(new wrench::SimpleStorageService(host2, {"/"},
-                                                                           {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
+    ASSERT_NO_THROW(ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(host2, {"/"},
+                                                                                                   {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;

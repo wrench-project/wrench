@@ -15,6 +15,8 @@
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
+
+#include <memory>
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
@@ -127,14 +129,14 @@ private:
     int main() override {
 
         // Starting a FailedHost1 murderer!!
-        auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
-                                                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
+        auto murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost1",
+                                                                   wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
         murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
-        auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 1000, "FailedHost1",
-                                                                                                 wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
+        auto resurector = std::make_shared<wrench::ResourceSwitcher>("StableHost", 1000, "FailedHost1",
+                                                                     wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
         resurector->setSimulation(this->simulation);
         resurector->start(resurector, true, false);// Daemonized, no auto-restart
 
@@ -144,8 +146,8 @@ private:
 
         // Create a standard job
         auto job = job_manager->createStandardJob(this->test->task,
-                                                  {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                                                   {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                  {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)},
+                                                   {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file)}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         std::map<std::string, std::string> service_specific_args;
@@ -159,8 +161,8 @@ private:
         }
 
         // Paranoid check
-        if (not wrench::StorageService::lookupFile(this->test->output_file,
-                                                   wrench::FileLocation::LOCATION(this->test->storage_service))) {
+        if (not wrench::StorageService::lookupFile(
+                    wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file))) {
             throw std::runtime_error("Output file not written to storage service");
         }
 
@@ -200,7 +202,8 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
                                                 {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
+    storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(stable_host, {"/"},
+                                                                                               {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -240,14 +243,14 @@ private:
     int main() override {
 
         // Starting a FailedHost1 murderer!!
-        auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
-                                                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
+        auto murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost1",
+                                                                   wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
         murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
-        auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 1000, "FailedHost1",
-                                                                                                 wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
+        auto resurector = std::make_shared<wrench::ResourceSwitcher>("StableHost", 1000, "FailedHost1",
+                                                                     wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
         resurector->setSimulation(this->simulation);
         resurector->start(resurector, true, false);// Daemonized, no auto-restart
 
@@ -256,8 +259,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                                                                     {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)},
+                                                                     {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file)}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         job_manager->submitJob(job, this->test->compute_service, {});
@@ -269,8 +272,8 @@ private:
         }
 
         // Paranoid check
-        if (not wrench::StorageService::lookupFile(this->test->output_file,
-                                                   wrench::FileLocation::LOCATION(this->test->storage_service))) {
+        if (not wrench::StorageService::lookupFile(
+                    wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file))) {
             throw std::runtime_error("Output file not written to storage service");
         }
 
@@ -313,7 +316,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
                                                 }));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
+    storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(stable_host, {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -363,17 +366,17 @@ private:
 
             // Starting a FailedHost1 random repeat switch!!
             unsigned long seed1 = trial * 2 + 37;
-            auto switch1 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
-                    new wrench::ResourceRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100,
-                                                             "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
+            auto switch1 = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(
+                    "StableHost", seed1, 10, 100, 10, 100,
+                    "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
             switch1->setSimulation(this->simulation);
             switch1->start(switch1, true, false);// Daemonized, no auto-restart
 
             // Starting a FailedHost2 random repeat switch!!
             unsigned long seed2 = trial * 7 + 417;
-            auto switch2 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
-                    new wrench::ResourceRandomRepeatSwitcher("StableHost", seed2, 10, 100, 10, 100,
-                                                             "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
+            auto switch2 = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(
+                    "StableHost", seed2, 10, 100, 10, 100,
+                    "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
             switch2->setSimulation(this->simulation);
             switch2->start(switch2, true, false);// Daemonized, no auto-restart
 
@@ -385,9 +388,9 @@ private:
 
             // Create a standard job
             auto job = job_manager->createStandardJob(task, {{this->test->input_file,
-                                                              wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                              wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)},
                                                              {output_file,
-                                                              wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                              wrench::FileLocation::LOCATION(this->test->storage_service, output_file)}});
 
             // Submit the standard job to the compute service, making it sure it runs on FailedHost1
             job_manager->submitJob(job, this->test->compute_service, {});
@@ -444,7 +447,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
                                                 {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
+    storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(stable_host, {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -495,9 +498,9 @@ private:
 
         // Create a standard job
         auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file,
-                                                                      wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                      wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)},
                                                                      {this->test->output_file,
-                                                                      wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                                      wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file)}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         job_manager->submitJob(job, this->test->compute_service, {});
@@ -545,7 +548,8 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
                     {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
+    storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(stable_host, {"/"},
+                                                                                               {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

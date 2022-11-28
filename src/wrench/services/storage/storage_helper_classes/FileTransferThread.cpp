@@ -192,7 +192,7 @@ namespace wrench {
                 sendLocalFileToNetwork(this->file, this->src_location, num_bytes_to_transfer, this->dst_mailbox);
             } catch (ExecutionException &e) {
                 WRENCH_INFO(
-                        "FileTransferThread::main(): Network error (%s)", failure_cause->toString().c_str());
+                        "FileTransferThread::main(): Network error (%s)", e.getCause()->toString().c_str());
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
             }
@@ -204,7 +204,7 @@ namespace wrench {
                 receiveFileFromNetwork(this->file, this->src_mailbox, this->dst_location);
             } catch (ExecutionException &e) {
                 WRENCH_INFO(
-                        "FileTransferThread::main() Network error (%s)", failure_cause->toString().c_str());
+                        "FileTransferThread::main() Network error (%s)", e.getCause()->toString().c_str());
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
             }
@@ -221,7 +221,7 @@ namespace wrench {
                 downloadFileFromStorageService(this->file, this->src_location, this->dst_location);
             } catch (ExecutionException &e) {
                 msg_to_send_back->success = false;
-                msg_to_send_back->failure_cause = failure_cause;
+                msg_to_send_back->failure_cause = e.getCause();
             } catch (std::shared_ptr<FailureCause> &failure_cause) {
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
@@ -406,7 +406,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to copy a f localy
+     * @brief Method to copy a f locally
      * @param f: the f to copy
      * @param src_loc: the source location
      * @param dst_loc: the destination location
@@ -464,9 +464,12 @@ namespace wrench {
     void FileTransferThread::downloadFileFromStorageService(const std::shared_ptr<DataFile> &f,
                                                             const std::shared_ptr<FileLocation> &src_loc,
                                                             const std::shared_ptr<FileLocation> &dst_loc) {
+
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (f == nullptr) {
             throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
         }
+#endif
 
         WRENCH_INFO("Downloading file  %s from location %s",
                     f->getID().c_str(), src_loc->toString().c_str());
@@ -481,15 +484,21 @@ namespace wrench {
         // Send a message to the source
         auto request_answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         //        auto mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailbox("works_by_itself");
-        auto mailbox_that_should_receive_file_content = S4U_Mailbox::getTemporaryMailbox();
+
+        simgrid::s4u::Mailbox *mailbox_that_should_receive_file_content;
+        if (src_loc->getStorageService()->buffer_size > DBL_EPSILON) {
+            mailbox_that_should_receive_file_content = S4U_Mailbox::getTemporaryMailbox();
+        } else {
+            mailbox_that_should_receive_file_content = nullptr;
+        }
 
         try {
             S4U_Mailbox::putMessage(
                     src_loc->getStorageService()->mailbox,
                     new StorageServiceFileReadRequestMessage(
                             request_answer_mailbox,
+                            simgrid::s4u::this_actor::get_host(),
                             mailbox_that_should_receive_file_content,
-                            f,
                             src_loc,
                             f->getSize(),
                             src_loc->getStorageService()->getMessagePayloadValue(
@@ -513,7 +522,7 @@ namespace wrench {
             // If it's not a success, throw an exception
             if (not msg->success) {
                 S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
-                throw msg->failure_cause;
+                throw ExecutionException(msg->failure_cause);
             }
         } else {
             S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);

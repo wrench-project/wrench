@@ -100,7 +100,7 @@ private:
         // Create a copy file1 on the first child
         this->test->root_supervisor->getChild(0)->createFile(file1, "/disk100");
         // use the other file create just in case
-        this->test->root_supervisor->getChild(0)->createFile(file3, wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0)->getStorageServer(), "/disk100"));
+        this->test->root_supervisor->getChild(0)->createFile(wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0)->getStorageServer(), "/disk100", file3));
 
         // Read file1 from XRootD
         this->test->root_supervisor->readFile(file1);
@@ -163,9 +163,8 @@ private:
 
         this->test->root_supervisor->getChild(0)->writeFile(file4);
         wrench::StorageService::copyFile(
-                file4,
-                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0)),
-                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(1)));
+                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0), file4),
+                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(1), file4));
         // Check that the copy has worked
         if (!this->test->root_supervisor->getChild(1)->lookupFile(file4)) {
             throw std::runtime_error("It seems that file4 was never copied to child 1 from child 0");
@@ -175,9 +174,8 @@ private:
         auto file5 = wrench::Simulation::addFile("file5", 10000);
         this->test->root_supervisor->getChild(0)->writeFile(file5);
         wrench::StorageService::copyFile(
-                file5,
-                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0)),
-                wrench::FileLocation::LOCATION(this->test->standalone_ss));
+                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0), file5),
+                wrench::FileLocation::LOCATION(this->test->standalone_ss, file5));
         // Check that the copy has worked
         if (!this->test->standalone_ss->lookupFile(file5)) {
             throw std::runtime_error("It seems that file5 was never copied to standalone ss from child 0");
@@ -187,9 +185,8 @@ private:
         auto file6 = wrench::Simulation::addFile("file6", 10000);
         this->test->standalone_ss->writeFile(file6);
         wrench::StorageService::copyFile(
-                file6,
-                wrench::FileLocation::LOCATION(this->test->standalone_ss),
-                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(1)));
+                wrench::FileLocation::LOCATION(this->test->standalone_ss, file6),
+                wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(1), file6));
 
         // Check that the copy has worked
         if (!this->test->root_supervisor->getChild(1)->lookupFile(file6)) {
@@ -201,9 +198,8 @@ private:
         //        this->test->root_supervisor->getChild(0)->createFile(file7);  // works too
         this->test->root_supervisor->getChild(0)->writeFile(file7);
         wrench::StorageService::copyFile(
-                file7,
-                wrench::FileLocation::LOCATION(this->test->root_supervisor),
-                wrench::FileLocation::LOCATION(this->test->standalone_ss));
+                wrench::FileLocation::LOCATION(this->test->root_supervisor, file7),
+                wrench::FileLocation::LOCATION(this->test->standalone_ss, file7));
 
         // Check that the copy has worked
         if (!this->test->standalone_ss->lookupFile(file7)) {
@@ -263,11 +259,11 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1");
     ASSERT_THROW(this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1"), std::runtime_error);
 
-    auto ss2 = this->root_supervisor->addChildStorageServer("Host2", "/disk100", {}, {});
-    auto ss3 = this->root_supervisor->addChildStorageServer("Host3", "/disk100", {}, {});
+    auto ss2 = this->root_supervisor->addChildStorageServer("Host2", "/disk100", {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}, {});
+    auto ss3 = this->root_supervisor->addChildStorageServer("Host3", "/disk100", {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}, {});
 
-    this->standalone_ss = simulation->add(new wrench::SimpleStorageService(
-            "Host1", {"/disk100"}, {}, {}));
+    this->standalone_ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+            "Host1", {"/disk100"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}, {}));
 
     // Create an execution controller
     auto controller = simulation->add(new XRootDServiceBasicFunctionalityTestExecutionController(this, "Host1"));

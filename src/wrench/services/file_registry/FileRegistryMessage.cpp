@@ -10,6 +10,8 @@
 
 #include "wrench/services/file_registry/FileRegistryMessage.h"
 
+#include <utility>
+
 namespace wrench {
 
     /**
@@ -26,7 +28,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                                                               std::shared_ptr<DataFile> file, double payload) : FileRegistryMessage(payload), answer_mailbox(answer_mailbox), file(file) {
+                                                                               const std::shared_ptr<DataFile> &file, double payload) : FileRegistryMessage(payload), answer_mailbox(answer_mailbox), file(file) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || file == nullptr) {
             throw std::invalid_argument(
@@ -37,20 +39,17 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param file: the file that was looked up
      * @param locations: the set of locations for the file
      * @param payload: the message size in bytes
      */
-    FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(std::shared_ptr<DataFile> file,
-                                                                             std::set<std::shared_ptr<FileLocation>> locations,
+    FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(std::set<std::shared_ptr<FileLocation>> locations,
                                                                              double payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if (file == nullptr) {
-            throw std::invalid_argument(
-                    "FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(): Invalid argument");
-        }
+//        if (locations.empty()) {
+//            throw std::invalid_argument(
+//                    "FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(): Invalid argument");
+//        }
 #endif
-        this->file = std::move(file);
         this->locations = std::move(locations);
     }
 
@@ -103,22 +102,19 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param file: the file for which an entry should be removed
      * @param location: the file location of that entry
      * @param payload: the message size in bytes
      */
     FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                                                                 std::shared_ptr<DataFile> file,
                                                                                  std::shared_ptr<FileLocation> location,
                                                                                  double payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
+        if ((answer_mailbox == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(): Invalid argument");
         }
 #endif
         this->answer_mailbox = answer_mailbox;
-        this->file = std::move(file);
         this->location = std::move(location);
     }
 
@@ -136,22 +132,19 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param file: the file for which an entry should be added
      * @param location: the location for the new entry
      * @param payload: the message size in bytes
      */
     FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                                                           std::shared_ptr<DataFile> file,
                                                                            std::shared_ptr<FileLocation> location,
                                                                            double payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
+        if ((answer_mailbox == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(): Invalid argument");
         }
 #endif
         this->answer_mailbox = answer_mailbox;
-        this->file = std::move(file);
         this->location = std::move(location);
     }
 

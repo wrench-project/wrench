@@ -36,9 +36,9 @@ namespace wrench {
     StandardJob::StandardJob(std::shared_ptr<JobManager> job_manager,
                              std::vector<std::shared_ptr<WorkflowTask>> tasks,
                              std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
-                             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &pre_file_copies,
-                             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &post_file_copies,
-                             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>> &cleanup_file_deletions)
+                             std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &pre_file_copies,
+                             std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &post_file_copies,
+                             std::vector<std::shared_ptr<FileLocation>> &cleanup_file_deletions)
         : Job("", std::move(job_manager)),
           file_locations(file_locations),
           pre_file_copies(pre_file_copies),
@@ -207,39 +207,39 @@ namespace wrench {
 
         // Create the pre- file copy actions
         for (auto const &pfc: this->pre_file_copies) {
-            auto src_location = std::get<1>(pfc);
-            auto dst_location = std::get<2>(pfc);
-            if (src_location == FileLocation::SCRATCH) {
-                src_location = FileLocation::LOCATION(compute_service->getScratch());
+            auto src_location = std::get<0>(pfc);
+            auto dst_location = std::get<1>(pfc);
+            if (src_location->isScratch()) {
+                src_location = FileLocation::LOCATION(compute_service->getScratch(), src_location->getFile());
             }
-            if (dst_location == FileLocation::SCRATCH) {
-                dst_location = FileLocation::LOCATION(compute_service->getScratch());
+            if (dst_location->isScratch()) {
+                dst_location = FileLocation::LOCATION(compute_service->getScratch(), dst_location->getFile());
             }
 
-            pre_file_copy_actions.push_back(cjob->addFileCopyAction("", std::get<0>(pfc), src_location, dst_location));
+            pre_file_copy_actions.push_back(cjob->addFileCopyAction("", src_location, dst_location));
         }
 
         // Create the post- file copy actions
         for (auto const &pfc: this->post_file_copies) {
-            auto src_location = std::get<1>(pfc);
-            auto dst_location = std::get<2>(pfc);
-            if (src_location == FileLocation::SCRATCH) {
-                src_location = FileLocation::LOCATION(compute_service->getScratch());
+            auto src_location = std::get<0>(pfc);
+            auto dst_location = std::get<1>(pfc);
+            if (src_location->isScratch()) {
+                src_location = FileLocation::LOCATION(compute_service->getScratch(), src_location->getFile());
             }
-            if (dst_location == FileLocation::SCRATCH) {
-                dst_location = FileLocation::LOCATION(compute_service->getScratch());
+            if (dst_location->isScratch()) {
+                dst_location = FileLocation::LOCATION(compute_service->getScratch(), dst_location->getFile());
             }
 
-            post_file_copy_actions.push_back(cjob->addFileCopyAction("", std::get<0>(pfc), src_location, dst_location));
+            post_file_copy_actions.push_back(cjob->addFileCopyAction("", src_location, dst_location));
         }
 
         // Create the file cleanup actions
         for (auto const &fc: this->cleanup_file_deletions) {
-            auto target_location = std::get<1>(fc);
-            if (target_location == FileLocation::SCRATCH) {
-                target_location = FileLocation::LOCATION(compute_service->getScratch());
+            if (fc->isScratch()) {
+                cleanup_actions.push_back(cjob->addFileDeleteAction("", FileLocation::LOCATION(compute_service->getScratch(), fc->getFile())));
+            } else {
+                cleanup_actions.push_back(cjob->addFileDeleteAction("", fc));
             }
-            cleanup_actions.push_back(cjob->addFileDeleteAction("", std::get<0>(fc), target_location));
         }
 
         // Create the task actions
@@ -253,15 +253,15 @@ namespace wrench {
                 if (this->file_locations.find(f) != this->file_locations.end()) {
                     std::vector<std::shared_ptr<FileLocation>> fixed_locations;
                     for (auto const &loc: this->file_locations[f]) {
-                        if (loc == FileLocation::SCRATCH) {
-                            fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch()));
+                        if (loc->isScratch()) {
+                            fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch(), loc->getFile()));
                         } else {
                             fixed_locations.push_back(loc);
                         }
                     }
-                    fread_action = cjob->addFileReadAction("", f, fixed_locations);
+                    fread_action = cjob->addFileReadAction("", fixed_locations);
                 } else {
-                    fread_action = cjob->addFileReadAction("", f, FileLocation::LOCATION(compute_service->getScratch()));
+                    fread_action = cjob->addFileReadAction("", FileLocation::LOCATION(compute_service->getScratch(), f));
                 }
                 task_file_read_actions[task].push_back(fread_action);
                 cjob->addActionDependency(fread_action, compute_action);
@@ -272,8 +272,8 @@ namespace wrench {
                 if (this->file_locations.find(f) != this->file_locations.end()) {
                     std::vector<std::shared_ptr<FileLocation>> fixed_locations;
                     for (auto const &loc: this->file_locations[f]) {
-                        if (loc == FileLocation::SCRATCH) {
-                            fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch()));
+                        if (loc->isScratch()) {
+                            fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch(), loc->getFile()));
                         } else {
                             fixed_locations.push_back(loc);
                         }
@@ -282,9 +282,9 @@ namespace wrench {
                         throw std::runtime_error("StandardJob::createUnderlyingCompoundJob(): Internal WRENCH error - "
                                                  "there should be a single location for a file write action");
                     }
-                    fwrite_action = cjob->addFileWriteAction("", f, fixed_locations.at(0));
+                    fwrite_action = cjob->addFileWriteAction("", fixed_locations.at(0));
                 } else {
-                    fwrite_action = cjob->addFileWriteAction("", f, FileLocation::LOCATION(compute_service->getScratch()));
+                    fwrite_action = cjob->addFileWriteAction("", FileLocation::LOCATION(compute_service->getScratch(), f));
                 }
                 task_file_write_actions[task].push_back(fwrite_action);
                 cjob->addActionDependency(compute_action, fwrite_action);
@@ -323,7 +323,7 @@ namespace wrench {
                         if (this->file_locations.find(f) == this->file_locations.end()) {
                             try {
                                 auto scratch = this->getParentComputeService()->getScratch();
-                                scratch->deleteFile(f, FileLocation::LOCATION(scratch));
+                                scratch->deleteFile(FileLocation::LOCATION(scratch, f));
                             } catch (ExecutionException &ignore) {
                                 // ignore
                             }
@@ -333,7 +333,7 @@ namespace wrench {
                         if (this->file_locations.find(f) == this->file_locations.end()) {
                             try {
                                 auto scratch = this->getParentComputeService()->getScratch();
-                                scratch->deleteFile(f, FileLocation::LOCATION(scratch));
+                                scratch->deleteFile(FileLocation::LOCATION(scratch, f));
                             } catch (ExecutionException &ignore) {
                                 // ignore
                             }
@@ -508,7 +508,7 @@ namespace wrench {
         switch (this->state) {
             case StandardJob::State::PENDING:
             case StandardJob::State::RUNNING:
-                throw std::rBuntime_error("StandardJob::processCompoundJobOutcome(): Cannot be called on a RUNNING/PENDING job");
+                throw std::runtime_error("StandardJob::processCompoundJobOutcome(): Cannot be called on a RUNNING/PENDING job");
             default:
                 break;
         }
@@ -842,7 +842,7 @@ namespace wrench {
     bool StandardJob::usesScratch() {
         for (const auto &fl: this->file_locations) {
             for (auto const &fl_l: fl.second) {
-                if (fl_l == FileLocation::SCRATCH) {
+                if (fl_l->isScratch()) {
                     return true;
                 }
             }
@@ -862,13 +862,13 @@ namespace wrench {
         }
 
         for (auto const &pfc: this->pre_file_copies) {
-            if ((std::get<1>(pfc) == FileLocation::SCRATCH) or (std::get<2>(pfc) == FileLocation::SCRATCH)) {
+            if ((std::get<0>(pfc)->isScratch()) or (std::get<1>(pfc)->isScratch())) {
                 return true;
             }
         }
 
         for (auto const &pfc: this->post_file_copies) {
-            if ((std::get<1>(pfc) == FileLocation::SCRATCH) or (std::get<2>(pfc) == FileLocation::SCRATCH)) {
+            if ((std::get<0>(pfc)->isScratch()) or (std::get<1>(pfc)->isScratch())) {
                 return true;
             }
         }

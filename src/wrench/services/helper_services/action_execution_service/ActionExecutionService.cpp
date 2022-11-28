@@ -472,7 +472,7 @@ namespace wrench {
             action_executor->setSimulation(this->simulation);
             try {
                 action_executor->start(action_executor, true, false);// Daemonized, no auto-restart
-            } catch (std::shared_ptr<HostError> &e) {
+            } catch (ExecutionException &e) {
                 // This is an error on the target host!!
                 throw std::runtime_error(
                         "ActionSchedule::dispatchReadyActions(): got a host error on the target host - this shouldn't happen");
@@ -779,9 +779,10 @@ namespace wrench {
         WRENCH_INFO("Sending action failure notification to '%s'", parent_service->mailbox->get_cname());
         // NOTE: This is synchronous so that the process doesn't fall off the end
         try {
+            auto msg = new ActionExecutionServiceActionDoneMessage(action, 0);
             S4U_Mailbox::putMessage(
                     this->parent_service->mailbox,
-                    new ActionExecutionServiceActionDoneMessage(action, 0));
+                    msg);
         } catch (ExecutionException &e) {
             return;
         }

@@ -29,15 +29,13 @@ namespace wrench {
     * @param type: the action's type
     * @param name: the action's name (if empty, a unique name will be picked for you)
     * @param file_registry_service: the file registry service toupdate
-    * @param file: the file
     * @param file_location: the location where the file should be deleted
     */
     FileRegistryAction::FileRegistryAction(FileRegistryAction::Type type,
                                            const std::string &name,
                                            std::shared_ptr<FileRegistryService> file_registry_service,
-                                           std::shared_ptr<DataFile> file,
                                            std::shared_ptr<FileLocation> file_location) : Action(name, "file_registry"),
-                                                                                          type(type), file_registry_service(std::move(file_registry_service)), file(std::move(file)), file_location(std::move(file_location)) {
+                                                                                          type(type), file_registry_service(std::move(file_registry_service)), file_location(std::move(file_location)) {
     }
 
     /**
@@ -54,7 +52,7 @@ namespace wrench {
      * @return the file
      */
     std::shared_ptr<DataFile> FileRegistryAction::getFile() const {
-        return this->file;
+        return this->file_location->getFile();
     }
 
     /**
@@ -75,9 +73,9 @@ namespace wrench {
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File write
         if (this->type == FileRegistryAction::ADD) {
-            this->file_registry_service->addEntry(this->file, this->file_location);
+            this->file_registry_service->addEntry(this->file_location);
         } else if (this->type == FileRegistryAction::DELETE) {
-            this->file_registry_service->removeEntry(this->file, this->file_location);
+            this->file_registry_service->removeEntry(this->file_location);
         }
     }
 

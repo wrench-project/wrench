@@ -91,11 +91,11 @@ namespace wrench {
         } else if (auto m = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
             if (m->success) {
                 return std::shared_ptr<FileCopyCompletedEvent>(new FileCopyCompletedEvent(
-                        m->file, m->src, m->dst, m->file_registry_service, m->file_registry_service_updated));
+                        m->src->getFile(), m->src, m->dst, m->file_registry_service, m->file_registry_service_updated));
 
             } else {
                 return std::shared_ptr<FileCopyFailedEvent>(
-                        new FileCopyFailedEvent(m->file, m->src, m->dst, m->failure_cause));
+                        new FileCopyFailedEvent(m->src->getFile(), m->src, m->dst, m->failure_cause));
             }
         } else if (auto m = dynamic_cast<ExecutionControllerAlarmTimerMessage *>(message.get())) {
             return std::shared_ptr<TimerEvent>(new TimerEvent(m->message));
