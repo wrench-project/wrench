@@ -13,6 +13,7 @@
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <boost/algorithm/string.hpp>
+#include <memory>
 #include <wrench/failure_causes/HostError.h>
 
 #ifdef MESSAGE_MANAGER
@@ -142,7 +143,7 @@ namespace wrench {
 
         // Check that the host is up!
         if (not S4U_Simulation::isHostOn(hostname)) {
-            throw std::shared_ptr<HostError>(new HostError(hostname));
+            throw ExecutionException(std::make_shared<HostError>(hostname));
         }
 
         this->daemonized = daemonized;
@@ -160,7 +161,7 @@ namespace wrench {
 
         // nullptr is returned if the host is off (not the current behavior in SimGrid... just paranoid here)
         if (this->s4u_actor == nullptr) {
-            throw std::shared_ptr<HostError>(new HostError(hostname));
+            throw ExecutionException(std::make_shared<HostError>(hostname));
         }
 
         // This test here is critical. It's possible that the created actor above returns
@@ -194,15 +195,16 @@ namespace wrench {
             this->state = S4U_Daemon::State::DOWN;
             // Call cleanup
             this->cleanup(this->hasReturnedFromMain(), this->getReturnValue());
+
             // Free memory_manager_service for the object unless the service is set to auto-restart
             if (not this->isSetToAutoRestart()) {
-                auto life_saver = this->life_saver;
+                auto life_saver_ref = this->life_saver;
                 this->life_saver = nullptr;
 //                Service::increaseNumCompletedServicesCount();
 #ifdef MESSAGE_MANAGER
                 MessageManager::cleanUpMessages(this->mailbox_name);
 #endif
-                delete life_saver;
+                delete life_saver_ref;
             }
             return 0;
         });
@@ -213,7 +215,7 @@ namespace wrench {
  * @brief Return the auto-restart status of the daemon
  * @return true or false
  */
-    bool S4U_Daemon::isSetToAutoRestart() {
+    bool S4U_Daemon::isSetToAutoRestart() const {
         return this->auto_restart;
     }
 
@@ -221,7 +223,7 @@ namespace wrench {
  * @brief Return the daemonized status of the daemon
  * @return true or false
  */
-    bool S4U_Daemon::isDaemonized() {
+    bool S4U_Daemon::isDaemonized() const {
         return this->daemonized;
     }
 
@@ -306,7 +308,7 @@ namespace wrench {
  * @brief Returns true if the daemon has returned from main() (i.e., not brutally killed)
  * @return The true or false
  */
-    bool S4U_Daemon::hasReturnedFromMain() {
+    bool S4U_Daemon::hasReturnedFromMain() const {
         return this->has_returned_from_main;
     }
 
@@ -314,7 +316,7 @@ namespace wrench {
  * @brief Returns the value returned by main() (if the daemon has returned from main)
  * @return The return value
  */
-    int S4U_Daemon::getReturnValue() {
+    int S4U_Daemon::getReturnValue() const {
         return this->return_value;
     }
 
@@ -322,7 +324,7 @@ namespace wrench {
  * @brief Retrieve the process name
  * @return the name
  */
-    std::string S4U_Daemon::getName() {
+    std::string S4U_Daemon::getName() const {
         return this->process_name;
     }
 

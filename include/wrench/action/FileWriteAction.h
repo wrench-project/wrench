@@ -37,13 +37,12 @@ namespace wrench {
         friend class CompoundJob;
 
         FileWriteAction(const std::string &name,
-                        std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> file_location);
+                        std::shared_ptr<FileLocation> file_location);
 
         void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
         void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
     private:
-        std::shared_ptr<DataFile> file;
         std::shared_ptr<FileLocation> file_location;
     };
 

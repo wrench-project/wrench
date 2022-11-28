@@ -171,7 +171,7 @@ private:
 
         // Is the start-date sensible?
         if (file_copy_action->getStartDate() < 0.0 or file_copy_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_copy_action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_copy_action->getStartDate()));
         }
 
         // Is the end-date sensible?
@@ -208,10 +208,14 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss1 = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+            "Host3", {"/"},
+            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create another Storage Service
-    this->ss2 = simulation->add(new wrench::SimpleStorageService("Host1", {"/"}));
+    this->ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+            "Host1", {"/"},
+            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();
@@ -220,7 +224,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     this->file = workflow->addFile("some_file", 1000000.0);
 
     // Put it on ss1
-    wrench::Simulation::createFile(this->file, wrench::FileLocation::LOCATION(this->ss1));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -259,9 +263,9 @@ private:
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
         // Add a file_copy_action
-        auto file_copy_action = job->addFileCopyAction("", this->test->file,
-                                                       wrench::FileLocation::LOCATION(this->test->ss1, "/"),
-                                                       wrench::FileLocation::LOCATION(this->test->ss1, "/disk2"));
+        auto file_copy_action = job->addFileCopyAction("",
+                                                       wrench::FileLocation::LOCATION(this->test->ss1, "/", this->test->file),
+                                                       wrench::FileLocation::LOCATION(this->test->ss1, "/disk2", this->test->file));
 
         // Create a file copy action executor
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
@@ -309,10 +313,10 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessSameHostTest_te
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss1 = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
 
     // Create another Storage Service
-    this->ss2 = simulation->add(new wrench::SimpleStorageService("Host1", {"/"}));
+    this->ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host1", {"/"}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();
@@ -321,7 +325,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessSameHostTest_te
     this->file = workflow->addFile("some_file", 1000000000.0);
 
     // Put it on ss1
-    wrench::Simulation::createFile(this->file, wrench::FileLocation::LOCATION(this->ss1));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

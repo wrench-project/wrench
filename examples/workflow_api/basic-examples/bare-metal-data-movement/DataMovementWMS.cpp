@@ -71,20 +71,19 @@ namespace wrench {
 
         /* Synchronously copy infile_1 from storage_service1 to storage_service2 */
         WRENCH_INFO("Synchronously copying file infile_1 from storage_service1 to storage_service2");
-        data_movement_manager->doSynchronousFileCopy(infile_1,
-                                                     FileLocation::LOCATION(storage_service1),
-                                                     FileLocation::LOCATION(storage_service2));
+        data_movement_manager->doSynchronousFileCopy(FileLocation::LOCATION(storage_service1, infile_1),
+                                                     FileLocation::LOCATION(storage_service2, infile_1));
         WRENCH_INFO("File copy complete");
 
 
         /* Now let's create a map of file locations, stating for each file
-         * where is should be read/written while the task executes */
+         * where it should be read/written while the task executes */
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
 
-        file_locations[infile_1] = FileLocation::LOCATION(storage_service2);
-        file_locations[infile_2] = FileLocation::LOCATION(storage_service1);
-        file_locations[outfile_1] = FileLocation::LOCATION(storage_service2);
-        file_locations[outfile_2] = FileLocation::LOCATION(storage_service2);
+        file_locations[infile_1] = FileLocation::LOCATION(storage_service2, infile_1);
+        file_locations[infile_2] = FileLocation::LOCATION(storage_service1, infile_2);
+        file_locations[outfile_1] = FileLocation::LOCATION(storage_service2, outfile_1);
+        file_locations[outfile_2] = FileLocation::LOCATION(storage_service2, outfile_2);
 
         /* Create the standard job */
         WRENCH_INFO("Creating a  job to execute task %s", task->getID().c_str());
@@ -103,9 +102,8 @@ namespace wrench {
         /* Let's copying outfile_1 from storage_service2 to storage_service1, and let's
          * do it asynchronously for kicks */
         WRENCH_INFO("Asynchronously copying outfile_1 from storage_service2 to storage_service1")
-        data_movement_manager->initiateAsynchronousFileCopy(outfile_1,
-                                                            FileLocation::LOCATION(storage_service2),
-                                                            FileLocation::LOCATION(storage_service1));
+        data_movement_manager->initiateAsynchronousFileCopy(FileLocation::LOCATION(storage_service2, outfile_1),
+                                                            FileLocation::LOCATION(storage_service1, outfile_1));
 
         /* Just for kicks again, let's wait for the next event using  the low-level
          * waitForNextEvent() instead of waitForAndProcessNextEvent() */
@@ -127,7 +125,7 @@ namespace wrench {
 
         /* Delete outfile_2 on storage_service2 */
         WRENCH_INFO("Deleting file outfile_2 from storage_service2");
-        StorageService::deleteFile(outfile_2, FileLocation::LOCATION(storage_service2));
+        StorageService::deleteFile(FileLocation::LOCATION(storage_service2, outfile_2));
         WRENCH_INFO("File deleted");
 
         WRENCH_INFO("Workflow execution complete");

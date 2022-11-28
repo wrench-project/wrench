@@ -134,17 +134,17 @@ private:
 
 
         // Get a "FILE COPY COMPLETION" event (default handler)
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->small_file,
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service2),
-                                                            nullptr);
+        data_movement_manager->initiateAsynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->small_file),
+                wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->small_file),
+                nullptr);
         this->waitForAndProcessNextEvent();
 
         // Get a "FILE COPY FAILURE" event (default handler)
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->big_file,
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service2),
-                                                            nullptr);
+        data_movement_manager->initiateAsynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->big_file),
+                wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->big_file),
+                nullptr);
         this->waitForAndProcessNextEvent();
 
         // Set a timer
@@ -184,11 +184,11 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname1, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname1, {"/"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname2, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname2, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> cloud_hosts;
@@ -300,18 +300,18 @@ private:
         }
 
         // Get a "FILE COPY COMPLETION" event (default handler)
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->small_file,
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service2), nullptr);
+        data_movement_manager->initiateAsynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->small_file),
+                wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->small_file), nullptr);
         this->waitForAndProcessNextEvent();
         if (this->counter != 5) {
             throw std::runtime_error("Did not get expected FileCompletedEvent");
         }
 
         // Get a "FILE COPY FAILURE" event (default handler)
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->big_file,
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_service2), nullptr);
+        data_movement_manager->initiateAsynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->big_file),
+                wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->big_file), nullptr);
         this->waitForAndProcessNextEvent();
         if (this->counter != 6) {
             throw std::runtime_error("Did not get expected FileCopyFailureEvent");
@@ -344,8 +344,8 @@ private:
         // Get a "COMPOUND JOB FAILED" event (default handler)
         auto fail_job = job_manager->createCompoundJob("fail_job");
         auto file = wrench::Simulation::addFile("somefile", 1.0);
-        fail_job->addFileReadAction("file_read_action", file,
-                                    wrench::FileLocation::LOCATION(this->test->storage_service1));
+        fail_job->addFileReadAction("file_read_action",
+                                    wrench::FileLocation::LOCATION(this->test->storage_service1, file));
         job_manager->submitJob(fail_job, vm_cs);
 
         this->waitForAndProcessNextEvent();
@@ -416,11 +416,11 @@ void WMSTest::do_CustomHandlerWMS_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname1, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname1, {"/"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname2, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname2, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> cloud_hosts;

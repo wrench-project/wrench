@@ -129,7 +129,7 @@ namespace wrench {
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
                                                                    const std::shared_ptr<DataFile> &file,
                                                                    const std::shared_ptr<StorageService> &storage_service) {
-        return addFileReadAction(name, file, FileLocation::LOCATION(storage_service));
+        return addFileReadAction(name, FileLocation::LOCATION(storage_service, file));
     }
 
     /**
@@ -144,7 +144,7 @@ namespace wrench {
                                                                    const std::shared_ptr<DataFile> &file,
                                                                    const std::shared_ptr<StorageService> &storage_service,
                                                                    const double num_bytes_to_read) {
-        return addFileReadAction(name, file, FileLocation::LOCATION(storage_service), num_bytes_to_read);
+        return addFileReadAction(name, FileLocation::LOCATION(storage_service, file), num_bytes_to_read);
     }
 
 
@@ -158,7 +158,7 @@ namespace wrench {
     std::shared_ptr<FileWriteAction> CompoundJob::addFileWriteAction(const std::string &name,
                                                                      const std::shared_ptr<DataFile> &file,
                                                                      const std::shared_ptr<StorageService> &storage_service) {
-        return addFileWriteAction(name, file, FileLocation::LOCATION(storage_service));
+        return addFileWriteAction(name, FileLocation::LOCATION(storage_service, file));
     }
 
     /**
@@ -170,10 +170,10 @@ namespace wrench {
      * @return a file copy action
      */
     std::shared_ptr<FileCopyAction> CompoundJob::addFileCopyAction(const std::string &name,
-                                                                   std::shared_ptr<DataFile> file,
+                                                                   const std::shared_ptr<DataFile> &file,
                                                                    const std::shared_ptr<StorageService> &src_storage_service,
                                                                    const std::shared_ptr<StorageService> &dst_storage_service) {
-        return addFileCopyAction(name, file, FileLocation::LOCATION(src_storage_service), FileLocation::LOCATION(dst_storage_service));
+        return addFileCopyAction(name, FileLocation::LOCATION(src_storage_service, file), FileLocation::LOCATION(dst_storage_service, file));
     }
 
     /**
@@ -186,66 +186,58 @@ namespace wrench {
     std::shared_ptr<FileDeleteAction> CompoundJob::addFileDeleteAction(const std::string &name,
                                                                        std::shared_ptr<DataFile> file,
                                                                        const std::shared_ptr<StorageService> &storage_service) {
-        return addFileDeleteAction(name, file, FileLocation::LOCATION(storage_service));
+        return addFileDeleteAction(name, FileLocation::LOCATION(storage_service, file));
     }
     /**
      * @brief Add a file read action to the job
      * @param name: the action's name (if empty, a unique name will be picked for you)
-     * @param file: the file
      * @param file_location: the file's location
      * @return a file read action
      */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
-                                                                   const std::shared_ptr<DataFile> &file,
                                                                    const std::shared_ptr<FileLocation> &file_location) {
         std::vector<std::shared_ptr<FileLocation>> v = {file_location};
-        return this->addFileReadAction(name, file, v, -1.0);
+        return this->addFileReadAction(name, v, -1.0);
     }
 
     /**
      * @brief Add a file read action to the job
      * @param name: the action's name (if empty, a unique name will be picked for you)
-     * @param file: the file
      * @param file_location: the file's location
      * @param num_bytes_to_read: the number of bytes to read
      * @return a file read action
      */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
-                                                                   const std::shared_ptr<DataFile> &file,
                                                                    const std::shared_ptr<FileLocation> &file_location,
                                                                    const double num_bytes_to_read) {
         std::vector<std::shared_ptr<FileLocation>> v = {file_location};
-        return this->addFileReadAction(name, file, v, num_bytes_to_read);
+        return this->addFileReadAction(name, v, num_bytes_to_read);
     }
 
 
     /**
     * @brief Add a file read action to the job
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param file: the file
     * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
     * @return a file read action
     */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
-                                                                   const std::shared_ptr<DataFile> &file,
                                                                    const std::vector<std::shared_ptr<FileLocation>> &file_locations) {
-        return this->addFileReadAction(name, file, file_locations, -1.0);
+        return this->addFileReadAction(name, file_locations, -1.0);
     }
 
     /**
     * @brief Add a file read action to the job
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param file: the file
     * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
     * @param num_bytes_to_read: number of bytes to read
     * @return a file read action
     */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
-                                                                   const std::shared_ptr<DataFile> &file,
                                                                    const std::vector<std::shared_ptr<FileLocation>> &file_locations,
                                                                    const double num_bytes_to_read) {
         auto new_action = std::shared_ptr<FileReadAction>(
-                new FileReadAction(name, file, file_locations, num_bytes_to_read));
+                new FileReadAction(name, file_locations, num_bytes_to_read));
         this->addAction(new_action);
         return new_action;
     }
@@ -253,15 +245,13 @@ namespace wrench {
     /**
     * @brief Add a file write action to the job
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param file: the file
     * @param file_location: the file's location where it should be written
     * @return a file write action
     */
     std::shared_ptr<FileWriteAction> CompoundJob::addFileWriteAction(const std::string &name,
-                                                                     const std::shared_ptr<DataFile> &file,
                                                                      const std::shared_ptr<FileLocation> &file_location) {
         auto new_action = std::shared_ptr<FileWriteAction>(
-                new FileWriteAction(name, file, {file_location}));
+                new FileWriteAction(name, {file_location}));
         this->addAction(new_action);
         return new_action;
     }
@@ -269,17 +259,15 @@ namespace wrench {
     /**
     * @brief Add a file copy action to the job
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param file: the file
     * @param src_file_location: the file's location where it should be read
     * @param dst_file_location: the file's location where it should be written
     * @return a file copy action
     */
     std::shared_ptr<FileCopyAction> CompoundJob::addFileCopyAction(const std::string &name,
-                                                                   std::shared_ptr<DataFile> file,
                                                                    std::shared_ptr<FileLocation> src_file_location,
                                                                    std::shared_ptr<FileLocation> dst_file_location) {
         auto new_action = std::shared_ptr<FileCopyAction>(
-                new FileCopyAction(name, std::move(file), std::move(src_file_location), std::move(dst_file_location)));
+                new FileCopyAction(name, std::move(src_file_location), std::move(dst_file_location)));
         this->addAction(new_action);
         return new_action;
     }
@@ -287,15 +275,14 @@ namespace wrench {
     /**
     * @brief Add a file delete action to the job
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param file: the file
     * @param file_location: the location from which to delete the file
     * @return a file delete action
     */
     std::shared_ptr<FileDeleteAction>
-    CompoundJob::addFileDeleteAction(const std::string &name, std::shared_ptr<DataFile> file,
+    CompoundJob::addFileDeleteAction(const std::string &name,
                                      std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileDeleteAction>(
-                new FileDeleteAction(name, std::move(file), std::move(file_location)));
+                new FileDeleteAction(name, file_location->getFile(), std::move(file_location)));
         this->addAction(new_action);
         return new_action;
     }
@@ -304,17 +291,15 @@ namespace wrench {
      * @brief Add a file registry add entry action
      * @param name: the action's name
      * @param file_registry: the file registry
-     * @param file: the file
      * @param file_location: the file location
      * @return
      */
     std::shared_ptr<FileRegistryAddEntryAction> CompoundJob::addFileRegistryAddEntryAction(
             const std::string &name,
             std::shared_ptr<FileRegistryService> file_registry,
-            std::shared_ptr<DataFile> file,
             std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileRegistryAddEntryAction>(
-                new FileRegistryAddEntryAction(name, std::move(file_registry), std::move(file), std::move(file_location)));
+                new FileRegistryAddEntryAction(name, std::move(file_registry), std::move(file_location)));
         this->addAction(new_action);
         return new_action;
     }
@@ -323,17 +308,15 @@ namespace wrench {
      * @brief Add a file registry add entry action
      * @param name: the action's name
      * @param file_registry: the file registry
-     * @param file: the file
      * @param file_location: the file location
      * @return
      */
     std::shared_ptr<FileRegistryDeleteEntryAction> CompoundJob::addFileRegistryDeleteEntryAction(
             const std::string &name,
-            std::shared_ptr<FileRegistryService> file_registry,
-            std::shared_ptr<DataFile> file,
+            const std::shared_ptr<FileRegistryService> &file_registry,
             std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileRegistryDeleteEntryAction>(
-                new FileRegistryDeleteEntryAction(name, std::move(file_registry), std::move(file), std::move(file_location)));
+                new FileRegistryDeleteEntryAction(name, std::move(file_registry), std::move(file_location)));
         this->addAction(new_action);
         return new_action;
     }

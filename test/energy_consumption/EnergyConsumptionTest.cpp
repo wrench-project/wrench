@@ -258,11 +258,11 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
@@ -414,11 +414,11 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
@@ -531,11 +531,11 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
@@ -672,11 +672,11 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
@@ -840,11 +840,11 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
