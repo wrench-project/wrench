@@ -25,15 +25,12 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param file: the file
     * @param src_file_location: the location from which the file should be read
     * @param dst_file_location: the location to which the file should be written
     */
     FileCopyAction::FileCopyAction(const std::string &name,
-                                   std::shared_ptr<DataFile> file,
                                    std::shared_ptr<FileLocation> src_file_location,
                                    std::shared_ptr<FileLocation> dst_file_location) : Action(name, "file_copy_"),
-                                                                                      file(file),
                                                                                       src_file_location(std::move(src_file_location)),
                                                                                       dst_file_location(std::move(dst_file_location)) {
     }
@@ -71,7 +68,7 @@ namespace wrench {
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File copy
         StorageService::copyFile(
-                this->file, this->src_file_location, this->dst_file_location);
+                this->src_file_location, this->dst_file_location);
     }
 
     /**
@@ -88,7 +85,7 @@ namespace wrench {
      * @return true if the action uses scratch, false otherwise
      */
     bool FileCopyAction::usesScratch() const {
-        return (this->src_file_location == FileLocation::SCRATCH or this->dst_file_location == FileLocation::SCRATCH);
+        return (this->src_file_location->isScratch() or this->dst_file_location->isScratch());
     }
 
 

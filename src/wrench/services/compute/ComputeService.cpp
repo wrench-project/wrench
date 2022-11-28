@@ -155,9 +155,12 @@ namespace wrench {
         this->state = ComputeService::UP;
 
         if (not scratch_space_mount_point.empty()) {
+            double buffer_size = 10000000;// TODO: Make this configurable?
             try {
                 this->scratch_space_storage_service =
-                        std::shared_ptr<StorageService>(new SimpleStorageService(hostname, {scratch_space_mount_point}));
+                        std::shared_ptr<StorageService>(
+                                SimpleStorageService::createSimpleStorageService(hostname, {scratch_space_mount_point},
+                                                                                 {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {}));
                 this->scratch_space_storage_service->setScratch();
                 this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(
                         this->scratch_space_storage_service);

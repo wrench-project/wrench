@@ -43,12 +43,14 @@ namespace wrench {
      */
     class SimpleStorageService : public StorageService {
 
-    private:
+    protected:
+        /** @brief Default property values */
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "infinity"},
-                {SimpleStorageServiceProperty::BUFFER_SIZE, "10485760"},// 10 MEGA BYTE
+                {SimpleStorageServiceProperty::BUFFER_SIZE, "10000000"},// 10 MEGA BYTE
         };
 
+        /** @brief Default message payload values */
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
                 {SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
@@ -66,77 +68,52 @@ namespace wrench {
                 {SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 1024},
         };
 
-    public:
-        // Public Constructor
-        SimpleStorageService(const std::string &hostname,
-                             std::set<std::string> mount_points,
-                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
+    public:
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
         ~SimpleStorageService() override;
 
-        void cleanup(bool has_returned_from_main, int return_value) override;
         double getLoad() override;
-        double countRunningFileTransferThreads();
+
+        static SimpleStorageService *createSimpleStorageService(const std::string &hostname,
+                                                                std::set<std::string> mount_points,
+                                                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+
+        double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
+
         /***********************/
         /** \endcond          **/
         /***********************/
 
-    private:
-        friend class Simulation;
-
-        // Low-level Constructor
+    protected:
         SimpleStorageService(const std::string &hostname,
                              std::set<std::string> mount_points,
                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                              const std::string &suffix);
 
-        int main() override;
-
-        bool processNextMessage();
-
+    protected:
         static unsigned long getNewUniqueNumber();
 
-        bool processFileDeleteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
-                                      simgrid::s4u::Mailbox *answer_mailbox);
-
-        bool processFileWriteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &, simgrid::s4u::Mailbox *answer_mailbox,
-                                     double buffer_size);
-
-        bool
-        processFileReadRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
-                               double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox,
-                               simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content);
-
-        bool processFileCopyRequest(const std::shared_ptr<DataFile> &file,
-                                    const std::shared_ptr<FileLocation> &src,
-                                    const std::shared_ptr<FileLocation> &dst,
-                                    simgrid::s4u::Mailbox *answer_mailbox);
-
-        bool processFileTransferThreadNotification(
-                const std::shared_ptr<FileTransferThread> &ftt,
-                const std::shared_ptr<DataFile> &file,
-                simgrid::s4u::Mailbox *src_mailbox,
-                const std::shared_ptr<FileLocation> &src_location,
-                simgrid::s4u::Mailbox *dst_mailbox,
-                const std::shared_ptr<FileLocation> &dst_location,
-                bool success,
-                std::shared_ptr<FailureCause> failure_cause,
-                simgrid::s4u::Mailbox *answer_mailbox_if_read,
-                simgrid::s4u::Mailbox *answer_mailbox_if_write,
-                simgrid::s4u::Mailbox *answer_mailbox_if_copy);
-
+        /** @brief Maximum number of concurrent connections */
         unsigned long num_concurrent_connections;
 
-        void startPendingFileTransferThread();
+        bool processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox);
+        bool processFileDeleteRequest(const std::shared_ptr<FileLocation> &location,
+                                      simgrid::s4u::Mailbox *answer_mailbox);
+        bool processFileLookupRequest(const std::shared_ptr<FileLocation> &location,
+                                      simgrid::s4u::Mailbox *answer_mailbox);
+        bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox);
 
-        std::deque<std::shared_ptr<FileTransferThread>> pending_file_transfer_threads;
-        std::set<std::shared_ptr<FileTransferThread>> running_file_transfer_threads;
+    private:
+        friend class Simulation;
+
+        int main() override;
+
 
         void validateProperties();
 

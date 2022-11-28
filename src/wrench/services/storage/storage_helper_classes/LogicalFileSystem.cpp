@@ -43,7 +43,8 @@ namespace wrench {
             devnull = false;
             mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
             // Check validity
-            if (not S4U_Simulation::hostHasMountPoint(hostname, mount_point)) {
+            this->disk = S4U_Simulation::hostHasMountPoint(hostname, mount_point);
+            if (not this->disk) {
                 throw std::invalid_argument("LogicalFileSystem::LogicalFileSystem(): Host " +
                                             hostname + " does not have a disk mounted at " + mount_point);
             }
@@ -140,7 +141,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::storeFileInDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path) {
+    void LogicalFileSystem::storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return;
         }
@@ -150,7 +151,7 @@ namespace wrench {
             createDirectory(absolute_path);
         }
 
-        this->content[absolute_path].insert(file);
+        this->content[absolute_path][file] = S4U_Simulation::getClock();
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
         if (this->reserved_space.find(key) == this->reserved_space.end()) {
             this->occupied_space += file->getSize();
@@ -166,7 +167,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::removeFileFromDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path) {
+    void LogicalFileSystem::removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return;
         }
@@ -201,7 +202,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    bool LogicalFileSystem::isFileInDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path) {
+    bool LogicalFileSystem::isFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return false;
         }
@@ -223,12 +224,16 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     std::set<std::shared_ptr<DataFile>> LogicalFileSystem::listFilesInDirectory(const std::string &absolute_path) {
+        std::set<std::shared_ptr<DataFile>> to_return;
         if (devnull) {
-            return std::set<std::shared_ptr<DataFile>>();
+            return {};
         }
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
-        return this->content[absolute_path];
+        for (auto const &f: this->content[absolute_path]) {
+            to_return.insert(f.first);
+        }
+        return to_return;
     }
 
     /**
@@ -265,7 +270,7 @@ namespace wrench {
  * @param absolute_path: the path where it will be written
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::reserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
+    void LogicalFileSystem::reserveSpace(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return;
         }
@@ -337,11 +342,44 @@ namespace wrench {
 
         // If file does  not already exist, create it
         if (this->content.find(absolute_path) != this->content.end()) {
-            this->content[absolute_path].insert(file);
+            this->content[absolute_path][file] = S4U_Simulation::getClock();
             this->occupied_space += file->getSize();
         } else {
             return;
         }
     }
+
+    /**
+     * @brief Retrieve the file's last write date
+     * @param file: the file
+     * @param absolute_path: the file path
+     * @return a date in seconds (returns -1.0) if file in not found
+     */
+    double LogicalFileSystem::getFileLastWriteDate(const shared_ptr<DataFile> &file, const string &absolute_path) {
+
+        if (devnull) {
+            return -1;
+        }
+        assertInitHasBeenCalled();
+        // If directory does not exist, say "no"
+        if (not doesDirectoryExist(absolute_path)) {
+            return -1;
+        }
+
+        if (this->content[absolute_path].find(file) != this->content[absolute_path].end()) {
+            return this->content[absolute_path][file];
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * @brief
+     * @return The SimGrid disk on which this file system is mounted
+     */
+    simgrid::s4u::Disk *LogicalFileSystem::getDisk() {
+        return this->disk;
+    }
+
 
 }// namespace wrench

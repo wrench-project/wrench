@@ -344,7 +344,7 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -488,7 +488,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -625,7 +625,7 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -757,7 +757,7 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -906,7 +906,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1028,7 +1029,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1200,7 +1201,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1251,8 +1253,8 @@ private:
 
         // Create a compound job and submit it
         auto job = job_manager->createCompoundJob("my_job");
-        auto action = job->addFileReadAction("my_file_read", this->test->input_file,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service1));
+        auto action = job->addFileReadAction("my_file_read",
+                                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->input_file));
         job_manager->submitJob(job, this->test->compute_service, {});
 
         // Wait for the workflow execution event
@@ -1345,7 +1347,7 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1452,7 +1454,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1559,7 +1561,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1603,9 +1605,9 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("my_job");
-        auto action = job->addFileCopyAction("my_file_copy", this->test->input_file,
-                                             wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                             wrench::FileLocation::SCRATCH);
+        auto action = job->addFileCopyAction("my_file_copy",
+                                             wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->input_file),
+                                             wrench::FileLocation::SCRATCH(this->test->input_file));
 
         // Submit the job
         try {
@@ -1653,7 +1655,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1696,9 +1698,8 @@ private:
             // Create a compound job
             auto job = job_manager->createCompoundJob("my_job");
             auto action = job->addFileRegistryAddEntryAction("add_entry", this->test->file_registry_service,
-                                                             this->test->input_file,
                                                              wrench::FileLocation::LOCATION(
-                                                                     this->test->storage_service1));
+                                                                     this->test->storage_service1, this->test->input_file));
 
             // Submit the job
             job_manager->submitJob(job, this->test->compute_service, {});
@@ -1714,9 +1715,8 @@ private:
             // Create a compound job
             auto job = job_manager->createCompoundJob("my_job");
             auto action = job->addFileRegistryDeleteEntryAction("delete_entry", this->test->file_registry_service,
-                                                                this->test->input_file,
                                                                 wrench::FileLocation::LOCATION(
-                                                                        this->test->storage_service1));
+                                                                        this->test->storage_service1, this->test->input_file));
 
             // Submit the job
             job_manager->submitJob(job, this->test->compute_service, {});
@@ -1768,7 +1768,7 @@ void BareMetalComputeServiceOneActionTest::do_FileRegistryActions_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
