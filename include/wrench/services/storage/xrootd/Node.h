@@ -47,6 +47,8 @@ namespace wrench {
 
             void writeFile(const std::shared_ptr<DataFile> &file) override;
 
+            double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
+
             /***********************/
             /** \endcond           */
             /***********************/
@@ -58,6 +60,7 @@ namespace wrench {
                     {Property::SEARCH_BROADCAST_OVERHEAD, "1"},
                     {Property::UPDATE_CACHE_OVERHEAD, "1"},
                     {Property::CACHE_MAX_LIFETIME, "infinity"},
+                    {StorageServiceProperty::BUFFER_SIZE, "1000000"},
                     {Property::REDUCED_SIMULATION, "false"},
                     {Property::FILE_NOT_FOUND_TIMEOUT, "30"}};
 
@@ -101,7 +104,7 @@ namespace wrench {
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
 
 
-            void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) override;
+            void createFile(const std::shared_ptr<FileLocation> &location) override;
 
             double getLoad() override;
 

@@ -60,7 +60,7 @@ namespace wrench {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File write
-        StorageService::deleteFile(this->file, this->file_location);
+        StorageService::deleteFile(this->file_location);
     }
 
     /**
@@ -76,7 +76,7 @@ namespace wrench {
      * @return true if the action uses scratch, false otherwise
      */
     bool FileDeleteAction::usesScratch() const {
-        return (this->file_location == FileLocation::SCRATCH);
+        return (this->file_location->isScratch());
     }
 
 }// namespace wrench

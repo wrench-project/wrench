@@ -33,6 +33,7 @@ public:
     std::shared_ptr<wrench::StorageService> client_storage_service;
     std::shared_ptr<wrench::StorageService> server_storage_service;
     std::shared_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::DataFile> the_file;
 
     void do_BandwidthMeterCreationDestruction_test();
 
@@ -83,7 +84,7 @@ public:
 
 private:
     BandwidthMeterServiceTest *test;
-    std::shared_ptr<wrench::DataFile> file;
+    //    std::shared_ptr<wrench::DataFile> file;
 
     int main() {
         // Linknames
@@ -133,11 +134,12 @@ private:
 
         //Setting up storage services to accommodate data transfer.
         auto data_manager = this->createDataMovementManager();
+
         //copying file to force link usage.
         auto file = *(this->test->workflow->getFileMap().begin());
-        data_manager->doSynchronousFileCopy(file.second,
-                                            wrench::FileLocation::LOCATION(this->test->client_storage_service),
-                                            wrench::FileLocation::LOCATION(this->test->server_storage_service));
+        data_manager->doSynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->client_storage_service, file.second),
+                wrench::FileLocation::LOCATION(this->test->server_storage_service, file.second));
 
         // Terminating the Bandwidth Meter Services
         bm1->stop();
@@ -152,11 +154,13 @@ TEST_F(BandwidthMeterServiceTest, BasicCreationDestruction) {
 }
 
 void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
-    auto simulation = wrench::Simulation::createSimulation();
+
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -165,17 +169,20 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
 
-    client_storage_service = simulation->add(new wrench::SimpleStorageService("host1", {"/"}, {}));
-    server_storage_service = simulation->add(new wrench::SimpleStorageService("host2", {"/"}, {}));
+    client_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("host1", {"/"}, {}));
+    server_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("host2", {"/"}, {}));
 
     const double GB = 1000.0 * 1000.0 * 1000.0;
     //std::shared_ptr<wrench::DataFile> file = new wrench::DataFile("test_file", 10*GB);
-    auto link_usage_workflow = wrench::Workflow::createWorkflow();
+
+    this->workflow = wrench::Workflow::createWorkflow();
+
+
     std::shared_ptr<wrench::WorkflowTask> single_task;
-    single_task = link_usage_workflow->addTask("dummy_task", 1, 1, 1, 8 * GB);
-    single_task->addInputFile(link_usage_workflow->addFile("test_file", 10 * GB));
+    single_task = this->workflow->addTask("dummy_task", 1, 1, 1, 8 * GB);
+    this->the_file = this->workflow->addFile("test_file", 10 * GB);
+    single_task->addInputFile(the_file);
 
     EXPECT_NO_THROW(wms = simulation->add(
                             new BasicCreationDestructionTestWMS(
@@ -183,13 +190,14 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
                                     host)));
 
     simulation->add(new wrench::FileRegistryService("host1"));
-    for (auto const &file: link_usage_workflow->getInputFiles()) {
+    for (auto const &file: this->workflow->getInputFiles()) {
         simulation->stageFile(file, client_storage_service);
     }
 
+
     EXPECT_NO_THROW(simulation->launch());
 
-    link_usage_workflow->clear();
+    this->workflow->clear();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

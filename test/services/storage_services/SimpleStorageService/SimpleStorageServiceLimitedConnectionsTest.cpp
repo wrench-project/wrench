@@ -35,7 +35,7 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service_unlimited = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_limited = nullptr;
 
-    void do_ConcurrencyFileCopies_test();
+    void do_ConcurrencyFileCopies_test(double buffer_size);
 
 
 protected:
@@ -151,9 +151,9 @@ private:
 
             // Initiate asynchronous file copies to/from storage_service
             for (int i = 0; i < NUM_PARALLEL_TRANSFERS; i++) {
-                data_movement_manager->initiateAsynchronousFileCopy(this->test->files[i],
-                                                                    wrench::FileLocation::LOCATION(src_storage_service),
-                                                                    wrench::FileLocation::LOCATION(dst_storage_service));
+                data_movement_manager->initiateAsynchronousFileCopy(
+                        wrench::FileLocation::LOCATION(src_storage_service, this->test->files[i]),
+                        wrench::FileLocation::LOCATION(dst_storage_service, this->test->files[i]));
             }
 
             double elapsed[NUM_PARALLEL_TRANSFERS];
@@ -212,16 +212,18 @@ private:
 };
 
 TEST_F(SimpleStorageServiceLimitedConnectionsTest, ConcurrencyFileCopies) {
-    DO_TEST_WITH_FORK(do_ConcurrencyFileCopies_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrencyFileCopies_test, 100000000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrencyFileCopies_test, 0);
 }
 
-void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test() {
+void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test(double buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -238,21 +240,25 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
 
     // Create a Local storage service with unlimited connections
     ASSERT_NO_THROW(storage_service_wms_unlimited = simulation->add(
-                            new wrench::SimpleStorageService("WMSHost", {"/disk1"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/disk1"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a Local storage service with limited connections
     ASSERT_NO_THROW(storage_service_wms_limited = simulation->add(
-                            new wrench::SimpleStorageService("WMSHost", {"/disk2"},
-                                                             {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "3"}})));
+                            wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/disk2"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "3"},
+                                                                                      {wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}},
+                                                                                     {})));
 
     // Create a Storage service with unlimited connections
     ASSERT_NO_THROW(storage_service_unlimited = simulation->add(
-                            new wrench::SimpleStorageService("Host1", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a Storage Service limited to 3 connections
     ASSERT_NO_THROW(storage_service_limited = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"},
-                                                             {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "3"}})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "3"},
+                                                                                      {wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

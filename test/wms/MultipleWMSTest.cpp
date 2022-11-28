@@ -128,12 +128,12 @@ private:
         // Get the cloud service
         auto cs = this->test->compute_service;
 
-        std::vector<std::tuple<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_copies = {};
+        std::vector<std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_copies = {};
         for (auto it: this->workflow->getInputFileMap()) {
-            std::tuple<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> each_copy =
-                    std::make_tuple(it.second,
-                                    wrench::FileLocation::LOCATION(this->test->storage_service),
-                                    wrench::FileLocation::SCRATCH);
+            std::tuple<std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> each_copy =
+                    std::make_tuple(
+                            wrench::FileLocation::LOCATION(this->test->storage_service, it.second),
+                            wrench::FileLocation::SCRATCH(it.second));
             pre_copies.push_back(each_copy);
         }
 
@@ -190,7 +190,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
@@ -243,7 +243,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};

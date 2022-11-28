@@ -35,7 +35,7 @@ namespace wrench {
             throw std::invalid_argument("SimulationMessage::SimulationMessage(): Invalid arguments");
         }
 #endif
-        this->payload = payload;
+        this->payload = std::max<double>(0, payload);
     }
 
     /**

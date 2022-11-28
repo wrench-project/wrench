@@ -166,7 +166,7 @@ private:
 
         // Is the start-date sensible?
         if (file_delete_action->getStartDate() < 0.0 or file_delete_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_delete_action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_delete_action->getStartDate()));
         }
 
         // Is the end-date sensible?
@@ -203,12 +203,12 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
 
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
