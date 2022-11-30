@@ -194,8 +194,6 @@ namespace wrench {
             // Create all activities to wait on
             std::vector<simgrid::s4u::ActivityPtr> pending_activities;
             pending_activities.emplace_back(comm_ptr);
-
-            // TODO: DEBUGGING REMOVED THAT
             for (auto const &transaction: this->running_transactions) {
                 pending_activities.emplace_back(transaction->stream);
             }

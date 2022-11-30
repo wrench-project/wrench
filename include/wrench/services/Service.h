@@ -27,7 +27,7 @@ namespace wrench {
     /**
      * @brief Abstraction of a service message payload collection type
      */
-    typedef std::unordered_map<WRENCH_MESSAGEPAYLOAD_TYPE, double> WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE;
+    typedef std::map<WRENCH_MESSAGEPAYLOAD_TYPE, double> WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE;
 
 
     class FailureCause;
