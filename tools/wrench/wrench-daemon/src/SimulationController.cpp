@@ -400,7 +400,7 @@ namespace wrench {
         std::string head_host = data["head_host"];
 
         // Create the new service
-        auto new_service = new SimpleStorageService(head_host, {"/"}, {}, {});
+        auto new_service = SimpleStorageService::createSimpleStorageService(head_host, {"/"}, {}, {});
         // Put in the list of services to start (this is because this method is called
         // by the server thread, and therefore, it will segfault horribly if it calls any
         // SimGrid simulation methods, e.g., to start a service)
@@ -448,7 +448,7 @@ namespace wrench {
             throw std::runtime_error("Unknown file " + filename);
         }
 
-        wrench::Simulation::createFile(file, FileLocation::LOCATION(ss));
+        wrench::Simulation::createFile(FileLocation::LOCATION(ss, file));
 
         // Return the expected answer
         return {};
