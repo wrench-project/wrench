@@ -11,6 +11,7 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
+#include <wrench/services/storage/compound/CompoundStorageService.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <iostream>
@@ -213,6 +214,16 @@ namespace wrench {
     }
 
     /**
+     * @brief Update storage service
+     * @return The updated storage service
+     */
+    std::shared_ptr<StorageService> FileLocation::setStorageService(std::shared_ptr<StorageService> storage_service) {
+        this->storage_service = std::move(storage_service);
+        return this->storage_service;
+    }
+
+
+    /**
      * @brief Get the location's file
      * @return a file
      */
@@ -241,6 +252,15 @@ namespace wrench {
         }
         return this->mount_point;
     }
+
+    std::string FileLocation::setMountPoint(std::string mount_point) {
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getMountPoint(): No mount point for a SCRATCH location");
+        }
+        this->mount_point = std::move(mount_point);
+        return this->mount_point;
+    }
+
 
     /**
      * @brief Get the location's path at mount point
