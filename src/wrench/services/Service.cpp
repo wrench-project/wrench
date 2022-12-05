@@ -112,6 +112,9 @@ namespace wrench {
         if (string_value == "infinity") {
             return DBL_MAX;
         }
+        if (string_value == "zero") {
+            return 0;
+        }
         if (sscanf(string_value.c_str(), "%lf", &value) != 1) {
             throw std::invalid_argument(
                     "Service::getPropertyValueAsDouble(): Invalid double property value " + std::to_string(property) + " " +
@@ -137,6 +140,9 @@ namespace wrench {
         }
         if (string_value == "infinity") {
             return DBL_MAX;
+        }
+        if (string_value == "zero") {
+            return 0;
         }
         return unit_parsing_function(string_value);
     }
@@ -185,6 +191,9 @@ namespace wrench {
         }
         if (string_value == "infinity") {
             return ULONG_MAX;
+        }
+        if (string_value == "zero") {
+            return 0;
         }
         if (sscanf(string_value.c_str(), "%lu", &value) != 1) {
             throw std::invalid_argument(
