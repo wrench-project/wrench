@@ -217,8 +217,30 @@ started. Typical kinds of services include compute services, storage
 services, and file registry services (see
 :ref:`below <wrench-101-simulator-services>` for more details).
 
-The bare-metal-chain simulator instantiates four services. The first one
-is a compute service:
+The multi-action-multi-job simulator instantiates four services. The first one
+ is a storage service:
+
+.. code:: cpp
+
+   auto storage_service_1 = simulation->add(new wrench::SimpleStorageService("StorageHost1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
+
+The :cpp:class:`wrench::SimpleStorageService` class implements a simulation of a
+remotely-accessible storage service on which files can be stored,
+copied, deleted, read, and written. In this particular case, the storage
+service is started on host ``StorageHost1``. It uses storage mounted at
+``/`` on that host (which corresponds to the mount path of a disk, as
+seen in the XML platform description). The last two arguments, as for
+the compute services, are used to configure particular properties of the
+service. In this case, the service is configured to use a 50-MB buffer
+size to pipeline network and disk accesses (see details in :ref:`this section
+below <wrench-101-customizing-services>`).
+
+The second service is a another storage service that runs on host
+``StorageHost2``.
+
+.. _wrench-101-simulator-1000ft-step-4:
+
+The third service is a compute service:
 
 .. code:: cpp
 
@@ -250,32 +272,11 @@ The :cpp:class:`wrench::CloudComputeService` implements a simulation of a cloud
 platform on which virtual machine (VM) instances can be created,
 started, used, and shutdown. The service runs on host ``CloudHeadHost``
 and has access to the compute resources on host ``CloudHost``. Unlike
-the previous service, this service has scratch space, at path ``/data``
+the previous service, this service has scratch space, at path ``/scratch``
 on the disk attached to host ``CloudHost`` (as seen in the XML platform
 description). Here again, the last two arguments are used to configure
 properties of the service.
 
-The third service is a storage service:
-
-.. code:: cpp
-
-   auto storage_service_1 = simulation->add(new wrench::SimpleStorageService("StorageHost1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
-
-The :cpp:class:`wrench::SimpleStorageService` class implements a simulation of a
-remotely-accessible storage service on which files can be stored,
-copied, deleted, read, and written. In this particular case, the storage
-service is started on host ``StorageHost1``. It uses storage mounted at
-``/`` on that host (which corresponds to the mount path of a disk, as
-seen in the XML platform description). The last two arguments, as for
-the compute services, are used to configure particular properties of the
-service. In this case, the service is configured to use a 50-MB buffer
-size to pipeline network and disk accesses (see details in :ref:`this section
-below <wrench-101-customizing-services>`).
-
-The fourth service is a another storage service that runs on host
-``StorageHost2``.
-
-.. _wrench-101-simulator-1000ft-step-4:
 
 Step 4: Instantiate at least one Execution controller
 -----------------------------------------------------
