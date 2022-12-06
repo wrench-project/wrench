@@ -289,27 +289,26 @@ constructor as well as its ``main()`` method. This method is
 implementing using the :ref:`WRENCH Developer
 API <developer-api>`.
 
-The example in ``examples/action_api/bare-metal-bag-of-actions`` does
+The example in ``examples/action_api/multi-action-multi-job`` does
 this as follows: 
 
 .. code:: cpp
 
-   auto wms = simulation->add(new wrench::TwoTasksAtATimeExecutionController(num_tasks, baremetal_service, storage_service, "UserHost"));
+   auto wms = simulation->add(new wrench::MultiActionMultiJobController(baremetal_service, cloud_service, storage_service_1, storage_service_2, "UserHost"));
 
-This creates an execution controller and passes to its constructor a
-number of tasks to execute, the compute service to use, the storage
-service to use, and the host on which it is supposed to execute. Class
-``wrench::TwoTasksAtATimeExecutionController`` is of course provided
+This creates an execution controller and passes to its constructor the 
+services created before, and the host on which it is supposed to execute. 
+Class ``wrench::MultiActionMultiJobController`` is of course provided
 with the example. See the :ref:`WRENCH 102 <wrench-102-header>` page for
 information on how to implement an execution controller.
 
 One important question is how to specify an *application workload* and
 tell the execution controller to execute it. This is completely up to
-the developer, and in this example the execution controller is simply
-given a number of tasks and then creates files, file read actions, file
-write actions, and compute actions to be executed as part of various
+the developer, and in this example the execution controller creates a 
+different number of tasks to creates files, file read actions,
+file write actions, and compute actions to be executed as part of various
 jobs (see the implementation of
-``wrench::TwoTasksAtATimeExecutionController``). All the examples in the
+``wrench::MultiActionMultiJobController``). All the examples in the
 ``examples/action_api`` directory do this in different ways. *However*,
 many users are interested in **workflow applications**, for this reason,
 WRENCH provides a :cpp:class:`wrench::Workflow` class that has member functions
