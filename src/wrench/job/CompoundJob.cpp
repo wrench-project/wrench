@@ -184,7 +184,7 @@ namespace wrench {
      * @return a file delete action
      */
     std::shared_ptr<FileDeleteAction> CompoundJob::addFileDeleteAction(const std::string &name,
-                                                                       std::shared_ptr<DataFile> file,
+                                                                       const std::shared_ptr<DataFile> &file,
                                                                        const std::shared_ptr<StorageService> &storage_service) {
         return addFileDeleteAction(name, FileLocation::LOCATION(storage_service, file));
     }
@@ -264,10 +264,10 @@ namespace wrench {
     * @return a file copy action
     */
     std::shared_ptr<FileCopyAction> CompoundJob::addFileCopyAction(const std::string &name,
-                                                                   std::shared_ptr<FileLocation> src_file_location,
-                                                                   std::shared_ptr<FileLocation> dst_file_location) {
+                                                                   const std::shared_ptr<FileLocation> &src_file_location,
+                                                                   const std::shared_ptr<FileLocation> &dst_file_location) {
         auto new_action = std::shared_ptr<FileCopyAction>(
-                new FileCopyAction(name, std::move(src_file_location), std::move(dst_file_location)));
+                new FileCopyAction(name, src_file_location, dst_file_location));
         this->addAction(new_action);
         return new_action;
     }
@@ -280,9 +280,9 @@ namespace wrench {
     */
     std::shared_ptr<FileDeleteAction>
     CompoundJob::addFileDeleteAction(const std::string &name,
-                                     std::shared_ptr<FileLocation> file_location) {
+                                     const std::shared_ptr<FileLocation>& file_location) {
         auto new_action = std::shared_ptr<FileDeleteAction>(
-                new FileDeleteAction(name, file_location->getFile(), std::move(file_location)));
+                new FileDeleteAction(name, file_location->getFile(), file_location));
         this->addAction(new_action);
         return new_action;
     }
@@ -296,8 +296,8 @@ namespace wrench {
      */
     std::shared_ptr<FileRegistryAddEntryAction> CompoundJob::addFileRegistryAddEntryAction(
             const std::string &name,
-            std::shared_ptr<FileRegistryService> file_registry,
-            std::shared_ptr<FileLocation> file_location) {
+            const std::shared_ptr<FileRegistryService> &file_registry,
+            const std::shared_ptr<FileLocation> &file_location) {
         auto new_action = std::shared_ptr<FileRegistryAddEntryAction>(
                 new FileRegistryAddEntryAction(name, std::move(file_registry), std::move(file_location)));
         this->addAction(new_action);
@@ -314,9 +314,9 @@ namespace wrench {
     std::shared_ptr<FileRegistryDeleteEntryAction> CompoundJob::addFileRegistryDeleteEntryAction(
             const std::string &name,
             const std::shared_ptr<FileRegistryService> &file_registry,
-            std::shared_ptr<FileLocation> file_location) {
+            const std::shared_ptr<FileLocation> &file_location) {
         auto new_action = std::shared_ptr<FileRegistryDeleteEntryAction>(
-                new FileRegistryDeleteEntryAction(name, std::move(file_registry), std::move(file_location)));
+                new FileRegistryDeleteEntryAction(name, file_registry, file_location));
         this->addAction(new_action);
         return new_action;
     }
