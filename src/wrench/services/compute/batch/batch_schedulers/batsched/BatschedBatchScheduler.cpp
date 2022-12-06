@@ -558,9 +558,8 @@ namespace wrench {
         //    This was the "old" batsched up until commit 39a30d83
         //      compute_resources_map["events"][0]["data"]["config"]["redis"]["enabled"] = false;
         compute_resources_map["events"][0]["data"]["config"]["redis-enabled"] = false;
-        std::map<std::string, unsigned long>::iterator it;
         int count = 0;
-        for (it = this->cs->nodes_to_cores_map.begin(); it != this->cs->nodes_to_cores_map.end(); it++) {
+        for (auto it = this->cs->nodes_to_cores_map.begin(); it != this->cs->nodes_to_cores_map.end(); it++) {
             compute_resources_map["events"][0]["data"]["resources_data"][count]["id"] = std::to_string(count);
             compute_resources_map["events"][0]["data"]["resources_data"][count]["name"] = it->first;
             compute_resources_map["events"][0]["data"]["resources_data"][count]["core"] = it->second;
