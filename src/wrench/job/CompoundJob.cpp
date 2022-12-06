@@ -280,7 +280,7 @@ namespace wrench {
     */
     std::shared_ptr<FileDeleteAction>
     CompoundJob::addFileDeleteAction(const std::string &name,
-                                     const std::shared_ptr<FileLocation>& file_location) {
+                                     const std::shared_ptr<FileLocation> &file_location) {
         auto new_action = std::shared_ptr<FileDeleteAction>(
                 new FileDeleteAction(name, file_location->getFile(), file_location));
         this->addAction(new_action);
