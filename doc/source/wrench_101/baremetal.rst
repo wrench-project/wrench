@@ -57,10 +57,10 @@ answers resource request description requests is configured to be 1KiB:
    auto baremetal_cs = simulation->add(
              new wrench::BareMetalComputeService("Gateway", 
                                           {{"Node1", std::make_tuple(wrench::ComputeService::ALL_CORES, pow(2,30))}, 
-                                          {"Node2", std::make_tuple(8, wrench::ComputeService::ALL_RAM}},
+                                          {"Node2", std::make_tuple(8, wrench::ComputeService::ALL_RAM)}},
                                           "/scratch/",
                                           {{wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD, "0.01"}}, 
-                                          {{wrench::BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024});
+                                          {{wrench::BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024}}));
 
 See the documentation of :cpp:class:`wrench::BareMetalComputeServiceProperty` and
 :cpp:class:`wrench::BareMetalComputeServiceMessagePayload` for all possible
