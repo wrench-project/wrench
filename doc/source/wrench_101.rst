@@ -262,7 +262,7 @@ In this case, the scratch storage specification is empty as host
 configure properties of the service (see details in :ref:`this section
 below <wrench-101-customizing-services>`).
 
-The second service is a cloud compute service:
+The fourth service is a cloud compute service:
 
 .. code:: cpp
 
