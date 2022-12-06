@@ -15,6 +15,7 @@
 #include <cerrno>
 #include <stdlib.h>
 #include <wrench/util/UnitParser.h>
+#include <cfloat>
 
 namespace wrench {
 
@@ -72,6 +73,13 @@ namespace wrench {
         char *ptr;
         const char *c_string = string.c_str();
         errno = 0;
+
+        if (string == "zero") {
+            return 0.0;
+        }
+        if (string == "infinity") {
+            return DBL_MAX;
+        }
 
         double res = strtod(c_string, &ptr);
         if (errno == ERANGE)

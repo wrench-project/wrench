@@ -21,7 +21,7 @@
 
 WRENCH_LOG_CATEGORY(wrench_core_file_location, "Log category for FileLocation");
 
-#define RECLAIM_TRIGGER 1000
+#define RECLAIM_TRIGGER 10000
 
 namespace wrench {
 
