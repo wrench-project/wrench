@@ -711,7 +711,7 @@ namespace wrench {
     //    }
 
     /**
-     * @brief Wait for and procress the next message
+     * @brief Wait for and process the next message
      * @return true if the service should keep going, false otherwise
      */
     bool BatchComputeService::processNextMessage() {
@@ -889,7 +889,7 @@ namespace wrench {
         // Remove the job from the running job list
         this->removeJobFromRunningList(batch_job);
 
-        // notify the scheduled of the job completion
+        // notify the scheduler of the job completion
         this->scheduler->processJobCompletion(batch_job);
 
         // Send the callback to the originator

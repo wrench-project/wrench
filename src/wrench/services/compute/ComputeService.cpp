@@ -368,7 +368,7 @@ namespace wrench {
     bool ComputeService::isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, double ram) {
         assertServiceIsUp();
 
-        // send a "info request" message to the daemon's mailbox_name
+        // send an "info request" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
@@ -448,7 +448,7 @@ namespace wrench {
     std::map<std::string, double> ComputeService::getServiceResourceInformation(const std::string &key) {
         assertServiceIsUp();
 
-        // send a "info request" message to the daemon's mailbox_name
+        // send an "info request" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(

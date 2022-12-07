@@ -295,9 +295,9 @@ namespace wrench {
         return to_return;
 #else
         // Cannot have certain substring (why not)
-        //        std::string unallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
-        char unallowed_characters[] = {'\\', ' ', '~', '`', '\'', '&', '*', '?'};
-        for (auto const &c: unallowed_characters) {
+        //        std::string disallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
+        char disallowed_characters[] = {'\\', ' ', '~', '`', '\'', '&', '*', '?'};
+        for (auto const &c: disallowed_characters) {
             if (path.find(c) != std::string::npos) {
                 throw std::invalid_argument("FileLocation::sanitizePath(): Disallowed character '" + std::to_string(c) + "' in path (" + path + ")");
             }

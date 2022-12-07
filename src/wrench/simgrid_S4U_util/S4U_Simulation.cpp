@@ -565,7 +565,7 @@ namespace wrench {
         read_activity->start();
         // Do synchronous write
         write_disk->write((sg_size_t) num_bytes_to_write);
-        // Wait for asychronous read to be done
+        // Wait for asynchronous read to be done
         read_activity->wait();
     }
 

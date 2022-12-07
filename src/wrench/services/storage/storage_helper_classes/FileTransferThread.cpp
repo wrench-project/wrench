@@ -281,7 +281,6 @@ namespace wrench {
             try {
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
-                    //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
 
                 // Receive chunks and write them to disk
@@ -334,7 +333,6 @@ namespace wrench {
 
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
-                    //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
             } catch (ExecutionException &e) {
                 throw;
@@ -395,7 +393,6 @@ namespace wrench {
                 }
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
-                    //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
                 req->wait();
                 WRENCH_INFO("Bytes sent over the network were received");

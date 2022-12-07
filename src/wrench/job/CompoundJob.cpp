@@ -472,7 +472,7 @@ namespace wrench {
      */
     void CompoundJob::assertJobNotSubmitted() {
         if (this->state != CompoundJob::State::NOT_SUBMITTED) {
-            throw std::runtime_error("CompoundJob::assertJobNotSubmitted(): Cannot modify a CompoundJob onces it has been submitted");
+            throw std::runtime_error("CompoundJob::assertJobNotSubmitted(): Cannot modify a CompoundJob once it has been submitted");
         }
     }
 

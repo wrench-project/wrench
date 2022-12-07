@@ -59,7 +59,7 @@ namespace wrench {
             double earliestAllowedTime = wrench::S4U_Simulation::getClock() - maxCacheTime;
             auto entries = cache[file];
             std::set<std::shared_ptr<FileLocation>> ret;
-            for (auto ittr = entries.begin(); ittr != entries.end();) {//intentionaly blank 3rd term
+            for (auto ittr = entries.begin(); ittr != entries.end();) {// intentionally blank 3rd term
                 auto entry = *ittr;
                 if (entry.second < earliestAllowedTime) {
                     ittr = entries.erase(ittr);
