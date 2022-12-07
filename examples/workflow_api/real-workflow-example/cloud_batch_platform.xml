@@ -18,7 +18,7 @@
             </disk>
         </host>
 
-        <!-- A since network links that connects all hosts together, which 
+        <!-- A single network links that connects all hosts together, which
              of course a crazy over-simplification -->
         <link id="wide_area_backbone" bandwidth="30MBps" latency="1ms"/>
 

@@ -47,7 +47,6 @@ int main(int argc, char **argv) {
      * Create a WRENCH simulation object
      */
     auto simulation = wrench::Simulation::createSimulation();
-    ;
 
     /* Initialize the simulation, which may entail extracting WRENCH-specific and
      * Simgrid-specific command-line arguments that can modify general simulation behavior.
@@ -69,7 +68,7 @@ int main(int argc, char **argv) {
     /* Declare a workflow */
     auto workflow = wrench::Workflow::createWorkflow();
 
-    /* Add the workflow task an files */
+    /* Add the workflow task and files */
     auto task = workflow->addTask("task", 10000000000.0, 1, 10, 10000000);
     task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
     task->addInputFile(workflow->addFile("infile_1", 100000000));

@@ -118,7 +118,7 @@ namespace wrench {
 
         auto standard_job = job_manager->createStandardJob({task_0, task_1}, file_locations);
 
-        WRENCH_INFO("Submitting the standard job to the pilot job")
+        WRENCH_INFO("Submitting the standard job to the pilot job");
         job_manager->submitJob(standard_job, cs);
 
         WRENCH_INFO("Wait for an event");

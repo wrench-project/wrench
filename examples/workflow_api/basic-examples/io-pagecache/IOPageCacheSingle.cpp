@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    long file_size_gb = 0;
+    long file_size_gb;
     try {
         file_size_gb = std::atoi(argv[1]);
     } catch (std::invalid_argument &e) {
@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
     }
     long mem_req_gb = file_size_gb;
 
-    double cpu_time_sec = 0;
+    double cpu_time_sec;
     try {
         cpu_time_sec = std::atof(argv[2]);
     } catch (std::invalid_argument &e) {
