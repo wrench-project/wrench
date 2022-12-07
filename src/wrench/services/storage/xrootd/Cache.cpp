@@ -34,7 +34,7 @@ namespace wrench {
          * @param file: The file to add to the cache
          * @param location: The location to add to the cache
          */
-        void Cache::add(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& location) {
+        void Cache::add(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
             double currentSimTime = wrench::S4U_Simulation::getClock();
             cache[file][location] = currentSimTime;
         }
@@ -44,9 +44,9 @@ namespace wrench {
         * @param file: The file to add to the cache
         * @param locations: The locations to add to the cache
         */
-        void Cache::add(const std::shared_ptr<DataFile>& file, const std::set<std::shared_ptr<FileLocation>>& locations) {
+        void Cache::add(const std::shared_ptr<DataFile> &file, const std::set<std::shared_ptr<FileLocation>> &locations) {
             double currentSimTime = wrench::S4U_Simulation::getClock();
-            for (auto  const &location: locations) {
+            for (auto const &location: locations) {
                 cache[file][location] = currentSimTime;
             }
         }
@@ -55,7 +55,7 @@ namespace wrench {
          * @param file: The file to check the cache for
          * @return the set of valid cached copies.  (empty set if not found)
          */
-        std::set<std::shared_ptr<FileLocation>> Cache::get(const std::shared_ptr<DataFile>& file) {
+        std::set<std::shared_ptr<FileLocation>> Cache::get(const std::shared_ptr<DataFile> &file) {
             double earliestAllowedTime = wrench::S4U_Simulation::getClock() - maxCacheTime;
             auto entries = cache[file];
             std::set<std::shared_ptr<FileLocation>> ret;
@@ -76,7 +76,7 @@ namespace wrench {
          * @return the set of valid cached copies.  (empty set if not found)
          */
 
-        std::set<std::shared_ptr<FileLocation>> Cache::operator[](const std::shared_ptr<DataFile>& file) {
+        std::set<std::shared_ptr<FileLocation>> Cache::operator[](const std::shared_ptr<DataFile> &file) {
             return get(file);
         }
 
@@ -85,7 +85,7 @@ namespace wrench {
          * @param file: The file to check the cache for
          */
 
-        void Cache::remove(const std::shared_ptr<DataFile>& file) {
+        void Cache::remove(const std::shared_ptr<DataFile> &file) {
             cache.erase(file);
         }
 
