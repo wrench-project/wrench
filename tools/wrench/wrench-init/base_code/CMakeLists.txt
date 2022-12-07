@@ -33,14 +33,14 @@ if (ENABLE_BATSCHED)
             ${WRENCH_LIBRARY}
             ${SimGrid_LIBRARY}
             ${Boost_LIBRARIES}
-#            ${WRENCH_WFCOMMONS_WORKFLOW_PARSER_LIBRARY}
+            ${WRENCH_WFCOMMONS_WORKFLOW_PARSER_LIBRARY}
             -lzmq)
 else()
     target_link_libraries(my-wrench-simulator
             ${WRENCH_LIBRARY}
             ${SimGrid_LIBRARY}
             ${Boost_LIBRARIES}
-#            ${WRENCH_WFCOMMONS_WORKFLOW_PARSER_LIBRARY}
+            ${WRENCH_WFCOMMONS_WORKFLOW_PARSER_LIBRARY}
             )
 endif()
 
