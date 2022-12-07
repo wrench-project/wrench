@@ -103,7 +103,7 @@ namespace wrench {
             simulateComputationAsSleep(action_executor, num_threads, sequential_work, parallel_per_thread_work);
         } else {
             simulateComputationAsComputation(action_executor, num_threads, sequential_work,
-                                                   parallel_per_thread_work);
+                                             parallel_per_thread_work);
         }
     }
 

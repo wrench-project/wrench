@@ -39,7 +39,7 @@ namespace wrench {
         wrench::TerminalOutput::beginThisProcessColor();                                  \
         XBT_DEBUG(__VA_ARGS__);                                                           \
         wrench::TerminalOutput::endThisProcessColor();                                    \
-    }                                                                                    \
+    }                                                                                     \
     static_assert(true, "")
 
 #define WRENCH_WARN(...)                                                                    \
@@ -47,7 +47,7 @@ namespace wrench {
         wrench::TerminalOutput::beginThisProcessColor();                                    \
         XBT_WARN(__VA_ARGS__);                                                              \
         wrench::TerminalOutput::endThisProcessColor();                                      \
-    }                                                                                    \
+    }                                                                                       \
     static_assert(true, "")
 
     /***********************/
