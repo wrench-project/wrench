@@ -143,7 +143,7 @@ namespace wrench {
             message = "  - mount point " + fs.first + ": " +
                       std::to_string(fs.second->getFreeSpace()) + "/" +
                       std::to_string(fs.second->getTotalCapacity()) + " Bytes";
-            WRENCH_INFO("%s", message.c_str())
+            WRENCH_INFO("%s", message.c_str());
         }
 
         //        WRENCH_INFO("STREAMS PENDING: %zu", this->pending_transactions.size());
@@ -438,7 +438,7 @@ namespace wrench {
                     requesting_host,
                     nullptr,
                     answer_mailbox,
-                    location->getFile()->getSize());
+                    num_bytes_to_read);
 
             // Add it to the Pool of pending data communications
             //            this->transactions[sg_iostream] = transaction;
@@ -462,7 +462,7 @@ namespace wrench {
 
         WRENCH_INFO("FileCopyRequest: %s -> %s",
                     src_location->toString().c_str(),
-                    dst_location->toString().c_str())
+                    dst_location->toString().c_str());
 
         auto src_host = simgrid::s4u::Host::by_name(src_location->getStorageService()->getHostname());
         auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());

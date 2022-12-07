@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-#include <typeinfo>
 #include <map>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -18,7 +17,6 @@
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
-#include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
@@ -270,7 +268,7 @@ namespace wrench {
                                                                                                                                  "bare_metal",
                                                                                                                                  scratch_space_mount_point) {
         std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
-        for (auto h: compute_hosts) {
+        for (const auto& h: compute_hosts) {
             specified_compute_resources.insert(
                     std::make_pair(h, std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM)));
         }
@@ -365,7 +363,7 @@ namespace wrench {
         try {
             this->action_execution_service = std::shared_ptr<ActionExecutionService>(new ActionExecutionService(
                     hostname,
-                    std::move(compute_resources),
+                    compute_resources,
                     nullptr,
                     {
                             {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD, this->getPropertyValueAsString(BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
