@@ -657,7 +657,7 @@ namespace wrench {
             S4U_Mailbox::putMessage(ack_mailbox,
                                     new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                             SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-        } catch (ExecutionException &ignore) { }
+        } catch (ExecutionException &ignore) {}
         return false;
     }
 
