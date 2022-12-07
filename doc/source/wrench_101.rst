@@ -280,7 +280,7 @@ The fourth service is a another storage service that runs on host
 Step 4: Instantiate at least one Execution controller
 -----------------------------------------------------
 
-At leave on *execution controller* must be created and added to the
+At least one *execution controller* must be created and added to the
 simulation. This is a special service that is in charge of executing an
 application workload on the platform. It is implemented as a class that
 derives from :cpp:class:`wrench::ExecutionController` and override its
