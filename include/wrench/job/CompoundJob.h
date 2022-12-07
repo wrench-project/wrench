@@ -119,7 +119,7 @@ namespace wrench {
                                                           const std::shared_ptr<FileLocation> &dst_file_location);
 
         std::shared_ptr<FileDeleteAction> addFileDeleteAction(const std::string &name,
-                                                              const std::shared_ptr<FileLocation>& file_location);
+                                                              const std::shared_ptr<FileLocation> &file_location);
 
         std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(const std::string &name,
                                                                                   const std::shared_ptr<FileRegistryService> &file_registry,
