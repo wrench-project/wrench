@@ -78,7 +78,7 @@ namespace wrench {
             message = "  - mount point " + fs.first + ": " +
                       std::to_string(fs.second->getFreeSpace()) + "/" +
                       std::to_string(fs.second->getTotalCapacity()) + " Bytes";
-            WRENCH_INFO("%s", message.c_str())
+            WRENCH_INFO("%s", message.c_str());
         }
 
         // If writeback device simulation is activated

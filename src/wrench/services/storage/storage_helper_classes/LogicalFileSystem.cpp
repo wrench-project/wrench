@@ -290,11 +290,11 @@ namespace wrench {
     }
 
     /**
- * @brief Unreserve space that was saved for a file (likely a failed transfer)
- * @param file: the file
- * @param absolute_path: the path where it would have been written
- * @throw std::invalid_argument
- */
+     * @brief Unreserved space that was saved for a file (likely a failed transfer)
+     * @param file: the file
+     * @param absolute_path: the path where it would have been written
+     * @throw std::invalid_argument
+     */
     void LogicalFileSystem::unreserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
         if (devnull) {
             return;
