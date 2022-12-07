@@ -29,7 +29,7 @@ namespace wrench {
      */
     NetworkError::NetworkError(NetworkError::OperationType operation_type,
                                NetworkError::ErrorType error_type,
-                               const std::string& mailbox) {
+                               const std::string &mailbox) {
         if (mailbox.empty()) {
             throw std::invalid_argument("NetworkError::NetworkError(): invalid arguments");
         }
