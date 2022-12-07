@@ -270,7 +270,7 @@ namespace wrench {
                             VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD));
 
         } else {
-            // Do the migrationa
+            // Do the migration
             vm->migrate(dest_pm_hostname);
             msg_to_send_back = new VirtualizedClusterComputeServiceMigrateVMAnswerMessage(
                     true,

@@ -418,17 +418,17 @@ namespace wrench {
     /**
      * @brief Set default and user-defined properties
      * @param default_property_values: list of default properties
-     * @param overridden_poperty_values: list of overridden properties (override the default)
+     * @param overridden_property_values: list of overridden properties (override the default)
      */
     void Service::setProperties(WRENCH_PROPERTY_COLLECTION_TYPE default_property_values,
-                                WRENCH_PROPERTY_COLLECTION_TYPE overridden_poperty_values) {
+                                WRENCH_PROPERTY_COLLECTION_TYPE overridden_property_values) {
         // Set default properties
         for (auto const &p: default_property_values) {
             this->setProperty(p.first, p.second);
         }
 
         // Set specified properties (possible overwriting default ones)
-        for (auto const &p: overridden_poperty_values) {
+        for (auto const &p: overridden_property_values) {
             this->setProperty(p.first, p.second);
         }
     }

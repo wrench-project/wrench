@@ -781,7 +781,7 @@ namespace wrench {
 
 
     /**
-    * @brief Terminate a pilot jobthat hasn't completed/expired/failed yet
+    * @brief Terminate a pilot job that hasn't completed/expired/failed yet
     * @param job: the job to be terminated
     *
     * @throw ExecutionException

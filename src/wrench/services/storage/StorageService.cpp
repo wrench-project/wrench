@@ -391,7 +391,7 @@ namespace wrench {
     void StorageService::readFile(const std::shared_ptr<FileLocation> &location) {
         if (location == nullptr) {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
-        }//This check DOES need to exist, becasue we call file->getSize()
+        }//This check DOES need to exist, because we call file->getSize()
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         readFile(location, answer_mailbox, location->getFile()->getSize());
     }
@@ -832,7 +832,7 @@ namespace wrench {
      * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
      * at that location.
      *
-     * @param location: a file location, must be the same object as the function is envoked on
+     * @param location: a file location, must be the same object as the function is invoked on
      *
      * @throw std::invalid_argument
      */

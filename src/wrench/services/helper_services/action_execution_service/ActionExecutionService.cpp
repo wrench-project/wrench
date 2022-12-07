@@ -1013,7 +1013,7 @@ namespace wrench {
         } else if (key == "num_idle_cores") {
             // Num idle cores per hosts
             std::map<std::string, double> num_idle_cores;
-            for (auto r: this->running_thread_counts) {
+            for (auto const &r: this->running_thread_counts) {
                 unsigned long cores = std::get<0>(this->compute_resources[r.first]);
                 unsigned long running_threads = r.second;
                 num_idle_cores.insert(
@@ -1040,7 +1040,7 @@ namespace wrench {
         } else if (key == "ram_availabilities") {
             // RAM availability per host
             std::map<std::string, double> ram_availabilities_to_return;
-            for (auto r: this->ram_availabilities) {
+            for (auto const &r: this->ram_availabilities) {
                 ram_availabilities_to_return.insert(std::make_pair(r.first, r.second));
             }
             return ram_availabilities_to_return;

@@ -762,7 +762,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Update the top level of all tasks (in case dynamic top level udpates
+     * @brief Update the top level of all tasks (in case dynamic top level updates
      * had been disabled)
      */
     void Workflow::updateAllTopBottomLevels() {
