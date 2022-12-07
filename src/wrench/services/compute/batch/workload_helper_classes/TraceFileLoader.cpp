@@ -319,7 +319,7 @@ namespace wrench {
         nlohmann::json j;
 
 
-        //handle the exceptions of opening the json file
+        // handle the exceptions when opening the json file
         file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
         try {
             file.open(filename);

@@ -331,7 +331,7 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<CoordinateLookupRequestMessage *>(message.get())) {
             std::string requested_host = msg->requested_host;
             auto const coordinate_itr = this->coordinate_lookup_table.find(requested_host);
-            CoordinateLookupAnswerMessage *msg_to_send_back = nullptr;
+            CoordinateLookupAnswerMessage *msg_to_send_back;
 
             if (coordinate_itr != this->coordinate_lookup_table.cend()) {
                 msg_to_send_back = new CoordinateLookupAnswerMessage(

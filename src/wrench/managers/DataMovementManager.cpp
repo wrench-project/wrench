@@ -172,7 +172,7 @@ namespace wrench {
 
         WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // There shouldn't be any need to clean any state up
             return false;
 

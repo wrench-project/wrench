@@ -915,10 +915,10 @@ namespace wrench {
         WRENCH_DEBUG("Job Manager got a %s message", message->getName().c_str());
         WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<JobManagerWakeupMessage *>(message.get())) {
+        if (dynamic_cast<JobManagerWakeupMessage *>(message.get())) {
             // Just wakeup
             return true;
-        } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        } else if (dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // There shouldn't be any need to clean up any state
             return false;
         } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobDoneMessage *>(message.get())) {

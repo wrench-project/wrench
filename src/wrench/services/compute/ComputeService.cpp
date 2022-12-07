@@ -74,7 +74,7 @@ namespace wrench {
             throw;
         }
 
-        if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
+        if (dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
             this->state = Service::DOWN;
         } else {
             throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");

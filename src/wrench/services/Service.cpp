@@ -131,7 +131,6 @@ namespace wrench {
      */
     double Service::getPropertyValueWithUnitsAsValue(WRENCH_PROPERTY_TYPE property,
                                                      const std::function<double(std::string &s)> &unit_parsing_function) {
-        double value;
         std::string string_value;
         try {
             string_value = this->getPropertyValueAsString(property);
@@ -250,7 +249,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     bool Service::getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE property) {
-        bool value;
         std::string string_value;
         try {
             string_value = this->getPropertyValueAsString(property);
@@ -342,7 +340,7 @@ namespace wrench {
             throw;
         }
 
-        if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
+        if (dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
             this->state = Service::DOWN;
         } else {
             throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");

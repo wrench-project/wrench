@@ -864,7 +864,7 @@ namespace wrench {
             WRENCH_WARN(
                     "BatchComputeService::processCompoundJobCompletion(): Received a compound job completion, but "
                     "the executor is not in the executor list - Likely getting wires crossed due to concurrent "
-                    "completion and time-outs.. ignoring")
+                    "completion and time-outs.. ignoring");
             return;
         }
 
