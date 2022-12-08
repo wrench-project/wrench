@@ -127,7 +127,7 @@ namespace wrench {
         double getLinkUsage(const std::string &link_name, bool record_as_time_stamp);
         std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps);
 
-        static bool doesHostExist(const std::string& hostname);
+        static bool doesHostExist(const std::string &hostname);
         static bool isHostOn(const std::string &hostname);
         static void turnOnHost(const std::string &hostname);
         static void turnOffHost(const std::string &hostname);
@@ -249,6 +249,6 @@ namespace wrench {
     };
 
 
-} // namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_SIMULATION_H
