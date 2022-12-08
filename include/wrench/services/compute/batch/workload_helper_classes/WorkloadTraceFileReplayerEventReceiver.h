@@ -46,8 +46,8 @@ namespace wrench {
 
 }// namespace wrench
 
-    /***********************/
-    /** \endcond          **/
-    /***********************/
+/***********************/
+/** \endcond          **/
+/***********************/
 
 #endif//WRENCH_ONEJOBWMS_H

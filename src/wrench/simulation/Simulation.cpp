@@ -1032,7 +1032,7 @@ namespace wrench {
      * @param hostname - name of host being queried
      * @return boolean of existence
      */
-    bool Simulation::doesHostExist(const std::string& hostname) {
+    bool Simulation::doesHostExist(const std::string &hostname) {
         return S4U_Simulation::hostExists(hostname);
     }
 
