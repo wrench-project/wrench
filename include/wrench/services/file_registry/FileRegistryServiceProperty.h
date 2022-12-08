@@ -39,7 +39,7 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(REMOVE_ENTRY_COMPUTE_COST);
     };
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_FILEREGISTRYPROPERTY_H

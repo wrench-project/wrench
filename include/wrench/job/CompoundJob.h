@@ -236,7 +236,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_COMPOUNDJOB_H

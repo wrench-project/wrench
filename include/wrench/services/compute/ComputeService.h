@@ -195,6 +195,6 @@ namespace wrench {
     };
 
 
-};// namespace wrench
+}// namespace wrench
 
 #endif//SIMULATION_COMPUTESERVICE_H

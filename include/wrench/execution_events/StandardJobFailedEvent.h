@@ -74,7 +74,7 @@ namespace wrench {
     };
 
 
-};// namespace wrench
+}// namespace wrench
 
     /***********************/
     /** \endcond           */

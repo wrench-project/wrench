@@ -52,4 +52,4 @@ namespace wrench {
         return payloadToString.at(messagePayload);
     }
 
-};// namespace wrench
+}// namespace wrench

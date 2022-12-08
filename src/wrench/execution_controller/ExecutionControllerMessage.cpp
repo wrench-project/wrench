@@ -28,4 +28,4 @@ namespace wrench {
     ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(const std::string &message, double payload) : ExecutionControllerMessage(payload), message(message) {}
 
 
-};// namespace wrench
+}// namespace wrench

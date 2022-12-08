@@ -202,7 +202,6 @@ namespace wrench {
         }
 
         return (unsigned long) (*(dict.begin())).second;
-        ;
     }
 
     /**
@@ -535,4 +534,4 @@ namespace wrench {
     }
 
 
-};// namespace wrench
+}// namespace wrench

@@ -87,7 +87,7 @@ namespace wrench {
                                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                              const std::string &suffix) : ComputeService(hostname,
                                                                                          "BatchComputeService" + suffix,
-                                                                                         std::move(scratch_space_mount_point)) {
+                                                                                         scratch_space_mount_point) {
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
 
@@ -285,11 +285,11 @@ namespace wrench {
         std::sort(queue_state.begin(), queue_state.end(),
                   [](const std::tuple<std::string, std::string, int, int, int, double, double> &j1,
                      const std::tuple<std::string, std::string, int, int, int, double, double> &j2) -> bool {
-                      if (std::get<6>(j1) == std::get<6>(j2)) {
-                          return (std::get<1>(j1) > std::get<1>(j2));
-                      } else {
-                          return (std::get<6>(j1) > std::get<6>(j2));
-                      }
+                    if (std::get<6>(j1) == std::get<6>(j2)) {
+                        return (std::get<1>(j1) > std::get<1>(j2));
+                    } else {
+                        return (std::get<6>(j1) > std::get<6>(j2));
+                    }
                   });
 
         return queue_state;
@@ -1094,14 +1094,14 @@ namespace wrench {
         }
 
         // Create the trace replayer process
-        this->workload_trace_replayer = std::shared_ptr<WorkloadTraceFileReplayer>(
-                new WorkloadTraceFileReplayer(
+        this->workload_trace_replayer = std::make_shared<WorkloadTraceFileReplayer>(
+
                         S4U_Simulation::getHostName(),
                         this->getSharedPtr<BatchComputeService>(),
                         this->num_cores_per_node,
                         this->getPropertyValueAsBoolean(
                                 BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE),
-                        this->workload_trace));
+                        this->workload_trace);
         this->workload_trace_replayer->setSimulation(this->simulation);
         this->workload_trace_replayer->start(this->workload_trace_replayer, true,
                                              false);// Daemonized, no auto-restart
@@ -1286,7 +1286,7 @@ namespace wrench {
                     this->host_id_to_names[node]);// Use the whole RAM
             this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
             resources.insert(std::make_pair(this->host_id_to_names[node], std::make_tuple(
-                                                                                  cores_per_node_asked_for, ram_capacity)));
+                    cores_per_node_asked_for, ram_capacity)));
         }
 
         startJob(resources, compound_job, batch_job, num_nodes_allocated, time_in_seconds,

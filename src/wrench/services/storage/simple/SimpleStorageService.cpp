@@ -694,4 +694,4 @@ namespace wrench {
         return fs->getFileLastWriteDate(location->getFile(), location->getAbsolutePathAtMountPoint());
     }
 
-};// namespace wrench
+}// namespace wrench
