@@ -155,7 +155,7 @@ namespace wrench {
         /** \endcond           */
         /***********************/
     };
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_SERVICE_H

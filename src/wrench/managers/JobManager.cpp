@@ -7,9 +7,9 @@
  * (at your option) any later version.
  */
 
+#include <memory>
 #include <string>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
 #include <utility>
 
 #include <wrench/exceptions/ExecutionException.h>
@@ -188,7 +188,7 @@ namespace wrench {
             }
         }
 
-        for (auto fd: cleanup_file_deletions) {
+        for (auto const &fd: cleanup_file_deletions) {
             if (fd == nullptr) {
                 throw std::invalid_argument(
                         "JobManager::createStandardJob(): nullptr file location in the cleanup_file_deletions set");
@@ -444,7 +444,7 @@ namespace wrench {
         } catch (ExecutionException &e) {
             job->compound_job = nullptr;
             if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
-                throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(job, compute_service)));
+                throw ExecutionException(std::make_shared<NotEnoughResources>(job, compute_service));
             } else {
                 throw;
             }
@@ -535,7 +535,7 @@ namespace wrench {
             compute_service->validateServiceSpecificArguments(job, service_specific_args);
         } catch (ExecutionException &e) {
             if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
-                throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(job, compute_service)));
+                throw ExecutionException(std::make_shared<NotEnoughResources>(job, compute_service));
             } else {
                 throw;
             }
@@ -654,7 +654,7 @@ namespace wrench {
         } catch (ExecutionException &e) {
             job->compound_job = nullptr;
             if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
-                throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(job, compute_service)));
+                throw ExecutionException(std::make_shared<NotEnoughResources>(job, compute_service));
             } else {
                 throw;
             }
@@ -673,7 +673,7 @@ namespace wrench {
             compute_service->validateServiceSpecificArguments(job->compound_job, service_specific_args);
         } catch (ExecutionException &e) {
             if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
-                throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(job, compute_service)));
+                throw ExecutionException(std::make_shared<NotEnoughResources>(job, compute_service));
             } else {
                 throw;
             }

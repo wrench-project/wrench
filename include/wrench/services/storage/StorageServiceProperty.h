@@ -33,7 +33,7 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(BUFFER_SIZE);
     };
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_STORAGESERVICEPROPERTY_H

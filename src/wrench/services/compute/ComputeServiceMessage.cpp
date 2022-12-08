@@ -414,4 +414,4 @@ namespace wrench {
      */
     ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
             bool answer, double payload) : ComputeServiceMessage(payload), answer(answer) {}
-};// namespace wrench
+}// namespace wrench
