@@ -491,4 +491,4 @@ namespace wrench {
                     std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr<Service>())));
         }
     }
-};// namespace wrench
+}// namespace wrench

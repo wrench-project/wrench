@@ -112,7 +112,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_S4U_COLORLOGGING_H

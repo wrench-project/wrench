@@ -147,6 +147,6 @@ namespace wrench {
         std::shared_ptr<MemoryManager> memory_manager;
     };
 
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_SIMPLESTORAGESERVICENONBUFFERIZED_H

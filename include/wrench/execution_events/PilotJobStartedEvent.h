@@ -66,7 +66,7 @@ namespace wrench {
         std::string toString() override { return "PilotJobStartedEvent (cs = " + this->compute_service->getName() + ")"; }
     };
 
-};// namespace wrench
+}// namespace wrench
 
     /***********************/
     /** \endcond           */

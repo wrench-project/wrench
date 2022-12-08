@@ -99,7 +99,7 @@ namespace wrench {
     /***********************/
 
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_DATAMOVEMENTMANAGER_H

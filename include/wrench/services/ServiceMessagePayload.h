@@ -59,7 +59,7 @@ namespace wrench {
         DECLARE_MESSAGEPAYLOAD_NAME(DAEMON_STOPPED_MESSAGE_PAYLOAD);
     };
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_SERVICEMESSAGEPAYLOAD_H

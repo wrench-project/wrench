@@ -57,4 +57,4 @@ namespace wrench {
             //            this->job_manager->forgetJob(job);
         }
     }
-};// namespace wrench
+}// namespace wrench

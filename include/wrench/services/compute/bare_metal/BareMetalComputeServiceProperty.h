@@ -33,6 +33,6 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
     };
 
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_BAREMETALCOMPUTESERVICEPROPERTY_H

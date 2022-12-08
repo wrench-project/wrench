@@ -46,7 +46,7 @@ namespace wrench {
         int main() override;
     };
 
-};// namespace wrench
+}// namespace wrench
 
     /***********************/
     /** \endcond          **/

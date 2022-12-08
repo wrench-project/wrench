@@ -18,7 +18,6 @@
 #include <wrench/data_file/DataFile.h>
 #include <wrench/managers/DataMovementManager.h>
 #include <wrench/failure_causes/FileAlreadyBeingCopied.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 #include <memory>
 
@@ -235,4 +234,4 @@ namespace wrench {
     }
 
 
-};// namespace wrench
+} // namespace wrench
