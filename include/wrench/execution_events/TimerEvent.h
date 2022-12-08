@@ -64,9 +64,9 @@ namespace wrench {
 
 }// namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
 
 #endif//WRENCH_TIMER_EVENT_H

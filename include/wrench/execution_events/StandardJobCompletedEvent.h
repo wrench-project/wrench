@@ -72,9 +72,9 @@ namespace wrench {
 
 }// namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
 
 #endif//WRENCH_STANDARD_JOB_COMPLETED_EVENT_H

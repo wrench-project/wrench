@@ -71,9 +71,9 @@ namespace wrench {
 
 }// namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
 
 #endif//WRENCH_COMPOUND_JOB_FAILED_H

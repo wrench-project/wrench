@@ -88,9 +88,9 @@ namespace wrench {
 
 }// namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
 
 #endif//WRENCH_FILE_COPY_COMPLETED_EVENT_H
