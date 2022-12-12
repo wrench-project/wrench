@@ -68,9 +68,9 @@ namespace wrench {
 
 }// namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
 
 #endif//WRENCH_PILOT_JOB_EXPIRED_EVENT_H
