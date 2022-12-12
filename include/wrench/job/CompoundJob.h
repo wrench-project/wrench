@@ -209,7 +209,7 @@ namespace wrench {
         bool hasAction(const std::string &name);
 
         std::set<std::shared_ptr<CompoundJob>> &getChildren();
-        std::set<std::shared_ptr<CompoundJob>> &getParents();
+//        std::set<std::shared_ptr<CompoundJob>> &getParents();
 
     private:
         void assertJobNotSubmitted();
@@ -218,7 +218,7 @@ namespace wrench {
         void addAction(const std::shared_ptr<Action> &action);
 
         bool pathExists(const std::shared_ptr<Action> &a, const std::shared_ptr<Action> &b);
-        bool pathExists(const std::shared_ptr<CompoundJob> &a, const std::shared_ptr<CompoundJob> &b);
+        static bool pathExists(const std::shared_ptr<CompoundJob> &a, const std::shared_ptr<CompoundJob> &b);
 
         std::set<std::shared_ptr<CompoundJob>> parents;
         std::set<std::shared_ptr<CompoundJob>> children;
