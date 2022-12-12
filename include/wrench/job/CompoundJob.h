@@ -209,7 +209,7 @@ namespace wrench {
         bool hasAction(const std::string &name);
 
         std::set<std::shared_ptr<CompoundJob>> &getChildren();
-//        std::set<std::shared_ptr<CompoundJob>> &getParents();
+        //        std::set<std::shared_ptr<CompoundJob>> &getParents();
 
     private:
         void assertJobNotSubmitted();

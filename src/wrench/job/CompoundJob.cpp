@@ -579,13 +579,13 @@ namespace wrench {
         return this->children;
     }
 
-//    /**
-//     * @brief Returns a reference to the job's parent jobs, if any (use with caution)
-//     * @return a set of jobs (a reference)
-//     */
-//    std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getParents() {
-//        return this->parents;
-//    }
+    //    /**
+    //     * @brief Returns a reference to the job's parent jobs, if any (use with caution)
+    //     * @return a set of jobs (a reference)
+    //     */
+    //    std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getParents() {
+    //        return this->parents;
+    //    }
 
     /**
      * @brief Remove an action from the job
