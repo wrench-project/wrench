@@ -161,7 +161,6 @@ set(HEADER_FILES
         include/wrench/failure_causes/JobKilled.h
         include/wrench/failure_causes/JobTimeout.h
         include/wrench/failure_causes/NetworkError.h
-        include/wrench/failure_causes/NoScratchSpace.h
         include/wrench/failure_causes/NotAllowed.h
         include/wrench/failure_causes/NotEnoughResources.h
         include/wrench/failure_causes/ServiceIsDown.h
@@ -338,7 +337,6 @@ set(SOURCE_FILES
         src/wrench/failure_causes/JobKilled.cpp
         src/wrench/failure_causes/JobTimeout.cpp
         src/wrench/failure_causes/NetworkError.cpp
-        src/wrench/failure_causes/NoScratchSpace.cpp
         src/wrench/failure_causes/NotAllowed.cpp
         src/wrench/failure_causes/NotEnoughResources.cpp
         src/wrench/failure_causes/ServiceIsDown.cpp
