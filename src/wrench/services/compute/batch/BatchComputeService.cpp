@@ -1310,7 +1310,7 @@ namespace wrench {
      * @param job: the job
      * @param service_specific_args: the service-specific arguments
      */
-    void BatchComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
+    void BatchComputeService::validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &job,
                                                                std::map<std::string, std::string> &service_specific_args) {
         // Check that -N, -t, and -c are specified
         // -user is optional

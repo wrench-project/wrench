@@ -517,7 +517,7 @@ namespace wrench {
      * @param job: the job that's being submitted
      * @param service_specific_args: the service-specific arguments
      */
-    void ComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
+    void ComputeService::validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &job,
                                                           map<std::string, std::string> &service_specific_args) {
         throw std::runtime_error("ComputeService::validateServiceSpecificArguments(): should be overridden in compute service implementation");
     }
