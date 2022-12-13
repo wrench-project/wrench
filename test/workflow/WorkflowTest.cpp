@@ -371,7 +371,7 @@ protected:
         t3 = workflow->addTask("task1-test-03", 1, 1, 1, 0);
         t4 = workflow->addTask("task1-test-04", 1, 1, 1, 0);
 
-        workflow->addControlDependency(t1, t1, true); // coverage
+        workflow->addControlDependency(t1, t1, true);// coverage
         workflow->addControlDependency(t1, t2, true);
         workflow->addControlDependency(t1, t3, true);
         workflow->addControlDependency(t1, t4, true);
