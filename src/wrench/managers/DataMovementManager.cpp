@@ -225,13 +225,13 @@ namespace wrench {
         }
     }
 
-    /** @brief Get the mailbox of the service that created this data movement manager
-     *
-     * @return a mailbox
-     */
-    simgrid::s4u::Mailbox *DataMovementManager::getCreatorMailbox() {
-        return this->creator_mailbox;
-    }
+//    /** @brief Get the mailbox of the service that created this data movement manager
+//     *
+//     * @return a mailbox
+//     */
+//    simgrid::s4u::Mailbox *DataMovementManager::getCreatorMailbox() {
+//        return this->creator_mailbox;
+//    }
 
 
 }// namespace wrench
