@@ -670,13 +670,13 @@ namespace wrench {
         this->getPropertyValueAsSizeInByte(SimpleStorageServiceProperty::BUFFER_SIZE);
     }
 
-//    /**
-//     * @brief Get the load (number of concurrent reads) on the storage service
-//     * @return the load on the service
-//     */
-//    double SimpleStorageService::getLoad() {
-//        throw std::runtime_error("SimpleStorageService::getLoad(): is only implemented in derived class");
-//    }
+    //    /**
+    //     * @brief Get the load (number of concurrent reads) on the storage service
+    //     * @return the load on the service
+    //     */
+    //    double SimpleStorageService::getLoad() {
+    //        throw std::runtime_error("SimpleStorageService::getLoad(): is only implemented in derived class");
+    //    }
 
     /**
      * @brief Get a file's last write date at a location (in zero simulated time)
