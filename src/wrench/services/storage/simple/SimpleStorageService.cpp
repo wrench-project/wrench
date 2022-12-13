@@ -106,6 +106,7 @@ namespace wrench {
                 SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
     }
 
+#if 0
     /**
      * @brief Main method of the daemon
      *
@@ -115,7 +116,6 @@ namespace wrench {
         throw std::runtime_error("SimpleStorageService::main(): Should only be called in derived classes");
     }
 
-#if 0
     /**
      * @brief Process a received control message
      *
@@ -670,13 +670,13 @@ namespace wrench {
         this->getPropertyValueAsSizeInByte(SimpleStorageServiceProperty::BUFFER_SIZE);
     }
 
-    /**
-     * @brief Get the load (number of concurrent reads) on the storage service
-     * @return the load on the service
-     */
-    double SimpleStorageService::getLoad() {
-        throw std::runtime_error("SimpleStorageService::getLoad(): is only implemented in derived class");
-    }
+//    /**
+//     * @brief Get the load (number of concurrent reads) on the storage service
+//     * @return the load on the service
+//     */
+//    double SimpleStorageService::getLoad() {
+//        throw std::runtime_error("SimpleStorageService::getLoad(): is only implemented in derived class");
+//    }
 
     /**
      * @brief Get a file's last write date at a location (in zero simulated time)

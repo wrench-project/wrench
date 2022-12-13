@@ -76,8 +76,6 @@ namespace wrench {
 
         ~SimpleStorageService() override;
 
-        double getLoad() override;
-
         static SimpleStorageService *createSimpleStorageService(const std::string &hostname,
                                                                 std::set<std::string> mount_points,
                                                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
@@ -111,9 +109,6 @@ namespace wrench {
 
     private:
         friend class Simulation;
-
-        int main() override;
-
 
         void validateProperties();
 
