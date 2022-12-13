@@ -629,6 +629,8 @@ private:
         if (not std::dynamic_pointer_cast<wrench::SomeActionsHaveFailed>(real_event->failure_cause)) {
             throw std::runtime_error("Unexpected job-level failure cause");
         }
+        auto real_cause = std::dynamic_pointer_cast<wrench::SomeActionsHaveFailed>(real_event->failure_cause);
+        real_cause->toString(); // coverage
 
         // Check job state
         if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
