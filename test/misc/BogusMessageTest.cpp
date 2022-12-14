@@ -180,7 +180,7 @@ TEST_F(BogusMessageTest, SimpleStorage) {
     DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "simple_storage", true);
 }
 
- TEST_F(BogusMessageTest, DataMovementManager) {
+TEST_F(BogusMessageTest, DataMovementManager) {
     DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "data_movement_manager", true);
 }
 
