@@ -13,13 +13,11 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/compute/cloud/CloudComputeService.h>
-#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
 #include "wrench/services/storage/StorageServiceMessage.h"
 #include <wrench/services/storage/StorageServiceMessagePayload.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 #include <memory>
 
@@ -153,6 +151,7 @@ namespace wrench {
     void StorageService::deleteFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service) {
         StorageService::deleteFile(FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this()), file), file_registry_service);
     }
+
     /**
      * @brief Synchronously read a file from the storage service
      *
@@ -285,7 +284,7 @@ namespace wrench {
                     remaining -= this->buffer_size;
                 }
                 S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
-                                                                         file, (unsigned long) remaining, true));
+                                                                         file, remaining, true));
 
                 //Waiting for the final ack
                 message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
