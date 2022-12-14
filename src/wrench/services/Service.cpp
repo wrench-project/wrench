@@ -18,11 +18,11 @@
 #include <wrench/services/ServiceMessagePayload.h>
 #include <wrench/failure_causes/ServiceIsDown.h>
 #include <wrench/failure_causes/ServiceIsSuspended.h>
-#include <wrench/failure_causes/HostError.h>
-#include <wrench/failure_causes/NetworkError.h>
 #include <wrench/failure_causes/NotAllowed.h>
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 #include <wrench/util/UnitParser.h>
+
+#include <memory>
 
 WRENCH_LOG_CATEGORY(wrench_core_service, "Log category for Service");
 namespace std {
@@ -275,7 +275,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::shared_ptr<HostError>
      */
-    void Service::start(std::shared_ptr<Service> this_service, bool daemonize, bool auto_restart) {
+    void Service::start(const std::shared_ptr<Service>& this_service, bool daemonize, bool auto_restart) {
         try {
             // Setting the state to UP
             this->state = Service::UP;
@@ -373,8 +373,8 @@ namespace wrench {
     void Service::resume() {
         if (this->state != Service::SUSPENDED) {
             std::string what = "Service cannot be resumed because it is not in the suspended state";
-            throw ExecutionException(std::shared_ptr<NotAllowed>(
-                    new NotAllowed(this->getSharedPtr<Service>(), what)));
+            throw ExecutionException(std::make_shared<NotAllowed>(
+                    this->getSharedPtr<Service>(), what));
         }
         this->resumeActor();
         this->state = Service::UP;

@@ -15,7 +15,6 @@
 #include <wrench/services/compute/ComputeServiceMessagePayload.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 #include <utility>
 
