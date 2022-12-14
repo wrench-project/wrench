@@ -69,8 +69,6 @@ namespace wrench {
 
         double getCompletionDate();
 
-        void exportToEPS(const std::string &);
-
         std::vector<std::shared_ptr<DataFile>> getInputFiles() const;
         std::map<std::string, std::shared_ptr<DataFile>> getInputFileMap() const;
         std::vector<std::shared_ptr<DataFile>> getOutputFiles() const;

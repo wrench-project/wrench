@@ -38,10 +38,10 @@ namespace wrench {
      */
     VirtualizedClusterComputeService::VirtualizedClusterComputeService(const std::string &hostname,
                                                                        std::vector<std::string> &execution_hosts,
-                                                                       std::string scratch_space_mount_point,
+                                                                       const std::string& scratch_space_mount_point,
                                                                        WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                                        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
-        : CloudComputeService(hostname, execution_hosts, std::move(scratch_space_mount_point)) {
+        : CloudComputeService(hostname, execution_hosts, scratch_space_mount_point) {
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
         // Set default and specified message payloads

@@ -252,17 +252,6 @@ namespace wrench {
         }
     }
 
-
-    /**
-     * @brief Output the workflow's dependency graph to EPS
-     *
-     * @param eps_filename: a filename to which the EPS content is saved
-     *
-     */
-    void Workflow::exportToEPS(const std::string &eps_filename) {
-        throw std::runtime_error("Export to EPS broken / not implemented at the moment");
-    }
-
     /**
      * @brief Get the number of tasks in the workflow
      *

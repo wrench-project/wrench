@@ -10,6 +10,7 @@
 #include <map>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <memory>
 #include <utility>
 
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
@@ -396,9 +397,9 @@ namespace wrench {
 
         if (this->getPropertyValueAsBoolean(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)) {
             // Set up a service termination detector for the action execution service if necessary
-            auto termination_detector = std::shared_ptr<ServiceTerminationDetector>(
-                    new ServiceTerminationDetector(this->hostname, this->action_execution_service,
-                                                   this->mailbox, false, true));
+            auto termination_detector = std::make_shared<ServiceTerminationDetector>(
+                    this->hostname, this->action_execution_service,
+                                                   this->mailbox, false, true);
             termination_detector->setSimulation(this->simulation);
             termination_detector->start(termination_detector, true, false);// Daemonized, no auto-restart
         }
