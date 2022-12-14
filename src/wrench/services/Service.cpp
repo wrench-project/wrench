@@ -275,7 +275,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::shared_ptr<HostError>
      */
-    void Service::start(const std::shared_ptr<Service>& this_service, bool daemonize, bool auto_restart) {
+    void Service::start(const std::shared_ptr<Service> &this_service, bool daemonize, bool auto_restart) {
         try {
             // Setting the state to UP
             this->state = Service::UP;
