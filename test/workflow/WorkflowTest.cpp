@@ -352,9 +352,6 @@ TEST_F(WorkflowTest, SumFlops) {
     ASSERT_EQ(sum_flops, 4.0);
 }
 
-TEST_F(WorkflowTest, Export) {
-    ASSERT_THROW(workflow->exportToEPS("tmp/workflow.eps"), std::runtime_error);
-}
 
 class AllDependenciesWorkflowTest : public ::testing::Test {
 protected:
