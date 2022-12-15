@@ -48,7 +48,10 @@ namespace wrench {
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
         double getFreeSpace();
-        void reserveSpace(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
+
+        bool reserveSpace(const std::shared_ptr<DataFile> &file,
+                          const std::string &absolute_path,
+                          const std::string &eviction_policy);
         void unreserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path);
 
         void createDirectory(const std::string &absolute_path);
@@ -60,6 +63,8 @@ namespace wrench {
         void removeAllFilesInDirectory(const std::string &absolute_path);
         bool isFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
         double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
+        void updateReadDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
+        double getFileLastReadDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
         std::set<std::shared_ptr<DataFile>> listFilesInDirectory(const std::string &absolute_path);
 
         simgrid::s4u::Disk *getDisk();
@@ -69,9 +74,11 @@ namespace wrench {
         friend class StorageService;
         void stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path);
 
+        bool evictLRUFiles(double needed_free_space);
+
         static std::map<std::string, StorageService *> mount_points;
 
-        std::map<std::string, std::map<std::shared_ptr<DataFile>, double>> content;
+        std::map<std::string, std::map<std::shared_ptr<DataFile>, std::pair<double, double>>> content;
 
         simgrid::s4u::Disk *disk;
 
