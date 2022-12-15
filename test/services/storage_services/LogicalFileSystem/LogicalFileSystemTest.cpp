@@ -107,4 +107,52 @@ void LogicalFileSystemTest::do_BasicTests() {
 }
 
 
+TEST_F(LogicalFileSystemTest, DevNullTests) {
+    DO_TEST_WITH_FORK(do_DevNullTests);
+}
 
+void LogicalFileSystemTest::do_DevNullTests() {
+    // Create and initialize the simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 1;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+    auto workflow = wrench::Workflow::createWorkflow();
+
+    // set up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Create a  Storage Services
+    std::shared_ptr<wrench::SimpleStorageService> storage_service;
+    ASSERT_NO_THROW(storage_service = simulation->add(
+                            wrench::SimpleStorageService::createSimpleStorageService("Host", {"/"})));
+
+    // Create a Logical File System
+    auto fs1 = new wrench::LogicalFileSystem("Host", storage_service.get(), "/dev/null");
+    fs1->init();
+
+    auto file = wrench::Simulation::addFile("file", 1.0);
+
+    fs1->createDirectory(("/foo"));
+    ASSERT_FALSE(fs1->doesDirectoryExist(("/foo")));
+    ASSERT_TRUE(fs1->isDirectoryEmpty(("/foo")));
+    ASSERT_FALSE(fs1->isFileInDirectory(file, "/foo"));
+    fs1->removeEmptyDirectory("/foo");
+    fs1->storeFileInDirectory(file, "/foo");
+    fs1->removeFileFromDirectory(file, "/foo");
+    fs1->removeAllFilesInDirectory("/foo");
+    ASSERT_TRUE(fs1->listFilesInDirectory("/foo").empty());
+    fs1->reserveSpace(file, "/foo");
+    fs1->unreserveSpace(file, "/foo");
+    fs1->getFileLastWriteDate(file, "/foo");
+
+    workflow->clear();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
