@@ -399,7 +399,7 @@ namespace wrench {
             // Set up a service termination detector for the action execution service if necessary
             auto termination_detector = std::make_shared<ServiceTerminationDetector>(
                     this->hostname, this->action_execution_service,
-                                                   this->mailbox, false, true);
+                    this->mailbox, false, true);
             termination_detector->setSimulation(this->simulation);
             termination_detector->start(termination_detector, true, false);// Daemonized, no auto-restart
         }
