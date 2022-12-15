@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <set>
 #include <memory>
 
@@ -41,7 +42,12 @@ namespace wrench {
          */
         const static std::string DEV_NULL;
 
-        explicit LogicalFileSystem(const std::string &hostname, StorageService *storage_service, std::string mount_point = DEV_NULL);
+        unsigned int last_accessed = 0;
+
+        explicit LogicalFileSystem(const std::string &hostname,
+                                   StorageService *storage_service,
+                                   std::string mount_point = DEV_NULL,
+                                   std::string eviction_policy = "NONE");
 
         void init();
 
@@ -50,8 +56,7 @@ namespace wrench {
         double getFreeSpace();
 
         bool reserveSpace(const std::shared_ptr<DataFile> &file,
-                          const std::string &absolute_path,
-                          const std::string &eviction_policy);
+                          const std::string &absolute_path);
         void unreserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path);
 
         void createDirectory(const std::string &absolute_path);
@@ -64,7 +69,6 @@ namespace wrench {
         bool isFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
         double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
         void updateReadDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
-        double getFileLastReadDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
         std::set<std::shared_ptr<DataFile>> listFilesInDirectory(const std::string &absolute_path);
 
         simgrid::s4u::Disk *getDisk();
@@ -78,19 +82,25 @@ namespace wrench {
 
         static std::map<std::string, StorageService *> mount_points;
 
-        std::map<std::string, std::map<std::shared_ptr<DataFile>, std::pair<double, double>>> content;
+        std::unordered_map<std::string, std::map<std::shared_ptr<DataFile>, std::pair<double, unsigned int>>> content;
+        std::map<unsigned int, std::tuple<const std::string &, const std::shared_ptr<DataFile> &>> lru_list;
+
 
         simgrid::s4u::Disk *disk;
 
         std::string hostname;
         StorageService *storage_service;
         std::string mount_point;
+        std::string eviction_policy;
+        bool uses_lru;
         double total_capacity;
-        double occupied_space;
+        double free_space;
         bool devnull = false;
         std::map<std::string, double> reserved_space;
 
         bool initialized;
+
+    private:
 
         void assertInitHasBeenCalled() const {
             if (not this->initialized) {
