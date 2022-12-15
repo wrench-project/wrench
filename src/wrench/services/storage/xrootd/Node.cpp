@@ -239,7 +239,7 @@ namespace wrench {
                 try {
                     S4U_Mailbox::dputMessage(msg->ack_mailbox,
                                              new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                     SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                                     ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
                 } catch (ExecutionException &e) {
                     return false;
                 }
