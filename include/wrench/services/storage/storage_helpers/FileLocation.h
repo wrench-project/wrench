@@ -32,7 +32,7 @@ namespace wrench {
     class FileLocation {
 
     public:
-        ~FileLocation();
+        virtual ~FileLocation();
 
         /**
          * @brief Static location that denotes a compute service's scratch space
