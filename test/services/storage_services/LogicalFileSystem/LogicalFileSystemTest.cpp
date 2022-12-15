@@ -11,6 +11,7 @@ class LogicalFileSystemTest : public ::testing::Test {
 
 public:
     void do_BasicTests();
+    void do_DevNullTests();
 
 protected:
     LogicalFileSystemTest() {
@@ -104,3 +105,6 @@ void LogicalFileSystemTest::do_BasicTests() {
         free(argv[i]);
     free(argv);
 }
+
+
+
