@@ -12,6 +12,7 @@ class LogicalFileSystemTest : public ::testing::Test {
 public:
     void do_BasicTests();
     void do_DevNullTests();
+    void do_LRUTests();
 
 protected:
     LogicalFileSystemTest() {
@@ -27,13 +28,9 @@ protected:
                           "             <prop id=\"size\" value=\"100MB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100MB\"/>"
+                          "          <disk id=\"100bytedisk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100\"/>"
                           "             <prop id=\"mount\" value=\"/tmp\"/>"
-                          "          </disk>"
-                          "          <disk id=\"large_disk4\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100MB\"/>"
-                          "             <prop id=\"mount\" value=\"/home/users\"/>"
                           "          </disk>"
                           "       </host>"
                           "   </zone> "
@@ -149,6 +146,62 @@ void LogicalFileSystemTest::do_DevNullTests() {
     fs1->reserveSpace(file, "/foo");
     fs1->unreserveSpace(file, "/foo");
     fs1->getFileLastWriteDate(file, "/foo");
+
+    workflow->clear();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+TEST_F(LogicalFileSystemTest, LRUTests) {
+    DO_TEST_WITH_FORK(do_LRUTests);
+}
+
+void LogicalFileSystemTest::do_LRUTests() {
+    // Create and initialize the simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 1;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+    auto workflow = wrench::Workflow::createWorkflow();
+
+    // set up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Create a  Storage Services
+    std::shared_ptr<wrench::SimpleStorageService> storage_service;
+    ASSERT_NO_THROW(storage_service = simulation->add(
+                            wrench::SimpleStorageService::createSimpleStorageService("Host", {"/tmp"})));
+
+    // Create a Logical File System with LRU eviction
+    auto fs1 = new wrench::LogicalFileSystem("Host", storage_service.get(), "/tmp", "LRU");
+    fs1->init();
+
+    auto file_60 = wrench::Simulation::addFile("file_60", 60);
+    auto file_50 = wrench::Simulation::addFile("file_50", 50);
+    auto file_30 = wrench::Simulation::addFile("file_30", 30);
+    auto file_20 = wrench::Simulation::addFile("file_20", 20);
+    auto file_10 = wrench::Simulation::addFile("file_10", 10);
+
+    fs1->createDirectory(("/foo"));
+    ASSERT_TRUE(fs1->reserveSpace(file_60, "/foo"));
+    ASSERT_FALSE(fs1->reserveSpace(file_50, "/foo"));
+    fs1->storeFileInDirectory(file_60, "/foo");
+    fs1->storeFileInDirectory(file_10, "/foo");
+
+    ASSERT_TRUE(fs1->reserveSpace(file_50, "/foo"));
+    // Check that file_60 has been evicted
+    ASSERT_FALSE(fs1->isFileInDirectory(file_60, "/foo"));
+    // Check that file_10 is still there evicted
+    ASSERT_TRUE(fs1->isFileInDirectory(file_10, "/foo"));
+    fs1->storeFileInDirectory(file_50, "/foo");
+
 
     workflow->clear();
 
