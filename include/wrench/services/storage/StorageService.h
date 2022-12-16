@@ -116,6 +116,7 @@ namespace wrench {
                        const std::string &service_name);
 
     protected:
+
         StorageService(const std::string &hostname,
                        const std::string &service_name);
         friend class Simulation;
