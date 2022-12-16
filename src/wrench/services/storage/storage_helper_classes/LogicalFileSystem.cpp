@@ -9,6 +9,8 @@
 
 #include <wrench-dev.h>
 #include <wrench/services/storage/storage_helpers/LogicalFileSystem.h>
+#include <wrench/services/storage/storage_helpers/LogicalFileSystemNoCaching.h>
+#include <wrench/services/storage/storage_helpers/LogicalFileSystemLRUCaching.h>
 
 #include <limits>
 #include <utility>
@@ -17,21 +19,39 @@ WRENCH_LOG_CATEGORY(wrench_core_logical_file_system, "Log category for Logical F
 
 
 namespace wrench {
+
     const std::string LogicalFileSystem::DEV_NULL = "/dev/null";
     std::map<std::string, StorageService *> LogicalFileSystem::mount_points;
 
     /**
-     * @brief Constructor
-     * @param hostname: the host on which the file system is located
-     * @param storage_service: the storage service this file system is for
-     * @param mount_point: the mount point, defaults to /dev/null
-     * @param eviction_policy: "NONE" or "LRU"
+     * @brief Method to create a LogicalFileSystem instance
+     * @param hostname hostname on which the disk is mounted
+     * @param storage_service storage service for which this file system is created
+     * @param mount_point the mountpoint
+     * @param eviction_policy the cache eviction policy ("NONE", "LRU")
+     * @return a shared pointer to a LogicalFileSystem instance
      */
-    LogicalFileSystem::LogicalFileSystem(const std::string &hostname, StorageService *storage_service,
-                                         std::string mount_point, std::string eviction_policy) {
+    std::unique_ptr<LogicalFileSystem> LogicalFileSystem::createLogicalFileSystem(const std::string &hostname,
+                                                                      StorageService *storage_service,
+                                                                      const std::string& mount_point,
+                                                                      const std::string& eviction_policy) {
         if (storage_service == nullptr) {
-            throw std::invalid_argument("LogicalFileSystem::LogicalFileSystem(): nullptr storage_service argument");
+            throw std::invalid_argument("LogicalFileSystem::createLogicalFileSystem(): nullptr storage_service argument");
         }
+
+        if (eviction_policy == "NONE") {
+            return std::unique_ptr<LogicalFileSystem>(new LogicalFileSystemNoCaching(hostname, storage_service, mount_point));
+        } else if (eviction_policy == "LRU") {
+            return std::unique_ptr<LogicalFileSystem>(new LogicalFileSystemLRUCaching(hostname, storage_service, mount_point));
+        } else {
+            throw std::invalid_argument("LogicalFileSystem::createLogicalFileSystem(): Unknown cache eviction policy " + eviction_policy);
+        }
+    }
+
+
+    LogicalFileSystem::LogicalFileSystem(const std::string &hostname, StorageService *storage_service,
+                                                           const std::string &mount_point) {
+
         this->hostname = hostname;
         this->storage_service = storage_service;
         this->content["/"] = {};
@@ -42,7 +62,7 @@ namespace wrench {
             this->total_capacity = std::numeric_limits<double>::infinity();
         } else {
             devnull = false;
-            mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
+            this->mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
             // Check validity
             this->disk = S4U_Simulation::hostHasMountPoint(hostname, mount_point);
             if (not this->disk) {
@@ -53,10 +73,7 @@ namespace wrench {
         }
         this->free_space = this->total_capacity;
         this->mount_point = mount_point;
-        this->eviction_policy = std::move(eviction_policy);
-        this->uses_lru = (this->eviction_policy == "LRU");
     }
-
 
     /**
      * @brief Initializes the Logical File System (must be called before any other operation on this file system)
@@ -137,72 +154,6 @@ namespace wrench {
         this->content.erase(absolute_path);
     }
 
-/**
- * @brief Store file in directory
- *
- * @param file: the file to store
- * @param absolute_path: the directory's absolute path (at the mount point)
- *
- * @throw std::invalid_argument
- */
-    void LogicalFileSystem::storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
-        if (devnull) {
-            return;
-        }
-        assertInitHasBeenCalled();
-        // If directory does not exit, create it
-        if (not doesDirectoryExist(absolute_path)) {
-            createDirectory(absolute_path);
-        }
-
-        this->content[absolute_path][file] = std::make_tuple(S4U_Simulation::getClock(), this->last_accessed++);
-        this->lru_list.insert(std::make_pair(this->last_accessed - 1, std::make_tuple(absolute_path, file)));
-
-        std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
-        if (this->reserved_space.find(key) == this->reserved_space.end()) {
-            this->free_space -= file->getSize();
-        } else {
-            this->reserved_space.erase(key);
-        }
-    }
-
-    /**
- * @brief Remove a file in a directory
- * @param file: the file to remove
- * @param absolute_path: the directory's absolute path
- *
- * @throw std::invalid_argument
- */
-    void LogicalFileSystem::removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
-        if (devnull) {
-            return;
-        }
-        assertInitHasBeenCalled();
-        assertDirectoryExist(absolute_path);
-        assertFileIsInDirectory(file, absolute_path);
-        auto seq = std::get<1>(this->content[absolute_path][file]);
-        this->content[absolute_path].erase(file);
-        this->lru_list.erase(seq);
-        this->free_space += file->getSize();
-    }
-
-    /**
- * @brief Remove all files in a directory
- * @param absolute_path: the directory's absolute path
- *
- * @throw std::invalid_argument
- */
-    void LogicalFileSystem::removeAllFilesInDirectory(const std::string &absolute_path) {
-        if (devnull) {
-            return;
-        }
-        assertInitHasBeenCalled();
-        assertDirectoryExist(absolute_path);
-        for (auto const &c : this->content[absolute_path]) {
-            this->lru_list.erase(std::get<1>(c.second));
-        }
-        this->content[absolute_path].clear();
-    }
 
     /**
  * @brief Checks whether a file is in a directory
@@ -281,7 +232,6 @@ namespace wrench {
     * @param absolute_path: the path where it will be written
     *
     * @return true on success, false on failure
-    * @throw std::invalid_argument
     */
     bool LogicalFileSystem::reserveSpace(const std::shared_ptr<DataFile> &file,
                                          const std::string &absolute_path) {
@@ -299,23 +249,14 @@ namespace wrench {
         }
 
         if (this->free_space < file->getSize()) {
-
-            if (this->eviction_policy == "NONE") {
+            if (!this->evictFiles(file->getSize())) {
                 return false;
-
-            } else if (this->eviction_policy == "LRU") {
-                if (!evictLRUFiles(file->getSize())) {
-                    return false;
-                }
-
-            } else {
-                throw std::invalid_argument("LogicalFileSystem::reserveSpace(): Invalid eviction policy " + eviction_policy);
             }
         }
 
         this->reserved_space[key] = file->getSize();
         this->free_space -= file->getSize();
-        return false;
+        return true;
     }
 
     /**
@@ -335,13 +276,42 @@ namespace wrench {
             return;// oh well, the transfer was cancelled/terminated/whatever
         }
 
-        //         This will never happen
-        //        if (this->occupied_space <  file->getSize()) {
-        //            throw std::invalid_argument("LogicalFileSystem::unreserveSpace(): Occupied space is less than the file size... should not happen");
-        //        }
-
         this->reserved_space.erase(key);
         this->free_space += file->getSize();
+    }
+
+
+    /**
+     * @brief Retrieve the file's last write date
+     * @param file: the file
+     * @param absolute_path: the file path
+     * @return a date in seconds (returns -1.0) if file in not found
+     */
+    double LogicalFileSystem::getFileLastWriteDate(const shared_ptr<DataFile> &file, const string &absolute_path) {
+
+        if (devnull) {
+            return -1;
+        }
+        assertInitHasBeenCalled();
+        // If directory does not exist, say "no"
+        if (not doesDirectoryExist(absolute_path)) {
+            return -1;
+        }
+
+        if (this->content[absolute_path].find(file) != this->content[absolute_path].end()) {
+            return (this->content[absolute_path][file]->last_write_date);
+        } else {
+            return -1;
+        }
+    }
+
+
+    /**
+     * @brief Get the disk on which this file system runs
+     * @return The SimGrid disk on which this file system is mounted
+     */
+    simgrid::s4u::Disk *LogicalFileSystem::getDisk() {
+        return this->disk;
     }
 
 
@@ -364,98 +334,8 @@ namespace wrench {
 
         absolute_path = wrench::FileLocation::sanitizePath(absolute_path);
 
-        // If directory does not exit, create it
-        if (this->content.find(absolute_path) == this->content.end()) {
-            this->content[absolute_path] = {};
-        }
-
-        // If file does  not already exist, create it
-        if (this->content.find(absolute_path) != this->content.end()) {
-            this->content[absolute_path][file] = std::make_tuple(S4U_Simulation::getClock(), this->last_accessed++);
-            this->lru_list.erase(this->last_accessed - 1);
-            this->free_space -= file->getSize();
-        } else {
-            return;
-        }
+        this->storeFileInDirectory(file, absolute_path);
     }
 
-    /**
-     * @brief Retrieve the file's last write date
-     * @param file: the file
-     * @param absolute_path: the file path
-     * @return a date in seconds (returns -1.0) if file in not found
-     */
-    double LogicalFileSystem::getFileLastWriteDate(const shared_ptr<DataFile> &file, const string &absolute_path) {
-
-        if (devnull) {
-            return -1;
-        }
-        assertInitHasBeenCalled();
-        // If directory does not exist, say "no"
-        if (not doesDirectoryExist(absolute_path)) {
-            return -1;
-        }
-
-        if (this->content[absolute_path].find(file) != this->content[absolute_path].end()) {
-            return std::get<0>(this->content[absolute_path][file]);
-        } else {
-            return -1;
-        }
-    }
-
-    /**
-     * @brief Update a file's read date
-     * @param file: the file
-     * @param absolute_path: the path
-     */
-    void LogicalFileSystem::updateReadDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
-        if (devnull) {
-            return;
-        }
-        assertInitHasBeenCalled();
-        // If directory does not exist, do nothing
-        if (not doesDirectoryExist(absolute_path)) {
-            return;
-        }
-
-        if (this->content[absolute_path].find(file) != this->content[absolute_path].end()) {
-            std::get<1>(this->content[absolute_path][file]) = this->last_accessed++;
-        }
-    }
-
-
-    /**
-     * @brief Get the disk on which this file system runs
-     * @return The SimGrid disk on which this file system is mounted
-     */
-    simgrid::s4u::Disk *LogicalFileSystem::getDisk() {
-        return this->disk;
-    }
-
-    /**
-     * @brief Evict LRU files to create some free space
-     * @param needed_free_space: the needed free space
-     * @return true on success, false on failure
-     */
-    bool LogicalFileSystem::evictLRUFiles(double needed_free_space) {
-
-        double total_reserved_space = 0;
-        for (auto const &x : this->reserved_space) {
-            total_reserved_space += x.second;
-        }
-
-        if (this->total_capacity - total_reserved_space < needed_free_space) return false;
-
-        while(this->free_space < needed_free_space) {
-            unsigned int key = this->lru_list.begin()->first;
-            auto path = std::get<0>(this->lru_list.begin()->second);
-            auto file = std::get<1>(this->lru_list.begin()->second);
-            this->lru_list.erase(key);
-            this->content[path].erase(file);
-            this->free_space += file->getSize();
-        }
-        return true;
-
-    }
 
 }// namespace wrench

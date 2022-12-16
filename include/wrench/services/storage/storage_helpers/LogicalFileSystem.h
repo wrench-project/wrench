@@ -37,17 +37,28 @@ namespace wrench {
     class LogicalFileSystem {
 
     public:
+
+        virtual ~LogicalFileSystem() {
+            this->content.clear();
+        }
+
+        class FileOnDisk {
+        public:
+            explicit FileOnDisk(double last_write_date) : last_write_date(last_write_date) {}
+
+            double last_write_date;
+
+        };
+
         /**
          * @brief A constant that signifies /dev/null, when the actual location/path/mountpoint/etc. is unknown
          */
         const static std::string DEV_NULL;
 
-        unsigned int last_accessed = 0;
-
-        explicit LogicalFileSystem(const std::string &hostname,
+        static std::unique_ptr<LogicalFileSystem> createLogicalFileSystem(const std::string &hostname,
                                    StorageService *storage_service,
-                                   std::string mount_point = DEV_NULL,
-                                   std::string eviction_policy = "NONE");
+                                   const std::string& mount_point = DEV_NULL,
+                                   const std::string& eviction_policy = "NONE");
 
         void init();
 
@@ -63,44 +74,40 @@ namespace wrench {
         bool doesDirectoryExist(const std::string &absolute_path);
         bool isDirectoryEmpty(const std::string &absolute_path);
         void removeEmptyDirectory(const std::string &absolute_path);
-        void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
-        void removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
-        void removeAllFilesInDirectory(const std::string &absolute_path);
+        virtual void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) = 0;
+        virtual void removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) = 0;
+        virtual void removeAllFilesInDirectory(const std::string &absolute_path) = 0;
         bool isFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
         double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
-        void updateReadDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
+
+        virtual void updateReadDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) = 0;
+
         std::set<std::shared_ptr<DataFile>> listFilesInDirectory(const std::string &absolute_path);
 
         simgrid::s4u::Disk *getDisk();
 
 
-    private:
-        friend class StorageService;
         void stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path);
 
-        bool evictLRUFiles(double needed_free_space);
+    protected:
+        friend class StorageService;
 
+        LogicalFileSystem(const std::string &hostname, StorageService *storage_service,
+                          const std::string &mount_point);
+
+        bool devnull = false;
+        virtual bool gievictFiles(double needed_free_space) = 0;
         static std::map<std::string, StorageService *> mount_points;
-
-        std::unordered_map<std::string, std::map<std::shared_ptr<DataFile>, std::pair<double, unsigned int>>> content;
-        std::map<unsigned int, std::tuple<const std::string &, const std::shared_ptr<DataFile> &>> lru_list;
-
-
         simgrid::s4u::Disk *disk;
-
         std::string hostname;
         StorageService *storage_service;
         std::string mount_point;
-        std::string eviction_policy;
-        bool uses_lru;
         double total_capacity;
-        double free_space;
-        bool devnull = false;
         std::map<std::string, double> reserved_space;
 
         bool initialized;
-
-    private:
+        double free_space;
+        std::unordered_map<std::string, std::map<std::shared_ptr<DataFile>, std::shared_ptr<LogicalFileSystem::FileOnDisk>>> content;
 
         void assertInitHasBeenCalled() const {
             if (not this->initialized) {
@@ -133,6 +140,7 @@ namespace wrench {
                                             " is not in directory " + absolute_path);
             }
         }
+
     };
 
 
