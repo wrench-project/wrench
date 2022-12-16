@@ -96,7 +96,7 @@ namespace wrench {
                           const std::string &mount_point);
 
         bool devnull = false;
-        virtual bool gievictFiles(double needed_free_space) = 0;
+        virtual bool evictFiles(double needed_free_space) = 0;
         static std::map<std::string, StorageService *> mount_points;
         simgrid::s4u::Disk *disk;
         std::string hostname;
