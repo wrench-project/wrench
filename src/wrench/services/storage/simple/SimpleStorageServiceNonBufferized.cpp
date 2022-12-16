@@ -307,66 +307,61 @@ namespace wrench {
         // (If the file is already there, then there will just be an overwrite. Note that
         // if the overwrite fails, then the file will disappear, which is expected)
 
-        if ((not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) or
-            (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint()))) {
-            if (not fs->hasEnoughFreeSpace(file->getSize())) {
-                failure_cause = std::shared_ptr<FailureCause>(
-                        new StorageServiceNotEnoughSpace(
-                                file,
-                                this->getSharedPtr<SimpleStorageService>()));
+        bool file_already_there = fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint()) and fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint());
+        if ((not file_already_there) and (not fs->reserveSpace(file, location->getAbsolutePathAtMountPoint()))) {
+            try {
+                S4U_Mailbox::dputMessage(
+                        answer_mailbox,
+                        new StorageServiceFileWriteAnswerMessage(
+                                location,
+                                false,
+                                std::shared_ptr<FailureCause>(
+                                        new StorageServiceNotEnoughSpace(
+                                                file,
+                                                this->getSharedPtr<SimpleStorageService>())),
+                                nullptr,
+                                this->getMessagePayloadValue(
+                                        SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+            } catch (wrench::ExecutionException &e) {
+                return true;
             }
+            return true;
         }
 
-        if (failure_cause == nullptr) {
-
-            if (not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) {
-                fs->createDirectory(location->getAbsolutePathAtMountPoint());
-            }
-
-            // Update occupied space, in advance (will have to be decreased later in case of failure)
-            fs->reserveSpace(file, location->getAbsolutePathAtMountPoint());
-
-            // Reply with a "go ahead, send me the file" message
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
-                    new StorageServiceFileWriteAnswerMessage(
-                            location,
-                            true,
-                            nullptr,
-                            nullptr,
-                            this->getMessagePayloadValue(
-                                    SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
-
-            // Create the streaming activity
-            auto me_host = simgrid::s4u::this_actor::get_host();
-            simgrid::s4u::Disk *me_disk = fs->getDisk();
-
-            // Create a Transaction
-            auto transaction = std::make_shared<Transaction>(
-                    nullptr,
-                    requesting_host,
-                    nullptr,
-                    location,
-                    me_host,
-                    me_disk,
-                    answer_mailbox,
-                    file->getSize());
-
-            // Add it to the Pool of pending data communications
-            this->pending_transactions.push_back(transaction);
-
-        } else {
-            // Reply with a "failure" message
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
-                    new StorageServiceFileWriteAnswerMessage(
-                            location,
-                            false,
-                            failure_cause,
-                            nullptr,
-                            this->getMessagePayloadValue(
-                                    SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+        // At this point we're good
+        if (not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) {
+            fs->createDirectory(location->getAbsolutePathAtMountPoint());
         }
+
+        // Reply with a "go ahead, send me the file" message
+        S4U_Mailbox::dputMessage(
+                answer_mailbox,
+                new StorageServiceFileWriteAnswerMessage(
+                        location,
+                        true,
+                        nullptr,
+                        nullptr,
+                        this->getMessagePayloadValue(
+                                SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+
+        // Create the streaming activity
+        auto me_host = simgrid::s4u::this_actor::get_host();
+        simgrid::s4u::Disk *me_disk = fs->getDisk();
+
+        // Create a Transaction
+        auto transaction = std::make_shared<Transaction>(
+                nullptr,
+                requesting_host,
+                nullptr,
+                location,
+                me_host,
+                me_disk,
+                answer_mailbox,
+                file->getSize());
+
+        // Add it to the Pool of pending data communications
+        this->pending_transactions.push_back(transaction);
+
 
         return true;
     }
@@ -425,6 +420,8 @@ namespace wrench {
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
 
+            fs->updateReadDate(location->getFile(), location->getAbsolutePathAtMountPoint());
+
             // Create the streaming activity
             auto me_host = simgrid::s4u::this_actor::get_host();
             simgrid::s4u::Disk *me_disk = fs->getDisk();
@@ -466,7 +463,7 @@ namespace wrench {
 
         auto src_host = simgrid::s4u::Host::by_name(src_location->getStorageService()->getHostname());
         auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
-        // TODO: This disk identification is really ugly.
+        // TODO: This disk identification is really ugly and likely slow
         simgrid::s4u::Disk *src_disk = nullptr;
         auto src_location_sanitized_mount_point = FileLocation::sanitizePath(src_location->getMountPoint() + "/");
         for (auto const &d: src_host->get_disks()) {
@@ -490,78 +487,8 @@ namespace wrench {
 
         auto file = src_location->getFile();
 
-        // Am I the source????
-        if (src_location->getStorageService() == this->shared_from_this()) {
-
-            // If the source does not exit, return a failure
-            if (not this->file_systems[src_location->getMountPoint()]->isFileInDirectory(file, src_location->getAbsolutePathAtMountPoint())) {
-                try {
-                    S4U_Mailbox::putMessage(
-                            answer_mailbox,
-                            new StorageServiceFileCopyAnswerMessage(
-                                    src_location,
-                                    dst_location,
-                                    nullptr, false,
-                                    false,
-                                    std::shared_ptr<FailureCause>(
-                                            new FileNotFound(
-                                                    src_location)),
-                                    this->getMessagePayloadValue(
-                                            SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-
-                } catch (ExecutionException &e) {
-                    return true;
-                }
-                return true;
-            }
-
-            uint64_t transfer_size;
-            transfer_size = (uint64_t) (file->getSize());
-
-            // Create a Transaction
-            auto transaction = std::make_shared<Transaction>(
-                    src_location,
-                    src_host,
-                    src_disk,
-                    dst_location,
-                    dst_host,
-                    dst_disk,
-                    answer_mailbox,
-                    transfer_size);
-
-            // Add it to the Pool of pending data communications
-            this->pending_transactions.push_back(transaction);
-
-            return true;
-        }
-
-        // I am not the source
-        // Does the source have the file?
-        auto fs = this->file_systems[dst_location->getMountPoint()].get();
-
-        bool file_is_there;
-
-        try {
-            file_is_there = src_location->getStorageService()->lookupFile(src_location);
-        } catch (ExecutionException &e) {
-            try {
-                S4U_Mailbox::putMessage(
-                        answer_mailbox,
-                        new StorageServiceFileCopyAnswerMessage(
-                                src_location,
-                                dst_location,
-                                nullptr, false,
-                                false,
-                                e.getCause(),
-                                this->getMessagePayloadValue(
-                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (ExecutionException &e) {
-                return true;
-            }
-            return true;
-        }
-
-        if (not file_is_there) {
+        // Does the source have the file
+        if (not src_location->getStorageService()->lookupFile(src_location)) {
             try {
                 S4U_Mailbox::putMessage(
                         answer_mailbox,
@@ -582,34 +509,33 @@ namespace wrench {
             return true;
         }
 
-        // Is there enough space here?
-        if (not fs->isFileInDirectory(file, dst_location->getAbsolutePathAtMountPoint())) {
-            if (not fs->hasEnoughFreeSpace(file->getSize())) {
-                this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
+        auto fs = this->file_systems[dst_location->getMountPoint()].get();
 
-                try {
-                    S4U_Mailbox::putMessage(
-                            answer_mailbox,
-                            new StorageServiceFileCopyAnswerMessage(
-                                    src_location,
-                                    dst_location,
-                                    nullptr, false,
-                                    false,
-                                    std::shared_ptr<FailureCause>(
-                                            new StorageServiceNotEnoughSpace(
-                                                    file,
-                                                    this->getSharedPtr<SimpleStorageService>())),
-                                    this->getMessagePayloadValue(
-                                            SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-
-                } catch (ExecutionException &e) {
-                    return true;
-                }
+        // If file is not already here, reserve space for it
+        bool file_is_already_here = fs->isFileInDirectory(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint());
+        if ((not file_is_already_here) and (not fs->reserveSpace(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint()))) {
+            this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
+            try {
+                S4U_Mailbox::putMessage(
+                        answer_mailbox,
+                        new StorageServiceFileCopyAnswerMessage(
+                                src_location,
+                                dst_location,
+                                nullptr, false,
+                                false,
+                                std::shared_ptr<FailureCause>(
+                                        new StorageServiceNotEnoughSpace(
+                                                file,
+                                                this->getSharedPtr<SimpleStorageService>())),
+                                this->getMessagePayloadValue(
+                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+            } catch (ExecutionException &e) {
                 return true;
             }
-            fs->reserveSpace(file, dst_location->getAbsolutePathAtMountPoint());
+            return true;
         }
 
+        // At this point, there is enough space
         // Create a Transaction
         auto transaction = std::make_shared<Transaction>(
                 src_location,
@@ -626,9 +552,9 @@ namespace wrench {
         return true;
     }
 
-    /**
- * @brief Start pending file transfer threads if any and if possible
- */
+/**
+* @brief Start pending file transfer threads if any and if possible
+*/
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
         while ((not this->pending_transactions.empty()) and
                (this->running_transactions.size() < this->num_concurrent_connections)) {
@@ -652,10 +578,10 @@ namespace wrench {
         }
     }
 
-    /**
- * @brief Get the load (number of concurrent reads) on the storage service
- * @return the load on the service
- */
+/**
+* @brief Get the load (number of concurrent reads) on the storage service
+* @return the load on the service
+*/
     double SimpleStorageServiceNonBufferized::getLoad() {
         return (double) this->running_transactions.size() + (double) this->pending_transactions.size();
     }
