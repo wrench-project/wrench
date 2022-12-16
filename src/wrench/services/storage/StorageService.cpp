@@ -42,15 +42,6 @@ namespace wrench {
             throw std::invalid_argument("StorageService::StorageService(): At least one mount point must be provided");
         }
 
-        try {
-            for (const auto &mp: mount_points) {
-                this->file_systems[mp] = std::make_unique<LogicalFileSystem>(
-                        this->getHostname(), this, mp);
-            }
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
-
         this->state = StorageService::UP;
         this->is_scratch = false;
     }

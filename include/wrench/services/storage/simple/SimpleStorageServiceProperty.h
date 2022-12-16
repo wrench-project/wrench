@@ -24,12 +24,7 @@ namespace wrench {
         /** @brief The maximum number of concurrent data connections supported by the service (default = "infinity") **/
         DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
 
-        /** @brief The caching behavior. Possible values are:
-         *   - NONE (default): no caching, i.e., if not enough space is available for a new file, then the file write/creation fails.
-         *   - LRU: Least Recently Used policy, i.e.,  if not enough space is available for a new file, the Least Recently Used
-         *          files are deleted until enough space is available.
-         **/
-        DECLARE_PROPERTY_NAME(CACHING_BEHAVIOR);
+
     };
 
 }// namespace wrench
