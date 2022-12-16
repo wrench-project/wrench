@@ -16,6 +16,7 @@
 #include <unordered_map>
 #include <set>
 #include <memory>
+#include <iostream>
 
 #include <simgrid/disk.h>
 
@@ -39,7 +40,8 @@ namespace wrench {
     public:
 
         virtual ~LogicalFileSystem() {
-            this->content.clear();
+//            this->content.clear();
+//            LogicalFileSystem::mount_points.erase(this->mount_point);
         }
 
         class FileOnDisk {
@@ -64,6 +66,7 @@ namespace wrench {
 
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
+        bool isInitialized() const;
         double getFreeSpace();
 
         bool reserveSpace(const std::shared_ptr<DataFile> &file,
@@ -74,7 +77,7 @@ namespace wrench {
         bool doesDirectoryExist(const std::string &absolute_path);
         bool isDirectoryEmpty(const std::string &absolute_path);
         void removeEmptyDirectory(const std::string &absolute_path);
-        virtual void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) = 0;
+        virtual void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path, bool must_be_initialized) = 0;
         virtual void removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) = 0;
         virtual void removeAllFilesInDirectory(const std::string &absolute_path) = 0;
         bool isFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
@@ -91,6 +94,7 @@ namespace wrench {
 
     protected:
         friend class StorageService;
+        friend class Simulation;
 
         LogicalFileSystem(const std::string &hostname, StorageService *storage_service,
                           const std::string &mount_point);
@@ -111,7 +115,8 @@ namespace wrench {
 
         void assertInitHasBeenCalled() const {
             if (not this->initialized) {
-                throw std::runtime_error("LogicalFileSystem::assertInitHasBeenCalled(): A logical file system needs to be initialized before it's been called");
+                std::cerr << "IN ASSERT; " << this->hostname << ":" << this->mount_point << "\n";
+                throw std::runtime_error("LogicalFileSystem::assertInitHasBeenCalled(): A logical file system needs to be initialized before it's called");
             }
         }
         void assertDirectoryExist(const std::string &absolute_path) {

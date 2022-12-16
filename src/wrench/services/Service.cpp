@@ -72,7 +72,7 @@ namespace wrench {
 
         if (value < 0) {
             throw std::invalid_argument(
-                    "Service::setMessagePayload(): Invalid message payload value " + ServiceProperty::translatePropertyType(messagepayload) + ": " +
+                    "Service::setMessagePayload(): Invalid message payload value " + ServiceMessagePayload::translatePayloadType(messagepayload) + ": " +
                     std::to_string(value));
         }
         this->messagepayload_list[messagepayload] = value;

@@ -7,16 +7,13 @@
  * (at your option) any later version.
  */
 
-
 #include <gtest/gtest.h>
 
 #include <wrench-dev.h>
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
-
 WRENCH_LOG_CATEGORY(xrootd_storage_service_basic_functional_test, "Log category for XRootDServiceBasicFunctionalTest");
-
 
 class XRootDServiceBasicFunctionalTest : public ::testing::Test {
 
@@ -84,8 +81,7 @@ public:
 private:
     XRootDServiceBasicFunctionalTest *test;
 
-    int main() {
-
+    int main() override {
 
         WRENCH_INFO("Adding a file files to the simulation");
         auto file1 = wrench::Simulation::addFile("file1", 10000);
@@ -103,7 +99,9 @@ private:
         this->test->root_supervisor->getChild(0)->createFile(wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0)->getStorageServer(), "/disk100", file3));
 
         // Read file1 from XRootD
+        std::cerr << "READING FILE FROM SUPERVISOR\n";
         this->test->root_supervisor->readFile(file1);
+        std::cerr << "READ FILE FROM SUPERVISOR\n";
         //read file again to cover cache
         this->test->root_supervisor->readFile(file1);
         //read file directly from child
@@ -241,10 +239,10 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -252,11 +250,11 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     simulation->instantiatePlatform(platform_file_path);
 
     // Create a XRootD Manager object
-
     wrench::XRootD::Deployment xrootd_deployment(simulation, {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"}, {wrench::XRootD::Property::REDUCED_SIMULATION, arg}, {wrench::XRootD::Property::FILE_NOT_FOUND_TIMEOUT, "10"}}, {{wrench::StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 1024}});
 
-
     this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1");
+    std::cerr << "#MP: " << this->root_supervisor->getMountPoints().size() << "\n";
+
     ASSERT_THROW(this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1"), std::runtime_error);
 
     auto ss2 = this->root_supervisor->addChildStorageServer("Host2", "/disk100", {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}, {});

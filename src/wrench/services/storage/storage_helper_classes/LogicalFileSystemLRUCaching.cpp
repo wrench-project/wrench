@@ -34,14 +34,17 @@ namespace wrench {
  *
  * @param file: the file to store
  * @param absolute_path: the directory's absolute path (at the mount point)
+ * @param must_be_initialized: whether the file system is initialized
  *
  * @throw std::invalid_argument
  */
-    void LogicalFileSystemLRUCaching::storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
+    void LogicalFileSystemLRUCaching::storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path, bool must_be_initialized) {
         if (devnull) {
             return;
         }
-        assertInitHasBeenCalled();
+        if (must_be_initialized) {
+            assertInitHasBeenCalled();
+        }
         // If directory does not exit, create it
         if (not doesDirectoryExist(absolute_path)) {
             createDirectory(absolute_path);

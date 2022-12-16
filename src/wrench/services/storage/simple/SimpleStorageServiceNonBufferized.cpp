@@ -67,9 +67,10 @@ namespace wrench {
             transaction->src_location->getStorageService() == shared_from_this() and
             transaction->dst_location != nullptr and
             transaction->dst_location->getStorageService()->isBufferized()) {
-            transaction->dst_location->getStorageService()->createFile(transaction->dst_location);
+            transaction->dst_location->
+                    getStorageService()->file_systems[transaction->dst_location->getMountPoint()]->
+                    storeFileInDirectory(transaction->dst_location->getFile(), transaction->dst_location->getAbsolutePathAtMountPoint(), true);
         }
-
 
         // Send back the relevant ack if this was a read
         if (transaction->dst_location == nullptr) {
@@ -78,7 +79,7 @@ namespace wrench {
         } else if (transaction->src_location == nullptr) {
             WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
             this->file_systems[transaction->dst_location->getMountPoint()]->storeFileInDirectory(
-                    transaction->dst_location->getFile(), transaction->dst_location->getAbsolutePathAtMountPoint());
+                    transaction->dst_location->getFile(), transaction->dst_location->getAbsolutePathAtMountPoint(), true);
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // Maybe no corresponding timestamp.
             //            WRENCH_INFO("Sending back an ack for a successful file read");
@@ -87,7 +88,7 @@ namespace wrench {
             if (transaction->dst_location->getStorageService() == shared_from_this()) {
                 WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
                 this->file_systems[transaction->dst_location->getMountPoint()]->storeFileInDirectory(
-                        transaction->dst_location->getFile(), transaction->dst_location->getAbsolutePathAtMountPoint());
+                        transaction->dst_location->getFile(), transaction->dst_location->getAbsolutePathAtMountPoint(), true);
                 try {
                     this->simulation->getOutput().addTimestampFileCopyCompletion(
                             Simulation::getCurrentSimulatedDate(), transaction->dst_location->getFile(), transaction->src_location, transaction->dst_location);
@@ -129,9 +130,10 @@ namespace wrench {
         std::string message = "Simple Storage Service (Non-Bufferized) " + this->getName() + "  starting on host " + this->getHostname();
         WRENCH_INFO("%s", message.c_str());
 
-        // "Start" all logical file systems
-        for (auto const &fs: this->file_systems) {
-            fs.second->init();
+        for (auto const &mp : this->file_systems) {
+            if (not mp.second->isInitialized()) {
+                mp.second->init();
+            }
         }
 
         // In case this was a restart!
@@ -272,7 +274,11 @@ namespace wrench {
                                           msg->num_bytes_to_read, msg->answer_mailbox, msg->requesting_host);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message)) {
-            return processFileCopyRequest(msg->src, msg->dst, msg->answer_mailbox);
+            if (msg->src->getStorageService() != this->getSharedPtr<StorageService>()) {
+                return processFileCopyRequestIAmNotTheSource(msg->src, msg->dst, msg->answer_mailbox);
+            } else {
+                return processFileCopyRequestIAmTheSource(msg->src, msg->dst, msg->answer_mailbox);
+            }
 
         } else {
             throw std::runtime_error(
@@ -452,7 +458,7 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @return
      */
-    bool SimpleStorageServiceNonBufferized::processFileCopyRequest(
+    bool SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(
             const std::shared_ptr<FileLocation> &src_location,
             const std::shared_ptr<FileLocation> &dst_location,
             simgrid::s4u::Mailbox *answer_mailbox) {
@@ -472,7 +478,7 @@ namespace wrench {
             }
         }
         if (src_disk == nullptr) {
-            throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequest(): source disk not found - internal error");
+            throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(): source disk not found - internal error");
         }
         simgrid::s4u::Disk *dst_disk = nullptr;
         auto dst_location_sanitized_mount_point = FileLocation::sanitizePath(dst_location->getMountPoint() + "/");
@@ -482,13 +488,45 @@ namespace wrench {
             }
         }
         if (dst_disk == nullptr) {
-            throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequest(): destination disk not found - internal error");
+            throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(): destination disk not found - internal error");
         }
 
         auto file = src_location->getFile();
 
-        // Does the source have the file
-        if (not src_location->getStorageService()->lookupFile(src_location)) {
+        bool src_has_the_file;
+        bool src_could_be_contacted = true;
+        std::shared_ptr<FailureCause> src_could_not_be_contacted_failure_cause;
+
+
+        try {
+            src_has_the_file = src_location->getStorageService()->lookupFile(src_location);
+        } catch (wrench::ExecutionException &e) {
+            src_could_be_contacted = false;
+            src_could_not_be_contacted_failure_cause = e.getCause();
+        }
+
+        // If the src could not be contacted, send back an error
+        if (not src_could_be_contacted) {
+            try {
+                S4U_Mailbox::putMessage(
+                        answer_mailbox,
+                        new StorageServiceFileCopyAnswerMessage(
+                                src_location,
+                                dst_location,
+                                nullptr, false,
+                                false,
+                                src_could_not_be_contacted_failure_cause,
+                                this->getMessagePayloadValue(
+                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+
+            } catch (ExecutionException &e) {
+                return true;
+            }
+            return true;
+        }
+
+        // If the src doesn't have the file, return an error
+        if (not src_has_the_file) {
             try {
                 S4U_Mailbox::putMessage(
                         answer_mailbox,
@@ -550,6 +588,126 @@ namespace wrench {
         this->pending_transactions.push_back(transaction);
 
         return true;
+    }
+
+
+    /**
+     * @brief Handle a file copy request
+     * @param src_location: the source location
+     * @param dst_location: the destination location
+     * @param answer_mailbox: the mailbox to which the answer should be sent
+     * @return
+     */
+    bool SimpleStorageServiceNonBufferized::processFileCopyRequestIAmTheSource(
+            const std::shared_ptr<FileLocation> &src_location,
+            const std::shared_ptr<FileLocation> &dst_location,
+            simgrid::s4u::Mailbox *answer_mailbox) {
+
+        WRENCH_INFO("FileCopyRequest: %s -> %s",
+                    src_location->toString().c_str(),
+                    dst_location->toString().c_str());
+
+        // TODO: This code is duplicated with the IAmNotTheSource version of this method
+        auto src_host = simgrid::s4u::Host::by_name(src_location->getStorageService()->getHostname());
+        auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
+        // TODO: This disk identification is really ugly and likely slow
+        simgrid::s4u::Disk *src_disk = nullptr;
+        auto src_location_sanitized_mount_point = FileLocation::sanitizePath(src_location->getMountPoint() + "/");
+        for (auto const &d: src_host->get_disks()) {
+            if (src_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
+                src_disk = d;
+            }
+        }
+        if (src_disk == nullptr) {
+            throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmTheSource(): source disk not found - internal error");
+        }
+        simgrid::s4u::Disk *dst_disk = nullptr;
+        auto dst_location_sanitized_mount_point = FileLocation::sanitizePath(dst_location->getMountPoint() + "/");
+        for (auto const &d: dst_host->get_disks()) {
+            if (dst_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
+                dst_disk = d;
+            }
+        }
+        if (dst_disk == nullptr) {
+            throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmTheSource(): destination disk not found - internal error");
+        }
+
+        auto file = src_location->getFile();
+
+        auto my_fs = this->file_systems[src_location->getMountPoint()].get();
+
+        // Do I have the file
+        if (not my_fs->isFileInDirectory(src_location->getFile(), src_location->getAbsolutePathAtMountPoint())) {
+            try {
+                S4U_Mailbox::putMessage(
+                        answer_mailbox,
+                        new StorageServiceFileCopyAnswerMessage(
+                                src_location,
+                                dst_location,
+                                nullptr, false,
+                                false,
+                                std::shared_ptr<FailureCause>(
+                                        new FileNotFound(
+                                                src_location)),
+                                this->getMessagePayloadValue(
+                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+
+            } catch (ExecutionException &e) {
+                return true;
+            }
+            return true;
+        }
+
+        // At this point, I have the file
+
+        // Can file fit at the destination?
+        auto dst_file_system = dst_location->getStorageService()->file_systems[dst_location->getMountPoint()].get();
+        bool file_already_at_destination = dst_file_system->isFileInDirectory(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint());
+
+        // If not already at destination make space for it, and if not possible, then return an error
+        if (not file_already_at_destination) {
+            if (not dst_file_system->reserveSpace(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint())) {
+                try {
+                    S4U_Mailbox::putMessage(
+                            answer_mailbox,
+                            new StorageServiceFileCopyAnswerMessage(
+                                    src_location,
+                                    dst_location,
+                                    nullptr, false,
+                                    false,
+                                    std::shared_ptr<FailureCause>(
+                                            new StorageServiceNotEnoughSpace(dst_location->getFile(),
+                                                                             dst_location->getStorageService())),
+                                    this->getMessagePayloadValue(
+                                            SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+
+                } catch (ExecutionException &e) {
+                    return true;
+                }
+                return true;
+            }
+        }
+
+        // At this point we're all good
+        uint64_t transfer_size;
+        transfer_size = (uint64_t) (file->getSize());
+
+        // Create a Transaction
+        auto transaction = std::make_shared<Transaction>(
+                src_location,
+                src_host,
+                src_disk,
+                dst_location,
+                dst_host,
+                dst_disk,
+                answer_mailbox,
+                transfer_size);
+
+        // Add it to the Pool of pending data communications
+        this->pending_transactions.push_back(transaction);
+
+        return true;
+
     }
 
 /**

@@ -527,7 +527,7 @@ namespace wrench {
                                      message->getName() + "] message!");
         }
 
-        WRENCH_INFO("Download request accepted (will receive f content on mailbox_name %s)",
+        WRENCH_INFO("Download request accepted (will receive file content on mailbox_name %s)",
                     mailbox_that_should_receive_file_content->get_cname());
 
         if (this->buffer_size < DBL_EPSILON) {

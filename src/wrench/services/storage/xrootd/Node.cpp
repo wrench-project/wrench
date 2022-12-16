@@ -39,6 +39,7 @@ namespace wrench {
             //if(internalStorage){
             //    internalStorage->start(internalStorage,true,true);
             //}
+
             std::string message =
                     "XRootD Node " + this->getName() + "  starting on host " + this->getHostname();
             WRENCH_INFO("%s",
@@ -605,6 +606,7 @@ namespace wrench {
                 if (internalStorage) {
                     //File in internal storage
                     try {
+                        std::cerr << "LOCATION " << __LINE__ << "\n";
                         StorageService::deleteFile(FileLocation::LOCATION(internalStorage, msg->file));
                     } catch (ExecutionException &e) {
                         //we don't actually care if this fails, that just means the file
@@ -624,6 +626,7 @@ namespace wrench {
                 if (not internalStorage) {
                     // Reply this is not allowed
                     std::string error_message = "Cannot write file at non-storage XRootD node";
+                    std::cerr << "LOCATION " << __LINE__ << "\n";
                     S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                              new StorageServiceFileWriteAnswerMessage(
                                                      FileLocation::LOCATION(getSharedPtr<Node>(), file),
@@ -635,6 +638,7 @@ namespace wrench {
 
                 } else {
                     // Forward the message
+                    std::cerr << "LOCATION " << __LINE__ << "\n";
                     msg->location = FileLocation::LOCATION(internalStorage, file);
                     msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
                             SimpleStorageServiceProperty::BUFFER_SIZE);
@@ -646,6 +650,7 @@ namespace wrench {
                 if (not internalStorage) {
                     // Reply this is not allowed
                     std::string error_message = "Cannot copy file to/from non-storage XRooD node";
+                    std::cerr << "LOCATION " << __LINE__ << "\n";
                     S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                              new StorageServiceFileWriteAnswerMessage(
                                                      FileLocation::LOCATION(getSharedPtr<Node>(), file),
@@ -657,6 +662,7 @@ namespace wrench {
 
                 } else {
                     // Forward the message
+                    std::cerr << "LOCATION " << __LINE__ << "\n";
                     msg->dst = FileLocation::LOCATION(internalStorage, file);
                     S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
                 }
@@ -783,6 +789,10 @@ namespace wrench {
                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
             if (internalStorage != nullptr) {
                 return false;
+            }
+            std::cerr << "CREATING INTERNAL STORAGE :\n";
+            for (auto const &x : path) {
+              std::cerr << "  - " << x << "\n";
             }
             //            internalStorage = make_shared<SimpleStorageService>(hostname, path, property_list, messagepayload_list);
             internalStorage = std::shared_ptr<SimpleStorageService>(SimpleStorageService::createSimpleStorageService(hostname, path, property_list, messagepayload_list));
