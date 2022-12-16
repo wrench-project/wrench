@@ -35,17 +35,22 @@ namespace wrench {
                                                                       StorageService *storage_service,
                                                                       const std::string& mount_point,
                                                                       const std::string& eviction_policy) {
+
         if (storage_service == nullptr) {
             throw std::invalid_argument("LogicalFileSystem::createLogicalFileSystem(): nullptr storage_service argument");
         }
 
+//        std::cerr << "CREATING LOGICAL FS " << hostname << ":" << mount_point << "\n";
+        std::unique_ptr<LogicalFileSystem> to_return;
         if (eviction_policy == "NONE") {
-            return std::unique_ptr<LogicalFileSystem>(new LogicalFileSystemNoCaching(hostname, storage_service, mount_point));
+            to_return =  std::unique_ptr<LogicalFileSystem>(new LogicalFileSystemNoCaching(hostname, storage_service, mount_point));
         } else if (eviction_policy == "LRU") {
-            return std::unique_ptr<LogicalFileSystem>(new LogicalFileSystemLRUCaching(hostname, storage_service, mount_point));
+            to_return = std::unique_ptr<LogicalFileSystem>(new LogicalFileSystemLRUCaching(hostname, storage_service, mount_point));
         } else {
             throw std::invalid_argument("LogicalFileSystem::createLogicalFileSystem(): Unknown cache eviction policy " + eviction_policy);
         }
+//        std::cerr << "CREATED LOGICAL FS " << hostname << ":" << mount_point << "\n";
+        return to_return;
     }
 
 
@@ -79,17 +84,21 @@ namespace wrench {
      * @brief Initializes the Logical File System (must be called before any other operation on this file system)
      */
     void LogicalFileSystem::init() {
+
         // Check uniqueness
-        auto lfs = LogicalFileSystem::mount_points.find(this->hostname + ":" + this->mount_point);
+        auto key = this->hostname + ":" + this->mount_point;
+//        std::cerr << "CALLING INIT ON " << key << "\n";
+
+        auto lfs = LogicalFileSystem::mount_points.find(key);
 
         if (lfs != LogicalFileSystem::mount_points.end() && mount_point != DEV_NULL) {
-            if (lfs->second != this->storage_service) {
-                throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem with mount point " + this->mount_point + " at host " + this->hostname + " already exists");
+            if (lfs->second == this->storage_service) {
+                throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem " + key + " already exists");
             } else {
                 return;
             }
         } else {
-            LogicalFileSystem::mount_points[this->hostname + ":" + this->mount_point] = this->storage_service;
+            LogicalFileSystem::mount_points[key] = this->storage_service;
             this->initialized = true;
         }
     }
@@ -104,7 +113,7 @@ namespace wrench {
         if (devnull) {
             return;
         }
-        assertInitHasBeenCalled();
+//        assertInitHasBeenCalled();
         assertDirectoryDoesNotExist(absolute_path);
         this->content[absolute_path] = {};
     }
@@ -118,7 +127,7 @@ namespace wrench {
         if (devnull) {
             return false;
         }
-        assertInitHasBeenCalled();
+//        assertInitHasBeenCalled();
         return (this->content.find(absolute_path) != this->content.end());
     }
 
@@ -326,15 +335,26 @@ namespace wrench {
         if (devnull) {
             return;
         }
+
+//        std::cerr << "LOGICAL FILE SYSTEM: STAGING FILE\n";
         // If Space is not sufficient, forget it
         if (this->free_space < file->getSize()) {
+//            std::cerr << "FREE SPACE = " << this->free_space << "\n";
             throw std::invalid_argument("LogicalFileSystem::stageFile(): Insufficient space to store file " +
                                         file->getID() + " at " + this->hostname + ":" + absolute_path);
         }
 
         absolute_path = wrench::FileLocation::sanitizePath(absolute_path);
 
-        this->storeFileInDirectory(file, absolute_path);
+        this->storeFileInDirectory(file, absolute_path, false);
+    }
+
+    /**
+     * @brief
+     * @return
+     */
+    bool LogicalFileSystem::isInitialized() const {
+        return this->initialized;
     }
 
 

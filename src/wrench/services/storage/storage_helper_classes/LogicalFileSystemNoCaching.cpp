@@ -30,19 +30,22 @@ namespace wrench {
 
 
 
-/**
- * @brief Store file in directory
- *
- * @param file: the file to store
- * @param absolute_path: the directory's absolute path (at the mount point)
- *
- * @throw std::invalid_argument
- */
-    void LogicalFileSystemNoCaching::storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
+    /**
+     * @brief Store file in directory
+     *
+     * @param file: the file to store
+     * @param absolute_path: the directory's absolute path (at the mount point)
+     * @param must_be_initialized: whether the file system is initialized
+     *
+     * @throw std::invalid_argument
+     */
+    void LogicalFileSystemNoCaching::storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path, bool must_be_initialized) {
         if (devnull) {
             return;
         }
-        assertInitHasBeenCalled();
+        if (must_be_initialized) {
+            assertInitHasBeenCalled();
+        }
         // If directory does not exit, create it
         if (not doesDirectoryExist(absolute_path)) {
             createDirectory(absolute_path);
@@ -51,20 +54,20 @@ namespace wrench {
         this->content[absolute_path][file] = std::make_shared<LogicalFileSystemNoCaching::FileOnDiskNoCaching>(S4U_Simulation::getClock());
 
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
-        if (this->reserved_space.find(key) == this->reserved_space.end()) {
-            this->free_space -= file->getSize();
-        } else {
+        if (this->reserved_space.find(key) != this->reserved_space.end()) {
             this->reserved_space.erase(key);
+        } else {
+            this->free_space += file->getSize();
         }
     }
 
     /**
- * @brief Remove a file in a directory
- * @param file: the file to remove
- * @param absolute_path: the directory's absolute path
- *
- * @throw std::invalid_argument
- */
+     * @brief Remove a file in a directory
+     * @param file: the file to remove
+     * @param absolute_path: the directory's absolute path
+     *
+     * @throw std::invalid_argument
+     */
     void LogicalFileSystemNoCaching::removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return;
@@ -77,11 +80,11 @@ namespace wrench {
     }
 
     /**
- * @brief Remove all files in a directory
- * @param absolute_path: the directory's absolute path
- *
- * @throw std::invalid_argument
- */
+     * @brief Remove all files in a directory
+     * @param absolute_path: the directory's absolute path
+     *
+     * @throw std::invalid_argument
+     */
     void LogicalFileSystemNoCaching::removeAllFilesInDirectory(const std::string &absolute_path) {
         if (devnull) {
             return;

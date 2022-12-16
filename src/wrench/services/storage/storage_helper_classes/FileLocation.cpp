@@ -111,7 +111,7 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::LOCATION(): Storage Service has multiple mount points. "
                                         "Call the version of this method that takes a mount point argument");
         }
-        return LOCATION(ss, *(ss->getMountPoints().begin()), file);
+        return LOCATION(ss, ss->getMountPoint(), file);
     }
 
     /**

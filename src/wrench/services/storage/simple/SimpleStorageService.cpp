@@ -103,15 +103,14 @@ namespace wrench {
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
         this->validateProperties();
 
-        try {
-            for (const auto &mp: mount_points) {
-                this->file_systems[mp] = LogicalFileSystem::createLogicalFileSystem(
-                        this->getHostname(), this, mp, this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR));
-            }
-        } catch (std::invalid_argument &e) {
-
-            throw;
-        }
+//        try {
+//            for (const auto &mp: mount_points) {
+//                this->file_systems[mp] = LogicalFileSystem::createLogicalFileSystem(
+//                        this->getHostname(), this, mp, this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR));
+//            }
+//        } catch (std::invalid_argument &e) {
+//            throw;
+//        }
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(
                 SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
