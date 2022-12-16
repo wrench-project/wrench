@@ -42,6 +42,16 @@ namespace wrench {
             throw std::invalid_argument("StorageService::StorageService(): At least one mount point must be provided");
         }
 
+//        try {
+//            for (const auto &mp: mount_points) {
+//                this->file_systems[mp] = LogicalFileSystem::createLogicalFileSystem(
+//                        this->getHostname(), this, mp);
+//            }
+//        } catch (std::invalid_argument &e) {
+//            throw;
+//        }
+//
+
         this->state = StorageService::UP;
         this->is_scratch = false;
     }
@@ -152,6 +162,10 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     void StorageService::readFile(const std::shared_ptr<DataFile> &file) {
+        std::cerr << "IN READ FILE: THERE ARE " << this->file_systems.size() << "  MOUNT POINTS\n";
+        for (auto const &mp: this->file_systems) {
+            std::cerr << "  - " << mp.first << "\n";
+        }
         StorageService::readFile(FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this()), file));
     }
     /**
@@ -634,7 +648,6 @@ namespace wrench {
     }
 
     /**
-<<<<<<< HEAD
      * @brief Synchronously ask the storage service to read a file from another storage service
      *
      * @param src_location: the location where to read the file
@@ -705,7 +718,6 @@ namespace wrench {
     }
 
     /**
-<<<<<<< HEAD
      * @brief Asynchronously ask for a file copy between two storage services
      *
      * @param answer_mailbox: the mailbox to which a notification message will be sent

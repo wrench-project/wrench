@@ -67,9 +67,10 @@ namespace wrench {
     int SimpleStorageServiceBufferized::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
-        // "Start" all logical file systems
-        for (auto const &fs: this->file_systems) {
-            fs.second->init();
+        for (auto const &mp : this->file_systems) {
+            if (not mp.second->isInitialized()) {
+                mp.second->init();
+            }
         }
 
         std::string message = "Simple Storage Service (Bufferized) " + this->getName() + "  starting on host " + this->getHostname();
@@ -189,6 +190,8 @@ namespace wrench {
         if (buffer_size < 1.0) {
             throw std::runtime_error("SimpleStorageServiceBufferized::processFileWriteRequest(): Cannot process a write requests with a zero buffer size");
         }
+
+
 
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
@@ -355,8 +358,44 @@ namespace wrench {
         auto fs = this->file_systems[dst_location->getMountPoint()].get();
         auto file = src_location->getFile();
 
-        // Check that the source has it (I am necessarily the destination)
-        if (not src_location->getStorageService()->lookupFile(src_location)) {
+        // Check that the source has it
+        bool src_has_the_file;
+        bool src_could_be_contacted = true;
+        std::shared_ptr<FailureCause> src_could_not_be_contacted_failure_cause;
+
+        if (src_location->getStorageService() == this->getSharedPtr<StorageService>()) {
+            src_has_the_file = this->file_systems[src_location->getMountPoint()]->isFileInDirectory(
+                    src_location->getFile(), src_location->getAbsolutePathAtMountPoint());
+        } else {
+            try {
+                src_has_the_file = src_location->getStorageService()->lookupFile(src_location);
+            } catch (wrench::ExecutionException &e) {
+                src_could_be_contacted = false;
+                src_could_not_be_contacted_failure_cause = e.getCause();
+            }
+        }
+
+        // If the src could not be contacted, send back an error
+        if (not src_could_be_contacted) {
+            try {
+                S4U_Mailbox::putMessage(
+                        answer_mailbox,
+                        new StorageServiceFileCopyAnswerMessage(
+                                src_location,
+                                dst_location,
+                                nullptr, false,
+                                false,
+                                src_could_not_be_contacted_failure_cause,
+                                this->getMessagePayloadValue(
+                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+
+            } catch (ExecutionException &e) {
+                return true;
+            }
+            return true;
+        }
+
+        if (not src_has_the_file) {
             try {
                 S4U_Mailbox::putMessage(
                         answer_mailbox,
@@ -479,7 +518,7 @@ namespace wrench {
             if (success) {
                 WRENCH_INFO("File %s stored!", file->getID().c_str());
                 this->file_systems[dst_location->getMountPoint()]->storeFileInDirectory(
-                        file, dst_location->getAbsolutePathAtMountPoint());
+                        file, dst_location->getAbsolutePathAtMountPoint(), true);
                 // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
                 // May be no corresponding timestamp.
                 try {

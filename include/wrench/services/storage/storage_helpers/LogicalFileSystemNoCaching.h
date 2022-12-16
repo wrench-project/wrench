@@ -44,7 +44,7 @@ namespace wrench {
 
     public:
 
-        void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) override;
+        void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path, bool must_be_initializede) override;
         void removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) override;
         void removeAllFilesInDirectory(const std::string &absolute_path) override;
         void updateReadDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) override;

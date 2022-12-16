@@ -119,9 +119,11 @@ namespace wrench {
 
         StorageService(const std::string &hostname,
                        const std::string &service_name);
+
         friend class Simulation;
         friend class FileRegistryService;
         friend class FileTransferThread;
+        friend class SimpleStorageServiceNonBufferized;
 
         static void stageFile(const std::shared_ptr<FileLocation> &location);
 
