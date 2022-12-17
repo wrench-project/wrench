@@ -122,5 +122,23 @@ namespace wrench {
         return false;
     }
 
+    /**
+     * @brief Increment the number of running transactions that have to do with a file
+     * @param file: the file
+     * @param absolute_path: the file path
+     */
+    void LogicalFileSystemNoCaching::incrementNumRunningTransactionsForFileInDirectory(const shared_ptr<DataFile> &file, const string &absolute_path) {
+        // Do nothing since no caching
+    }
+
+    /**
+     * @brief Decrement the number of running transactions that have to do with a file
+     * @param file: the file
+     * @param absolute_path: the file path
+     */
+    void LogicalFileSystemNoCaching::decrementNumRunningTransactionsForFileInDirectory(const shared_ptr<DataFile> &file, const string &absolute_path) {
+        // Do nothing since no caching
+    }
+
 
 }// namespace wrench
