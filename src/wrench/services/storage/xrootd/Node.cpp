@@ -153,8 +153,8 @@ namespace wrench {
                                                          msg->file,
                                                          cached,
                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
-                                                                         cached.size(),
+                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                                         cached.size(),
                                                          msg->answered));
                     } else {
                         if (children.size() > 0) {
@@ -178,7 +178,7 @@ namespace wrench {
                                                                          msg->file,
                                                                          set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
                                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                                          msg->answered));
                                     }
                                 } else {
@@ -202,7 +202,7 @@ namespace wrench {
                                                              msg->file,
                                                              set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
                                                              getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                     getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                             getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                              msg->answered));
                         }
                     }
@@ -477,8 +477,8 @@ namespace wrench {
                                                      msg->file,
                                                      cached,
                                                      getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                             getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
-                                                                     cached.size(),
+                                                     getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                                     cached.size(),
                                                      msg->answered));
                 } else {//File Not Cached
                     if (internalStorage &&
@@ -494,7 +494,7 @@ namespace wrench {
                                                          msg->file,
                                                          set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                          msg->answered));
                     } else {//File not in internal storage or cache
                         if (children.size() > 0 &&
@@ -606,7 +606,6 @@ namespace wrench {
                 if (internalStorage) {
                     //File in internal storage
                     try {
-                        std::cerr << "LOCATION " << __LINE__ << "\n";
                         StorageService::deleteFile(FileLocation::LOCATION(internalStorage, msg->file));
                     } catch (ExecutionException &e) {
                         //we don't actually care if this fails, that just means the file
@@ -626,7 +625,6 @@ namespace wrench {
                 if (not internalStorage) {
                     // Reply this is not allowed
                     std::string error_message = "Cannot write file at non-storage XRootD node";
-                    std::cerr << "LOCATION " << __LINE__ << "\n";
                     S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                              new StorageServiceFileWriteAnswerMessage(
                                                      FileLocation::LOCATION(getSharedPtr<Node>(), file),
@@ -638,7 +636,6 @@ namespace wrench {
 
                 } else {
                     // Forward the message
-                    std::cerr << "LOCATION " << __LINE__ << "\n";
                     msg->location = FileLocation::LOCATION(internalStorage, file);
                     msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
                             SimpleStorageServiceProperty::BUFFER_SIZE);
@@ -650,7 +647,6 @@ namespace wrench {
                 if (not internalStorage) {
                     // Reply this is not allowed
                     std::string error_message = "Cannot copy file to/from non-storage XRooD node";
-                    std::cerr << "LOCATION " << __LINE__ << "\n";
                     S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                              new StorageServiceFileWriteAnswerMessage(
                                                      FileLocation::LOCATION(getSharedPtr<Node>(), file),
@@ -662,7 +658,6 @@ namespace wrench {
 
                 } else {
                     // Forward the message
-                    std::cerr << "LOCATION " << __LINE__ << "\n";
                     msg->dst = FileLocation::LOCATION(internalStorage, file);
                     S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
                 }
@@ -768,7 +763,13 @@ namespace wrench {
         * @param messagepayload_list: A Message Payload list
         *
         */
-        Node::Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootD") {
+        Node::Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootD") {
+
+            // Create /dev/null mountpoint so that Locations can be created
+            this->file_systems[LogicalFileSystem::DEV_NULL] =
+                    LogicalFileSystem::createLogicalFileSystem(hostname, this, LogicalFileSystem::DEV_NULL, "NONE");
+
             this->setProperties(this->default_property_values, property_list);
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
             cache.maxCacheTime = getPropertyValueAsTimeInSecond(Property::CACHE_MAX_LIFETIME);
@@ -789,10 +790,6 @@ namespace wrench {
                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
             if (internalStorage != nullptr) {
                 return false;
-            }
-            std::cerr << "CREATING INTERNAL STORAGE :\n";
-            for (auto const &x : path) {
-              std::cerr << "  - " << x << "\n";
             }
             //            internalStorage = make_shared<SimpleStorageService>(hostname, path, property_list, messagepayload_list);
             internalStorage = std::shared_ptr<SimpleStorageService>(SimpleStorageService::createSimpleStorageService(hostname, path, property_list, messagepayload_list));

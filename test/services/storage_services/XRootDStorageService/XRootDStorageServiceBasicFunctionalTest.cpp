@@ -99,9 +99,7 @@ private:
         this->test->root_supervisor->getChild(0)->createFile(wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0)->getStorageServer(), "/disk100", file3));
 
         // Read file1 from XRootD
-        std::cerr << "READING FILE FROM SUPERVISOR\n";
         this->test->root_supervisor->readFile(file1);
-        std::cerr << "READ FILE FROM SUPERVISOR\n";
         //read file again to cover cache
         this->test->root_supervisor->readFile(file1);
         //read file directly from child
@@ -239,10 +237,10 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -253,7 +251,6 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     wrench::XRootD::Deployment xrootd_deployment(simulation, {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"}, {wrench::XRootD::Property::REDUCED_SIMULATION, arg}, {wrench::XRootD::Property::FILE_NOT_FOUND_TIMEOUT, "10"}}, {{wrench::StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 1024}});
 
     this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1");
-    std::cerr << "#MP: " << this->root_supervisor->getMountPoints().size() << "\n";
 
     ASSERT_THROW(this->root_supervisor = xrootd_deployment.createRootSupervisor("Host1"), std::runtime_error);
 

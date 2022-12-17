@@ -30,42 +30,17 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the service should run
-     * @param mount_points: the mount points of each disk usable by the service.  "/dev/null" is a reserved mount point with no physical disk associated.  It acts similar to /dev/null on unix systems.
      * @param service_name: the name of the storage service
      *
      * @throw std::invalid_argument
      */
     StorageService::StorageService(const std::string &hostname,
-                                   const std::set<std::string> &mount_points,
                                    const std::string &service_name) : Service(hostname, service_name) {
-        if (mount_points.empty()) {
-            throw std::invalid_argument("StorageService::StorageService(): At least one mount point must be provided");
-        }
-
-//        try {
-//            for (const auto &mp: mount_points) {
-//                this->file_systems[mp] = LogicalFileSystem::createLogicalFileSystem(
-//                        this->getHostname(), this, mp);
-//            }
-//        } catch (std::invalid_argument &e) {
-//            throw;
-//        }
-//
 
         this->state = StorageService::UP;
         this->is_scratch = false;
     }
-    /**
-     * @brief Constructor
-     *
-     * @param hostname: the name of the host on which the service should run
-     * @param service_name: the name of the storage service
-     *
-     * @throw std::invalid_argument
-     */
-    StorageService::StorageService(const std::string &hostname,
-                                   const std::string &service_name) : StorageService(hostname, {LogicalFileSystem::DEV_NULL}, service_name) {
-    }
+
     /**
      * @brief Determines whether the storage service is a scratch service of a ComputeService
      * @return true if it is, false otherwise
@@ -162,10 +137,6 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     void StorageService::readFile(const std::shared_ptr<DataFile> &file) {
-        std::cerr << "IN READ FILE: THERE ARE " << this->file_systems.size() << "  MOUNT POINTS\n";
-        for (auto const &mp: this->file_systems) {
-            std::cerr << "  - " << mp.first << "\n";
-        }
         StorageService::readFile(FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this()), file));
     }
     /**
