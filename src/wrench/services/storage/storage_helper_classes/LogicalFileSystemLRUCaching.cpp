@@ -50,11 +50,21 @@ namespace wrench {
             createDirectory(absolute_path);
         }
 
+        bool file_already_there = this->content[absolute_path].find(file) != this->content[absolute_path].end();
+
+        // If the file was already there, remove its LRU entry
+        if (file_already_there) {
+            unsigned old_seq = std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->lru_sequence_number;
+            this->lru_list.erase(old_seq);
+        }
+
         this->content[absolute_path][file] = std::make_shared<FileOnDiskLRUCaching>(S4U_Simulation::getClock(), this->next_lru_sequence_number++, 0);
         this->lru_list[this->next_lru_sequence_number - 1] = std::make_tuple(absolute_path, file);
 
+//        print_lru_list();
+
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
-        if (this->reserved_space.find(key) == this->reserved_space.end()) {
+        if ((not file_already_there) and (this->reserved_space.find(key) == this->reserved_space.end())) {
             this->free_space -= file->getSize();
         } else {
             this->reserved_space.erase(key);
@@ -78,6 +88,7 @@ namespace wrench {
         auto seq = std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->lru_sequence_number;
         this->content[absolute_path].erase(file);
         this->lru_list.erase(seq);
+//        print_lru_list();
         this->free_space += file->getSize();
     }
 
@@ -103,6 +114,7 @@ namespace wrench {
         for (auto const &c : this->content[absolute_path]) {
             this->lru_list.erase(std::static_pointer_cast<FileOnDiskLRUCaching>(c.second)->lru_sequence_number);
         }
+//        print_lru_list();
         this->content[absolute_path].clear();
     }
 
@@ -123,7 +135,12 @@ namespace wrench {
         }
 
         if (this->content[absolute_path].find(file) != this->content[absolute_path].end()) {
-            std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->lru_sequence_number++;
+            unsigned new_seq = this->next_lru_sequence_number++;
+            unsigned old_seq = std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->lru_sequence_number;
+            this->lru_list.erase(old_seq);
+            std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->lru_sequence_number = new_seq;
+            this->lru_list[new_seq] = std::make_tuple(absolute_path, file);
+//            print_lru_list();
         }
     }
 
@@ -167,10 +184,12 @@ namespace wrench {
         for (const unsigned int &key : to_evict) {
             auto path = std::get<0>(this->lru_list[key]);
             auto file = std::get<1>(this->lru_list[key]);
+            WRENCH_INFO("Evicting file %s:%s", path.c_str(), file->getID().c_str());
             this->lru_list.erase(key);
             this->content[path].erase(file);
             this->free_space += file->getSize();
         }
+//        print_lru_list();
 
         return true;
     }
