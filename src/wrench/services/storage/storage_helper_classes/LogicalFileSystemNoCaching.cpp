@@ -56,10 +56,10 @@ namespace wrench {
         this->content[absolute_path][file] = std::make_shared<LogicalFileSystemNoCaching::FileOnDiskNoCaching>(S4U_Simulation::getClock());
 
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
-        if ((not file_already_there) and (this->reserved_space.find(key) != this->reserved_space.end())) {
+        if (this->reserved_space.find(key) != this->reserved_space.end()) {
             this->reserved_space.erase(key);
-        } else {
-            this->free_space += file->getSize();
+        } else if (not file_already_there) {
+            this->free_space -= file->getSize();
         }
     }
 

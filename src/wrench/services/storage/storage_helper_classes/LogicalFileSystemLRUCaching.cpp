@@ -64,11 +64,12 @@ namespace wrench {
 //        print_lru_list();
 
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
-        if ((not file_already_there) and (this->reserved_space.find(key) == this->reserved_space.end())) {
-            this->free_space -= file->getSize();
-        } else {
+        if (this->reserved_space.find(key) != this->reserved_space.end()) {
             this->reserved_space.erase(key);
+        } else if (not file_already_there) {
+            this->free_space -= file->getSize();
         }
+
     }
 
     /**
