@@ -51,10 +51,12 @@ namespace wrench {
             createDirectory(absolute_path);
         }
 
+        bool file_already_there =  this->content[absolute_path].find(file) != this->content[absolute_path].end();
+
         this->content[absolute_path][file] = std::make_shared<LogicalFileSystemNoCaching::FileOnDiskNoCaching>(S4U_Simulation::getClock());
 
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
-        if (this->reserved_space.find(key) != this->reserved_space.end()) {
+        if ((not file_already_there) and (this->reserved_space.find(key) != this->reserved_space.end())) {
             this->reserved_space.erase(key);
         } else {
             this->free_space += file->getSize();

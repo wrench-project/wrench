@@ -125,6 +125,7 @@ namespace wrench {
         friend class FileRegistryService;
         friend class FileTransferThread;
         friend class SimpleStorageServiceNonBufferized;
+        friend class SimpleStorageServiceBufferized;
 
         static void stageFile(const std::shared_ptr<FileLocation> &location);
 
