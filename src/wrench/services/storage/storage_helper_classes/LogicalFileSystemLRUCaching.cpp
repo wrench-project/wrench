@@ -134,23 +134,70 @@ namespace wrench {
      */
     bool LogicalFileSystemLRUCaching::evictFiles(double needed_free_space) {
 
-        double total_reserved_space = 0;
-        for (auto const &x : this->reserved_space) {
-            total_reserved_space += x.second;
+        // Easy case: there is already enough space without evicting anything
+        if (this->free_space >= needed_free_space) {
+            return true;
         }
 
-        if (this->total_capacity - total_reserved_space < needed_free_space) return false;
+        // Otherwise, we have to try to evict evictable files
+        // The worst-case complexity is O(n) here, but we expect
+        // very few files to not be evictable. Besides, non-evictable
+        // files are likely recently used anyway.
+        std::vector<unsigned int> to_evict;
+        double freeable_space = 0;
+        for (auto const &lru : this->lru_list) {
+            auto path = std::get<0>(lru.second);
+            auto file = std::get<1>(lru.second);
+            if (std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[path][file])->num_current_transactions > 0) {
+                continue;
+            }
+            to_evict.push_back(lru.first);
+            freeable_space += file->getSize();
+            if (this->free_space + freeable_space >= needed_free_space) {
+                break;
+            }
+        }
 
-        while(this->free_space < needed_free_space) {
-            unsigned int key = this->lru_list.begin()->first;
-            auto path = std::get<0>(this->lru_list.begin()->second);
-            auto file = std::get<1>(this->lru_list.begin()->second);
+        // Perhaps that wasn't enough
+        if (this->free_space + freeable_space < needed_free_space) {
+            return false;
+        }
+
+        // If it was enough, simply remove files
+        for (const unsigned int &key : to_evict) {
+            auto path = std::get<0>(this->lru_list[key]);
+            auto file = std::get<1>(this->lru_list[key]);
             this->lru_list.erase(key);
             this->content[path].erase(file);
             this->free_space += file->getSize();
         }
-        return true;
 
+        return true;
     }
+
+    /**
+     * @brief Increment the number of running transactions that have to do with a file
+     * @param file: the file
+     * @param absolute_path: the file path
+     */
+    void LogicalFileSystemLRUCaching::incrementNumRunningTransactionsForFileInDirectory(const shared_ptr<DataFile> &file, const string &absolute_path) {
+        if ((this->content.find(absolute_path) != this->content.end()) and
+            (this->content[absolute_path].find(file) != this->content[absolute_path].end())) {
+            std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->num_current_transactions++;
+        }
+    }
+
+    /**
+     * @brief Decrement the number of running transactions that have to do with a file
+     * @param file: the file
+     * @param absolute_path: the file path
+     */
+    void LogicalFileSystemLRUCaching::decrementNumRunningTransactionsForFileInDirectory(const shared_ptr<DataFile> &file, const string &absolute_path) {
+        if ((this->content.find(absolute_path) != this->content.end()) and
+            (this->content[absolute_path].find(file) != this->content[absolute_path].end())) {
+            std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->num_current_transactions--;
+        }
+    }
+
 
 }// namespace wrench

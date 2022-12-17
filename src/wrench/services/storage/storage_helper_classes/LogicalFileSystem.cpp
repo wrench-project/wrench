@@ -104,11 +104,19 @@ namespace wrench {
     }
 
     /**
- * @brief Create a new directory
- *
- * @param absolute_path: the directory's absolute path
- * @throw std::invalid_argument
- */
+     * @brief Determine whether the file system has been initialized
+     * @return true or false
+     */
+    bool LogicalFileSystem::isInitialized() {
+        return this->initialized;
+    }
+
+    /**
+     * @brief Create a new directory
+     *
+     * @param absolute_path: the directory's absolute path
+     * @throw std::invalid_argument
+     */
     void LogicalFileSystem::createDirectory(const std::string &absolute_path) {
         if (devnull) {
             return;
@@ -216,20 +224,20 @@ namespace wrench {
         return this->total_capacity;
     }
 
-    /**
- * @brief Checks whether there is enough space to store some number of bytes
- * @param bytes: a number of bytes
- * @return true if the number of bytes can fit
- */
-    bool LogicalFileSystem::hasEnoughFreeSpace(double bytes) {
-        assertInitHasBeenCalled();
-        return (this->free_space >= bytes);
-    }
+//    /**
+// * @brief Checks whether there is enough space to store some number of bytes
+// * @param bytes: a number of bytes
+// * @return true if the number of bytes can fit
+// */
+//    bool LogicalFileSystem::hasEnoughFreeSpace(double bytes) {
+//        assertInitHasBeenCalled();
+//        return (this->free_space >= bytes);
+//    }
 
     /**
- * @brief Get the file system's free space
- * @return the free space in bytes
- */
+     * @brief Get the file system's free space
+     * @return the free space in bytes
+     */
     double LogicalFileSystem::getFreeSpace() {
         assertInitHasBeenCalled();
         return this->free_space;
@@ -348,14 +356,5 @@ namespace wrench {
 
         this->storeFileInDirectory(file, absolute_path, false);
     }
-
-    /**
-     * @brief
-     * @return
-     */
-    bool LogicalFileSystem::isInitialized() const {
-        return this->initialized;
-    }
-
 
 }// namespace wrench
