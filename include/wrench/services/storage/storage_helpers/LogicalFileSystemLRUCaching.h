@@ -59,6 +59,8 @@ namespace wrench {
         void removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) override;
         void removeAllFilesInDirectory(const std::string &absolute_path) override;
         void updateReadDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) override;
+        void incrementNumRunningTransactionsForFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) override;
+        void decrementNumRunningTransactionsForFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) override;
 
     protected:
         bool evictFiles(double needed_free_space) override;

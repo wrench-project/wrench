@@ -39,10 +39,7 @@ namespace wrench {
 
     public:
 
-        virtual ~LogicalFileSystem() {
-//            this->content.clear();
-//            LogicalFileSystem::mount_points.erase(this->mount_point);
-        }
+        virtual ~LogicalFileSystem() = default;
 
         class FileOnDisk {
         public:
@@ -63,11 +60,13 @@ namespace wrench {
                                    const std::string& eviction_policy = "NONE");
 
         void init();
+        bool isInitialized();
 
         double getTotalCapacity();
-        bool hasEnoughFreeSpace(double bytes);
-        bool isInitialized() const;
         double getFreeSpace();
+//        bool hasEnoughFreeSpace(double bytes);
+
+        void stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path);
 
         bool reserveSpace(const std::shared_ptr<DataFile> &file,
                           const std::string &absolute_path);
@@ -77,20 +76,19 @@ namespace wrench {
         bool doesDirectoryExist(const std::string &absolute_path);
         bool isDirectoryEmpty(const std::string &absolute_path);
         void removeEmptyDirectory(const std::string &absolute_path);
+
+        bool isFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
+        std::set<std::shared_ptr<DataFile>> listFilesInDirectory(const std::string &absolute_path);
+        simgrid::s4u::Disk *getDisk();
+
+        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
+
         virtual void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path, bool must_be_initialized) = 0;
         virtual void removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) = 0;
         virtual void removeAllFilesInDirectory(const std::string &absolute_path) = 0;
-        bool isFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
-        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
-
         virtual void updateReadDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) = 0;
-
-        std::set<std::shared_ptr<DataFile>> listFilesInDirectory(const std::string &absolute_path);
-
-        simgrid::s4u::Disk *getDisk();
-
-
-        void stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path);
+        virtual void incrementNumRunningTransactionsForFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) = 0;
+        virtual void decrementNumRunningTransactionsForFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) = 0;
 
     protected:
         friend class StorageService;
@@ -107,10 +105,10 @@ namespace wrench {
         StorageService *storage_service;
         std::string mount_point;
         double total_capacity;
+        double free_space = 0;
         std::map<std::string, double> reserved_space;
 
         bool initialized;
-        double free_space;
         std::unordered_map<std::string, std::map<std::shared_ptr<DataFile>, std::shared_ptr<LogicalFileSystem::FileOnDisk>>> content;
 
         void assertInitHasBeenCalled() const {

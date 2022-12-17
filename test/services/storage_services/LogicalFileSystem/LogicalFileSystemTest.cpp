@@ -96,12 +96,15 @@ void LogicalFileSystemTest::do_BasicTests() {
     ASSERT_TRUE(fs1->reserveSpace(file_80, "/files/"));
     fs1->storeFileInDirectory(file_80, "/files/", true);
     ASSERT_DOUBLE_EQ(20, fs1->getFreeSpace());
+    fs1->incrementNumRunningTransactionsForFileInDirectory(file_80, "/files"); // coverage
+    fs1->decrementNumRunningTransactionsForFileInDirectory(file_80, "/files"); // coverage
 
     auto file_50 = workflow->addFile("file_50", 50);
     ASSERT_FALSE(fs1->reserveSpace(file_50, "/files/"));
     ASSERT_DOUBLE_EQ(20, fs1->getFreeSpace());
     fs1->removeFileFromDirectory(file_80, "/files/");
     ASSERT_DOUBLE_EQ(100, fs1->getFreeSpace());
+
 
     workflow->clear();
 
@@ -176,7 +179,6 @@ void LogicalFileSystemTest::do_LRUTests() {
     //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
-    auto workflow = wrench::Workflow::createWorkflow();
 
     // set up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
@@ -190,12 +192,12 @@ void LogicalFileSystemTest::do_LRUTests() {
     auto fs1 = wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service.get(), "/tmp", "LRU");
     fs1->init();
 
-
     auto file_60 = wrench::Simulation::addFile("file_60", 60);
     auto file_50 = wrench::Simulation::addFile("file_50", 50);
     auto file_30 = wrench::Simulation::addFile("file_30", 30);
     auto file_20 = wrench::Simulation::addFile("file_20", 20);
     auto file_10 = wrench::Simulation::addFile("file_10", 10);
+
 
     fs1->createDirectory(("/foo"));
     ASSERT_TRUE(fs1->reserveSpace(file_60, "/foo"));
@@ -213,8 +215,28 @@ void LogicalFileSystemTest::do_LRUTests() {
     fs1->storeFileInDirectory(file_50, "/foo", true);
     ASSERT_DOUBLE_EQ(40, fs1->getFreeSpace());
 
+    // At this point the content is:
+    //  If I store another file that requires 50 bytes, but make file_10 unevictable, file_50 should be evicted
+    auto other_file_50 = wrench::Simulation::addFile("other_file_50", 50);
+    fs1->incrementNumRunningTransactionsForFileInDirectory(file_10, "/foo");
+    ASSERT_TRUE(fs1->reserveSpace(other_file_50, "/foo"));
+    ASSERT_TRUE(fs1->isFileInDirectory(file_10, "/foo"));
+    ASSERT_FALSE(fs1->isFileInDirectory(file_50, "/foo"));
+    fs1->storeFileInDirectory(other_file_50, "/foo", true);
 
-    workflow->clear();
+    // At this point the content is;
+    //   LRU: file_10 (UNEVICTABLE), other_file_50 (EVICTABLE)
+    fs1->incrementNumRunningTransactionsForFileInDirectory(other_file_50, "/foo");
+    // At this point the content is;
+    //   LRU: file_10 (UNEVICTABLE), other_file_50 (UNEVICTABLE)
+    // I should not be able to store/reserve space for file_50
+    ASSERT_FALSE(fs1->reserveSpace(file_50, "/foo"));
+    ASSERT_DOUBLE_EQ(fs1->getFreeSpace(), 40);
+    // Make other_file_50 EVICTABLE again
+    fs1->decrementNumRunningTransactionsForFileInDirectory(other_file_50, "/foo");
+    ASSERT_TRUE(fs1->reserveSpace(file_50, "/foo"));
+    ASSERT_FALSE(fs1->isFileInDirectory(file_50, "/foo"));
+    ASSERT_DOUBLE_EQ(fs1->getFreeSpace(), 40);
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
