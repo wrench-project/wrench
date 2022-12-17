@@ -320,8 +320,6 @@ namespace wrench {
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
 
-            // Update the file read date in the file system
-            fs->updateReadDate(file, location->getAbsolutePathAtMountPoint());
 
             // Create a FileTransferThread
             auto ftt = std::make_shared<FileTransferThread>(
@@ -339,6 +337,13 @@ namespace wrench {
 
             // Add it to the Pool of pending data communications
             this->pending_file_transfer_threads.push_front(ftt);
+
+            // Update the file read date in the file system
+            fs->updateReadDate(file, location->getAbsolutePathAtMountPoint());
+
+            // Mark the file as unevictable
+            this->file_systems[location->getMountPoint()]->incrementNumRunningTransactionsForFileInDirectory(
+                    location->getFile(), location->getAbsolutePathAtMountPoint());
         }
 
         return true;
@@ -462,6 +467,9 @@ namespace wrench {
         ftt->setSimulation(this->simulation);
         this->pending_file_transfer_threads.push_back(ftt);
 
+        src_location->getStorageService()->file_systems[src_location->getMountPoint()]->incrementNumRunningTransactionsForFileInDirectory(
+                src_location->getFile(), src_location->getAbsolutePathAtMountPoint());
+
         return true;
     }
 
@@ -511,6 +519,10 @@ namespace wrench {
             this->running_file_transfer_threads.erase(ftt);
         }
 
+        if (src_location) {
+            src_location->getStorageService()->file_systems[src_location->getMountPoint()]->decrementNumRunningTransactionsForFileInDirectory(
+                    src_location->getFile(), src_location->getAbsolutePathAtMountPoint());
+        }
 
         // Was the destination me?
         if (dst_location and (dst_location->getStorageService().get() == this)) {

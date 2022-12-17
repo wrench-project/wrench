@@ -61,6 +61,11 @@ namespace wrench {
      */
     void SimpleStorageServiceNonBufferized::processTransactionCompletion(const std::shared_ptr<Transaction> &transaction) {
 
+        if (transaction->src_location) {
+            transaction->src_location->getStorageService()->file_systems[transaction->src_location->getMountPoint()]->decrementNumRunningTransactionsForFileInDirectory(
+                    transaction->src_location->getFile(), transaction->src_location->getAbsolutePathAtMountPoint());
+        }
+
         // If I was the source and the destination was bufferized, I am the one creating the file there! (yes,
         // this is ugly and lame, and one day we'll clean the storage service implementation
         if (transaction->src_location != nullptr and
@@ -412,6 +417,7 @@ namespace wrench {
 
         bool success = (failure_cause == nullptr);
 
+
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
@@ -425,6 +431,9 @@ namespace wrench {
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
+            // Make the file un-evictable
+            location->getStorageService()->file_systems[location->getMountPoint()]->incrementNumRunningTransactionsForFileInDirectory(
+                    location->getFile(), location->getAbsolutePathAtMountPoint());
 
             fs->updateReadDate(location->getFile(), location->getAbsolutePathAtMountPoint());
 
@@ -573,6 +582,9 @@ namespace wrench {
             return true;
         }
 
+        src_location->getStorageService()->file_systems[src_location->getMountPoint()]->incrementNumRunningTransactionsForFileInDirectory(
+                src_location->getFile(), src_location->getAbsolutePathAtMountPoint());
+
         // At this point, there is enough space
         // Create a Transaction
         auto transaction = std::make_shared<Transaction>(
@@ -691,6 +703,9 @@ namespace wrench {
         // At this point we're all good
         uint64_t transfer_size;
         transfer_size = (uint64_t) (file->getSize());
+
+        src_location->getStorageService()->file_systems[src_location->getMountPoint()]->incrementNumRunningTransactionsForFileInDirectory(
+                src_location->getFile(), src_location->getAbsolutePathAtMountPoint());
 
         // Create a Transaction
         auto transaction = std::make_shared<Transaction>(

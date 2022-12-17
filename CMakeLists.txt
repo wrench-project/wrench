@@ -389,6 +389,7 @@ set(TEST_FILES
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiJobTests.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceOneTaskTest.cpp
         test/services/storage_services/LogicalFileSystem/LogicalFileSystemTest.cpp
+        test/services/storage_services/SimpleStorageService/SimpleStorageServiceCachingTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp

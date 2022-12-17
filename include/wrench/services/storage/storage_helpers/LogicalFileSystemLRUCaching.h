@@ -76,6 +76,12 @@ namespace wrench {
 
         std::map<unsigned int, std::tuple<std::string, std::shared_ptr<DataFile> >> lru_list;
 
+        void print_lru_list() {
+                std::cerr << "LRU LIST:\n";
+            for (auto const &lru : this->lru_list) {
+                std::cerr << "[" << lru.first << "] " << std::get<0>(lru.second) << ":" << std::get<1>(lru.second)->getID() << "\n";
+            }
+        }
 
     private:
 
