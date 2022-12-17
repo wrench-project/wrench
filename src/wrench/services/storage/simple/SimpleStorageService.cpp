@@ -97,20 +97,23 @@ namespace wrench {
             std::set<std::string> mount_points,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            const std::string &suffix) : StorageService(hostname, mount_points, "simple_storage" + suffix) {
+            const std::string &suffix) : StorageService(hostname, "simple_storage" + suffix) {
 
         this->setProperties(this->default_property_values, std::move(property_list));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
         this->validateProperties();
 
-//        try {
-//            for (const auto &mp: mount_points) {
-//                this->file_systems[mp] = LogicalFileSystem::createLogicalFileSystem(
-//                        this->getHostname(), this, mp, this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR));
-//            }
-//        } catch (std::invalid_argument &e) {
-//            throw;
-//        }
+        if (mount_points.empty()) {
+            throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): A storage service must have at least one mount point");
+        }
+        try {
+            for (const auto &mp: mount_points) {
+                this->file_systems[mp] = LogicalFileSystem::createLogicalFileSystem(
+                        this->getHostname(), this, mp, this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR));
+            }
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(
                 SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
