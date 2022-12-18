@@ -23,8 +23,6 @@ namespace wrench {
     public:
         /** @brief The maximum number of concurrent data connections supported by the service (default = "infinity") **/
         DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-
-
     };
 
 }// namespace wrench

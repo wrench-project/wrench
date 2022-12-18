@@ -38,7 +38,6 @@ namespace wrench {
     class LogicalFileSystem {
 
     public:
-
         virtual ~LogicalFileSystem() = default;
 
         class FileOnDisk {
@@ -46,7 +45,6 @@ namespace wrench {
             explicit FileOnDisk(double last_write_date) : last_write_date(last_write_date) {}
 
             double last_write_date;
-
         };
 
         /**
@@ -55,16 +53,16 @@ namespace wrench {
         const static std::string DEV_NULL;
 
         static std::unique_ptr<LogicalFileSystem> createLogicalFileSystem(const std::string &hostname,
-                                   StorageService *storage_service,
-                                   const std::string& mount_point = DEV_NULL,
-                                   const std::string& eviction_policy = "NONE");
+                                                                          StorageService *storage_service,
+                                                                          const std::string &mount_point = DEV_NULL,
+                                                                          const std::string &eviction_policy = "NONE");
 
         void init();
         bool isInitialized();
 
         double getTotalCapacity();
         double getFreeSpace();
-//        bool hasEnoughFreeSpace(double bytes);
+        //        bool hasEnoughFreeSpace(double bytes);
 
         void stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path);
 
@@ -143,7 +141,6 @@ namespace wrench {
                                             " is not in directory " + absolute_path);
             }
         }
-
     };
 
 

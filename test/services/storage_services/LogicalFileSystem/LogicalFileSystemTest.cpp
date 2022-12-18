@@ -55,7 +55,7 @@ void LogicalFileSystemTest::do_BasicTests() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//        argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
     auto workflow = wrench::Workflow::createWorkflow();
@@ -66,7 +66,7 @@ void LogicalFileSystemTest::do_BasicTests() {
     // Create two Storage Services
     std::shared_ptr<wrench::SimpleStorageService> storage_service1, storage_service2;
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("Host", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host", {"/"})));
 
     ASSERT_THROW(wrench::LogicalFileSystem::createLogicalFileSystem("Host", nullptr, "/tmp", "NONE"), std::invalid_argument);
     ASSERT_THROW(wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service1.get(), "/bogus"), std::invalid_argument);
@@ -96,8 +96,8 @@ void LogicalFileSystemTest::do_BasicTests() {
     ASSERT_TRUE(fs1->reserveSpace(file_80, "/files/"));
     fs1->storeFileInDirectory(file_80, "/files/", true);
     ASSERT_DOUBLE_EQ(20, fs1->getFreeSpace());
-    fs1->incrementNumRunningTransactionsForFileInDirectory(file_80, "/files"); // coverage
-    fs1->decrementNumRunningTransactionsForFileInDirectory(file_80, "/files"); // coverage
+    fs1->incrementNumRunningTransactionsForFileInDirectory(file_80, "/files");// coverage
+    fs1->decrementNumRunningTransactionsForFileInDirectory(file_80, "/files");// coverage
 
     auto file_50 = workflow->addFile("file_50", 50);
     ASSERT_FALSE(fs1->reserveSpace(file_50, "/files/"));
@@ -125,7 +125,7 @@ void LogicalFileSystemTest::do_DevNullTests() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
     auto workflow = wrench::Workflow::createWorkflow();
@@ -136,7 +136,7 @@ void LogicalFileSystemTest::do_DevNullTests() {
     // Create a  Storage Services
     std::shared_ptr<wrench::SimpleStorageService> storage_service;
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("Host", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host", {"/"})));
 
     // Create a Logical File System
     auto fs1 = wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service.get(), "/dev/null");
@@ -186,7 +186,7 @@ void LogicalFileSystemTest::do_LRUTests() {
     // Create a  Storage Services
     std::shared_ptr<wrench::SimpleStorageService> storage_service;
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("Host", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host", {"/"})));
 
     // Create a Logical File System with LRU eviction
     auto fs1 = wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service.get(), "/tmp", "LRU");

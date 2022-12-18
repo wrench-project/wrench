@@ -25,11 +25,11 @@ namespace wrench {
      * @param mount_point: the mount point, defaults to /dev/null
      */
     LogicalFileSystemLRUCaching::LogicalFileSystemLRUCaching(const std::string &hostname, StorageService *storage_service, const std::string &mount_point)
-            : LogicalFileSystem(hostname, storage_service, mount_point) {
+        : LogicalFileSystem(hostname, storage_service, mount_point) {
     }
 
 
-/**
+    /**
  * @brief Store file in directory
  *
  * @param file: the file to store
@@ -61,7 +61,7 @@ namespace wrench {
         this->content[absolute_path][file] = std::make_shared<FileOnDiskLRUCaching>(S4U_Simulation::getClock(), this->next_lru_sequence_number++, 0);
         this->lru_list[this->next_lru_sequence_number - 1] = std::make_tuple(absolute_path, file);
 
-//        print_lru_list();
+        //        print_lru_list();
 
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
         if (this->reserved_space.find(key) != this->reserved_space.end()) {
@@ -69,7 +69,6 @@ namespace wrench {
         } else if (not file_already_there) {
             this->free_space -= file->getSize();
         }
-
     }
 
     /**
@@ -89,7 +88,7 @@ namespace wrench {
         auto seq = std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->lru_sequence_number;
         this->content[absolute_path].erase(file);
         this->lru_list.erase(seq);
-//        print_lru_list();
+        //        print_lru_list();
         this->free_space += file->getSize();
     }
 
@@ -106,16 +105,16 @@ namespace wrench {
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         double freed_space = 0;
-        for (auto const &s : this->content[absolute_path]) {
+        for (auto const &s: this->content[absolute_path]) {
             freed_space += s.first->getSize();
         }
         this->content[absolute_path].clear();
         this->free_space += freed_space;
 
-        for (auto const &c : this->content[absolute_path]) {
+        for (auto const &c: this->content[absolute_path]) {
             this->lru_list.erase(std::static_pointer_cast<FileOnDiskLRUCaching>(c.second)->lru_sequence_number);
         }
-//        print_lru_list();
+        //        print_lru_list();
         this->content[absolute_path].clear();
     }
 
@@ -141,7 +140,7 @@ namespace wrench {
             this->lru_list.erase(old_seq);
             std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->lru_sequence_number = new_seq;
             this->lru_list[new_seq] = std::make_tuple(absolute_path, file);
-//            print_lru_list();
+            //            print_lru_list();
         }
     }
 
@@ -163,11 +162,11 @@ namespace wrench {
         // files are likely recently used anyway.
         std::vector<unsigned int> to_evict;
         double freeable_space = 0;
-        for (auto const &lru : this->lru_list) {
+        for (auto const &lru: this->lru_list) {
             auto path = std::get<0>(lru.second);
             auto file = std::get<1>(lru.second);
             if (std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[path][file])->num_current_transactions > 0) {
-//                std::cerr << "PASSING OVER " << path << ":" << file->getID() << "\n";
+                //                std::cerr << "PASSING OVER " << path << ":" << file->getID() << "\n";
                 continue;
             }
             to_evict.push_back(lru.first);
@@ -183,16 +182,16 @@ namespace wrench {
         }
 
         // If it was enough, simply remove files
-        for (const unsigned int &key : to_evict) {
+        for (const unsigned int &key: to_evict) {
             auto path = std::get<0>(this->lru_list[key]);
             auto file = std::get<1>(this->lru_list[key]);
-//            std::cerr << "Evicting file " <<  path.c_str() << ":" <<  file->getID().c_str() << "\n";
+            //            std::cerr << "Evicting file " <<  path.c_str() << ":" <<  file->getID().c_str() << "\n";
             WRENCH_INFO("Evicting file %s:%s", path.c_str(), file->getID().c_str());
             this->lru_list.erase(key);
             this->content[path].erase(file);
             this->free_space += file->getSize();
         }
-//        print_lru_list();
+        //        print_lru_list();
 
         return true;
     }
