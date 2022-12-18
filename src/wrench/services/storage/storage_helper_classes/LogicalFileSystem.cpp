@@ -54,6 +54,12 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Constructor
+     * @param hostname the host on which this file system runs
+     * @param storage_service the storage service for which this file system runs
+     * @param mount_point the mount point at the host
+     */
     LogicalFileSystem::LogicalFileSystem(const std::string &hostname, StorageService *storage_service,
                                          const std::string &mount_point) {
 
@@ -121,9 +127,10 @@ namespace wrench {
         if (devnull) {
             return;
         }
-        //        assertInitHasBeenCalled();
-        assertDirectoryDoesNotExist(absolute_path);
-        this->content[absolute_path] = {};
+        //        assertInitHasBeenCalled(); 
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+        assertDirectoryDoesNotExist(fixed_path);
+        this->content[fixed_path] = {};
     }
 
     /**
@@ -136,7 +143,8 @@ namespace wrench {
             return false;
         }
         //        assertInitHasBeenCalled();
-        return (this->content.find(absolute_path) != this->content.end());
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+        return (this->content.find(fixed_path) != this->content.end());
     }
 
     /**
@@ -151,8 +159,9 @@ namespace wrench {
             return true;
         }
         assertInitHasBeenCalled();
-        assertDirectoryExist(absolute_path);
-        return (this->content[absolute_path].empty());
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+        assertDirectoryExist(fixed_path);
+        return (this->content[fixed_path].empty());
     }
 
     /**
@@ -165,10 +174,11 @@ namespace wrench {
         if (devnull) {
             return;
         }
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
         assertInitHasBeenCalled();
-        assertDirectoryExist(absolute_path);
-        assertDirectoryIsEmpty(absolute_path);
-        this->content.erase(absolute_path);
+        assertDirectoryExist(fixed_path);
+        assertDirectoryIsEmpty(fixed_path);
+        this->content.erase(fixed_path);
     }
 
 
@@ -186,12 +196,14 @@ namespace wrench {
             return false;
         }
         assertInitHasBeenCalled();
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+
         // If directory does not exist, say "no"
-        if (not doesDirectoryExist(absolute_path)) {
+        if (not doesDirectoryExist(fixed_path)) {
             return false;
         }
 
-        return (this->content[absolute_path].find(file) != this->content[absolute_path].end());
+        return (this->content[fixed_path].find(file) != this->content[fixed_path].end());
     }
 
     /**
@@ -208,8 +220,10 @@ namespace wrench {
             return {};
         }
         assertInitHasBeenCalled();
-        assertDirectoryExist(absolute_path);
-        for (auto const &f: this->content[absolute_path]) {
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+
+        assertDirectoryExist(fixed_path);
+        for (auto const &f: this->content[fixed_path]) {
             to_return.insert(f.first);
         }
         return to_return;
@@ -257,12 +271,14 @@ namespace wrench {
         }
 
         assertInitHasBeenCalled();
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
-        std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
+
+        std::string key = FileLocation::sanitizePath(fixed_path) + file->getID();
         if (this->reserved_space.find(key) != this->reserved_space.end()) {
             WRENCH_WARN("LogicalFileSystem::reserveSpace(): Space was already being reserved for storing file %s at path %s:%s. "
                         "This is likely a redundant copy, and nothing needs to be done",
-                        file->getID().c_str(), this->hostname.c_str(), absolute_path.c_str());
+                        file->getID().c_str(), this->hostname.c_str(), fixed_path.c_str());
         }
 
         if (this->free_space < file->getSize()) {
@@ -287,7 +303,9 @@ namespace wrench {
             return;
         }
         assertInitHasBeenCalled();
-        std::string key = FileLocation::sanitizePath(std::move(absolute_path)) + file->getID();
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+
+        std::string key = FileLocation::sanitizePath(std::move(fixed_path)) + file->getID();
 
         if (this->reserved_space.find(key) == this->reserved_space.end()) {
             return;// oh well, the transfer was cancelled/terminated/whatever
@@ -310,13 +328,15 @@ namespace wrench {
             return -1;
         }
         assertInitHasBeenCalled();
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+
         // If directory does not exist, say "no"
-        if (not doesDirectoryExist(absolute_path)) {
+        if (not doesDirectoryExist(fixed_path)) {
             return -1;
         }
 
-        if (this->content[absolute_path].find(file) != this->content[absolute_path].end()) {
-            return (this->content[absolute_path][file]->last_write_date);
+        if (this->content[fixed_path].find(file) != this->content[fixed_path].end()) {
+            return (this->content[fixed_path][file]->last_write_date);
         } else {
             return -1;
         }
@@ -352,9 +372,9 @@ namespace wrench {
                                         file->getID() + " at " + this->hostname + ":" + absolute_path);
         }
 
-        absolute_path = wrench::FileLocation::sanitizePath(absolute_path);
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
-        this->storeFileInDirectory(file, absolute_path, false);
+        this->storeFileInDirectory(file, fixed_path, false);
     }
 
 }// namespace wrench
