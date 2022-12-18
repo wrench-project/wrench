@@ -13,13 +13,11 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/compute/cloud/CloudComputeService.h>
-#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
 #include "wrench/services/storage/StorageServiceMessage.h"
 #include <wrench/services/storage/StorageServiceMessagePayload.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 #include <memory>
 
@@ -32,41 +30,17 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the service should run
-     * @param mount_points: the mount points of each disk usable by the service.  "/dev/null" is a reserved mount point with no physical disk associated.  It acts similar to /dev/null on unix systems.
      * @param service_name: the name of the storage service
      *
      * @throw std::invalid_argument
      */
     StorageService::StorageService(const std::string &hostname,
-                                   const std::set<std::string> &mount_points,
                                    const std::string &service_name) : Service(hostname, service_name) {
-        if (mount_points.empty()) {
-            throw std::invalid_argument("StorageService::StorageService(): At least one mount point must be provided");
-        }
-
-        try {
-            for (const auto &mp: mount_points) {
-                this->file_systems[mp] = std::make_unique<LogicalFileSystem>(
-                        this->getHostname(), this, mp);
-            }
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
 
         this->state = StorageService::UP;
         this->is_scratch = false;
     }
-    /**
-     * @brief Constructor
-     *
-     * @param hostname: the name of the host on which the service should run
-     * @param service_name: the name of the storage service
-     *
-     * @throw std::invalid_argument
-     */
-    StorageService::StorageService(const std::string &hostname,
-                                   const std::string &service_name) : StorageService(hostname, {LogicalFileSystem::DEV_NULL}, service_name) {
-    }
+
     /**
      * @brief Determines whether the storage service is a scratch service of a ComputeService
      * @return true if it is, false otherwise
@@ -153,6 +127,7 @@ namespace wrench {
     void StorageService::deleteFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service) {
         StorageService::deleteFile(FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this()), file), file_registry_service);
     }
+
     /**
      * @brief Synchronously read a file from the storage service
      *
@@ -285,7 +260,7 @@ namespace wrench {
                     remaining -= this->buffer_size;
                 }
                 S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
-                                                                         file, (unsigned long) remaining, true));
+                                                                         file, remaining, true));
 
                 //Waiting for the final ack
                 message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -391,7 +366,7 @@ namespace wrench {
     void StorageService::readFile(const std::shared_ptr<FileLocation> &location) {
         if (location == nullptr) {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
-        }//This check DOES need to exist, becasue we call file->getSize()
+        }//This check DOES need to exist, because we call file->getSize()
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         readFile(location, answer_mailbox, location->getFile()->getSize());
     }
@@ -644,7 +619,6 @@ namespace wrench {
     }
 
     /**
-<<<<<<< HEAD
      * @brief Synchronously ask the storage service to read a file from another storage service
      *
      * @param src_location: the location where to read the file
@@ -715,7 +689,6 @@ namespace wrench {
     }
 
     /**
-<<<<<<< HEAD
      * @brief Asynchronously ask for a file copy between two storage services
      *
      * @param answer_mailbox: the mailbox to which a notification message will be sent
@@ -832,7 +805,7 @@ namespace wrench {
      * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
      * at that location.
      *
-     * @param location: a file location, must be the same object as the function is envoked on
+     * @param location: a file location, must be the same object as the function is invoked on
      *
      * @throw std::invalid_argument
      */

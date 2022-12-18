@@ -39,6 +39,7 @@ namespace wrench {
             //if(internalStorage){
             //    internalStorage->start(internalStorage,true,true);
             //}
+
             std::string message =
                     "XRootD Node " + this->getName() + "  starting on host " + this->getHostname();
             WRENCH_INFO("%s",
@@ -312,7 +313,8 @@ namespace wrench {
                                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                                 for (auto entry: splitStacks) {
                                     if (entry.first == this) {//this node was the target
-                                        //we shouldn't have to worry about this, it should have been handled earlier.  But just in case, I dont want a rogue search going who knows where
+                                        //we shouldn't have to worry about this, it should have been handled earlier.
+                                        // But just in case, I don't want a rogue search going who knows where
                                     } else {
                                         S4U_Mailbox::dputMessage(entry.first->mailbox,
                                                                  new AdvancedContinueSearchMessage(
@@ -413,7 +415,8 @@ namespace wrench {
                                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                                 for (auto entry: splitStacks) {
                                     if (entry.first == this) {//this node was the target
-                                        //we shouldn't have to worry about this, it should have been handled earlier.  But just in case, I dont want a rogue search going who knows where
+                                        //we shouldn't have to worry about this, it should have been handled earlier.
+                                        // But just in case, I don't want a rogue search going who knows where
                                     } else {
                                         S4U_Mailbox::dputMessage(entry.first->mailbox,
                                                                  new AdvancedContinueSearchMessage(
@@ -444,7 +447,7 @@ namespace wrench {
                                                                      metavisor->defaultTimeToLive));
                                 }
                             }
-                        } else {//you asked a leaf directly and it didn't have the file
+                        } else {// you asked a leaf directly and it didn't have the file
                             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                                      new StorageServiceFileReadAnswerMessage(
                                                              FileLocation::LOCATION(internalStorage, file),
@@ -495,7 +498,7 @@ namespace wrench {
                                                          msg->answered));
                     } else {//File not in internal storage or cache
                         if (children.size() > 0 &&
-                            msg->timeToLive > 0) {//shotgun continued search message to all chldren
+                            msg->timeToLive > 0) {//shotgun continued search message to all children
                             WRENCH_DEBUG(" Basic Search broadcast for %s", msg->file->getID().c_str());
 
                             S4U_Simulation::compute(
@@ -505,7 +508,7 @@ namespace wrench {
                                                          new ContinueSearchMessage(msg));
                             }
                         } else {
-                            //this is a leaf that just didn't have the file.  XRootD protocal is to silently fail in this case.  Do not respond
+                            //this is a leaf that just didn't have the file.  XRootD protocol is to silently fail in this case.  Do not respond
                         }
                     }
                 }
@@ -560,7 +563,8 @@ namespace wrench {
                     S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                     for (auto entry: splitStacks) {
                         if (entry.first == this) {//this node was the target
-                            //we shouldn't have to worry about this, it should have been handled earlier.  But just in case, I dont want a rogue search going who knows where
+                            //we shouldn't have to worry about this, it should have been handled earlier.
+                            // But just in case, I don't want a rogue search going who knows where
                         } else {
                             S4U_Mailbox::dputMessage(entry.first->mailbox,
                                                      new AdvancedRippleDelete(
@@ -604,11 +608,12 @@ namespace wrench {
                     try {
                         StorageService::deleteFile(FileLocation::LOCATION(internalStorage, msg->file));
                     } catch (ExecutionException &e) {
-                        //we don't actually care if this fails, that just means the file we tried to delete wasn't there already.  Big woop.
+                        //we don't actually care if this fails, that just means the file
+                        // we tried to delete wasn't there already.  Big whoop.
                     }
                 }
                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
-                if (children.size() > 0 && msg->timeToLive > 0) {//shotgun remove search message to all chldren
+                if (children.size() > 0 && msg->timeToLive > 0) {//shotgun remove search message to all children
                     shared_ptr<bool> answered = make_shared<bool>(false);
 
                     for (auto child: children) {
@@ -758,7 +763,13 @@ namespace wrench {
         * @param messagepayload_list: A Message Payload list
         *
         */
-        Node::Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootD") {
+        Node::Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootD") {
+
+            // Create /dev/null mountpoint so that Locations can be created
+            this->file_systems[LogicalFileSystem::DEV_NULL] =
+                    LogicalFileSystem::createLogicalFileSystem(hostname, this, LogicalFileSystem::DEV_NULL, "NONE");
+
             this->setProperties(this->default_property_values, property_list);
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
             cache.maxCacheTime = getPropertyValueAsTimeInSecond(Property::CACHE_MAX_LIFETIME);
@@ -853,7 +864,7 @@ namespace wrench {
             vector<stack<Node *>> ret;
             for (auto target: targets) {
                 if (target.get() == this) {
-                    ret.push_back(stack<Node *>());//I dont think this should ever happen, but it might
+                    ret.push_back(stack<Node *>());//I don't think this should ever happen, but it might
                 } else {
                     stack<Node *> tmp = constructSearchStack(target.get());
                     if (!tmp.empty()) {
@@ -876,7 +887,7 @@ namespace wrench {
                 ret.push(next);
                 next = next->supervisor;
             }
-            if (next != this) {//failed to find this in parrent tree
+            if (next != this) {//failed to find this in parent tree
                 ret = stack<Node *>();
             } else {
                 WRENCH_DEBUG("Found file server %s in subtree at depth %zu", target->getName().c_str(), ret.size());
@@ -899,7 +910,7 @@ namespace wrench {
         }
         /**
         * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
-        * @param location: a file location, must be the same object as the function is envoked on
+        * @param location: a file location, must be the same object as the function is invoked on
         *
         * @throw std::invalid_argument
         */

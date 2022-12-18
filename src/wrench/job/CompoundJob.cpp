@@ -280,7 +280,7 @@ namespace wrench {
     */
     std::shared_ptr<FileDeleteAction>
     CompoundJob::addFileDeleteAction(const std::string &name,
-                                     const std::shared_ptr<FileLocation>& file_location) {
+                                     const std::shared_ptr<FileLocation> &file_location) {
         auto new_action = std::shared_ptr<FileDeleteAction>(
                 new FileDeleteAction(name, file_location->getFile(), file_location));
         this->addAction(new_action);
@@ -359,7 +359,6 @@ namespace wrench {
      */
     void CompoundJob::addAction(const std::shared_ptr<Action> &action) {
         assertJobNotSubmitted();
-        assertJobNotSubmitted();
         assertActionNameDoesNotAlreadyExist(action->getName());
         action->job = this->getSharedPtr();
         action->setState(Action::State::READY);
@@ -401,7 +400,7 @@ namespace wrench {
         if (parent == nullptr) {
             throw std::invalid_argument("CompoundJob::addParentJob: Cannot add a nullptr parent");
         }
-        if (this->pathExists(this->getSharedPtr(), parent)) {
+        if (pathExists(this->getSharedPtr(), parent)) {
             throw std::invalid_argument("CompoundJob::addChildJob(): Adding this dependency would create a cycle");
         }
         this->parents.insert(parent);
@@ -417,7 +416,7 @@ namespace wrench {
         if (child == nullptr) {
             throw std::invalid_argument("CompoundJob::addChildJob: Cannot add a nullptr child");
         }
-        if (this->pathExists(child, this->getSharedPtr())) {
+        if (pathExists(child, this->getSharedPtr())) {
             throw std::invalid_argument("CompoundJob::addChildJob(): Adding this dependency would create a cycle");
         }
         this->children.insert(child);
@@ -472,7 +471,7 @@ namespace wrench {
      */
     void CompoundJob::assertJobNotSubmitted() {
         if (this->state != CompoundJob::State::NOT_SUBMITTED) {
-            throw std::runtime_error("CompoundJob::assertJobNotSubmitted(): Cannot modify a CompoundJob onces it has been submitted");
+            throw std::runtime_error("CompoundJob::assertJobNotSubmitted(): Cannot modify a CompoundJob once it has been submitted");
         }
     }
 
@@ -567,26 +566,26 @@ namespace wrench {
         }
         bool path_exists = false;
         for (auto const &c: current_children) {
-            path_exists = path_exists || this->pathExists(c, b);
+            path_exists = path_exists || CompoundJob::pathExists(c, b);
         }
         return path_exists;
     }
 
     /**
      * @brief Returns the job's child jobs, if any
-     * @return a set of jobs
+     * @return a set of jobs (a reference)
      */
     std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getChildren() {
         return this->children;
     }
 
-    /**
-     * @brief Returns a reference to the job's parent jobs, if any (use with caution)
-     * @return a set of jobs
-     */
-    std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getParents() {
-        return this->parents;
-    }
+    //    /**
+    //     * @brief Returns a reference to the job's parent jobs, if any (use with caution)
+    //     * @return a set of jobs (a reference)
+    //     */
+    //    std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getParents() {
+    //        return this->parents;
+    //    }
 
     /**
      * @brief Remove an action from the job

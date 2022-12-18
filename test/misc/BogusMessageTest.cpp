@@ -131,7 +131,7 @@ public:
 private:
     BogusMessageTest *test;
 
-    int main() {
+    int main() override {
         wrench::Simulation::sleep(1000);
         try {
             wrench::S4U_Mailbox::putMessage(this->test->dst_mailbox, new BogusMessage());
@@ -154,7 +154,7 @@ private:
     BogusMessageTest *test;
     bool create_data_movement_manager;
 
-    int main() {
+    int main() override {
 
         if (this->create_data_movement_manager) {
             auto dmm = this->createDataMovementManager();
@@ -178,10 +178,6 @@ TEST_F(BogusMessageTest, FileRegistryService) {
 
 TEST_F(BogusMessageTest, SimpleStorage) {
     DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "simple_storage", true);
-}
-
-TEST_F(BogusMessageTest, WMS) {
-    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "wms", true);
 }
 
 TEST_F(BogusMessageTest, DataMovementManager) {
@@ -212,10 +208,6 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     } else if (service_type == "simple_storage") {
         this->service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"}));
         this->dst_mailbox = this->service->mailbox;
-    } else if (service_type == "wms") {
-        auto wms = new NoopWMS(this, hostname, false);
-        this->service = simulation->add(wms);
-        this->dst_mailbox = wms->mailbox;
     } else if (service_type == "data_movement_manager") {
         auto wms = new NoopWMS(this, hostname, true);
         this->service = simulation->add(wms);
@@ -224,7 +216,7 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
 
     // Create the Bogus Message WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BogusMessageTestWMS(this, hostname)));
 

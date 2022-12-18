@@ -25,7 +25,7 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
     };
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_SIMPLESTORAGESERVICEPROPERTY_H

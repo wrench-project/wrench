@@ -401,11 +401,6 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     ASSERT_GE(storage_service->getPropertyList().size(), 2);
     ASSERT_GE(storage_service->getMessagePayloadList().size(), 2);
 
-    // Try to get a bogus property as string or double
-    ASSERT_THROW(storage_service->getPropertyValueAsString(-1), std::invalid_argument);
-    ASSERT_THROW(storage_service->getPropertyValueAsDouble(-1), std::invalid_argument);
-    ASSERT_THROW(storage_service->getPropertyValueAsUnsignedLong(-1), std::invalid_argument);
-    ASSERT_THROW(storage_service->getPropertyValueAsBoolean(-1), std::invalid_argument);
 
     ASSERT_EQ(storage_service->getPropertyValueAsUnsignedLong(wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS), 567);
     ASSERT_EQ(storage_service->getPropertyValueAsUnsignedLong(wrench::ServiceProperty::translateString("SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS")), 567);
