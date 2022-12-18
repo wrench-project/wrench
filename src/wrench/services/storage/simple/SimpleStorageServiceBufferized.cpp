@@ -67,7 +67,7 @@ namespace wrench {
     int SimpleStorageServiceBufferized::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
-        for (auto const &mp : this->file_systems) {
+        for (auto const &mp: this->file_systems) {
             if (not mp.second->isInitialized()) {
                 mp.second->init();
             }
@@ -192,7 +192,6 @@ namespace wrench {
         }
 
 
-
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
@@ -289,12 +288,12 @@ namespace wrench {
 
         //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
         if (not this->file_systems[location->getMountPoint()]->doesDirectoryExist(
-                location->getAbsolutePathAtMountPoint())) {
+                    location->getAbsolutePathAtMountPoint())) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new InvalidDirectoryPath(
                             this->getSharedPtr<SimpleStorageService>(),
                             location->getMountPoint() + "/" +
-                            location->getAbsolutePathAtMountPoint()));
+                                    location->getAbsolutePathAtMountPoint()));
         } else {
             if (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint())) {
                 WRENCH_INFO(

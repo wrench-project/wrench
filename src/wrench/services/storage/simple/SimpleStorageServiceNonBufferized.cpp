@@ -72,9 +72,7 @@ namespace wrench {
             transaction->src_location->getStorageService() == shared_from_this() and
             transaction->dst_location != nullptr and
             transaction->dst_location->getStorageService()->isBufferized()) {
-            transaction->dst_location->
-                    getStorageService()->file_systems[transaction->dst_location->getMountPoint()]->
-                    storeFileInDirectory(transaction->dst_location->getFile(), transaction->dst_location->getAbsolutePathAtMountPoint(), true);
+            transaction->dst_location->getStorageService()->file_systems[transaction->dst_location->getMountPoint()]->storeFileInDirectory(transaction->dst_location->getFile(), transaction->dst_location->getAbsolutePathAtMountPoint(), true);
         }
 
         // Send back the relevant ack if this was a read
@@ -135,7 +133,7 @@ namespace wrench {
         std::string message = "Simple Storage Service (Non-Bufferized) " + this->getName() + "  starting on host " + this->getHostname();
         WRENCH_INFO("%s", message.c_str());
 
-        for (auto const &mp : this->file_systems) {
+        for (auto const &mp: this->file_systems) {
             if (not mp.second->isInitialized()) {
                 mp.second->init();
             }
@@ -399,12 +397,12 @@ namespace wrench {
 
         //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
         if (not this->file_systems[location->getMountPoint()]->doesDirectoryExist(
-                location->getAbsolutePathAtMountPoint())) {
+                    location->getAbsolutePathAtMountPoint())) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new InvalidDirectoryPath(
                             this->getSharedPtr<SimpleStorageService>(),
                             location->getMountPoint() + "/" +
-                            location->getAbsolutePathAtMountPoint()));
+                                    location->getAbsolutePathAtMountPoint()));
         } else {
             fs = this->file_systems[location->getMountPoint()].get();
 
@@ -722,10 +720,9 @@ namespace wrench {
         this->pending_transactions.push_back(transaction);
 
         return true;
-
     }
 
-/**
+    /**
 * @brief Start pending file transfer threads if any and if possible
 */
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
@@ -741,7 +738,7 @@ namespace wrench {
                                                                transaction->src_disk,
                                                                transaction->dst_host,
                                                                transaction->dst_disk)
-                    ->set_size((uint64_t) (transaction->transfer_size));
+                                       ->set_size((uint64_t) (transaction->transfer_size));
 
             transaction->stream = sg_iostream;
 
@@ -751,7 +748,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
 * @brief Get the load (number of concurrent reads) on the storage service
 * @return the load on the service
 */

@@ -41,10 +41,9 @@ namespace wrench {
         public:
             FileOnDiskLRUCaching(double last_write_date,
                                  unsigned int lru_sequence_number,
-                                 unsigned short num_current_transactions) :
-                    FileOnDisk(last_write_date),
-                    lru_sequence_number(lru_sequence_number),
-                    num_current_transactions(num_current_transactions) {}
+                                 unsigned short num_current_transactions) : FileOnDisk(last_write_date),
+                                                                            lru_sequence_number(lru_sequence_number),
+                                                                            num_current_transactions(num_current_transactions) {}
 
             // the LRU sequence number (lower means older)
             unsigned int lru_sequence_number;
@@ -74,17 +73,16 @@ namespace wrench {
                                              const std::string &mount_point);
 
 
-        std::map<unsigned int, std::tuple<std::string, std::shared_ptr<DataFile> >> lru_list;
+        std::map<unsigned int, std::tuple<std::string, std::shared_ptr<DataFile>>> lru_list;
 
         void print_lru_list() {
-                std::cerr << "LRU LIST:\n";
-            for (auto const &lru : this->lru_list) {
+            std::cerr << "LRU LIST:\n";
+            for (auto const &lru: this->lru_list) {
                 std::cerr << "[" << lru.first << "] " << std::get<0>(lru.second) << ":" << std::get<1>(lru.second)->getID() << "\n";
             }
         }
 
     private:
-
     };
 
 
