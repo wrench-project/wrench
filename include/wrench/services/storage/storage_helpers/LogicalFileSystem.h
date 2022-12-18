@@ -40,18 +40,18 @@ namespace wrench {
     public:
         virtual ~LogicalFileSystem() = default;
 
-	/**
+        /**
 	 * @brief A helper class to describe a file instance on the file system
 	 */
         class FileOnDisk {
         public:
-	    /**
+            /**
 	     * @brief Constructor
 	     * @param last_write_date: the file's last write date
 	     */
             explicit FileOnDisk(double last_write_date) : last_write_date(last_write_date) {}
 
-	    /**
+            /**
 	     * @brief the file's last write date
 	     */
             double last_write_date;
@@ -91,7 +91,7 @@ namespace wrench {
 
         double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
 
-	/**
+        /**
          * @brief Store file in directory
          *
          * @param file: the file to store
@@ -116,19 +116,19 @@ namespace wrench {
          * @throw std::invalid_argument
          */
         virtual void removeAllFilesInDirectory(const std::string &absolute_path) = 0;
-	/**
+        /**
          * @brief Update a file's read date
          * @param file: the file
          * @param absolute_path: the path
          */
         virtual void updateReadDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) = 0;
-	/**
+        /**
          * @brief Increment the number of running transactions that have to do with a file
          * @param file: the file
          * @param absolute_path: the file path
          */
         virtual void incrementNumRunningTransactionsForFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) = 0;
-	/**
+        /**
          * @brief Decrement the number of running transactions that have to do with a file
          * @param file: the file
          * @param absolute_path: the file path

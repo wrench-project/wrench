@@ -114,7 +114,6 @@ void LogicalFileSystemTest::do_BasicTests() {
     fs1->storeFileInDirectory(file_50, "/faa", true);
 
 
-
     workflow->clear();
 
     for (int i = 0; i < argc; i++)
@@ -251,7 +250,7 @@ void LogicalFileSystemTest::do_LRUTests() {
     ASSERT_FALSE(fs1->isFileInDirectory(file_50, "/foo"));
     fs1->storeFileInDirectory(other_file_50, "/foo", true);
     fs1->updateReadDate(other_file_50, "/foo");
-    fs1->updateReadDate(other_file_50, "/faa"); // coverage
+    fs1->updateReadDate(other_file_50, "/faa");// coverage
 
     // At this point the content is;
     //   LRU: file_10 (UNEVICTABLE), other_file_50 (EVICTABLE)
