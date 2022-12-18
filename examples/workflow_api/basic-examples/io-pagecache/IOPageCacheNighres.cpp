@@ -52,7 +52,6 @@ void export_output_single(wrench::SimulationOutput &output, int num_tasks, std::
 int main(int argc, char **argv) {
 
     auto simulation = wrench::Simulation::createSimulation();
-    ;
     simulation->init(&argc, argv);
 
     if (argc < 3) {
@@ -72,7 +71,7 @@ int main(int argc, char **argv) {
     std::cerr << workflow->getTasks().size() << "\n";
 
     std::cerr << "Instantiating a SimpleStorageService on host01..." << std::endl;
-    auto storage_service = simulation->add(new wrench::SimpleStorageService(
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "host01", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100MB"}}, {}));
 
     std::cerr << "Instantiating a bare-metal compute service on ComputeHost..." << std::endl;

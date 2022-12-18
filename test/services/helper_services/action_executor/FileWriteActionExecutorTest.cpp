@@ -24,7 +24,7 @@
 WRENCH_LOG_CATEGORY(file_write_action_executor_test, "Log category for FileWriteActionExecutorTest");
 
 //#define EPSILON (std::numeric_limits<double>::epsilon())
-#define EPSILON (0.000001)
+#define EPSILON (0.0001)
 
 class FileWriteActionExecutorTest : public ::testing::Test {
 
@@ -166,11 +166,11 @@ private:
 
         // Is the start-date sensible?
         if (file_write_action->getStartDate() < 0.0 or file_write_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_write_action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_write_action->getStartDate()));
         }
 
         // Is the end-date sensible?
-        if (file_write_action->getEndDate() + EPSILON < 10.85743174020618617703 or file_write_action->getEndDate() > 10.85743174020618617703 + EPSILON) {
+        if (std::abs<double>(file_write_action->getEndDate() - 10.857443) > EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(file_write_action->getEndDate()));
         }
 
@@ -203,7 +203,9 @@ void FileWriteActionExecutorTest::do_FileWriteActionExecutorSuccessTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss1 = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+            "Host3", {"/"},
+            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();

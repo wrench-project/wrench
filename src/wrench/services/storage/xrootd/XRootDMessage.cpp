@@ -101,7 +101,7 @@ namespace wrench {
         * @param other: The storage service file delete message to copy.
         * @param timeToLive:  The max number of hops this message can take
         */
-        RippleDelete::RippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive) : Message(other->payload), file(other->file), timeToLive(timeToLive) {}
+        RippleDelete::RippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive) : Message(other->payload), file(other->location->getFile()), timeToLive(timeToLive) {}
 
         /**
          * @brief Constructor

@@ -35,6 +35,6 @@ namespace wrench {
         double size;// in bytes
     };
 
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_DATAFILE_H

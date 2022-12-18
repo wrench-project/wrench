@@ -172,11 +172,19 @@ private:
                 job->addActionDependency(first_chain_tasks[i - 1], first_chain_tasks[i]);
             }
         }
+
+        // Coverage
+        try {
+            job->addSleepAction("chain1_sleep_0", 10.0);
+            throw std::runtime_error("Shouldn't be able to add a task with same name as an existing task");
+        } catch (std::runtime_error &ignore) {}
+
         std::vector<std::shared_ptr<wrench::SleepAction>> fork_tasks;
         for (unsigned long i = 0; i < fork_width; i++) {
             fork_tasks.push_back(job->addSleepAction("fork_sleep_" + std::to_string(i), dist_sleep(rng)));
             job->addActionDependency(first_chain_tasks[first_chain_tasks.size() - 1], fork_tasks[i]);
         }
+
 
         std::vector<std::shared_ptr<wrench::SleepAction>> second_chain_tasks;
         for (unsigned long i = 0; i < second_chain_length; i++) {
@@ -204,15 +212,22 @@ private:
             expected_makespan += a->getSleepTime();
         }
 
-
         // Coverage
         job->getCallbackMailbox();
 
         // Submit the job
         job_manager->submitJob(job, this->test->compute_service, {});
 
+
         // Coverage
+        wrench::Simulation::sleep(1.0);
         job->printCallbackMailboxStack();
+
+        // Coverage
+        try {
+            job->addSleepAction("sleep", 1.0);
+            throw std::runtime_error("Shouldn't be able to add action to job that has been submitted");
+        } catch (std::runtime_error &ignore) {}
 
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
@@ -282,7 +297,7 @@ void BareMetalComputeServiceMultiActionTest::do_DAGOfSleeps_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -394,7 +409,7 @@ void BareMetalComputeServiceMultiActionTest::do_NonDAG_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -528,7 +543,7 @@ void BareMetalComputeServiceMultiActionTest::do_RAMConstraintsAndPriorities_test
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -585,7 +600,7 @@ private:
         auto job = job_manager->createCompoundJob("my_job");
 
         auto sleep1 = job->addSleepAction("sleep1", 10.0);
-        auto file_read = job->addFileReadAction("file_read", this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service1));
+        auto file_read = job->addFileReadAction("file_read", wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->input_file));
         auto sleep_after_file_read = job->addSleepAction("sleep_after_file_read", 10.0);
         auto compute = job->addComputeAction("compute", 10000.0, 100.0, 1, 1, wrench::ParallelModel::AMDAHL(1.0));
         auto sleep_after_compute = job->addSleepAction("sleep_after_compute", 10.0);
@@ -614,6 +629,8 @@ private:
         if (not std::dynamic_pointer_cast<wrench::SomeActionsHaveFailed>(real_event->failure_cause)) {
             throw std::runtime_error("Unexpected job-level failure cause");
         }
+        auto real_cause = std::dynamic_pointer_cast<wrench::SomeActionsHaveFailed>(real_event->failure_cause);
+        real_cause->toString();// coverage
 
         // Check job state
         if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
@@ -675,7 +692,7 @@ void BareMetalComputeServiceMultiActionTest::do_PartialFailure_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -815,7 +832,7 @@ void BareMetalComputeServiceMultiActionTest::do_PartialTermination_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService("Host2", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);

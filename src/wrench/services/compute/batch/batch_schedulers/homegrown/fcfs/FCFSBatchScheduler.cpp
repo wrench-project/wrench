@@ -17,7 +17,7 @@ WRENCH_LOG_CATEGORY(wrench_core_fcfs_batch_scheduler, "Log category for FCFSBatc
 namespace wrench {
 
     /**
-    * @brief Overriden Method to pick the next job to schedule
+    * @brief Overridden Method to pick the next job to schedule
     *
     * @return A BatchComputeService job, or nullptr is none is found
     */
@@ -160,7 +160,7 @@ namespace wrench {
     std::map<std::string, double> FCFSBatchScheduler::getStartTimeEstimates(
             std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
         if (cs->getPropertyValueAsString(BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM) != "FIRSTFIT") {
-            throw std::runtime_error("FCFSBatchScheduler::getStartTimeEstimates(): The fcfs sceduling algorithm can only provide start time estimates "
+            throw std::runtime_error("FCFSBatchScheduler::getStartTimeEstimates(): The fcfs scheduling algorithm can only provide start time estimates "
                                      "when the HOST_SELECTION_ALGORITHM property is set to FIRSTFIT");
         }
 
@@ -273,7 +273,7 @@ namespace wrench {
 #endif
         }
 
-        // We now have the predicted available times for each cores given
+        // We now have the predicted available times for each core given
         // everything that's running and pending. We can compute predictions.
         std::map<std::string, double> predictions;
 

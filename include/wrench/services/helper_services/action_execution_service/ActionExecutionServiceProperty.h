@@ -44,7 +44,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_ACTION_EXECUTION_SERVICE_PROPERTY_H

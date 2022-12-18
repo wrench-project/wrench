@@ -120,10 +120,10 @@ private:
         // try synchronous copy and register
 
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->src_file_1,
-                                                         wrench::FileLocation::LOCATION(this->test->src_storage_service),
-                                                         wrench::FileLocation::LOCATION(this->test->dst_storage_service),
-                                                         file_registry_service);
+            data_movement_manager->doSynchronousFileCopy(
+                    wrench::FileLocation::LOCATION(this->test->src_storage_service, this->test->src_file_1),
+                    wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src_file_1),
+                    file_registry_service);
 
         } catch (wrench::ExecutionEvent &e) {
             throw std::runtime_error("Synchronous file copy failed");
@@ -132,7 +132,7 @@ private:
         auto src_file_1_locations = file_registry_service->lookupEntry(this->test->src_file_1);
         bool found = false;
         for (auto const &l: src_file_1_locations) {
-            if (wrench::FileLocation::equal(l, wrench::FileLocation::LOCATION(this->test->dst_storage_service))) {
+            if (wrench::FileLocation::equal(l, wrench::FileLocation::LOCATION(this->test->dst_storage_service, l->getFile()))) {
                 found = true;
             }
         }
@@ -143,15 +143,15 @@ private:
 
         // Do the same thing but kill the FileRegistryService first
 
-        wrench::StorageService::deleteFile(this->test->src_file_1,
-                                           wrench::FileLocation::LOCATION(this->test->dst_storage_service),
-                                           file_registry_service);
+        wrench::StorageService::deleteFile(
+                wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src_file_1),
+                file_registry_service);
         file_registry_service->stop();
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->src_file_1,
-                                                         wrench::FileLocation::LOCATION(this->test->src_storage_service),
-                                                         wrench::FileLocation::LOCATION(this->test->dst_storage_service),
-                                                         file_registry_service);
+            data_movement_manager->doSynchronousFileCopy(
+                    wrench::FileLocation::LOCATION(this->test->src_storage_service, this->test->src_file_1),
+                    wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src_file_1),
+                    file_registry_service);
 
             throw std::runtime_error("Synchronous file copy failed");
         } catch (wrench::ExecutionException &e) {
@@ -168,10 +168,10 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> async_copy_event;
 
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->src2_file_1,
-                                                                wrench::FileLocation::LOCATION(this->test->src2_storage_service),
-                                                                wrench::FileLocation::LOCATION(this->test->dst_storage_service),
-                                                                file_registry_service);
+            data_movement_manager->initiateAsynchronousFileCopy(
+                    wrench::FileLocation::LOCATION(this->test->src2_storage_service, this->test->src2_file_1),
+                    wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src2_file_1),
+                    file_registry_service);
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an exception while trying to instantiate a file copy: " + std::string(e.what()));
         }
@@ -190,7 +190,7 @@ private:
 
         found = false;
         for (auto const &l: src2_file_1_locations) {
-            if (wrench::FileLocation::equal(l, wrench::FileLocation::LOCATION(this->test->dst_storage_service))) {
+            if (wrench::FileLocation::equal(l, wrench::FileLocation::LOCATION(this->test->dst_storage_service, l->getFile()))) {
                 found = true;
             }
         }
@@ -203,16 +203,16 @@ private:
         bool double_copy_failed = false;
         std::shared_ptr<wrench::ExecutionEvent> async_dual_copy_event;
 
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->src_file_2,
-                                                            wrench::FileLocation::LOCATION(this->test->src_storage_service),
-                                                            wrench::FileLocation::LOCATION(this->test->dst_storage_service),
-                                                            file_registry_service);
+        data_movement_manager->initiateAsynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->src_storage_service, this->test->src_file_2),
+                wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src_file_2),
+                file_registry_service);
 
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->src_file_2,
-                                                         wrench::FileLocation::LOCATION(this->test->src_storage_service),
-                                                         wrench::FileLocation::LOCATION(this->test->dst_storage_service),
-                                                         file_registry_service);
+            data_movement_manager->doSynchronousFileCopy(
+                    wrench::FileLocation::LOCATION(this->test->src_storage_service, this->test->src_file_2),
+                    wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src_file_2),
+                    file_registry_service);
         } catch (wrench::ExecutionException &e) {
             double_copy_failed = true;
         }
@@ -223,7 +223,7 @@ private:
 
         found = false;
         for (auto const &l: src_file_2_locations) {
-            if (wrench::FileLocation::equal(l, wrench::FileLocation::LOCATION(this->test->dst_storage_service))) {
+            if (wrench::FileLocation::equal(l, wrench::FileLocation::LOCATION(this->test->dst_storage_service, l->getFile()))) {
                 found = true;
             }
         }
@@ -246,16 +246,16 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> async_dual_copy_event2;
 
 
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->src_file_3,
-                                                            wrench::FileLocation::LOCATION(this->test->src_storage_service),
-                                                            wrench::FileLocation::LOCATION(this->test->dst_storage_service),
-                                                            file_registry_service);
+        data_movement_manager->initiateAsynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->src_storage_service, this->test->src_file_3),
+                wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src_file_3),
+                file_registry_service);
 
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->src_file_3,
-                                                         wrench::FileLocation::LOCATION(this->test->src_storage_service),
-                                                         wrench::FileLocation::LOCATION(this->test->dst_storage_service),
-                                                         file_registry_service);
+            data_movement_manager->doSynchronousFileCopy(
+                    wrench::FileLocation::LOCATION(this->test->src_storage_service, this->test->src_file_3),
+                    wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src_file_3),
+                    file_registry_service);
         } catch (wrench::ExecutionException &e) {
             if (std::dynamic_pointer_cast<wrench::FileAlreadyBeingCopied>(e.getCause())) {
                 double_copy_failed = true;
@@ -283,7 +283,7 @@ private:
 
         found = false;
         for (auto const &l: src_file_3_locations) {
-            if (wrench::FileLocation::equal(l, wrench::FileLocation::LOCATION(this->test->dst_storage_service))) {
+            if (wrench::FileLocation::equal(l, wrench::FileLocation::LOCATION(this->test->dst_storage_service, l->getFile()))) {
                 found = true;
             }
         }
@@ -295,10 +295,10 @@ private:
         // try 1 asynchronous copy and then kill the file registry service right after the copy is instantiated
         std::shared_ptr<wrench::ExecutionEvent> async_copy_event2;
 
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->src2_file_2,
-                                                            wrench::FileLocation::LOCATION(this->test->src2_storage_service),
-                                                            wrench::FileLocation::LOCATION(this->test->dst_storage_service),
-                                                            file_registry_service);
+        data_movement_manager->initiateAsynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->src2_storage_service, this->test->src2_file_2),
+                wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src2_file_2),
+                file_registry_service);
 
         file_registry_service->stop();
 
@@ -314,8 +314,8 @@ private:
             throw std::runtime_error("File registry service should not have been updated");
         }
 
-        if (not wrench::StorageService::lookupFile(this->test->src2_file_2,
-                                                   wrench::FileLocation::LOCATION(this->test->dst_storage_service))) {
+        if (not wrench::StorageService::lookupFile(
+                    wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src2_file_2))) {
             throw std::runtime_error("Asynchronous file copy should have completed even though the FileRegistryService was down.");
         }
 
@@ -352,13 +352,13 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
 
     // Create src and dst storage services
     ASSERT_NO_THROW(src_storage_service = simulation->add(
-                            new wrench::SimpleStorageService("SrcHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("SrcHost", {"/"})));
 
     ASSERT_NO_THROW(src2_storage_service = simulation->add(
-                            new wrench::SimpleStorageService("WMSHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/"})));
 
     ASSERT_NO_THROW(dst_storage_service = simulation->add(
-                            new wrench::SimpleStorageService("DstHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("DstHost", {"/"})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;

@@ -100,10 +100,10 @@ namespace wrench {
         double sequential_work = this->getParallelModel()->getPurelySequentialWork(this->getFlops(), num_threads);
         double parallel_per_thread_work = this->getParallelModel()->getParallelPerThreadWork(this->getFlops(), num_threads);
         if (action_executor->getSimulateComputationAsSleep()) {
-            this->simulateComputationAsSleep(action_executor, num_threads, sequential_work, parallel_per_thread_work);
+            simulateComputationAsSleep(action_executor, num_threads, sequential_work, parallel_per_thread_work);
         } else {
-            this->simulateComputationAsComputation(action_executor, num_threads, sequential_work,
-                                                   parallel_per_thread_work);
+            simulateComputationAsComputation(action_executor, num_threads, sequential_work,
+                                             parallel_per_thread_work);
         }
     }
 
@@ -150,6 +150,8 @@ namespace wrench {
                                                    action_executor->getThreadCreationOverhead(),
                                                    sequential_work,
                                                    parallel_per_thread_work);
+
+
         } catch (std::exception &e) {
             throw ExecutionException(std::shared_ptr<FailureCause>(new ComputationHasDied()));
         }

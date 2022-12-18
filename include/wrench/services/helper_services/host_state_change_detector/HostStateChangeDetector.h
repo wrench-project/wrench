@@ -70,7 +70,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_HOSTSTATECHANGEDETECTOR_H

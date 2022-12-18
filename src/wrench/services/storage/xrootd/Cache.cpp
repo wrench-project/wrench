@@ -19,7 +19,7 @@ namespace wrench {
             double earliestAllowedTime = wrench::S4U_Simulation::getClock() - maxCacheTime;
             auto entries = cache[file];
             //after getting all possible cache entries, loop through them "all" and check the timestamps, removing any that fail.  If you find even 1 success, return true and stop cleaning.
-            for (auto ittr = entries.begin(); ittr != entries.end();) {//intentionaly blank 3rd term
+            for (auto ittr = entries.begin(); ittr != entries.end();) {// intentionally blank 3rd term
                 auto entry = *ittr;
                 if (entry.second < earliestAllowedTime) {
                     ittr = entries.erase(ittr);
@@ -34,7 +34,7 @@ namespace wrench {
          * @param file: The file to add to the cache
          * @param location: The location to add to the cache
          */
-        void Cache::add(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
+        void Cache::add(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
             double currentSimTime = wrench::S4U_Simulation::getClock();
             cache[file][location] = currentSimTime;
         }
@@ -44,9 +44,9 @@ namespace wrench {
         * @param file: The file to add to the cache
         * @param locations: The locations to add to the cache
         */
-        void Cache::add(std::shared_ptr<DataFile> file, std::set<std::shared_ptr<FileLocation>> locations) {
+        void Cache::add(const std::shared_ptr<DataFile> &file, const std::set<std::shared_ptr<FileLocation>> &locations) {
             double currentSimTime = wrench::S4U_Simulation::getClock();
-            for (auto location: locations) {
+            for (auto const &location: locations) {
                 cache[file][location] = currentSimTime;
             }
         }
@@ -55,11 +55,11 @@ namespace wrench {
          * @param file: The file to check the cache for
          * @return the set of valid cached copies.  (empty set if not found)
          */
-        std::set<std::shared_ptr<FileLocation>> Cache::get(std::shared_ptr<DataFile> file) {
+        std::set<std::shared_ptr<FileLocation>> Cache::get(const std::shared_ptr<DataFile> &file) {
             double earliestAllowedTime = wrench::S4U_Simulation::getClock() - maxCacheTime;
             auto entries = cache[file];
             std::set<std::shared_ptr<FileLocation>> ret;
-            for (auto ittr = entries.begin(); ittr != entries.end();) {//intentionaly blank 3rd term
+            for (auto ittr = entries.begin(); ittr != entries.end();) {// intentionally blank 3rd term
                 auto entry = *ittr;
                 if (entry.second < earliestAllowedTime) {
                     ittr = entries.erase(ittr);
@@ -76,14 +76,16 @@ namespace wrench {
          * @return the set of valid cached copies.  (empty set if not found)
          */
 
-        std::set<std::shared_ptr<FileLocation>> Cache::operator[](std::shared_ptr<DataFile> file) {
+        std::set<std::shared_ptr<FileLocation>> Cache::operator[](const std::shared_ptr<DataFile> &file) {
             return get(file);
-        } /**
+        }
+
+        /**
          * @brief remove all copies of a file from the cache
          * @param file: The file to check the cache for
          */
 
-        void Cache::remove(std::shared_ptr<DataFile> file) {
+        void Cache::remove(const std::shared_ptr<DataFile> &file) {
             cache.erase(file);
         }
 

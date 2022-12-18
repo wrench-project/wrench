@@ -51,7 +51,7 @@ namespace wrench {
         static std::string translatePropertyType(WRENCH_PROPERTY_TYPE serviceProperty);
     };
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_SERVICEPROPERTY_H

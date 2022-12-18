@@ -66,7 +66,7 @@ public:
 
     void do_ShutdownComputeServiceWhileJobIsRunning_test();
 
-    void do_ShutdownStorageServiceBeforeJobIsSubmitted_test();
+    void do_ShutdownStorageServiceBeforeJobIsSubmitted_test(double buffer_size);
 
 protected:
     ~BareMetalComputeServiceTestStandardJobs() {
@@ -216,7 +216,7 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -269,13 +269,13 @@ private:
 
         // Create a 1-task1 job
         std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> file_locations;
-        file_locations[this->test->input_file] = wrench::FileLocation::SCRATCH;
-        file_locations[this->test->output_file3] = wrench::FileLocation::SCRATCH;
+        file_locations[this->test->input_file] = wrench::FileLocation::SCRATCH(this->test->input_file);
+        file_locations[this->test->output_file3] = wrench::FileLocation::SCRATCH(this->test->output_file3);
         auto two_core_task_job = job_manager->createStandardJob({this->test->task3},
                                                                 file_locations,
-                                                                {std::make_tuple(this->test->input_file,
-                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                 wrench::FileLocation::SCRATCH)},
+                                                                {std::make_tuple(
+                                                                        wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                                                        wrench::FileLocation::SCRATCH(this->test->input_file))},
                                                                 {}, {});
 
         // Submit the 1-task1 job for execution with too few cores
@@ -322,7 +322,7 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -377,17 +377,17 @@ private:
 
         // Create a 2-task1 job
         std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> file_locations;
-        file_locations[this->test->input_file] = wrench::FileLocation::SCRATCH;
-        file_locations[this->test->output_file1] = wrench::FileLocation::SCRATCH;
-        file_locations[this->test->output_file2] = wrench::FileLocation::SCRATCH;
+        file_locations[this->test->input_file] = wrench::FileLocation::SCRATCH(this->test->input_file);
+        file_locations[this->test->output_file1] = wrench::FileLocation::SCRATCH(this->test->output_file1);
+        file_locations[this->test->output_file2] = wrench::FileLocation::SCRATCH(this->test->output_file2);
 
 
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1, this->test->task2},
                 file_locations,
-                {std::make_tuple(this->test->input_file,
-                                 wrench::FileLocation::LOCATION(this->test->storage_service),
-                                 wrench::FileLocation::SCRATCH)},
+                {std::make_tuple(
+                        wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                        wrench::FileLocation::SCRATCH(this->test->input_file))},
                 {}, {});
 
         // Coverage
@@ -466,7 +466,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -521,14 +521,14 @@ private:
 
         // Create a 2-task1 job
         std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> file_locations;
-        file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
-        file_locations[this->test->output_file3] = wrench::FileLocation::SCRATCH;
-        file_locations[this->test->output_file4] = wrench::FileLocation::SCRATCH;
+        file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file);
+        file_locations[this->test->output_file3] = wrench::FileLocation::SCRATCH(this->test->output_file3);
+        file_locations[this->test->output_file4] = wrench::FileLocation::SCRATCH(this->test->output_file4);
         auto two_task_job = job_manager->createStandardJob({this->test->task3, this->test->task4},
                                                            file_locations,
-                                                           {std::make_tuple(this->test->input_file,
-                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                            wrench::FileLocation::SCRATCH)},
+                                                           {std::make_tuple(
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                                                   wrench::FileLocation::SCRATCH(this->test->input_file))},
                                                            {}, {});
 
         // Submit the 2-task job for execution
@@ -589,7 +589,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -646,9 +646,9 @@ private:
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task5, this->test->task6},
                                                            file_locations,
-                                                           {std::make_tuple(this->test->input_file,
-                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                            wrench::FileLocation::SCRATCH)},
+                                                           {std::make_tuple(
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                                                   wrench::FileLocation::SCRATCH(this->test->input_file))},
                                                            {}, {});
 
         // Submit the 2-task1 job for execution
@@ -722,7 +722,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -780,9 +780,8 @@ private:
         auto two_task_job_1 = job_manager->createStandardJob({this->test->task5, this->test->task6},
                                                              (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                                                              {std::make_tuple(
-                                                                     this->test->input_file,
-                                                                     wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                     wrench::FileLocation::SCRATCH)},
+                                                                     wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                                                     wrench::FileLocation::SCRATCH(this->test->input_file))},
                                                              {}, {});
 
         // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
@@ -790,7 +789,7 @@ private:
             job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                    {{"whatever", "QuadCoreHost:2"}});
             throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &ignore) {
         }
 
         // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
@@ -798,7 +797,7 @@ private:
             job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                    {{"task_6_10s_1_to_2_cores", "QuadCoreHost:2:bogus"}});
             throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &ignore) {
         }
 
         // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
@@ -806,7 +805,7 @@ private:
             job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                    {{"task_6_10s_1_to_2_cores", "QuadCoreHost:whatever"}});
             throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &ignore) {
         }
 
         // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
@@ -814,7 +813,23 @@ private:
             job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                    {{"task_6_10s_1_to_2_cores", "whatever"}});
             throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &ignore) {
+        }
+
+        // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
+        try {
+            job_manager->submitJob(two_task_job_1, this->test->compute_service,
+                                   {{"task_6_10s_1_to_2_cores", "bogushost:2"}});
+            throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
+        } catch (std::invalid_argument &ignore) {
+        }
+
+        // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
+        try {
+            job_manager->submitJob(two_task_job_1, this->test->compute_service,
+                                   {{"task_6_10s_1_to_2_cores", "QuadCoreHost:1000"}});
+            throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
+        } catch (wrench::ExecutionException &ignore) {
         }
 
         // Submit the 2-task1 job for execution
@@ -843,7 +858,7 @@ private:
         double task5_end_date = this->test->task5->getEndDate();
         double task6_end_date = this->test->task6->getEndDate();
 
-        // Check the each task1 ran using 2 cores
+        // Check that each task1 ran using 2 cores
         if (this->test->task5->getNumCoresAllocated() != 2) {
             throw std::runtime_error("It looks like task5 didn't run with 2 cores according to in-task1 info (" + std::to_string(this->test->task5->getNumCoresAllocated()) + ")");
         }
@@ -871,9 +886,9 @@ private:
         // both tasks should run in parallel, use 4 cores each, thus oversubscribing
         auto two_task_job_2 = job_manager->createStandardJob({this->test->task7, this->test->task8},
                                                              (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                                                             {std::make_tuple(this->test->input_file,
-                                                                              wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                              wrench::FileLocation::SCRATCH)},
+                                                             {std::make_tuple(
+                                                                     wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                                                     wrench::FileLocation::SCRATCH(this->test->input_file))},
                                                              {}, {});
 
         job_manager->submitJob(two_task_job_2, this->test->compute_service,
@@ -937,7 +952,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -993,9 +1008,9 @@ private:
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                                                           {std::make_tuple(this->test->input_file,
-                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                            wrench::FileLocation::SCRATCH)},
+                                                           {std::make_tuple(
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                                                   wrench::FileLocation::SCRATCH(this->test->input_file))},
                                                            {}, {});
 
         // Submit the 2-task1 job for execution
@@ -1048,7 +1063,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1109,9 +1124,9 @@ private:
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                                                           {std::make_tuple(this->test->input_file,
-                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                            wrench::FileLocation::SCRATCH)},
+                                                           {std::make_tuple(
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                                                   wrench::FileLocation::SCRATCH(this->test->input_file))},
                                                            {}, {});
 
         // Submit the 2-task1 job for execution
@@ -1167,7 +1182,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1274,7 +1289,7 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1337,9 +1352,9 @@ private:
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                                                           {std::make_tuple(this->test->input_file,
-                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                            wrench::FileLocation::SCRATCH)},
+                                                           {std::make_tuple(
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                                                   wrench::FileLocation::SCRATCH(this->test->input_file))},
                                                            {}, {});
 
         // Submit the 2-task1 job for execution
@@ -1390,7 +1405,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1456,9 +1471,9 @@ private:
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                                                           {std::make_tuple(this->test->input_file,
-                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                            wrench::FileLocation::SCRATCH)},
+                                                           {std::make_tuple(
+                                                                   wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                                                   wrench::FileLocation::SCRATCH(this->test->input_file))},
                                                            {}, {});
 
         // Submit the 2-task1 job for execution
@@ -1521,7 +1536,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1619,15 +1634,17 @@ private:
 };
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, ShutdownStorageServiceBeforeJobIsSubmitted) {
-    DO_TEST_WITH_FORK(do_ShutdownStorageServiceBeforeJobIsSubmitted_test);
+    //    DO_TEST_WITH_FORK_ONE_ARG(do_ShutdownStorageServiceBeforeJobIsSubmitted_test, 100000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ShutdownStorageServiceBeforeJobIsSubmitted_test, 0);
 }
 
-void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJobIsSubmitted_test() {
+void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJobIsSubmitted_test(double buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
+
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -1641,7 +1658,8 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(

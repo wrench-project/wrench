@@ -70,7 +70,7 @@ namespace wrench {
      * @param requested_host: the host whose coordinates are being requested
      * @return A pair:
      *      - a (x,y) coordinate pair
-     *      - a timestamp (the oldest timestamp of measurements usead to compute the coordinate)
+     *      - a timestamp (the oldest timestamp of measurements used to compute the coordinate)
      *
      * @throw WorkFlowExecutionException
      * @throw std::runtime_error
@@ -199,7 +199,7 @@ namespace wrench {
                             this->messagepayload_list));
             this->network_daemons.push_back(np_daemon);
 
-            // if this network service type is 'vivaldi', setup the coordinate lookup table
+            // if this network service type is 'vivaldi', set up the coordinate lookup table
             if (boost::iequals(
                         this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
                         "vivaldi")) {
@@ -331,7 +331,7 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<CoordinateLookupRequestMessage *>(message.get())) {
             std::string requested_host = msg->requested_host;
             auto const coordinate_itr = this->coordinate_lookup_table.find(requested_host);
-            CoordinateLookupAnswerMessage *msg_to_send_back = nullptr;
+            CoordinateLookupAnswerMessage *msg_to_send_back;
 
             if (coordinate_itr != this->coordinate_lookup_table.cend()) {
                 msg_to_send_back = new CoordinateLookupAnswerMessage(

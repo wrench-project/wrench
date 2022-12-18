@@ -53,7 +53,7 @@ namespace wrench {
     public:
         VirtualizedClusterComputeService(const std::string &hostname,
                                          std::vector<std::string> &execution_hosts,
-                                         std::string scratch_space_mount_point,
+                                         const std::string &scratch_space_mount_point,
                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 

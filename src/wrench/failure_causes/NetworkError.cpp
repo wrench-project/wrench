@@ -29,7 +29,7 @@ namespace wrench {
      */
     NetworkError::NetworkError(NetworkError::OperationType operation_type,
                                NetworkError::ErrorType error_type,
-                               std::string mailbox) {
+                               const std::string &mailbox) {
         if (mailbox.empty()) {
             throw std::invalid_argument("NetworkError::NetworkError(): invalid arguments");
         }
@@ -76,7 +76,7 @@ namespace wrench {
      */
     std::string NetworkError::toString() {
         std::string operation;
-        if (this->while_sending) {
+        if (this->whileSending()) {
             operation = "sending to";
         } else {
             operation = "receiving from";

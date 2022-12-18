@@ -60,6 +60,6 @@ int wrench::ServiceTerminationDetector::main() {
                                 new ServiceHasTerminatedMessage(this->service_to_monitor, return_value_from_main));
     }
 
-    this->service_to_monitor = nullptr;// released, so that it can be freed in case refount = 0
+    this->service_to_monitor = nullptr;// released, so that it can be freed in case ref-count = 0
     return 0;
 }

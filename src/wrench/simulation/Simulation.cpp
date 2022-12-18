@@ -13,16 +13,11 @@
 #include <simgrid/plugins/live_migration.h>
 
 #include <wrench/execution_controller/ExecutionController.h>
-#include <wrench/services/compute/cloud/CloudComputeService.h>
-#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/Service.h>
-#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/simulation/Simulation.h>
 #include "simgrid/plugins/energy.h"
-#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/services/memory/MemoryManager.h>
 #include <wrench/data_file/DataFile.h>
@@ -31,8 +26,6 @@
 #include <wrench/util/MessageManager.h>
 #endif
 
-#include <nlohmann/json.hpp>
-#include <fstream>
 #include <memory>
 #include <utility>
 
@@ -43,7 +36,9 @@ namespace wrench {
     int Simulation::unique_disk_sequence_number = 0;
     bool Simulation::energy_enabled = false;
     bool Simulation::host_shutdown_enabled = false;
+    bool Simulation::link_shutdown_enabled = false;
     bool Simulation::pagecache_enabled = false;
+    bool Simulation::surf_precision_set_by_user = false;
 
     bool Simulation::initialized = false;
 
@@ -122,6 +117,13 @@ namespace wrench {
         // By  default, logs are disabled
         xbt_log_control_set("root.thresh:critical");
 
+        // Determine if specific --cfg arguments were passed
+        for (i = 0; i < *argc; i++) {
+            if (!strncmp(argv[i], "--cfg=surf/precision:", strlen("--cfg=surf/precision:"))) {
+                Simulation::surf_precision_set_by_user = true;
+            }
+        }
+
         std::vector<std::string> cleanedup_args;
 
 
@@ -156,6 +158,8 @@ namespace wrench {
                 Simulation::energy_enabled = true;
             } else if (not strcmp(argv[i], "--wrench-host-shutdown-simulation")) {
                 Simulation::host_shutdown_enabled = true;
+            } else if (not strcmp(argv[i], "--wrench-link-shutdown-simulation")) {
+                Simulation::link_shutdown_enabled = true;
             } else if ((not strcmp(argv[i], "--help-wrench")) or
                        (not strcmp(argv[i], "--wrench-help"))) {
                 wrench_help_requested = true;
@@ -164,7 +168,7 @@ namespace wrench {
             } else if (not strcmp(argv[i], "--wrench-version")) {
                 version_requested = true;
             } else if (not strcmp(argv[i], "--wrench-pagecache-simulation")) {
-                this->pagecache_enabled = true;
+                Simulation::pagecache_enabled = true;
             } else {
                 cleanedup_args.emplace_back(argv[i]);
             }
@@ -185,6 +189,19 @@ namespace wrench {
                     }
                 });
 
+        // Register a callback on link state changes to warn users
+        // that the --wrench-host-shutdown-simulation flag should have been passed
+        // to the simulator if host shutdowns are to be simulated
+        simgrid::s4u::Link::on_state_change_cb(
+                [](simgrid::s4u::Link const &l) {
+                    if (not Simulation::link_shutdown_enabled) {
+                        throw std::runtime_error(
+                                "It looks like you are simulating link failures/shutdowns during the simulated execution."
+                                " Please restart your simulation passing it the --wrench-link-shutdown-simulation command-line flag.");
+                    }
+                });
+
+
         // Print help message if requested
         if (wrench_help_requested) {
             std::cout << "General WRENCH command-line arguments:\n";
@@ -192,7 +209,9 @@ namespace wrench {
             std::cout << "   --wrench-energy-simulation: activates SimGrid's energy plugin\n";
             std::cout << "     (requires host pstate definitions in XML platform description file)\n";
             std::cout
-                    << "   --wrench-host-shutdown-simulation: activates WRENCH's capability to simulate host failures/shutdowns during execution (will slow down simulation)\n";
+                    << "   --wrench-host-shutdown-simulation: activates WRENCH's capability to simulate host failures/shutdowns during execution\n";
+            std::cout
+                    << "   --wrench-link-shutdown-simulation: activates WRENCH's capability to simulate link failures/shutdowns during execution\n";
             std::cout
                     << "   --wrench-pagecache-simulation: Activate the in-memory (Linux) page cache simulation (which ";
             std::cout
@@ -219,7 +238,7 @@ namespace wrench {
 
         // If version requested, put back the "--version" argument
         if (version_requested) {
-            std::cout << "This program was linked against WRENCH version " << getWRENCHVersionString();
+            std::cout << "This program was linked against WRENCH version " << Simulation::getWRENCHVersionString();
 #ifdef ENABLE_BATSCHED
             std::cout << " (compiled with Batsched)";
 #endif
@@ -249,6 +268,7 @@ namespace wrench {
             (*argc)++;
             std::cout << "\nSimgrid command-line arguments:\n\n";
         }
+
 
         this->s4u_simulation->initialize(argc, argv);
 
@@ -411,12 +431,30 @@ namespace wrench {
     }
 
     /**
+     * @brief Method to check if link shutdown simulation is activated
+     * @return true or false
+     */
+    bool Simulation::isLinkShutdownSimulationEnabled() {
+        return Simulation::link_shutdown_enabled;
+    }
+
+
+    /**
      * @brief Method to check if energy simulation is activated
      * @return true or false
      */
     bool Simulation::isEnergySimulationEnabled() {
         return Simulation::energy_enabled;
     }
+
+    /**
+     * @brief Method to check if surf precision was set by the user
+     * @return true or false
+     */
+    bool Simulation::isSurfPrecisionSetByUser() {
+        return Simulation::surf_precision_set_by_user;
+    }
+
 
     ///**
     // * @brief Method to retrieve MemoryManager by hostname
@@ -692,8 +730,8 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> storage_service) {
-        Simulation::stageFile(file, FileLocation::LOCATION(std::move(storage_service)));
+    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &storage_service) {
+        Simulation::stageFile(FileLocation::LOCATION(storage_service, file));
     }
 
     /**
@@ -706,19 +744,18 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> storage_service,
+    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &storage_service,
                                std::string directory_absolute_path) {
-        Simulation::stageFile(file, FileLocation::LOCATION(std::move(storage_service), std::move(directory_absolute_path)));
+        Simulation::stageFile(FileLocation::LOCATION(storage_service, directory_absolute_path, file));
     }
 
     /**
      * @brief State a copy of a file at a location, and update the file registry service
-     * @param file: the file
-     * @param location: the location
+     * @param location: the file location
      */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-        if ((file == nullptr) or (location == nullptr)) {
-            throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
+    void Simulation::stageFile(const std::shared_ptr<FileLocation> &location) {
+        if (location == nullptr) {
+            throw std::invalid_argument("Simulation::stageFile(): Invalid nullptr arguments");
         }
 
         if (this->is_running) {
@@ -733,30 +770,27 @@ namespace wrench {
 
         // Put the file on the storage service (not via the service daemon)
         try {
-            StorageService::stageFile(file, location);
+            StorageService::stageFile(location);
         } catch (std::invalid_argument &e) {
             throw;
         }
 
         // Update all file registry services
         for (const auto &frs: this->file_registry_services) {
-            frs->addEntryToDatabase(file, location);
+            frs->addEntryToDatabase(location);
         }
     }
     /**
      * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
      * at that location.
      *
-     * @param file: a file
      * @param location: a file location
      *
      * @throw std::invalid_argument
      */
 
-    void Simulation::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-        //location->getStorageService()->stageFile(file, location->getMountPoint(),
-        //                                         location->getAbsolutePathAtMountPoint());
-        location->getStorageService()->createFile(file, location);
+    void Simulation::createFile(const std::shared_ptr<FileLocation> &location) {
+        location->getStorageService()->createFile(location);
     }
     /**
      * @brief Store a file on a particular file server ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
@@ -998,8 +1032,8 @@ namespace wrench {
      * @param hostname - name of host being queried
      * @return boolean of existence
      */
-    bool Simulation::doesHostExist(std::string hostname) {
-        return S4U_Simulation::hostExists(std::move(hostname));
+    bool Simulation::doesHostExist(const std::string &hostname) {
+        return S4U_Simulation::hostExists(hostname);
     }
 
     /**
@@ -1561,6 +1595,15 @@ namespace wrench {
     }
 
     /**
+     * @brief Remove all files from the simulation (use at your own peril if you're using the workflow API)
+     * @param file : file to remove
+     */
+    void Simulation::removeAllFiles() {
+        Simulation::data_files.clear();
+    }
+
+
+    /**
      * @brief Determine if the simulation has been initialized
      * @return  true or false
      */
@@ -1573,7 +1616,8 @@ namespace wrench {
      * @return a simulation
      */
     std::shared_ptr<Simulation> Simulation::createSimulation() {
-        return std::shared_ptr<Simulation>(new Simulation);
+        LogicalFileSystem::mount_points.clear();
+        return std::shared_ptr<Simulation>(new Simulation());
     }
 
 }// namespace wrench

@@ -62,13 +62,13 @@ namespace wrench {
                 WRENCH_INFO("Creating a job for task %s", ready_task->getID().c_str());
 
                 /* Create a map of file locations, stating for each file (could be none)
-                 * where is should be read/written */
+                 * where it should be read/written */
                 std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
                 for (auto const &f: ready_task->getInputFiles()) {
-                    file_locations[f] = FileLocation::LOCATION(storage_service);
+                    file_locations[f] = FileLocation::LOCATION(storage_service, f);
                 }
                 for (auto const &f: ready_task->getOutputFiles()) {
-                    file_locations[f] = FileLocation::LOCATION(storage_service);
+                    file_locations[f] = FileLocation::LOCATION(storage_service, f);
                 }
 
                 /* Create the job  */

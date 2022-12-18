@@ -63,7 +63,7 @@ namespace wrench {
 
         /* Creates an instance of input_file on both storage services. This takes zero simulation time. After
          * all, that file needs to be there somewhere initially if it's indeed some input file */
-        wrench::Simulation::createFile(input_file, wrench::FileLocation::LOCATION(ss_1, "/data/"));
+        wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss_1, "/data/", input_file));
 
         /* Create a job  */
         auto job = job_manager->createCompoundJob("job");
@@ -72,7 +72,7 @@ namespace wrench {
         auto compute_action = job->addComputeAction("compute", 200 * GFLOP, 100, 3, 4, wrench::ParallelModel::AMDAHL(0.95));
 
         /* Add a file-write action that will fail */
-        auto file_write_action = job->addFileWriteAction("file_write", output_file, wrench::FileLocation::LOCATION(ss_2));
+        auto file_write_action = job->addFileWriteAction("file_write", wrench::FileLocation::LOCATION(ss_2, output_file));
 
         /* Add a long compute action that will fail when we kill the compute service! */
         auto compute_long = job->addComputeAction("compute_long", 10000 * GFLOP, 100, 1, 20, wrench::ParallelModel::AMDAHL(0.57));

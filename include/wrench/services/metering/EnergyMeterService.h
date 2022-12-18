@@ -44,7 +44,7 @@ namespace wrench {
         std::map<std::string, double> time_to_next_measurement;
     };
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_ENERGYMETERSERVICE_H

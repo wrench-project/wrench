@@ -33,7 +33,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FileNotFound(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location);
+        FileNotFound(std::shared_ptr<FileLocation> location);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -43,14 +43,13 @@ namespace wrench {
         std::string toString() override;
 
     private:
-        std::shared_ptr<DataFile> file;
         std::shared_ptr<FileLocation> location;
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_FILENOTFOUND_H

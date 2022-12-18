@@ -197,10 +197,10 @@ namespace wrench {
                     // Specify that ALL files are read/written from the one storage service
                     std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
                     for (auto const &f: task->getInputFiles()) {
-                        file_locations[f] = wrench::FileLocation::LOCATION(this->storage_service);
+                        file_locations[f] = wrench::FileLocation::LOCATION(this->storage_service, f);
                     }
                     for (auto const &f: task->getOutputFiles()) {
-                        file_locations[f] = wrench::FileLocation::LOCATION(this->storage_service);
+                        file_locations[f] = wrench::FileLocation::LOCATION(this->storage_service, f);
                     }
                     try {
                         auto job = job_manager->createStandardJob(task, file_locations);

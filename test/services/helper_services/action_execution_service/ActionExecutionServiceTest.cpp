@@ -30,7 +30,7 @@
 WRENCH_LOG_CATEGORY(action_scheduler_test, "Log category for ActionExecutionServiceTest");
 
 //#define EPSILON (std::numeric_limits<double>::epsilon())
-#define EPSILON (0.000001)
+#define EPSILON (0.0001)
 
 
 class ActionExecutionServiceTest : public ::testing::Test {
@@ -180,7 +180,7 @@ private:
 
         // Is the start-date sensible?
         if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
@@ -219,12 +219,13 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"},
+                                                                                        {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -298,7 +299,7 @@ private:
 
         // Is the start-date sensible?
         if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
@@ -337,12 +338,12 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -430,12 +431,12 @@ private:
         }
 
         // Is the start-date sensible?
-        if (action->getStartDate() < 12.0 or action->getStartDate() > 12.0) {
+        if (std::abs<double>(action->getStartDate() - 12.0) > EPSILON) {
             throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
-        if (action->getEndDate() + EPSILON < 45.333333333333335701810 or action->getEndDate() > 45.33333333333333570181 + EPSILON) {
+        if (std::abs<double>(action->getEndDate() - 45.333333333333335701810) > EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
         }
 
@@ -504,12 +505,12 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -563,7 +564,7 @@ private:
         auto job = job_manager->createCompoundJob("my_job");
 
         // Add a sleep action to it
-        auto action = job->addFileReadAction("my_file_read", this->test->file, wrench::FileLocation::LOCATION(this->test->ss));
+        auto action = job->addFileReadAction("my_file_read", wrench::FileLocation::LOCATION(this->test->ss, this->test->file));
 
         // Submit the action to the action executor
         action_execution_service->submitAction(action);
@@ -630,12 +631,12 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -688,7 +689,7 @@ private:
         auto job = job_manager->createCompoundJob("my_job");
 
         // Add a sleep action to it
-        auto action = job->addFileReadAction("my_file_read", this->test->file, wrench::FileLocation::LOCATION(this->test->ss));
+        auto action = job->addFileReadAction("my_file_read", wrench::FileLocation::LOCATION(this->test->ss, this->test->file));
 
         // Submit the action to the action executor
         action_execution_service->submitAction(action);
@@ -715,8 +716,8 @@ private:
         }
 
         // Is the start-date sensible?
-        if (action->getStartDate() < 0.0 or action->getStartDate() > 0.0) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
+        if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
@@ -760,12 +761,14 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+            "Host4", {"/"},
+            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -865,12 +868,12 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -993,15 +996,15 @@ private:
         // Are the dates sensible?
         if (action1->getStartDate() > EPSILON)
             throw std::runtime_error("Unexpected action1 start date " + std::to_string(action1->getStartDate()));
-        if ((action1->getEndDate() < 10.0 - EPSILON) or (action1->getEndDate() > 10.0 + EPSILON))
+        if (std::abs<double>(action1->getEndDate() - 10.0) > EPSILON)
             throw std::runtime_error("Unexpected action1 end date " + std::to_string(action1->getEndDate()));
-        if ((action2->getStartDate() < 10.0 - EPSILON) or (action2->getStartDate() > 10.0 + EPSILON))
+        if (std::abs<double>(action2->getStartDate() - 10.0) > EPSILON)
             throw std::runtime_error("Unexpected action2 start date " + std::to_string(action2->getStartDate()));
-        if ((action2->getEndDate() < 55.0 - EPSILON) or (action2->getEndDate() > 55.0 + EPSILON))
+        if (std::abs<double>(action2->getEndDate() - 55.0) > EPSILON)
             throw std::runtime_error("Unexpected action2 end date " + std::to_string(action2->getEndDate()));
-        if ((action3->getStartDate() < 55.0 - EPSILON) or (action3->getStartDate() > 55.0 + EPSILON))
+        if (std::abs<double>(action3->getStartDate() - 55.0) > EPSILON)
             throw std::runtime_error("Unexpected action3 start date " + std::to_string(action3->getStartDate()));
-        if ((action3->getEndDate() < 60.0 - EPSILON) or (action3->getEndDate() > 60.0 + EPSILON))
+        if (std::abs<double>(action3->getEndDate() - 60.0) > EPSILON)
             throw std::runtime_error("Unexpected action3 end date " + std::to_string(action3->getEndDate()));
 
 
@@ -1031,12 +1034,12 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

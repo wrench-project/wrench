@@ -63,7 +63,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_BAREMETALCOMPUTESERVICEONESHOT_H

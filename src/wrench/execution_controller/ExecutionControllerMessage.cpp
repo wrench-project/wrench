@@ -8,7 +8,6 @@
  */
 
 #include <wrench/execution_controller/ExecutionControllerMessage.h>
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 
 namespace wrench {
 
@@ -26,7 +25,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(std::string message, double payload) : ExecutionControllerMessage(payload), message(message) {}
+    ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(const std::string &message, double payload) : ExecutionControllerMessage(payload), message(message) {}
 
 
-};// namespace wrench
+}// namespace wrench

@@ -155,7 +155,7 @@ namespace wrench {
     /** \endcond INTERNAL  */
     /***********************/
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_SIMULATIONTRACE_H

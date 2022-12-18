@@ -153,4 +153,4 @@ namespace wrench {
         return (unsigned long) index;
     }
 
-};// namespace wrench
+}// namespace wrench

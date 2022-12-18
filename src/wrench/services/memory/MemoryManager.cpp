@@ -73,7 +73,7 @@ namespace wrench {
             double end_time = S4U_Simulation::getClock();
             if (amt > 0) {
                 WRENCH_INFO("Periodically flushed %lf MB in %lf, %lf MB dirty data left",
-                            amt / 1000000, end_time - start_time, this->dirty / 1000000)
+                            amt / 1000000, end_time - start_time, this->dirty / 1000000);
             }
 
             if (end_time - start_time < interval) {
@@ -272,10 +272,10 @@ namespace wrench {
         }
 
         if (flushed_inactive > 0) {
-            WRENCH_INFO("Flushed %lf from inactive list", flushed_inactive)
+            WRENCH_INFO("Flushed %lf from inactive list", flushed_inactive);
         }
         if (flushed_active > 0) {
-            WRENCH_INFO("Flushed %lf from active list", flushed_active)
+            WRENCH_INFO("Flushed %lf from active list", flushed_active);
         }
 
         return flushed_inactive + flushed_active;

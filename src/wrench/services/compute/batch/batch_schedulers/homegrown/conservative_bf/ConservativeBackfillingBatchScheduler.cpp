@@ -138,7 +138,7 @@ namespace wrench {
             //            this->schedule->print();
 
             // Find the earliest start time
-            //            WRENCH_INFO("FINDING EARLIEST START TIME");
+            //            WRENCH_INFO("FINDING THE EARLIEST START TIME");
             auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
             //            WRENCH_INFO("EARLIEST START TIME FOR IT: %u", est);
             // Insert it in the schedule

@@ -40,7 +40,7 @@ namespace wrench {
         if (this->task_map.find(task) == this->task_map.end() or this->task_map[task] >= this->task_list.size()) {
             throw std::invalid_argument("wrench::DagOfTasks::removeVertex(): Trying to remove a non-existing vertex");
         }
-        // Remove the correspond task list item
+        // Remove the corresponding task list item
         this->task_list.erase(this->task_list.begin() + this->task_map[task]);
         // Update subsequent task's vertex indices
         for (auto it = this->task_list.begin() + this->task_map[task]; it != this->task_list.end(); ++it) {

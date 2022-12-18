@@ -311,6 +311,6 @@ namespace wrench {
 
         friend class DagOfTasks;
     };
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_WORKFLOWTASK_H

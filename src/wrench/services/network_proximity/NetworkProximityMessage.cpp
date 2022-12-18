@@ -122,7 +122,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to return the answer to
-     * @param requested_host: the naje of the host whose coordinates are being requested
+     * @param requested_host: the name of the host whose coordinates are being requested
      * @param payload: the message size in bytes
      */
     CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,

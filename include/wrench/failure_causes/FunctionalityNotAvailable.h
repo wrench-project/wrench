@@ -52,7 +52,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_FUNCTIONALITY_NOT_AVAILABLE_H

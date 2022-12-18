@@ -33,12 +33,10 @@ namespace wrench {
             try {
                 event = this->waitForNextEvent();
 
-                if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
-                    job = real_event->standard_job;
+                if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                     // success, do nothing
                     WRENCH_INFO("Received job completion notification");
                 } else if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
-                    job = real_event->standard_job;
                     WRENCH_INFO("Received job failure notification: %s",
                                 real_event->failure_cause->toString().c_str());
                 } else {
@@ -59,4 +57,4 @@ namespace wrench {
             //            this->job_manager->forgetJob(job);
         }
     }
-};// namespace wrench
+}// namespace wrench

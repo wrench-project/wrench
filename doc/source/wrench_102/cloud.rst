@@ -52,7 +52,7 @@ Here is an example interaction with a :cpp:class:`wrench::CloudComputeService`:
    Simulation::sleep(10);
 
    // Resume the 1st VM
-   some_cloud_cs->suspend(vm1);
+   some_cloud_cs->resume(vm1);
 
    // Wait for and process the next event (should be a standard job completion or failure)
    this->waitForAndProcessNextEvent();

@@ -37,7 +37,7 @@ namespace wrench {
         DECLARE_MESSAGEPAYLOAD_NAME(REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD);
     };
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_FILEREGISTRYMESSAGEPAYLOAD_H

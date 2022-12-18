@@ -47,7 +47,6 @@ int main(int argc, char **argv) {
      * Create a WRENCH simulation object
      */
     auto simulation = wrench::Simulation::createSimulation();
-    ;
 
     /* Initialize the simulation, which may entail extracting WRENCH-specific and
      * Simgrid-specific command-line arguments that can modify general simulation behavior.
@@ -69,7 +68,7 @@ int main(int argc, char **argv) {
     /* Declare a workflow */
     auto workflow = wrench::Workflow::createWorkflow();
 
-    /* Add the workflow task an files */
+    /* Add the workflow task and files */
     auto task = workflow->addTask("task", 10000000000.0, 1, 10, 10000000);
     task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
     task->addInputFile(workflow->addFile("infile_1", 100000000));
@@ -88,12 +87,12 @@ int main(int argc, char **argv) {
      * storage service is configured to use a buffer size of 50MB when transferring data over
      * the network (i.e., to pipeline disk reads/writes and network revs/sends). */
     std::cerr << "Instantiating a SimpleStorageService on StorageHost1..." << std::endl;
-    auto storage_service1 = simulation->add(new wrench::SimpleStorageService(
+    auto storage_service1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "StorageHost1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
     /* Instantiate another one on StorageHost2 */
     std::cerr << "Instantiating a SimpleStorageService on StorageHost2..." << std::endl;
-    auto storage_service2 = simulation->add(new wrench::SimpleStorageService(
+    auto storage_service2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "StorageHost2", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
     /* Instantiate a bare-metal compute service, and add it to the simulation.

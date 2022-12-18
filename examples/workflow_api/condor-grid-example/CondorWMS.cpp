@@ -64,10 +64,10 @@ namespace wrench {
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
         for (auto const &t: this->workflow->getTasks()) {
             for (auto const &f: t->getInputFiles()) {
-                file_locations[f] = wrench::FileLocation::LOCATION(storage_service);
+                file_locations[f] = wrench::FileLocation::LOCATION(storage_service, f);
             }
             for (auto const &f: t->getOutputFiles()) {
-                file_locations[f] = wrench::FileLocation::LOCATION(storage_service);
+                file_locations[f] = wrench::FileLocation::LOCATION(storage_service, f);
             }
         }
 

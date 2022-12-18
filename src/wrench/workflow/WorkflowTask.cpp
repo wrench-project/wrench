@@ -56,7 +56,7 @@ namespace wrench {
     void WorkflowTask::addInputFile(const std::shared_ptr<DataFile> &file) {
         WRENCH_DEBUG("Adding file '%s' as input to task %s", file->getID().c_str(), this->getID().c_str());
 
-        // If the file is alreadxy an input file of the task, complain
+        // If the file is already an input file of the task, complain
         if (this->input_files.find(file->getID()) != this->input_files.end()) {
             throw std::invalid_argument(" WorkflowTask::addInputFile(): File ID '" + file->getID() +
                                         "' is already an input file of task '" + this->getID() + "'");
@@ -99,7 +99,7 @@ namespace wrench {
                                         this->workflow->getTaskThatOutputs(file)->getID() + "')");
         }
 
-        // Otherwise proceeed
+        // Otherwise proceed
         this->output_files[file->getID()] = file;
         this->workflow->task_output_files[file] = this->getSharedPtr();
 
@@ -660,7 +660,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the tasks's most recent computation start date
+     * @brief Get the task's most recent computation start date
      * @return the date when the computation portion of a task started (-1 if computation has not started yet or if no execution history exists for this task yet)
      */
     double WorkflowTask::getComputationStartDate() const {
@@ -716,7 +716,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the tasks's most recent termination date (when it was explicitly requested to be terminated by the execution controller)
+     * @brief Get the task's most recent termination date (when it was explicitly requested to be terminated by the execution controller)
      * @return the date when the task was terminated (-1 if it wasn't terminated or if not execution history exists for this task yet)
      */
     double WorkflowTask::getTerminationDate() const {
@@ -939,4 +939,4 @@ namespace wrench {
         }
     }
 
-};// namespace wrench
+}// namespace wrench

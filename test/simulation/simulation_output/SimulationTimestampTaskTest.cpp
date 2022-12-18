@@ -8,6 +8,8 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
+#define EPSILON 0.00001
+
 class SimulationTimestampTaskTest : public ::testing::Test {
 
 public:
@@ -140,14 +142,14 @@ private:
 
         auto failed_job = job_manager->createStandardJob(
                 this->test->failed_task,
-                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->small_input_file)},
+                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->large_input_file)}});
 
         job_manager->submitJob(failed_job, this->test->compute_service);
 
-        wrench::StorageService::deleteFile(this->test->workflow->getFileByID("small_input_file"),
-                                           wrench::FileLocation::LOCATION(this->test->storage_service),
-                                           this->test->file_registry_service);
+        wrench::StorageService::deleteFile(
+                wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("small_input_file")),
+                this->test->file_registry_service);
 
 
         std::shared_ptr<wrench::ExecutionEvent> workflow_execution_event;
@@ -189,7 +191,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test() {
                                                                                                                   wrench::ComputeService::ALL_RAM))},
                                                                                           {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"})));
+    ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/"})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
@@ -333,20 +335,20 @@ private:
 
         auto failed_job = job_manager->createStandardJob(
                 this->test->failed_task,
-                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->small_input_file)},
+                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->large_input_file)}});
 
 
         job_manager->submitJob(failed_job, this->test->compute_service);
-        wrench::StorageService::deleteFile(this->test->workflow->getFileByID("small_input_file"),
-                                           wrench::FileLocation::LOCATION(this->test->storage_service));
+        wrench::StorageService::deleteFile(
+                wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("small_input_file")));
 
         this->waitForAndProcessNextEvent();
 
         auto passing_job = job_manager->createStandardJob(
                 this->test->failed_task,
-                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
-                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->backup_storage_service, this->test->small_input_file)},
+                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->large_input_file)}});
         job_manager->submitJob(passing_job, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
@@ -379,8 +381,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
                                                                                                                   wrench::ComputeService::ALL_RAM))},
                                                                                           {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"})));
-    ASSERT_NO_THROW(backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/backup"})));
+    ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/"})));
+    ASSERT_NO_THROW(backup_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/backup"})));
 
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -475,12 +477,17 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     double task1_start_date_1 = starts_trace[0]->getDate();
     double task1_completion_date_1 = completions_trace[0]->getDate();
 
-    ASSERT_DOUBLE_EQ(std::floor(task1_completion_date_1 - task1_start_date_1), 10.0);
+    //    ASSERT_DOUBLE_EQ(std::floor(task1_completion_date_1 - task1_start_date_1), 10.0);
+    ASSERT_TRUE(std::abs<double>((task1_completion_date_1 - task1_start_date_1) - 10.0) < EPSILON);
 
     double task1_start_date_2 = starts_trace[1]->getDate();
     double task1_completion_date_2 = completions_trace[1]->getDate();
 
-    ASSERT_DOUBLE_EQ(std::floor(task1_completion_date_2 - task1_start_date_2), 10.0);
+    //    std::cerr << task1_completion_date_2 << "\n";
+    //    std::cerr << task1_start_date_2 << "\n";
+    //    std::cerr << std::floor(task1_completion_date_2 - task1_start_date_2) << "\n";
+    //    ASSERT_DOUBLE_EQ(std::floor(task1_completion_date_2 - task1_start_date_2), 10.0);
+    ASSERT_TRUE(std::abs<double>((task1_completion_date_2 - task1_start_date_2) - 10.0) < EPSILON);
 
     double failed_task_start_date_1 = starts_trace[2]->getDate();
     double failed_task_failure_date_1 = failures_trace[0]->getDate();
@@ -571,7 +578,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
                                                                                                                   wrench::ComputeService::ALL_RAM))},
                                                                                           {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"})));
+    ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/"},
+                                                                                                               {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;

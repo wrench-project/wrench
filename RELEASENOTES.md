@@ -1,12 +1,20 @@
 WRENCH Release Notes
 ------
 
-### wrench 2.0
+### current master branch
 
-(october XXX, 2022) this release include **a new storage service implementation**, **performance enhancements**, and **minor bug fixes**. More specifically:
+- Implementation of non-bufferized (i.e., buffer size of zero) storage services, which is transparent to the user but can vastly reduce simulation time by using a fluid (rather than message-based) model for how storage services read/write data to/from disk while sending/receiving that same data to/from the network. 
+- API change by which a `FileLocation` now includes a `DataFile`.
+- Minor bug fixes and scalability improvements.
+
+**note**: master requires [simgrid](https://simgrid.org) master, commit tag 17ac6c61bd407825851b824adbfa28d64fb69587. 
+
+### wrench 2.1
+
+(october 7, 2022) this release include **a new storage service implementation**, **performance enhancements**, and **minor bug fixes**. More specifically:
 
 - implementation of a new storage service for the simulation of the [XRootD](https://xrootd.slac.stanford.edu/) storage system, along with implementation and examples.
-- many performance and scalability improvements that reduce memory footprint and simulation execution time. 
+- performance and scalability improvements that reduce memory footprint and simulation execution time. 
 
 **note**: wrench 2.0 requires [simgrid 3.32](https://simgrid.org)
 

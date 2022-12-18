@@ -161,4 +161,4 @@ namespace wrench {
         throw std::runtime_error("EnergyMeter::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
     }
 
-};// namespace wrench
+}// namespace wrench

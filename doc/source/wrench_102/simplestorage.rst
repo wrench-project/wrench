@@ -38,10 +38,10 @@ it possible to lookup, delete, read, and write files. For instance:
    [...]
 
    // Check whether the storage service holds the file at path /data/ and delete it if so
-   auto file_location = wrench::FileLocation::LOCATION(storage_service, "/data/");
-   if (wrench::StorageService::lookupFile(some_file, file_location) {
+   auto file_location = wrench::FileLocation::LOCATION(storage_service, "/data/", some_file);
+   if (wrench::StorageService::lookupFile(file_location) {
      std::cerr << "File found!" << std::endl;
-     wrench::StorageService::deleteFile(some_file, file_location, file_registry);
+     wrench::StorageService::deleteFile(file_location, file_registry);
    }
 
 Note that the file registry service is passed to the
@@ -58,12 +58,12 @@ spend time doing file I/O, it is easily done:
 
    // Read some file from the "/" path at some storage service. 
    // This does not change the simulation state besides simulating a time overhead during which the execution controller is busy
-   wrench::StorageService::readFile(some_file, wrench::FileLocation::LOCATION(storage_service, "/");
+   wrench::StorageService::readFile(wrench::FileLocation::LOCATION(storage_service, "/", some_file);
 
    // Write some file to the "/stuff/" path at some storage service. 
    // This simulates a time overhead after which the storage service will host the file. It
    // is a good idea to then add an entry to the file registry service
-   wrench::StorageService::writeFile(some_file, wrench::FileLocation::LOCATION(storage_service, "/stuff/");
+   wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(storage_service, "/stuff/", some_file);
 
 An operation commonly performed by an execution controller is copying
 files between storage services (e.g., to enforce some data locality).
@@ -82,10 +82,10 @@ an example in which a file is copied between storage services:
 
    // Synchronously copy some_file from storage_service1 to storage_service2
    // While this is taking place, the execution controller is busy
-   data_movement_manager->doSynchronousFileCopy(some_file, wrench::FileLocation::LOCATION(storage_service1), wrench::FileLocation::LOCATION(storage_service2));
+   data_movement_manager->doSynchronousFileCopy(wrench::FileLocation::LOCATION(storage_service1, some_file), wrench::FileLocation::LOCATION(storage_service2, some_file));
 
    // Asynchronously copy some_file from storage_service2 to storage_service3
-   data_movement_manager->initiateAsynchronousFileCopy(some_file, wrench::FileLocation::LOCATION(storage_service2), wrench::FileLocation::LOCATION(storage_service3));
+   data_movement_manager->initiateAsynchronousFileCopy(wrench::FileLocation::LOCATION(storage_service2, some_file), wrench::FileLocation::LOCATION(storage_service3, some_file));
 
    [...]
 

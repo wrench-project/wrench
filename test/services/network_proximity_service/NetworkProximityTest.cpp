@@ -203,6 +203,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -220,7 +221,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
 
     // Create a file registry service
@@ -412,7 +413,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -568,7 +569,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
                                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
 
     // Create a file registry service
@@ -662,7 +663,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
                                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a file registry service
     simulation->add(new wrench::FileRegistryService(hostname));

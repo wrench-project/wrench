@@ -26,8 +26,8 @@ namespace wrench {
     CustomAction::CustomAction(const std::string &name,
                                double ram,
                                unsigned long num_cores,
-                               const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_execute,
-                               const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_terminate) : Action(name, "custom_"), ram(ram), num_cores(num_cores), lambda_execute(std::move(lambda_execute)), lambda_terminate(std::move(lambda_terminate)) {
+                               std::function<void(std::shared_ptr<ActionExecutor>)> lambda_execute,
+                               std::function<void(std::shared_ptr<ActionExecutor>)> lambda_terminate) : Action(name, "custom_"), ram(ram), num_cores(num_cores), lambda_execute(std::move(lambda_execute)), lambda_terminate(std::move(lambda_terminate)) {
     }
 
     /**

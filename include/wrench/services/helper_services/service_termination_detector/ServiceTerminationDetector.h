@@ -43,7 +43,7 @@ namespace wrench {
     /***********************/
 
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_FAILUREDETECTOR_H

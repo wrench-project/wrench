@@ -622,6 +622,6 @@ namespace wrench {
         std::string linkname;
         double bytes_per_second;
     };
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_SIMULATIONTIMESTAMPTYPES_H

@@ -67,28 +67,28 @@ namespace wrench {
         auto outfile_2 = this->workflow->getFileByID("outfile_2");
 
         /* Now let's create a map of file locations, stating for each file
-         * where is should be read/written while the task executes */
+         * where it should be read/written while the task executes */
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
 
-        file_locations[infile_1] = FileLocation::LOCATION(storage_service2); // read from storage service #2
-        file_locations[infile_2] = FileLocation::LOCATION(storage_service1); // read from storage service #1
-        file_locations[outfile_1] = FileLocation::LOCATION(storage_service2);// written to storage service #2
-        file_locations[outfile_2] = FileLocation::LOCATION(storage_service2);// written to storage service #2
+        file_locations[infile_1] = FileLocation::LOCATION(storage_service2, infile_1);  // read from storage service #2
+        file_locations[infile_2] = FileLocation::LOCATION(storage_service1, infile_2);  // read from storage service #1
+        file_locations[outfile_1] = FileLocation::LOCATION(storage_service2, outfile_1);// written to storage service #2
+        file_locations[outfile_2] = FileLocation::LOCATION(storage_service2, outfile_2);// written to storage service #2
 
         /* Let's create a set of "pre" file copy operations to be performed
          * BEFORE the task can run */
-        std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
-        pre_file_copies.emplace_back(infile_1, FileLocation::LOCATION(storage_service1), FileLocation::LOCATION(storage_service2));
+        std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
+        pre_file_copies.emplace_back(FileLocation::LOCATION(storage_service1, infile_1), FileLocation::LOCATION(storage_service2, infile_1));
 
         /* Let's create a set of "post" file copy operations to be performed
         * AFTER the task can run */
-        std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
-        post_file_copies.emplace_back(outfile_1, FileLocation::LOCATION(storage_service2), FileLocation::LOCATION(storage_service1));
+        std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
+        post_file_copies.emplace_back(FileLocation::LOCATION(storage_service2, outfile_1), FileLocation::LOCATION(storage_service1, outfile_1));
 
         /* Let's create a set of file deletion operations to be performed
         * AFTER the "post" file copies have been performed */
-        std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>> cleanup_file_deletions;
-        cleanup_file_deletions.emplace_back(outfile_2, FileLocation::LOCATION(storage_service2));
+        std::vector<std::shared_ptr<FileLocation>> cleanup_file_deletions;
+        cleanup_file_deletions.emplace_back(FileLocation::LOCATION(storage_service2, outfile_2));
 
         /* Create the standard job */
         WRENCH_INFO("Creating a complex job with pre file copies, post file copies, and post file deletions to execute task  %s", task->getID().c_str());

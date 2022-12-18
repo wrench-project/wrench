@@ -51,7 +51,6 @@ int main(int argc, char **argv) {
 
     /* Create a WRENCH simulation object */
     auto simulation = wrench::Simulation::createSimulation();
-    ;
 
     /* Initialize the simulation, which may entail extracting WRENCH-specific and
      * Simgrid-specific command-line arguments that can modify general simulation behavior.
@@ -71,7 +70,7 @@ int main(int argc, char **argv) {
     simulation->instantiatePlatform(argv[2]);
 
     /* Parse the first command-line argument (number of tasks) */
-    int num_tasks = 0;
+    int num_tasks;
     try {
         num_tasks = std::atoi(argv[1]);
     } catch (std::invalid_argument &e) {
@@ -103,7 +102,7 @@ int main(int argc, char **argv) {
      * storage service is configured to use a buffer size of 50MB when transferring data over
      * the network (i.e., to pipeline disk reads/writes and network revs/sends). */
     std::cerr << "Instantiating a SimpleStorageService on WMSHost..." << std::endl;
-    auto storage_service = simulation->add(new wrench::SimpleStorageService(
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
     /* Instantiate a batch_standard_and_pilot_jobs compute service, and add it to the simulation.

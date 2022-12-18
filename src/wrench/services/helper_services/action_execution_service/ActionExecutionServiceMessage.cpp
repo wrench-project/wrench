@@ -110,7 +110,6 @@ namespace wrench {
         }
 #endif
         this->action = std::move(action);
-        this->payload = payload;
     }
 
-};// namespace wrench
+}// namespace wrench

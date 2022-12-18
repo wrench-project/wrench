@@ -97,7 +97,8 @@ private:
             wrench::Alarm::createAndStartAlarm(this->simulation, 10.0, "Host2", mailbox,
                                                new wrench::SimulationMessage(1), "bogus");
             throw std::runtime_error("Should not be able to create an alarm on a down host");
-        } catch (std::shared_ptr<wrench::HostError> &e) {}
+        } catch (wrench::ExecutionException &e) {
+        }
 
 
         return 0;
@@ -116,6 +117,7 @@ void AlarmTest::do_downHost_Test() {
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 

@@ -80,7 +80,7 @@ namespace wrench {
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
                                                           const std::shared_ptr<DataFile> &file,
                                                           const std::shared_ptr<StorageService> &storageService,
-                                                          const double num_bytes_to_read);
+                                                          double num_bytes_to_read);
 
 
         std::shared_ptr<FileWriteAction> addFileWriteAction(const std::string &name,
@@ -88,53 +88,46 @@ namespace wrench {
                                                             const std::shared_ptr<StorageService> &storageService);
 
         std::shared_ptr<FileCopyAction> addFileCopyAction(const std::string &name,
-                                                          std::shared_ptr<DataFile> file,
+                                                          const std::shared_ptr<DataFile> &file,
                                                           const std::shared_ptr<StorageService> &src_storageService,
                                                           const std::shared_ptr<StorageService> &dest_storageService);
 
         std::shared_ptr<FileDeleteAction> addFileDeleteAction(const std::string &name,
-                                                              std::shared_ptr<DataFile> file,
+                                                              const std::shared_ptr<DataFile> &file,
                                                               const std::shared_ptr<StorageService> &storageService);
 
 
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
-                                                          const std::shared_ptr<DataFile> &file,
                                                           const std::shared_ptr<FileLocation> &file_location);
 
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
-                                                          const std::shared_ptr<DataFile> &file,
                                                           const std::vector<std::shared_ptr<FileLocation>> &file_locations);
 
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
-                                                          const std::shared_ptr<DataFile> &file,
                                                           const std::shared_ptr<FileLocation> &file_location,
-                                                          const double num_bytes_to_read);
+                                                          double num_bytes_to_read);
 
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
-                                                          const std::shared_ptr<DataFile> &file,
                                                           const std::vector<std::shared_ptr<FileLocation>> &file_locations,
-                                                          const double num_bytes_to_read);
+                                                          double num_bytes_to_read);
 
         std::shared_ptr<FileWriteAction> addFileWriteAction(const std::string &name,
-                                                            const std::shared_ptr<DataFile> &file,
                                                             const std::shared_ptr<FileLocation> &file_location);
 
         std::shared_ptr<FileCopyAction> addFileCopyAction(const std::string &name,
-                                                          std::shared_ptr<DataFile> file,
-                                                          std::shared_ptr<FileLocation> src_file_location,
-                                                          std::shared_ptr<FileLocation> dst_file_location);
+                                                          const std::shared_ptr<FileLocation> &src_file_location,
+                                                          const std::shared_ptr<FileLocation> &dst_file_location);
 
         std::shared_ptr<FileDeleteAction> addFileDeleteAction(const std::string &name,
-                                                              std::shared_ptr<DataFile> file,
-                                                              std::shared_ptr<FileLocation> file_location);
+                                                              const std::shared_ptr<FileLocation> &file_location);
 
         std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(const std::string &name,
-                                                                                  std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile> file,
-                                                                                  std::shared_ptr<FileLocation> file_location);
+                                                                                  const std::shared_ptr<FileRegistryService> &file_registry,
+                                                                                  const std::shared_ptr<FileLocation> &file_location);
 
         std::shared_ptr<FileRegistryDeleteEntryAction> addFileRegistryDeleteEntryAction(const std::string &name,
-                                                                                        std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile> file,
-                                                                                        std::shared_ptr<FileLocation> file_location);
+                                                                                        const std::shared_ptr<FileRegistryService> &file_registry,
+                                                                                        const std::shared_ptr<FileLocation> &file_location);
 
         std::shared_ptr<ComputeAction> addComputeAction(const std::string &name,
                                                         double flops,
@@ -198,7 +191,7 @@ namespace wrench {
         /**
          * @brief Map of action names to actions
          */
-        std::map<std::string, std::shared_ptr<Action>> name_map;
+        std::unordered_map<std::string, std::shared_ptr<Action>> name_map;
 
         /**
          * @brief Job state
@@ -216,7 +209,7 @@ namespace wrench {
         bool hasAction(const std::string &name);
 
         std::set<std::shared_ptr<CompoundJob>> &getChildren();
-        std::set<std::shared_ptr<CompoundJob>> &getParents();
+        //        std::set<std::shared_ptr<CompoundJob>> &getParents();
 
     private:
         void assertJobNotSubmitted();
@@ -225,7 +218,7 @@ namespace wrench {
         void addAction(const std::shared_ptr<Action> &action);
 
         bool pathExists(const std::shared_ptr<Action> &a, const std::shared_ptr<Action> &b);
-        bool pathExists(const std::shared_ptr<CompoundJob> &a, const std::shared_ptr<CompoundJob> &b);
+        static bool pathExists(const std::shared_ptr<CompoundJob> &a, const std::shared_ptr<CompoundJob> &b);
 
         std::set<std::shared_ptr<CompoundJob>> parents;
         std::set<std::shared_ptr<CompoundJob>> children;
@@ -243,7 +236,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_COMPOUNDJOB_H

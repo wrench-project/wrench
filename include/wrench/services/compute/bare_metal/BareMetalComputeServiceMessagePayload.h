@@ -31,7 +31,7 @@ namespace wrench {
         DECLARE_MESSAGEPAYLOAD_NAME(FLOP_RATE_ANSWER_MESSAGE_PAYLOAD);
     };
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_BAREMETALCOMPUTESERVICEMESSAGEPAYLOAD_H

@@ -46,11 +46,11 @@ namespace wrench {
         int main() override;
     };
 
-};// namespace wrench
+}// namespace wrench
 
-    /***********************/
-    /** \endcond          **/
-    /***********************/
+/***********************/
+/** \endcond          **/
+/***********************/
 
 
 #endif//WRENCH_WORKLOADTRACEFILEREPLAYER_H

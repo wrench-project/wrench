@@ -118,6 +118,6 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_ACTION_ACTION_EXECUTION_SERVICE_MESSAGE_H

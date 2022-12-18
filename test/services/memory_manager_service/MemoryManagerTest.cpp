@@ -163,8 +163,8 @@ private:
             auto task = *(this->workflow->getReadyTasks().begin());
             auto job = job_manager->createStandardJob(
                     task,
-                    {{*(task->getInputFiles().begin()), wrench::FileLocation::LOCATION((test->storage_service1))},
-                     {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(test->storage_service1)}});
+                    {{task->getInputFiles().at(0), wrench::FileLocation::LOCATION(test->storage_service1, task->getInputFiles().at(0))},
+                     {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(test->storage_service1, task->getOutputFiles().at(0))}});
             // Submit the job
             job_manager->submitJob(job, test->compute_service);
 
@@ -220,9 +220,9 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            new wrench::SimpleStorageService(hostname, {"/"},
-                                                             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000.0"}},
-                                                             {})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000.0"}},
+                                                                                     {})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(

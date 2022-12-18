@@ -39,7 +39,7 @@ namespace wrench {
         friend class CompoundJob;
 
         FileReadAction(const std::string &name,
-                       std::shared_ptr<DataFile> file, std::vector<std::shared_ptr<FileLocation>> file_locations,
+                       std::vector<std::shared_ptr<FileLocation>> file_locations,
                        double num_bytes_to_read);
 
 

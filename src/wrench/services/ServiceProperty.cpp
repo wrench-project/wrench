@@ -62,4 +62,4 @@ namespace wrench {
     std::string ServiceProperty::translatePropertyType(WRENCH_PROPERTY_TYPE serviceProperty) {
         return wrapper_propertyToStringMap().at(serviceProperty);
     }
-};// namespace wrench
+}// namespace wrench

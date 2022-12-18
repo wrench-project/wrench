@@ -54,7 +54,6 @@ int main(int argc, char **argv) {
      * Create a WRENCH simulation object
      */
     auto simulation = wrench::Simulation::createSimulation();
-    ;
 
     /* Initialize the simulation, which may entail extracting WRENCH-specific and
      * Simgrid-specific command-line arguments that can modify general simulation behavior.

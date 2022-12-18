@@ -133,16 +133,15 @@ private:
             auto job = job_manager->createCompoundJob("");
             // Add a file_read_action
             auto file_registry_add_entry_action = job->addFileRegistryAddEntryAction("", this->test->fr,
-                                                                                     this->test->file,
                                                                                      wrench::FileLocation::LOCATION(
-                                                                                             this->test->ss));
+                                                                                             this->test->ss, this->test->file));
             // coverage
             wrench::Action::getActionTypeAsString(file_registry_add_entry_action);
 
             // Create a file read action executor
-            auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                    new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_registry_add_entry_action,
-                                               nullptr));
+            auto file_read_action_executor = std::make_shared<wrench::ActionExecutor>(
+                    "Host2", 0, 0.0, 0, false, this->mailbox, file_registry_add_entry_action,
+                    nullptr);
 
             // Start it
             file_read_action_executor->setSimulation(this->simulation);
@@ -174,9 +173,8 @@ private:
             auto job = job_manager->createCompoundJob("");
             // Add a file_read_action
             auto file_registry_delete_entry_action = job->addFileRegistryDeleteEntryAction("", this->test->fr,
-                                                                                           this->test->file,
                                                                                            wrench::FileLocation::LOCATION(
-                                                                                                   this->test->ss));
+                                                                                                   this->test->ss, this->test->file));
             // coverage
             wrench::Action::getActionTypeAsString(file_registry_delete_entry_action);
             file_registry_delete_entry_action->getFile();
@@ -238,7 +236,7 @@ void FileRegistryActionExecutorTest::do_FileRegistryActionExecutorSuccessTest_te
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();
@@ -246,7 +244,7 @@ void FileRegistryActionExecutorTest::do_FileRegistryActionExecutorSuccessTest_te
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a file registry
     this->fr = simulation->add(new wrench::FileRegistryService("Host1"));

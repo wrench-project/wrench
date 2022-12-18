@@ -102,9 +102,9 @@ private:
         sleeper->setSimulation(this->simulation);
         try {
             sleeper->start(sleeper, true, true);// Daemonized, auto-restart!!
-        } catch (std::shared_ptr<wrench::HostError> &e) {
+        } catch (wrench::ExecutionException &e) {
             // Expected exception
-            e->toString();// for coverage
+            e.getCause()->toString();// for coverage
             return 0;
         }
         throw std::runtime_error("Should have gotten a HostFailure exception");

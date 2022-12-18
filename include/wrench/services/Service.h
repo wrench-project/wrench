@@ -27,7 +27,7 @@ namespace wrench {
     /**
      * @brief Abstraction of a service message payload collection type
      */
-    typedef std::unordered_map<WRENCH_MESSAGEPAYLOAD_TYPE, double> WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE;
+    typedef std::map<WRENCH_MESSAGEPAYLOAD_TYPE, double> WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE;
 
 
     class FailureCause;
@@ -43,7 +43,7 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        void start(std::shared_ptr<Service> this_service, bool daemonize, bool auto_restart);
+        void start(const std::shared_ptr<Service> &this_service, bool daemonize, bool auto_restart);
         virtual void stop();
         void suspend();
         void resume();
@@ -155,7 +155,7 @@ namespace wrench {
         /** \endcond           */
         /***********************/
     };
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_SERVICE_H

@@ -11,6 +11,7 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 #include <algorithm>
+#include <memory>
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
@@ -73,7 +74,7 @@ protected:
 class Sleep100Daemon : public wrench::S4U_Daemon {
 
 public:
-    Sleep100Daemon(std::string hostname) : S4U_Daemon(hostname, "sleep100daemon") {}
+    explicit Sleep100Daemon(std::string hostname) : S4U_Daemon(hostname, "sleep100daemon") {}
 
     int main() override {
         simgrid::s4u::this_actor::execute(100);
@@ -90,17 +91,17 @@ class S4U_DaemonTestWMS : public wrench::ExecutionController {
 
 public:
     S4U_DaemonTestWMS(S4U_DaemonTest *test,
-                      std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                      const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
     S4U_DaemonTest *test;
 
-    int main() {
+    int main() override {
 
         std::shared_ptr<Sleep100Daemon> daemon =
-                std::shared_ptr<Sleep100Daemon>(new Sleep100Daemon("Host1"));
+                std::make_shared<Sleep100Daemon>("Host1");
 
         // Start the daemon without a life saver
         try {
@@ -158,7 +159,7 @@ private:
 };
 
 TEST_F(S4U_DaemonTest, Basic) {
-    DO_TEST_WITH_FORK(do_basic_Test);
+    DO_TEST_WITH_FORK(do_basic_Test)
 }
 
 void S4U_DaemonTest::do_basic_Test() {
@@ -208,10 +209,10 @@ public:
 private:
     S4U_DaemonTest *test;
 
-    int main() {
+    int main() override {
 
         std::shared_ptr<Sleep100Daemon> daemon =
-                std::shared_ptr<Sleep100Daemon>(new Sleep100Daemon("Host2"));
+                std::make_shared<Sleep100Daemon>("Host2");
 
         daemon->createLifeSaver(std::shared_ptr<Sleep100Daemon>(daemon));
         daemon->setSimulation(this->simulation);
@@ -223,12 +224,16 @@ private:
         // Turn off Host2
         wrench::Simulation::turnOffHost("Host2");
 
+        // sleep 10 seconds
+        wrench::Simulation::sleep(10);
+
+
         return 0;
     }
 };
 
 TEST_F(S4U_DaemonTest, NoCleanup) {
-    DO_TEST_WITH_FORK_EXPECT_FATAL_FAILURE(do_noCleanup_Test, true);
+    DO_TEST_WITH_FORK_EXPECT_FATAL_FAILURE(do_noCleanup_Test, true)
 }
 
 void S4U_DaemonTest::do_noCleanup_Test() {
@@ -249,7 +254,7 @@ void S4U_DaemonTest::do_noCleanup_Test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new S4U_DaemonNoCleanupTestWMS(this, hostname)));
 

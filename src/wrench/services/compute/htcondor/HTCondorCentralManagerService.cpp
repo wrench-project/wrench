@@ -209,7 +209,7 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<CentralManagerWakeUpMessage *>(message.get())) {
+        } else if (dynamic_cast<CentralManagerWakeUpMessage *>(message.get())) {
             // Do nothing
             return true;
 

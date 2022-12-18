@@ -276,4 +276,4 @@ namespace wrench {
     void ExecutionController::processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent> event) {
         WRENCH_INFO("In default event-handler: Notified that a standard job has failed (all its tasks are back in the ready state)");
     }
-};// namespace wrench
+}// namespace wrench

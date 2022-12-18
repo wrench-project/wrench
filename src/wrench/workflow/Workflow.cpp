@@ -83,8 +83,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Workflow::removeFile(const std::shared_ptr<DataFile> &file) {
-        //        std::cerr << "REMOVING FILE " << file->getID() << "\n";
-
         if (this->task_output_files.find(file) != this->task_output_files.end()) {
             throw std::invalid_argument("Workflow::removeFile(): File " +
                                         file->getID() + " cannot be removed because it is output of task " +
@@ -252,17 +250,6 @@ namespace wrench {
                 }
             }
         }
-    }
-
-
-    /**
-     * @brief Output the workflow's dependency graph to EPS
-     *
-     * @param eps_filename: a filename to which the EPS content is saved
-     *
-     */
-    void Workflow::exportToEPS(const std::string &eps_filename) {
-        throw std::runtime_error("Export to EPS broken / not implemented at the moment");
     }
 
     /**
@@ -764,7 +751,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Update the top level of all tasks (in case dynamic top level udpates
+     * @brief Update the top level of all tasks (in case dynamic top level updates
      * had been disabled)
      */
     void Workflow::updateAllTopBottomLevels() {

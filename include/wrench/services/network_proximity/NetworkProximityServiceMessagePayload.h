@@ -32,7 +32,7 @@ namespace wrench {
         DECLARE_MESSAGEPAYLOAD_NAME(NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD);
 
         /** @brief The number of bytes in the message sent by the service to a network proximity daemon in 
-         *  answer to a request for which other network proximity daemon to run network proximity 
+         * answer to a request for which other network proximity daemon to run network proximity
          * experiments with **/
         DECLARE_MESSAGEPAYLOAD_NAME(NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD);
 

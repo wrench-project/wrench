@@ -51,8 +51,8 @@ protected:
         f5 = workflow->addFile("file-05", 1);
 
         t1->addInputFile(f1);
-        t1->addOutputFile(f2);
         t2->addInputFile(f2);
+        t1->addOutputFile(f2);
         t2->addOutputFile(f3);
         t3->addInputFile(f2);
         t3->addOutputFile(f4);
@@ -60,11 +60,21 @@ protected:
         t4->addInputFile(f4);
         t4->addOutputFile(f5);
 
+
         // Coverage
         auto tasks = workflow->getTasksThatInput(f2);
         if ((tasks.find(t2) == tasks.end()) or (tasks.find(t3) == tasks.end())) {
             throw std::runtime_error("getTasksThatInput() doesn't generate the same output");
         }
+        t1->getPriority();
+        try {
+            t1->updateStartDate(666.6);
+            throw std::runtime_error("Should not be able to call WorkflowTask::updateStartDate()");
+        } catch (std::runtime_error &ignore) {}
+        try {
+            t1->setTerminationDate(666.6);
+            throw std::runtime_error("Should not be able to call WorkflowTask::setTerminationDate()");
+        } catch (std::runtime_error &ignore) {}
     }
 
     // data members
@@ -342,9 +352,6 @@ TEST_F(WorkflowTest, SumFlops) {
     ASSERT_EQ(sum_flops, 4.0);
 }
 
-TEST_F(WorkflowTest, Export) {
-    ASSERT_THROW(workflow->exportToEPS("tmp/workflow.eps"), std::runtime_error);
-}
 
 class AllDependenciesWorkflowTest : public ::testing::Test {
 protected:
@@ -361,6 +368,7 @@ protected:
         t3 = workflow->addTask("task1-test-03", 1, 1, 1, 0);
         t4 = workflow->addTask("task1-test-04", 1, 1, 1, 0);
 
+        workflow->addControlDependency(t1, t1, true);// coverage
         workflow->addControlDependency(t1, t2, true);
         workflow->addControlDependency(t1, t3, true);
         workflow->addControlDependency(t1, t4, true);

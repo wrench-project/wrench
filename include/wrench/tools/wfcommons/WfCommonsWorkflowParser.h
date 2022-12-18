@@ -102,7 +102,7 @@ namespace wrench {
                                                                           bool enforce_num_cores = false);
     };
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_WFCOMMONSWORKFLOWPARSER_H

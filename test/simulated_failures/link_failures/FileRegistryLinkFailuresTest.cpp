@@ -125,13 +125,15 @@ private:
             try {
                 // Do a random add
                 wrench::Simulation::sleep(1.0);
-                this->test->file_registry_service->addEntry(files.at(dist_files(rng)),
-                                                            wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng))));
+                auto file = files.at(dist_files(rng));
+                this->test->file_registry_service->addEntry(
+                        wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)), file));
 
                 // Do a random delete
                 wrench::Simulation::sleep(1.0);
-                this->test->file_registry_service->removeEntry(files.at(dist_files(rng)),
-                                                               wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng))));
+                file = files.at(dist_files(rng));
+                this->test->file_registry_service->removeEntry(
+                        wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)), file));
 
                 // Do a random lookup
                 wrench::Simulation::sleep(1.0);
@@ -154,9 +156,10 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-link-shutdown-simulation");
 
     simulation->init(&argc, argv);
 
@@ -169,7 +172,9 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
     // Create a bunch of storage services
     for (unsigned int i = 0; i < NUM_STORAGE_SERVICES; i++) {
         storage_services.push_back(simulation->add(
-                new wrench::SimpleStorageService(hostname, {"/disk_" + std::to_string(i)})));
+                wrench::SimpleStorageService::createSimpleStorageService(
+                        hostname, {"/disk_" + std::to_string(i)},
+                        {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
     }
 
     // Create a file registry service

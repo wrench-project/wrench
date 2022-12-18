@@ -31,7 +31,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "2")
-set(WRENCH_VERSION_MINOR "1")
+set(WRENCH_VERSION_MINOR "2")
 set(WRENCH_VERSION_PATCH "0")
 set(WRENCH_VERSION_EXTRA "dev")
 
@@ -115,6 +115,8 @@ set(HEADER_FILES
         include/wrench/services/storage/StorageServiceMessagePayload.h
         include/wrench/services/storage/StorageServiceProperty.h
         include/wrench/services/storage/simple/SimpleStorageService.h
+        include/wrench/services/storage/simple/SimpleStorageServiceBufferized.h
+        include/wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h
         include/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.h
         include/wrench/services/storage/simple/SimpleStorageServiceProperty.h
         include/wrench/services/storage/storage_helpers/FileLocation.h
@@ -160,7 +162,6 @@ set(HEADER_FILES
         include/wrench/failure_causes/JobKilled.h
         include/wrench/failure_causes/JobTimeout.h
         include/wrench/failure_causes/NetworkError.h
-        include/wrench/failure_causes/NoScratchSpace.h
         include/wrench/failure_causes/NotAllowed.h
         include/wrench/failure_causes/NotEnoughResources.h
         include/wrench/failure_causes/ServiceIsDown.h
@@ -204,6 +205,8 @@ set(SOURCE_FILES
         include/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
         include/wrench/services/storage/storage_helpers/LogicalFileSystem.h
+        include/wrench/services/storage/storage_helpers/LogicalFileSystemNoCaching.h
+        include/wrench/services/storage/storage_helpers/LogicalFileSystemLRUCaching.h
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/DataMovementManager.cpp
         src/wrench/managers/JobManager.cpp
@@ -292,12 +295,16 @@ set(SOURCE_FILES
         src/wrench/services/storage/StorageServiceMessagePayload.cpp
         src/wrench/services/storage/StorageServiceProperty.cpp
         src/wrench/services/storage/simple/SimpleStorageService.cpp
+        src/wrench/services/storage/simple/SimpleStorageServiceBufferized.cpp
+        src/wrench/services/storage/simple/SimpleStorageServiceNonBufferized.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/services/storage/storage_helper_classes/FileLocation.cpp
         src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
         include/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystem.cpp
+        src/wrench/services/storage/storage_helper_classes/LogicalFileSystemNoCaching.cpp
+        src/wrench/services/storage/storage_helper_classes/LogicalFileSystemLRUCaching.cpp
         src/wrench/services/memory/Block.cpp
         src/wrench/services/memory/MemoryManager.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
@@ -335,7 +342,6 @@ set(SOURCE_FILES
         src/wrench/failure_causes/JobKilled.cpp
         src/wrench/failure_causes/JobTimeout.cpp
         src/wrench/failure_causes/NetworkError.cpp
-        src/wrench/failure_causes/NoScratchSpace.cpp
         src/wrench/failure_causes/NotAllowed.cpp
         src/wrench/failure_causes/NotEnoughResources.cpp
         src/wrench/failure_causes/ServiceIsDown.cpp
@@ -384,6 +390,7 @@ set(TEST_FILES
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiJobTests.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceOneTaskTest.cpp
         test/services/storage_services/LogicalFileSystem/LogicalFileSystemTest.cpp
+        test/services/storage_services/SimpleStorageService/SimpleStorageServiceCachingTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
@@ -391,6 +398,7 @@ set(TEST_FILES
         test/services/storage_services/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
         test/services/storage_services/SimpleStorageService/ZeroSizeFileTest.cpp
         test/services/storage_services/SimpleStorageService/ChunkingTest.cpp
+        test/services/storage_services/SimpleStorageService/CopyBufferizedNonBufferizedTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceTestStandardJobs.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceTestPilotJobs.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceSchedulingTest.cpp

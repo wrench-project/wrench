@@ -74,11 +74,11 @@ namespace wrench {
     };
 
 
-};// namespace wrench
+}// namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
 
 #endif//WRENCH_STANDARD_JOB_FAILED_H
