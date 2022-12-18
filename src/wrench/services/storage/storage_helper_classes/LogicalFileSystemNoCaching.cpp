@@ -25,9 +25,8 @@ namespace wrench {
      * @param mount_point: the mount point, defaults to /dev/null
      */
     LogicalFileSystemNoCaching::LogicalFileSystemNoCaching(const std::string &hostname, StorageService *storage_service,
-                                         const std::string &mount_point) : LogicalFileSystem(hostname, storage_service, mount_point) {
+                                                           const std::string &mount_point) : LogicalFileSystem(hostname, storage_service, mount_point) {
     }
-
 
 
     /**
@@ -51,7 +50,7 @@ namespace wrench {
             createDirectory(absolute_path);
         }
 
-        bool file_already_there =  this->content[absolute_path].find(file) != this->content[absolute_path].end();
+        bool file_already_there = this->content[absolute_path].find(file) != this->content[absolute_path].end();
 
         this->content[absolute_path][file] = std::make_shared<LogicalFileSystemNoCaching::FileOnDiskNoCaching>(S4U_Simulation::getClock());
 
@@ -94,15 +93,12 @@ namespace wrench {
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         double freed_space = 0;
-        for (auto const &s : this->content[absolute_path]) {
+        for (auto const &s: this->content[absolute_path]) {
             freed_space += s.first->getSize();
         }
         this->content[absolute_path].clear();
         this->free_space += freed_space;
     }
-
-
-
 
 
     /**

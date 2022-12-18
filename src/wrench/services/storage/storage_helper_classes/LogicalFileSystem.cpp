@@ -32,30 +32,30 @@ namespace wrench {
      * @return a shared pointer to a LogicalFileSystem instance
      */
     std::unique_ptr<LogicalFileSystem> LogicalFileSystem::createLogicalFileSystem(const std::string &hostname,
-                                                                      StorageService *storage_service,
-                                                                      const std::string& mount_point,
-                                                                      const std::string& eviction_policy) {
+                                                                                  StorageService *storage_service,
+                                                                                  const std::string &mount_point,
+                                                                                  const std::string &eviction_policy) {
 
         if (storage_service == nullptr) {
             throw std::invalid_argument("LogicalFileSystem::createLogicalFileSystem(): nullptr storage_service argument");
         }
 
-//        std::cerr << "CREATING LOGICAL FS " << hostname << ":" << mount_point << "\n";
+        //        std::cerr << "CREATING LOGICAL FS " << hostname << ":" << mount_point << "\n";
         std::unique_ptr<LogicalFileSystem> to_return;
         if (eviction_policy == "NONE") {
-            to_return =  std::unique_ptr<LogicalFileSystem>(new LogicalFileSystemNoCaching(hostname, storage_service, mount_point));
+            to_return = std::unique_ptr<LogicalFileSystem>(new LogicalFileSystemNoCaching(hostname, storage_service, mount_point));
         } else if (eviction_policy == "LRU") {
             to_return = std::unique_ptr<LogicalFileSystem>(new LogicalFileSystemLRUCaching(hostname, storage_service, mount_point));
         } else {
             throw std::invalid_argument("LogicalFileSystem::createLogicalFileSystem(): Unknown cache eviction policy " + eviction_policy);
         }
-//        std::cerr << "CREATED LOGICAL FS " << hostname << ":" << mount_point << "\n";
+        //        std::cerr << "CREATED LOGICAL FS " << hostname << ":" << mount_point << "\n";
         return to_return;
     }
 
 
     LogicalFileSystem::LogicalFileSystem(const std::string &hostname, StorageService *storage_service,
-                                                           const std::string &mount_point) {
+                                         const std::string &mount_point) {
 
         this->hostname = hostname;
         this->storage_service = storage_service;
@@ -87,7 +87,7 @@ namespace wrench {
 
         // Check uniqueness
         auto key = this->hostname + ":" + this->mount_point;
-//        std::cerr << "CALLING INIT ON " << key << "\n";
+        //        std::cerr << "CALLING INIT ON " << key << "\n";
 
         auto lfs = LogicalFileSystem::mount_points.find(key);
 
@@ -121,7 +121,7 @@ namespace wrench {
         if (devnull) {
             return;
         }
-//        assertInitHasBeenCalled();
+        //        assertInitHasBeenCalled();
         assertDirectoryDoesNotExist(absolute_path);
         this->content[absolute_path] = {};
     }
@@ -135,7 +135,7 @@ namespace wrench {
         if (devnull) {
             return false;
         }
-//        assertInitHasBeenCalled();
+        //        assertInitHasBeenCalled();
         return (this->content.find(absolute_path) != this->content.end());
     }
 
@@ -224,15 +224,15 @@ namespace wrench {
         return this->total_capacity;
     }
 
-//    /**
-// * @brief Checks whether there is enough space to store some number of bytes
-// * @param bytes: a number of bytes
-// * @return true if the number of bytes can fit
-// */
-//    bool LogicalFileSystem::hasEnoughFreeSpace(double bytes) {
-//        assertInitHasBeenCalled();
-//        return (this->free_space >= bytes);
-//    }
+    //    /**
+    // * @brief Checks whether there is enough space to store some number of bytes
+    // * @param bytes: a number of bytes
+    // * @return true if the number of bytes can fit
+    // */
+    //    bool LogicalFileSystem::hasEnoughFreeSpace(double bytes) {
+    //        assertInitHasBeenCalled();
+    //        return (this->free_space >= bytes);
+    //    }
 
     /**
      * @brief Get the file system's free space
@@ -344,10 +344,10 @@ namespace wrench {
             return;
         }
 
-//        std::cerr << "LOGICAL FILE SYSTEM: STAGING FILE\n";
+        //        std::cerr << "LOGICAL FILE SYSTEM: STAGING FILE\n";
         // If Space is not sufficient, forget it
         if (this->free_space < file->getSize()) {
-//            std::cerr << "FREE SPACE = " << this->free_space << "\n";
+            //            std::cerr << "FREE SPACE = " << this->free_space << "\n";
             throw std::invalid_argument("LogicalFileSystem::stageFile(): Insufficient space to store file " +
                                         file->getID() + " at " + this->hostname + ":" + absolute_path);
         }
