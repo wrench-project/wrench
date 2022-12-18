@@ -97,7 +97,7 @@ namespace wrench {
         }
         assertInitHasBeenCalled();
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
-        
+
         assertDirectoryExist(fixed_path);
         double freed_space = 0;
         for (auto const &s: this->content[fixed_path]) {
