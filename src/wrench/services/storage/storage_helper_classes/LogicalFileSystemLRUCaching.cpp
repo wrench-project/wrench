@@ -167,6 +167,7 @@ namespace wrench {
             auto path = std::get<0>(lru.second);
             auto file = std::get<1>(lru.second);
             if (std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[path][file])->num_current_transactions > 0) {
+//                std::cerr << "PASSING OVER " << path << ":" << file->getID() << "\n";
                 continue;
             }
             to_evict.push_back(lru.first);
@@ -185,6 +186,7 @@ namespace wrench {
         for (const unsigned int &key : to_evict) {
             auto path = std::get<0>(this->lru_list[key]);
             auto file = std::get<1>(this->lru_list[key]);
+//            std::cerr << "Evicting file " <<  path.c_str() << ":" <<  file->getID().c_str() << "\n";
             WRENCH_INFO("Evicting file %s:%s", path.c_str(), file->getID().c_str());
             this->lru_list.erase(key);
             this->content[path].erase(file);
