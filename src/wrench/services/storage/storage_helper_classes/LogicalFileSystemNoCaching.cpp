@@ -45,16 +45,19 @@ namespace wrench {
         if (must_be_initialized) {
             assertInitHasBeenCalled();
         }
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+
         // If directory does not exit, create it
-        if (not doesDirectoryExist(absolute_path)) {
-            createDirectory(absolute_path);
+        if (not doesDirectoryExist(fixed_path)) {
+            createDirectory(fixed_path);
         }
 
-        bool file_already_there = this->content[absolute_path].find(file) != this->content[absolute_path].end();
 
-        this->content[absolute_path][file] = std::make_shared<LogicalFileSystemNoCaching::FileOnDiskNoCaching>(S4U_Simulation::getClock());
+        bool file_already_there = this->content[fixed_path].find(file) != this->content[fixed_path].end();
 
-        std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
+        this->content[fixed_path][file] = std::make_shared<LogicalFileSystemNoCaching::FileOnDiskNoCaching>(S4U_Simulation::getClock());
+
+        std::string key = FileLocation::sanitizePath(fixed_path) + file->getID();
         if (this->reserved_space.find(key) != this->reserved_space.end()) {
             this->reserved_space.erase(key);
         } else if (not file_already_there) {
@@ -74,9 +77,11 @@ namespace wrench {
             return;
         }
         assertInitHasBeenCalled();
-        assertDirectoryExist(absolute_path);
-        assertFileIsInDirectory(file, absolute_path);
-        this->content[absolute_path].erase(file);
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+
+        assertDirectoryExist(fixed_path);
+        assertFileIsInDirectory(file, fixed_path);
+        this->content[fixed_path].erase(file);
         this->free_space += file->getSize();
     }
 
@@ -91,16 +96,14 @@ namespace wrench {
             return;
         }
         assertInitHasBeenCalled();
-        std::cerr << "CONTENT\n";
-        for (auto const &d : this->content) {
-            std::cerr << "  - DIR: " << d.first << "\n";
-        }
-        assertDirectoryExist(absolute_path);
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+        
+        assertDirectoryExist(fixed_path);
         double freed_space = 0;
-        for (auto const &s: this->content[absolute_path]) {
+        for (auto const &s: this->content[fixed_path]) {
             freed_space += s.first->getSize();
         }
-        this->content[absolute_path].clear();
+        this->content[fixed_path].clear();
         this->free_space += freed_space;
     }
 

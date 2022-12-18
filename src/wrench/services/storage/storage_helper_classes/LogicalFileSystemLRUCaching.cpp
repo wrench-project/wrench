@@ -45,25 +45,27 @@ namespace wrench {
         if (must_be_initialized) {
             assertInitHasBeenCalled();
         }
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+
         // If directory does not exit, create it
-        if (not doesDirectoryExist(absolute_path)) {
-            createDirectory(absolute_path);
+        if (not doesDirectoryExist(fixed_path)) {
+            createDirectory(fixed_path);
         }
 
-        bool file_already_there = this->content[absolute_path].find(file) != this->content[absolute_path].end();
+        bool file_already_there = this->content[fixed_path].find(file) != this->content[fixed_path].end();
 
         // If the file was already there, remove its LRU entry
         if (file_already_there) {
-            unsigned old_seq = std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->lru_sequence_number;
+            unsigned old_seq = std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[fixed_path][file])->lru_sequence_number;
             this->lru_list.erase(old_seq);
         }
 
-        this->content[absolute_path][file] = std::make_shared<FileOnDiskLRUCaching>(S4U_Simulation::getClock(), this->next_lru_sequence_number++, 0);
-        this->lru_list[this->next_lru_sequence_number - 1] = std::make_tuple(absolute_path, file);
+        this->content[fixed_path][file] = std::make_shared<FileOnDiskLRUCaching>(S4U_Simulation::getClock(), this->next_lru_sequence_number++, 0);
+        this->lru_list[this->next_lru_sequence_number - 1] = std::make_tuple(fixed_path, file);
 
         //        print_lru_list();
 
-        std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
+        std::string key = FileLocation::sanitizePath(fixed_path) + file->getID();
         if (this->reserved_space.find(key) != this->reserved_space.end()) {
             this->reserved_space.erase(key);
         } else if (not file_already_there) {
@@ -83,10 +85,12 @@ namespace wrench {
             return;
         }
         assertInitHasBeenCalled();
-        assertDirectoryExist(absolute_path);
-        assertFileIsInDirectory(file, absolute_path);
-        auto seq = std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->lru_sequence_number;
-        this->content[absolute_path].erase(file);
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+
+        assertDirectoryExist(fixed_path);
+        assertFileIsInDirectory(file, fixed_path);
+        auto seq = std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[fixed_path][file])->lru_sequence_number;
+        this->content[fixed_path].erase(file);
         this->lru_list.erase(seq);
         //        print_lru_list();
         this->free_space += file->getSize();
@@ -103,19 +107,21 @@ namespace wrench {
             return;
         }
         assertInitHasBeenCalled();
-        assertDirectoryExist(absolute_path);
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+
+        assertDirectoryExist(fixed_path);
         double freed_space = 0;
-        for (auto const &s: this->content[absolute_path]) {
+        for (auto const &s: this->content[fixed_path]) {
             freed_space += s.first->getSize();
         }
-        this->content[absolute_path].clear();
+        this->content[fixed_path].clear();
         this->free_space += freed_space;
 
-        for (auto const &c: this->content[absolute_path]) {
+        for (auto const &c: this->content[fixed_path]) {
             this->lru_list.erase(std::static_pointer_cast<FileOnDiskLRUCaching>(c.second)->lru_sequence_number);
         }
         //        print_lru_list();
-        this->content[absolute_path].clear();
+        this->content[fixed_path].clear();
     }
 
 
@@ -129,17 +135,19 @@ namespace wrench {
             return;
         }
         assertInitHasBeenCalled();
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+
         // If directory does not exist, do nothing
-        if (not doesDirectoryExist(absolute_path)) {
+        if (not doesDirectoryExist(fixed_path)) {
             return;
         }
 
-        if (this->content[absolute_path].find(file) != this->content[absolute_path].end()) {
+        if (this->content[fixed_path].find(file) != this->content[fixed_path].end()) {
             unsigned new_seq = this->next_lru_sequence_number++;
-            unsigned old_seq = std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->lru_sequence_number;
+            unsigned old_seq = std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[fixed_path][file])->lru_sequence_number;
             this->lru_list.erase(old_seq);
-            std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->lru_sequence_number = new_seq;
-            this->lru_list[new_seq] = std::make_tuple(absolute_path, file);
+            std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[fixed_path][file])->lru_sequence_number = new_seq;
+            this->lru_list[new_seq] = std::make_tuple(fixed_path, file);
             //            print_lru_list();
         }
     }
@@ -202,9 +210,12 @@ namespace wrench {
      * @param absolute_path: the file path
      */
     void LogicalFileSystemLRUCaching::incrementNumRunningTransactionsForFileInDirectory(const shared_ptr<DataFile> &file, const string &absolute_path) {
-        if ((this->content.find(absolute_path) != this->content.end()) and
-            (this->content[absolute_path].find(file) != this->content[absolute_path].end())) {
-            std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->num_current_transactions++;
+
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+
+        if ((this->content.find(fixed_path) != this->content.end()) and
+            (this->content[fixed_path].find(file) != this->content[fixed_path].end())) {
+            std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[fixed_path][file])->num_current_transactions++;
         }
     }
 
@@ -214,9 +225,12 @@ namespace wrench {
      * @param absolute_path: the file path
      */
     void LogicalFileSystemLRUCaching::decrementNumRunningTransactionsForFileInDirectory(const shared_ptr<DataFile> &file, const string &absolute_path) {
-        if ((this->content.find(absolute_path) != this->content.end()) and
-            (this->content[absolute_path].find(file) != this->content[absolute_path].end())) {
-            std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[absolute_path][file])->num_current_transactions--;
+
+        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+
+        if ((this->content.find(fixed_path) != this->content.end()) and
+            (this->content[fixed_path].find(file) != this->content[fixed_path].end())) {
+            std::static_pointer_cast<FileOnDiskLRUCaching>(this->content[fixed_path][file])->num_current_transactions--;
         }
     }
 
