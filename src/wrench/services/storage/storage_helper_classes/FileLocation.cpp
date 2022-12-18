@@ -162,7 +162,7 @@ namespace wrench {
         if (absolute_path.empty()) {
             throw std::invalid_argument("FileLocation::LOCATION(): must specify a non-empty path");
         }
-        absolute_path = FileLocation::sanitizePath(absolute_path);
+        absolute_path = FileLocation::sanitizePath(absolute_path + "/");
 
         std::string mount_point = "";
         for (auto const &mp: ss->getMountPoints()) {
