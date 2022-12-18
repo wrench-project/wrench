@@ -127,7 +127,7 @@ namespace wrench {
         if (devnull) {
             return;
         }
-        //        assertInitHasBeenCalled(); 
+        //        assertInitHasBeenCalled();
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
         assertDirectoryDoesNotExist(fixed_path);
         this->content[fixed_path] = {};
