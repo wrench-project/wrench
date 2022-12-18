@@ -105,6 +105,8 @@ void LogicalFileSystemTest::do_BasicTests() {
     fs1->removeFileFromDirectory(file_80, "/files/");
     ASSERT_DOUBLE_EQ(100, fs1->getFreeSpace());
 
+    fs1->removeAllFilesInDirectory("/files/");  // coverage
+
 
     workflow->clear();
 
@@ -157,6 +159,23 @@ void LogicalFileSystemTest::do_DevNullTests() {
     fs1->unreserveSpace(file, "/foo");
     fs1->getFileLastWriteDate(file, "/foo");
 
+    // Create a Logical File System
+    auto fs2 = wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service.get(), "/dev/null","LRU");
+    fs2->init();
+    
+    fs2->createDirectory(("/foo"));
+    ASSERT_FALSE(fs2->doesDirectoryExist(("/foo")));
+    ASSERT_TRUE(fs2->isDirectoryEmpty(("/foo")));
+    ASSERT_FALSE(fs2->isFileInDirectory(file, "/foo"));
+    fs2->removeEmptyDirectory("/foo");
+    fs2->storeFileInDirectory(file, "/foo", true);
+    fs2->removeFileFromDirectory(file, "/foo");
+    fs2->removeAllFilesInDirectory("/foo");
+    ASSERT_TRUE(fs2->listFilesInDirectory("/foo").empty());
+    fs2->reserveSpace(file, "/foo");
+    fs2->unreserveSpace(file, "/foo");
+    fs2->getFileLastWriteDate(file, "/foo");
+    
     workflow->clear();
 
     for (int i = 0; i < argc; i++)
@@ -237,6 +256,11 @@ void LogicalFileSystemTest::do_LRUTests() {
     ASSERT_TRUE(fs1->reserveSpace(file_50, "/foo"));
     ASSERT_FALSE(fs1->isFileInDirectory(file_50, "/foo"));
     ASSERT_DOUBLE_EQ(fs1->getFreeSpace(), 40);
+
+
+    fs1->removeFileFromDirectory(file_10, "/foo");  // coverage
+    fs1->storeFileInDirectory(file_10, "/foo", true); // coverage
+    fs1->removeAllFilesInDirectory("/foo");  // coverage
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
