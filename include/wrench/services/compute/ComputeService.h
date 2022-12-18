@@ -161,7 +161,7 @@ namespace wrench {
 
         void submitJob(const std::shared_ptr<CompoundJob> &job, const std::map<std::string, std::string> & = {});
 
-        virtual void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
+        virtual void validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &job,
                                                       std::map<std::string, std::string> &service_specific_args);
 
         virtual void validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args);
@@ -195,6 +195,6 @@ namespace wrench {
     };
 
 
-};// namespace wrench
+}// namespace wrench
 
 #endif//SIMULATION_COMPUTESERVICE_H

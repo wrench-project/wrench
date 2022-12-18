@@ -99,9 +99,9 @@ namespace wrench {
         WRENCH_INFO("Waiting for next event");
         this->waitForAndProcessNextEvent();
 
-        /* Let's copying outfile_1 from storage_service2 to storage_service1, and let's
+        /* Let's copy outfile_1 from storage_service2 to storage_service1, and let's
          * do it asynchronously for kicks */
-        WRENCH_INFO("Asynchronously copying outfile_1 from storage_service2 to storage_service1")
+        WRENCH_INFO("Asynchronously copying outfile_1 from storage_service2 to storage_service1");
         data_movement_manager->initiateAsynchronousFileCopy(FileLocation::LOCATION(storage_service2, outfile_1),
                                                             FileLocation::LOCATION(storage_service1, outfile_1));
 

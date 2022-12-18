@@ -119,7 +119,7 @@ namespace wrench {
                                                           const std::shared_ptr<FileLocation> &dst_file_location);
 
         std::shared_ptr<FileDeleteAction> addFileDeleteAction(const std::string &name,
-                                                              const std::shared_ptr<FileLocation>& file_location);
+                                                              const std::shared_ptr<FileLocation> &file_location);
 
         std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(const std::string &name,
                                                                                   const std::shared_ptr<FileRegistryService> &file_registry,
@@ -209,7 +209,7 @@ namespace wrench {
         bool hasAction(const std::string &name);
 
         std::set<std::shared_ptr<CompoundJob>> &getChildren();
-        std::set<std::shared_ptr<CompoundJob>> &getParents();
+        //        std::set<std::shared_ptr<CompoundJob>> &getParents();
 
     private:
         void assertJobNotSubmitted();
@@ -218,7 +218,7 @@ namespace wrench {
         void addAction(const std::shared_ptr<Action> &action);
 
         bool pathExists(const std::shared_ptr<Action> &a, const std::shared_ptr<Action> &b);
-        bool pathExists(const std::shared_ptr<CompoundJob> &a, const std::shared_ptr<CompoundJob> &b);
+        static bool pathExists(const std::shared_ptr<CompoundJob> &a, const std::shared_ptr<CompoundJob> &b);
 
         std::set<std::shared_ptr<CompoundJob>> parents;
         std::set<std::shared_ptr<CompoundJob>> children;
@@ -236,7 +236,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_COMPOUNDJOB_H

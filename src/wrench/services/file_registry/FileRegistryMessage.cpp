@@ -155,4 +155,4 @@ namespace wrench {
     FileRegistryAddEntryAnswerMessage::FileRegistryAddEntryAnswerMessage(double payload) : FileRegistryMessage(payload) {
     }
 
-};// namespace wrench
+}// namespace wrench

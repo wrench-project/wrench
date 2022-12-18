@@ -130,7 +130,7 @@ namespace wrench {
         // helper function
         static unsigned long parseUnsignedLongServiceSpecificArgument(const std::string &key, const std::map<std::string, std::string> &args);
 
-        void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
+        void validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &compound_job,
                                               std::map<std::string, std::string> &service_specific_args) override;
 
         /***********************/

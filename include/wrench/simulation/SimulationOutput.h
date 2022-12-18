@@ -210,6 +210,6 @@ namespace wrench {
             this->enabledStatus[type_index] = enabled;
         }
     };
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_SIMULATIONOUTPUT_H

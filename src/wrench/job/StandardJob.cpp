@@ -205,7 +205,7 @@ namespace wrench {
             post_overhead_action = cjob->addSleepAction("", this->getPostJobOverheadInSeconds());
         }
 
-        // Create the pre- file copy actions
+        // Create the pre file copy actions
         for (auto const &pfc: this->pre_file_copies) {
             auto src_location = std::get<0>(pfc);
             auto dst_location = std::get<1>(pfc);
@@ -219,7 +219,7 @@ namespace wrench {
             pre_file_copy_actions.push_back(cjob->addFileCopyAction("", src_location, dst_location));
         }
 
-        // Create the post- file copy actions
+        // Create the post file copy actions
         for (auto const &pfc: this->post_file_copies) {
             auto src_location = std::get<0>(pfc);
             auto dst_location = std::get<1>(pfc);

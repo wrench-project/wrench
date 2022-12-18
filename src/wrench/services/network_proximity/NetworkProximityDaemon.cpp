@@ -90,7 +90,7 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void NetworkProximityDaemon::cleanup(bool has_returned_from_main, int return_value) {
-        // Do nothing. It's fine to die and we'll just autorestart with our previous state
+        // Do nothing. It's fine to die, and we'll just autorestart with our previous state
     }
 
 
@@ -222,7 +222,7 @@ namespace wrench {
 
             return true;
 
-        } else if (auto msg = dynamic_cast<NetworkProximityTransferMessage *>(message.get())) {
+        } else if (dynamic_cast<NetworkProximityTransferMessage *>(message.get())) {
             return true;
 
         } else {

@@ -101,9 +101,9 @@ int main(int argc, char **argv) {
      * The next argument to the constructor
      * shows how to configure particular simulated behaviors of the compute service via a property
      * list. In this case, we use the conservative_bf_core_level scheduling algorithm which implements
-     * conservative backfilling at the core level (i.e., two jobs can shared a compute node by using different cores on it).
+     * conservative backfilling at the core level (i.e., two jobs can share a compute node by using different cores on it).
      * The last argument to the constructor makes it possible to specify various control message sizes.
-     * In this example, one specifies that the message that will be send to the service to
+     * In this example, one specifies that the message that will be sent to the service to
      * terminate it will be 2048 bytes. See the documentation to find out all available
      * configurable properties for each kind of service.
      */
@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
      * In this example, this particular cloud service has no scratch storage space (mount point = "").
      * The last argument to the constructor
      * shows how to configure particular simulated behaviors of the compute service via a property
-     * list. In this example, one specified that the message that will be send to the service to
+     * list. In this example, one specified that the message that will be sent to the service to
      * terminate it will by 1024 bytes. See the documentation to find out all available
      * configurable properties for each kind of service.
      */
