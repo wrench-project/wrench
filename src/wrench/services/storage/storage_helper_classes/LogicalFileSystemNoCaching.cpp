@@ -92,7 +92,7 @@ namespace wrench {
         }
         assertInitHasBeenCalled();
         std::cerr << "CONTENT\n";
-        for (auto const &d : this->content) {
+        for (auto const &d: this->content) {
             std::cerr << "  - DIR: " << d.first << "\n";
         }
         assertDirectoryExist(absolute_path);
