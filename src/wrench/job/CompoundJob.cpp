@@ -114,7 +114,7 @@ namespace wrench {
                                                                  unsigned long max_num_cores,
                                                                  const std::shared_ptr<ParallelModel> &parallel_model) {
         auto new_action = std::shared_ptr<ComputeAction>(
-                new ComputeAction(name, flops, ram, min_num_cores, max_num_cores, std::move(parallel_model)));
+                new ComputeAction(name, flops, ram, min_num_cores, max_num_cores, parallel_model));
         this->addAction(new_action);
         return new_action;
     }
@@ -299,7 +299,7 @@ namespace wrench {
             const std::shared_ptr<FileRegistryService> &file_registry,
             const std::shared_ptr<FileLocation> &file_location) {
         auto new_action = std::shared_ptr<FileRegistryAddEntryAction>(
-                new FileRegistryAddEntryAction(name, std::move(file_registry), std::move(file_location)));
+                new FileRegistryAddEntryAction(name, file_registry, file_location));
         this->addAction(new_action);
         return new_action;
     }
