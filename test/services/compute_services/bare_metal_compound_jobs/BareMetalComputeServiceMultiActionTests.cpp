@@ -854,5 +854,3 @@ void BareMetalComputeServiceMultiActionTest::do_PartialTermination_test() {
         free(argv[i]);
     free(argv);
 }
-
-
