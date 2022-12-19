@@ -37,7 +37,7 @@ namespace wrench {
     class LogicalFileSystemLRUCaching : public LogicalFileSystem {
 
     public:
-	/**
+        /**
 	 * @brief A helper struct to describe a file instance on disk
 	 */
         struct FileOnDiskLRUCaching : public FileOnDisk {
