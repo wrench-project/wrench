@@ -104,7 +104,7 @@ class BareMetalComputeServiceResourceInformationTestWMS : public wrench::Executi
 
 public:
     BareMetalComputeServiceResourceInformationTestWMS(BareMetalComputeServiceLinkFailuresTest *test,
-                                                      const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
+                                                      const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -211,7 +211,6 @@ void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_
 }
 
 
-
 /**********************************************************************/
 /**  LINK FAILURE TEST BEFORE MULTI-ACTION JOB SUBMISSION            **/
 /**********************************************************************/
@@ -264,7 +263,7 @@ private:
             throw std::runtime_error("Invalid job state");
         }
 
-        for (const auto &a : job->getActions()) {
+        for (const auto &a: job->getActions()) {
             if (a->getState() != wrench::Action::FAILED) {
                 throw std::runtime_error("Invalid action state");
             }
@@ -296,18 +295,18 @@ void BareMetalComputeServiceLinkFailuresTest::do_MultiActionJobLinkFailure_test(
     // Create a Compute Service
     std::shared_ptr<wrench::BareMetalComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host3",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"},
-                                                {})));
+                            new wrench::BareMetalComputeService("Host3",
+                                                                {std::make_pair("Host3",
+                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                wrench::ComputeService::ALL_RAM))},
+                                                                {"/scratch"},
+                                                                {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new MultiActionJobLinkFailureTestWMS(this, workflow, compute_service,hostname)));
+                            new MultiActionJobLinkFailureTestWMS(this, workflow, compute_service, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
