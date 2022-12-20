@@ -205,6 +205,8 @@ set(SOURCE_FILES
         include/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
         include/wrench/services/storage/storage_helpers/LogicalFileSystem.h
+        include/wrench/services/storage/storage_helpers/LogicalFileSystemNoCaching.h
+        include/wrench/services/storage/storage_helpers/LogicalFileSystemLRUCaching.h
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/DataMovementManager.cpp
         src/wrench/managers/JobManager.cpp
@@ -301,6 +303,8 @@ set(SOURCE_FILES
         src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
         include/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystem.cpp
+        src/wrench/services/storage/storage_helper_classes/LogicalFileSystemNoCaching.cpp
+        src/wrench/services/storage/storage_helper_classes/LogicalFileSystemLRUCaching.cpp
         src/wrench/services/memory/Block.cpp
         src/wrench/services/memory/MemoryManager.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
@@ -387,6 +391,7 @@ set(TEST_FILES
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiJobTests.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceOneTaskTest.cpp
         test/services/storage_services/LogicalFileSystem/LogicalFileSystemTest.cpp
+        test/services/storage_services/SimpleStorageService/SimpleStorageServiceCachingTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
@@ -497,6 +502,7 @@ install(DIRECTORY include/ DESTINATION include)
 # generate unit tests if Google Test is found
 find_library(GTEST_LIBRARY NAMES gtest)
 if(GTEST_LIBRARY)
+    add_definitions(-DGTEST_USED)
     add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
     if (ENABLE_BATSCHED)
         find_library(ZMQ_LIBRARY NAMES zmq)

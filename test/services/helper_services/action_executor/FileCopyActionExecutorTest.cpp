@@ -175,7 +175,7 @@ private:
         }
 
         // Is the end-date sensible?
-        if (file_copy_action->getEndDate() + EPSILON < 10.87973091237113543173 or file_copy_action->getEndDate() > 10.87973091237113543173 + EPSILON) {
+        if (file_copy_action->getEndDate() + EPSILON < 10.90216 or file_copy_action->getEndDate() > 10.90216 + EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(file_copy_action->getEndDate()));
         }
 

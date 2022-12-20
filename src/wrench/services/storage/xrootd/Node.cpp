@@ -39,6 +39,7 @@ namespace wrench {
             //if(internalStorage){
             //    internalStorage->start(internalStorage,true,true);
             //}
+
             std::string message =
                     "XRootD Node " + this->getName() + "  starting on host " + this->getHostname();
             WRENCH_INFO("%s",
@@ -762,7 +763,13 @@ namespace wrench {
         * @param messagepayload_list: A Message Payload list
         *
         */
-        Node::Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootD") {
+        Node::Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootD") {
+
+            // Create /dev/null mountpoint so that Locations can be created
+            this->file_systems[LogicalFileSystem::DEV_NULL] =
+                    LogicalFileSystem::createLogicalFileSystem(hostname, this, LogicalFileSystem::DEV_NULL, "NONE");
+
             this->setProperties(this->default_property_values, property_list);
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
             cache.maxCacheTime = getPropertyValueAsTimeInSecond(Property::CACHE_MAX_LIFETIME);

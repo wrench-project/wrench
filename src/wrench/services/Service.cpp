@@ -72,7 +72,7 @@ namespace wrench {
 
         if (value < 0) {
             throw std::invalid_argument(
-                    "Service::setMessagePayload(): Invalid message payload value " + std::to_string(messagepayload) + ": " +
+                    "Service::setMessagePayload(): Invalid message payload value " + ServiceMessagePayload::translatePayloadType(messagepayload) + ": " +
                     std::to_string(value));
         }
         this->messagepayload_list[messagepayload] = value;
@@ -88,7 +88,7 @@ namespace wrench {
     std::string Service::getPropertyValueAsString(WRENCH_PROPERTY_TYPE property) {
         if (this->property_list.find(property) == this->property_list.end()) {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsString(): Cannot find value for property " + std::to_string(property) +
+                    "Service::getPropertyValueAsString(): Cannot find value for property " + ServiceProperty::translatePropertyType(property) +
                     " (perhaps a derived service class does not provide a default value?)");
         }
         return this->property_list[property];
@@ -117,7 +117,7 @@ namespace wrench {
         }
         if (sscanf(string_value.c_str(), "%lf", &value) != 1) {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsDouble(): Invalid double property value " + std::to_string(property) + " " +
+                    "Service::getPropertyValueAsDouble(): Invalid double property value " + ServiceProperty::translatePropertyType(property) + " " +
                     this->getPropertyValueAsString(property));
         }
         return value;
@@ -261,7 +261,7 @@ namespace wrench {
             return false;
         } else {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsBoolean(): Invalid boolean property value " + std::to_string(property) + " " +
+                    "Service::getPropertyValueAsBoolean(): Invalid boolean property value " + ServiceProperty::translatePropertyType(property) + " " +
                     this->getPropertyValueAsString(property));
         }
     }

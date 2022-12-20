@@ -662,6 +662,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -691,7 +692,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new VirtualizedClusterVMMigrationTestWMS(this, hostname)));
 
