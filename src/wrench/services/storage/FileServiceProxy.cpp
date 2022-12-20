@@ -81,26 +81,78 @@ namespace wrench{
             if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
                 target=location->target;
             }
+            if(target or StorageService::lookupFile(FileLocation::LOCATION(cache, msg->location->getFile()))) {//forward request to cache
+
+            }else if(remote){//forward request to remote
+
+            }
+        }else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
+            auto target=remote;
+            if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
+                target=location->target;
+            }
+           if(target or StorageService::lookupFile(FileLocation::LOCATION(cache, msg->location->getFile()))) {//forward request to cache
+
+           }else if(remote){//forward request to remote
+
+           }
+        } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
+            auto target=remote;
+            if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
+                target=location->target;
+            }
+            if(target) {//forward request to cache
+
+            }
+            if(remote){//forward request to remote
+
+            }
+        } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
+            auto target=remote;
+            if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
+                target=location->target;
+            }
+
+            if(target) {//forward request to cache
+
+            }
+            if(remote){//forward request to remote
+
+            }
+
+        } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
+            auto target=remote;
+            if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
+                target=location->target;
+            }
             if(not target){
                 throw std::runtime_error("Can not forward File Lookup Request Message to null target");
             }
-        }else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
-        } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
-        } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
-        } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
-        } else if (auto msg = dynamic_cast<StorageServiceMessage *>(message.get())) {//we got a message targeted at a normal storage server
-            if (cache) {
-                try{
-                    S4U_Mailbox::dputMessage(cache->mailbox, message.release());
-                    return true;
-                }catch(...){}
+            if(target or StorageService::lookupFile(FileLocation::LOCATION(cache, msg->location->getFile()))) {//forward request to cache
+
+            }else if(remote){//forward request to remote
 
             }
-            if(remote){
-                S4U_Mailbox::dputMessage(remote->mailbox, message.release());
-                return true;
-            }
-            throw std::runtime_error( "FileServiceProxy:processNextMessage(): Unexpected [" + message->getName() + "] message that either could not be forwared");
+//        } else if (auto msg = dynamic_cast<StorageServiceMessage *>(message.get())) {//we got a message targeted at a normal storage server
+//            auto target=remote;
+//            if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
+//                target=location->target;
+//            }
+//            if(not target){
+//                throw std::runtime_error("Can not forward File Lookup Request Message to null target");
+//            }
+//            if (target) {
+//                try{
+//                    S4U_Mailbox::dputMessage(cache->mailbox, message.release());
+//                    return true;
+//                }catch(...){}
+//
+//            }
+//            if(remote){
+//                S4U_Mailbox::dputMessage(remote->mailbox, message.release());
+//                return true;
+//            }
+//            throw std::runtime_error( "FileServiceProxy:processNextMessage(): Unexpected [" + message->getName() + "] message that either could not be forwared");
         } else {
             throw std::runtime_error(
                     "FileServiceProxy:processNextMessage(): Unexpected [" + message->getName() + "] message");
