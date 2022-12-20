@@ -10,11 +10,13 @@
 #ifndef WRENCH_FILESERVICEPROXY_H
 #define WRENCH_FILESERVICEPROXY_H
 #include "wrench/services/storage/StorageService.h"
+#include "wrench/services/storage/StorageServiceMessage.h"
 
 namespace wrench {
     /***********************/
     /** \cond DEVELOPER   **/
     /***********************/
+
     class  FileServiceProxy: public StorageService {
 
     public:
@@ -103,6 +105,7 @@ namespace wrench {
             return std::make_shared<FileServiceProxy>(hostname,nullptr,defaultRemote,properties,messagePayload);
         }
     protected:
+        std::map<std::shared_ptr<FileLocation>,std::vector<StorageServiceMessage>> pending;
         std::shared_ptr<StorageService> cache;
         std::shared_ptr<StorageService> remote;
 
