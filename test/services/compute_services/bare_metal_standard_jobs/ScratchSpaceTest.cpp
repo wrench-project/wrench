@@ -45,8 +45,6 @@ public:
 
     void do_PartitionsTest_test();
 
-    void do_JobForgettingAndScratchSpaceCleanup_test();
-
 protected:
     ~ScratchSpaceTest() {
         workflow->clear();
@@ -509,7 +507,7 @@ public:
 private:
     ScratchSpaceTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
@@ -621,7 +619,8 @@ private:
             double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
             if (free_space_size != 3000.0) {
                 throw std::runtime_error(
-                        "Scratch space should be empty after this pilot job expires but it is not now");
+                        "Scratch space should be empty after this pilot job expires (expected: 3000.00  vs. actual: " +
+                        std::to_string(free_space_size));
             }
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
@@ -644,11 +643,11 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
 
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //  argv[1] = strdup("--wrench-full-log");
+    //      argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -676,7 +675,7 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new PilotJobScratchSpaceTestWMS(
                                     this, hostname)));
@@ -848,7 +847,7 @@ public:
 private:
     ScratchSpaceTest *test;
 
-    int main() {
+    int main() override {
 
         //NonScratch have only / partition but other partitions can be created
         //Scratch have /, /<job's_name> partitions
@@ -985,6 +984,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1012,7 +1012,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ScratchNonScratchPartitionsTestWMS(this, hostname)));
 

@@ -111,7 +111,7 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::LOCATION(): Storage Service has multiple mount points. "
                                         "Call the version of this method that takes a mount point argument");
         }
-        return LOCATION(ss, *(ss->getMountPoints().begin()), file);
+        return LOCATION(ss, ss->getMountPoint(), file);
     }
 
     /**
@@ -162,7 +162,7 @@ namespace wrench {
         if (absolute_path.empty()) {
             throw std::invalid_argument("FileLocation::LOCATION(): must specify a non-empty path");
         }
-        absolute_path = FileLocation::sanitizePath(absolute_path);
+        absolute_path = FileLocation::sanitizePath(absolute_path + "/");
 
         std::string mount_point = "";
         for (auto const &mp: ss->getMountPoints()) {

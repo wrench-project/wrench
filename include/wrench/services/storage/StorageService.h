@@ -111,16 +111,19 @@ namespace wrench {
         static void writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
 
+        //        StorageService(const std::string &hostname,
+        //                       const std::set<std::string> &mount_points,
+        //                       const std::string &service_name);
+
         StorageService(const std::string &hostname,
-                       const std::set<std::string> &mount_points,
                        const std::string &service_name);
 
     protected:
-        StorageService(const std::string &hostname,
-                       const std::string &service_name);
         friend class Simulation;
         friend class FileRegistryService;
         friend class FileTransferThread;
+        friend class SimpleStorageServiceNonBufferized;
+        friend class SimpleStorageServiceBufferized;
 
         static void stageFile(const std::shared_ptr<FileLocation> &location);
 
