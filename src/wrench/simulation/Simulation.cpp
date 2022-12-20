@@ -1616,7 +1616,8 @@ namespace wrench {
      * @return a simulation
      */
     std::shared_ptr<Simulation> Simulation::createSimulation() {
-        return std::shared_ptr<Simulation>(new Simulation);
+        LogicalFileSystem::mount_points.clear();
+        return std::shared_ptr<Simulation>(new Simulation());
     }
 
 }// namespace wrench

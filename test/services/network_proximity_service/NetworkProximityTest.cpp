@@ -203,6 +203,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 

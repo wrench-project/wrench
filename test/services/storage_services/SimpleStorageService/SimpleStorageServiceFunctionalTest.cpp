@@ -593,6 +593,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1465,6 +1466,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
+
         // Copy storage_service_510:foo:file_10 to storage_service_1000:foo
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
@@ -1485,7 +1487,6 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
-
         // Copy storage_service_510:foo:file_10 to storage_service_510:bar
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
@@ -1505,6 +1506,7 @@ private:
         if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
+
 
         // Copy storage_service_510:foo:file_10 to storage_service_510:foo    SHOULD NOT WORK
         try {
@@ -1528,6 +1530,7 @@ private:
         if (not wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/foo", this->test->file_10))) {
             throw std::runtime_error("File should be in storage_service_1000 at path /large_disk/foo");
         }
+
 
         // Bogus lookup
         try {
@@ -1578,6 +1581,8 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test(double buffer_size) 
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
+
+    //    std::cerr << "BUFFER_SIZE = " << buffer_size << "\n";
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
