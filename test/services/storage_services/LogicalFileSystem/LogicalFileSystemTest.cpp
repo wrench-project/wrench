@@ -271,7 +271,7 @@ void LogicalFileSystemTest::do_LRUTests() {
     fs1->storeFileInDirectory(file_10, "/foo", true);// coverage
     fs1->removeAllFilesInDirectory("/foo");          // coverage
 
-    fs1->storeFileInDirectory(file_10, "/faa", true); // coverage
+    fs1->storeFileInDirectory(file_10, "/faa", true);// coverage
 
 
     for (int i = 0; i < argc; i++)
