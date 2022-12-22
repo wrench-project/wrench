@@ -24,6 +24,8 @@ jobs:
         run: |
           clang -v
           brew update
+          brew upgrade
+          brew link --overwrite python@3.10
           brew install nlohmann-json googletest boost
       
       - name: Install Simgrid
