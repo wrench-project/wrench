@@ -24,7 +24,8 @@ jobs:
         run: |
           clang -v
           brew update
-          brew link --overwrite python@3.10
+          rm '/usr/local/bin/2to3'
+          brew unlink python@3.10 && brew link python@3.10
           brew install python-tk@3.10
           brew install nlohmann-json googletest boost
       
