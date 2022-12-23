@@ -24,6 +24,7 @@ jobs:
         run: |
           clang -v
           brew update
+          brew link --overwrite python@3.10
           brew install python-tk@3.10
           brew install nlohmann-json googletest boost
       
