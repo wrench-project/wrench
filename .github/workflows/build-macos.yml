@@ -20,16 +20,19 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install dependencies
+      - name: Update brew
         run: |
           clang -v
           brew update
-          rm '/usr/local/bin/2to3'
-          rm '/usr/local/bin/idle3' 
-          rm '/usr/local/bin/pydoc3'
-          brew link --overwrite python@3.10
-          brew install python-tk@3.10
-          brew install nlohmann-json googletest boost
+      - name: Install nlohmann-json
+        run: |
+          brew install nlohmann-json 
+      - name: Install googletest
+        run: |
+          brew install googletest
+      - name: Install boost
+        run: |
+          brew install boost
       - name: Install Simgrid
         run: |
           git clone https://framagit.org/simgrid/simgrid.git
@@ -38,7 +41,6 @@ jobs:
           cmake -Denable_smpi=off .
           make -j4
           make install
-
       - name: Source Build and Test
         run: |
           # build and test wrench
