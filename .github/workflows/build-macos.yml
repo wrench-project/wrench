@@ -30,6 +30,9 @@ jobs:
       - name: Install googletest
         run: |
           brew install googletest
+      - name: Install Python
+        run: |
+          brew install python
       - name: Install boost
         run: |
           brew install boost
