@@ -32,6 +32,7 @@ jobs:
           brew install googletest
       - name: Install Python
         run: |
+          brew uninstall python
           brew install python
       - name: Install boost
         run: |
