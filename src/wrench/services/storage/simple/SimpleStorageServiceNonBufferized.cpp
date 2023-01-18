@@ -78,7 +78,7 @@ namespace wrench {
         // Send back the relevant ack if this was a read
         if (transaction->dst_location == nullptr) {
             //            WRENCH_INFO("Sending back an ack for a successful file read");
-            S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage());
+            S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage(transaction->src_location));
         } else if (transaction->src_location == nullptr) {
             WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
             this->file_systems[transaction->dst_location->getMountPoint()]->storeFileInDirectory(
@@ -86,7 +86,7 @@ namespace wrench {
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // Maybe no corresponding timestamp.
             //            WRENCH_INFO("Sending back an ack for a successful file read");
-            S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage());
+            S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage(transaction->dst_location));
         } else {
             if (transaction->dst_location->getStorageService() == shared_from_this()) {
                 WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());

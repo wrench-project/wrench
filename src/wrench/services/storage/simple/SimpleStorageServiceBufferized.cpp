@@ -531,7 +531,7 @@ namespace wrench {
                 this->file_systems[dst_location->getMountPoint()]->storeFileInDirectory(
                         file, dst_location->getAbsolutePathAtMountPoint(), true);
                 // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
-                // May be no corresponding timestamp.
+                // Maybe no corresponding timestamp.
                 try {
                     this->simulation->getOutput().addTimestampFileCopyCompletion(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
                 } catch (invalid_argument &ignore) {
@@ -548,14 +548,14 @@ namespace wrench {
         if (answer_mailbox_if_read and success) {
             WRENCH_INFO(
                     "Sending back an ack since this was a file read and some client is waiting for me to say something");
-            S4U_Mailbox::dputMessage(answer_mailbox_if_read, new StorageServiceAckMessage());
+            S4U_Mailbox::dputMessage(answer_mailbox_if_read, new StorageServiceAckMessage(src_location));
         }
 
         // Send back the relevant ack if this was a write
         if (answer_mailbox_if_write and success) {
             WRENCH_INFO(
                     "Sending back an ack since this was a file write and some client is waiting for me to say something");
-            S4U_Mailbox::dputMessage(answer_mailbox_if_write, new StorageServiceAckMessage());
+            S4U_Mailbox::dputMessage(answer_mailbox_if_write, new StorageServiceAckMessage(dst_location));
         }
 
         // Send back the relevant ack if this was a copy
