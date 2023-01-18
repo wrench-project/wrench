@@ -7,17 +7,18 @@
 * (at your option) any later version.
 */
 
-#ifndef WRENCH_FILESERVICEPROXY_H
-#define WRENCH_FILESERVICEPROXY_H
+#ifndef WRENCH_STORAGESERVICEPROXY_H
+#define WRENCH_STORAGESERVICEPROXY_H
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/storage/StorageServiceMessage.h"
+#include "StorageServiceProxyProperty.h"
 
 namespace wrench {
     /***********************/
     /** \cond DEVELOPER   **/
     /***********************/
 
-    class  FileServiceProxy: public StorageService {
+    class StorageServiceProxy : public StorageService {
 
     public:
 
@@ -63,54 +64,55 @@ namespace wrench {
         /** \cond INTERNAL    **/
 
 
-        FileServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService>& cache=nullptr,const std::shared_ptr<StorageService>& defaultRemote=nullptr,WRENCH_PROPERTY_COLLECTION_TYPE properties={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload={});
+        StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService>& cache=nullptr,const std::shared_ptr<StorageService>& defaultRemote=nullptr,WRENCH_PROPERTY_COLLECTION_TYPE properties={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload={});
         /**
-         * @brief Factory to create a FileServiceProxy that does not have a default destination to forward requests too, but will cache requests as they are made
+         * @brief Factory to create a StorageServiceProxy that does not have a default destination to forward requests too, but will cache requests as they are made
          * @param hostname: hostname
          * @param cache: The StorageService to use as a Cache
          * @param remote: The StorageService to use as a remote file source
          * @param properties: Properties for the fileServiceProxy
          * @param messagePayload: Message Payloads for the fileServiceProxy
-         * @return the FileServiceProxy created
+         * @return the StorageServiceProxy created
          */
-        static std::shared_ptr<FileServiceProxy> createRedirectProxy(const std::string &hostname, const std::shared_ptr<StorageService>& cache,WRENCH_PROPERTY_COLLECTION_TYPE properties={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload={}){
-            return std::make_shared<FileServiceProxy>(hostname,cache,nullptr,properties,messagePayload);
+        static std::shared_ptr<StorageServiceProxy> createRedirectProxy(const std::string &hostname, const std::shared_ptr<StorageService>& cache,WRENCH_PROPERTY_COLLECTION_TYPE properties={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload={}){
+            return std::make_shared<StorageServiceProxy>(hostname,cache,nullptr,properties,messagePayload);
         }
         /**
-         * @brief Factory to create a FileServiceProxy that does not cache reads, and does not have a default destination to forward too
+         * @brief Factory to create a StorageServiceProxy that does not cache reads, and does not have a default destination to forward too
          * @param hostname: hostname
          * @param cache: The StorageService to use as a Cache
          * @param remote: The StorageService to use as a remote file source
          * @param properties: Properties for the fileServiceProxy
          * @param messagePayload: Message Payloads for the fileServiceProxy
-         * @return the FileServiceProxy created
+         * @return the StorageServiceProxy created
          */
-        static std::shared_ptr<FileServiceProxy> createCachelessRedirectProxy(const std::string &hostname,WRENCH_PROPERTY_COLLECTION_TYPE properties={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload={}){
+        static std::shared_ptr<StorageServiceProxy> createCachelessRedirectProxy(const std::string &hostname,WRENCH_PROPERTY_COLLECTION_TYPE properties={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload={}){
 
             throw std::runtime_error("Cacheless proxies are not currently supported");
-            return std::make_shared<FileServiceProxy>(hostname,nullptr,nullptr,properties,messagePayload);
+            return std::make_shared<StorageServiceProxy>(hostname,nullptr,nullptr,properties,messagePayload);
         }
         /**
-         * @brief Factory to create a FileServiceProxy that does not cache reads, and only forwards requests to another service
+         * @brief Factory to create a StorageServiceProxy that does not cache reads, and only forwards requests to another service
          * @param hostname: hostname
          * @param cache: The StorageService to use as a Cache
          * @param remote: The StorageService to use as a remote file source
          * @param properties: Properties for the fileServiceProxy
          * @param messagePayload: Message Payloads for the fileServiceProxy
-         * @return the FileServiceProxy created
+         * @return the StorageServiceProxy created
          */
-        static std::shared_ptr<FileServiceProxy> createCachelessProxy(const std::string &hostname, const std::shared_ptr<StorageService>& defaultRemote,WRENCH_PROPERTY_COLLECTION_TYPE properties={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload={}){
+        static std::shared_ptr<StorageServiceProxy> createCachelessProxy(const std::string &hostname, const std::shared_ptr<StorageService>& defaultRemote,WRENCH_PROPERTY_COLLECTION_TYPE properties={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload={}){
 
             throw std::runtime_error("Cacheless proxies are not currently supported");
-            return std::make_shared<FileServiceProxy>(hostname,nullptr,defaultRemote,properties,messagePayload);
+            return std::make_shared<StorageServiceProxy>(hostname,nullptr,defaultRemote,properties,messagePayload);
         }
     protected:
-        std::map<std::shared_ptr<FileLocation>,std::vector<StorageServiceMessage>> pending;
+        std::map<std::shared_ptr<DataFile>,std::vector<unique_ptr<SimulationMessage>>> pending;
         std::shared_ptr<StorageService> cache;
         std::shared_ptr<StorageService> remote;
 
+    private:
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {};
-        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {};
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {{StorageServiceProxyProperty::MESSAGE_OVERHEAD,0}};
     };
 
     class ProxyLocation : public FileLocation{
@@ -149,4 +151,4 @@ namespace wrench {
 
 
 
-#endif//WRENCH_FILESERVICEPROXY_H
+#endif//WRENCH_STORAGESERVICEPROXY_H
