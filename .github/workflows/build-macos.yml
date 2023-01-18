@@ -20,6 +20,9 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Remove existing links
+          rm '/usr/local/bin/2to3'
+          rm '/usr/local/bin/2to3-3.11'
       - name: Update brew
         run: |
           clang -v
