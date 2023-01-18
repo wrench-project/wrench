@@ -13,6 +13,7 @@
 
 
 #include <memory>
+#include <utility>
 
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/failure_causes/FailureCause.h"
@@ -278,7 +279,9 @@ namespace wrench {
     */
     class StorageServiceAckMessage : public StorageServiceMessage {
     public:
-        StorageServiceAckMessage() : StorageServiceMessage(0) {}
+        explicit StorageServiceAckMessage(std::shared_ptr<FileLocation> location) :
+                StorageServiceMessage(0), location(std::move(location)) {}
+        std::shared_ptr<FileLocation> location;
     };
 
 
