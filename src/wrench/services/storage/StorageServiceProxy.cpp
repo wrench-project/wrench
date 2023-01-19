@@ -298,26 +298,14 @@ namespace wrench{
 
 
     void StorageServiceProxy::createFile(const std::shared_ptr<FileLocation> &location){
-        if(remote){
-            return remote->createFile(location);
-        }
-        throw std::invalid_argument("No Remote Fileserver supplied and no fallback default to use");
+        throw std::invalid_argument("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
     }
     void StorageServiceProxy::createFile(const std::shared_ptr<DataFile> &file, const std::string &path){
-        if(remote){
-            return remote->createFile(file,path);
-        }
-        throw std::invalid_argument("No Remote Fileserver supplied and no fallback default to use");
-
+        throw std::invalid_argument("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
     }
     void StorageServiceProxy::createFile(const std::shared_ptr<DataFile> &file){
-        if(remote){
-            return remote->createFile(file);
-        }
-        throw std::invalid_argument("No Remote Fileserver supplied and no fallback default to use");
+        throw std::invalid_argument("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
     }
-
-
 
     double StorageServiceProxy::getLoad() {
         if(cache){
@@ -341,6 +329,12 @@ namespace wrench{
     void StorageServiceProxy::deleteFile(const std::shared_ptr<StorageService>& targetServer, const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service){
         StorageService::deleteFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()), file),file_registry_service);
     }
+    bool StorageServiceProxy::lookupFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file){
+        return StorageService::lookupFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()), file));
+    }
+    void StorageServiceProxy::readFile(const std::shared_ptr<DataFile> &file){
+        StorageService::readFile(ProxyLocation::LOCATION(remote,std::static_pointer_cast<StorageService>(shared_from_this()), file));
+    }
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file){
         StorageService::readFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
@@ -358,5 +352,8 @@ namespace wrench{
     }
     void StorageServiceProxy::writeFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file){
         StorageService::writeFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()), file));
+    }
+    const std::shared_ptr<StorageService> StorageServiceProxy::getCache(){
+        return this->cache;
     }
 }

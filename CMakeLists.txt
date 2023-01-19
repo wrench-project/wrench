@@ -487,6 +487,7 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
         test/simulation/S4U_MailboxTest.cpp
         test/misc/UnitParserTest.cpp
+        test/services/storage_services/StorageServiceProxy/StorageServiceProxyBasicTest.cpp
         )
 
 
