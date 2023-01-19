@@ -438,6 +438,7 @@ set(TEST_FILES
         test/simulation/DynamicServiceCreationTest.cpp
         test/simulation/SimulationCommandLineArgumentsTest.cpp
         test/simulation/SimulationLoggingTest.cpp
+        test/simulation/MultiControllerSimulationTest.cpp
         test/simulation/simulation_output/SimulationOutputTest.cpp
         test/simulation/simulation_output/SimulationTimestampDiskReadWriteTest.cpp
         test/simulation/simulation_output/SimulationTimestampTaskTest.cpp
