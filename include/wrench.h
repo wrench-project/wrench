@@ -31,6 +31,7 @@
 #include "wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h"
 #include "wrench/services/network_proximity/NetworkProximityService.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
+#include "wrench/services/storage/StorageServiceProxy.h"
 
 // Simulation Output Analysis
 #include "wrench/simulation/SimulationTimestamp.h"
