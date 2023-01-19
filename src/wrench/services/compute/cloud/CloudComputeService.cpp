@@ -33,7 +33,7 @@ namespace wrench {
      *
      * @param hostname: the hostname on which to start the service
      * @param execution_hosts: the list of the names of the hosts available for running virtual machines
-     * @param scratch_space_mount_point: the mount point for the cloud sercvice's strach space ("" means none)
+     * @param scratch_space_mount_point: the mount point for the cloud service's scratch space ("" means none)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
@@ -1169,7 +1169,7 @@ namespace wrench {
                     // Resume the VM
                     actual_vm->resume();
                     cs->resume();
-                    // WARNING: No the lack of a "break" below which is a hacl
+                    // WARNING: No the lack of a "break" below which is a hack
                 case S4U_VirtualMachine::State::RUNNING:
                     // Shut it down
                     std::string pm = actual_vm->getPhysicalHostname();
@@ -1257,7 +1257,7 @@ namespace wrench {
         if (vm_resource_allocation_algorithm != "first-fit" and
             vm_resource_allocation_algorithm != "best-fit-ram-first" and
             vm_resource_allocation_algorithm != "best-fit-cores-first") {
-            throw std::invalid_argument("Inalid VM_RESOURCE_ALLOCATION_ALGORITHM property specification: " +
+            throw std::invalid_argument("Invalid VM_RESOURCE_ALLOCATION_ALGORITHM property specification: " +
                                         vm_resource_allocation_algorithm);
         }
     }

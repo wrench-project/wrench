@@ -32,11 +32,6 @@ namespace wrench {
     class SimpleStorageServiceBufferized : public SimpleStorageService {
 
     private:
-        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "infinity"},
-                {SimpleStorageServiceProperty::BUFFER_SIZE, "10000000"},// 10 MEGA BYTE
-        };
-
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
                 {SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
@@ -117,6 +112,6 @@ namespace wrench {
         std::shared_ptr<MemoryManager> memory_manager;
     };
 
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_SIMPLESTORAGESERVICEBUFFERIZED_H

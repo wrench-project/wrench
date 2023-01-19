@@ -63,6 +63,6 @@ namespace wrench {
         std::unique_ptr<T> content;
     };
 
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_SIMULATIONTIMESTAMP_H

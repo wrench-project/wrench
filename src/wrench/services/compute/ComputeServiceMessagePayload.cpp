@@ -36,4 +36,4 @@ namespace wrench {
     SET_MESSAGEPAYLOAD_NAME(ComputeServiceMessagePayload, TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD);
     SET_MESSAGEPAYLOAD_NAME(ComputeServiceMessagePayload, TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD);
 
-};// namespace wrench
+}// namespace wrench

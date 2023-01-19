@@ -382,4 +382,4 @@ namespace wrench {
         this->last_chunk = last_chunk;
     }
 
-};// namespace wrench
+}// namespace wrench

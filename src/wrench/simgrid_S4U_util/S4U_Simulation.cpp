@@ -565,7 +565,7 @@ namespace wrench {
         read_activity->start();
         // Do synchronous write
         write_disk->write((sg_size_t) num_bytes_to_write);
-        // Wait for asychronous read to be done
+        // Wait for asynchronous read to be done
         read_activity->wait();
     }
 
@@ -735,7 +735,7 @@ namespace wrench {
 * @throw std::runtime_error
 */
     double S4U_Simulation::getEnergyConsumedByHost(const std::string &hostname) {
-        double energy_consumed = 0;
+        double energy_consumed;
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
@@ -970,7 +970,6 @@ namespace wrench {
     simgrid::s4u::Disk *S4U_Simulation::hostHasMountPoint(const std::string &hostname, const std::string &mount_point) {
         simgrid::s4u::Host *host;
         try {
-            host = S4U_Simulation::get_host_or_vm_by_name(hostname);
             host = simgrid::s4u::Host::by_name(hostname);
         } catch (std::exception &e) {
             throw std::invalid_argument("S4U_Simulation::hostHasMountPoint(): Unknown host " + hostname);
@@ -1151,4 +1150,4 @@ namespace wrench {
     }
 
 
-};// namespace wrench
+}// namespace wrench

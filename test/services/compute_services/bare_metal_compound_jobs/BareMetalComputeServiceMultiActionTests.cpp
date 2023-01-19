@@ -172,11 +172,19 @@ private:
                 job->addActionDependency(first_chain_tasks[i - 1], first_chain_tasks[i]);
             }
         }
+
+        // Coverage
+        try {
+            job->addSleepAction("chain1_sleep_0", 10.0);
+            throw std::runtime_error("Shouldn't be able to add a task with same name as an existing task");
+        } catch (std::runtime_error &ignore) {}
+
         std::vector<std::shared_ptr<wrench::SleepAction>> fork_tasks;
         for (unsigned long i = 0; i < fork_width; i++) {
             fork_tasks.push_back(job->addSleepAction("fork_sleep_" + std::to_string(i), dist_sleep(rng)));
             job->addActionDependency(first_chain_tasks[first_chain_tasks.size() - 1], fork_tasks[i]);
         }
+
 
         std::vector<std::shared_ptr<wrench::SleepAction>> second_chain_tasks;
         for (unsigned long i = 0; i < second_chain_length; i++) {
@@ -204,15 +212,22 @@ private:
             expected_makespan += a->getSleepTime();
         }
 
-
         // Coverage
         job->getCallbackMailbox();
 
         // Submit the job
         job_manager->submitJob(job, this->test->compute_service, {});
 
+
         // Coverage
+        wrench::Simulation::sleep(1.0);
         job->printCallbackMailboxStack();
+
+        // Coverage
+        try {
+            job->addSleepAction("sleep", 1.0);
+            throw std::runtime_error("Shouldn't be able to add action to job that has been submitted");
+        } catch (std::runtime_error &ignore) {}
 
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
@@ -614,6 +629,8 @@ private:
         if (not std::dynamic_pointer_cast<wrench::SomeActionsHaveFailed>(real_event->failure_cause)) {
             throw std::runtime_error("Unexpected job-level failure cause");
         }
+        auto real_cause = std::dynamic_pointer_cast<wrench::SomeActionsHaveFailed>(real_event->failure_cause);
+        real_cause->toString();// coverage
 
         // Check job state
         if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {

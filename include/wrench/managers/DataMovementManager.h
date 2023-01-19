@@ -66,7 +66,7 @@ namespace wrench {
     private:
         int main() override;
 
-        simgrid::s4u::Mailbox *getCreatorMailbox();
+        //        simgrid::s4u::Mailbox *getCreatorMailbox();
 
         simgrid::s4u::Mailbox *creator_mailbox;
 
@@ -99,7 +99,7 @@ namespace wrench {
     /***********************/
 
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_DATAMOVEMENTMANAGER_H
