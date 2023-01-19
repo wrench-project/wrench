@@ -210,6 +210,11 @@ private:
             throw std::runtime_error("Last file write date is incoherent");
         }
 
+        try {
+            this->test->storage_service_100->getFileLastWriteDate(nullptr);
+            throw std::runtime_error("Should not be able to pass a nullptr location to getFileLastWriteDate()");
+        } catch (std::invalid_argument &ignore) {}
+
 
         // Send a free space request
         std::map<std::string, double> free_space;
@@ -588,6 +593,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -676,7 +682,7 @@ public:
 private:
     SimpleStorageServiceFunctionalTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -702,6 +708,14 @@ private:
             data_movement_manager->doSynchronousFileCopy(wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
                                                          nullptr);
             throw std::runtime_error("Shouldn't be able to do a synchronous file copy with a nullptr src");
+        } catch (std::invalid_argument &e) {
+        }
+
+        // Do a bogus file copy (src->getFile() = dst->getFile())
+        try {
+            data_movement_manager->doSynchronousFileCopy(wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_1));
+            throw std::runtime_error("Shouldn't be able to do a synchronous file copy where locations don't have the same file");
         } catch (std::invalid_argument &e) {
         }
 
@@ -833,10 +847,19 @@ public:
 private:
     SimpleStorageServiceFunctionalTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
+
+        // Initiate bogus file copy
+        try {
+            data_movement_manager->initiateAsynchronousFileCopy(
+                    wrench::FileLocation::LOCATION(this->test->storage_service_1000, this->test->file_500),
+                    wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_10));
+            throw std::runtime_error("Should not be able to do an asynchronous file copy for different files");
+        } catch (std::invalid_argument &ignore) {
+        }
 
         // Initiate a file copy
         try {
@@ -966,7 +989,7 @@ public:
 private:
     SimpleStorageServiceFunctionalTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -1164,7 +1187,7 @@ public:
 private:
     SimpleStorageServiceFunctionalTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -1443,6 +1466,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
+
         // Copy storage_service_510:foo:file_10 to storage_service_1000:foo
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
@@ -1463,7 +1487,6 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
-
         // Copy storage_service_510:foo:file_10 to storage_service_510:bar
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
@@ -1483,6 +1506,7 @@ private:
         if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
+
 
         // Copy storage_service_510:foo:file_10 to storage_service_510:foo    SHOULD NOT WORK
         try {
@@ -1506,6 +1530,7 @@ private:
         if (not wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/foo", this->test->file_10))) {
             throw std::runtime_error("File should be in storage_service_1000 at path /large_disk/foo");
         }
+
 
         // Bogus lookup
         try {
@@ -1556,6 +1581,8 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test(double buffer_size) 
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
+
+    //    std::cerr << "BUFFER_SIZE = " << buffer_size << "\n";
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1612,7 +1639,7 @@ public:
 private:
     SimpleStorageServiceFunctionalTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();

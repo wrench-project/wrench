@@ -410,7 +410,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     argv[2] = strdup("--cfg=contexts/stack-size:100");
-    //    argv[3] = strdup("--wrench-full-log");
+    //        argv[3] = strdup("--wrench-full-log");
 
     this->faulty_map = args;
 
@@ -452,7 +452,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     if (args.find("cloud") != args.end()) {
         std::string cloudhead = "CloudHead";
         std::vector<std::string> cloudhosts;
-        cloudhosts.push_back("CloudHost1");
+        cloudhosts.emplace_back("CloudHost1");
         //        cloudhosts.push_back("CloudHost2");
         //        cloudhosts.push_back("CloudHost3");
         this->cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(

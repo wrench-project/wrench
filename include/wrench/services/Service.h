@@ -43,7 +43,7 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        void start(std::shared_ptr<Service> this_service, bool daemonize, bool auto_restart);
+        void start(const std::shared_ptr<Service> &this_service, bool daemonize, bool auto_restart);
         virtual void stop();
         void suspend();
         void resume();
@@ -155,7 +155,7 @@ namespace wrench {
         /** \endcond           */
         /***********************/
     };
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_SERVICE_H

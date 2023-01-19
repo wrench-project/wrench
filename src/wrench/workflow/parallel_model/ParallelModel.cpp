@@ -55,4 +55,4 @@ namespace wrench {
         return std::shared_ptr<ParallelModel>(new CustomParallelModel(lambda_sequential, lambda_per_thread));
     }
 
-};// namespace wrench
+}// namespace wrench

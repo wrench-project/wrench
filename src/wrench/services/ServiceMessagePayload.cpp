@@ -32,7 +32,7 @@ namespace wrench {
         ++WRENCH_MESSAGEPAYLOAD_COUNT;
         stringToPayloadMap[classname + "::" + messagePayload] = WRENCH_MESSAGEPAYLOAD_COUNT;
         payloadToString[WRENCH_MESSAGEPAYLOAD_COUNT] = classname + "::" + messagePayload;
-        //std::cout<<classname+"::"+messagePayload<<std::endl;
+        //        std::cout<<"["<<WRENCH_MESSAGEPAYLOAD_COUNT<<"] " << classname+"::"+messagePayload<<std::endl;
         return WRENCH_MESSAGEPAYLOAD_COUNT;
     }
     /**
@@ -52,4 +52,4 @@ namespace wrench {
         return payloadToString.at(messagePayload);
     }
 
-};// namespace wrench
+}// namespace wrench

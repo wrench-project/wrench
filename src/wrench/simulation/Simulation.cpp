@@ -13,16 +13,11 @@
 #include <simgrid/plugins/live_migration.h>
 
 #include <wrench/execution_controller/ExecutionController.h>
-#include <wrench/services/compute/cloud/CloudComputeService.h>
-#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/Service.h>
-#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/simulation/Simulation.h>
 #include "simgrid/plugins/energy.h"
-#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/services/memory/MemoryManager.h>
 #include <wrench/data_file/DataFile.h>
@@ -31,8 +26,6 @@
 #include <wrench/util/MessageManager.h>
 #endif
 
-#include <nlohmann/json.hpp>
-#include <fstream>
 #include <memory>
 #include <utility>
 
@@ -175,7 +168,7 @@ namespace wrench {
             } else if (not strcmp(argv[i], "--wrench-version")) {
                 version_requested = true;
             } else if (not strcmp(argv[i], "--wrench-pagecache-simulation")) {
-                this->pagecache_enabled = true;
+                Simulation::pagecache_enabled = true;
             } else {
                 cleanedup_args.emplace_back(argv[i]);
             }
@@ -245,7 +238,7 @@ namespace wrench {
 
         // If version requested, put back the "--version" argument
         if (version_requested) {
-            std::cout << "This program was linked against WRENCH version " << getWRENCHVersionString();
+            std::cout << "This program was linked against WRENCH version " << Simulation::getWRENCHVersionString();
 #ifdef ENABLE_BATSCHED
             std::cout << " (compiled with Batsched)";
 #endif
@@ -567,7 +560,7 @@ namespace wrench {
         try {
             // Start the execution controllers
             for (const auto &execution_controller: this->execution_controllers) {
-                execution_controller->start(execution_controller, false, false);// Not daemonized, no auto-restart
+                execution_controller->start(execution_controller, execution_controller->daemonized, false);// Not daemonized, no auto-restart
             }
 
             // Start the compute services
@@ -1039,8 +1032,8 @@ namespace wrench {
      * @param hostname - name of host being queried
      * @return boolean of existence
      */
-    bool Simulation::doesHostExist(std::string hostname) {
-        return S4U_Simulation::hostExists(std::move(hostname));
+    bool Simulation::doesHostExist(const std::string &hostname) {
+        return S4U_Simulation::hostExists(hostname);
     }
 
     /**
@@ -1623,7 +1616,8 @@ namespace wrench {
      * @return a simulation
      */
     std::shared_ptr<Simulation> Simulation::createSimulation() {
-        return std::shared_ptr<Simulation>(new Simulation);
+        LogicalFileSystem::mount_points.clear();
+        return std::shared_ptr<Simulation>(new Simulation());
     }
 
 }// namespace wrench

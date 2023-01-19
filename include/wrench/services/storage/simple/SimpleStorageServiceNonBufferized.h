@@ -127,7 +127,12 @@ namespace wrench {
                                double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox,
                                simgrid::s4u::Host *requesting_host);
 
-        bool processFileCopyRequest(
+        bool processFileCopyRequestIAmTheSource(
+                const std::shared_ptr<FileLocation> &src,
+                const std::shared_ptr<FileLocation> &dst,
+                simgrid::s4u::Mailbox *answer_mailbox);
+
+        bool processFileCopyRequestIAmNotTheSource(
                 const std::shared_ptr<FileLocation> &src,
                 const std::shared_ptr<FileLocation> &dst,
                 simgrid::s4u::Mailbox *answer_mailbox);
@@ -147,6 +152,6 @@ namespace wrench {
         std::shared_ptr<MemoryManager> memory_manager;
     };
 
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_SIMPLESTORAGESERVICENONBUFFERIZED_H

@@ -146,7 +146,7 @@ namespace wrench {
             COMPUTE_SERVICE_KILLED
         };
 
-        void terminateRunningAction(std::shared_ptr<Action> action, bool killed_due_to_job_cancelation);
+        void terminateRunningAction(std::shared_ptr<Action> action, bool killed_due_to_job_cancellation);
 
         void killAction(const std::shared_ptr<Action> &action, const std::shared_ptr<FailureCause> &cause);
 
@@ -174,7 +174,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_ACTION_SCHEDULER_H

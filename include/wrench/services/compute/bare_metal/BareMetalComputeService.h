@@ -120,7 +120,7 @@ namespace wrench {
     protected:
         friend class JobManager;
 
-        void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
+        void validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &job,
                                               std::map<std::string, std::string> &service_specific_args) override;
 
 
@@ -234,7 +234,7 @@ namespace wrench {
         /** \endcond           */
         /***********************/
     };
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_BAREMETALCOMPUTESERVICE_H

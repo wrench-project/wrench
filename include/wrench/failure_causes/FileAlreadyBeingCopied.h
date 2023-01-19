@@ -58,7 +58,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_FILE_ALREADY_BEING_COPIED_H
