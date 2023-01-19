@@ -44,6 +44,10 @@ namespace wrench {
 
 
         void deleteFile(const std::shared_ptr<StorageService>& targetServer, const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
+
+        virtual bool lookupFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file);
+
+        virtual void readFile(const std::shared_ptr<DataFile> &file);
         virtual void readFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file);
         virtual void readFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file, double num_bytes);
         virtual void readFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file, const std::string &path);
@@ -56,6 +60,7 @@ namespace wrench {
         void createFile(const std::shared_ptr<DataFile> &file, const std::string &path);//forward
         void createFile(const std::shared_ptr<DataFile> &file);//forward
 
+        const std::shared_ptr<StorageService> getCache();
 
 
         double getLoad() ;//cache
@@ -74,8 +79,8 @@ namespace wrench {
          * @param messagePayload: Message Payloads for the fileServiceProxy
          * @return the StorageServiceProxy created
          */
-        static std::shared_ptr<StorageServiceProxy> createRedirectProxy(const std::string &hostname, const std::shared_ptr<StorageService>& cache,WRENCH_PROPERTY_COLLECTION_TYPE properties={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload={}){
-            return std::make_shared<StorageServiceProxy>(hostname,cache,nullptr,properties,messagePayload);
+        static std::shared_ptr<StorageServiceProxy> createRedirectProxy(const std::string &hostname, const std::shared_ptr<StorageService>& cache, const std::shared_ptr<StorageService>& remote=nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload={}){
+            return std::make_shared<StorageServiceProxy>(hostname,cache,remote,properties,messagePayload);
         }
         /**
          * @brief Factory to create a StorageServiceProxy that does not cache reads, and does not have a default destination to forward too
