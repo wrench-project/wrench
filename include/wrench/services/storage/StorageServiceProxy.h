@@ -41,7 +41,7 @@ namespace wrench {
 	 * @param location: the file location
 	 * @return a (simulated) date in seconds
 	 */
-        virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location);//forward
+        double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location);//forward
 
 
 
@@ -51,7 +51,7 @@ namespace wrench {
 
         virtual bool lookupFile(const std::shared_ptr<StorageService>& targetServer, const std::shared_ptr<DataFile> &file);
 
-        virtual void readFile(const std::shared_ptr<DataFile> &file);
+        void readFile(const std::shared_ptr<DataFile> &file);
         virtual void readFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file);
         virtual void readFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file, double num_bytes);
         virtual void readFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file, const std::string &path);
