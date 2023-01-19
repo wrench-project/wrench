@@ -22,6 +22,10 @@ namespace wrench {
 
     public:
 
+        using StorageService::deleteFile;
+        using StorageService::lookupFile;
+        using StorageService::writeFile;
+        using StorageService::readFile;
 
         int main();
         bool processNextMessage();
@@ -43,9 +47,9 @@ namespace wrench {
 
 
 
-        void deleteFile(const std::shared_ptr<StorageService>& targetServer, const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
+        virtual void deleteFile(const std::shared_ptr<StorageService>& targetServer, const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
 
-        virtual bool lookupFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file);
+        virtual bool lookupFile(const std::shared_ptr<StorageService>& targetServer, const std::shared_ptr<DataFile> &file);
 
         virtual void readFile(const std::shared_ptr<DataFile> &file);
         virtual void readFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file);

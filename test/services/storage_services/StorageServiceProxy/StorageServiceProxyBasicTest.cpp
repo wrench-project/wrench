@@ -111,7 +111,9 @@ private:
        this->test->proxy->getCache()->createFile(file3);
 
        // locate file1 via proxy
-       if(testWithDefault) ((shared_ptr<StorageService>)this->test->proxy)->lookupFile(file1);
+//       if(testWithDefault) ((shared_ptr<StorageService>)this->test->proxy)->lookupFile(file1);
+       if(testWithDefault) this->test->proxy->lookupFile(file1);
+
        // Try to read file2 from remote although it is on target
        try {
            this->test->proxy->readFile(file2);
