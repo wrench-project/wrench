@@ -51,16 +51,15 @@ class TestController : public wrench::ExecutionController {
 
 public:
     TestController(std::string controller_name,
-               double sleep_time,
-               double *finish_time,
-               const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+                   double sleep_time,
+                   double *finish_time,
+                   const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->controller_name = controller_name;
         this->sleep_time = sleep_time;
         this->finish_time = finish_time;
     }
 
 private:
-
     int main() override {
         *(this->finish_time) = -1.0;
         wrench::Simulation::sleep(this->sleep_time);
@@ -83,10 +82,10 @@ void MultiControllerSimulationTest::do_multiControllerTest_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc=1;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
     simulation->instantiatePlatform(platform_file_path);
