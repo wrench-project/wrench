@@ -18,11 +18,11 @@
 #include <wrench/services/ServiceMessagePayload.h>
 #include <wrench/failure_causes/ServiceIsDown.h>
 #include <wrench/failure_causes/ServiceIsSuspended.h>
-#include <wrench/failure_causes/HostError.h>
-#include <wrench/failure_causes/NetworkError.h>
 #include <wrench/failure_causes/NotAllowed.h>
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 #include <wrench/util/UnitParser.h>
+
+#include <memory>
 
 WRENCH_LOG_CATEGORY(wrench_core_service, "Log category for Service");
 namespace std {
@@ -72,7 +72,7 @@ namespace wrench {
 
         if (value < 0) {
             throw std::invalid_argument(
-                    "Service::setMessagePayload(): Invalid message payload value " + std::to_string(messagepayload) + ": " +
+                    "Service::setMessagePayload(): Invalid message payload value " + ServiceMessagePayload::translatePayloadType(messagepayload) + ": " +
                     std::to_string(value));
         }
         this->messagepayload_list[messagepayload] = value;
@@ -88,7 +88,7 @@ namespace wrench {
     std::string Service::getPropertyValueAsString(WRENCH_PROPERTY_TYPE property) {
         if (this->property_list.find(property) == this->property_list.end()) {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsString(): Cannot find value for property " + std::to_string(property) +
+                    "Service::getPropertyValueAsString(): Cannot find value for property " + ServiceProperty::translatePropertyType(property) +
                     " (perhaps a derived service class does not provide a default value?)");
         }
         return this->property_list[property];
@@ -117,7 +117,7 @@ namespace wrench {
         }
         if (sscanf(string_value.c_str(), "%lf", &value) != 1) {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsDouble(): Invalid double property value " + std::to_string(property) + " " +
+                    "Service::getPropertyValueAsDouble(): Invalid double property value " + ServiceProperty::translatePropertyType(property) + " " +
                     this->getPropertyValueAsString(property));
         }
         return value;
@@ -131,7 +131,6 @@ namespace wrench {
      */
     double Service::getPropertyValueWithUnitsAsValue(WRENCH_PROPERTY_TYPE property,
                                                      const std::function<double(std::string &s)> &unit_parsing_function) {
-        double value;
         std::string string_value;
         try {
             string_value = this->getPropertyValueAsString(property);
@@ -250,7 +249,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     bool Service::getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE property) {
-        bool value;
         std::string string_value;
         try {
             string_value = this->getPropertyValueAsString(property);
@@ -263,7 +261,7 @@ namespace wrench {
             return false;
         } else {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsBoolean(): Invalid boolean property value " + std::to_string(property) + " " +
+                    "Service::getPropertyValueAsBoolean(): Invalid boolean property value " + ServiceProperty::translatePropertyType(property) + " " +
                     this->getPropertyValueAsString(property));
         }
     }
@@ -277,7 +275,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::shared_ptr<HostError>
      */
-    void Service::start(std::shared_ptr<Service> this_service, bool daemonize, bool auto_restart) {
+    void Service::start(const std::shared_ptr<Service> &this_service, bool daemonize, bool auto_restart) {
         try {
             // Setting the state to UP
             this->state = Service::UP;
@@ -342,7 +340,7 @@ namespace wrench {
             throw;
         }
 
-        if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
+        if (dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
             this->state = Service::DOWN;
         } else {
             throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
@@ -375,8 +373,8 @@ namespace wrench {
     void Service::resume() {
         if (this->state != Service::SUSPENDED) {
             std::string what = "Service cannot be resumed because it is not in the suspended state";
-            throw ExecutionException(std::shared_ptr<NotAllowed>(
-                    new NotAllowed(this->getSharedPtr<Service>(), what)));
+            throw ExecutionException(std::make_shared<NotAllowed>(
+                    this->getSharedPtr<Service>(), what));
         }
         this->resumeActor();
         this->state = Service::UP;
@@ -420,17 +418,17 @@ namespace wrench {
     /**
      * @brief Set default and user-defined properties
      * @param default_property_values: list of default properties
-     * @param overridden_poperty_values: list of overridden properties (override the default)
+     * @param overridden_property_values: list of overridden properties (override the default)
      */
     void Service::setProperties(WRENCH_PROPERTY_COLLECTION_TYPE default_property_values,
-                                WRENCH_PROPERTY_COLLECTION_TYPE overridden_poperty_values) {
+                                WRENCH_PROPERTY_COLLECTION_TYPE overridden_property_values) {
         // Set default properties
         for (auto const &p: default_property_values) {
             this->setProperty(p.first, p.second);
         }
 
         // Set specified properties (possible overwriting default ones)
-        for (auto const &p: overridden_poperty_values) {
+        for (auto const &p: overridden_property_values) {
             this->setProperty(p.first, p.second);
         }
     }
@@ -493,4 +491,4 @@ namespace wrench {
                     std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr<Service>())));
         }
     }
-};// namespace wrench
+}// namespace wrench

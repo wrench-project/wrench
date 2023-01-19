@@ -111,7 +111,7 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::LOCATION(): Storage Service has multiple mount points. "
                                         "Call the version of this method that takes a mount point argument");
         }
-        return LOCATION(ss, *(ss->getMountPoints().begin()), file);
+        return LOCATION(ss, ss->getMountPoint(), file);
     }
 
     /**
@@ -162,7 +162,7 @@ namespace wrench {
         if (absolute_path.empty()) {
             throw std::invalid_argument("FileLocation::LOCATION(): must specify a non-empty path");
         }
-        absolute_path = FileLocation::sanitizePath(absolute_path);
+        absolute_path = FileLocation::sanitizePath(absolute_path + "/");
 
         std::string mount_point = "";
         for (auto const &mp: ss->getMountPoints()) {
@@ -295,9 +295,9 @@ namespace wrench {
         return to_return;
 #else
         // Cannot have certain substring (why not)
-        //        std::string unallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
-        char unallowed_characters[] = {'\\', ' ', '~', '`', '\'', '&', '*', '?'};
-        for (auto const &c: unallowed_characters) {
+        //        std::string disallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
+        char disallowed_characters[] = {'\\', ' ', '~', '`', '\'', '&', '*', '?'};
+        for (auto const &c: disallowed_characters) {
             if (path.find(c) != std::string::npos) {
                 throw std::invalid_argument("FileLocation::sanitizePath(): Disallowed character '" + std::to_string(c) + "' in path (" + path + ")");
             }

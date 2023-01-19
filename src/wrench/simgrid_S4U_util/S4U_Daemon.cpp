@@ -377,4 +377,4 @@ namespace wrench {
         return S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()];
     }
 
-};// namespace wrench
+}// namespace wrench

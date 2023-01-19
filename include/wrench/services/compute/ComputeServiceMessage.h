@@ -225,42 +225,6 @@ namespace wrench {
         std::shared_ptr<FailureCause> failure_cause;
     };
 
-    //    /**
-    //     * @brief A message sent to a ComputeService to submit a PilotJob for execution
-    //     */
-    //    class ComputeServiceSubmitPilotJobRequestMessage : public ComputeServiceMessage {
-    //    public:
-    //        ComputeServiceSubmitPilotJobRequestMessage(std::string answer_mailbox, std::shared_ptr<PilotJob> ,
-    //                                                   const std::map<std::string, std::string> service_specific_args,
-    //                                                   double payload);
-    //
-    //        /** @brief The mailbox to which the answer message should be sent */
-    //        std::string answer_mailbox;
-    //        /** @brief The submitted pilot job */
-    //        std::shared_ptr<PilotJob> job;
-    //        /** @brief Service specific arguments */
-    //        std::map<std::string, std::string> service_specific_args;
-    //    };
-    //
-    //    /**
-    //    * @brief A message sent by a ComputeService in answer to a PilotJob submission request
-    //    */
-    //    class ComputeServiceSubmitPilotJobAnswerMessage : public ComputeServiceMessage {
-    //    public:
-    //        ComputeServiceSubmitPilotJobAnswerMessage(std::shared_ptr<PilotJob> , std::shared_ptr<ComputeService>, bool success,
-    //                                                  std::shared_ptr<FailureCause> cause,
-    //                                                  double payload);
-    //
-    //        /** @brief The submitted pilot job */
-    //        std::shared_ptr<PilotJob> job;
-    //        /** @brief The compute service to which the job was submitted */
-    //        std::shared_ptr<ComputeService> compute_service;
-    //        /** @brief Whether the job submission was successful or not */
-    //        bool success;
-    //        /** @brief The cause of the failure, or nullptr on success */
-    //        std::shared_ptr<FailureCause> failure_cause;
-    //    };
-
 
     /**
      * @brief A message sent by a ComputeService when a PilotJob has started its execution
@@ -286,56 +250,6 @@ namespace wrench {
         std::shared_ptr<PilotJob> job;
         /** @brief The compute service on which the pilot job has expired */
         std::shared_ptr<ComputeService> compute_service;
-    };
-
-    //    /**
-    //     * @brief A message sent by a ComputeService when a PilotJob has failed
-    //     */
-    //    class ComputeServicePilotJobFailedMessage : public ComputeServiceMessage {
-    //    public:
-    //        ComputeServicePilotJobFailedMessage(std::shared_ptr<PilotJob>,
-    //                                            std::shared_ptr<ComputeService>,
-    //                                            std::shared_ptr<FailureCause> cause,
-    //                                            double payload);
-    //
-    //        /** @brief The pilot job that has failed */
-    //        std::shared_ptr<PilotJob> job;
-    //        /** @brief The compute service on which the pilot job failed */
-    //        std::shared_ptr<ComputeService> compute_service;
-    //        /** @brief The failure cause */
-    //        std::shared_ptr<FailureCause> cause;
-    //    };
-
-    /**
-    * @brief A message sent to a ComputeService to terminate a PilotJob previously submitted for execution
-    */
-    class ComputeServiceTerminatePilotJobRequestMessage : public ComputeServiceMessage {
-    public:
-        ComputeServiceTerminatePilotJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<PilotJob>, double payload);
-
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
-        /** @brief The job to terminate*/
-        std::shared_ptr<PilotJob> job;
-    };
-
-    /**
-     * @brief A message sent by a ComputeService in answer to a PilotJob termination request
-     */
-    class ComputeServiceTerminatePilotJobAnswerMessage : public ComputeServiceMessage {
-    public:
-        ComputeServiceTerminatePilotJobAnswerMessage(std::shared_ptr<PilotJob>, std::shared_ptr<ComputeService> compute_service,
-                                                     bool success,
-                                                     std::shared_ptr<FailureCause> failure_cause, double payload);
-
-        /** @brief The job to terminate */
-        std::shared_ptr<PilotJob> job;
-        /** @brief The compute service to which the job had been submitted */
-        std::shared_ptr<ComputeService> compute_service;
-        /** @brief Whether to job termination was successful */
-        bool success;
-        /** @brief The cause of the failure, or nullptr on success */
-        std::shared_ptr<FailureCause> failure_cause;
     };
 
 
@@ -396,6 +310,6 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_COMPUTESERVICEMESSAGE_H

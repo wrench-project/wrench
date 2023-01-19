@@ -162,7 +162,7 @@ namespace wrench {
      * @param event: the event
      */
     void GreedyExecutionController::processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent> event) {
-        WRENCH_INFO("Job %s completed sucessfully!", event->job->getName().c_str());
+        WRENCH_INFO("Job %s completed successfully!", event->job->getName().c_str());
     }
 
 
