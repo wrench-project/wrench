@@ -89,70 +89,81 @@ public:
 private:
     StorageServiceProxyBasicTest *test;
     bool testWithDefault;
-   int main() override {
-       using namespace wrench;
-       WRENCH_INFO("Adding a file files to the simulation");
-       auto file1 = wrench::Simulation::addFile("file1", 10000);
-       auto file2 = wrench::Simulation::addFile("file2", 10000);
-       auto file3 = wrench::Simulation::addFile("file3", 10000);
+    int main() override {
+        using namespace wrench;
+        WRENCH_INFO("Adding a file files to the simulation");
+        auto file1 = wrench::Simulation::addFile("file1", 10000);
+        auto file2 = wrench::Simulation::addFile("file2", 10000);
+        auto file3 = wrench::Simulation::addFile("file3", 10000);
 
-       try {
-           this->test->proxy->createFile(file1);
-           throw std::runtime_error("Should not be able to create a file on a proxy directly");
-       } catch (std::runtime_error &ignore) {}
+        try {
+            this->test->proxy->createFile(file1);
+            throw std::runtime_error("Should not be able to create a file on a proxy directly");
+        } catch (std::runtime_error &ignore) {}
 
-       // Create a copy file1 on remote
-       this->test->remote->createFile(file1);
-       // Create a copy file1 on target
-       this->test->target->createFile(file2);
+        // Create a copy file1 on remote
+        this->test->remote->createFile(file1);
+        // Create a copy file1 on target
+        this->test->target->createFile(file2);
 
-       // Create a copy file3 on remote and in cache
-       this->test->remote->createFile(file3);
-       this->test->proxy->getCache()->createFile(file3);
+        // Create a copy file3 on remote and in cache
+        this->test->remote->createFile(file3);
+        this->test->proxy->getCache()->createFile(file3);
 
-       // locate file1 via proxy
-//       if(testWithDefault) ((shared_ptr<StorageService>)this->test->proxy)->lookupFile(file1);
-       if(testWithDefault) this->test->proxy->lookupFile(file1);
+        // locate file1 via proxy
+        //       if(testWithDefault) ((shared_ptr<StorageService>)this->test->proxy)->lookupFile(file1);
+        if(testWithDefault){
+            if(!this->test->proxy->lookupFile(file1)){
+                throw std::runtime_error("Failed to find file that exists on remote");
+            }
+        }
 
-       // Try to read file2 from remote although it is on target
-       try {
-           this->test->proxy->readFile(file2);
-           throw std::runtime_error("Non extant files should throw exceptions when not found");
-       } catch (wrench::ExecutionException &ignore) {
-           if (not std::dynamic_pointer_cast<wrench::FileNotFound>(ignore.getCause())) {
-               throw std::runtime_error("Should have received a FileNotFound execution when reading file2 from supervisor");
-           }
+        // Try to lookup file2 from remote although it is on target
+
+        if(this->test->proxy->lookupFile(test->remote,file2)){
+            throw std::runtime_error("Found file that does not exist");
+        }
+
+        // locate file2 via proxy and target
+        if(!this->test->proxy->lookupFile(this->test->target,file2)){
+            throw std::runtime_error("Failed to find file that exists on target");
+        }
+
+        //TODO insert timing checks
+
+        // Read file1 via proxy
+        if(testWithDefault){
+            this->test->proxy->readFile(file1);
+            //read file again to check cache
+            this->test->proxy->readFile(file1);
+        }
+
+        // Try to read file2 from remote although it is on target
+        try {
+            this->test->proxy->readFile(test->remote,file2);
+            throw std::runtime_error("Non extant files should throw exceptions when not found");
+        }  catch (std::runtime_error &rethrow){
+            throw rethrow;
+        }catch (wrench::ExecutionException &ignore) {
+            ignore.what();
+            cerr<<ignore.getCause()->toString()<<endl;
+            if (not std::dynamic_pointer_cast<wrench::FileNotFound>(ignore.getCause())) {
+                throw std::runtime_error("Should have received a FileNotFound execution when reading file2 from remote");
+            }
+        }
+        // read file2 via proxy and target
+        this->test->proxy->readFile(this->test->target,file2);
+        // read file2 via proxy and target
+        this->test->proxy->readFile(this->test->target,file2);
+
+        //write file tests
+        //if(testWithDefault)
+        //delete file tests
+        //if(testWithDefault)
+        return 0;
+
+
        }
-       // locate file2 via proxy and target
-       this->test->proxy->lookupFile(this->test->remote,file1);
-
-
-       //TODO insert timing checks
-
-       // Read file1 via proxy
-       if(testWithDefault) this->test->proxy->readFile(file1);
-       //read file again to check cache
-       this->test->proxy->readFile(file1);
-
-       // Try to read file2 from remote although it is on target
-       try {
-           this->test->proxy->readFile(file2);
-           throw std::runtime_error("Non extant files should throw exceptions when not found");
-       } catch (wrench::ExecutionException &ignore) {
-           if (not std::dynamic_pointer_cast<wrench::FileNotFound>(ignore.getCause())) {
-               throw std::runtime_error("Should have received a FileNotFound execution when reading file2 from supervisor");
-           }
-       }
-       // read file2 via proxy and target
-       this->test->proxy->readFile(this->test->remote,file1);
-
-       //write file tests
-       //if(testWithDefault)
-       //delete file tests
-       //if(testWithDefault)
-       return 0;
-
-   }
 };
 
 TEST_F(StorageServiceProxyBasicTest, BasicFunctionalityNoDefaultLocation) {
@@ -160,20 +171,21 @@ TEST_F(StorageServiceProxyBasicTest, BasicFunctionalityNoDefaultLocation) {
 }
 TEST_F(StorageServiceProxyBasicTest, BasicFunctionalityDefaultLocation) {
    DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test, true);
+   //do_BasicFunctionality_test(true);
 }
 
 void StorageServiceProxyBasicTest::do_BasicFunctionality_test(bool arg) {
 
    // Create and initialize a simulation
    auto simulation = wrench::Simulation::createSimulation();
-   int argc = 1;
+   int argc = 3;
    char **argv = (char **) calloc(argc, sizeof(char *));
    argv[0] = strdup("unit_test");
-   //    argv[1] = strdup("--wrench-full-log");
+   argv[1] = strdup("--wrench-full-log");
+   argv[2] = strdup("--log=wrench_core_mailbox.threshold=debug");
 
    simulation->init(&argc, argv);
 
-   // Setting up the platform
    simulation->instantiatePlatform(platform_file_path);
 
    // Create a XRootD Manager object
@@ -195,15 +207,17 @@ void StorageServiceProxyBasicTest::do_BasicFunctionality_test(bool arg) {
    }else{
        this->proxy = simulation->add(
                wrench::StorageServiceProxy::createRedirectProxy(
-                       "Proxy", cache,target
+                       "Proxy", cache,remote
                        )
        );
 
    }
+
    // Create an execution controller
    auto controller = simulation->add(new StorageServiceProxyBasicTestExecutionController(this, "Client",arg));
 
    // Running a "run a single task1" simulation
+
    ASSERT_NO_THROW(simulation->launch());
 
    for (int i = 0; i < argc; i++)
