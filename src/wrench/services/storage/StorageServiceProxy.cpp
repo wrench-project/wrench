@@ -109,7 +109,9 @@ namespace wrench{
             if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
                 target=location->target;
             }
+            // TODO its not caching...
             if(StorageService::lookupFile(FileLocation::LOCATION(cache, msg->location->getFile()))) {//check cache
+                WRENCH_INFO("Forwarding to cache reply mailbox %s",msg->answer_mailbox->get_name().c_str());
                 S4U_Mailbox::putMessage(
                         cache->mailbox,
                         new StorageServiceFileReadRequestMessage(msg->answer_mailbox,msg->requesting_host,msg->mailbox_to_receive_the_file_content,FileLocation::LOCATION(cache,msg->location->getMountPoint(),msg->location->getFile()),msg->num_bytes_to_read,0)
@@ -261,25 +263,37 @@ namespace wrench{
         if(remote){
             return remote->getMountPoint();
         }
-        throw std::invalid_argument("No Remote Fileserver supplied and no fallback default to use");
+        if(cache){
+            return cache->getMountPoint();
+        }
+        return "/";
     }
     std::set<std::string> StorageServiceProxy::getMountPoints(){
         if(remote){
             return remote->getMountPoints();
         }
-        throw std::invalid_argument("No Remote Fileserver supplied and no fallback default to use");
+        if(cache){
+            return cache->getMountPoints();
+        }
+        return {};
     }
     bool StorageServiceProxy::hasMultipleMountPoints(){
         if(remote){
             return remote->hasMultipleMountPoints();
         }
-        throw std::invalid_argument("No Remote Fileserver supplied and no fallback default to use");
+        if(cache){
+            return cache->hasMultipleMountPoints();
+        }
+        return false;
     }
     bool StorageServiceProxy::hasMountPoint(const std::string &mp){
         if(remote){
             return remote->hasMountPoint(mp);
         }
-        throw std::invalid_argument("No Remote Fileserver supplied and no fallback default to use");
+        if(cache){
+            return cache->hasMountPoint(mp);
+        }
+        return false;
     }
 
 
@@ -292,19 +306,22 @@ namespace wrench{
         if(remote){
             return remote->getFileLastWriteDate(location);
         }
-        throw std::invalid_argument("No Remote Fileserver supplied and no fallback default to use");
+        if(cache){
+            return cache->getFileLastWriteDate(location);
+        }
+        return simulation->getCurrentSimulatedDate();//TODO HENRI that or 0, im not sure
     }
 
 
 
     void StorageServiceProxy::createFile(const std::shared_ptr<FileLocation> &location){
-        throw std::invalid_argument("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
+        throw std::runtime_error("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
     }
     void StorageServiceProxy::createFile(const std::shared_ptr<DataFile> &file, const std::string &path){
-        throw std::invalid_argument("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
+        throw std::runtime_error("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
     }
     void StorageServiceProxy::createFile(const std::shared_ptr<DataFile> &file){
-        throw std::invalid_argument("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
+        throw std::runtime_error("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
     }
 
     double StorageServiceProxy::getLoad() {
@@ -320,11 +337,21 @@ namespace wrench{
     /** \cond INTERNAL    **/
 
 
-    StorageServiceProxy::StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService>& cache,const std::shared_ptr<StorageService>& defaultRemote,WRENCH_PROPERTY_COLLECTION_TYPE properties,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload): StorageService(hostname,  "storage_proxy" ),cache(cache),remote(defaultRemote) {
+    StorageServiceProxy::StorageServiceProxy(const std::string &hostname,
+                                             const std::shared_ptr<StorageService>& cache,
+                                             const std::shared_ptr<StorageService>& defaultRemote,
+                                             WRENCH_PROPERTY_COLLECTION_TYPE properties,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload
+                                             ):
+                                                 StorageService(hostname,
+                                                                "storage_proxy"
+                                                                ),
+                                                 cache(cache),
+                                                 remote(defaultRemote) {
 
         this->setProperties(this->default_property_values, std::move(property_list));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
         this->setProperty(StorageServiceProperty::BUFFER_SIZE,cache->getPropertyValueAsString(StorageServiceProperty::BUFFER_SIZE));//the internal cache has the same buffer properties as this service.
+
     }
     void StorageServiceProxy::deleteFile(const std::shared_ptr<StorageService>& targetServer, const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service){
         StorageService::deleteFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()), file),file_registry_service);
