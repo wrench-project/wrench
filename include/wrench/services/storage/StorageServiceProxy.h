@@ -11,6 +11,7 @@
 #define WRENCH_STORAGESERVICEPROXY_H
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/storage/StorageServiceMessage.h"
+#include "wrench/services/storage/StorageServiceMessagePayload.h"
 #include "StorageServiceProxyProperty.h"
 
 namespace wrench {
@@ -83,7 +84,10 @@ namespace wrench {
          * @param messagePayload: Message Payloads for the fileServiceProxy
          * @return the StorageServiceProxy created
          */
-        static std::shared_ptr<StorageServiceProxy> createRedirectProxy(const std::string &hostname, const std::shared_ptr<StorageService>& cache, const std::shared_ptr<StorageService>& remote=nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload={}){
+        static std::shared_ptr<StorageServiceProxy> createRedirectProxy(
+                const std::string &hostname,
+                const std::shared_ptr<StorageService> &cache,
+                const std::shared_ptr<StorageService> &remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload = {}) {
             return std::make_shared<StorageServiceProxy>(hostname,cache,remote,properties,messagePayload);
         }
         /**
@@ -120,8 +124,32 @@ namespace wrench {
         std::shared_ptr<StorageService> remote;
 
     private:
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {};
-        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {{StorageServiceProxyProperty::MESSAGE_OVERHEAD,0}};
+
+        /** @brief Default property values */
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
+                {StorageServiceProperty::BUFFER_SIZE, "10000000"},// 10 MEGA BYTE
+                {StorageServiceProperty::CACHING_BEHAVIOR, "NONE"},
+                {StorageServiceProxyProperty::MESSAGE_OVERHEAD,"0"}
+        };
+
+
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+                {ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
+                {ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
+                {StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {StorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {StorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {StorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 1024},
+
+        };
     };
 
     class ProxyLocation : public FileLocation{
