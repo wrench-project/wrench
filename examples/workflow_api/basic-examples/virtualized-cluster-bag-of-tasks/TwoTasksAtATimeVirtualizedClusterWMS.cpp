@@ -64,14 +64,14 @@ namespace wrench {
 
         /* Create a VM instance with 5 cores and one with 2 cores (and 500M of RAM) */
         WRENCH_INFO("Creating a 'large' VM with 5 cores  and a 'small' VM with 2 cores, both of them with 5GB RAM");
-        auto large_vm = virtualized_cluster_compute_service->createVM(5, 5 * GB);
-        auto small_vm = virtualized_cluster_compute_service->createVM(2, 5 * GB);
+        auto large_vm = virtualized_cluster_compute_service->createVM(5, 5 * GB, "VirtualizedClusterHost1");
+        auto small_vm = virtualized_cluster_compute_service->createVM(2, 5 * GB, "VirtualizedClusterHost2");
 
         /* Start the VMs */
         WRENCH_INFO("Start the large VM on host VirtualizedClusterHost1");
-        auto large_vm_compute_service = virtualized_cluster_compute_service->startVM(large_vm, "VirtualizedClusterHost1");
+        auto large_vm_compute_service = virtualized_cluster_compute_service->startVM(large_vm);
         WRENCH_INFO("Start the small VM on host VirtualizedClusterHost2");
-        auto small_vm_compute_service = virtualized_cluster_compute_service->startVM(small_vm, "VirtualizedClusterHost2");
+        auto small_vm_compute_service = virtualized_cluster_compute_service->startVM(small_vm);
 
         /* While the workflow isn't done, repeat the main loop */
         while (not this->workflow->isDone()) {
