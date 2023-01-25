@@ -149,6 +149,12 @@ namespace wrench {
             this->waitForAndProcessNextEvent();
         }
 
+        // Shutting down and destroying VMs
+        virtualized_cluster_compute_service->shutdownVM(large_vm);
+        virtualized_cluster_compute_service->destroyVM(large_vm);
+        virtualized_cluster_compute_service->shutdownVM(small_vm);
+        virtualized_cluster_compute_service->destroyVM(small_vm);
+
         WRENCH_INFO("Workflow execution complete");
         return 0;
     }

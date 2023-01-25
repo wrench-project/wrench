@@ -63,7 +63,7 @@ Here is an example interaction with a :cpp:class:`wrench::CloudComputeService`:
    some_cloud_cs->shutdownVM(vm1_name);
    some_cloud_cs->shutdownVM(vm2_name);
 
-   // Destroy both VMs
+   // Destroy both VMs, which releases resources
    some_cloud_cs->destroyVM(vm1_name);
    some_cloud_cs->destroyVM(vm2_name);
 

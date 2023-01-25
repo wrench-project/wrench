@@ -222,6 +222,10 @@ namespace wrench {
             processShutdownVM(msg->answer_mailbox, msg->vm_name, msg->send_failure_notifications, msg->termination_cause);
             return true;
 
+        } else if (auto msg = dynamic_cast<CloudComputeServiceDestroyVMRequestMessage *>(message.get())) {
+            processDestroyVM(msg->answer_mailbox, msg->vm_name);
+            return true;
+
         } else if (auto msg = dynamic_cast<CloudComputeServiceStartVMRequestMessage *>(message.get())) {
             processStartVM(msg->answer_mailbox, msg->vm_name);
             return true;
