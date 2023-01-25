@@ -84,10 +84,11 @@ namespace wrench{
             return false;
         }else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
             auto target=remote;
+
             if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
                 target=location->target;
             }
-
+            //cerr<<"FILE LOOKUP!!!! "<<remote<<" "<<target<<endl;
             if(StorageService::lookupFile(FileLocation::LOCATION(cache, msg->location->getFile()))) {//forward request to cache
                 S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileLookupAnswerMessage(msg->location->getFile(),true,StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
 
@@ -194,17 +195,27 @@ namespace wrench{
 //            }
 //            throw std::runtime_error( "StorageServiceProxy:processNextMessage(): Unexpected [" + message->getName() + "] message that either could not be forwared");
         }else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {//Our remote read request has finished
+
             std::vector<unique_ptr<SimulationMessage>>& messages=pending[msg->src->getFile()];
             for(unsigned int i=0;i<messages.size();i++){
                 if(auto tmpMsg= dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())){
-                    S4U_Mailbox::putMessage(mailbox,tmpMsg);//now that the data is cached, resend the message
-                    std::swap(messages[i],messages.back());
-                    messages.back().release();
-                    messages.pop_back();
-                    i--;
+                    if(msg->success){
+                        S4U_Mailbox::putMessage(mailbox,tmpMsg);//now that the data is cached, resend the message
+                        std::swap(messages[i],messages.back());
+                        messages.back().release();
+                        messages.pop_back();
+                        i--;
+                    }else{
+                        S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,false,msg->failure_cause,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                        std::swap(messages[i],messages.back());
+                        messages.pop_back();
+                        i--;
+
+                    }
                 }
 
             }
+
         }else if (auto msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {//Our remote lookup has finished
             std::vector<unique_ptr<SimulationMessage>>& messages=pending[msg->file];
             for(unsigned int i=0;i<messages.size();i++){
@@ -243,6 +254,8 @@ namespace wrench{
                     initiateFileCopy(recv_mailbox,FileLocation::LOCATION(cache,msg->location->getFile()),FileLocation::LOCATION(target,msg->location->getFile()));
                     S4U_Mailbox::igetMessage(recv_mailbox);//there will be a message on this mailbox, but we dont actually care
                     //TODO this is horrible hacky and might leak memory like a sieve
+
+
                     std::swap(messages[i],messages.back());
                     messages.pop_back();
                     i--;
