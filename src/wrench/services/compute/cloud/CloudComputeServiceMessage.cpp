@@ -59,7 +59,7 @@ namespace wrench {
      *                   available on the host)
      * @param ram_memory: the VM's RAM memory_manager_service capacity (use ComputeService::ALL_RAM to use all RAM available on the
      *                    host, this can be lead to an out of memory_manager_service issue)
-     * @param desired_vm_name: the desired VM name ("" means "pick a name for me")
+     * @param physical_host: the physical execution host ("" means "pick a name for me")
      * @param property_list: a property list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      * @param messagepayload_list: a message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      * @param payload: the message size in bytes
@@ -70,7 +70,7 @@ namespace wrench {
             simgrid::s4u::Mailbox *answer_mailbox,
             unsigned long num_cores,
             double ram_memory,
-            std::string desired_vm_name,
+            const std::string &physical_host,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             double payload) : CloudComputeServiceMessage(payload) {
@@ -84,7 +84,7 @@ namespace wrench {
         this->answer_mailbox = answer_mailbox;
         this->num_cores = num_cores;
         this->ram_memory = ram_memory;
-        this->desired_vm_name = desired_vm_name;
+        this->physical_host = physical_host;
         this->property_list = std::move(property_list);
         this->messagepayload_list = std::move(messagepayload_list);
     }
@@ -148,15 +148,13 @@ namespace wrench {
      *
      * @param answer_mailbox: the mailbox to which to send the answer
      * @param vm_name: the name of the VM host
-     * @param pm_name: the name of the physical host on which to start the VM (or "" if up to the service)
-     * @param payload: the message size in bytes
+     * @param payload: githe message size in bytes
      *
      * @throw std::invalid_argument
      */
     CloudComputeServiceStartVMRequestMessage::CloudComputeServiceStartVMRequestMessage(
             simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &vm_name,
-            const std::string &pm_name,
             double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || vm_name.empty()) {
@@ -166,7 +164,6 @@ namespace wrench {
 #endif
         this->answer_mailbox = answer_mailbox;
         this->vm_name = vm_name;
-        this->pm_name = pm_name;
     }
 
     /**
