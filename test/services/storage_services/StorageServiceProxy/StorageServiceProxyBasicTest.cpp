@@ -178,11 +178,11 @@ void StorageServiceProxyBasicTest::do_BasicFunctionality_test(bool arg) {
 
    // Create and initialize a simulation
    auto simulation = wrench::Simulation::createSimulation();
-   int argc = 3;
+   int argc = 2;
    char **argv = (char **) calloc(argc, sizeof(char *));
    argv[0] = strdup("unit_test");
    argv[1] = strdup("--wrench-full-log");
-   argv[2] = strdup("--log=wrench_core_mailbox.threshold=debug");
+   //argv[2] = strdup("--log=wrench_core_mailbox.threshold=debug");
 
    simulation->init(&argc, argv);
 
@@ -201,13 +201,13 @@ void StorageServiceProxyBasicTest::do_BasicFunctionality_test(bool arg) {
    if(arg){
        this->proxy = simulation->add(
                wrench::StorageServiceProxy::createRedirectProxy(
-                       "Proxy", cache
+                       "Proxy", cache,remote
                )
        );
    }else{
        this->proxy = simulation->add(
                wrench::StorageServiceProxy::createRedirectProxy(
-                       "Proxy", cache,remote
+                       "Proxy", cache
                        )
        );
 
