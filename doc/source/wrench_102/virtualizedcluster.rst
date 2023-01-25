@@ -50,7 +50,7 @@ which VM instances are created and (live) migrated:
    virtualized_cluster_cs->shutdownVM(vm1_name);
    virtualized_cluster_cs->shutdownVM(vm2_name);
 
-   // Destroy the VMs
+   // Destroy the VMs, which releases resources
    virtualized_cluster_cs->destroyVM(vm1_name);
    virtualized_cluster_cs->destroyVM(vm2_name);
 
