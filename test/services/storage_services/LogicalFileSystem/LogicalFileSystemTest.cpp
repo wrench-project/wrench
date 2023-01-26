@@ -110,8 +110,8 @@ void LogicalFileSystemTest::do_BasicTests() {
     fs1->removeFileFromDirectory(file_80, "/files/");
     ASSERT_DOUBLE_EQ(100, fs1->getFreeSpace());
 
-    fs1->removeAllFilesInDirectory("/files/");// coverage
     fs1->storeFileInDirectory(file_50, "/faa", true);
+    fs1->removeAllFilesInDirectory("/faa/");// coverage
 
 
     workflow->clear();
@@ -270,6 +270,9 @@ void LogicalFileSystemTest::do_LRUTests() {
     fs1->removeFileFromDirectory(file_10, "/foo");   // coverage
     fs1->storeFileInDirectory(file_10, "/foo", true);// coverage
     fs1->removeAllFilesInDirectory("/foo");          // coverage
+
+    fs1->storeFileInDirectory(file_10, "/faa", true);// coverage
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
