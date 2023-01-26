@@ -276,4 +276,13 @@ namespace wrench {
     void ExecutionController::processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent> event) {
         WRENCH_INFO("In default event-handler: Notified that a standard job has failed (all its tasks are back in the ready state)");
     }
+
+    /**
+     * @brief Make the execution controller daemonized, meaning that the simulation can terminate without
+     *
+     */
+    void ExecutionController::setDaemonized(bool daemonized) {
+        this->daemonized = daemonized;
+    }
+
 }// namespace wrench

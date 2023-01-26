@@ -41,11 +41,11 @@ service to lookup an entry is configured to be 1KiB:
 .. code:: cpp
 
    auto np_service = simulation->add(
-             new wrench::NetworkProximityService("Networkcentral", 
-                                          {"Host1", "Host2", "Host3", "Host4"},
-                                          {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "60"},
-                                           {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"}},
-                                          {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, "1024"}});
+         new wrench::NetworkProximityService("Networkcentral",
+                                             {"Host1", "Host2", "Host3", "Host4"},
+                                             {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "60"},
+                                              {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"}},
+                                             {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024}}));
 
 See the documentation of :cpp:class:`wrench::NetworkProximityServiceProperty` and
 :cpp:class:`wrench::NetworkProximityServiceMessagePayload` for all possible
