@@ -30,8 +30,9 @@ namespace wrench {
 
         int main();
         bool processNextMessage();
-        //std::map<std::string, double> getTotalSpace();
-                //TODO HENRI I dont know the best way to forward this function
+        std::map<std::string, double> getTotalSpace();
+        std::map<std::string, double> getFreeSpace();
+
         std::string getMountPoint();//simple forward
         std::set<std::string> getMountPoints();//simple forward
         bool hasMultipleMountPoints();//simple forward
