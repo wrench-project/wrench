@@ -186,7 +186,20 @@ namespace wrench {
         }
         return links.at(0)->get_bandwidth();
     }
-
+    /**
+     * @brief Set a link's new bandwidth
+     * @param name: the link's name
+     * @param bandwidth: the new bandwidth
+     *
+     */
+    void S4U_Simulation::setLinkBandwidth(const std::string &name, double bandwidth) {
+        auto links = simgrid::s4u::Engine::get_instance()->get_filtered_links(
+                [name](simgrid::s4u::Link *l) { return (l->get_name() == name); });
+        if (links.empty()) {
+            throw std::invalid_argument("S4U_Simulation::setLinkBandwidth(): unknown link " + name);
+        }
+        links.at(0)->set_bandwidth(bandwidth);
+    }
     /**
      * @brief Get a link's bandwidth usage
      * @param name: the link's name

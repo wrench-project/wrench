@@ -55,6 +55,12 @@ namespace wrench{
 
         return 0;
     }
+    std::map<std::string, double> StorageServiceProxy::getTotalSpace(){
+        if(remote){
+            return remote->getTotalSpace();
+        }
+        throw runtime_error("Proxy with no default location does not support getTotalSpace()");
+    }
     bool StorageServiceProxy::processNextMessage() {
         //S4U_Simulation::compute(flops);
         S4U_Simulation::computeZeroFlop();
@@ -90,6 +96,7 @@ namespace wrench{
             }
             //cerr<<"FILE LOOKUP!!!! "<<remote<<" "<<target<<endl;
             if(StorageService::lookupFile(FileLocation::LOCATION(cache, msg->location->getFile()))) {//forward request to cache
+                //cerr<<"File cached"<<endl;
                 S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileLookupAnswerMessage(msg->location->getFile(),true,StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
 
             }else if(target){
@@ -110,7 +117,7 @@ namespace wrench{
             if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
                 target=location->target;
             }
-            // TODO its not caching...
+
             if(StorageService::lookupFile(FileLocation::LOCATION(cache, msg->location->getFile()))) {//check cache
                 WRENCH_INFO("Forwarding to cache reply mailbox %s",msg->answer_mailbox->get_name().c_str());
                 S4U_Mailbox::putMessage(
@@ -129,11 +136,11 @@ namespace wrench{
             if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
                 target=location->target;
             }
-            bool deleated=false;
+            bool deleted=false;
             if(cache){
                 try{
                     cache->deleteFile(msg->location->getFile());
-                    deleated=true;
+                    deleted=true;
                 }catch(ExecutionException& e){
                     //silently ignore
                 }
@@ -141,12 +148,12 @@ namespace wrench{
             if(target) {
                 try{
                     target->deleteFile(msg->location->getFile());
-                    deleated=true;
+                    deleted=true;
                 }catch(ExecutionException& e){
                     //silently ignore
                 }
             }
-            if(deleated){
+            if(deleted){
                 S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileDeleteAnswerMessage(msg->location->getFile(),target,true,nullptr,StorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD));
             }else{
                 S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileDeleteAnswerMessage(msg->location->getFile(),target,false,std::make_shared<FileNotFound>(msg->location),StorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD));
@@ -154,12 +161,16 @@ namespace wrench{
         } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
             auto target=remote;
             if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
+                //WRENCH_INFO("Proxy Location");
                 target=location->target;
             }
-            if(target and cache) {//check cache
-                pending[msg->location->getFile()].push_back(std::move(message));
-            }
-            if(cache){
+            //cerr<<"writing"<<target<<" "<<remote<<endl;
+            if(cache){//check cache
+                if(target) {//check that someone is waiting for this message
+                    pending[msg->location->getFile()].push_back(std::move(message));
+                    WRENCH_INFO("Adding pending write");
+                    cerr<<target<<endl;
+                }
                 S4U_Mailbox::putMessage(cache->mailbox,new StorageServiceFileWriteRequestMessage(mailbox,msg->requesting_host,FileLocation::LOCATION(cache,msg->location->getFile()),msg->buffer_size,0));
             }else{
                 S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileWriteAnswerMessage(msg->location,false,std::make_shared<HostError>(hostname),0,StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD));
@@ -228,12 +239,14 @@ namespace wrench{
 
             }
         }else if (auto msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {//forward through
+            //WRENCH_INFO("Got write answer");
             std::vector<unique_ptr<SimulationMessage>>& messages=pending[msg->location->getFile()];
             for(unsigned int i=0;i<messages.size();i++){
                 if(auto tmpMsg= dynamic_cast<StorageServiceFileWriteRequestMessage *>(messages[i].get())){
-
+                    //WRENCH_INFO("Forwarding");
                     S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileWriteAnswerMessage(*msg));
                     if(!msg->success){//the the file write failed, there will be no ack message
+                        //WRENCH_INFO("write failed");
                         std::swap(messages[i],messages.back());
                         messages.pop_back();
                         i--;
@@ -247,10 +260,13 @@ namespace wrench{
             std::vector<unique_ptr<SimulationMessage>>& messages=pending[msg->location->getFile()];
             for(unsigned int i=0;i<messages.size();i++){
                 if(auto tmpMsg= dynamic_cast<StorageServiceFileWriteRequestMessage *>(messages[i].get())){
+
+                    S4U_Mailbox::putMessage(tmpMsg->answer_mailbox, new StorageServiceAckMessage(*msg));//forward ACK
                     auto target=remote;
                     if(auto location=std::dynamic_pointer_cast<ProxyLocation>(tmpMsg->location)){
                         target=location->target;
                     }
+                    //WRENCH_INFO("initiating file copy");
                     initiateFileCopy(recv_mailbox,FileLocation::LOCATION(cache,msg->location->getFile()),FileLocation::LOCATION(target,msg->location->getFile()));
                     S4U_Mailbox::igetMessage(recv_mailbox);//there will be a message on this mailbox, but we dont actually care
                     //TODO this is horrible hacky and might leak memory like a sieve
@@ -268,44 +284,39 @@ namespace wrench{
         }
         return true;
     }
-    //std::map<std::string, double> getFreeSpace();
-    //TODO handle StorageServiceFreeSpaceRequestMessage and
-    //std::map<std::string, double> getTotalSpace();
-    //TODO HENRI I dont know the best way to forward this function
+    std::map<std::string, double> StorageServiceProxy::getFreeSpace(){
+        if(remote){
+            return remote->getFreeSpace();
+        }
+        throw runtime_error("Proxy with no default location does not support getFreeSpace()");
+
+    }
     std::string StorageServiceProxy::getMountPoint(){
         if(remote){
             return remote->getMountPoint();
         }
-        if(cache){
-            return cache->getMountPoint();
-        }
-        return "/";
+
+        return LogicalFileSystem::DEV_NULL;
     }
     std::set<std::string> StorageServiceProxy::getMountPoints(){
         if(remote){
             return remote->getMountPoints();
         }
-        if(cache){
-            return cache->getMountPoints();
-        }
+
         return {};
     }
     bool StorageServiceProxy::hasMultipleMountPoints(){
         if(remote){
             return remote->hasMultipleMountPoints();
         }
-        if(cache){
-            return cache->hasMultipleMountPoints();
-        }
+
         return false;
     }
     bool StorageServiceProxy::hasMountPoint(const std::string &mp){
         if(remote){
             return remote->hasMountPoint(mp);
         }
-        if(cache){
-            return cache->hasMountPoint(mp);
-        }
+
         return false;
     }
 
@@ -322,7 +333,7 @@ namespace wrench{
         if(cache){
             return cache->getFileLastWriteDate(location);
         }
-        return simulation->getCurrentSimulatedDate();//TODO HENRI that or 0, im not sure
+        return -1;
     }
 
 
@@ -390,9 +401,11 @@ namespace wrench{
     void StorageServiceProxy::writeFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file, const std::string &path){
         StorageService::writeFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()),path, file));
     }
+
     void StorageServiceProxy::writeFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file){
         StorageService::writeFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
+
     const std::shared_ptr<StorageService> StorageServiceProxy::getCache(){
         return this->cache;
     }
