@@ -93,6 +93,7 @@ namespace wrench {
         static std::vector<std::string> getAllHostnames();
         static std::vector<std::string> getAllLinknames();
         static double getLinkBandwidth(const std::string &name);
+        static void setLinkBandwidth(const std::string &name, double bandwidth);
         static double getLinkUsage(const std::string &name);
 
         static std::map<std::string, std::vector<std::string>> getAllHostnamesByCluster();

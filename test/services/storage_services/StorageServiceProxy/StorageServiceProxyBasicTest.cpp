@@ -61,9 +61,12 @@ public:
                          "       <link id=\"link12\" bandwidth=\"5GBps\" latency=\"10us\"/>"
                          "       <link id=\"link13\" bandwidth=\"100MBps\" latency=\"100us\"/>"
                          "       <link id=\"link23\" bandwidth=\"100MBps\" latency=\"100us\"/>"
+                         "      <link id=\"backdoor\" bandwidth=\"0.0001bps\" latency=\"100us\"/>"
                          "       <route src=\"Client\" dst=\"Proxy\"> <link_ctn id=\"link12\"/> </route>"
                          "       <route src=\"Proxy\" dst=\"Remote\"> <link_ctn id=\"link13\"/> </route>"
                          "       <route src=\"Proxy\" dst=\"Target\"> <link_ctn id=\"link23\"/> </route>"
+                         "      <route src=\"Client\" dst=\"Remote\"> <link_ctn id=\"backdoor\"/> </route>"
+                         "       <route src=\"Client\" dst=\"Target\"> <link_ctn id=\"backdoor\"/> </route>"
                          "   </zone> "
                          "</platform>";
        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -90,14 +93,18 @@ private:
     StorageServiceProxyBasicTest *test;
     bool testWithDefault;
     int main() override {
+       
         using namespace wrench;
+        auto& proxy=test->proxy;
+        ///sealing backdoor
+        //S4U_Simulation::setLinkBandwidth("backdoor",0);
         WRENCH_INFO("Adding a file files to the simulation");
         auto file1 = wrench::Simulation::addFile("file1", 10000);
         auto file2 = wrench::Simulation::addFile("file2", 10000);
         auto file3 = wrench::Simulation::addFile("file3", 10000);
 
         try {
-            this->test->proxy->createFile(file1);
+            proxy->createFile(file1);
             throw std::runtime_error("Should not be able to create a file on a proxy directly");
         } catch (std::runtime_error &ignore) {}
 
@@ -106,41 +113,43 @@ private:
         // Create a copy file1 on target
         this->test->target->createFile(file2);
 
+
         // Create a copy file3 on remote and in cache
-        this->test->remote->createFile(file3);
-        this->test->proxy->getCache()->createFile(file3);
+        //this->test->remote->createFile(file3);
+        //proxy->getCache()->createFile(file3);
 
         // locate file1 via proxy
-        //       if(testWithDefault) ((shared_ptr<StorageService>)this->test->proxy)->lookupFile(file1);
+        //       if(testWithDefault) ((shared_ptr<StorageService>)proxy)->lookupFile(file1);
+        WRENCH_INFO("Lookup tests");
         if(testWithDefault){
-            if(!this->test->proxy->lookupFile(file1)){
+            if(!proxy->lookupFile(file1)){
                 throw std::runtime_error("Failed to find file that exists on remote");
             }
         }
 
         // Try to lookup file2 from remote although it is on target
-
-        if(this->test->proxy->lookupFile(test->remote,file2)){
+        auto start=simulation->getCurrentSimulatedDate();
+        if(proxy->lookupFile(test->remote,file2)){
             throw std::runtime_error("Found file that does not exist");
         }
+        auto firstCache=simulation->getCurrentSimulatedDate()-start;
 
         // locate file2 via proxy and target
-        if(!this->test->proxy->lookupFile(this->test->target,file2)){
+        if(!proxy->lookupFile(this->test->target,file2)){
             throw std::runtime_error("Failed to find file that exists on target");
         }
 
-        //TODO insert timing checks
-
+        WRENCH_INFO("Read tests");
         // Read file1 via proxy
         if(testWithDefault){
-            this->test->proxy->readFile(file1);
+            proxy->readFile(file1);
             //read file again to check cache
-            this->test->proxy->readFile(file1);
+            proxy->readFile(file1);
         }
 
         // Try to read file2 from remote although it is on target
         try {
-            this->test->proxy->readFile(test->remote,file2);
+            proxy->readFile(test->remote,file2);
             throw std::runtime_error("Non extant files should throw exceptions when not found");
         }  catch (std::runtime_error &rethrow){
             throw rethrow;
@@ -152,14 +161,76 @@ private:
             }
         }
         // read file2 via proxy and target
-        this->test->proxy->readFile(this->test->target,file2);
+        start=simulation->getCurrentSimulatedDate();
+        proxy->readFile(this->test->target,file2);
+        auto firstFile=simulation->getCurrentSimulatedDate();
         // read file2 via proxy and target
-        this->test->proxy->readFile(this->test->target,file2);
+        proxy->readFile(this->test->target,file2);
+        auto secondFile=simulation->getCurrentSimulatedDate();
 
-        //write file tests
-        //if(testWithDefault)
-        //delete file tests
-        //if(testWithDefault)
+
+        if(firstFile-start<(secondFile-firstFile)*1.2){
+            throw std::runtime_error("caching was not significantly faster than not caching for file read");
+        }
+
+        //check the file again, it should now be cached
+        start=simulation->getCurrentSimulatedDate();
+
+        if(!proxy->lookupFile(test->remote,file2)){
+            throw std::runtime_error("Could not find previously found file after read");
+        }
+        auto secondCache=simulation->getCurrentSimulatedDate()-start;
+
+        if(firstCache<secondCache*1.2){
+            throw std::runtime_error("caching was not significantly faster than not caching for file lookup");
+        }
+
+        WRENCH_INFO("File Write tests");
+        //File write tests
+        proxy->writeFile(test->target,file3);
+
+        if(testWithDefault){
+            proxy->writeFile(file3);
+        }
+        simulation->sleep(1000);
+        WRENCH_INFO("Activating backdoor");
+        ///activating backdoor
+        S4U_Simulation::setLinkBandwidth("backdoor",1000000000);
+        proxy->getCache()->deleteFile(file3);
+        if(proxy->lookupFile(test->target,file3)){
+            WRENCH_INFO("Proxy search works fine");
+        }
+        if(testWithDefault and !test->remote->lookupFile(file3)){
+            throw std::runtime_error("newly written file not found on remote");
+        }
+        if(!test->target->lookupFile(file3)){
+            throw std::runtime_error("newly written file not found on target");
+        }
+
+        //use if network problem
+        //proxy->getCache()->deleteFile(file3);
+        //if(!test->target->lookupFile(file3)){
+        //    throw std::runtime_error("newly written file not found on target");
+        //}
+
+        WRENCH_INFO("Delete tests");
+        proxy->deleteFile(test->target,file3);
+
+        if(testWithDefault){
+            proxy->deleteFile(file3);
+        }
+        if(test->target->lookupFile(file3)){
+            throw std::runtime_error("file not deleted from cache");
+        }
+
+        if(testWithDefault and test->remote->lookupFile(file3)){
+            throw std::runtime_error("file not deleted from remote");
+        }
+        if(test->target->lookupFile(file3)){
+            throw std::runtime_error("file not deleted from target");
+        }
+        WRENCH_INFO("Terminating");
+        proxy->stop();
         return 0;
 
 

@@ -182,15 +182,15 @@ namespace wrench {
     /**
      * @brief Synchronously write a file to the storage service
      *
-     * @param location: the file location
+     * @param file: the file
+     * @param path: path to file
      *
      * @throw ExecutionException
      */
-    void StorageService::writeFile(const std::shared_ptr<FileLocation> &location) {
-        if (location == nullptr) {
-            throw std::invalid_argument("StorageService::writeFile(): Invalid nullptr arguments");
-        }
-        location->getStorageService()->writeFile(location->getFile(), location->getFullAbsolutePath());
+    void StorageService::writeFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+
+        writeFile(FileLocation::LOCATION(getSharedPtr<StorageService>(),path,file));
+
     }
 
     /**
@@ -204,37 +204,40 @@ namespace wrench {
         this->writeFile(file, this->getMountPoint());
     }
 
+
     /**
      * @brief Synchronously write a file to the storage service
      *
-     * @param file: the file
-     * @param path: path to file
+     * @param location: the file location
      *
      * @throw ExecutionException
      */
-    void StorageService::writeFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+    void StorageService::writeFile(const std::shared_ptr<FileLocation> &location) {
+        auto file=location->getFile();
+        auto path=location->getFullAbsolutePath();
+        auto that=location->getStorageService();
         if (file == nullptr) {
             throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
         }
 
-        assertServiceIsUp();
+        that->assertServiceIsUp();
 
         // Send a  message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        S4U_Mailbox::putMessage(this->mailbox,
+        S4U_Mailbox::putMessage(that->mailbox,
                                 new StorageServiceFileWriteRequestMessage(
                                         answer_mailbox,
                                         simgrid::s4u::this_actor::get_host(),
-                                        wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file),
-                                        this->buffer_size,
-                                        this->getMessagePayloadValue(
+                                        location,
+                                        that->buffer_size,
+                                        that->getMessagePayloadValue(
                                                 StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
         std::shared_ptr<SimulationMessage> message;
 
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        message = S4U_Mailbox::getMessage(answer_mailbox, that->network_timeout);
 
         if (auto msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
             // If not a success, throw an exception
@@ -242,7 +245,7 @@ namespace wrench {
                 throw ExecutionException(msg->failure_cause);
             }
 
-            if (this->buffer_size < 1) {
+            if (that->buffer_size < 1) {
                 // just wait for the final ack (no timeout!)
                 message = S4U_Mailbox::getMessage(answer_mailbox);
                 if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
@@ -253,17 +256,17 @@ namespace wrench {
             } else {
                 // Bufferized
                 double remaining = file->getSize();
-                while (remaining - this->buffer_size > DBL_EPSILON) {
+                while (remaining - that->buffer_size > DBL_EPSILON) {
                     S4U_Mailbox::putMessage(msg->data_write_mailbox,
                                             new StorageServiceFileContentChunkMessage(
-                                                    file, this->buffer_size, false));
-                    remaining -= this->buffer_size;
+                                                    file, that->buffer_size, false));
+                    remaining -= that->buffer_size;
                 }
                 S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
                                                                          file, remaining, true));
 
                 //Waiting for the final ack
-                message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+                message = S4U_Mailbox::getMessage(answer_mailbox, that->network_timeout);
                 if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
                     throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
                                              message->getName() + "] message instead of final ack!");
