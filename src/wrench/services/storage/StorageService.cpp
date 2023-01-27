@@ -289,10 +289,6 @@ namespace wrench {
      *        mount points
      * @return The free space in bytes of each mount point, as a map
      *
-     * @throw ExecutionException
-     *
-     * @throw std::runtime_error
-     *
      */
     std::map<std::string, double> StorageService::getFreeSpace() {
         assertServiceIsUp();
@@ -567,16 +563,11 @@ namespace wrench {
     }
 
     /**
-<<<<<<< HEAD
      * @brief Synchronously delete a file at a location
      *
      * @param location: the file location
      * @param file_registry_service: a file registry service that should be updated once the
      *         file deletion has (successfully) completed (none if nullptr)
-     *
-     * @throw ExecutionException
-     * @throw std::runtime_error
-     * @throw std::invalid_argument
      */
     void StorageService::deleteFile(const std::shared_ptr<FileLocation> &location,
                                     const std::shared_ptr<FileRegistryService> &file_registry_service) {
