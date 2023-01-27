@@ -196,8 +196,8 @@ set(HEADER_FILES
         include/wrench/services/storage/xrootd/SearchStack.h
         include/wrench/services/storage/xrootd/Cache.h
         include/wrench/services/storage/xrootd/XRootDProperty.h
-        include/wrench/services/storage/StorageServiceProxy.h
-        include/wrench/services/storage/StorageServiceProxyProperty.h
+        include/wrench/services/storage/proxy/StorageServiceProxy.h
+        include/wrench/services/storage/proxy/StorageServiceProxyProperty.h
         )
 
 # source files
@@ -371,8 +371,8 @@ set(SOURCE_FILES
         src/wrench/services/storage/xrootd/XRootDMessagePayload.cpp
         src/wrench/services/storage/xrootd/XRootDMessage.cpp
         src/wrench/services/storage/xrootd/XRootDProperty.cpp
-        src/wrench/services/storage/StorageServiceProxy.cpp
-        src/wrench/services/storage/StorageServiceProxyProperty.cpp
+        src/wrench/services/storage/proxy/StorageServiceProxy.cpp
+        src/wrench/services/storage/proxy/StorageServiceProxyProperty.cpp
         )
 
 # test files
