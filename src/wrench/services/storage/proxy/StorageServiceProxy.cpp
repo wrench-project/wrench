@@ -6,7 +6,7 @@
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 */
-#include "wrench/services/storage/StorageServiceProxy.h"
+#include "wrench/services/storage/proxy/StorageServiceProxy.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/simulation/SimulationMessage.h"
@@ -17,8 +17,8 @@
 #include "wrench/failure_causes/FileNotFound.h"
 #include "wrench/failure_causes/HostError.h"
 #include "wrench/services/storage/StorageServiceProperty.h"
-#include "wrench/services/storage/StorageServiceProxyProperty.h"
-#include "wrench/services/storage/StorageServiceProxyProperty.h"
+#include "wrench/services/storage/proxy/StorageServiceProxyProperty.h"
+#include "wrench/services/storage/proxy/StorageServiceProxyProperty.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_proxy_file_server,
                     "Log category for ProxyFileServers");
