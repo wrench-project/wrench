@@ -7,7 +7,7 @@
 * (at your option) any later version.
 */
 
-#include "wrench/services/storage/StorageServiceProxyProperty.h"
+#include "wrench/services/storage/proxy/StorageServiceProxyProperty.h"
 namespace wrench {
 
     SET_PROPERTY_NAME(StorageServiceProxyProperty, MESSAGE_OVERHEAD);
