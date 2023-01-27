@@ -34,6 +34,11 @@ namespace wrench{
     //Cache then Forward
     //handle StorageServiceFreeSpaceRequestMessage
     //unclear
+    /**
+     * @brief Main method of the daemon
+     *
+     * @return 0 on termination
+     */
     int StorageServiceProxy::main(){
         //TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
         // Start file storage server
@@ -55,12 +60,21 @@ namespace wrench{
 
         return 0;
     }
+    /**
+     * @brief Get the total static capacity of the remote storage service (in zero simulation time) if there is no remote, this function is invalid
+     * @return capacity of the storage service (double) for each mount point, in a map
+     */
     std::map<std::string, double> StorageServiceProxy::getTotalSpace(){
         if(remote){
             return remote->getTotalSpace();
         }
         throw runtime_error("Proxy with no default location does not support getTotalSpace()");
     }
+    /**
+     * @brief Process a received control message
+     *
+     * @return false if the daemon should terminate
+     */
     bool StorageServiceProxy::processNextMessage() {
         //S4U_Simulation::compute(flops);
         S4U_Simulation::computeZeroFlop();
@@ -284,6 +298,12 @@ namespace wrench{
         }
         return true;
     }
+    /**
+     * @brief Synchronously asks the remote storage service for its capacity at all its
+     *        mount points.  invalid if there is no default location
+     * @return The free space in bytes of each mount point, as a map
+     *
+     */
     std::map<std::string, double> StorageServiceProxy::getFreeSpace(){
         if(remote){
             return remote->getFreeSpace();
@@ -291,20 +311,36 @@ namespace wrench{
         throw runtime_error("Proxy with no default location does not support getFreeSpace()");
 
     }
+    /**
+     * @brief Get the mount point of the remote server (will throw is more than one).  If there isnt a default, returns DEV_NUL
+     * @return the (sole) mount point of the service
+     */
     std::string StorageServiceProxy::getMountPoint(){
         if(remote){
             return remote->getMountPoint();
         }
-
+        if(cache){
+            return cache->getMountPoint();
+        }
         return LogicalFileSystem::DEV_NULL;
     }
+    /**
+     * @brief Get the set of mount points of the remote server, if not returns {}
+     * @return the set of mount points
+     */
     std::set<std::string> StorageServiceProxy::getMountPoints(){
         if(remote){
             return remote->getMountPoints();
         }
-
+        if(cache){
+            return cache->getMountPoints();
+        }
         return {};
     }
+    /**
+     * @brief Checked whether the remote storage service has multiple mount points
+     * @return true whether the service has multiple mount points
+     */
     bool StorageServiceProxy::hasMultipleMountPoints(){
         if(remote){
             return remote->hasMultipleMountPoints();
@@ -312,11 +348,19 @@ namespace wrench{
 
         return false;
     }
+    /**
+    * @brief Checked whether the remote storage service has a particular mount point
+    * @param mp: a mount point
+    *
+    * @return true whether the service has that mount point
+    */
     bool StorageServiceProxy::hasMountPoint(const std::string &mp){
         if(remote){
             return remote->hasMountPoint(mp);
         }
-
+        if(cache){
+            return cache->hasMountPoint(mp);
+        }
         return false;
     }
 
@@ -337,17 +381,34 @@ namespace wrench{
     }
 
 
-
+    /**
+     * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.
+If you want it to start cached, you should also call StorageServiceProxy.getCache().createFile
+     *
+     **/
     void StorageServiceProxy::createFile(const std::shared_ptr<FileLocation> &location){
         throw std::runtime_error("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
     }
+    /**
+     * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.
+If you want it to start cached, you should also call StorageServiceProxy.getCache().createFile
+     *
+     **/
     void StorageServiceProxy::createFile(const std::shared_ptr<DataFile> &file, const std::string &path){
         throw std::runtime_error("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
     }
+    /**
+     * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.
+If you want it to start cached, you should also call StorageServiceProxy.getCache().createFile
+     *
+     **/
     void StorageServiceProxy::createFile(const std::shared_ptr<DataFile> &file){
         throw std::runtime_error("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
     }
-
+    /**
+     * Get the load of the cache
+     * @return the load of the cache
+     */
     double StorageServiceProxy::getLoad() {
         if(cache){
             return cache->getLoad();
@@ -359,8 +420,15 @@ namespace wrench{
 
     /***********************/
     /** \cond INTERNAL    **/
-
-
+    /***********************/
+    /**
+     * @brief Constructor
+     * @param hostname The host to run on
+     * @param cache A Storage server to use as a cache.  Ideal on the same host
+     * @param defaultRemote A remote file server to use as a default target.  Defaults to nullptr
+     * @param properties The wrench property overrides
+     * @param messagePayload The wrench message payload overrides
+     */
     StorageServiceProxy::StorageServiceProxy(const std::string &hostname,
                                              const std::shared_ptr<StorageService>& cache,
                                              const std::shared_ptr<StorageService>& defaultRemote,
@@ -375,8 +443,20 @@ namespace wrench{
         this->setProperties(this->default_property_values, std::move(property_list));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
         this->setProperty(StorageServiceProperty::BUFFER_SIZE,cache->getPropertyValueAsString(StorageServiceProperty::BUFFER_SIZE));//the internal cache has the same buffer properties as this service.
+        if(cache and cache->hasMultipleMountPoints()){
+            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy() A storage service proxy's cache can not have multiple mountpoints");
+        }
+        if(remote and remote->hasMultipleMountPoints()){
+            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy() A storage service proxy's default remote can not have multiple mountpoints");
+        }
 
     }
+    /**
+     *  @brief
+     * @param targetServer
+     * @param file
+     * @param file_registry_service
+     */
     void StorageServiceProxy::deleteFile(const std::shared_ptr<StorageService>& targetServer, const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service){
         StorageService::deleteFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()), file),file_registry_service);
     }
