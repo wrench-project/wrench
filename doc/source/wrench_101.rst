@@ -217,8 +217,30 @@ started. Typical kinds of services include compute services, storage
 services, and file registry services (see
 :ref:`below <wrench-101-simulator-services>` for more details).
 
-The bare-metal-chain simulator instantiates four services. The first one
-is a compute service:
+The multi-action-multi-job simulator instantiates four services. The first one
+ is a storage service:
+
+.. code:: cpp
+
+   auto storage_service_1 = simulation->add(new wrench::SimpleStorageService("StorageHost1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
+
+The :cpp:class:`wrench::SimpleStorageService` class implements a simulation of a
+remotely-accessible storage service on which files can be stored,
+copied, deleted, read, and written. In this particular case, the storage
+service is started on host ``StorageHost1``. It uses storage mounted at
+``/`` on that host (which corresponds to the mount path of a disk, as
+seen in the XML platform description). The last two arguments, as for
+the compute services, are used to configure particular properties of the
+service. In this case, the service is configured to use a 50-MB buffer
+size to pipeline network and disk accesses (see details in :ref:`this section
+below <wrench-101-customizing-services>`).
+
+The second service is a another storage service that runs on host
+``StorageHost2``.
+
+.. _wrench-101-simulator-1000ft-step-4:
+
+The third service is a compute service:
 
 .. code:: cpp
 
@@ -240,7 +262,7 @@ In this case, the scratch storage specification is empty as host
 configure properties of the service (see details in :ref:`this section
 below <wrench-101-customizing-services>`).
 
-The second service is a cloud compute service:
+The fourth service is a cloud compute service:
 
 .. code:: cpp
 
@@ -250,32 +272,11 @@ The :cpp:class:`wrench::CloudComputeService` implements a simulation of a cloud
 platform on which virtual machine (VM) instances can be created,
 started, used, and shutdown. The service runs on host ``CloudHeadHost``
 and has access to the compute resources on host ``CloudHost``. Unlike
-the previous service, this service has scratch space, at path ``/data``
+the previous service, this service has scratch space, at path ``/scratch``
 on the disk attached to host ``CloudHost`` (as seen in the XML platform
 description). Here again, the last two arguments are used to configure
 properties of the service.
 
-The third service is a storage service:
-
-.. code:: cpp
-
-   auto storage_service_1 = simulation->add(new wrench::SimpleStorageService("StorageHost1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
-
-The :cpp:class:`wrench::SimpleStorageService` class implements a simulation of a
-remotely-accessible storage service on which files can be stored,
-copied, deleted, read, and written. In this particular case, the storage
-service is started on host ``StorageHost1``. It uses storage mounted at
-``/`` on that host (which corresponds to the mount path of a disk, as
-seen in the XML platform description). The last two arguments, as for
-the compute services, are used to configure particular properties of the
-service. In this case, the service is configured to use a 50-MB buffer
-size to pipeline network and disk accesses (see details in :ref:`this section
-below <wrench-101-customizing-services>`).
-
-The fourth service is a another storage service that runs on host
-``StorageHost2``.
-
-.. _wrench-101-simulator-1000ft-step-4:
 
 Step 4: Instantiate at least one Execution controller
 -----------------------------------------------------
@@ -288,27 +289,26 @@ constructor as well as its ``main()`` method. This method is
 implementing using the :ref:`WRENCH Developer
 API <developer-api>`.
 
-The example in ``examples/action_api/bare-metal-bag-of-actions`` does
+The example in ``examples/action_api/multi-action-multi-job`` does
 this as follows: 
 
 .. code:: cpp
 
-   auto wms = simulation->add(new wrench::TwoTasksAtATimeExecutionController(num_tasks, baremetal_service, storage_service, "UserHost"));
+   auto wms = simulation->add(new wrench::MultiActionMultiJobController(baremetal_service, cloud_service, storage_service_1, storage_service_2, "UserHost"));
 
-This creates an execution controller and passes to its constructor a
-number of tasks to execute, the compute service to use, the storage
-service to use, and the host on which it is supposed to execute. Class
-``wrench::TwoTasksAtATimeExecutionController`` is of course provided
+This creates an execution controller and passes to its constructor the 
+services created before, and the host on which it is supposed to execute. 
+Class ``wrench::MultiActionMultiJobController`` is of course provided
 with the example. See the :ref:`WRENCH 102 <wrench-102-header>` page for
 information on how to implement an execution controller.
 
 One important question is how to specify an *application workload* and
 tell the execution controller to execute it. This is completely up to
-the developer, and in this example the execution controller is simply
-given a number of tasks and then creates files, file read actions, file
-write actions, and compute actions to be executed as part of various
+the developer, and in this example the execution controller creates a 
+different number of tasks to creates files, file read actions,
+file write actions, and compute actions to be executed as part of various
 jobs (see the implementation of
-``wrench::TwoTasksAtATimeExecutionController``). All the examples in the
+``wrench::MultiActionMultiJobController``). All the examples in the
 ``examples/action_api`` directory do this in different ways. *However*,
 many users are interested in **workflow applications**, for this reason,
 WRENCH provides a :cpp:class:`wrench::Workflow` class that has member functions

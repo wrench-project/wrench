@@ -36,9 +36,9 @@ message sent to the service to lookup an entry is 1KiB:
 .. code:: cpp
 
    auto fr_service = simulation->add(
-             new wrench::FileRegistryService("ReplicaCatalog",
-                                          {{wrench::FileRegistryServiceProperty::LOOKUP_COMPUTE_COST, "0.1"}},
-                                          {{wrench::BareMetalComputeServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024}});
+         new wrench::FileRegistryService("ReplicaCatalog",
+                                         {{wrench::FileRegistryServiceProperty::LOOKUP_COMPUTE_COST, "0.1"}},
+                                         {{wrench::FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024}}));
 
 See the documentation of :cpp:class:`wrench::FileRegistryServiceProperty` and
 :cpp:class:`wrench::FileRegistryServiceMessagePayload` for all possible

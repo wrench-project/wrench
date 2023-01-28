@@ -50,9 +50,9 @@ description requests is configured to be 1KiB:
 
 .. code:: cpp
 
-   auto cloud_cs = simulation.add(
+   auto cloud_cs = simulation->add(
              new wrench::CloudComputeService("cloud_gateway", {"host1", "host2", "host3", "host4"}, "/scratch/",
-                                      {{wrench::CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "10"}},
+                                      {{wrench::CloudComputeServiceProperty::VM_BOOT_OVERHEAD, "10s"}},
                                       {{wrench::BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024}}));
 
 See the documentation of :cpp:class:`wrench::CloudComputeServiceProperty` and

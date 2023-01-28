@@ -36,7 +36,8 @@ namespace wrench {
 
     /**
      * @brief An abstraction of an execution controller, i.e., a running process that interacts
-     * with other services to accomplish some computational goal
+     * with other services to accomplish some computational goal. The simulation will terminate
+     * when all execution controllers have terminated.
      */
     class ExecutionController : public Service {
 
@@ -71,6 +72,8 @@ namespace wrench {
 
         virtual void processEventTimer(std::shared_ptr<TimerEvent>);
 
+        void setDaemonized(bool daemonized);
+
     protected:
         ExecutionController(
                 const std::string &hostname,
@@ -84,6 +87,8 @@ namespace wrench {
         friend class Simulation;
         friend class DataMovementManager;
         friend class JobManager;
+
+        bool daemonized = false;
 
     private:
         virtual int main() = 0;

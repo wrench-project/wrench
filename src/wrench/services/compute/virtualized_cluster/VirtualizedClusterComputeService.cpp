@@ -41,7 +41,7 @@ namespace wrench {
                                                                        const std::string &scratch_space_mount_point,
                                                                        WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                                        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
-        : CloudComputeService(hostname, execution_hosts, scratch_space_mount_point) {
+            : CloudComputeService(hostname, execution_hosts, scratch_space_mount_point) {
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
         // Set default and specified message payloads
@@ -53,43 +53,59 @@ namespace wrench {
     /**
      * @brief Start a VM
      *
-     * @param vm_name: the name of the VM
-     * @param pm_name: the physical host on which to start the VM
+     * @param num_cores: the desired number of cores in the VM
+     * @param ram_memory: the desired memory size of the VM
+     * @param physical_host: the physical host on which to create the VM
      *
-     * @return The compute service running on the VM
+     * @return A VM name
      * @throw ExecutionException
      * @throw std::invalid_argument
      */
-    std::shared_ptr<BareMetalComputeService>
-    VirtualizedClusterComputeService::startVM(const std::string &vm_name, const std::string &pm_name) {
-        if (this->vm_list.find(vm_name) == this->vm_list.end()) {
-            throw std::invalid_argument("CloudComputeService::startVM(): Unknown VM name '" + vm_name + "'");
+    std::string
+    VirtualizedClusterComputeService::createVM(unsigned long num_cores,
+                                               double ram_memory,
+                                               const std::string &physical_host,
+                                               WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
+        if (num_cores == ComputeService::ALL_CORES) {
+            throw std::invalid_argument(
+                    "CloudComputeService::createVM(): the VM's number of cores cannot be ComputeService::ALL_CORES");
         }
-
-        if ((not pm_name.empty()) and (std::find(this->execution_hosts.begin(), this->execution_hosts.end(), pm_name) ==
-                                       this->execution_hosts.end())) {
-            throw std::invalid_argument("Trying to start a VM on an unknown (at least to this service) physical host");
+        if (ram_memory == ComputeService::ALL_RAM) {
+            throw std::invalid_argument(
+                    "CloudComputeService::createVM(): the VM's memory_manager_service requirement cannot be ComputeService::ALL_RAM");
         }
 
         assertServiceIsUp();
 
+        if ((not physical_host.empty()) and (std::find(this->execution_hosts.begin(),
+                                                       this->execution_hosts.end(),
+                                                       physical_host) ==
+                                             this->execution_hosts.end())) {
+            throw std::invalid_argument("Trying to start a VM on an unknown (at least to this service) physical host");
+        }
+
+        // send a "create vm" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
-                new CloudComputeServiceStartVMRequestMessage(
-                        answer_mailbox, vm_name, pm_name,
+                new CloudComputeServiceCreateVMRequestMessage(
+                        answer_mailbox,
+                        num_cores, ram_memory, physical_host,
+                        std::move(property_list), std::move(messagepayload_list),
                         this->getMessagePayloadValue(
-                                CloudComputeServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD)));
+                                CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceStartVMAnswerMessage *>(answer_message.get())) {
+        if (auto msg = dynamic_cast<CloudComputeServiceCreateVMAnswerMessage *>(answer_message.get())) {
             if (not msg->success) {
                 throw ExecutionException(msg->failure_cause);
+            } else {
+                return msg->vm_name;
             }
-            return msg->cs;
         } else {
             throw std::runtime_error(
-                    "CloudComputeService::startVM(): Unexpected [" + answer_message->getName() + "] message");
+                    "CloudComputeService::createVM(): Unexpected [" + answer_message->getName() + "] message");
         }
     }
 
@@ -118,7 +134,7 @@ namespace wrench {
                                 VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<VirtualizedClusterComputeServiceMigrateVMAnswerMessage *>(
-                    answer_message.get())) {
+                answer_message.get())) {
             if (not msg->success) {
                 throw ExecutionException(msg->failure_cause);
             }
@@ -197,7 +213,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceCreateVMRequestMessage *>(message.get())) {
-            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->desired_vm_name,
+            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->physical_host,
                             msg->property_list,
                             msg->messagepayload_list);
             return true;
@@ -206,8 +222,12 @@ namespace wrench {
             processShutdownVM(msg->answer_mailbox, msg->vm_name, msg->send_failure_notifications, msg->termination_cause);
             return true;
 
+        } else if (auto msg = dynamic_cast<CloudComputeServiceDestroyVMRequestMessage *>(message.get())) {
+            processDestroyVM(msg->answer_mailbox, msg->vm_name);
+            return true;
+
         } else if (auto msg = dynamic_cast<CloudComputeServiceStartVMRequestMessage *>(message.get())) {
-            processStartVM(msg->answer_mailbox, msg->vm_name, msg->pm_name);
+            processStartVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceSuspendVMRequestMessage *>(message.get())) {
@@ -219,7 +239,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<VirtualizedClusterComputeServiceMigrateVMRequestMessage *>(
-                           message.get())) {
+                message.get())) {
             processMigrateVM(msg->answer_mailbox, msg->vm_name, msg->dest_pm_hostname);
             return true;
 
@@ -252,9 +272,9 @@ namespace wrench {
 
         VirtualizedClusterComputeServiceMigrateVMAnswerMessage *msg_to_send_back;
 
-        auto vm_pair = vm_list[vm_name];
+        auto vm_tuple = vm_list[vm_name];
 
-        auto vm = vm_pair.first;
+        auto vm = std::get<0>(vm_tuple);
 
         // Check that the target host has sufficient resources
         double dest_available_ram = Simulation::getHostMemoryCapacity(dest_pm_hostname) -

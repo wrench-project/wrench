@@ -41,11 +41,10 @@ free space is configured to be 1KiB:
 .. code:: cpp
 
    auto storage_service = simulation->add(
-             new wrench::SimpleStorageService("BigDisk", 
-                                     {"/data/", "/home/"},
-                                          {{wrench::SimpleStorageProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "8"}},
-                                          {{wrench::SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, "1024"}
-                                         );
+         wrench::SimpleStorageService::createSimpleStorageService("BigDisk",
+                                         {"/data/", "/home/"},
+                                         {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "8"}},
+                                         {{wrench::SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, 1024}}));
 
 See the documentation of :cpp:class:`wrench::SimpleStorageServiceProperty` and
 :cpp:class:`wrench::SimpleStorageServiceMessagePayload` for all possible

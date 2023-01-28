@@ -42,30 +42,28 @@ instance of an HTCondor service with a pool of resources containing a
 
 .. code:: cpp
 
-   // Simulation 
-   wrench::Simulation simulation;
-   simulation.init(&argc, argv);
+   // Simulation
+   auto simulation = wrench::Simulation::createSimulation();
+   simulation->init(&argc, argv);
 
    // Create a bare-metal service
 
-   auto baremetal_service = simulation.add(
-       new wrench::BareMetalComputeService(
-             "execution_hostname",
-             {std::make_pair(
-                     "execution_hostname",
-                     std::make_tuple(wrench::Simulation::getHostNumCores("execution_hostname"),
-                                     wrench::Simulation::getHostMemoryCapacity("execution_hostname")))},
-             "/scratch/"));
+   auto baremetal_service = simulation->add(
+         new wrench::BareMetalComputeService("execution_hostname",
+                                             {std::make_pair(
+                                             "execution_hostname",
+                                             std::make_tuple(wrench::Simulation::getHostNumCores("execution_hostname"),
+                                                             wrench::Simulation::getHostMemoryCapacity("execution_hostname")))},
+                                             "/scratch/"));
 
    std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
    compute_services.insert(baremetal_service);
 
    auto htcondor_compute_service = simulation->add(
-             new wrench::HTCondorComputeService(hostname, 
-                                         std::move(compute_services),
-                                         {{wrench::HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}
-                                         ));
+         new wrench::HTCondorComputeService("htc_gateway",
+                                            std::move(compute_services),
+                                            {}));
 
 Jobs submitted to the :cpp:class:`wrench::HTCondorComputeService` instance will
-be dispatched automatically to one of the ‘child’ compute services
+be dispatched automatically to one of the 'child' compute services
 available to that instance (only one in the above example).

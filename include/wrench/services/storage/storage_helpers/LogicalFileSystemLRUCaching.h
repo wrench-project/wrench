@@ -37,21 +37,37 @@ namespace wrench {
     class LogicalFileSystemLRUCaching : public LogicalFileSystem {
 
     public:
+        /**
+	 * @brief A helper struct to describe a file instance on disk
+	 */
         struct FileOnDiskLRUCaching : public FileOnDisk {
         public:
+            /**
+             * @brief Constructor
+             * @param last_write_date Last write date
+             * @param lru_sequence_number LRU sequence number
+             * @param num_current_transactions Number of current transactions using this file on disk
+             */
             FileOnDiskLRUCaching(double last_write_date,
                                  unsigned int lru_sequence_number,
                                  unsigned short num_current_transactions) : FileOnDisk(last_write_date),
                                                                             lru_sequence_number(lru_sequence_number),
                                                                             num_current_transactions(num_current_transactions) {}
 
-            // the LRU sequence number (lower means older)
+            /**
+             * @brief The LRU sequence number (lower means older)
+             */
             unsigned int lru_sequence_number;
-            // the number of transactions that involve this file, meaning that it's not evictable is > 0
+            /**
+             * @brief The number of transactions that involve this file, meaning that it's not evictable is > 0
+             */
             unsigned short num_current_transactions;
         };
 
     public:
+        /**
+         * @brief Next LRU sequence number
+         */
         unsigned int next_lru_sequence_number = 0;
 
         void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path, bool must_be_initialized) override;

@@ -72,6 +72,11 @@ void LogicalFileSystemTest::do_BasicTests() {
     ASSERT_THROW(wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service1.get(), "/bogus"), std::invalid_argument);
 
     // Create a Logical File System
+    try {
+        wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service1.get(), "/tmp", "BOGUS");
+        throw std::runtime_error("Should not be able to create a logical file system with a bogus caching policy");
+    } catch (std::invalid_argument &ignore) {}
+
     auto fs1 = wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service1.get(), "/tmp", "NONE");
     fs1->init();
 
@@ -105,7 +110,8 @@ void LogicalFileSystemTest::do_BasicTests() {
     fs1->removeFileFromDirectory(file_80, "/files/");
     ASSERT_DOUBLE_EQ(100, fs1->getFreeSpace());
 
-    fs1->removeAllFilesInDirectory("/files/");// coverage
+    fs1->storeFileInDirectory(file_50, "/faa", true);
+    fs1->removeAllFilesInDirectory("/faa/");// coverage
 
 
     workflow->clear();
@@ -147,6 +153,7 @@ void LogicalFileSystemTest::do_DevNullTests() {
     auto file = wrench::Simulation::addFile("file", 1.0);
 
     fs1->createDirectory(("/foo"));
+    fs1->stageFile(file, "/foo");
     ASSERT_FALSE(fs1->doesDirectoryExist(("/foo")));
     ASSERT_TRUE(fs1->isDirectoryEmpty(("/foo")));
     ASSERT_FALSE(fs1->isFileInDirectory(file, "/foo"));
@@ -242,6 +249,8 @@ void LogicalFileSystemTest::do_LRUTests() {
     ASSERT_TRUE(fs1->isFileInDirectory(file_10, "/foo"));
     ASSERT_FALSE(fs1->isFileInDirectory(file_50, "/foo"));
     fs1->storeFileInDirectory(other_file_50, "/foo", true);
+    fs1->updateReadDate(other_file_50, "/foo");
+    fs1->updateReadDate(other_file_50, "/faa");// coverage
 
     // At this point the content is;
     //   LRU: file_10 (UNEVICTABLE), other_file_50 (EVICTABLE)
@@ -261,6 +270,9 @@ void LogicalFileSystemTest::do_LRUTests() {
     fs1->removeFileFromDirectory(file_10, "/foo");   // coverage
     fs1->storeFileInDirectory(file_10, "/foo", true);// coverage
     fs1->removeAllFilesInDirectory("/foo");          // coverage
+
+    fs1->storeFileInDirectory(file_10, "/faa", true);// coverage
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

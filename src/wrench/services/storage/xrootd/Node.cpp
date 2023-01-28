@@ -990,6 +990,17 @@ namespace wrench {
                                                                         node_property_list, node_messagepayload_list));
         }
 
+        /**
+         * @brief Determines whether the storage service has the file. This doesn't simulate anything and is merely a zero-simulated-time data structure lookup.
+         * If you want to simulate the overhead of querying the StorageService, instead use lookupFile().
+         * @param file a file
+         * @param path the path
+         * @return true if the file is present, false otherwise
+         */
+        bool Node::hasFile(const shared_ptr<DataFile> &file, const string &path) {
+            throw std::runtime_error("XRootD::Node::hasFile(): Not supported/implemented yet");
+        }
+
 
     }// namespace XRootD
 }// namespace wrench

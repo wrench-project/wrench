@@ -126,6 +126,12 @@ namespace wrench {
             this->waitForAndProcessNextEvent();
         }
 
+        // Shutdown and destroy VMs
+        this->compute_service->shutdownVM(vm1_name);
+        this->compute_service->destroyVM(vm1_name);
+        this->compute_service->shutdownVM(vm2_name);
+        this->compute_service->destroyVM(vm2_name);
+
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
         WRENCH_INFO("Inspecting task states");
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);

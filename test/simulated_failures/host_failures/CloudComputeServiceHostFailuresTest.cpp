@@ -38,7 +38,7 @@ public:
     void do_CloudServiceRandomFailures_test();
 
 protected:
-    ~CloudServiceHostFailuresTest() {
+    ~CloudServiceHostFailuresTest() override {
         workflow->clear();
     }
 
@@ -127,8 +127,9 @@ private:
     int main() override {
 
         // Starting a FailedHost1 murderer!!
-        auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
-                                                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
+        auto murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost1",
+                                                                   wrench::ResourceSwitcher::Action::TURN_OFF,
+                                                                   wrench::ResourceSwitcher::ResourceType::HOST);
         murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
@@ -154,6 +155,7 @@ private:
         if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
+
         auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
         auto cause = std::dynamic_pointer_cast<wrench::HostError>(real_event->failure_cause);
         if (not cause) {
@@ -189,6 +191,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
+//    argv[2] = strdup("--wrench-full-log");
 
 
     simulation->init(&argc, argv);
@@ -199,7 +202,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     // Get a hostname
     std::string stable_host = "StableHost";
     std::vector<std::string> compute_hosts;
-    compute_hosts.push_back("FailedHost1");
+    compute_hosts.emplace_back("FailedHost1");
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
@@ -250,14 +253,14 @@ private:
     int main() override {
 
         // Starting a FailedHost1 murderer!!
-        auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
-                                                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
+        auto murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost1",
+                                                                   wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
         murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
-        auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 1000, "FailedHost1",
-                                                                                                 wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
+        auto resurector = std::make_shared<wrench::ResourceSwitcher>("StableHost", 1000, "FailedHost1",
+                                                                     wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
         resurector->setSimulation(this->simulation);
         resurector->start(resurector, true, false);// Daemonized, no auto-restart
 
@@ -345,7 +348,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     // Get a hostname
     std::string stable_host = "StableHost";
     std::vector<std::string> compute_hosts;
-    compute_hosts.push_back("FailedHost1");
+    compute_hosts.emplace_back("FailedHost1");
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
@@ -359,8 +362,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
-    wms = simulation->add(new CloudServiceFailureOfAVMAndRestartTestWMS(this, stable_host));
+
+    simulation->add(new CloudServiceFailureOfAVMAndRestartTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
     // Create a File Registry Service
@@ -407,17 +410,17 @@ private:
 
             // Starting a FailedHost1 random repeat switch!!
             unsigned long seed1 = trial * 2 + 37;
-            auto switch1 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
-                    new wrench::ResourceRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100,
-                                                             "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
+            auto switch1 = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(
+                    "StableHost", seed1, 10, 100, 10, 100,
+                    "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
             switch1->setSimulation(this->simulation);
             switch1->start(switch1, true, false);// Daemonized, no auto-restart
 
             // Starting a FailedHost2 random repeat switch!!
             unsigned long seed2 = trial * 17 + 42;
-            auto switch2 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
-                    new wrench::ResourceRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100,
-                                                             "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
+            auto switch2 = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(
+                    "StableHost", seed1, 10, 100, 10, 100,
+                    "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
             switch2->setSimulation(this->simulation);
             switch2->start(switch1, true, false);// Daemonized, no auto-restart
 
@@ -428,33 +431,35 @@ private:
             task->addInputFile(this->test->input_file);
             task->addOutputFile(output_file);
 
-
-            // Create a VM
-            auto vm_name = cloud_service->createVM(task->getMinNumCores(), task->getMemoryRequirement());
-
             std::shared_ptr<wrench::ExecutionEvent> event = nullptr;
             unsigned long total_num_vm_start_attempts = 0;
             unsigned long num_vm_start_attempts = 0;
             unsigned long num_job_submission_attempts = 0;
+            bool completed;
             do {
+
+                    if (num_vm_start_attempts > 200) exit(0);
 
                 // Create a standard job
                 auto job = job_manager->createStandardJob(task, {{this->test->input_file,
-                                                                  wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)},
+                                                                               wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)},
                                                                  {output_file, wrench::FileLocation::LOCATION(this->test->storage_service, output_file)}});
 
-                // Start the VM (sleep 10 and retry if unsuccessful)
+                // Create and Start a VM (sleep 10 and retry if unsuccessful)
                 std::shared_ptr<wrench::BareMetalComputeService> vm_cs;
+                std::string vm_name;
                 try {
-                    //                    WRENCH_INFO("Trying to start the VM");
+                    // WRENCH_INFO("Trying to start the VM");
+                    // Create and start a VM
                     num_vm_start_attempts++;
                     total_num_vm_start_attempts++;
+                    vm_name = cloud_service->createVM(task->getMinNumCores(), task->getMemoryRequirement());
                     vm_cs = cloud_service->startVM(vm_name);
                 } catch (wrench::ExecutionException &e) {
                     wrench::Simulation::sleep(10);
                     continue;
                 }
-                //                WRENCH_INFO("*** WAS ABLE TO START THE VM AFTER %lu attempts", num_vm_start_attempts);
+//                                WRENCH_INFO("*** WAS ABLE TO START THE VM AFTER %lu attempts", num_vm_start_attempts);
                 num_vm_start_attempts = 0;
 
                 // Submit the standard job to the compute service, making it sure it runs on FailedHost1
@@ -463,7 +468,14 @@ private:
 
                 // Wait for a workflow execution event
                 event = this->waitForNextEvent();
-            } while ((event == nullptr) || (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)));
+
+                completed = (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event) != nullptr);
+                if (completed) {
+                    cloud_service->shutdownVM(vm_name);
+                }
+                cloud_service->destroyVM(vm_name);
+
+            } while (not completed);
 
             WRENCH_INFO("*** WAS ABLE TO RUN THE JOB AFTER %lu attempts (%lu VM start attempts)",
                         num_job_submission_attempts,
@@ -493,6 +505,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     argv[2] = strdup("--cfg=contexts/stack-size:100");
+//    argv[3] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -502,8 +515,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     // Get a hostname
     std::string stable_host = "StableHost";
     std::vector<std::string> compute_hosts;
-    compute_hosts.push_back("FailedHost1");
-    compute_hosts.push_back("FailedHost2");
+    compute_hosts.emplace_back("FailedHost1");
+    compute_hosts.emplace_back("FailedHost2");
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(

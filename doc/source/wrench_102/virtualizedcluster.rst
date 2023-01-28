@@ -20,33 +20,39 @@ which VM instances are created and (live) migrated:
    std::shared_ptr<wrench::VirtualizedClusterComputeService> virtualized_cluster_cs;
 
 
-   // Create a VM with 2 cores and 1 GiB of RAM
-   auto vm1 = virtualized_cluster_cs->createVM(2, pow(2,30));
+   // Create a VM with 2 cores and 1 GiB of RAM on Host1, which could fail
+   // if not enough resources are available
+   auto vm1_name = virtualized_cluster_cs->createVM(2, pow(2,30), "Host1");
 
-   // Create a VM with 4 cores and 2 GiB of RAM
-   auto vm2 = virtualized_cluster_cs->createVM(4, pow(2,31));
+   // Create a VM with 4 cores and 2 GiB of RAM on Host2 , which could fail
+   // if not enough resources are available
+   auto vm2_name = virtualized_cluster_cs->createVM(4, pow(2,31), "Host2");
 
    [...]
 
    // Start the first VM on Host1
-   virtualized_cluster_cs->startVM(vm1, "Host1");
+   virtualized_cluster_cs->startVM(vm1_name);
 
    // Start the second VM on Host2
-   virtualized_cluster_cs->startVM(vm1, "Host2");
+   virtualized_cluster_cs->startVM(vm2_name);
 
    [...]
 
-   // Live migrate vm1 to host3
-   virtualized_cluster_cs->migrateVM(vm1, "host3");
+   // Live migrate vm1 to Host3
+   virtualized_cluster_cs->migrateVM(vm1_name, "Host3");
 
-   // Live migrate vm2 to host4
-   virtualized_cluster_cs->migrateVM(vm2, "host4");
+   // Live migrate vm2 to Host4
+   virtualized_cluster_cs->migrateVM(vm2_name, "Host4");
 
    [...]
 
    // Shutdown the VMs
-   virtualized_cluster_cs->shutdownVM(vm1);
-   virtualized_cluster_cs->shutdownVM(vm2);
+   virtualized_cluster_cs->shutdownVM(vm1_name);
+   virtualized_cluster_cs->shutdownVM(vm2_name);
+
+   // Destroy the VMs, which releases resources
+   virtualized_cluster_cs->destroyVM(vm1_name);
+   virtualized_cluster_cs->destroyVM(vm2_name);
 
 In the code above the VM instances are not used for anything. See the
 :ref:`interacting with a cloud service page <guide-102-cloud>` for

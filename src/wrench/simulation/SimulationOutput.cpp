@@ -570,13 +570,13 @@ namespace wrench {
                     }
                 }
 
-                current_execution_instance.hostname = current_task_execution.execution_host;
+                current_execution_instance.hostname = current_task_execution.physical_execution_host;
                 current_execution_instance.host_flop_rate = Simulation::getHostFlopRate(
-                        current_task_execution.execution_host);
+                        current_task_execution.physical_execution_host);
                 current_execution_instance.host_memory = Simulation::getHostMemoryCapacity(
-                        current_task_execution.execution_host);
+                        current_task_execution.physical_execution_host);
                 current_execution_instance.host_num_cores = Simulation::getHostNumCores(
-                        current_task_execution.execution_host);
+                        current_task_execution.physical_execution_host);
 
                 current_execution_instance.num_cores_allocated = current_task_execution.num_cores_allocated;
                 current_execution_instance.vertical_position = 0;

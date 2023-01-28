@@ -11,17 +11,11 @@
 #include <wrench-dev.h>
 
 #include <wrench/action/Action.h>
-#include <wrench/action/SleepAction.h>
-#include <wrench/action/ComputeAction.h>
-#include <wrench/action/CustomAction.h>
-#include <wrench/action/FileReadAction.h>
-#include <wrench/action/FileWriteAction.h>
-#include <wrench/action/FileCopyAction.h>
 #include <wrench/services/helper_services/action_execution_service//ActionExecutionService.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h>
 #include <wrench/job/CompoundJob.h>
-#include <wrench/failure_causes/HostError.h>
 
+#include <memory>
 #include <utility>
 
 #include "../../../include/TestWithFork.h"
@@ -43,6 +37,7 @@ public:
     std::shared_ptr<wrench::Workflow> workflow;
 
     void do_ActionExecutionServiceOneActionSuccessTest_test();
+    void do_ActionExecutionServiceOneActionBogusSpecTest_test();
     void do_ActionExecutionServiceOneActionTerminateTest_test();
     void do_ActionExecutionServiceOneActionCrashRestartTest_test();
     void do_ActionExecutionServiceOneActionCrashNoRestartTest_test();
@@ -136,7 +131,7 @@ public:
 private:
     ActionExecutionServiceTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -144,9 +139,8 @@ private:
         // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
-                new wrench::ActionExecutionService("Host2", compute_resources,
-                                                   {}, {}));
+        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
+                "Host2", compute_resources, {}, {}));
 
         action_execution_service->setParentService(this->getSharedPtr<Service>());
 
@@ -231,6 +225,102 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
                             new ActionExecutionServiceOneActionSuccessTestWMS(this, "Host1")));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    this->workflow->clear();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  ACTION SCHEDULER ONE ACTION BOGUS SPEC TEST                     **/
+/**********************************************************************/
+
+
+class ActionExecutionServiceOneActionBogusSpecTestWMS : public wrench::ExecutionController {
+
+public:
+    ActionExecutionServiceOneActionBogusSpecTestWMS(ActionExecutionServiceTest *test,
+                                                    std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+    }
+
+private:
+    ActionExecutionServiceTest *test;
+
+    int main() override {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create an ActionExecutionService
+        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
+                new wrench::ActionExecutionService(
+                        "Host2", compute_resources,
+                        {}, {}));
+
+        action_execution_service->setParentService(this->getSharedPtr<Service>());
+
+        // Start it
+        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->start(action_execution_service, true, false);
+
+        // Create a Compound Job
+        auto job = job_manager->createCompoundJob("my_job");
+
+        // Add a sleep action to it
+        auto action = job->addComputeAction("compute", 100.0, 0.0, 100, 100, wrench::ParallelModel::CONSTANTEFFICIENCY(1.0));
+
+        // Submit the action to the action executor
+        try {
+            action_execution_service->submitAction(action);
+            throw std::runtime_error("Should not be able to submit action with bogus number of cores");
+        } catch (wrench::ExecutionException &ignore) {
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ActionExecutionServiceTest, OneActionBogusSpec) {
+    DO_TEST_WITH_FORK(do_ActionExecutionServiceOneActionBogusSpecTest_test);
+}
+
+void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionBogusSpecTest_test() {
+
+    // Create and initialize a simulation
+    simulation = wrench::Simulation::createSimulation();
+    int argc = 2;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
+    //    argv[2] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    this->workflow = wrench::Workflow::createWorkflow();
+
+    // Create a Storage Service
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"},
+                                                                                        {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
+
+    // Create a file
+    this->file = this->workflow->addFile("some_file", 1000000.0);
+
+    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
+
+    // Create a WMS
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+                            new ActionExecutionServiceOneActionBogusSpecTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

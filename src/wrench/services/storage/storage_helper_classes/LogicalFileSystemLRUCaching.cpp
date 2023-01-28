@@ -30,14 +30,14 @@ namespace wrench {
 
 
     /**
- * @brief Store file in directory
- *
- * @param file: the file to store
- * @param absolute_path: the directory's absolute path (at the mount point)
- * @param must_be_initialized: whether the file system is initialized
- *
- * @throw std::invalid_argument
- */
+     * @brief Store file in directory
+     *
+     * @param file: the file to store
+     * @param absolute_path: the directory's absolute path (at the mount point)
+     * @param must_be_initialized: whether the file system is initialized
+     *
+     * @throw std::invalid_argument
+     */
     void LogicalFileSystemLRUCaching::storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path, bool must_be_initialized) {
         if (devnull) {
             return;
@@ -74,12 +74,12 @@ namespace wrench {
     }
 
     /**
- * @brief Remove a file in a directory
- * @param file: the file to remove
- * @param absolute_path: the directory's absolute path
- *
- * @throw std::invalid_argument
- */
+     * @brief Remove a file in a directory
+     * @param file: the file to remove
+     * @param absolute_path: the directory's absolute path
+     *
+     * @throw std::invalid_argument
+     */
     void LogicalFileSystemLRUCaching::removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return;
@@ -97,11 +97,11 @@ namespace wrench {
     }
 
     /**
- * @brief Remove all files in a directory
- * @param absolute_path: the directory's absolute path
- *
- * @throw std::invalid_argument
- */
+     * @brief Remove all files in a directory
+     * @param absolute_path: the directory's absolute path
+     *
+     * @throw std::invalid_argument
+     */
     void LogicalFileSystemLRUCaching::removeAllFilesInDirectory(const std::string &absolute_path) {
         if (devnull) {
             return;
@@ -114,14 +114,12 @@ namespace wrench {
         for (auto const &s: this->content[fixed_path]) {
             freed_space += s.first->getSize();
         }
-        this->content[fixed_path].clear();
-        this->free_space += freed_space;
-
         for (auto const &c: this->content[fixed_path]) {
             this->lru_list.erase(std::static_pointer_cast<FileOnDiskLRUCaching>(c.second)->lru_sequence_number);
         }
-        //        print_lru_list();
+
         this->content[fixed_path].clear();
+        this->free_space += freed_space;
     }
 
 

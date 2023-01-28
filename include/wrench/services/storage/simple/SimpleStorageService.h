@@ -83,6 +83,8 @@ namespace wrench {
 
         double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
 
+        bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) override;
+
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -106,6 +108,7 @@ namespace wrench {
         bool processFileLookupRequest(const std::shared_ptr<FileLocation> &location,
                                       simgrid::s4u::Mailbox *answer_mailbox);
         bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox);
+
 
     private:
         friend class Simulation;

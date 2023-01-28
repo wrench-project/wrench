@@ -560,7 +560,7 @@ namespace wrench {
         try {
             // Start the execution controllers
             for (const auto &execution_controller: this->execution_controllers) {
-                execution_controller->start(execution_controller, false, false);// Not daemonized, no auto-restart
+                execution_controller->start(execution_controller, execution_controller->daemonized, false);// Not daemonized, no auto-restart
             }
 
             // Start the compute services

@@ -136,6 +136,12 @@ namespace wrench {
             this->waitForAndProcessNextEvent();
         }
 
+        // Shutting down and destroying VMs
+        cloud_compute_service->shutdownVM(large_vm);
+        cloud_compute_service->destroyVM(large_vm);
+        cloud_compute_service->shutdownVM(small_vm);
+        cloud_compute_service->destroyVM(small_vm);
+
         WRENCH_INFO("Workflow execution complete");
         return 0;
     }

@@ -23,7 +23,7 @@ Creating a virtualized cluster compute service
 ==============================================
 
 In WRENCH, a virtualized cluster service is defined by the
-wrench::VirtualizedClusterComputeService class. An instantiation of a
+:cpp:class:`wrench::VirtualizedClusterComputeService` class. An instantiation of a
 virtualized cluster service requires the following parameters:
 
 -  The name of a host on which to start the service;
@@ -46,14 +46,13 @@ description requests is configured to be 1KiB:
 
 .. code:: cpp
 
-   auto virtualized_cluster_cs = simulation.add(
-             new wrench::VirtualizedClusterComputeService(
-                                                   "vc_gateway", 
-                                                   {"host1", "host2", "host3", "host4"}, 
-                                                   "/scratch/", 
-                                                   {{wrench::VirtualClusterComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "10"}}, 
-                                                   {{wrench::VirtualClusterComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 
-                                                   1024}}));
+   std::vector<std::string> virtualized_cluster_hosts = {"host1", "host2", "host3", "host4"};
+   auto virtualized_cluster_cs = simulation->add(
+         new wrench::VirtualizedClusterComputeService("vc_gateway",
+                                                      virtualized_cluster_hosts,
+                                                      "/scratch/",
+                                                      {{wrench::VirtualizedClusterComputeServiceProperty::VM_BOOT_OVERHEAD, "10s"}},
+                                                      {{wrench::VirtualizedClusterComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024}}));
 
 See the documentation of
 :cpp:class:`wrench::VirtualizedClusterComputeServiceProperty` and
