@@ -242,4 +242,18 @@ namespace wrench {
         return fs->getFileLastWriteDate(location->getFile(), location->getAbsolutePathAtMountPoint());
     }
 
+    /**
+     * @brief Determines whether the storage service has the file. This doesn't simulate anything and is merely a zero-simulated-time data structure lookup.
+     * If you want to simulate the overhead of querying the StorageService, instead use lookupFile().
+     * @param file a file
+     * @param path the path
+     * @return true if the file is present, false otherwise
+     */
+    bool SimpleStorageService::hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+        auto location = wrench::FileLocation::LOCATION(this->getSharedPtr<SimpleStorageService>(), path, file);
+        auto fs = this->file_systems[location->getMountPoint()].get();
+        return fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint());
+    }
+
+
 }// namespace wrench
