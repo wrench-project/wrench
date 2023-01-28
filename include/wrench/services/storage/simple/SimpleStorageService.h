@@ -110,7 +110,6 @@ namespace wrench {
         bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox);
 
 
-
     private:
         friend class Simulation;
 
