@@ -182,15 +182,15 @@ void VirtualizedClusterServiceTest::do_ConstructorTest_test() {
     std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
 
     ASSERT_THROW(cloud_compute_service = simulation->add(
-            new wrench::CloudComputeService(
-                    hostname, execution_hosts, {"/"},
-                    {{wrench::CloudComputeServiceProperty::VM_BOOT_OVERHEAD, "-1.0"}})),
+                         new wrench::CloudComputeService(
+                                 hostname, execution_hosts, {"/"},
+                                 {{wrench::CloudComputeServiceProperty::VM_BOOT_OVERHEAD, "-1.0"}})),
                  std::invalid_argument);
 
     ASSERT_THROW(cloud_compute_service = simulation->add(
-            new wrench::CloudComputeService(
-                    hostname, execution_hosts, {"/"},
-                    {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "bogus"}})),
+                         new wrench::CloudComputeService(
+                                 hostname, execution_hosts, {"/"},
+                                 {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "bogus"}})),
                  std::invalid_argument);
 
 
@@ -401,20 +401,20 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
     ASSERT_NO_THROW(cloud_compute_service = simulation->add(
-            new wrench::CloudComputeService(
-                    hostname, execution_hosts, "/scratch",
-                    {})));
+                            new wrench::CloudComputeService(
+                                    hostname, execution_hosts, "/scratch",
+                                    {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new CloudStandardJobTestWMS(this, hostname)));
+                            new CloudStandardJobTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -430,7 +430,6 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
         free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -544,7 +543,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -556,27 +555,27 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Virtualized Cluster Service with no hosts
     std::vector<std::string> nothing;
     ASSERT_THROW(compute_service = simulation->add(
-            new wrench::VirtualizedClusterComputeService(hostname, nothing, "/scratch",
-                                                         {})),
+                         new wrench::VirtualizedClusterComputeService(hostname, nothing, "/scratch",
+                                                                      {})),
                  std::invalid_argument);
 
     // Create a Virtualized Cluster Service
     std::vector<std::string> execution_hosts = wrench::Simulation::getHostnameList();
 
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::VirtualizedClusterComputeService(hostname, execution_hosts, "/scratch",
-                                                         {})));
+                            new wrench::VirtualizedClusterComputeService(hostname, execution_hosts, "/scratch",
+                                                                         {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
 
     ASSERT_NO_THROW(wms = simulation->add(
-            new VirtualizedClusterVMMigrationTestWMS(this, hostname)));
+                            new VirtualizedClusterVMMigrationTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -672,19 +671,19 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {"QuadCoreHost", "DualCoreHost"};
     ASSERT_NO_THROW(cloud_compute_service = simulation->add(
-            new wrench::CloudComputeService(hostname, execution_hosts, "",
-                                            {})));
+                            new wrench::CloudComputeService(hostname, execution_hosts, "",
+                                                            {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new CloudNumCoresTestWMS(this, hostname)));
+                            new CloudNumCoresTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
@@ -772,20 +771,20 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::VirtualizedClusterComputeService(
-                    hostname, execution_hosts, "",
-                    {})));
+                            new wrench::VirtualizedClusterComputeService(
+                                    hostname, execution_hosts, "",
+                                    {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new StopAllVMsTestWMS(this, hostname)));
+                            new StopAllVMsTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
@@ -1010,21 +1009,21 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
 
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::VirtualizedClusterComputeService(
-                    hostname, execution_hosts, "",
-                    {})));
+                            new wrench::VirtualizedClusterComputeService(
+                                    hostname, execution_hosts, "",
+                                    {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ShutdownVMTestWMS(this, hostname)));
+                            new ShutdownVMTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
@@ -1129,19 +1128,19 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::VirtualizedClusterComputeService(hostname, execution_hosts, "",
-                                                         {})));
+                            new wrench::VirtualizedClusterComputeService(hostname, execution_hosts, "",
+                                                                         {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ShutdownVMAndThenShutdownServiceTestWMS(this, hostname)));
+                            new ShutdownVMAndThenShutdownServiceTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
@@ -1283,18 +1282,18 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::VirtualizedClusterComputeService(hostname, execution_hosts, "/scratch")));
+                            new wrench::VirtualizedClusterComputeService(hostname, execution_hosts, "/scratch")));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SubmitToVMTestWMS(this, hostname)));
+                            new SubmitToVMTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));

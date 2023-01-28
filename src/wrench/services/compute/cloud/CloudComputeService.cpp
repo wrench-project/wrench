@@ -43,8 +43,7 @@ namespace wrench {
                                              const std::vector<std::string> &execution_hosts,
                                              const std::string &scratch_space_mount_point,
                                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
-            ComputeService(hostname, "cloud_service", scratch_space_mount_point) {
+                                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname, "cloud_service", scratch_space_mount_point) {
         if (execution_hosts.empty()) {
             throw std::invalid_argument(
                     "CloudComputeService::CloudComputeService(): At least one execution host should be provided");
@@ -611,7 +610,7 @@ namespace wrench {
         CloudComputeServiceCreateVMAnswerMessage *msg_to_send_back;
 
         // See if there is a host that works
-        auto host = findHost(requested_num_cores,requested_ram,physical_host);
+        auto host = findHost(requested_num_cores, requested_ram, physical_host);
 
         // If we couldn't find a host, return a failure
         if (host.empty()) {
@@ -788,36 +787,36 @@ namespace wrench {
             // Sort the possible hosts to implement best fit (using RAM first)
             std::sort(possible_hosts.begin(), possible_hosts.end(),
                       [](std::string const &a, std::string const &b) {
-                        unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                        double a_ram = Simulation::getHostMemoryCapacity(a);
-                        unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                        double b_ram = Simulation::getHostMemoryCapacity(b);
+                          unsigned long a_num_cores = Simulation::getHostNumCores(a);
+                          double a_ram = Simulation::getHostMemoryCapacity(a);
+                          unsigned long b_num_cores = Simulation::getHostNumCores(b);
+                          double b_ram = Simulation::getHostMemoryCapacity(b);
 
-                        if (a_ram != b_ram) {
-                            return a_ram < b_ram;
-                        } else if (a_num_cores < b_num_cores) {
-                            return a_num_cores < b_num_cores;
-                        } else {
-                            return a < b;// string order
-                        }
+                          if (a_ram != b_ram) {
+                              return a_ram < b_ram;
+                          } else if (a_num_cores < b_num_cores) {
+                              return a_num_cores < b_num_cores;
+                          } else {
+                              return a < b;// string order
+                          }
                       });
 
         } else if (vm_resource_allocation_algorithm == "best-fit-cores-first") {
             // Sort the possible hosts to implement best fit (using cores first)
             std::sort(possible_hosts.begin(), possible_hosts.end(),
                       [](std::string const &a, std::string const &b) {
-                        unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                        double a_ram = Simulation::getHostMemoryCapacity(a);
-                        unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                        double b_ram = Simulation::getHostMemoryCapacity(b);
+                          unsigned long a_num_cores = Simulation::getHostNumCores(a);
+                          double a_ram = Simulation::getHostMemoryCapacity(a);
+                          unsigned long b_num_cores = Simulation::getHostNumCores(b);
+                          double b_ram = Simulation::getHostMemoryCapacity(b);
 
-                        if (a_num_cores != b_num_cores) {
-                            return a_num_cores < b_num_cores;
-                        } else if (a_ram < b_ram) {
-                            return a_ram < b_ram;
-                        } else {
-                            return a < b;// string order
-                        }
+                          if (a_num_cores != b_num_cores) {
+                              return a_num_cores < b_num_cores;
+                          } else if (a_ram < b_ram) {
+                              return a_ram < b_ram;
+                          } else {
+                              return a < b;// string order
+                          }
                       });
         }
 
@@ -833,7 +832,7 @@ namespace wrench {
      */
     void CloudComputeService::
             processStartVM(simgrid::s4u::Mailbox *answer_mailbox,
-                                             const std::string &vm_name) {
+                           const std::string &vm_name) {
         auto vm_tuple = this->vm_list[vm_name];
         auto vm = std::get<0>(vm_tuple);
         auto host = std::get<1>(vm_tuple);

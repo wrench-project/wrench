@@ -44,7 +44,7 @@ public:
 
 
 protected:
-    std::string createRoute(const std::string& src, const std::string& dst, const std::vector<std::string> &links) {
+    std::string createRoute(const std::string &src, const std::string &dst, const std::vector<std::string> &links) {
         std::string to_return = "<route src=\"" + src + "\" ";
         to_return += "dst=\"" + dst + "\">\n";
         for (auto const &l: links) {
@@ -172,14 +172,14 @@ private:
     unsigned long num_jobs_on_baremetal_cs = 0;
     unsigned long max_num_jobs_on_baremetal_cs = 4;
 
-    void createMonkey(const std::string& victimhost, double alpha = 1.0) {
+    void createMonkey(const std::string &victimhost, double alpha = 1.0) {
         static unsigned long seed = 666;
         seed = seed * 17 + 37;
         auto switcher = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(
                 "WMSHost", seed,
-                                                         CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF, CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF,
-                                                         CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON, CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON,
-                                                         victimhost, wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
+                CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF, CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF,
+                CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON, CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON,
+                victimhost, wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
         switcher->setSimulation(this->simulation);
         switcher->start(switcher, true, false);// Daemonized, no auto-restart
     }
@@ -300,9 +300,9 @@ private:
 
         // Create/submit a standard job
         auto job = this->job_manager->createStandardJob(task, {
-                {task->getInputFiles().at(0), wrench::FileLocation::LOCATION(target_storage_service, task->getInputFiles().at(0))},
-                {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(target_storage_service, task->getOutputFiles().at(0))},
-        });
+                                                                      {task->getInputFiles().at(0), wrench::FileLocation::LOCATION(target_storage_service, task->getInputFiles().at(0))},
+                                                                      {task->getOutputFiles().at(0), wrench::FileLocation::LOCATION(target_storage_service, task->getOutputFiles().at(0))},
+                                                              });
         this->job_manager->submitJob(job, target_cs);
 
         //        WRENCH_INFO("Submitted task1 '%s' to '%s' with files to read from '%s",
@@ -410,7 +410,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     argv[2] = strdup("--cfg=contexts/stack-size:100");
-//    argv[3] = strdup("--wrench-full-log");
+    //    argv[3] = strdup("--wrench-full-log");
 
     this->faulty_map = args;
 
