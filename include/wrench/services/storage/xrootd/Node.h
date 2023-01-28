@@ -100,6 +100,8 @@ namespace wrench {
             //bool hasMultipleMountPoints() override;
             //bool hasMountPoint(const std::string &mp) override;
 
+            bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) override;
+
             bool cached(shared_ptr<DataFile> file);
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
 
