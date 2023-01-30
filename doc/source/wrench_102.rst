@@ -197,10 +197,11 @@ standard jobs (described below). But all these examples could be easily
 rewritten using the more generic compound job abstraction.
 
 A **Standard Job** is a specific kind of job designed for **workflow**
-applications. In its most complete form, a standard job specifies: - A
-set (in fact a vector) of ``std::shared_ptr<wrench::WorkflowTask>`` to
-execute, so that each task without all its predecessors in the set is
-ready;
+applications. In its most complete form, a standard job specifies:
+
+-  A set (in fact a vector) of ``std::shared_ptr<wrench::WorkflowTask>`` to
+   execute, so that each task without all its predecessors in the set is
+   ready;
 
 -  A ``std::map`` of
    ``<std::shared_ptr<wrench::DataFile>>, std::shared_ptr<wrench::StorageService>>``
