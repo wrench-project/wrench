@@ -30,8 +30,8 @@ Here is an example interaction with a :cpp:class:`wrench::CloudComputeService`:
    auto vm2 = some_cloud_cs->createVM(4, pow(2,31));
 
    // Start both VMs and keep track of their associated bare-metal compute services
-   vm1_cs = some_cloud_cs->startVM(vm1);
-   vm2_cs = some_cloud_cs->startVM(vm2);
+   auto vm1_cs = some_cloud_cs->startVM(vm1);
+   auto vm2_cs = some_cloud_cs->startVM(vm2);
 
    // Create a job manager
    auto job_manager = this->createJobManager();
@@ -46,20 +46,18 @@ Here is an example interaction with a :cpp:class:`wrench::CloudComputeService`:
    Simulation::sleep(10);
 
    // Suspend the 1st VM
-   some_cloud_cs->suspend(vm1);
-
+   some_cloud_cs->suspendVM(vm1);
    // Sleep for 10 seconds
    Simulation::sleep(10);
 
    // Resume the 1st VM
-   some_cloud_cs->resume(vm1);
-
+   some_cloud_cs->resumeVM(vm1);
    // Wait for and process the next event (should be a standard job completion or failure)
    this->waitForAndProcessNextEvent();
 
    // Shutdown both VMs
-   some_cloud_cs->shutdown(vm1);
-   some_cloud_cs->shutdown(vm2);
+   some_cloud_cs->shutdownVM(vm1);
+   some_cloud_cs->shutdownVM(vm2);
 
 Note that the cloud service will decide on which physical resources VM
 instances should be started. The underlying physical resources are
