@@ -240,9 +240,9 @@ private:
 
         CUSTOM_NO_THROW(new wrench::CloudComputeServiceShutdownVMAnswerMessage(true, nullptr, 666));
 
-        CUSTOM_NO_THROW(new wrench::CloudComputeServiceStartVMRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), "vm", "host", 666));
-        CUSTOM_THROW(new wrench::CloudComputeServiceStartVMRequestMessage(nullptr, "vm", "host", 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::CloudComputeServiceStartVMRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), "", "host", 666), std::invalid_argument);
+        CUSTOM_NO_THROW(new wrench::CloudComputeServiceStartVMRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), "vm", 666));
+        CUSTOM_THROW(new wrench::CloudComputeServiceStartVMRequestMessage(nullptr, "vm", 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::CloudComputeServiceStartVMRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), "", 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::CloudComputeServiceStartVMAnswerMessage(true, nullptr, nullptr, 666));
 
