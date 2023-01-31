@@ -360,7 +360,6 @@ namespace wrench {
         this->location = std::move(location);
         this->success = success;
         this->buffer_size = buffer_size;
-
         this->failure_cause = std::move(failure_cause);
     }
 
