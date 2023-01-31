@@ -87,7 +87,7 @@ namespace wrench {
                                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                              const std::string &suffix) : ComputeService(hostname,
                                                                                          "BatchComputeService" + suffix,
-                                                                                         std::move(scratch_space_mount_point)) {
+                                                                                         scratch_space_mount_point) {
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
 
@@ -711,7 +711,7 @@ namespace wrench {
     //    }
 
     /**
-     * @brief Wait for and procress the next message
+     * @brief Wait for and process the next message
      * @return true if the service should keep going, false otherwise
      */
     bool BatchComputeService::processNextMessage() {
@@ -864,7 +864,7 @@ namespace wrench {
             WRENCH_WARN(
                     "BatchComputeService::processCompoundJobCompletion(): Received a compound job completion, but "
                     "the executor is not in the executor list - Likely getting wires crossed due to concurrent "
-                    "completion and time-outs.. ignoring")
+                    "completion and time-outs.. ignoring");
             return;
         }
 
@@ -889,7 +889,7 @@ namespace wrench {
         // Remove the job from the running job list
         this->removeJobFromRunningList(batch_job);
 
-        // notify the scheduled of the job completion
+        // notify the scheduler of the job completion
         this->scheduler->processJobCompletion(batch_job);
 
         // Send the callback to the originator
@@ -1094,14 +1094,14 @@ namespace wrench {
         }
 
         // Create the trace replayer process
-        this->workload_trace_replayer = std::shared_ptr<WorkloadTraceFileReplayer>(
-                new WorkloadTraceFileReplayer(
-                        S4U_Simulation::getHostName(),
-                        this->getSharedPtr<BatchComputeService>(),
-                        this->num_cores_per_node,
-                        this->getPropertyValueAsBoolean(
-                                BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE),
-                        this->workload_trace));
+        this->workload_trace_replayer = std::make_shared<WorkloadTraceFileReplayer>(
+
+                S4U_Simulation::getHostName(),
+                this->getSharedPtr<BatchComputeService>(),
+                this->num_cores_per_node,
+                this->getPropertyValueAsBoolean(
+                        BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE),
+                this->workload_trace);
         this->workload_trace_replayer->setSimulation(this->simulation);
         this->workload_trace_replayer->start(this->workload_trace_replayer, true,
                                              false);// Daemonized, no auto-restart
@@ -1310,7 +1310,7 @@ namespace wrench {
      * @param job: the job
      * @param service_specific_args: the service-specific arguments
      */
-    void BatchComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
+    void BatchComputeService::validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &job,
                                                                std::map<std::string, std::string> &service_specific_args) {
         // Check that -N, -t, and -c are specified
         // -user is optional

@@ -16,7 +16,7 @@ namespace wrench {
         /**
         * @brief Create the XRootD Node that will be the root supervisor
         * @param hostname: the name of the host on which the service should run
-        * @param node_property_list: The property list to use for the new Node, defaluts to {}
+        * @param node_property_list: The property list to use for the new Node, defaults to {}
         * @param node_messagepayload_list: The message payload list to use for the new Node, defaults to {}
         *
         * @return a shared pointer to the newly created Node
@@ -46,7 +46,7 @@ namespace wrench {
         * @brief Create the an XRootD Node that will be a supervisor
         *
         * @param hostname: the name of the host on which the service should run
-        * @param node_property_list: The property list to use for the new Node, defaluts to {}
+        * @param node_property_list: The property list to use for the new Node, defaults to {}
         * @param node_messagepayload_list: The message payload list to use for the new Node, defaults to {}
         *
         * @return a shared pointer to the newly created Node
@@ -66,7 +66,7 @@ namespace wrench {
         * @param mount_point: the single mountpoint of the disk on which files will be stored
         * @param storage_property_list: The property list to use for the underlying storage server
         * @param storage_messagepayload_list: The message payload list to use for the underlying storage server
-        * @param node_property_list: The property list to use for the new Node, defaluts to {}
+        * @param node_property_list: The property list to use for the new Node, defaults to {}
         * @param node_messagepayload_list: The message payload list to use for the new Node, defaults to {}
         *
         * @return a shared pointer to the newly created Node
@@ -94,10 +94,10 @@ namespace wrench {
         std::shared_ptr<Node> Deployment::createNode(const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list_override, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list_override) {
             WRENCH_PROPERTY_COLLECTION_TYPE properties = property_values;
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE payloads = messagepayload_values;
-            for (auto property: property_list_override) {//override XRootD default properties with suplied properties for this node
+            for (auto property: property_list_override) {//override XRootD default properties with supplied properties for this node
                 properties[property.first] = property.second;
             }
-            for (auto property: messagepayload_list_override) {//override XRootD default message payload with suplied properties for this node
+            for (auto property: messagepayload_list_override) {//override XRootD default message payload with supplied properties for this node
                 payloads[property.first] = property.second;
             }
             std::shared_ptr<Node> ret = make_shared<Node>(this, hostname, properties, payloads);

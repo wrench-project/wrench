@@ -163,15 +163,15 @@ namespace wrench {
      * @brief Sets the action's failure cause
      * @param failure_cause: the failure cause
      */
-    void Action::setFailureCause(std::shared_ptr<FailureCause> failure_cause) {
-        this->execution_history.top().failure_cause = std::move(failure_cause);
+    void Action::setFailureCause(const std::shared_ptr<FailureCause> &failure_cause) {
+        this->execution_history.top().failure_cause = failure_cause;
     }
 
     /**
     * @brief Sets the action's execution hosts (and the action's physical execution host)
     * @param host: a hostname
     */
-    void Action::setExecutionHost(std::string host) {
+    void Action::setExecutionHost(const std::string &host) {
         std::string physical_host;
 
         this->execution_history.top().execution_host = host;
@@ -298,10 +298,10 @@ namespace wrench {
 
     /**
      * @brief Set the action's priority
-     * @param priority: a priority
+     * @param p: a priority
      */
-    void Action::setPriority(double priority) {
-        this->priority = priority;
+    void Action::setPriority(double p) {
+        this->priority = p;
     }
 
     /**

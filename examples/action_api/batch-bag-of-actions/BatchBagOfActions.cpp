@@ -24,7 +24,7 @@
  **    ./wrench-example-batch-bag-of-actions 10 ./four_hosts.xml
  **
  ** Example invocation of the simulator for a 10-compute-action workload, with only execution controller logging:
- **    ./wrench-example-batch-bag-of-actions 10 ./four_hosts.xml --log=custom_execution_controller.threshold=info
+ **    ./wrench-example-batch-bag-of-actions 10 ./four_hosts.xml --log=custom_controller.threshold=info
  **
  ** Example invocation of the simulator for a 6-compute-action workload with full logging:
  **    ./wrench-example-batch-bag-of-actions 6 ./four_hosts.xml --wrench-full-log

@@ -11,6 +11,8 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 #include <algorithm>
+#include <memory>
+#include <utility>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
@@ -27,6 +29,7 @@ public:
     std::shared_ptr<wrench::ComputeService> cs = nullptr;
 
     void do_ResourceInformationLinkFailure_test();
+    void do_MultiActionJobLinkFailure_test();
 
 protected:
     ~BareMetalComputeServiceLinkFailuresTest() {
@@ -101,19 +104,19 @@ class BareMetalComputeServiceResourceInformationTestWMS : public wrench::Executi
 
 public:
     BareMetalComputeServiceResourceInformationTestWMS(BareMetalComputeServiceLinkFailuresTest *test,
-                                                      std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                                                      const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
     BareMetalComputeServiceLinkFailuresTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a link switcher on/off er
-        auto switcher = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
-                new wrench::ResourceRandomRepeatSwitcher("Host1", 123, 1, 50, 1, 10,
-                                                         "link1", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
+        auto switcher = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(
+                "Host1", 123, 1, 50, 1, 10,
+                "link1", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK);
         switcher->setSimulation(this->simulation);
         switcher->start(switcher, true, false);// Daemonized, no auto-restart
 
@@ -201,6 +204,112 @@ void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_
             new BareMetalComputeServiceResourceInformationTestWMS(this, "Host1"));
 
     simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  LINK FAILURE TEST BEFORE MULTI-ACTION JOB SUBMISSION            **/
+/**********************************************************************/
+
+class MultiActionJobLinkFailureTestWMS : public wrench::ExecutionController {
+public:
+    MultiActionJobLinkFailureTestWMS(BareMetalComputeServiceLinkFailuresTest *test,
+                                     std::shared_ptr<wrench::Workflow> workflow,
+                                     std::shared_ptr<wrench::BareMetalComputeService> compute_service,
+                                     std::string &hostname) : wrench::ExecutionController(hostname, "test"),
+                                                              test(test), workflow(std::move(workflow)),
+                                                              compute_service(compute_service) {
+    }
+
+private:
+    BareMetalComputeServiceLinkFailuresTest *test;
+    std::shared_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::BareMetalComputeService> compute_service;
+
+    int main() override {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a compound job
+        auto job = job_manager->createCompoundJob("my_job");
+
+        unsigned long first_chain_length = 10;
+        unsigned long fork_width = 15;
+        unsigned long second_chain_length = 6;
+
+        std::vector<std::shared_ptr<wrench::SleepAction>> first_chain_tasks;
+
+        for (unsigned long i = 0; i < first_chain_length; i++) {
+            first_chain_tasks.push_back(job->addSleepAction("chain1_sleep_" + std::to_string(i), 10));
+            if (i > 0) {
+                job->addActionDependency(first_chain_tasks[i - 1], first_chain_tasks[i]);
+            }
+        }
+
+        // Turn off the network :)
+        wrench::Simulation::turnOffLink("link1");
+
+        // Submit the job
+        job_manager->submitJob(job, this->compute_service, {});
+
+        auto event = this->waitForNextEvent();
+
+        if (job->getState() != wrench::CompoundJob::DISCONTINUED) {
+            throw std::runtime_error("Invalid job state");
+        }
+
+        for (const auto &a: job->getActions()) {
+            if (a->getState() != wrench::Action::FAILED) {
+                throw std::runtime_error("Invalid action state");
+            }
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceLinkFailuresTest, MultiActionJob) {
+    DO_TEST_WITH_FORK(do_MultiActionJobLinkFailure_test);
+}
+
+void BareMetalComputeServiceLinkFailuresTest::do_MultiActionJobLinkFailure_test() {
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 2;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("multi_action_test");
+    argv[1] = strdup("--wrench-link-shutdown-simulation");
+    //    argv[2] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Create a Compute Service
+    std::shared_ptr<wrench::BareMetalComputeService> compute_service;
+    ASSERT_NO_THROW(compute_service = simulation->add(
+                            new wrench::BareMetalComputeService("Host3",
+                                                                {std::make_pair("Host3",
+                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                wrench::ComputeService::ALL_RAM))},
+                                                                {"/scratch"},
+                                                                {})));
+
+    // Create a WMS
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    std::string hostname = "Host1";
+    ASSERT_NO_THROW(wms = simulation->add(
+                            new MultiActionJobLinkFailureTestWMS(this, workflow, compute_service, hostname)));
+
+    // Running a "do nothing" simulation
+    ASSERT_NO_THROW(simulation->launch());
 
 
     for (int i = 0; i < argc; i++)

@@ -789,7 +789,7 @@ private:
             job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                    {{"whatever", "QuadCoreHost:2"}});
             throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &ignore) {
         }
 
         // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
@@ -797,7 +797,7 @@ private:
             job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                    {{"task_6_10s_1_to_2_cores", "QuadCoreHost:2:bogus"}});
             throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &ignore) {
         }
 
         // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
@@ -805,7 +805,7 @@ private:
             job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                    {{"task_6_10s_1_to_2_cores", "QuadCoreHost:whatever"}});
             throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &ignore) {
         }
 
         // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
@@ -813,7 +813,23 @@ private:
             job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                    {{"task_6_10s_1_to_2_cores", "whatever"}});
             throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &ignore) {
+        }
+
+        // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
+        try {
+            job_manager->submitJob(two_task_job_1, this->test->compute_service,
+                                   {{"task_6_10s_1_to_2_cores", "bogushost:2"}});
+            throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
+        } catch (std::invalid_argument &ignore) {
+        }
+
+        // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
+        try {
+            job_manager->submitJob(two_task_job_1, this->test->compute_service,
+                                   {{"task_6_10s_1_to_2_cores", "QuadCoreHost:1000"}});
+            throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
+        } catch (wrench::ExecutionException &ignore) {
         }
 
         // Submit the 2-task1 job for execution
@@ -842,7 +858,7 @@ private:
         double task5_end_date = this->test->task5->getEndDate();
         double task6_end_date = this->test->task6->getEndDate();
 
-        // Check the each task1 ran using 2 cores
+        // Check that each task1 ran using 2 cores
         if (this->test->task5->getNumCoresAllocated() != 2) {
             throw std::runtime_error("It looks like task5 didn't run with 2 cores according to in-task1 info (" + std::to_string(this->test->task5->getNumCoresAllocated()) + ")");
         }
