@@ -191,7 +191,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
 
     simulation->init(&argc, argv);
@@ -438,11 +438,11 @@ private:
             bool completed;
             do {
 
-                    if (num_vm_start_attempts > 200) exit(0);
+                if (num_vm_start_attempts > 200) exit(0);
 
                 // Create a standard job
                 auto job = job_manager->createStandardJob(task, {{this->test->input_file,
-                                                                               wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)},
+                                                                  wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)},
                                                                  {output_file, wrench::FileLocation::LOCATION(this->test->storage_service, output_file)}});
 
                 // Create and Start a VM (sleep 10 and retry if unsuccessful)
@@ -459,7 +459,7 @@ private:
                     wrench::Simulation::sleep(10);
                     continue;
                 }
-//                                WRENCH_INFO("*** WAS ABLE TO START THE VM AFTER %lu attempts", num_vm_start_attempts);
+                //                                WRENCH_INFO("*** WAS ABLE TO START THE VM AFTER %lu attempts", num_vm_start_attempts);
                 num_vm_start_attempts = 0;
 
                 // Submit the standard job to the compute service, making it sure it runs on FailedHost1
@@ -505,7 +505,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     argv[2] = strdup("--cfg=contexts/stack-size:100");
-//    argv[3] = strdup("--wrench-full-log");
+    //    argv[3] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
