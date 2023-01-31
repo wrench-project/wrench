@@ -14,5 +14,6 @@
 namespace wrench {
 
     SET_PROPERTY_NAME(StorageServiceProperty, BUFFER_SIZE);
+    SET_PROPERTY_NAME(StorageServiceProperty, CACHING_BEHAVIOR);
 
-};
+};// namespace wrench

@@ -52,7 +52,6 @@ void export_output_single(wrench::SimulationOutput &output, int num_tasks, std::
 int main(int argc, char **argv) {
 
     auto simulation = wrench::Simulation::createSimulation();
-    ;
     simulation->init(&argc, argv);
 
     if (argc < 3) {

@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
 
 
     /* Parse the first command-line argument (number of tasks) */
-    int num_tasks = 0;
+    int num_tasks;
     try {
         num_tasks = std::atoi(argv[1]);
         if (num_tasks % 2) {

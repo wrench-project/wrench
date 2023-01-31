@@ -28,7 +28,7 @@ namespace wrench {
     * @brief Constructor
     * @param type: the action's type
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param file_registry_service: the file registry service toupdate
+    * @param file_registry_service: the file registry service to update
     * @param file_location: the location where the file should be deleted
     */
     FileRegistryAction::FileRegistryAction(FileRegistryAction::Type type,

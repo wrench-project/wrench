@@ -48,11 +48,11 @@ namespace wrench {
         /***********************/
     };
 
-};// namespace wrench
+}// namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
 
 #endif//WRENCH_EXECUTIONEVENT_H

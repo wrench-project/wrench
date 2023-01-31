@@ -116,10 +116,10 @@ namespace wrench {
         void setStartDate(double date);
         void setEndDate(double date);
         void setState(Action::State new_state);
-        void setExecutionHost(std::string host);
+        void setExecutionHost(const std::string &host);
         void setNumCoresAllocated(unsigned long num_cores);
         void setRAMAllocated(double ram);
-        void setFailureCause(std::shared_ptr<FailureCause> failure_cause);
+        void setFailureCause(const std::shared_ptr<FailureCause> &failure_cause);
 
         virtual ~Action() = default;
 

@@ -49,7 +49,6 @@ int main(int argc, char **argv) {
 
     /* Create a WRENCH simulation object */
     auto simulation = wrench::Simulation::createSimulation();
-    ;
 
     /* Initialize the simulation, which may entail extracting WRENCH-specific and
      * Simgrid-specific command-line arguments that can modify general simulation behavior.
@@ -69,7 +68,7 @@ int main(int argc, char **argv) {
     simulation->instantiatePlatform(argv[2]);
 
     /* Parse the first command-line argument (number of tasks) */
-    int num_tasks = 0;
+    int num_tasks;
     try {
         num_tasks = std::atoi(argv[1]);
         if (num_tasks % 2) {

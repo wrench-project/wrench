@@ -24,7 +24,7 @@
 WRENCH_LOG_CATEGORY(wrench_core_s4u_daemon, "Log category for S4U_Daemon");
 
 #ifdef ACTOR_TRACKING_OUTPUT
-std::map<std::string, unsigned long> num_actors;
+std::unordered_map<std::string, unsigned long> num_actors;
 #endif
 
 namespace wrench {
@@ -377,4 +377,4 @@ namespace wrench {
         return S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()];
     }
 
-};// namespace wrench
+}// namespace wrench
