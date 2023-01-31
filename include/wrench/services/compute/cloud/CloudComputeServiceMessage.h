@@ -62,7 +62,7 @@ namespace wrench {
         CloudComputeServiceCreateVMRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                   unsigned long num_cores,
                                                   double ram_memory,
-                                                  std::string desired_vm_name,
+                                                  const std::string &physical_host,
                                                   WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                                   double payload);
@@ -74,8 +74,8 @@ namespace wrench {
         unsigned long num_cores;
         /** @brief The VM RAM memory_manager_service capacity (0 means "use all memory_manager_service available on the host", this can be lead to out of memory_manager_service issue) */
         double ram_memory;
-        /** @brief The desired name for the VM ("" means "pick for me") */
-        std::string desired_vm_name;
+        /** @brief The physical host on which the VM should be created ("" means "the service picks") */
+        std::string physical_host;
         /** @brief A property list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults") */
         WRENCH_PROPERTY_COLLECTION_TYPE property_list;
         /** @brief A message payload list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults") */
@@ -141,7 +141,6 @@ namespace wrench {
     public:
         CloudComputeServiceStartVMRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                  const std::string &vm_name,
-                                                 const std::string &pm_name,
                                                  double payload);
 
     public:
@@ -149,8 +148,6 @@ namespace wrench {
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The name of the VM  to start */
         std::string vm_name;
-        /** @brief The name of the physical host on which to start the VM (or "" if up to the service") */
-        std::string pm_name;
     };
 
     /**
