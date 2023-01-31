@@ -44,7 +44,7 @@ namespace wrench {
         double max_sleep_before_on_time;
         std::string resource_to_switch;
         ResourceType resource_type;
-        int main();
+        int main() override;
     };
 
     /***********************/

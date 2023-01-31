@@ -23,15 +23,17 @@ Here is an example interaction with a :cpp:class:`wrench::CloudComputeService`:
 
    std:shared_ptr<wrench::CloudComputeService> some_cloud_cs;
 
-   // Create a VM with 2 cores and 1 GiB of RAM
-   auto vm1 = some_cloud_cs->createVM(2, pow(2,30));
+   // Create a VM with 2 cores and 1 GiB of RAM, which could fail if
+   // not enough resources are available
+   auto vm1_name = some_cloud_cs->createVM(2, pow(2,30));
 
-   // Create a VM with 4 cores and 2 GiB of RAM
-   auto vm2 = some_cloud_cs->createVM(4, pow(2,31));
+   // Create a VM with 4 cores and 2 GiB of RAM, which could fail if
+   // not enough resources are available
+   auto vm2_name = some_cloud_cs->createVM(4, pow(2,31));
 
    // Start both VMs and keep track of their associated bare-metal compute services
-   vm1_cs = some_cloud_cs->startVM(vm1);
-   vm2_cs = some_cloud_cs->startVM(vm2);
+   vm1_cs = some_cloud_cs->startVM(vm1_name);
+   vm2_cs = some_cloud_cs->startVM(vm2_name);
 
    // Create a job manager
    auto job_manager = this->createJobManager();
@@ -58,11 +60,15 @@ Here is an example interaction with a :cpp:class:`wrench::CloudComputeService`:
    this->waitForAndProcessNextEvent();
 
    // Shutdown both VMs
-   some_cloud_cs->shutdown(vm1);
-   some_cloud_cs->shutdown(vm2);
+   some_cloud_cs->shutdownVM(vm1_name);
+   some_cloud_cs->shutdownVM(vm2_name);
+
+   // Destroy both VMs, which releases resources
+   some_cloud_cs->destroyVM(vm1_name);
+   some_cloud_cs->destroyVM(vm2_name);
 
 Note that the cloud service will decide on which physical resources VM
-instances should be started. The underlying physical resources are
+instances should be created. The underlying physical resources are
 completely hidden by the cloud service abstraction. If you want more
 control over how the physical resources are used you likely need a
 :ref:`virtualized cluster services <guide-102-virtualizedcluster>`.

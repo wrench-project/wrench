@@ -438,6 +438,7 @@ set(TEST_FILES
         test/simulation/DynamicServiceCreationTest.cpp
         test/simulation/SimulationCommandLineArgumentsTest.cpp
         test/simulation/SimulationLoggingTest.cpp
+        test/simulation/MultiControllerSimulationTest.cpp
         test/simulation/simulation_output/SimulationOutputTest.cpp
         test/simulation/simulation_output/SimulationTimestampDiskReadWriteTest.cpp
         test/simulation/simulation_output/SimulationTimestampTaskTest.cpp
@@ -500,6 +501,7 @@ install(DIRECTORY include/ DESTINATION include)
 # generate unit tests if Google Test is found
 find_library(GTEST_LIBRARY NAMES gtest)
 if(GTEST_LIBRARY)
+    add_definitions(-DGTEST_USED)
     add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
     if (ENABLE_BATSCHED)
         find_library(ZMQ_LIBRARY NAMES zmq)

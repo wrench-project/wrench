@@ -682,7 +682,7 @@ public:
 private:
     SimpleStorageServiceFunctionalTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -847,7 +847,7 @@ public:
 private:
     SimpleStorageServiceFunctionalTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -989,7 +989,7 @@ public:
 private:
     SimpleStorageServiceFunctionalTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -1187,7 +1187,7 @@ public:
 private:
     SimpleStorageServiceFunctionalTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -1531,6 +1531,11 @@ private:
             throw std::runtime_error("File should be in storage_service_1000 at path /large_disk/foo");
         }
 
+        // Check using hasFile
+        if (not this->test->storage_service_1000->hasFile(this->test->file_10)) {
+            throw std::runtime_error("File should be in storage_service_1000 at the mount point root");
+        }
+
 
         // Bogus lookup
         try {
@@ -1639,7 +1644,7 @@ public:
 private:
     SimpleStorageServiceFunctionalTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();

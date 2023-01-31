@@ -50,9 +50,9 @@ namespace wrench {
 
         // Create and start a 5-core VM with 32GB of RAM on the Cloud compute service */
         WRENCH_INFO("Creating a 5-core VM instance on the cloud service");
-        cloud_compute_service->createVM(5, 32.0 * 1000 * 1000 * 1000, "my_vm", {}, {});
+        auto my_vm = cloud_compute_service->createVM(5, 32.0 * 1000 * 1000 * 1000, {}, {});
         WRENCH_INFO("Starting the VM instance, which exposes a usable bare-metal compute service");
-        auto vm_cs = cloud_compute_service->startVM("my_vm");
+        auto vm_cs = cloud_compute_service->startVM(my_vm);
 
         /* Add the VM's BareMetalComputeService to the HTCondor compute service */
         WRENCH_INFO("Adding the VM's bare-metal compute service to HTCondor");
