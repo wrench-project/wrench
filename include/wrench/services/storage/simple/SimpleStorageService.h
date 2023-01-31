@@ -48,7 +48,7 @@ namespace wrench {
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "infinity"},
                 {SimpleStorageServiceProperty::BUFFER_SIZE, "10000000"},// 10 MEGA BYTE
-        };
+                {SimpleStorageServiceProperty::CACHING_BEHAVIOR, "NONE"}};
 
         /** @brief Default message payload values */
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
@@ -76,14 +76,14 @@ namespace wrench {
 
         ~SimpleStorageService() override;
 
-        double getLoad() override;
-
         static SimpleStorageService *createSimpleStorageService(const std::string &hostname,
                                                                 std::set<std::string> mount_points,
                                                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
+
+        bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) override;
 
         /***********************/
         /** \endcond          **/
@@ -109,17 +109,15 @@ namespace wrench {
                                       simgrid::s4u::Mailbox *answer_mailbox);
         bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox);
 
+
     private:
         friend class Simulation;
-
-        int main() override;
-
 
         void validateProperties();
 
         std::shared_ptr<MemoryManager> memory_manager;
     };
 
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_SIMPLESTORAGESERVICE_H

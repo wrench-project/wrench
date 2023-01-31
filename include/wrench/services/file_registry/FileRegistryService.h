@@ -101,6 +101,6 @@ namespace wrench {
                 entries;
     };
 
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_FILEREGISTRYSERVICE_H

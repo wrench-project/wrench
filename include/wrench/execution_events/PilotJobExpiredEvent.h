@@ -66,11 +66,11 @@ namespace wrench {
         std::string toString() override { return "PilotJobExpiredEvent (cs = " + this->compute_service->getName() + ")"; }
     };
 
-};// namespace wrench
+}// namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
 
 #endif//WRENCH_PILOT_JOB_EXPIRED_EVENT_H

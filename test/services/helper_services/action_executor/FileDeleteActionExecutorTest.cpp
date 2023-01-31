@@ -124,7 +124,7 @@ public:
 private:
     FileDeleteActionExecutorTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -134,8 +134,6 @@ private:
         // Add a file_delete_action
         auto file_delete_action = job->addFileDeleteAction("", this->test->file,
                                                            this->test->ss);
-
-
         // coverage
         wrench::Action::getActionTypeAsString(file_delete_action);
         file_delete_action->getFile();
@@ -143,8 +141,8 @@ private:
         file_delete_action->usesScratch();
 
         // Create a file read action executor
-        auto file_delete_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_delete_action, nullptr));
+        auto file_delete_action_executor = std::make_shared<wrench::ActionExecutor>(
+                "Host2", 0, 0.0, 0, false, this->mailbox, file_delete_action, nullptr);
         // Start it
         file_delete_action_executor->setSimulation(this->simulation);
         file_delete_action_executor->start(file_delete_action_executor, true, false);
@@ -212,7 +210,7 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    wms = simulation->add(new FileDeleteActionExecutorSuccessTestWMS(this, "Host1"));
+    simulation->add(new FileDeleteActionExecutorSuccessTestWMS(this, "Host1"));
 
     ASSERT_NO_THROW(simulation->launch());
 

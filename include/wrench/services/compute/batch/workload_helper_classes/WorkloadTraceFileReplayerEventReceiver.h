@@ -44,10 +44,10 @@ namespace wrench {
         std::shared_ptr<JobManager> job_manager;
     };
 
-};// namespace wrench
+}// namespace wrench
 
-    /***********************/
-    /** \endcond          **/
-    /***********************/
+/***********************/
+/** \endcond          **/
+/***********************/
 
 #endif//WRENCH_ONEJOBWMS_H

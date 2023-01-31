@@ -24,7 +24,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the file that could not be written
-     * @param storage_service:  the storage service that ran out of spacee
+     * @param storage_service:  the storage service that ran out of space
      */
     StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(std::shared_ptr<DataFile> file,
                                                                std::shared_ptr<StorageService> storage_service) {
