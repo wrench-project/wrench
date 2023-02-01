@@ -70,6 +70,16 @@ namespace wrench{
         }
         throw runtime_error("Proxy with no default location does not support getTotalSpace()");
     }
+    bool StorageServiceProxy::hasFile(const std::shared_ptr<DataFile> &file, const std::string& path){
+        if(cache){
+            return cache->hasFile(file,path);
+        }
+        if(remote){
+            return remote->hasFile(file,path);
+        }
+        return false;
+
+    }
     /**
      * @brief Process a received control message
      *

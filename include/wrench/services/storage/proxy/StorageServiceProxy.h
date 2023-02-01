@@ -81,9 +81,12 @@ namespace wrench {
                 const std::shared_ptr<StorageService> &remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload = {}) {
             return std::make_shared<StorageServiceProxy>(hostname,cache,remote,properties,messagePayload);
         }
+
+        bool hasFile(const std::shared_ptr<DataFile> &file, const std::string& path);
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
+
         int main();
         bool processNextMessage();
         StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService>& cache=nullptr,const std::shared_ptr<StorageService>& defaultRemote=nullptr,WRENCH_PROPERTY_COLLECTION_TYPE properties={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload={});
