@@ -109,7 +109,7 @@ namespace wrench{
                 target=location->target;
             }
             //cerr<<"FILE LOOKUP!!!! "<<remote<<" "<<target<<endl;
-            if(StorageService::lookupFile(FileLocation::LOCATION(cache, msg->location->getFile()))) {//forward request to cache
+            if(cache->hasFile( msg->location->getFile(),msg->location->getFullAbsolutePath())) {//forward request to cache
                 //cerr<<"File cached"<<endl;
                 S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileLookupAnswerMessage(msg->location->getFile(),true,StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
 
