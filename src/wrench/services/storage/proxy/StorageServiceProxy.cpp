@@ -132,7 +132,7 @@ namespace wrench{
                 target=location->target;
             }
 
-            if(StorageService::lookupFile(FileLocation::LOCATION(cache, msg->location->getFile()))) {//check cache
+            if(cache->hasFile( msg->location->getFile(),msg->location->getFullAbsolutePath())) {//check cache
                 WRENCH_INFO("Forwarding to cache reply mailbox %s",msg->answer_mailbox->get_name().c_str());
                 S4U_Mailbox::putMessage(
                         cache->mailbox,
