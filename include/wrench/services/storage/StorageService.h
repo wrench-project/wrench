@@ -53,11 +53,14 @@ namespace wrench {
         static bool lookupFile(const std::shared_ptr<FileLocation> &location);
         virtual bool lookupFile(const std::shared_ptr<DataFile> &file);
 
+        bool hasFile(const std::shared_ptr<DataFile> &file);
+        virtual bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) = 0;
+
         /**
-	 * @brief Get the last write date of a file
-	 * @param location: the file location
-	 * @return a (simulated) date in seconds
-	 */
+         * @brief Get the last write date of a file
+         * @param location: the file location
+         * @return a (simulated) date in seconds
+         */
         virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) = 0;
 
         static void deleteFile(const std::shared_ptr<FileLocation> &location,
