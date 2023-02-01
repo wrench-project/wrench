@@ -150,7 +150,18 @@ namespace wrench{
                 );
 
             }else if(target){
+                //TODO add handling for concurrent copy
                 pending[msg->location->getFile()].push_back(std::move(message));
+                //TODO add magicRead and readThrough
+                //current is copyThenRead
+                //Magic read: copy to internal->instantly report to client when its done (read answer buffersize 0, then emediatly ack)
+                //Readthrough: read from target to client emediatly, then instantly create on cache.  REQUIRES EXTANT NETWORK PATH
+                //cached behavior for all 3 is the same.
+                //concurrent first read behavior:
+                    //copyThenRead: all block until copy finished, then all read
+                    //magicRead:    all block until copy finsished, then all magic read
+                    //readthrough:  all block until first read is finished, then all others read
+                //do not speed excessive time on readThrough
                 StorageService::initiateFileCopy(mailbox, FileLocation::LOCATION(target,msg->location->getFile()),FileLocation::LOCATION(cache,msg->location->getFile()));
             }else{
                 S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileReadAnswerMessage(msg->location,false,std::make_shared<FileNotFound>(msg->location),0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
