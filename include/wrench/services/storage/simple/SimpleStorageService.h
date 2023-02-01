@@ -82,7 +82,7 @@ namespace wrench {
                                                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
-
+        using StorageService::hasFile;
         bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) override;
 
         /***********************/

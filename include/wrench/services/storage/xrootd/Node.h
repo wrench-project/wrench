@@ -123,7 +123,7 @@ namespace wrench {
 
             map<Node *, vector<stack<Node *>>> splitStack(vector<stack<Node *>> search_stack);
             virtual std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
-            vector<stack<Node *>> constructFileSearchTree(vector<shared_ptr<Node>> &targets);
+            vector<stack<Node *>> constructFileSearchTree(const vector<shared_ptr<Node>> &targets);
             stack<Node *> constructSearchStack(Node *target);
             //std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
 
