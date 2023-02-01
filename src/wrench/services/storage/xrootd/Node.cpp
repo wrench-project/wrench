@@ -260,6 +260,7 @@ namespace wrench {
                                                          false,
                                                          std::shared_ptr<FailureCause>(
                                                                  new FileNotFound(FileLocation::LOCATION(getSharedPtr<Node>(), msg->file))),
+                                                         nullptr,
                                                          0,
                                                          getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
 
@@ -373,7 +374,6 @@ namespace wrench {
                                              new StorageServiceFileReadRequestMessage(
                                                      msg->answer_mailbox,
                                                      simgrid::s4u::this_actor::get_host(),
-                                                     msg->mailbox_to_receive_the_file_content,
                                                      best,
                                                      msg->num_bytes_to_read,
                                                      getMessagePayloadValue(
@@ -389,7 +389,6 @@ namespace wrench {
                                                  new StorageServiceFileReadRequestMessage(
                                                          msg->answer_mailbox,
                                                          simgrid::s4u::this_actor::get_host(),
-                                                         msg->mailbox_to_receive_the_file_content,
                                                          FileLocation::LOCATION(internalStorage, file),
                                                          msg->num_bytes_to_read,
                                                          getMessagePayloadValue(
@@ -401,7 +400,7 @@ namespace wrench {
                         //        this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                         //extra compute call
 
-                        if (children.size() > 0) {//recursive search
+                        if (!children.empty()) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
                             Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
                                                        new FileNotFoundAlarm(msg->answer_mailbox, file, true, answered), "XROOTD_FileNotFoundAlarm");
@@ -413,7 +412,7 @@ namespace wrench {
                                 map<Node *, vector<stack<Node *>>> splitStacks = splitStack(search_stack);
                                 WRENCH_DEBUG("Searching %zu subtrees for %s", search_stack.size(), file->getID().c_str());
                                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
-                                for (auto entry: splitStacks) {
+                                for (auto const &entry: splitStacks) {
                                     if (entry.first == this) {//this node was the target
                                         //we shouldn't have to worry about this, it should have been handled earlier.
                                         // But just in case, I don't want a rogue search going who knows where
@@ -455,6 +454,7 @@ namespace wrench {
                                                              std::shared_ptr<FailureCause>(
                                                                      new FileNotFound(
                                                                              FileLocation::LOCATION(internalStorage, file))),
+                                                             nullptr,
                                                              0,
                                                              getMessagePayloadValue(
                                                                      MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
@@ -535,7 +535,6 @@ namespace wrench {
                                                      new StorageServiceFileReadRequestMessage(
                                                              msg->answer_mailbox,
                                                              simgrid::s4u::this_actor::get_host(),
-                                                             msg->original->mailbox_to_receive_the_file_content,
                                                              best,
                                                              msg->original->num_bytes_to_read,
                                                              getMessagePayloadValue(

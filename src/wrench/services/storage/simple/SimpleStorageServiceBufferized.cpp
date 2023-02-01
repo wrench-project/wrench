@@ -152,8 +152,7 @@ namespace wrench {
             return processFileWriteRequest(msg->location, msg->answer_mailbox, msg->buffer_size);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
-            return processFileReadRequest(msg->location, msg->num_bytes_to_read, msg->answer_mailbox,
-                                          msg->mailbox_to_receive_the_file_content);
+            return processFileReadRequest(msg->location, msg->num_bytes_to_read, msg->answer_mailbox);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
             return processFileCopyRequest(msg->src, msg->dst, msg->answer_mailbox);
@@ -272,14 +271,12 @@ namespace wrench {
      * @param location: the file's location
      * @param num_bytes_to_read: the number of bytes to read
      * @param answer_mailbox: the mailbox to which the answer should be sent
-     * @param mailbox_to_receive_the_file_content: the mailbox to which the file will be sent
      * @return
      */
     bool SimpleStorageServiceBufferized::processFileReadRequest(
             const std::shared_ptr<FileLocation> &location,
             double num_bytes_to_read,
-            simgrid::s4u::Mailbox *answer_mailbox,
-            simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content) {
+            simgrid::s4u::Mailbox *answer_mailbox) {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
         auto file = location->getFile();
@@ -303,6 +300,10 @@ namespace wrench {
         }
 
         bool success = (failure_cause == nullptr);
+        simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content = nullptr;
+        if (success) {
+            mailbox_to_receive_the_file_content = S4U_Mailbox::getTemporaryMailbox();
+        }
 
 
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
@@ -312,6 +313,7 @@ namespace wrench {
                         location,
                         success,
                         failure_cause,
+                        mailbox_to_receive_the_file_content,
                         buffer_size,
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
