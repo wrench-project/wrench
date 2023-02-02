@@ -19,7 +19,7 @@ WRENCH_LOG_CATEGORY(storage_service_proxy_basic_functional_test, "Log category f
 class StorageServiceProxyBasicTest : public ::testing::Test {
 
 public:
-   void do_BasicFunctionality_test(bool arg);
+   void do_BasicFunctionality_test(bool arg,std::string mode);
 
    std::shared_ptr<wrench::SimpleStorageService> remote;
    std::shared_ptr<wrench::SimpleStorageService> target;
@@ -65,8 +65,8 @@ public:
                          "       <route src=\"Client\" dst=\"Proxy\"> <link_ctn id=\"link12\"/> </route>"
                          "       <route src=\"Proxy\" dst=\"Remote\"> <link_ctn id=\"link13\"/> </route>"
                          "       <route src=\"Proxy\" dst=\"Target\"> <link_ctn id=\"link23\"/> </route>"
-                         "      <route src=\"Client\" dst=\"Remote\"> <link_ctn id=\"backdoor\"/> </route>"
-                         "       <route src=\"Client\" dst=\"Target\"> <link_ctn id=\"backdoor\"/> </route>"
+                         //"      <route src=\"Client\" dst=\"Remote\"> <link_ctn id=\"backdoor\"/> </route>"
+                         //"       <route src=\"Client\" dst=\"Target\"> <link_ctn id=\"backdoor\"/> </route>"
                          "   </zone> "
                          "</platform>";
        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -237,28 +237,78 @@ private:
        }
 };
 
-TEST_F(StorageServiceProxyBasicTest, BasicFunctionalityNoDefaultLocation) {
-   DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test, false);
+TEST_F(StorageServiceProxyBasicTest, BasicFunctionalityCopyThenReadNoDefaultLocation) {
+   DO_TEST_WITH_FORK_TWO_ARGS(do_BasicFunctionality_test, false,"CopyThenRead");
 }
-TEST_F(StorageServiceProxyBasicTest, BasicFunctionalityDefaultLocation) {
-   DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test, true);
+TEST_F(StorageServiceProxyBasicTest, BasicFunctionalityCopyThenReadDefaultLocation) {
+   DO_TEST_WITH_FORK_TWO_ARGS(do_BasicFunctionality_test, true,"CopyThenRead");
+   //do_BasicFunctionality_test(true);
+}
+TEST_F(StorageServiceProxyBasicTest, BasicFunctionalityMagicReadNoDefaultLocation) {
+   DO_TEST_WITH_FORK_TWO_ARGS(do_BasicFunctionality_test, false,"MagicRead");
+}
+TEST_F(StorageServiceProxyBasicTest, BasicFunctionalityMagicReadDefaultLocation) {
+   DO_TEST_WITH_FORK_TWO_ARGS(do_BasicFunctionality_test, true,"MagicRead");
+   //do_BasicFunctionality_test(true);
+}
+TEST_F(StorageServiceProxyBasicTest, BasicFunctionalityReadThroughNoDefaultLocation) {
+   DO_TEST_WITH_FORK_TWO_ARGS(do_BasicFunctionality_test, false,"ReadThrough");
+}
+TEST_F(StorageServiceProxyBasicTest, BasicFunctionalityReadThroughDefaultLocation) {
+   DO_TEST_WITH_FORK_TWO_ARGS(do_BasicFunctionality_test, true,"ReadThrough");
    //do_BasicFunctionality_test(true);
 }
 
-void StorageServiceProxyBasicTest::do_BasicFunctionality_test(bool arg) {
+void StorageServiceProxyBasicTest::do_BasicFunctionality_test(bool arg,std::string mode) {
 
    // Create and initialize a simulation
    auto simulation = wrench::Simulation::createSimulation();
-   int argc = 2;
+   int argc = 3;
    char **argv = (char **) calloc(argc, sizeof(char *));
    argv[0] = strdup("unit_test");
    argv[1] = strdup("--wrench-full-log");
    //argv[2] = strdup("--log=wrench_core_mailbox.threshold=debug");
-
+   argv[2] = strdup("--log=wrench_core_proxy_file_server.threshold=debug");
    simulation->init(&argc, argv);
 
    simulation->instantiatePlatform(platform_file_path);
+   if(mode=="ReadThrough"){
 
+        {
+
+            simgrid::s4u::Engine::get_instance()->netzone_by_name_or_null("AS0")->add_route(simgrid::s4u::Host::by_name("Remote")->get_netpoint(),
+                            simgrid::s4u::Host::by_name("Client")->get_netpoint(),
+                            nullptr,
+                            nullptr,
+                            {simgrid::s4u::LinkInRoute(simgrid::s4u::Link::by_name("link12")),simgrid::s4u::LinkInRoute(simgrid::s4u::Link::by_name("link13"))});
+        }
+        {
+
+            simgrid::s4u::Engine::get_instance()->netzone_by_name_or_null("AS0")->add_route(simgrid::s4u::Host::by_name("Target")->get_netpoint(),
+                                                                                            simgrid::s4u::Host::by_name("Client")->get_netpoint(),
+                                                                                            nullptr,
+                                                                                            nullptr,
+                                                                                            {simgrid::s4u::LinkInRoute(simgrid::s4u::Link::by_name("link12")),simgrid::s4u::LinkInRoute(simgrid::s4u::Link::by_name("link23"))});
+        }
+   }else{
+        {
+
+            simgrid::s4u::Engine::get_instance()->netzone_by_name_or_null("AS0")->add_route(simgrid::s4u::Host::by_name("Target")->get_netpoint(),
+                                                                                            simgrid::s4u::Host::by_name("Client")->get_netpoint(),
+                                                                                            nullptr,
+                                                                                            nullptr,
+                                                                                            {simgrid::s4u::LinkInRoute(simgrid::s4u::Link::by_name("backdoor"))});
+        }
+        {
+
+            simgrid::s4u::Engine::get_instance()->netzone_by_name_or_null("AS0")->add_route(simgrid::s4u::Host::by_name("Remote")->get_netpoint(),
+                                                                                            simgrid::s4u::Host::by_name("Client")->get_netpoint(),
+                                                                                            nullptr,
+                                                                                            nullptr,
+                                                                                            {simgrid::s4u::LinkInRoute(simgrid::s4u::Link::by_name("backdoor"))});
+        }
+
+   }
    // Create a XRootD Manager object
 
 
@@ -272,13 +322,13 @@ void StorageServiceProxyBasicTest::do_BasicFunctionality_test(bool arg) {
    if(arg){
        this->proxy = simulation->add(
                wrench::StorageServiceProxy::createRedirectProxy(
-                       "Proxy", cache,remote
+                       "Proxy", cache,remote,{{wrench::StorageServiceProxyProperty::UNCACHED_READ_METHOD,mode}}
                )
        );
    }else{
        this->proxy = simulation->add(
                wrench::StorageServiceProxy::createRedirectProxy(
-                       "Proxy", cache
+                       "Proxy", cache,nullptr,{{wrench::StorageServiceProxyProperty::UNCACHED_READ_METHOD,mode}}
                        )
        );
 
