@@ -18,6 +18,7 @@ namespace wrench {
         /** @brief The overhead for handling just 1 message
          **/
         DECLARE_PROPERTY_NAME(MESSAGE_OVERHEAD);
+        DECLARE_PROPERTY_NAME(UNCACHED_READ_METHOD);
 
     };
 

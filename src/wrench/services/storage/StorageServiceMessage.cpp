@@ -299,12 +299,13 @@ namespace wrench {
    *
    * @throw std::invalid_argument
    */
-    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                                                               simgrid::s4u::Host *requesting_host,
-                                                                               simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
-                                                                               std::shared_ptr<FileLocation> location,
-                                                                               double num_bytes_to_read,
-                                                                               double payload) : StorageServiceMessage(payload) {
+    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage
+            (simgrid::s4u::Mailbox *answer_mailbox,
+             simgrid::s4u::Host *requesting_host,
+             simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
+             std::shared_ptr<FileLocation> location,
+             double num_bytes_to_read,
+             double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
 
         if ((answer_mailbox == nullptr) || (mailbox_to_receive_the_file_content == nullptr) ||

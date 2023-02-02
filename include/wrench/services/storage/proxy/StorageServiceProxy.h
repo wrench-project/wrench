@@ -124,12 +124,18 @@ namespace wrench {
         std::shared_ptr<StorageService> cache;
         std::shared_ptr<StorageService> remote;
 
+        bool (StorageServiceProxy::*readMethod)(unique_ptr<SimulationMessage>&);
+        bool commonReadFile(StorageServiceFileReadRequestMessage* msg,unique_ptr<SimulationMessage>& message);
+        bool copyThenRead(unique_ptr<SimulationMessage>& message);
+        bool magicRead(unique_ptr<SimulationMessage>& message);
+        bool readThrough(unique_ptr<SimulationMessage>& message);
     private:
 
         /** @brief Default property values */
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {StorageServiceProperty::BUFFER_SIZE, "10000000"},// 10 MEGA BYTE
                 {StorageServiceProperty::CACHING_BEHAVIOR, "NONE"},
+                {StorageServiceProxyProperty::UNCACHED_READ_METHOD, "CopyThenRead"},
                 {StorageServiceProxyProperty::MESSAGE_OVERHEAD,"0"}
         };
 
