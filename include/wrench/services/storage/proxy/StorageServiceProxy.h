@@ -123,7 +123,7 @@ namespace wrench {
         std::map<std::shared_ptr<DataFile>,std::vector<unique_ptr<SimulationMessage>>> pending;
         std::shared_ptr<StorageService> cache;
         std::shared_ptr<StorageService> remote;
-
+        /** @brief the function to actually call when handling a file read */
         bool (StorageServiceProxy::*readMethod)(unique_ptr<SimulationMessage>&);
         bool commonReadFile(StorageServiceFileReadRequestMessage* msg,unique_ptr<SimulationMessage>& message);
         bool copyThenRead(unique_ptr<SimulationMessage>& message);

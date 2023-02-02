@@ -136,8 +136,8 @@ namespace wrench{
             }else{
                 S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileLookupAnswerMessage(msg->location->getFile(),false,StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
             }
-        }else if(){
-
+        }else if((this->*readMethod)(message)){
+            //no other handling required
         }
         else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
             auto target=remote;
@@ -557,10 +557,10 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                 }
                 return true;
             }
-        }else{
-            return false;
-
         }
+        return false;
+
+
     }
     /**
     * @brief function for MagicRead method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServerFileCopyAnswer.  The only behavioral difference is in uncached files.  This copies the file to the cache, and then instantly "magically" transfers the file to anyone waiting on it. This gives the most accurate time-to-cache, and a reasonably accurate arrival time by assuming the bottleneck is the bandwidth from cache to remote, not the internal network.  This does sacrifice some internal network congestion.
@@ -606,10 +606,10 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                 }
                 return true;
             }
-        }else{
-            return false;
-
         }
+        return false;
+
+
     }
     /**
      * @brief function for CopyThenRead ReadThrough method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServiceAnswerMessage and some StorageService Ack messages. The only behavioral difference is in uncached files.  This reads the file directly to the client with the proxy acting as a mediary.  Once the write finishes, the file is instantly created on the cache.  Assuming the network is configured properly, this gives the best network congestion and time-to-arival estimate, but at the cost of time-to-cache, which it over estimates.  Concurrent reads will wait until the file is cached.
@@ -690,9 +690,9 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                 }
                 return true;
             }
-        }else{
-            return false;
-
         }
+        return false;
+
+
     }
 }
