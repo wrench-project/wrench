@@ -136,37 +136,10 @@ namespace wrench{
             }else{
                 S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileLookupAnswerMessage(msg->location->getFile(),false,StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
             }
-        }else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
-            auto target=remote;
-            if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
-                target=location->target;
-            }
+        }else if(){
 
-            if(cache->hasFile( msg->location->getFile(),msg->location->getFullAbsolutePath())) {//check cache
-                WRENCH_INFO("Forwarding to cache reply mailbox %s",msg->answer_mailbox->get_name().c_str());
-                S4U_Mailbox::putMessage(
-                        cache->mailbox,
-                        new StorageServiceFileReadRequestMessage(msg->answer_mailbox,msg->requesting_host,msg->mailbox_to_receive_the_file_content,FileLocation::LOCATION(cache,msg->location->getMountPoint(),msg->location->getFile()),msg->num_bytes_to_read,0)
-                );
-
-            }else if(target){
-                //TODO add handling for concurrent copy
-                pending[msg->location->getFile()].push_back(std::move(message));
-                //TODO add magicRead and readThrough
-                //current is copyThenRead
-                //Magic read: copy to internal->instantly report to client when its done (read answer buffersize 0, then emediatly ack)
-                //Readthrough: read from target to client emediatly, then instantly create on cache.  REQUIRES EXTANT NETWORK PATH
-                //cached behavior for all 3 is the same.
-                //concurrent first read behavior:
-                    //copyThenRead: all block until copy finished, then all read
-                    //magicRead:    all block until copy finsished, then all magic read
-                    //readthrough:  all block until first read is finished, then all others read
-                //do not speed excessive time on readThrough
-                StorageService::initiateFileCopy(mailbox, FileLocation::LOCATION(target,msg->location->getFile()),FileLocation::LOCATION(cache,msg->location->getFile()));
-            }else{
-                S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileReadAnswerMessage(msg->location,false,std::make_shared<FileNotFound>(msg->location),0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
-            }
-        } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
+        }
+        else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
             auto target=remote;
             if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
                 target=location->target;
@@ -240,28 +213,6 @@ namespace wrench{
 //                return true;
 //            }
 //            throw std::runtime_error( "StorageServiceProxy:processNextMessage(): Unexpected [" + message->getName() + "] message that either could not be forwared");
-        }else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {//Our remote read request has finished
-
-            std::vector<unique_ptr<SimulationMessage>>& messages=pending[msg->src->getFile()];
-            for(unsigned int i=0;i<messages.size();i++){
-                if(auto tmpMsg= dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())){
-                    if(msg->success){
-                        S4U_Mailbox::putMessage(mailbox,tmpMsg);//now that the data is cached, resend the message
-                        std::swap(messages[i],messages.back());
-                        messages.back().release();
-                        messages.pop_back();
-                        i--;
-                    }else{
-                        S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,false,msg->failure_cause,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
-                        std::swap(messages[i],messages.back());
-                        messages.pop_back();
-                        i--;
-
-                    }
-                }
-
-            }
-
         }else if (auto msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {//Our remote lookup has finished
             std::vector<unique_ptr<SimulationMessage>>& messages=pending[msg->file];
             for(unsigned int i=0;i<messages.size();i++){
@@ -289,7 +240,7 @@ namespace wrench{
                 }
 
             }
-        //}else if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {//we never actually do this
+
 
         }else if (auto msg = dynamic_cast<StorageServiceAckMessage *>(message.get())) {//our file write has finished
             std::vector<unique_ptr<SimulationMessage>>& messages=pending[msg->location->getFile()];
@@ -470,7 +421,17 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
         if(remote and remote->hasMultipleMountPoints()){
             throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy() A storage service proxy's default remote can not have multiple mountpoints");
         }
+        string readPropery= getPropertyValueAsString(StorageServiceProxyProperty::UNCACHED_READ_METHOD);
+        if(readPropery=="CopyThenRead"){
+            readMethod=&StorageServiceProxy::copyThenRead;
+        }else if(readPropery=="MagicRead"){
+            readMethod=&StorageServiceProxy::magicRead;
+        }else if(readPropery=="ReadThrough"){
+            readMethod=&StorageServiceProxy::readThrough;
+        }else{
+            throw invalid_argument("Unknown value "+readPropery+" for StorageServiceProxyProperty::UNCACHED_READ_METHOD");
 
+        }
     }
     /**
      *  @brief
@@ -509,5 +470,229 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
 
     const std::shared_ptr<StorageService> StorageServiceProxy::getCache(){
         return this->cache;
+    }
+
+    /**
+     * @brief Check the cache and ongoing reads for the requested file.  If it is, this function handles the rest of reading it.
+     * @param msg the message that is being processed
+     * @param message the raw unique_ptr for the message.  Assumed to be the same as msg, passed to avoid second cast.
+     * @return True if the file is cached, false otherwise
+     */
+    bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage* msg,unique_ptr<SimulationMessage>& message){
+        if(cache->hasFile( msg->location->getFile(),msg->location->getFullAbsolutePath())) {//check cache
+            WRENCH_INFO("Forwarding to cache reply mailbox %s",msg->answer_mailbox->get_name().c_str());
+            S4U_Mailbox::putMessage(
+                    cache->mailbox,
+                    new StorageServiceFileReadRequestMessage(msg->answer_mailbox,msg->requesting_host,msg->mailbox_to_receive_the_file_content,FileLocation::LOCATION(cache,msg->location->getMountPoint(),msg->location->getFile()),msg->num_bytes_to_read,0)
+            );
+            return true;
+
+        }else{
+            std::vector<unique_ptr<SimulationMessage>>& messages=pending[msg->location->getFile()];
+            for(unsigned int i=0;i<messages.size();i++){
+                if(auto tmpMsg= dynamic_cast<StorageServiceFileWriteRequestMessage *>(messages[i].get())){
+                    //there is A writeRequest for this file in progress, ignore
+                    pending[msg->location->getFile()].push_back(std::move(message));
+                    return true;
+                }
+
+            }
+            //the message was not cached, and is not in progress of being read
+        }
+        return false;
+
+    }
+
+    /**
+     * @brief function for CopyThenRead method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServerFileCopyAnswer.  The only behavioral difference is in uncached files. This copies the file requested to the cache, and forwards the ongoing reads to the cache.  This is the default, and gives the most accurate time-to-cache for a file, and the most accurate network congestion, but overestimates how long the file will take to arive at the end.
+     * @param message the message that is being processed
+     * @return True if the message was processed by this function.  False otherwise
+     */
+    bool StorageServiceProxy::copyThenRead(unique_ptr<SimulationMessage>& message){
+        WRENCH_DEBUG("Trying copyThenRead(message)");
+        if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
+            if(commonReadFile(msg,message)){
+                return true;
+            }
+            auto target=remote;
+            if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
+                target=location->target;
+            }
+            if(target){
+
+                pending[msg->location->getFile()].push_back(std::move(message));
+                //TODO add magicRead and readThrough
+                //current is copyThenRead
+                //Magic read: copy to internal->instantly report to client when its done (read answer buffersize 0, then emediatly ack)
+                //Readthrough: read from target to client emediatly, then instantly create on cache.  REQUIRES EXTANT NETWORK PATH
+                //cached behavior for all 3 is the same.
+                //concurrent first read behavior:
+                //copyThenRead: all block until copy finished, then all read
+                //magicRead:    all block until copy finsished, then all magic read
+                //readthrough:  all block until first read is finished, then all others read
+                //do not speed excessive time on readThrough
+                StorageService::initiateFileCopy(mailbox, FileLocation::LOCATION(target,msg->location->getFile()),FileLocation::LOCATION(cache,msg->location->getFile()));
+            }else{
+                S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileReadAnswerMessage(msg->location,false,std::make_shared<FileNotFound>(msg->location),0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+            }
+            return true;
+        } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {//Our remote read request has finished
+            std::vector<unique_ptr<SimulationMessage>>& messages=pending[msg->src->getFile()];
+            for(unsigned int i=0;i<messages.size();i++){
+                if(auto tmpMsg= dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())){
+                    if(msg->success){
+                        tmpMsg->payload=0;//this message has already been sent, this is a fake resend
+                        S4U_Mailbox::putMessage(mailbox,tmpMsg);//now that the data is cached, resend the message
+                        std::swap(messages[i],messages.back());
+                        messages.back().release();
+                        messages.pop_back();
+                        i--;
+                    }else{
+                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,false,msg->failure_cause,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                            std::swap(messages[i],messages.back());
+                            messages.pop_back();
+                            i--;
+
+                    }
+                }
+                return true;
+            }
+        }else{
+            return false;
+
+        }
+    }
+    /**
+    * @brief function for MagicRead method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServerFileCopyAnswer.  The only behavioral difference is in uncached files.  This copies the file to the cache, and then instantly "magically" transfers the file to anyone waiting on it. This gives the most accurate time-to-cache, and a reasonably accurate arrival time by assuming the bottleneck is the bandwidth from cache to remote, not the internal network.  This does sacrifice some internal network congestion.
+    * @param message the message that is being processed
+    * @return True if the message was processed by this function.  False otherwise
+    */
+    bool StorageServiceProxy::magicRead(unique_ptr<SimulationMessage>& message){
+        WRENCH_DEBUG("Trying magicRead(message)");
+        if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
+            //Same FileRead as ReadThenCopy, only CopyAnswer should be different
+            if(commonReadFile(msg,message)){
+                return true;
+            }
+            auto target=remote;
+            if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
+                target=location->target;
+            }
+            if(target){
+
+                pending[msg->location->getFile()].push_back(std::move(message));
+                StorageService::initiateFileCopy(mailbox, FileLocation::LOCATION(target,msg->location->getFile()),FileLocation::LOCATION(cache,msg->location->getFile()));
+            }else{
+                S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileReadAnswerMessage(msg->location,false,std::make_shared<FileNotFound>(msg->location),0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+            }
+            return true;
+        } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {//Our remote read request has finished
+            std::vector<unique_ptr<SimulationMessage>>& messages=pending[msg->src->getFile()];
+            for(unsigned int i=0;i<messages.size();i++){
+                if(auto tmpMsg= dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())){
+                    if(msg->success){
+                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,true,nullptr,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));//magic read, send buffersize 0 and we are assumed to be nonbufferized
+                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceAckMessage(tmpMsg->location));//emediatly send the expected ack
+                            std::swap(messages[i],messages.back());
+                            messages.pop_back();
+                            i--;
+                    }else{
+                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,false,msg->failure_cause,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                            std::swap(messages[i],messages.back());
+                            messages.pop_back();
+                            i--;
+
+                    }
+                }
+                return true;
+            }
+        }else{
+            return false;
+
+        }
+    }
+    /**
+     * @brief function for CopyThenRead ReadThrough method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServiceAnswerMessage and some StorageService Ack messages. The only behavioral difference is in uncached files.  This reads the file directly to the client with the proxy acting as a mediary.  Once the write finishes, the file is instantly created on the cache.  Assuming the network is configured properly, this gives the best network congestion and time-to-arival estimate, but at the cost of time-to-cache, which it over estimates.  Concurrent reads will wait until the file is cached.
+     * @param message the message that is being processed
+     * @return True if the message was processed by this function.  False otherwise
+     */
+    bool StorageServiceProxy::readThrough(unique_ptr<SimulationMessage>& message){
+        WRENCH_DEBUG("Trying readThrough(message)");
+        if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
+
+            if(commonReadFile(msg,message)){
+                return true;
+            }
+            auto target=remote;
+            if(auto location=std::dynamic_pointer_cast<ProxyLocation>(msg->location)){
+                target=location->target;
+            }
+            if(target){
+
+                pending[msg->location->getFile()].push_back(std::move(message));
+                //pending[msg->location->getFile()].push_back(std::move(message));
+                //Readthrough: read from target to client emediatly, then instantly create on cache.  REQUIRES EXTANT NETWORK PATH
+                //readthrough:  all block until first read is finished, then all others read
+                //do not speed excessive time on readThrough
+                auto forward=new StorageServiceFileReadRequestMessage(msg);
+                forward->answer_mailbox=mailbox;//setup intercept mailbox
+                forward->location=FileLocation::LOCATION(target,msg->location->getFullAbsolutePath(),msg->location->getFile());//hyjack locaiton to be on target
+                S4U_Mailbox::putMessage(target->mailbox,forward);//send to target
+            }else{
+                S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileReadAnswerMessage(msg->location,false,std::make_shared<FileNotFound>(msg->location),0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+            }
+            return true;
+        } else if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {//Our readthrough is in progress
+            auto& messages=pending[msg->location->getFile()];
+
+            for(unsigned int i=0;i<messages.size();i++){
+                if(auto tmpMsg= dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())){
+                    if(msg->success){
+                            msg->location=tmpMsg->location;//fix up the location
+                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,message.release());//forward success message to first waiting read host
+                            return true;
+                    }else{
+                            //remote read has failed, notify all waiting
+                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,false,msg->failure_cause,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                            std::swap(messages[i],messages.back());
+                            messages.pop_back();
+                            i--;
+
+                    }
+                }
+                return true;
+            }
+        } else if (auto msg = dynamic_cast<StorageServiceAckMessage *>(message.get())) {//Our readthrough has finished
+            if(msg->location->getStorageService()==shared_from_this() or msg->location->getStorageService()==cache){
+                //this is not a proxied Ack, this is actually directed to us
+                return false;
+            }
+            std::vector<unique_ptr<SimulationMessage>>& messages=pending[msg->location->getFile()];
+            bool first=true;
+            for(unsigned int i=0;i<messages.size();i++){
+                if(auto tmpMsg= dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())){
+                    if(first){//this is the fileread we have been faking
+                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,tmpMsg);
+                            std::swap(messages[i],messages.back());
+                            messages.back().release();
+                            messages.pop_back();
+                            i--;
+                            first=false;
+                    }else{//these are the pending reads
+                            tmpMsg->payload=0;//this message has already been sent, this is a fake resend
+                            S4U_Mailbox::putMessage(mailbox,tmpMsg);//these should now be cached, and should just drop down to the cache automatically
+                            std::swap(messages[i],messages.back());
+                            messages.back().release();
+                            messages.pop_back();
+                            i--;
+                    }
+
+                }
+                return true;
+            }
+        }else{
+            return false;
+
+        }
     }
 }
