@@ -412,8 +412,8 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                                                  cache(cache),
                                                  remote(defaultRemote) {
 
-        this->setProperties(this->default_property_values, std::move(property_list));
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+        this->setProperties(this->default_property_values, std::move(properties));
+        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagePayload));
         this->setProperty(StorageServiceProperty::BUFFER_SIZE,cache->getPropertyValueAsString(StorageServiceProperty::BUFFER_SIZE));//the internal cache has the same buffer properties as this service.
         if(cache and cache->hasMultipleMountPoints()){
             throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy() A storage service proxy's cache can not have multiple mountpoints");
@@ -422,6 +422,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
             throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy() A storage service proxy's default remote can not have multiple mountpoints");
         }
         string readPropery= getPropertyValueAsString(StorageServiceProxyProperty::UNCACHED_READ_METHOD);
+        WRENCH_DEBUG("%s",readPropery.c_str());
         if(readPropery=="CopyThenRead"){
             readMethod=&StorageServiceProxy::copyThenRead;
         }else if(readPropery=="MagicRead"){
@@ -648,6 +649,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
             for(unsigned int i=0;i<messages.size();i++){
                 if(auto tmpMsg= dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())){
                     if(msg->success){
+                            cache->createFile(msg->location->getFile());
                             msg->location=tmpMsg->location;//fix up the location
                             S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,message.release());//forward success message to first waiting read host
                             return true;
@@ -672,7 +674,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
             for(unsigned int i=0;i<messages.size();i++){
                 if(auto tmpMsg= dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())){
                     if(first){//this is the fileread we have been faking
-                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,tmpMsg);
+                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceAckMessage(*msg));
                             std::swap(messages[i],messages.back());
                             messages.back().release();
                             messages.pop_back();
