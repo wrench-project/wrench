@@ -421,16 +421,16 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
         if(remote and remote->hasMultipleMountPoints()){
             throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy() A storage service proxy's default remote can not have multiple mountpoints");
         }
-        string readPropery= getPropertyValueAsString(StorageServiceProxyProperty::UNCACHED_READ_METHOD);
-        WRENCH_DEBUG("%s",readPropery.c_str());
-        if(readPropery=="CopyThenRead"){
+        string readProperty= getPropertyValueAsString(StorageServiceProxyProperty::UNCACHED_READ_METHOD);
+        WRENCH_DEBUG("%s",readProperty.c_str());
+        if(readProperty=="CopyThenRead"){
             readMethod=&StorageServiceProxy::copyThenRead;
-        }else if(readPropery=="MagicRead"){
+        }else if(readProperty=="MagicRead"){
             readMethod=&StorageServiceProxy::magicRead;
-        }else if(readPropery=="ReadThrough"){
+        }else if(readProperty=="ReadThrough"){
             readMethod=&StorageServiceProxy::readThrough;
         }else{
-            throw invalid_argument("Unknown value "+readPropery+" for StorageServiceProxyProperty::UNCACHED_READ_METHOD");
+            throw invalid_argument("Unknown value "+readProperty+" for StorageServiceProxyProperty::UNCACHED_READ_METHOD");
 
         }
     }
