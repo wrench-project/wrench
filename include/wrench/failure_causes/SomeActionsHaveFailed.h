@@ -44,7 +44,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_SOME_ACTIONS_HAVE_FAILED_H

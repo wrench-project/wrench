@@ -137,71 +137,63 @@ private:
         /*************************************************/
         /** FIRST FIT: FAIL CASE #1                     **/
         /*************************************************/
-        this->test->cloud_service_first_fit->createVM(2, 1, "vm_1");
-        this->test->cloud_service_first_fit->createVM(3, 1, "vm_2");
-        this->test->cloud_service_first_fit->startVM("vm_1");
+        auto vm_1 = this->test->cloud_service_first_fit->createVM(2, 1);
+        this->test->cloud_service_first_fit->startVM(vm_1);
         try {
-            this->test->cloud_service_first_fit->startVM("vm_2");
+            this->test->cloud_service_first_fit->createVM(3, 1);
             throw std::runtime_error("FirstFit Fail Case #1: Starting the 2nd VM should have caused a NotEnoughResources error");
         } catch (wrench::ExecutionException &e) {
         }
 
-        this->test->cloud_service_first_fit->shutdownVM("vm_1");
-        this->test->cloud_service_first_fit->destroyVM("vm_1");
-        this->test->cloud_service_first_fit->destroyVM("vm_2");
+        this->test->cloud_service_first_fit->shutdownVM(vm_1);
+        this->test->cloud_service_first_fit->destroyVM(vm_1);
+
 
         /*************************************************/
         /** FIRST FIT: FAIL CASE #1                     **/
         /*************************************************/
-        this->test->cloud_service_first_fit->createVM(1, 2, "vm_1");
-        this->test->cloud_service_first_fit->createVM(1, 18, "vm_2");
-        this->test->cloud_service_first_fit->createVM(1, 10, "vm_3");
-        this->test->cloud_service_first_fit->startVM("vm_1");
-        this->test->cloud_service_first_fit->startVM("vm_2");
+        vm_1 = this->test->cloud_service_first_fit->createVM(1, 2);
+        auto vm_2 = this->test->cloud_service_first_fit->createVM(1, 18);
+        this->test->cloud_service_first_fit->startVM(vm_1);
+        this->test->cloud_service_first_fit->startVM(vm_2);
         try {
-            this->test->cloud_service_first_fit->startVM("vm_3");
+            this->test->cloud_service_first_fit->createVM(1, 10);
             throw std::runtime_error("FirstFit Fail Case #2: Starting the 3rd VM should have caused a NotEnoughResources error");
         } catch (wrench::ExecutionException &e) {
         }
 
-        this->test->cloud_service_first_fit->shutdownVM("vm_1");
-        this->test->cloud_service_first_fit->shutdownVM("vm_2");
-        this->test->cloud_service_first_fit->destroyVM("vm_1");
-        this->test->cloud_service_first_fit->destroyVM("vm_2");
-        this->test->cloud_service_first_fit->destroyVM("vm_3");
+        this->test->cloud_service_first_fit->shutdownVM(vm_1);
+        this->test->cloud_service_first_fit->shutdownVM(vm_2);
+        this->test->cloud_service_first_fit->destroyVM(vm_1);
+        this->test->cloud_service_first_fit->destroyVM(vm_2);
 
         /*************************************************/
         /** BEST FIT CORES FIRST: FAIL CASE #1          **/
         /*************************************************/
-        this->test->cloud_service_best_fit_cores_first->createVM(2, 1, "vm_1");
-        this->test->cloud_service_best_fit_cores_first->createVM(1, 20, "vm_2");
-        this->test->cloud_service_best_fit_cores_first->startVM("vm_1");
+        vm_1 = this->test->cloud_service_best_fit_cores_first->createVM(2, 1);
+        this->test->cloud_service_best_fit_cores_first->startVM(vm_1);
         try {
-            this->test->cloud_service_best_fit_cores_first->startVM("vm_2");
+            this->test->cloud_service_best_fit_cores_first->createVM(1, 20);
             throw std::runtime_error("BestFitCoresFirst Fail Case #1: Starting the 2nd VM should have caused a NotEnoughResources error");
         } catch (wrench::ExecutionException &e) {
         }
 
-        this->test->cloud_service_best_fit_cores_first->shutdownVM("vm_1");
-        this->test->cloud_service_best_fit_cores_first->destroyVM("vm_1");
-        this->test->cloud_service_best_fit_cores_first->destroyVM("vm_2");
+        this->test->cloud_service_best_fit_cores_first->shutdownVM(vm_1);
+        this->test->cloud_service_best_fit_cores_first->destroyVM(vm_1);
 
         /*************************************************/
         /** BEST FIT RAM FIRST: FAIL CASE #1            **/
         /*************************************************/
-        this->test->cloud_service_best_fit_ram_first->createVM(2, 9, "vm_1");
-        this->test->cloud_service_best_fit_ram_first->createVM(4, 1, "vm_2");
-        this->test->cloud_service_best_fit_ram_first->startVM("vm_1");
+        vm_1 = this->test->cloud_service_best_fit_ram_first->createVM(2, 9);
+        this->test->cloud_service_best_fit_ram_first->startVM(vm_1);
         try {
-            this->test->cloud_service_best_fit_ram_first->startVM("vm_2");
+            this->test->cloud_service_best_fit_ram_first->createVM(4, 1);
             throw std::runtime_error("BestFitRAMFirst Fail Case #1: Starting the 2nd VM should have caused a NotEnoughResources error");
         } catch (wrench::ExecutionException &e) {
         }
 
-        this->test->cloud_service_best_fit_ram_first->shutdownVM("vm_1");
-        this->test->cloud_service_best_fit_ram_first->destroyVM("vm_1");
-        this->test->cloud_service_best_fit_ram_first->destroyVM("vm_2");
-
+        this->test->cloud_service_best_fit_ram_first->shutdownVM(vm_1);
+        this->test->cloud_service_best_fit_ram_first->destroyVM(vm_1);
 
         return 0;
     }
@@ -218,6 +210,7 @@ void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlg
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
 
     simulation->init(&argc, argv);

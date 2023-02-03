@@ -127,7 +127,7 @@ namespace wrench {
         double getLinkUsage(const std::string &link_name, bool record_as_time_stamp);
         std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps);
 
-        static bool doesHostExist(std::string hostname);
+        static bool doesHostExist(const std::string &hostname);
         static bool isHostOn(const std::string &hostname);
         static void turnOnHost(const std::string &hostname);
         static void turnOffHost(const std::string &hostname);
@@ -229,14 +229,11 @@ namespace wrench {
         void addService(const std::shared_ptr<BandwidthMeterService> &service);
         void addService(const std::shared_ptr<MemoryManager> &memory_manager);
 
-        std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
+        static std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
 
         bool is_running = false;
 
         bool already_setup = false;
-
-        unsigned int on_state_change_callback_id;
-
 
         static bool energy_enabled;
         static bool host_shutdown_enabled;
@@ -252,6 +249,6 @@ namespace wrench {
     };
 
 
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_SIMULATION_H

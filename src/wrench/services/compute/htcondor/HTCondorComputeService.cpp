@@ -390,7 +390,7 @@ namespace wrench {
      * @param job: the job that's being submitted
      * @param service_specific_args: the service-specific arguments
      */
-    void HTCondorComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
+    void HTCondorComputeService::validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &job,
                                                                   std::map<std::string, std::string> &service_specific_args) {
         // Is the job a grid universe job
         bool grid_universe = false;

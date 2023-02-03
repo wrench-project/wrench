@@ -103,4 +103,4 @@ namespace wrench {
         this->killActor();
     }
 
-};// namespace wrench
+}// namespace wrench

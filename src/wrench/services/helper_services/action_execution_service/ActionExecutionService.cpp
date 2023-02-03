@@ -375,7 +375,7 @@ namespace wrench {
                     new_host_to_avoid_ram_capacity = this->ram_availabilities[r.first];
                 } else {
                     if (this->ram_availabilities[r.first] > new_host_to_avoid_ram_capacity) {
-                        // Make sure we "Avoid" the host with the most RAM (as it might becomes usable sooner)
+                        // Make sure we "Avoid" the host with the most RAM (as it might become usable sooner)
                         new_host_to_avoid = r.first;
                         new_host_to_avoid_ram_capacity = this->ram_availabilities[r.first];
                     }
@@ -533,15 +533,15 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
-        if (auto msg = dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
+        if (dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
             // Do nothing, just wake up
             return true;
 
-        } else if (auto msg = dynamic_cast<HostHasChangedSpeedMessage *>(message.get())) {
+        } else if (dynamic_cast<HostHasChangedSpeedMessage *>(message.get())) {
             // Do nothing, just wake up
             return true;
 
-        } else if (auto msg = dynamic_cast<HostHasTurnedOffMessage *>(message.get())) {
+        } else if (dynamic_cast<HostHasTurnedOffMessage *>(message.get())) {
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
                         ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
@@ -551,7 +551,7 @@ namespace wrench {
                 // If not all resources are down or somebody is still running, nevermind
                 // we may have gotten this "Host down" message before the "This Action Executor has crashed" message.
                 // So we don't want to just quit right now. We'll
-                //  get a Action Executor Crash message, at which point we'll check whether all hosts are down again
+                //  get an Action Executor Crash message, at which point we'll check whether all hosts are down again
                 if (not this->areAllComputeResourcesDownWithNoActionExecutorRunning()) {
                     WRENCH_INFO("Not terminating as there are still non-down resources and/or WUE executors that "
                                 "haven't reported back yet");
@@ -634,14 +634,14 @@ namespace wrench {
             const std::shared_ptr<FailureCause> &cause) {
         WRENCH_INFO("Killing action %s", action->getName().c_str());
 
-        bool killed_due_to_job_cancelation = (std::dynamic_pointer_cast<JobKilled>(cause) != nullptr);
+        bool killed_due_to_job_cancellation = (std::dynamic_pointer_cast<JobKilled>(cause) != nullptr);
 
         // If action is running kill the executor
         if (this->action_executors.find(action) != this->action_executors.end()) {
             auto executor = this->action_executors[action];
             this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
             this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
-            executor->kill(killed_due_to_job_cancelation);
+            executor->kill(killed_due_to_job_cancellation);
             executor->getAction()->setFailureCause(cause);
             this->action_executors.erase(action);
 
@@ -658,7 +658,7 @@ namespace wrench {
         action->setFailureCause(cause);
 
         // Send back an action failed message if necessary
-        if (not killed_due_to_job_cancelation) {
+        if (not killed_due_to_job_cancellation) {
             WRENCH_INFO("Sending action failure notification to '%s'",
                         this->parent_service->mailbox->get_cname());
             // NOTE: This is synchronous so that the process doesn't fall off the end
@@ -1013,7 +1013,7 @@ namespace wrench {
         } else if (key == "num_idle_cores") {
             // Num idle cores per hosts
             std::map<std::string, double> num_idle_cores;
-            for (auto r: this->running_thread_counts) {
+            for (auto const &r: this->running_thread_counts) {
                 unsigned long cores = std::get<0>(this->compute_resources[r.first]);
                 unsigned long running_threads = r.second;
                 num_idle_cores.insert(
@@ -1040,7 +1040,7 @@ namespace wrench {
         } else if (key == "ram_availabilities") {
             // RAM availability per host
             std::map<std::string, double> ram_availabilities_to_return;
-            for (auto r: this->ram_availabilities) {
+            for (auto const &r: this->ram_availabilities) {
                 ram_availabilities_to_return.insert(std::make_pair(r.first, r.second));
             }
             return ram_availabilities_to_return;
@@ -1082,7 +1082,7 @@ namespace wrench {
         this->action_executors.erase(action);
 
         if (not this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)) {
-            // Reset the action state to READY)
+            // Reset the action state to READY
             action->newExecution(Action::State::READY);
             //            action->setState(Action::State::READY);
             // Put the action back in the ready list (at the end)

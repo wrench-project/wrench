@@ -33,7 +33,7 @@ namespace wrench {
     ActionExecutionServiceSubmitActionRequestMessage::ActionExecutionServiceSubmitActionRequestMessage(
             simgrid::s4u::Mailbox *reply_mailbox,
             std::shared_ptr<Action> action,
-            double payload) : ActionExecutionServiceMessage(0) {
+            double payload) : ActionExecutionServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((reply_mailbox == nullptr) || (action == nullptr)) {
             throw std::invalid_argument("ActionExecutionServiceSubmitActionRequestMessage::ActionExecutionServiceSubmitActionRequestMessage(): invalid argument");
@@ -112,4 +112,4 @@ namespace wrench {
         this->action = std::move(action);
     }
 
-};// namespace wrench
+}// namespace wrench

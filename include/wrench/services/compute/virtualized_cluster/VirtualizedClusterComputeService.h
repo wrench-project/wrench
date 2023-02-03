@@ -53,7 +53,7 @@ namespace wrench {
     public:
         VirtualizedClusterComputeService(const std::string &hostname,
                                          std::vector<std::string> &execution_hosts,
-                                         std::string scratch_space_mount_point,
+                                         const std::string &scratch_space_mount_point,
                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
@@ -61,10 +61,13 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        using CloudComputeService::startVM;
+        using CloudComputeService::createVM;
 
-        virtual std::shared_ptr<BareMetalComputeService>
-        startVM(const std::string &vm_name, const std::string &pm_name);
+        virtual std::string createVM(unsigned long num_cores,
+                                     double ram_memory,
+                                     const std::string &pm_name,
+                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         virtual void migrateVM(const std::string &vm_name, const std::string &dest_pm_hostname);
 

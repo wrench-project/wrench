@@ -15,7 +15,6 @@
 #include <wrench/services/compute/ComputeServiceMessagePayload.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 #include <utility>
 
@@ -74,7 +73,7 @@ namespace wrench {
             throw;
         }
 
-        if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
+        if (dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
             this->state = Service::DOWN;
         } else {
             throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
@@ -202,7 +201,6 @@ namespace wrench {
         }
 
         return (unsigned long) (*(dict.begin())).second;
-        ;
     }
 
     /**
@@ -368,7 +366,7 @@ namespace wrench {
     bool ComputeService::isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, double ram) {
         assertServiceIsUp();
 
-        // send a "info request" message to the daemon's mailbox_name
+        // send an "info request" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
@@ -448,7 +446,7 @@ namespace wrench {
     std::map<std::string, double> ComputeService::getServiceResourceInformation(const std::string &key) {
         assertServiceIsUp();
 
-        // send a "info request" message to the daemon's mailbox_name
+        // send an "info request" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
@@ -518,7 +516,7 @@ namespace wrench {
      * @param job: the job that's being submitted
      * @param service_specific_args: the service-specific arguments
      */
-    void ComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
+    void ComputeService::validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &job,
                                                           map<std::string, std::string> &service_specific_args) {
         throw std::runtime_error("ComputeService::validateServiceSpecificArguments(): should be overridden in compute service implementation");
     }
@@ -535,4 +533,4 @@ namespace wrench {
     }
 
 
-};// namespace wrench
+}// namespace wrench

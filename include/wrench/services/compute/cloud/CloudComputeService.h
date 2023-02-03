@@ -86,12 +86,6 @@ namespace wrench {
                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
-        virtual std::string createVM(unsigned long num_cores,
-                                     double ram_memory,
-                                     std::string desired_vm_name,
-                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
-
         virtual void shutdownVM(const std::string &vm_name);
 
         virtual void shutdownVM(const std::string &vm_name, bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
@@ -159,12 +153,12 @@ namespace wrench {
         virtual void processCreateVM(simgrid::s4u::Mailbox *answer_mailbox,
                                      unsigned long requested_num_cores,
                                      double requested_ram,
-                                     const std::string &desired_vm_name,
+                                     const std::string &physical_host,
                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
 
         virtual void
-        processStartVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name, const std::string &pm_name);
+        processStartVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
 
         virtual void processShutdownVM(simgrid::s4u::Mailbox *answer_mailbox,
                                        const std::string &vm_name,
@@ -184,7 +178,7 @@ namespace wrench {
         //                                           std::map<std::string, std::string> &service_specific_args);
 
         virtual void
-        processBareMetalComputeServiceTermination(std::shared_ptr<BareMetalComputeService> cs, int exit_code);
+        processBareMetalComputeServiceTermination(const std::shared_ptr<BareMetalComputeService> &cs, int exit_code);
 
         virtual void processIsThereAtLeastOneHostWithAvailableResources(
                 simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
@@ -200,13 +194,13 @@ namespace wrench {
         std::vector<std::string> execution_hosts;
 
         /** @brief Map of used RAM at the hosts */
-        std::map<std::string, double> used_ram_per_execution_host;
+        std::unordered_map<std::string, double> used_ram_per_execution_host;
 
         /** @brief Map of number of used cores at the hosts */
-        std::map<std::string, unsigned long> used_cores_per_execution_host;
+        std::unordered_map<std::string, unsigned long> used_cores_per_execution_host;
 
         /** @brief A map of VMs */
-        std::map<std::string, std::pair<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<BareMetalComputeService>>> vm_list;
+        std::unordered_map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::string, std::shared_ptr<BareMetalComputeService>>> vm_list;
 
         /***********************/
         /** \endcond           */

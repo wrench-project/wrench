@@ -264,7 +264,17 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
-        // Add a file_read_action
+
+        // Add a file read action with bogus locations
+        try {
+            auto other_file = this->simulation->addFile("other_file", 1.0);
+            job->addFileReadAction("",
+                                   {wrench::FileLocation::LOCATION(this->test->ss, "/bogus/", this->test->file),
+                                    wrench::FileLocation::LOCATION(this->test->ss, other_file)});
+            throw std::runtime_error("Shouldn't be able to add a file-read action with a vector of locations that are not for the same file");
+        } catch (std::invalid_argument &ignore) {}
+
+        // Add a file read action
         auto file_read_action = job->addFileReadAction("",
                                                        {wrench::FileLocation::LOCATION(this->test->ss, "/bogus/", this->test->file),
                                                         wrench::FileLocation::LOCATION(this->test->ss, this->test->file)});

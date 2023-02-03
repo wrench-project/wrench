@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
     simulation->instantiatePlatform(argv[2]);
 
     /* Parse the first command-line argument (number of tasks) */
-    int num_tasks = 0;
+    int num_tasks;
     try {
         num_tasks = std::atoi(argv[1]);
         if (num_tasks % 2) {
@@ -155,7 +155,7 @@ int main(int argc, char **argv) {
      * many such events there are, and print some information for the first such event. */
     auto trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     for (auto const &item: trace) {
-        std::cerr << "Task " << item->getContent()->getTask()->getID() << " completed at time " << item->getDate() << " on host " << item->getContent()->getTask()->getExecutionHost() << std::endl;
+        std::cerr << "Task " << item->getContent()->getTask()->getID() << " completed at time " << item->getDate() << " on host " << item->getContent()->getTask()->getPhysicalExecutionHost() << std::endl;
     }
 
     simulation->getOutput().dumpUnifiedJSON(workflow, "/tmp/wrench.json");
