@@ -42,4 +42,4 @@ namespace wrench {
         : ServiceMessage(payload) {}
 
 
-};// namespace wrench
+}// namespace wrench

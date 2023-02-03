@@ -165,7 +165,7 @@ namespace wrench {
     /***********************/
     /** \endcond          **/
     /***********************/
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_FILEREGISTRYMESSAGE_H

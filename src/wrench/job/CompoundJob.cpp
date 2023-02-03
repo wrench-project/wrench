@@ -114,7 +114,7 @@ namespace wrench {
                                                                  unsigned long max_num_cores,
                                                                  const std::shared_ptr<ParallelModel> &parallel_model) {
         auto new_action = std::shared_ptr<ComputeAction>(
-                new ComputeAction(name, flops, ram, min_num_cores, max_num_cores, std::move(parallel_model)));
+                new ComputeAction(name, flops, ram, min_num_cores, max_num_cores, parallel_model));
         this->addAction(new_action);
         return new_action;
     }
@@ -184,7 +184,7 @@ namespace wrench {
      * @return a file delete action
      */
     std::shared_ptr<FileDeleteAction> CompoundJob::addFileDeleteAction(const std::string &name,
-                                                                       std::shared_ptr<DataFile> file,
+                                                                       const std::shared_ptr<DataFile> &file,
                                                                        const std::shared_ptr<StorageService> &storage_service) {
         return addFileDeleteAction(name, FileLocation::LOCATION(storage_service, file));
     }
@@ -264,10 +264,10 @@ namespace wrench {
     * @return a file copy action
     */
     std::shared_ptr<FileCopyAction> CompoundJob::addFileCopyAction(const std::string &name,
-                                                                   std::shared_ptr<FileLocation> src_file_location,
-                                                                   std::shared_ptr<FileLocation> dst_file_location) {
+                                                                   const std::shared_ptr<FileLocation> &src_file_location,
+                                                                   const std::shared_ptr<FileLocation> &dst_file_location) {
         auto new_action = std::shared_ptr<FileCopyAction>(
-                new FileCopyAction(name, std::move(src_file_location), std::move(dst_file_location)));
+                new FileCopyAction(name, src_file_location, dst_file_location));
         this->addAction(new_action);
         return new_action;
     }
@@ -280,9 +280,9 @@ namespace wrench {
     */
     std::shared_ptr<FileDeleteAction>
     CompoundJob::addFileDeleteAction(const std::string &name,
-                                     std::shared_ptr<FileLocation> file_location) {
+                                     const std::shared_ptr<FileLocation> &file_location) {
         auto new_action = std::shared_ptr<FileDeleteAction>(
-                new FileDeleteAction(name, file_location->getFile(), std::move(file_location)));
+                new FileDeleteAction(name, file_location->getFile(), file_location));
         this->addAction(new_action);
         return new_action;
     }
@@ -296,10 +296,10 @@ namespace wrench {
      */
     std::shared_ptr<FileRegistryAddEntryAction> CompoundJob::addFileRegistryAddEntryAction(
             const std::string &name,
-            std::shared_ptr<FileRegistryService> file_registry,
-            std::shared_ptr<FileLocation> file_location) {
+            const std::shared_ptr<FileRegistryService> &file_registry,
+            const std::shared_ptr<FileLocation> &file_location) {
         auto new_action = std::shared_ptr<FileRegistryAddEntryAction>(
-                new FileRegistryAddEntryAction(name, std::move(file_registry), std::move(file_location)));
+                new FileRegistryAddEntryAction(name, file_registry, file_location));
         this->addAction(new_action);
         return new_action;
     }
@@ -314,9 +314,9 @@ namespace wrench {
     std::shared_ptr<FileRegistryDeleteEntryAction> CompoundJob::addFileRegistryDeleteEntryAction(
             const std::string &name,
             const std::shared_ptr<FileRegistryService> &file_registry,
-            std::shared_ptr<FileLocation> file_location) {
+            const std::shared_ptr<FileLocation> &file_location) {
         auto new_action = std::shared_ptr<FileRegistryDeleteEntryAction>(
-                new FileRegistryDeleteEntryAction(name, std::move(file_registry), std::move(file_location)));
+                new FileRegistryDeleteEntryAction(name, file_registry, file_location));
         this->addAction(new_action);
         return new_action;
     }
@@ -359,7 +359,6 @@ namespace wrench {
      */
     void CompoundJob::addAction(const std::shared_ptr<Action> &action) {
         assertJobNotSubmitted();
-        assertJobNotSubmitted();
         assertActionNameDoesNotAlreadyExist(action->getName());
         action->job = this->getSharedPtr();
         action->setState(Action::State::READY);
@@ -401,7 +400,7 @@ namespace wrench {
         if (parent == nullptr) {
             throw std::invalid_argument("CompoundJob::addParentJob: Cannot add a nullptr parent");
         }
-        if (this->pathExists(this->getSharedPtr(), parent)) {
+        if (pathExists(this->getSharedPtr(), parent)) {
             throw std::invalid_argument("CompoundJob::addChildJob(): Adding this dependency would create a cycle");
         }
         this->parents.insert(parent);
@@ -417,7 +416,7 @@ namespace wrench {
         if (child == nullptr) {
             throw std::invalid_argument("CompoundJob::addChildJob: Cannot add a nullptr child");
         }
-        if (this->pathExists(child, this->getSharedPtr())) {
+        if (pathExists(child, this->getSharedPtr())) {
             throw std::invalid_argument("CompoundJob::addChildJob(): Adding this dependency would create a cycle");
         }
         this->children.insert(child);
@@ -472,7 +471,7 @@ namespace wrench {
      */
     void CompoundJob::assertJobNotSubmitted() {
         if (this->state != CompoundJob::State::NOT_SUBMITTED) {
-            throw std::runtime_error("CompoundJob::assertJobNotSubmitted(): Cannot modify a CompoundJob onces it has been submitted");
+            throw std::runtime_error("CompoundJob::assertJobNotSubmitted(): Cannot modify a CompoundJob once it has been submitted");
         }
     }
 
@@ -567,26 +566,26 @@ namespace wrench {
         }
         bool path_exists = false;
         for (auto const &c: current_children) {
-            path_exists = path_exists || this->pathExists(c, b);
+            path_exists = path_exists || CompoundJob::pathExists(c, b);
         }
         return path_exists;
     }
 
     /**
      * @brief Returns the job's child jobs, if any
-     * @return a set of jobs
+     * @return a set of jobs (a reference)
      */
     std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getChildren() {
         return this->children;
     }
 
-    /**
-     * @brief Returns a reference to the job's parent jobs, if any (use with caution)
-     * @return a set of jobs
-     */
-    std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getParents() {
-        return this->parents;
-    }
+    //    /**
+    //     * @brief Returns a reference to the job's parent jobs, if any (use with caution)
+    //     * @return a set of jobs (a reference)
+    //     */
+    //    std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getParents() {
+    //        return this->parents;
+    //    }
 
     /**
      * @brief Remove an action from the job

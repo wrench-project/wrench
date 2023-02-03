@@ -129,7 +129,6 @@ private:
             wrench::StorageService::readFile(wrench::FileLocation::LOCATION(storage_service, file));
             throw std::runtime_error("Should not have been able to read the file (first attempt)");
         } catch (wrench::ExecutionException &e) {
-            std::cerr << "GOT THE EXPECTED EXCEPTION\n";
             // Expected
         }
         wrench::Simulation::sleep(1000);

@@ -126,6 +126,12 @@ namespace wrench {
             this->waitForAndProcessNextEvent();
         }
 
+        // Shutdown and destroy VMs
+        this->compute_service->shutdownVM(vm1_name);
+        this->compute_service->destroyVM(vm1_name);
+        this->compute_service->shutdownVM(vm2_name);
+        this->compute_service->destroyVM(vm2_name);
+
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
         WRENCH_INFO("Inspecting task states");
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
@@ -162,7 +168,7 @@ namespace wrench {
      * @param event: the event
      */
     void GreedyExecutionController::processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent> event) {
-        WRENCH_INFO("Job %s completed sucessfully!", event->job->getName().c_str());
+        WRENCH_INFO("Job %s completed successfully!", event->job->getName().c_str());
     }
 
 

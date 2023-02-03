@@ -51,7 +51,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_STORAGE_SERVICE_NOT_ENOUGH_SPACE_H

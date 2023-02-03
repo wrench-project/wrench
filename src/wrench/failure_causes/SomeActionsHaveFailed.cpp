@@ -30,7 +30,7 @@ namespace wrench {
         if (this->message.empty()) {
             return std::string("Some actions have failed");
         } else {
-            return std::string(this->message + " (some actions have failed))");
+            return std::string(this->message + " (some actions have failed)");
         }
     }
 

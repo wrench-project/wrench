@@ -62,11 +62,11 @@ namespace wrench {
         std::string toString() override { return "TimerEvent (message: " + this->message + ")"; }
     };
 
-};// namespace wrench
+}// namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
 
 #endif//WRENCH_TIMER_EVENT_H
