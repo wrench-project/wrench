@@ -220,6 +220,9 @@ private:
         auto not_too_big = wrench::Simulation::addFile("not_too_big", 20.0);
         wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, not_too_big));
 
+        wrench::Simulation::sleep(1);
+        std::cerr << "WMS RETURNING: " << ss.use_count() << "\n";
+
         return 0;
     }
 };
@@ -232,10 +235,10 @@ void SimulationPlatformTest::do_CreateNewDiskTest_test() {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -251,11 +254,15 @@ void SimulationPlatformTest::do_CreateNewDiskTest_test() {
     ASSERT_NO_THROW(wms = simulation->add(new CreateNewDiskTestWMS(this, hostname)));
 
     // Running the simulation
+    std::cerr << "CALLING LAUNCH\n";
     ASSERT_NO_THROW(simulation->launch());
+    std::cerr << "CALLED LAUNCH\n";
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
+
+    std::cerr << "END OF MAIN\n";
 }
 
 
@@ -266,7 +273,7 @@ void SimulationPlatformTest::do_CreateNewDiskTest_test() {
 class PlatformCreator {
 
 public:
-    PlatformCreator(double link_bw) : link_bw(link_bw) {}
+    explicit PlatformCreator(double link_bw) : link_bw(link_bw) {}
 
     void operator()() const {
         create_platform(this->link_bw);

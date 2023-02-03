@@ -78,6 +78,7 @@ namespace wrench {
      * @brief Destructor
      */
     SimpleStorageService::~SimpleStorageService() {
+        std::cerr << "IN DESTRUCTOR OF SIMPLE STORAGE SERVICE\n";
         this->default_property_values.clear();
     }
 

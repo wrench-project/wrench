@@ -142,7 +142,7 @@ public:
 private:
     DynamicServiceCreationTest *test;
 
-    int main() {
+    int main() override {
 
         // Coverage
         try {
@@ -178,6 +178,7 @@ private:
                 new wrench::NetworkProximityService(hostname, {"DualCoreHost", "QuadCoreHost"}));
 
         // Dynamically create a Storage Service on this host
+        std::cerr << "CREATING STORAGE SERVICE\n";
         auto dynamically_created_storage_service = simulation->startNewService(
                 wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
                                                                          {},
@@ -197,7 +198,7 @@ private:
 
         std::shared_ptr<wrench::StandardJob> one_task_jobs[5];
         int job_index = 0;
-        for (auto task: tasks) {
+        for (const auto &task: tasks) {
             try {
                 one_task_jobs[job_index] = job_manager->createStandardJob(
                         {task},
