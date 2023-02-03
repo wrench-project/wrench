@@ -135,7 +135,7 @@ private:
     }
 };
 
-TEST_F(NetworkProximityLinkFailuresTest, RandomLinkFailuress) {
+TEST_F(NetworkProximityLinkFailuresTest, RandomLinkFailures) {
     DO_TEST_WITH_FORK(do_NetworkProximityLinkFailures_Test);
 }
 

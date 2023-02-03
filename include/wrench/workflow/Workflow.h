@@ -69,8 +69,6 @@ namespace wrench {
 
         double getCompletionDate();
 
-        void exportToEPS(const std::string &);
-
         std::vector<std::shared_ptr<DataFile>> getInputFiles() const;
         std::map<std::string, std::shared_ptr<DataFile>> getInputFileMap() const;
         std::vector<std::shared_ptr<DataFile>> getOutputFiles() const;
@@ -144,6 +142,6 @@ namespace wrench {
         /* Set of files (also kept track by the simulation!) */
         std::set<std::shared_ptr<DataFile>> data_files;
     };
-};// namespace wrench
+}// namespace wrench
 
 #endif//WRENCH_WORKFLOW_H

@@ -33,14 +33,14 @@ seconds:
 
 .. code:: cpp
 
-   auto np_service = simulation->add(
-             new wrench::BandwidthMeterService("MeasurerHost", {{"link1",1.0},{"link2", 10.0}});
+   auto bm_service = simulation->add(
+               new wrench::BandwidthMeterService("MeasurerHost", {{"link1",1.0},{"link2", 10.0}}));
 
 One the simulation is completed, bandwidth usage measurement time stamps
 can be accessed as follows:
 
 .. code:: cpp
 
-       auto bandwidth_usage = simulation->getOutput().getTrace<wrench::SimulationTimestampLinkUsage>();
+   auto bandwidth_usage = simulation->getOutput().getTrace<wrench::SimulationTimestampLinkUsage>();
 
 See the documentation of :cpp:class:`wrench::SimulationOutput` for more details.

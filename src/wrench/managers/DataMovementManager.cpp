@@ -18,7 +18,6 @@
 #include <wrench/data_file/DataFile.h>
 #include <wrench/managers/DataMovementManager.h>
 #include <wrench/failure_causes/FileAlreadyBeingCopied.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 #include <memory>
 
@@ -172,7 +171,7 @@ namespace wrench {
 
         WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // There shouldn't be any need to clean any state up
             return false;
 
@@ -226,13 +225,13 @@ namespace wrench {
         }
     }
 
-    /** @brief Get the mailbox of the service that created this data movement manager
-     *
-     * @return a mailbox
-     */
-    simgrid::s4u::Mailbox *DataMovementManager::getCreatorMailbox() {
-        return this->creator_mailbox;
-    }
+    //    /** @brief Get the mailbox of the service that created this data movement manager
+    //     *
+    //     * @return a mailbox
+    //     */
+    //    simgrid::s4u::Mailbox *DataMovementManager::getCreatorMailbox() {
+    //        return this->creator_mailbox;
+    //    }
 
 
-};// namespace wrench
+}// namespace wrench

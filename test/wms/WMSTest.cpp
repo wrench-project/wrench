@@ -147,6 +147,13 @@ private:
                 nullptr);
         this->waitForAndProcessNextEvent();
 
+        // Get a "COMPOUND JOB COMPLETED" event (default handler)
+        auto sleep_job = job_manager->createCompoundJob("sleep_job");
+        sleep_job->addSleepAction("sleep_action", 1.0);
+        job_manager->submitJob(sleep_job, vm_cs);
+
+        this->waitForAndProcessNextEvent();
+
         // Set a timer
         double timer_off_date = wrench::Simulation::getCurrentSimulatedDate() + 10;
         this->setTimer(timer_off_date, "timer went off");
@@ -156,10 +163,10 @@ private:
                                      std::to_string(wrench::Simulation::getCurrentSimulatedDate()) + " instead of " +
                                      std::to_string(timer_off_date) + ")");
         }
-
         return 0;
     }
 };
+
 
 TEST_F(WMSTest, DefaultEventHandling) {
     DO_TEST_WITH_FORK(do_DefaultHandlerWMS_test);

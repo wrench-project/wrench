@@ -22,7 +22,7 @@ namespace wrench {
     public:
     };
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_SIMPLESTORAGESERVICEMESSAGEPAYLOAD_H

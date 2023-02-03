@@ -31,9 +31,16 @@ namespace wrench {
          *  - Example values: "0", "infinity", "42", "10000000", "42B", "56MB", "100KiB", etc.
          **/
         DECLARE_PROPERTY_NAME(BUFFER_SIZE);
+
+        /** @brief The caching behavior. Possible values are:
+         *   - "NONE" (default): no caching, i.e., if not enough space is available for a new file, then the file write/creation fails.
+         *   - "LRU": Least Recently Used policy, i.e.,  if not enough space is available for a new file, the Least Recently Used
+         *          files are deleted until enough space is available.
+         **/
+        DECLARE_PROPERTY_NAME(CACHING_BEHAVIOR);
     };
 
-};// namespace wrench
+}// namespace wrench
 
 
 #endif//WRENCH_STORAGESERVICEPROPERTY_H

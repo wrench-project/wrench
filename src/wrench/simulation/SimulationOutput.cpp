@@ -279,8 +279,8 @@ namespace wrench {
      */
     bool isSegmentOverlappingXAxis(std::pair<unsigned long long, unsigned long long> segment1,
                                    std::pair<unsigned long long, unsigned long long> segment2) {
-        // Note: EPSILON looks big because we "blow up" the floats by 10^9 so as to do all computations
-        //       with unsigned long longs instead of doubles (thus avoiding float comparison weirdnesses)
+        // Note: EPSILON looks big because we "blow up" the floats by 10^9 to do all computations
+        //       with unsigned long longs instead of doubles (thus avoiding float comparison weirdness)
         //       And the goal of this EPSILON is to capture the fact that this is for a visual display
         //       made up of pixels, thus we don't want to be too stringent in terms of overlaps
         const unsigned long long EPSILON = 1000 * 1000 * 10;
@@ -624,13 +624,13 @@ namespace wrench {
                     }
                 }
 
-                current_execution_instance.hostname = current_task_execution.execution_host;
+                current_execution_instance.hostname = current_task_execution.physical_execution_host;
                 current_execution_instance.host_flop_rate = Simulation::getHostFlopRate(
-                        current_task_execution.execution_host);
+                        current_task_execution.physical_execution_host);
                 current_execution_instance.host_memory = Simulation::getHostMemoryCapacity(
-                        current_task_execution.execution_host);
+                        current_task_execution.physical_execution_host);
                 current_execution_instance.host_num_cores = Simulation::getHostNumCores(
-                        current_task_execution.execution_host);
+                        current_task_execution.physical_execution_host);
 
                 current_execution_instance.num_cores_allocated = current_task_execution.num_cores_allocated;
                 current_execution_instance.vertical_position = 0;

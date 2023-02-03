@@ -116,13 +116,6 @@ namespace wrench {
                            [](const std::shared_ptr<FileLocation> &fl) {
                                return (fl->isScratch());
                            });
-
-        //        for (auto const &fl: this->file_locations) {
-        //            if (fl == FileLocation::SCRATCH) {
-        //                return true;
-        //            }
-        //        }
-        //        return false;
     }
 
 }// namespace wrench
