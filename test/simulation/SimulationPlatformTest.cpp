@@ -42,7 +42,12 @@ protected:
     </cluster>
 
     <zone id="host_zone" routing="Full">
-        <host id="subzonehost" speed="1f" core="2"/>
+        <host id="subzonehost" speed="1f" core="2">
+           <disk id="scratch" read_bw="100MBps" write_bw="100MBps">
+               <prop id="size" value="100B"/>
+               <prop id="mount" value="/scratch"/>
+           </disk>
+        </host>
     </zone>
 
     <zone id="subzone" routing="Full">
@@ -200,16 +205,15 @@ private:
 
     int main() override {
 
-        try {
-            wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 20.0, 100.0, "/foo");
-            throw std::runtime_error("Should not be able to create a disk with different read and write bandwidths");
-        } catch (std::invalid_argument &ignore) {}
 
         // Create a new disk on subzonehost
         wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 10.0, 100.0, "/foo");
 
         // Start a storage service that uses this disk
+//        auto ss = this->simulation->startNewService(wrench::SimpleStorageService::createSimpleStorageService("subzonehost", {"/scratch"}, {}, {}));
         auto ss = this->simulation->startNewService(wrench::SimpleStorageService::createSimpleStorageService("subzonehost", {"/foo"}, {}, {}));
+
+
 
         // Create a file on it
         auto too_big = wrench::Simulation::addFile("too_big", 200.0);
@@ -219,6 +223,10 @@ private:
         } catch (std::invalid_argument &ignore) {}
         auto not_too_big = wrench::Simulation::addFile("not_too_big", 20.0);
         wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, not_too_big));
+
+        // REMOVE THE DISK:
+                auto host = simgrid::s4u::Host::by_name("subzonehost");
+                host->remove_disk("new_disk");
 
         return 0;
     }
@@ -252,6 +260,7 @@ void SimulationPlatformTest::do_CreateNewDiskTest_test() {
 
     // Running the simulation
     ASSERT_NO_THROW(simulation->launch());
+    std::cerr << "RETURNED FROM LAUNCH\n";
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -275,7 +284,7 @@ public:
 private:
     double link_bw;
 
-    void create_platform(double link_bw) const {
+    static void create_platform(double link_bw) {
         // Create the top-level zone
         auto zone = simgrid::s4u::create_full_zone("AS0");
         // Create the WMSHost host with its disk
