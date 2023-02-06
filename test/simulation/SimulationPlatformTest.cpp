@@ -266,7 +266,7 @@ void SimulationPlatformTest::do_CreateNewDiskTest_test() {
 class PlatformCreator {
 
 public:
-    PlatformCreator(double link_bw) : link_bw(link_bw) {}
+    explicit PlatformCreator(double link_bw) : link_bw(link_bw) {}
 
     void operator()() const {
         create_platform(this->link_bw);
