@@ -1091,10 +1091,6 @@ namespace wrench {
                                        double write_bandwidth_in_bytes_per_sec,
                                        double capacity_in_bytes,
                                        const std::string &mount_point) {
-        if (read_bandwidth_in_bytes_per_sec != write_bandwidth_in_bytes_per_sec) {
-            throw std::invalid_argument("Simulation::createNewDisk(): For now, disks must have equal "
-                                        "read and write bandwidth");
-        }
 
         // Get the host
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
