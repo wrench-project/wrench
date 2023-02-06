@@ -12,5 +12,4 @@ namespace wrench {
 
     SET_PROPERTY_NAME(StorageServiceProxyProperty, MESSAGE_OVERHEAD);
     SET_PROPERTY_NAME(StorageServiceProxyProperty,UNCACHED_READ_METHOD);
-
 };// namespace wrench
