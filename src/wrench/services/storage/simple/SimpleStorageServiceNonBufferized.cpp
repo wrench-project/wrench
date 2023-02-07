@@ -424,7 +424,7 @@ namespace wrench {
                         location,
                         success,
                         failure_cause,
-                        nullptr, // non-bufferized = no chunk-receiving mailbox
+                        nullptr,// non-bufferized = no chunk-receiving mailbox
                         buffer_size,
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));

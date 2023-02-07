@@ -300,7 +300,7 @@ namespace wrench {
    */
     StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                simgrid::s4u::Host *requesting_host,
-//                                                                               simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
+                                                                               //                                                                               simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
                                                                                std::shared_ptr<FileLocation> location,
                                                                                double num_bytes_to_read,
                                                                                double payload) : StorageServiceMessage(payload) {
@@ -314,7 +314,7 @@ namespace wrench {
 #endif
         this->answer_mailbox = answer_mailbox;
         this->requesting_host = requesting_host;
-//        this->mailbox_to_receive_the_file_content = mailbox_to_receive_the_file_content;
+        //        this->mailbox_to_receive_the_file_content = mailbox_to_receive_the_file_content;
         this->location = std::move(location);
         this->num_bytes_to_read = num_bytes_to_read;
     }

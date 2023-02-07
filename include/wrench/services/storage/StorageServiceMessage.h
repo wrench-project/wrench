@@ -228,8 +228,8 @@ namespace wrench {
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The requesting host */
         simgrid::s4u::Host *requesting_host;
-//        /** @brief The mailbox to which the file content should be sent */
-//        simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content;
+        //        /** @brief The mailbox to which the file content should be sent */
+        //        simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content;
         /** @brief The location from which to  read the file */
         std::shared_ptr<FileLocation> location;
         /** @brief The number of bytes to read */
