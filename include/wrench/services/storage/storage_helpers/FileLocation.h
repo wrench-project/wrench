@@ -98,6 +98,7 @@ namespace wrench {
 
     private:
         friend class LogicalFileSystem;
+        friend class Simulation;
 
 
         /**
