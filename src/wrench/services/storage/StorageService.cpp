@@ -407,25 +407,25 @@ namespace wrench {
         assertServiceIsUp(storage_service);
 
         // NO LONGER CREATING THE CHUNK RECEIVING MAILBOX MYSELF
-//        simgrid::s4u::Mailbox *chunk_receiving_mailbox;
-//        if (storage_service->buffer_size == 0) {
-//            chunk_receiving_mailbox = nullptr;
-//        } else {
-//            chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
-//        }
+        //        simgrid::s4u::Mailbox *chunk_receiving_mailbox;
+        //        if (storage_service->buffer_size == 0) {
+        //            chunk_receiving_mailbox = nullptr;
+        //        } else {
+        //            chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
+        //        }
 
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox,
                                     new StorageServiceFileReadRequestMessage(
                                             answer_mailbox,
                                             simgrid::s4u::this_actor::get_host(),
-//                                            chunk_receiving_mailbox,
+                                            //                                            chunk_receiving_mailbox,
                                             location,
                                             num_bytes_to_read,
                                             storage_service->getMessagePayloadValue(
                                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &e) {
-//            if (chunk_receiving_mailbox) S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
+            //            if (chunk_receiving_mailbox) S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             throw;
         }
 

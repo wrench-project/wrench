@@ -307,7 +307,7 @@ namespace wrench {
                     // Wait for the comm to finish
                     msg = req->wait();
                     if (auto file_content_chunk_msg =
-                            dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
+                                dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                         done = file_content_chunk_msg->last_chunk;
                     } else {
                         throw std::runtime_error(
@@ -482,12 +482,12 @@ namespace wrench {
         auto request_answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         //        auto mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailbox("works_by_itself");
 
-//        simgrid::s4u::Mailbox *mailbox_that_should_receive_file_content;
-//        if (src_loc->getStorageService()->buffer_size > DBL_EPSILON) {
-//            mailbox_that_should_receive_file_content = S4U_Mailbox::getTemporaryMailbox();
-//        } else {
-//            mailbox_that_should_receive_file_content = nullptr;
-//        }
+        //        simgrid::s4u::Mailbox *mailbox_that_should_receive_file_content;
+        //        if (src_loc->getStorageService()->buffer_size > DBL_EPSILON) {
+        //            mailbox_that_should_receive_file_content = S4U_Mailbox::getTemporaryMailbox();
+        //        } else {
+        //            mailbox_that_should_receive_file_content = nullptr;
+        //        }
 
         try {
             S4U_Mailbox::putMessage(
@@ -532,7 +532,7 @@ namespace wrench {
             // Receive the first chunk
             auto msg = S4U_Mailbox::getMessage(mailbox_to_receive_the_file_content);
             if (auto file_content_chunk_msg =
-                    dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
+                        dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                 done = file_content_chunk_msg->last_chunk;
             } else {
                 S4U_Mailbox::retireTemporaryMailbox(mailbox_to_receive_the_file_content);
@@ -560,7 +560,7 @@ namespace wrench {
                 //                    WRENCH_INFO("Wrote of %f of f  %s", msg->payload, f->getID().c_str());
                 msg = req->wait();
                 if (auto file_content_chunk_msg =
-                        dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
+                            dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                     done = file_content_chunk_msg->last_chunk;
                 } else {
                     S4U_Mailbox::retireTemporaryMailbox(mailbox_to_receive_the_file_content);
