@@ -210,10 +210,7 @@ private:
         wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 10.0, 100.0, "/foo");
 
         // Start a storage service that uses this disk
-//        auto ss = this->simulation->startNewService(wrench::SimpleStorageService::createSimpleStorageService("subzonehost", {"/scratch"}, {}, {}));
         auto ss = this->simulation->startNewService(wrench::SimpleStorageService::createSimpleStorageService("subzonehost", {"/foo"}, {}, {}));
-
-
 
         // Create a file on it
         auto too_big = wrench::Simulation::addFile("too_big", 200.0);
@@ -223,10 +220,6 @@ private:
         } catch (std::invalid_argument &ignore) {}
         auto not_too_big = wrench::Simulation::addFile("not_too_big", 20.0);
         wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, not_too_big));
-
-        // REMOVE THE DISK:
-                auto host = simgrid::s4u::Host::by_name("subzonehost");
-                host->remove_disk("new_disk");
 
         return 0;
     }
@@ -260,7 +253,6 @@ void SimulationPlatformTest::do_CreateNewDiskTest_test() {
 
     // Running the simulation
     ASSERT_NO_THROW(simulation->launch());
-    std::cerr << "RETURNED FROM LAUNCH\n";
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
