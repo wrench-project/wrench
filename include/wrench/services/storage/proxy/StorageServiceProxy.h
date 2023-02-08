@@ -169,19 +169,19 @@ namespace wrench {
     public:
         const std::shared_ptr<StorageService> target;
 
-	    /**
+        /**
 	     * @brief Location specifier for a proxy
 	     * @param target: a (remote) storage service to access, which overrides the default remote
 	     *                service (if any) of the proxy
 	     * @param other: a file location whose storage service should be the proxy
 	     */
-            static std::shared_ptr<ProxyLocation> LOCATION(
-                    const std::shared_ptr<StorageService> &target,
-                    const std::shared_ptr<FileLocation> &other) {
-                return std::shared_ptr<ProxyLocation>(new ProxyLocation(target, other));
-            }
-	    
-	    /**
+        static std::shared_ptr<ProxyLocation> LOCATION(
+                const std::shared_ptr<StorageService> &target,
+                const std::shared_ptr<FileLocation> &other) {
+            return std::shared_ptr<ProxyLocation>(new ProxyLocation(target, other));
+        }
+
+        /**
 	     * @brief Location specifier for a proxy
 	     * @param target: a (remote) storage service to access, which overrides the default remote
              *                service (if any) of the proxy
@@ -195,7 +195,7 @@ namespace wrench {
             return std::shared_ptr<ProxyLocation>(new ProxyLocation(target, FileLocation::LOCATION(ss, file)));
         }
 
-	    /**
+        /**
 	     * @brief Location specifier for a proxy
 	     * @param target: a (remote) storage service to access, which overrides the default remote
              *                service (if any) of the proxy
@@ -211,7 +211,7 @@ namespace wrench {
             return std::shared_ptr<ProxyLocation>(new ProxyLocation(target, FileLocation::LOCATION(ss, server_ss, file)));
         }
 
-	    /**
+        /**
 	     * @brief Location specifier for a proxy
 	     * @param target: a (remote) storage service to access, which overrides the default remote
              *                service (if any) of the proxy
@@ -219,13 +219,13 @@ namespace wrench {
 	     * @param absolute_path: The absolute path
 	     * @param file: The file
 	     */
-            static std::shared_ptr<ProxyLocation> LOCATION(
-                    const std::shared_ptr<StorageService> &target,
-                    const std::shared_ptr<StorageService> &ss,
-                    const std::string& absolute_path,
-                    const std::shared_ptr<DataFile> &file) {
-                return std::shared_ptr<ProxyLocation>(new ProxyLocation(target, FileLocation::LOCATION(ss, ss->getMountPoint()+"/"+absolute_path, file)));
-            }
+        static std::shared_ptr<ProxyLocation> LOCATION(
+                const std::shared_ptr<StorageService> &target,
+                const std::shared_ptr<StorageService> &ss,
+                const std::string &absolute_path,
+                const std::shared_ptr<DataFile> &file) {
+            return std::shared_ptr<ProxyLocation>(new ProxyLocation(target, FileLocation::LOCATION(ss, ss->getMountPoint() + "/" + absolute_path, file)));
+        }
 
     private:
         /***********************/
