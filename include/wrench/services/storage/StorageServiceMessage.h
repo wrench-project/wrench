@@ -281,8 +281,7 @@ namespace wrench {
     */
     class StorageServiceAckMessage : public StorageServiceMessage {
     public:
-        explicit StorageServiceAckMessage(std::shared_ptr<FileLocation> location) :
-                StorageServiceMessage(0), location(std::move(location)) {}
+        explicit StorageServiceAckMessage(std::shared_ptr<FileLocation> location) : StorageServiceMessage(0), location(std::move(location)) {}
         std::shared_ptr<FileLocation> location;
     };
 

@@ -999,12 +999,11 @@ namespace wrench {
          * @return true if the file is present, false otherwise
          */
         bool Node::hasFile(const shared_ptr<DataFile> &file, const string &path) {
-            if( internalStorage)
-                return internalStorage->hasFile(file,path);
+            if (internalStorage)
+                return internalStorage->hasFile(file, path);
             //return false;//no internal storage here, so I dont have any files.  But I am pretending to have some, so its reasonable to ask.
             //alternativly
             return !constructFileSearchTree(metavisor->getFileNodes(file)).empty();//meta search the subtree for the file.  If its in the subtree we can find a route to it, so we have it
-
         }
 
 
