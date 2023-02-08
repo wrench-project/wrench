@@ -177,7 +177,6 @@ namespace wrench{
                 if(target) {//check that someone is waiting for this message
                     pending[msg->location->getFile()].push_back(std::move(message));
                     WRENCH_INFO("Adding pending write");
-                    cerr<<target<<endl;
                 }
                 S4U_Mailbox::putMessage(cache->mailbox,new StorageServiceFileWriteRequestMessage(mailbox,msg->requesting_host,FileLocation::LOCATION(cache,msg->location->getFile()),msg->buffer_size,0));
             }else{
