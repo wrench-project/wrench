@@ -155,7 +155,7 @@ private:
             throw rethrow;
         }catch (wrench::ExecutionException &ignore) {
             ignore.what();
-            cerr<<ignore.getCause()->toString()<<endl;
+//            cerr<<ignore.getCause()->toString()<<endl;
             if (not std::dynamic_pointer_cast<wrench::FileNotFound>(ignore.getCause())) {
                 throw std::runtime_error("Should have received a FileNotFound execution when reading file2 from remote");
             }
