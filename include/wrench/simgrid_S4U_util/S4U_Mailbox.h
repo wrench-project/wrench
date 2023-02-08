@@ -54,6 +54,13 @@ namespace wrench {
          */
         static unsigned long mailbox_pool_size;
 
+        /**
+         * @brief The "not a mailbox" mailbox, to avoid getting answers back when asked
+         *        to prove an "answer mailbox"
+         */
+        static simgrid::s4u::Mailbox *NULL_MAILBOX;
+
+
     private:
         static std::deque<simgrid::s4u::Mailbox *> free_mailboxes;
         static std::set<simgrid::s4u::Mailbox *> used_mailboxes;
