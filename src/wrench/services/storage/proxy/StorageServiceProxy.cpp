@@ -540,7 +540,12 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
             WRENCH_INFO("Forwarding to cache reply mailbox %s",msg->answer_mailbox->get_name().c_str());
             S4U_Mailbox::putMessage(
                     cache->mailbox,
-                    new StorageServiceFileReadRequestMessage(msg->answer_mailbox,msg->requesting_host,msg->mailbox_to_receive_the_file_content,FileLocation::LOCATION(cache,msg->location->getMountPoint(),msg->location->getFile()),msg->num_bytes_to_read,0)
+                    new StorageServiceFileReadRequestMessage(
+                            msg->answer_mailbox,
+                            msg->requesting_host,//msg->mailbox_to_receive_the_file_content,
+                            FileLocation::LOCATION(cache,msg->location->getMountPoint(),
+                            msg->location->getFile()),
+                            msg->num_bytes_to_read,0)
             );
             return true;
 
@@ -590,7 +595,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                 //do not speed excessive time on readThrough
                 StorageService::initiateFileCopy(mailbox, FileLocation::LOCATION(target,msg->location->getFile()),FileLocation::LOCATION(cache,msg->location->getFile()));
             }else{
-                S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileReadAnswerMessage(msg->location,false,std::make_shared<FileNotFound>(msg->location),0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileReadAnswerMessage(msg->location,false,std::make_shared<FileNotFound>(msg->location),nullptr,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
             }
             return true;
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {//Our remote read request has finished
@@ -605,7 +610,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                         messages.pop_back();
                         i--;
                     }else{
-                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,false,msg->failure_cause,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,false,msg->failure_cause,nullptr,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
                             std::swap(messages[i],messages.back());
                             messages.pop_back();
                             i--;
@@ -640,7 +645,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                 pending[msg->location->getFile()].push_back(std::move(message));
                 StorageService::initiateFileCopy(mailbox, FileLocation::LOCATION(target,msg->location->getFile()),FileLocation::LOCATION(cache,msg->location->getFile()));
             }else{
-                S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileReadAnswerMessage(msg->location,false,std::make_shared<FileNotFound>(msg->location),0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileReadAnswerMessage(msg->location,false,std::make_shared<FileNotFound>(msg->location),nullptr,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
             }
             return true;
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {//Our remote read request has finished
@@ -648,13 +653,13 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
             for(unsigned int i=0;i<messages.size();i++){
                 if(auto tmpMsg= dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())){
                     if(msg->success){
-                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,true,nullptr,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));//magic read, send buffersize 0 and we are assumed to be nonbufferized
+                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,true,nullptr,nullptr,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));//magic read, send buffersize 0 and we are assumed to be nonbufferized
                             S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceAckMessage(tmpMsg->location));//emediatly send the expected ack
                             std::swap(messages[i],messages.back());
                             messages.pop_back();
                             i--;
                     }else{
-                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,false,msg->failure_cause,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,false,msg->failure_cause,nullptr,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
                             std::swap(messages[i],messages.back());
                             messages.pop_back();
                             i--;
@@ -696,7 +701,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                 forward->location=FileLocation::LOCATION(target,msg->location->getFullAbsolutePath(),msg->location->getFile());//hyjack locaiton to be on target
                 S4U_Mailbox::putMessage(target->mailbox,forward);//send to target
             }else{
-                S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileReadAnswerMessage(msg->location,false,std::make_shared<FileNotFound>(msg->location),0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                S4U_Mailbox::putMessage(msg->answer_mailbox,new StorageServiceFileReadAnswerMessage(msg->location,false,std::make_shared<FileNotFound>(msg->location),nullptr,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
             }
             return true;
         } else if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {//Our readthrough is in progress
@@ -711,7 +716,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                             return true;
                     }else{
                             //remote read has failed, notify all waiting
-                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,false,msg->failure_cause,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                            S4U_Mailbox::putMessage(tmpMsg->answer_mailbox,new StorageServiceFileReadAnswerMessage(tmpMsg->location,false,msg->failure_cause,nullptr,0,StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
                             std::swap(messages[i],messages.back());
                             messages.pop_back();
                             i--;
