@@ -189,8 +189,7 @@ namespace wrench {
      */
     void StorageService::writeFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
 
-        writeFile(FileLocation::LOCATION(getSharedPtr<StorageService>(),path,file));
-
+        writeFile(FileLocation::LOCATION(getSharedPtr<StorageService>(), path, file));
     }
 
     /**
@@ -213,9 +212,9 @@ namespace wrench {
      * @throw ExecutionException
      */
     void StorageService::writeFile(const std::shared_ptr<FileLocation> &location) {
-        auto file=location->getFile();
-        auto path=location->getFullAbsolutePath();
-        auto that=location->getStorageService();
+        auto file = location->getFile();
+        auto path = location->getFullAbsolutePath();
+        auto that = location->getStorageService();
         if (file == nullptr) {
             throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
         }
