@@ -167,7 +167,7 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    * @param answer_mailbox: the mailbox to which to send the answer
+    * @param answer_mailbox: the mailbox to which to send the answer (if nullptr, no answer will be sent)
     * @param src: the source location
     * @param dst: the destination location
     * @param file_registry_service: the file registry service to update (nullptr if none)
@@ -181,7 +181,7 @@ namespace wrench {
                                                                                std::shared_ptr<FileRegistryService> file_registry_service,
                                                                                double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || (src == nullptr) || (dst == nullptr)) {
+        if ((answer_mailbox == nullpr) || (src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(): Invalid arguments");
         }
