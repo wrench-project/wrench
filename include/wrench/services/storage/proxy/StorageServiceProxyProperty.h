@@ -67,7 +67,6 @@ namespace wrench {
          *  </table>
          **/
         DECLARE_PROPERTY_NAME(UNCACHED_READ_METHOD);
-
     };
 
 }// namespace wrench
