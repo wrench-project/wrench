@@ -415,6 +415,7 @@ namespace wrench {
 
         bool success = (failure_cause == nullptr);
 
+        // If a success, create the chunk_receiving mailbox
 
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
         S4U_Mailbox::dputMessage(
@@ -423,6 +424,7 @@ namespace wrench {
                         location,
                         success,
                         failure_cause,
+                        nullptr,// non-bufferized = no chunk-receiving mailbox
                         buffer_size,
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));

@@ -405,25 +405,26 @@ namespace wrench {
 
         assertServiceIsUp(storage_service);
 
-        simgrid::s4u::Mailbox *chunk_receiving_mailbox;
-        if (storage_service->buffer_size == 0) {
-            chunk_receiving_mailbox = nullptr;
-        } else {
-            chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
-        }
+        // NO LONGER CREATING THE CHUNK RECEIVING MAILBOX MYSELF
+        //        simgrid::s4u::Mailbox *chunk_receiving_mailbox;
+        //        if (storage_service->buffer_size == 0) {
+        //            chunk_receiving_mailbox = nullptr;
+        //        } else {
+        //            chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
+        //        }
 
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox,
                                     new StorageServiceFileReadRequestMessage(
                                             answer_mailbox,
                                             simgrid::s4u::this_actor::get_host(),
-                                            chunk_receiving_mailbox,
+                                            //                                            chunk_receiving_mailbox,
                                             location,
                                             num_bytes_to_read,
                                             storage_service->getMessagePayloadValue(
                                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &e) {
-            if (chunk_receiving_mailbox) S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
+            //            if (chunk_receiving_mailbox) S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             throw;
         }
 
@@ -433,7 +434,6 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
         } catch (ExecutionException &e) {
-            if (chunk_receiving_mailbox) S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             throw;
         }
 
@@ -442,7 +442,6 @@ namespace wrench {
             // If it's not a success, throw an exception
             if (not msg->success) {
                 std::shared_ptr<FailureCause> cause = msg->failure_cause;
-                if (chunk_receiving_mailbox) S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                 throw ExecutionException(cause);
             }
 
@@ -460,26 +459,26 @@ namespace wrench {
                 while (true) {
                     std::shared_ptr<SimulationMessage> file_content_message = nullptr;
                     try {
-                        file_content_message = S4U_Mailbox::getMessage(chunk_receiving_mailbox);
+                        file_content_message = S4U_Mailbox::getMessage(msg->mailbox_to_receive_the_file_content);
                     } catch (ExecutionException &e) {
-                        S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
+                        S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
                         throw;
                     }
 
                     if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage *>(
                                 file_content_message.get())) {
                         if (file_content_chunk_msg->last_chunk) {
-                            S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
+                            S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
                             break;
                         }
                     } else {
-                        S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
+                        S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
                         throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                                  file_content_message->getName() + "] message!");
                     }
                 }
 
-                S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
+                S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
 
                 //Waiting for the final ack
                 message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
