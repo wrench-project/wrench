@@ -220,7 +220,6 @@ namespace wrench {
     public:
         StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                              simgrid::s4u::Host *requesting_host,
-                                             simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
                                              std::shared_ptr<FileLocation> location,
                                              double num_bytes_to_read,
                                              double payload);
@@ -230,8 +229,8 @@ namespace wrench {
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The requesting host */
         simgrid::s4u::Host *requesting_host;
-        /** @brief The mailbox to which the file content should be sent */
-        simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content;
+        //        /** @brief The mailbox to which the file content should be sent */
+        //        simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content;
         /** @brief The location from which to  read the file */
         std::shared_ptr<FileLocation> location;
         /** @brief The number of bytes to read */
@@ -246,6 +245,7 @@ namespace wrench {
         StorageServiceFileReadAnswerMessage(std::shared_ptr<FileLocation> location,
                                             bool success,
                                             std::shared_ptr<FailureCause> failure_cause,
+                                            simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
                                             double buffer_size,
                                             double payload);
 
@@ -255,6 +255,8 @@ namespace wrench {
         bool success;
         /** @brief The cause of the failure, or nullptr on success */
         std::shared_ptr<FailureCause> failure_cause;
+        /** @brief The mailbox to which the file content should be sent (or nullptr) */
+        simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content;
         /** @brief The requested buffer size */
         double buffer_size;
     };

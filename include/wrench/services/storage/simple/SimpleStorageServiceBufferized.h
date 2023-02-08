@@ -84,8 +84,7 @@ namespace wrench {
 
         bool
         processFileReadRequest(const std::shared_ptr<FileLocation> &location,
-                               double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox,
-                               simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content);
+                               double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processFileCopyRequest(
                 const std::shared_ptr<FileLocation> &src,
