@@ -512,8 +512,10 @@ namespace wrench {
         try {
             this->is_running = true;
             this->s4u_simulation->runSimulation();
+            wrench::FileLocation::file_location_map.clear();
             this->is_running = false;
         } catch (std::runtime_error &e) {
+            wrench::FileLocation::file_location_map.clear();
             this->is_running = false;
             throw;
         }
