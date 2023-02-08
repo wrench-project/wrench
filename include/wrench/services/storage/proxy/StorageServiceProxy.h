@@ -172,9 +172,10 @@ namespace wrench {
             const std::shared_ptr<StorageService> target;
 
 	    /**
-	     * @brief Location specifier 
-	     * @param target: TBD
-	     * @param other: TBD
+	     * @brief Location specifier for a proxy
+	     * @param target: a (remote) storage service to access, which overrides the default remote
+	     *                service (if any) of the proxy
+	     * @param other: a file location whose storage service should be the proxy
 	     */
             static std::shared_ptr<ProxyLocation> LOCATION(
                     const std::shared_ptr<StorageService> &target,
@@ -183,10 +184,11 @@ namespace wrench {
             }
 	    
 	    /**
-	     * @brief Location specifier 
-	     * @param target: TBD
-	     * @param ss: TBD
-	     * @param file: TBD
+	     * @brief Location specifier for a proxy
+	     * @param target: a (remote) storage service to access, which overrides the default remote
+*                service (if any) of the proxy
+	     * @param ss: The proxy
+	     * @param file: The file
 	     */
             static std::shared_ptr<ProxyLocation> LOCATION(
                     const std::shared_ptr<StorageService> &target,
@@ -196,11 +198,12 @@ namespace wrench {
             }
 
 	    /**
-	     * @brief Location specifier 
-	     * @param target: TBD
-	     * @param ss: TBD
-	     * @param server_ss: TBD
-	     * @param file: TBD
+	     * @brief Location specifier for a proxy
+	     * @param target: a (remote) storage service to access, which overrides the default remote
+*                service (if any) of the proxy
+	     * @param ss: The proxy
+	     * @param server_ss: The linux page cache server
+	     * @param file: The file
 	     */
             static std::shared_ptr<ProxyLocation> LOCATION(
                     const std::shared_ptr<StorageService> &target,
@@ -211,16 +214,17 @@ namespace wrench {
             }
 
 	    /**
-	     * @brief Location specifier 
-	     * @param target: TBD
-	     * @param ss: TBD
-	     * @param absolute_path: TBD
-	     * @param file: TBD
+	     * @brief Location specifier for a proxy
+	     * @param target: a (remote) storage service to access, which overrides the default remote
+*                service (if any) of the proxy
+	     * @param ss: The proxy
+	     * @param absolute_path: The absolute path
+	     * @param file: The file
 	     */
             static std::shared_ptr<ProxyLocation> LOCATION(
                     const std::shared_ptr<StorageService> &target,
                     const std::shared_ptr<StorageService> &ss,
-                    std::string absolute_path,
+                    const std::string& absolute_path,
                     const std::shared_ptr<DataFile> &file) {
                 return std::shared_ptr<ProxyLocation>(new ProxyLocation(target, FileLocation::LOCATION(ss, ss->getMountPoint()+"/"+absolute_path, file)));
             }
