@@ -13,8 +13,7 @@ interacting with the nodes that are in the subtree of which it is the root):
 
   -  Synchronously reading a file (rarely used by an execution controller but
      included for completeness); and 
-  -  Semi-Synchronously deleting a file (execution waits for supervisor to acknowledge delete request, 
-  but does not wait for the full XRootD subtree to be purged)
+  -  Semi-Synchronously deleting a file (execution waits for supervisor to acknowledge delete request, but does not wait for the full XRootD subtree to be purged)
 
 In addition, all storage nodes in an XRootD tree support all operations that an instance of :ref:`Simple Storage Service <guide-102-simplestorage>` does (which must be invoked directory on that node). 
 
