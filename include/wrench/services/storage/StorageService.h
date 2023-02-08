@@ -54,6 +54,13 @@ namespace wrench {
         virtual bool lookupFile(const std::shared_ptr<DataFile> &file);
 
         bool hasFile(const std::shared_ptr<DataFile> &file);
+
+	/**
+	 * @brief Check (outside of simulation time) whether the storage service has a file
+	 * 
+	 * @param file: the file
+	 * @param path: the file path
+	 */
         virtual bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) = 0;
 
         /**

@@ -646,15 +646,17 @@ namespace wrench {
                 auto file = msg->src->getFile();
                 if (not internalStorage) {
                     // Reply this is not allowed
-                    std::string error_message = "Cannot copy file to/from non-storage XRooD node";
-                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                             new StorageServiceFileWriteAnswerMessage(
-                                                     FileLocation::LOCATION(getSharedPtr<Node>(), file),
-                                                     false,
-                                                     std::shared_ptr<FailureCause>(
-                                                             new NotAllowed(getSharedPtr<Node>(), error_message)),
-                                                     0,
-                                                     getMessagePayloadValue(MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+                    if (msg->answer_mailbox) {
+                        std::string error_message = "Cannot copy file to/from non-storage XRooD node";
+                        S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                                 new StorageServiceFileWriteAnswerMessage(
+                                                         FileLocation::LOCATION(getSharedPtr<Node>(), file),
+                                                         false,
+                                                         std::shared_ptr<FailureCause>(
+                                                                 new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                                         0,
+                                                         getMessagePayloadValue(MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+                    }
 
                 } else {
                     // Forward the message

@@ -847,7 +847,9 @@ namespace wrench {
     /**
      * @brief Determines whether the storage service has the file. This doesn't simulate anything and is merely a zero-simulated-time data structure lookup.
      * If you want to simulate the overhead of querying the StorageService, instead use lookupFile().
+     *
      * @param file a file
+     *
      * @return true if the file is present, false otherwise
      */
     bool StorageService::hasFile(const shared_ptr<DataFile> &file) {

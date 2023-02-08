@@ -253,10 +253,8 @@ namespace wrench{
                         target=location->target;
                     }
                     //WRENCH_INFO("initiating file copy");
-                    initiateFileCopy(recv_mailbox,FileLocation::LOCATION(cache,msg->location->getFile()),FileLocation::LOCATION(target,msg->location->getFile()));
-                    S4U_Mailbox::igetMessage(recv_mailbox);//there will be a message on this mailbox, but we dont actually care
-                    //TODO this is horrible hacky and might leak memory like a sieve
-
+                    // Initiate File Copy but not wanting to receive an answer, hence the NULL_MAILBOX
+                    initiateFileCopy(S4U_Mailbox::NULL_MAILBOX, FileLocation::LOCATION(cache,msg->location->getFile()),FileLocation::LOCATION(target,msg->location->getFile()));
 
                     std::swap(messages[i],messages.back());
                     messages.pop_back();
@@ -356,6 +354,7 @@ namespace wrench{
     /**
      * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.
 If you want it to start cached, you should also call StorageServiceProxy.getCache().createFile
+     * @param location: the file location
      *
      **/
     void StorageServiceProxy::createFile(const std::shared_ptr<FileLocation> &location){
@@ -364,6 +363,8 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
     /**
      * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.
 If you want it to start cached, you should also call StorageServiceProxy.getCache().createFile
+     * @param file: the file to create
+     * @param path: the file path
      *
      **/
     void StorageServiceProxy::createFile(const std::shared_ptr<DataFile> &file, const std::string &path){
@@ -372,6 +373,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
     /**
      * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.
 If you want it to start cached, you should also call StorageServiceProxy.getCache().createFile
+     * @param file: the file to create
      *
      **/
     void StorageServiceProxy::createFile(const std::shared_ptr<DataFile> &file){
@@ -390,30 +392,27 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
         throw std::invalid_argument("This Proxy has not cache, no Remote fileserver to target, and no fallback default to use");
     }//cache
 
-    /***********************/
-    /** \cond INTERNAL    **/
-    /***********************/
     /**
      * @brief Constructor
      * @param hostname The host to run on
      * @param cache A Storage server to use as a cache.  Ideal on the same host
-     * @param defaultRemote A remote file server to use as a default target.  Defaults to nullptr
+     * @param default_remote A remote file server to use as a default target.  Defaults to nullptr
      * @param properties The wrench property overrides
-     * @param messagePayload The wrench message payload overrides
+     * @param message_payloads The wrench message payload overrides
      */
     StorageServiceProxy::StorageServiceProxy(const std::string &hostname,
                                              const std::shared_ptr<StorageService>& cache,
-                                             const std::shared_ptr<StorageService>& defaultRemote,
-                                             WRENCH_PROPERTY_COLLECTION_TYPE properties,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagePayload
+                                             const std::shared_ptr<StorageService>& default_remote,
+                                             WRENCH_PROPERTY_COLLECTION_TYPE properties,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads
                                              ):
                                                  StorageService(hostname,
                                                                 "storage_proxy"
                                                                 ),
                                                  cache(cache),
-                                                 remote(defaultRemote) {
+                                                 remote(default_remote) {
 
         this->setProperties(this->default_property_values, std::move(properties));
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagePayload));
+        this->setMessagePayloads(this->default_messagepayload_values, std::move(message_payloads));
         this->setProperty(StorageServiceProperty::BUFFER_SIZE,cache->getPropertyValueAsString(StorageServiceProperty::BUFFER_SIZE));//the internal cache has the same buffer properties as this service.
         if(cache and cache->hasMultipleMountPoints()){
             throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy() A storage service proxy's cache can not have multiple mountpoints");
@@ -435,7 +434,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
         }
     }
     /**
-     *  @brief
+     * @brief Delete a file
      * @param targetServer
      * @param file
      * @param file_registry_service
@@ -443,32 +442,90 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
     void StorageServiceProxy::deleteFile(const std::shared_ptr<StorageService>& targetServer, const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service){
         StorageService::deleteFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()), file),file_registry_service);
     }
+
+    /**
+     * @brief Lookup a file
+     * @param targetServer: the target server
+     * @param file: the file
+     *
+     * @return true if the file is present, false otherwise
+     */
     bool StorageServiceProxy::lookupFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file){
         return StorageService::lookupFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
+
+    /**
+     * @brief Read a file
+     * @param file: the file
+     */
     void StorageServiceProxy::readFile(const std::shared_ptr<DataFile> &file){
         StorageService::readFile(ProxyLocation::LOCATION(remote,std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
+
+    /**
+     * @brief Read a file
+     * @param targetServer: the target server
+     * @param file: the file
+     */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file){
         StorageService::readFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
+
+    /**
+     * @brief Read a file
+     * @param targetServer: the target server
+     * @param file: the file
+     * @param num_bytes: the number of bytes to read
+     */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file, double num_bytes){
         StorageService::readFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()), file),num_bytes);
     }
+
+    /**
+     * @brief Read a file
+     * @param targetServer: the target server
+     * @param file: the file
+     * @param path: the file path
+     */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file, const std::string &path){
         StorageService::readFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()),path, file));
     }
+
+    /**
+     * @brief Read a file
+     * @param targetServer: the target server
+     * @param file: the file
+     * @param path: the file path
+     * @param num_bytes: the number of bytes to read
+     */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes){
         StorageService::readFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()),path, file),num_bytes);
     }
+
+    /**
+     * @brief Write a file
+     * @param targetServer: the target server
+     * @param file: the file
+     * @param path: the file path
+     */
     void StorageServiceProxy::writeFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file, const std::string &path){
         StorageService::writeFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()),path, file));
     }
 
+    /**
+     * @brief Write a file
+     * @param targetServer: the target server
+     * @param file: the file
+     */
     void StorageServiceProxy::writeFile(const std::shared_ptr<StorageService>& targetServer,const std::shared_ptr<DataFile> &file){
         StorageService::writeFile(ProxyLocation::LOCATION(targetServer,std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
 
+    /**
+     * @brief Get the proxy's associated cache
+     *
+     * @return the cache storage service
+     */
     const std::shared_ptr<StorageService> StorageServiceProxy::getCache(){
         return this->cache;
     }
