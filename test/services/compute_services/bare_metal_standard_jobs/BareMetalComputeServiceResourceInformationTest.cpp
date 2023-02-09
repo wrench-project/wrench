@@ -240,23 +240,23 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
 
     // Create 1 Compute Service that manages Host1 and Host2
     ASSERT_NO_THROW(compute_service1 = simulation->add(
-            new wrench::BareMetalComputeService("Host1",
-                                                {{std::make_pair("Host1",
-                                                                 std::make_tuple(4, wrench::ComputeService::ALL_RAM))},
-                                                 {std::make_pair("Host2",
-                                                                 std::make_tuple(4, wrench::ComputeService::ALL_RAM))}},
-                                                "",
-                                                {})));
+                            new wrench::BareMetalComputeService("Host1",
+                                                                {{std::make_pair("Host1",
+                                                                                 std::make_tuple(4, wrench::ComputeService::ALL_RAM))},
+                                                                 {std::make_pair("Host2",
+                                                                                 std::make_tuple(4, wrench::ComputeService::ALL_RAM))}},
+                                                                "",
+                                                                {})));
 
     // Create 1 Compute Service that manages Host3 and Host4
     ASSERT_NO_THROW(compute_service2 = simulation->add(
-            new wrench::BareMetalComputeService("Host1",
-                                                {{std::make_pair("Host3",
-                                                                 std::make_tuple(8, wrench::ComputeService::ALL_RAM))},
-                                                 {std::make_pair("Host4",
-                                                                 std::make_tuple(8, wrench::ComputeService::ALL_RAM))}},
-                                                "",
-                                                {})));
+                            new wrench::BareMetalComputeService("Host1",
+                                                                {{std::make_pair("Host3",
+                                                                                 std::make_tuple(8, wrench::ComputeService::ALL_RAM))},
+                                                                 {std::make_pair("Host4",
+                                                                                 std::make_tuple(8, wrench::ComputeService::ALL_RAM))}},
+                                                                "",
+                                                                {})));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(compute_service1);
     compute_services.insert(compute_service2);
@@ -265,8 +265,8 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ResourceInformationTestWMS(
-                    this, "Host1")));
+                            new ResourceInformationTestWMS(
+                                    this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

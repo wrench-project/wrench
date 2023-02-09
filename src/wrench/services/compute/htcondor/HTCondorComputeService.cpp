@@ -383,7 +383,7 @@ namespace wrench {
      * @param service_specific_args: the service-specific arguments (useful for some services)
      */
     void HTCondorComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
-        for (auto const &cs : this->central_manager->compute_services) {
+        for (auto const &cs: this->central_manager->compute_services) {
             if (not cs->hasScratch()) {
                 throw std::invalid_argument(
                         "HTCondorComputeService::validateJobsUseOfScratch(): This HTCondor service cannot"
