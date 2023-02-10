@@ -1625,7 +1625,7 @@ private:
                 throw std::runtime_error(
                         "Got the correct failure even, a correct cause type, but the cause points to the wrong storage service");
             }
-            cause->getInvalidPath(); // coverage
+            cause->getInvalidPath();// coverage
 
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
@@ -1648,7 +1648,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//        argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
