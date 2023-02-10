@@ -71,5 +71,5 @@ echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/XRootD/wrench-example-xrootd-bas
 ${INSTALL_DIR}/action_api/XRootD/wrench-example-xrootd-basic ${INSTALL_DIR}/action_api/XRootD/xrootd_platform.xml
 
 echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/storage-service-proxy/storage-service-proxy-basic proxy_platform.xml${normal}"
-${INSTALL_DIR}/action_api/XRootD/wrench-example-xrootd-basic ${INSTALL_DIR}/action_api/XRootD/xrootd_platform.xml
+${INSTALL_DIR}/action_api/storage-service-proxy/storage-service-proxy ${INSTALL_DIR}/action_api/storage-service-proxy/storage-service-proxy
 
