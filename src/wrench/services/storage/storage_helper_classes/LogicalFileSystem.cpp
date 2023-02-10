@@ -165,11 +165,11 @@ namespace wrench {
     }
 
     /**
- * @brief Remove an empty directory
- * @param absolute_path: the directory's absolute path
- *
- * @throw std::invalid_argument
- */
+     * @brief Remove an empty directory
+     * @param absolute_path: the directory's absolute path
+     *
+     * @throw std::invalid_argument
+     */
     void LogicalFileSystem::removeEmptyDirectory(const std::string &absolute_path) {
         if (devnull) {
             return;
