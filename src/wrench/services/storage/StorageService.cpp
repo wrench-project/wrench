@@ -12,6 +12,7 @@
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
+#include <wrench/services/storage/compound/CompoundStorageService.h>
 #include <wrench/services/compute/cloud/CloudComputeService.h>
 #include "wrench/services/storage/StorageServiceMessage.h"
 #include <wrench/services/storage/StorageServiceMessagePayload.h>
@@ -215,6 +216,7 @@ namespace wrench {
         auto file = location->getFile();
         auto path = location->getFullAbsolutePath();
         auto that = location->getStorageService();
+        auto buffer_size = that->buffer_size;   // best guess at buffer-size, but can be updated later
         if (file == nullptr) {
             throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
         }
@@ -229,7 +231,7 @@ namespace wrench {
                                         answer_mailbox,
                                         simgrid::s4u::this_actor::get_host(),
                                         location,
-                                        that->buffer_size,
+                                        buffer_size,
                                         that->getMessagePayloadValue(
                                                 StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -244,7 +246,10 @@ namespace wrench {
                 throw ExecutionException(msg->failure_cause);
             }
 
-            if (that->buffer_size < 1) {
+            // Update buffer size according to which storage service actually answered.
+            auto buffer_size = msg->location->getStorageService()->buffer_size;
+
+            if (buffer_size < 1) {
                 // just wait for the final ack (no timeout!)
                 message = S4U_Mailbox::getMessage(answer_mailbox);
                 if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
@@ -255,11 +260,11 @@ namespace wrench {
             } else {
                 // Bufferized
                 double remaining = file->getSize();
-                while (remaining - that->buffer_size > DBL_EPSILON) {
+                while (remaining - buffer_size > DBL_EPSILON) {
                     S4U_Mailbox::putMessage(msg->data_write_mailbox,
                                             new StorageServiceFileContentChunkMessage(
-                                                    file, that->buffer_size, false));
-                    remaining -= that->buffer_size;
+                                                    file, buffer_size, false));
+                    remaining -= buffer_size;
                 }
                 S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
                                                                          file, remaining, true));
@@ -642,9 +647,9 @@ namespace wrench {
         //        }
 
         simgrid::s4u::Mailbox *mailbox_to_contact;
-        if (dst_is_non_bufferized) {
+        if (dst_is_non_bufferized and !(std::dynamic_pointer_cast<CompoundStorageService>(src_location->getStorageService()))) {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
-        } else if (src_is_non_bufferized) {
+        } else if (src_is_non_bufferized and !(std::dynamic_pointer_cast<CompoundStorageService>(dst_location->getStorageService()))) {
             mailbox_to_contact = src_location->getStorageService()->mailbox;
         } else {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
