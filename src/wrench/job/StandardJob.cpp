@@ -210,12 +210,12 @@ namespace wrench {
         for (auto const &pfc: this->pre_file_copies) {
             auto src_location = std::get<0>(pfc);
             auto dst_location = std::get<1>(pfc);
-//            if (src_location->isScratch()) {
-//                src_location = FileLocation::LOCATION(compute_service->getScratch(), src_location->getFile());
-//            }
-//            if (dst_location->isScratch()) {
-//                dst_location = FileLocation::LOCATION(compute_service->getScratch(), dst_location->getFile());
-//            }
+            //            if (src_location->isScratch()) {
+            //                src_location = FileLocation::LOCATION(compute_service->getScratch(), src_location->getFile());
+            //            }
+            //            if (dst_location->isScratch()) {
+            //                dst_location = FileLocation::LOCATION(compute_service->getScratch(), dst_location->getFile());
+            //            }
 
             pre_file_copy_actions.push_back(cjob->addFileCopyAction("", src_location, dst_location));
         }
@@ -224,24 +224,19 @@ namespace wrench {
         for (auto const &pfc: this->post_file_copies) {
             auto src_location = std::get<0>(pfc);
             auto dst_location = std::get<1>(pfc);
-//            if (src_location->isScratch()) {
-//                src_location = FileLocation::LOCATION(compute_service->getScratch(), src_location->getFile());
-//            }
-//            if (dst_location->isScratch()) {
-//                dst_location = FileLocation::LOCATION(compute_service->getScratch(), dst_location->getFile());
-//            }
+            //            if (src_location->isScratch()) {
+            //                src_location = FileLocation::LOCATION(compute_service->getScratch(), src_location->getFile());
+            //            }
+            //            if (dst_location->isScratch()) {
+            //                dst_location = FileLocation::LOCATION(compute_service->getScratch(), dst_location->getFile());
+            //            }
 
             post_file_copy_actions.push_back(cjob->addFileCopyAction("", src_location, dst_location));
         }
 
         // Create the file cleanup actions
         for (auto const &fc: this->cleanup_file_deletions) {
-//            if (fc->isScratch()) {
-//                cleanup_actions.push_back(cjob->addFileDeleteAction("", FileLocation::LOCATION(compute_service->getScratch(), fc->getFile())));
-//                cleanup_actions.push_back(cjob->addFileDeleteAction("", fc));
-//            } else {
             cleanup_actions.push_back(cjob->addFileDeleteAction("", fc));
-//            }
         }
 
         // Create the task actions
@@ -258,15 +253,11 @@ namespace wrench {
                 if (this->file_locations.find(f) != this->file_locations.end()) {
                     std::vector<std::shared_ptr<FileLocation>> fixed_locations;
                     for (auto const &loc: this->file_locations[f]) {
-//                        if (loc->isScratch()) {
-//                            fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch(), loc->getFile()));
-//                        } else {
                         fixed_locations.push_back(loc);
-//                        }
                     }
                     fread_action = cjob->addFileReadAction("", fixed_locations);
                 } else {
-                    fread_action = cjob->addFileReadAction("", FileLocation::SCRATCH( f));
+                    fread_action = cjob->addFileReadAction("", FileLocation::SCRATCH(f));
                 }
                 task_file_read_actions[task].push_back(fread_action);
                 cjob->addActionDependency(fread_action, compute_action);
@@ -277,11 +268,7 @@ namespace wrench {
                 if (this->file_locations.find(f) != this->file_locations.end()) {
                     std::vector<std::shared_ptr<FileLocation>> fixed_locations;
                     for (auto const &loc: this->file_locations[f]) {
-//                        if (loc->isScratch()) {
-//                            fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch(), loc->getFile()));
-//                        } else {
                         fixed_locations.push_back(loc);
-//                        }
                     }
                     if (fixed_locations.size() > 1) {
                         throw std::runtime_error("StandardJob::createUnderlyingCompoundJob(): Internal WRENCH error - "
@@ -289,7 +276,7 @@ namespace wrench {
                     }
                     fwrite_action = cjob->addFileWriteAction("", fixed_locations.at(0));
                 } else {
-                    fwrite_action = cjob->addFileWriteAction("", FileLocation::SCRATCH( f));
+                    fwrite_action = cjob->addFileWriteAction("", FileLocation::SCRATCH(f));
                 }
                 task_file_write_actions[task].push_back(fwrite_action);
                 cjob->addActionDependency(compute_action, fwrite_action);
