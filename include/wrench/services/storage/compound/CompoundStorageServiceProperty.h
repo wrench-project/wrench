@@ -19,7 +19,6 @@ namespace wrench {
     * @brief Configurable properties for a CompoundStorageService
     */
     class CompoundStorageServiceProperty : public StorageServiceProperty {
-
     public:
         /** @brief Property that defines how the underlying storage is selected:
          *         So far the only option is to have an external process that 

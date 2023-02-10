@@ -27,7 +27,6 @@ namespace wrench {
         const std::shared_ptr<DataFile>& file, 
         const std::set<std::shared_ptr<StorageService>>& resources,
         const std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>& mapping) {
-
         return nullptr;
     }
 
@@ -73,7 +72,6 @@ namespace wrench {
                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                 const std::string &suffix) : StorageService(hostname, 
                     "compound_storage" + suffix) {
-
             this->setProperties(this->default_property_values, std::move(property_list));
             this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
@@ -115,7 +113,6 @@ namespace wrench {
      * @return 0 on termination
      */
     int CompoundStorageService::main() {
-
         //TODO: Use another colour?
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
         std::string message = "Compound Storage Service " + this->getName() + "  starting on host " + this->getHostname();
@@ -138,7 +135,6 @@ namespace wrench {
         simgrid::s4u::CommPtr comm_ptr;
         std::unique_ptr<SimulationMessage> simulation_message;
         while (true) {
-
             S4U_Simulation::computeZeroFlop();
 
             // Create an async recv if needed
@@ -191,7 +187,6 @@ namespace wrench {
      * @return false if the daemon should terminate
      */
     bool CompoundStorageService::processNextMessage(SimulationMessage *message) {
-
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message)) {
@@ -224,8 +219,7 @@ namespace wrench {
      * 
      * @return A shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or nullptr if it's not.
      */
-    std::shared_ptr<FileLocation> CompoundStorageService::lookupFileLocation(const std::shared_ptr<DataFile> &file) {
-        
+    std::shared_ptr<FileLocation> CompoundStorageService::lookupFileLocation(const std::shared_ptr<DataFile> &file) { 
         WRENCH_DEBUG("lookupFileLocation: For file %s", file->getID().c_str());
 
         if (this->file_location_mapping.find(file) == this->file_location_mapping.end()) {
@@ -261,7 +255,6 @@ namespace wrench {
      *          or nullptr if it's not.
      */
     std::shared_ptr<FileLocation> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location) {
-
         if (this->lookupFileLocation(concrete_file_location)) {
             WRENCH_DEBUG("lookupOrDesignateStorageService: File %s already known by CSS", concrete_file_location->getID().c_str());
             return this->file_location_mapping[concrete_file_location];
@@ -305,10 +298,8 @@ namespace wrench {
      * @return true if this process should keep running
      */
     bool CompoundStorageService::processFileDeleteRequest(StorageServiceFileDeleteRequestMessage *msg) {
-
         auto designated_location = this->lookupFileLocation(msg->location);
         if (!designated_location) {
-
             WRENCH_WARN("processFileDeleteRequest: Unable to find file %s", 
                         msg->location->getFile()->getID().c_str());
             try {        
@@ -346,10 +337,8 @@ namespace wrench {
      * @return true if this process should keep running
      */
     bool CompoundStorageService::processFileLookupRequest(StorageServiceFileLookupRequestMessage* msg) {
-        
         auto designated_location = this->lookupFileLocation(msg->location);
         if (!designated_location) {
-            
             WRENCH_WARN("processFileLookupRequest: Unable to find file %s", msg->location->getFile()->getID().c_str());
             // Abort because we don't know the file (it should have been written or copied somewhere before the lookup happens)
             try {
@@ -379,7 +368,6 @@ namespace wrench {
         );
 
         return true;
-
     }
 
     /**
@@ -389,7 +377,6 @@ namespace wrench {
      * @return true if this process should keep running
      */
     bool CompoundStorageService::processFileCopyRequest(StorageServiceFileCopyRequestMessage *msg) {
-
         // If source location references a CSS, it must already be known to the CSS
         auto final_src = msg->src;
         if (std::dynamic_pointer_cast<CompoundStorageService>(msg->src->getStorageService())) {
@@ -403,7 +390,6 @@ namespace wrench {
 
         // Error case - src
         if (!final_src) {
-           
             WRENCH_WARN("processFileCopyRequest: Source %s is a CompoundStorageService and file doesn't exist yet.", 
                         msg->src->getStorageService()->getName().c_str());
             try {
@@ -433,7 +419,6 @@ namespace wrench {
 
         // Error case - dst
         if (!final_dst) {
-
             WRENCH_WARN("processFileCopyRequest: Destination file %s not found or not enough space left",
                         msg->dst->getFile()->getID().c_str());
 
@@ -507,10 +492,8 @@ namespace wrench {
      * @return true if this process should keep running
      */
     bool CompoundStorageService::processFileWriteRequest(StorageServiceFileWriteRequestMessage* msg) {
-
         auto designated_location = this->lookupOrDesignateStorageService(msg->location);
         if (!designated_location) {
-
             WRENCH_WARN("processFileWriteRequest: Destination file %s not found or not enough space left",
                         msg->location->getFile()->getID().c_str());
             try {
@@ -551,10 +534,8 @@ namespace wrench {
      * @return true if this process should keep running
      */
     bool CompoundStorageService::processFileReadRequest(StorageServiceFileReadRequestMessage* msg) {        
-        
         auto designated_location = this->lookupFileLocation(msg->location);
         if (!designated_location) {
-
             WRENCH_WARN("processFileReadRequest: file %s not found", msg->location->getFile()->getID().c_str());
             try {
                 S4U_Mailbox::dputMessage(
@@ -571,7 +552,6 @@ namespace wrench {
             } catch (wrench::ExecutionException &e) {}
 
             return true;
-
         }
 
         WRENCH_DEBUG("processFileReadRequest: Going to read file %s on storage service %s, at path %s", 
@@ -613,7 +593,6 @@ namespace wrench {
      * @return A map of service name and total capacity of all disks for each service.
      */
     std::map<std::string, double> CompoundStorageService::getTotalSpace() {
-
         WRENCH_INFO("CompoundStorageService::getTotalSpace");
         std::map<std::string, double> to_return;
         for (const auto & service : this->storage_services) {
@@ -637,20 +616,17 @@ namespace wrench {
      *
      */
     std::map<std::string, double> CompoundStorageService::getFreeSpace() {
-
         WRENCH_DEBUG("CompoundStorageService::getFreeSpace Forwarding request to internal services");
 
         std::map<std::string, double> to_return = {}; 
         std::map<std::string, simgrid::s4u::Mailbox*> mailboxes = {};
 
         for (const auto & service : this->storage_services) {
-            
             auto free_space = service->getFreeSpace();
 
             to_return[service->getName()] = std::accumulate(free_space.begin(), free_space.end(), 0, 
                                                           [](const std::size_t previous, const auto& element){return previous + element.second;}
             );
-
         }
 
         return to_return;
@@ -688,7 +664,6 @@ namespace wrench {
      *
      */
     double CompoundStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
-
         if (!this->lookupFile(location)) {
             throw std::invalid_argument("CompoundStorageService::getFileLastWriteDate(): File not known to the CompoundStorageService. Unable to forward to underlying StorageService");
         }
@@ -699,7 +674,6 @@ namespace wrench {
         } else {
             throw std::logic_error("CompoundStorageService::getFileLastWriteDate(): File known, but allocated on StorageService that doesn't implement getFileLastWriteDate()");
         }
-
     }
 
     bool CompoundStorageService::hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {

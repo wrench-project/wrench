@@ -39,9 +39,7 @@ namespace wrench {
      *        said request to one of the underlying storage services).
      */
     class CompoundStorageService : public StorageService {
-    
     public:
-
         CompoundStorageService(const std::string &hostname,
                                std::set<std::shared_ptr<StorageService>> storage_services,
                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
@@ -74,9 +72,8 @@ namespace wrench {
         std::shared_ptr<FileLocation> lookupFileLocation(const std::shared_ptr<DataFile> &file);
 
         std::shared_ptr<FileLocation> lookupFileLocation(const std::shared_ptr<FileLocation> &location);
-
+        
     protected:
-
         CompoundStorageService(const std::string &hostname, 
                                std::set<std::shared_ptr<StorageService>> storage_services,
                                StorageSelectionStrategyCallback storage_selection,
@@ -115,7 +112,7 @@ namespace wrench {
 
         bool processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox);
 
-        virtual bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) override;
+        bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) override;
 
     private:
         friend class Simulation;
@@ -145,7 +142,6 @@ namespace wrench {
         StorageSelectionStrategyCallback storage_selection;
 
         bool isStorageSelectionUserProvided;
-
     };
 
 };// namespace wrench
