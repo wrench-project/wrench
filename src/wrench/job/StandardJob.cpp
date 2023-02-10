@@ -330,60 +330,29 @@ namespace wrench {
         // Create the scratch clean up actions
 //        std::cerr << "NEED SCRATCH CLEAN = " << need_scratch_clean << "\n";
         // Does the lambda capture of cjob_file_locations work?
-        auto lambda_execute = [this](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
+        auto lambda_execute = [this, cjob](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
 
-//          std::cerr << "CLEANING UP SCRATCH!!!!\n";
-          for (auto const &task: this->tasks) {
-              for (auto const &f: task->getInputFiles()) {
-                  bool used_scratch = false;
-                  if (file_locations.find(f) != file_locations.end()) {
-                      for (const auto &fl : file_locations[f]) {
-                          if (fl->isScratch()) {
-                              // TODO: Not quite right, because perhaps only one of the
-                              // locations could be scratch, and not have been used
-                              // but too lazy right now to change everything
-                              used_scratch = true;
-                              break;
-                          }
+          auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
+          auto scratch = cs->getScratch();
+          if (scratch) {
+              for (auto const &task: this->tasks) {
+                  for (auto const &f: task->getInputFiles()) {
+                      if (scratch->hasFile(f, scratch->getMountPoint() + "/" + cjob->getName())) {
+                          try {
+                              scratch->deleteFile(FileLocation::LOCATION(scratch, scratch->getMountPoint() + "/" + cjob->getName(), f));
+                          } catch (ExecutionException &ignore) {}
                       }
-                  } else {
-                      used_scratch = true;
                   }
-                  if (used_scratch) {
-                      try {
-                          auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
-                          auto scratch = cs->getScratch();
-                          if (scratch) {
-                              scratch->deleteFile(FileLocation::LOCATION(scratch, f));
-                          }
-                      } catch (ExecutionException &ignore) {}
+
+                  for (auto const &f: task->getOutputFiles()) {
+                      if (scratch->hasFile(f, scratch->getMountPoint() + "/" + cjob->getName())) {
+                          try {
+                              scratch->deleteFile(FileLocation::LOCATION(scratch, scratch->getMountPoint() + "/" + cjob->getName(), f));
+                          } catch (ExecutionException &ignore) {}
+                      }
                   }
               }
-              for (auto const &f: task->getOutputFiles()) {
-                  bool used_scratch = false;
-                  if (file_locations.find(f) != file_locations.end()) {
-                      for (const auto &fl : file_locations[f]) {
-                          if (fl->isScratch()) {
-                              // TODO: Not quite right, because perhaps only one of the
-                              // locations could be scratch, and not have been used
-                              // but too lazy right now to change everything
-                              used_scratch = true;
-                              break;
-                          }
-                      }
-                  } else {
-                      used_scratch = true;
-                  }
-                  if (used_scratch) {
-                      try {
-                          auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
-                          auto scratch = cs->getScratch();
-                          if (scratch) {
-                              scratch->deleteFile(FileLocation::LOCATION(scratch, f));
-                          }
-                      } catch (ExecutionException &ignore) {}
-                  }
-              }
+              // TODO: REMOVE DIRECTORY
           }
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
