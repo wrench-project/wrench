@@ -40,12 +40,12 @@ namespace wrench {
                              std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &pre_file_copies,
                              std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &post_file_copies,
                              std::vector<std::shared_ptr<FileLocation>> &cleanup_file_deletions)
-        : Job("", std::move(job_manager)),
-          file_locations(file_locations),
-          pre_file_copies(pre_file_copies),
-          post_file_copies(post_file_copies),
-          cleanup_file_deletions(cleanup_file_deletions),
-          state(StandardJob::State::NOT_SUBMITTED) {
+            : Job("", std::move(job_manager)),
+              file_locations(file_locations),
+              pre_file_copies(pre_file_copies),
+              post_file_copies(post_file_copies),
+              cleanup_file_deletions(cleanup_file_deletions),
+              state(StandardJob::State::NOT_SUBMITTED) {
         // Check that this is a ready sub-graph
         for (const auto &t: tasks) {
             if (t->getState() != WorkflowTask::State::READY) {
@@ -240,7 +240,7 @@ namespace wrench {
 //                cleanup_actions.push_back(cjob->addFileDeleteAction("", FileLocation::LOCATION(compute_service->getScratch(), fc->getFile())));
 //                cleanup_actions.push_back(cjob->addFileDeleteAction("", fc));
 //            } else {
-                cleanup_actions.push_back(cjob->addFileDeleteAction("", fc));
+            cleanup_actions.push_back(cjob->addFileDeleteAction("", fc));
 //            }
         }
 
@@ -261,7 +261,7 @@ namespace wrench {
 //                        if (loc->isScratch()) {
 //                            fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch(), loc->getFile()));
 //                        } else {
-                            fixed_locations.push_back(loc);
+                        fixed_locations.push_back(loc);
 //                        }
                     }
                     fread_action = cjob->addFileReadAction("", fixed_locations);
@@ -280,7 +280,7 @@ namespace wrench {
 //                        if (loc->isScratch()) {
 //                            fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch(), loc->getFile()));
 //                        } else {
-                            fixed_locations.push_back(loc);
+                        fixed_locations.push_back(loc);
 //                        }
                     }
                     if (fixed_locations.size() > 1) {
@@ -297,60 +297,97 @@ namespace wrench {
         }
 
         // Determine whether the scratch space needs to be cleaned
-        bool need_scratch_clean = false;
-        for (auto const &task: this->tasks) {
-            for (auto const &f: task->getInputFiles()) {
-                if (this->file_locations.find(f) == this->file_locations.end()) {
-                    need_scratch_clean = true;
-                    break;
-                }
-            }
-            if (need_scratch_clean) {
-                break;
-            }
-            for (auto const &f: task->getOutputFiles()) {
-                if (this->file_locations.find(f) == this->file_locations.end()) {
-                    need_scratch_clean = true;
-                    break;
-                }
-            }
-            if (need_scratch_clean) {
-                break;
-            }
-        }
+//        std::cerr << "DETERMINING IS SCRATCH CLEAN IS NEEDED\n";
+//        bool need_scratch_clean = false;
+//        for (auto const &task: this->tasks) {
+//            for (auto const &f: task->getInputFiles()) {
+//                if (this->file_locations.find(f) == this->file_locations.end()) {
+//                    need_scratch_clean = true;
+//                    break;
+//                }
+//                for (const auto &fl : this->file_locations[f]) {
+//                    if (fl->isScratch()) {
+//                        need_scratch_clean = true;
+//                        break;
+//                    }
+//                }
+//                if (need_sc)
+//            }
+//            if (need_scratch_clean) {
+//                break;
+//            }
+//            for (auto const &f: task->getOutputFiles()) {
+//                if (this->file_locations.find(f) == this->file_locations.end()) {
+//                    need_scratch_clean = true;
+//                    break;
+//                }
+//            }
+//            if (need_scratch_clean) {
+//                break;
+//            }
+//        }
 
         // Create the scratch clean up actions
-        if (need_scratch_clean) {
-            // Does the lambda capture of cjob_file_locations work?
-            auto lambda_execute = [this](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
-                for (auto const &task: this->tasks) {
-                    for (auto const &f: task->getInputFiles()) {
-                        if (this->file_locations.find(f) == this->file_locations.end()) {
-                            try {
-                                auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
-                                auto scratch = cs->getScratch();
-                                scratch->deleteFile(FileLocation::LOCATION(scratch, f));
-                            } catch (ExecutionException &ignore) {
-                                // ignore
-                            }
-                        }
-                    }
-                    for (auto const &f: task->getOutputFiles()) {
-                        if (this->file_locations.find(f) == this->file_locations.end()) {
-                            try {
-                                auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
-                                auto scratch = cs->getScratch();
-                                scratch->deleteFile(FileLocation::LOCATION(scratch, f));
-                            } catch (ExecutionException &ignore) {
-                                // ignore
-                            }
-                        }
-                    }
-                }
-            };
-            auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
-            scratch_cleanup = cjob->addCustomAction("", 0, 0, lambda_execute, lambda_terminate);
-        }
+//        std::cerr << "NEED SCRATCH CLEAN = " << need_scratch_clean << "\n";
+        // Does the lambda capture of cjob_file_locations work?
+        auto lambda_execute = [this](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
+
+//          std::cerr << "CLEANING UP SCRATCH!!!!\n";
+          for (auto const &task: this->tasks) {
+              for (auto const &f: task->getInputFiles()) {
+                  bool used_scratch = false;
+                  if (file_locations.find(f) != file_locations.end()) {
+                      for (const auto &fl : file_locations[f]) {
+                          if (fl->isScratch()) {
+                              // TODO: Not quite right, because perhaps only one of the
+                              // locations could be scratch, and not have been used
+                              // but too lazy right now to change everything
+                              used_scratch = true;
+                              break;
+                          }
+                      }
+                  } else {
+                      used_scratch = true;
+                  }
+                  if (used_scratch) {
+                      try {
+                          auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
+                          auto scratch = cs->getScratch();
+                          if (scratch) {
+                              scratch->deleteFile(FileLocation::LOCATION(scratch, f));
+                          }
+                      } catch (ExecutionException &ignore) {}
+                  }
+              }
+              for (auto const &f: task->getOutputFiles()) {
+                  bool used_scratch = false;
+                  if (file_locations.find(f) != file_locations.end()) {
+                      for (const auto &fl : file_locations[f]) {
+                          if (fl->isScratch()) {
+                              // TODO: Not quite right, because perhaps only one of the
+                              // locations could be scratch, and not have been used
+                              // but too lazy right now to change everything
+                              used_scratch = true;
+                              break;
+                          }
+                      }
+                  } else {
+                      used_scratch = true;
+                  }
+                  if (used_scratch) {
+                      try {
+                          auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
+                          auto scratch = cs->getScratch();
+                          if (scratch) {
+                              scratch->deleteFile(FileLocation::LOCATION(scratch, f));
+                          }
+                      } catch (ExecutionException &ignore) {}
+                  }
+              }
+          }
+        };
+        auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
+        scratch_cleanup = cjob->addCustomAction("", 0, 0, lambda_execute, lambda_terminate);
 
         // Add all inter-task dependencies
         for (auto const &parent_task: this->tasks) {
@@ -378,7 +415,7 @@ namespace wrench {
             }
         }
 
-        // Create dummy tasks
+// Create dummy tasks
         std::shared_ptr<Action> pre_overhead_to_pre_file_copies = cjob->addSleepAction("", 0);
         std::shared_ptr<Action> pre_file_copies_to_tasks = cjob->addSleepAction("", 0);
         std::shared_ptr<Action> tasks_to_post_file_copies = cjob->addSleepAction("", 0);
@@ -389,7 +426,7 @@ namespace wrench {
         cjob->addActionDependency(tasks_to_post_file_copies, tasks_post_file_copies_to_cleanup);
         cjob->addActionDependency(tasks_post_file_copies_to_cleanup, cleanup_to_post_overhead);
 
-        // Add all dependencies, using the dummy tasks to help
+// Add all dependencies, using the dummy tasks to help
         if (pre_overhead_action != nullptr) {
             cjob->addActionDependency(pre_overhead_action, pre_overhead_to_pre_file_copies);
         }
@@ -436,29 +473,25 @@ namespace wrench {
 
         if (post_overhead_action != nullptr) {
             cjob->addActionDependency(cleanup_to_post_overhead, post_overhead_action);
-            if (scratch_cleanup != nullptr) {
-                cjob->addActionDependency(post_overhead_action, scratch_cleanup);
-            }
+            cjob->addActionDependency(post_overhead_action, scratch_cleanup);
         } else {
-            if (scratch_cleanup != nullptr) {
-                cjob->addActionDependency(cleanup_to_post_overhead, scratch_cleanup);
-            }
+            cjob->addActionDependency(cleanup_to_post_overhead, scratch_cleanup);
         }
 
-        // Use the dummy tasks for "easy" dependencies and remove the dummies
+// Use the dummy tasks for "easy" dependencies and remove the dummies
         std::vector<std::shared_ptr<Action>> dummies = {pre_overhead_to_pre_file_copies, pre_file_copies_to_tasks, tasks_to_post_file_copies, tasks_post_file_copies_to_cleanup, cleanup_to_post_overhead};
         for (auto &dummy: dummies) {
-            // propagate dependencies
+// propagate dependencies
             for (auto const &parent_action: dummy->getParents()) {
                 for (auto const &child_action: dummy->getChildren()) {
                     cjob->addActionDependency(parent_action, child_action);
                 }
             }
-            // remove the dummy
+// remove the dummy
             cjob->removeAction(dummy);
         }
 
-        //            cjob->printActionDependencies();
+//            cjob->printActionDependencies();
         this->compound_job = cjob;
     }
 
@@ -500,13 +533,13 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Compute all task updates based on the state of the underlying compound job (also updates timing information and other task information)
-     * @param state_changes: the set of task state changes to apply
-     * @param failure_count_increments: the set ot task failure count increments to apply
-     * @param job_failure_cause: the job failure cause, if any
-     * @param simulation: the simulation (to add timestamps!)
-     */
+/**
+ * @brief Compute all task updates based on the state of the underlying compound job (also updates timing information and other task information)
+ * @param state_changes: the set of task state changes to apply
+ * @param failure_count_increments: the set ot task failure count increments to apply
+ * @param job_failure_cause: the job failure cause, if any
+ * @param simulation: the simulation (to add timestamps!)
+ */
     void StandardJob::processCompoundJobOutcome(std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
                                                 std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments,
                                                 std::shared_ptr<FailureCause> &job_failure_cause,
@@ -812,11 +845,11 @@ namespace wrench {
         return;
     }
 
-    /**
-     * @brief Apply updates to tasks
-     * @param state_changes: state changes
-     * @param failure_count_increments: set of tasks whose failure counts should be incremented by one
-     */
+/**
+ * @brief Apply updates to tasks
+ * @param state_changes: state changes
+ * @param failure_count_increments: set of tasks whose failure counts should be incremented by one
+ */
     void StandardJob::applyTaskUpdates(map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
                                        set<std::shared_ptr<WorkflowTask>> &failure_count_increments) {
         // Update task states
@@ -842,10 +875,10 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Determines whether the job's spec uses scratch space
-     * @return
-     */
+/**
+ * @brief Determines whether the job's spec uses scratch space
+ * @return
+ */
     bool StandardJob::usesScratch() {
         for (const auto &fl: this->file_locations) {
             for (auto const &fl_l: fl.second) {
