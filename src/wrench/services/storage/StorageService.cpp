@@ -216,7 +216,7 @@ namespace wrench {
         auto file = location->getFile();
         auto path = location->getFullAbsolutePath();
         auto that = location->getStorageService();
-        auto buffer_size = that->buffer_size;   // best guess at buffer-size, but can be updated later
+        auto buffer_size = that->buffer_size;// best guess at buffer-size, but can be updated later
         if (file == nullptr) {
             throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
         }
