@@ -122,13 +122,13 @@ class CompoundStorageServiceBasicFunctionalityTestCtrl : public wrench::Executio
 
 public:
     CompoundStorageServiceBasicFunctionalityTestCtrl(CompoundStorageServiceFunctionalTest *test,
-                                                  std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                  const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
     CompoundStorageServiceFunctionalTest *test;
 
-    int main() {
+    int main() override {
 
         wrench::S4U_Simulation::computeZeroFlop();
 
@@ -250,7 +250,6 @@ private:
         // This one simply answers that the file was not found
         if (wrench::StorageService::lookupFile(file_1_loc_css))
             throw std::runtime_error("Should not be able to lookup file from a CompoundStorageService if it has not been written/copied to it first");
-       
 
         return 0;
     }
@@ -265,10 +264,10 @@ void CompoundStorageServiceFunctionalTest::do_BasicFunctionality_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    xbt_log_control_set("wrench_core_storage_service.thres:debug");
-    xbt_log_control_set("wrench_core_file_transfer_thread.thres:info");
-    xbt_log_control_set("wrench_core_compound_storage_system.thresh:debug");
-    xbt_log_control_set("wrench_core_file_transfer_thread.thres:info");
+//    xbt_log_control_set("wrench_core_storage_service.thres:debug");
+//    xbt_log_control_set("wrench_core_file_transfer_thread.thres:info");
+//    xbt_log_control_set("wrench_core_compound_storage_system.thresh:debug");
+//    xbt_log_control_set("wrench_core_file_transfer_thread.thres:info");
 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
