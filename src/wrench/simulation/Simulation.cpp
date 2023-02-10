@@ -16,6 +16,7 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
 #include <wrench/services/storage/StorageService.h>
+#include <wrench/services/storage/compound/CompoundStorageService.h>
 #include <wrench/simulation/Simulation.h>
 #include "simgrid/plugins/energy.h"
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
@@ -758,6 +759,10 @@ namespace wrench {
     void Simulation::stageFile(const std::shared_ptr<FileLocation> &location) {
         if (location == nullptr) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid nullptr arguments");
+        }
+
+        if (std::dynamic_pointer_cast<CompoundStorageService>(location->getStorageService())) {
+            throw std::invalid_argument("Simulation::stageFile(): Can't stage on CompoundStorageService (it is only an abstraction layer)");
         }
 
         if (this->is_running) {
