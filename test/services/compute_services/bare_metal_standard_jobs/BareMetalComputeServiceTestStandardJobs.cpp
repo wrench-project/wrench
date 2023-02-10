@@ -216,18 +216,18 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, "",
-                                                {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, "",
+                                                                {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new MulticoreComputeServiceUnsupportedJobTypeTestWMS(this, hostname)));
+                            new MulticoreComputeServiceUnsupportedJobTypeTestWMS(this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -322,19 +322,19 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"}, {})));//scratch space of size 101
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                {"/scratch"}, {})));//scratch space of size 101
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new MulticoreComputeServiceBogusNumCoresTestWMS(
-                    this, hostname)));
+                            new MulticoreComputeServiceBogusNumCoresTestWMS(
+                                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -454,7 +454,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -466,21 +466,21 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(
-                    hostname,
-                    {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                    {"/scratch"},
-                    {})));//scratch space of size 101
+                            new wrench::BareMetalComputeService(
+                                    hostname,
+                                    {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                    {"/scratch"},
+                                    {})));//scratch space of size 101
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new MulticoreComputeServiceTwoSingleCoreTasksTestWMS(
-                    this, hostname)));
+                            new MulticoreComputeServiceTwoSingleCoreTasksTestWMS(
+                                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -589,19 +589,19 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair("DualCoreHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"}, {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair("DualCoreHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                {"/scratch"}, {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms;
     ASSERT_NO_THROW(wms = simulation->add(
-            new MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(
-                    this, hostname)));
+                            new MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(
+                                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -722,20 +722,20 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair("QuadCoreHost",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"}, {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair("QuadCoreHost",
+                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                {"/scratch"}, {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(
-                    this, hostname)));
+                            new MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(
+                                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -952,19 +952,19 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair("QuadCoreHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair("QuadCoreHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS(
-                    this, hostname)));
+                            new BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS(
+                                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1063,19 +1063,19 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalComputeServiceJobImmediateTerminationTestWMS(
-                    this, hostname)));
+                            new BareMetalComputeServiceJobImmediateTerminationTestWMS(
+                                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1182,19 +1182,19 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalComputeServiceJobTerminationTestWMS(
-                    this, hostname)));
+                            new BareMetalComputeServiceJobTerminationTestWMS(
+                                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1289,19 +1289,19 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalComputeServiceNonSubmittedJobTerminationTestWMS(
-                    this, hostname)));
+                            new BareMetalComputeServiceNonSubmittedJobTerminationTestWMS(
+                                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1405,21 +1405,21 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname,
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname,
+                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalComputeServiceCompletedJobTerminationTestWMS(
-                    this, hostname)));
+                            new BareMetalComputeServiceCompletedJobTerminationTestWMS(
+                                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1536,20 +1536,20 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
-                    this, hostname)));
+                            new BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
+                                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1658,21 +1658,21 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"},
-                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
-                    this, hostname)));
+                            new BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
+                                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
