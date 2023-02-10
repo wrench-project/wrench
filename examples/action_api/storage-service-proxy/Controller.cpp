@@ -64,8 +64,8 @@ namespace wrench {
      */
     Controller::Controller(const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
                            const shared_ptr<StorageServiceProxy>& proxy,
-                           const shared_ptr<StorageServiceProxy>& remote,
-                           const shared_ptr<StorageServiceProxy>& target,
+                           const shared_ptr<StorageService>& remote,
+                           const shared_ptr<StorageService>& target,
                            const std::string &hostname) : ExecutionController(hostname, "controller"),
                                                           bare_metal_compute_service(bare_metal_compute_service),
                                                           proxy(proxy),
@@ -102,7 +102,7 @@ namespace wrench {
 
         /* create a file on default AND in the cache */
         remote->createFile(cachedFile);
-        proxy->getCache->createFile(cachedFile);
+        proxy->getCache()->createFile(cachedFile);
 
         //proxy->createFile(cachedFile);//What this line should do is ambigous and not supported.  Use createFile directly on the underlying storage services
 
@@ -113,7 +113,7 @@ namespace wrench {
         proxy->readFile(remoteFile);
 
         /* another way to do the same */
-        StorageService::readFile(FileLocation::LOCATION(proxy,file));
+        StorageService::readFile(FileLocation::LOCATION(proxy,remoteFile));
 
 
         /* read a file found on target (non default remote) via the proxy */
@@ -129,7 +129,7 @@ namespace wrench {
         proxy->writeFile(remoteFile);
 
         /* another way to do the same */
-        StorageService::writeFile(FileLocation::LOCATION(proxy,file));
+        StorageService::writeFile(FileLocation::LOCATION(proxy,remoteFile));
 
 
         /* write to a file found on target (non default remote) via the proxy */
