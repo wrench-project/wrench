@@ -25,10 +25,10 @@ namespace wrench {
         // Constructor
         Controller(
                 const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
-                    const shared_ptr<StorageServiceProxy>& proxy,
-                    const shared_ptr<StorageService>& remote,
-                    const shared_ptr<StorageService>& target,
-                    const std::string &hostname);
+                const shared_ptr<StorageServiceProxy> &proxy,
+                const shared_ptr<StorageService> &remote,
+                const shared_ptr<StorageService> &target,
+                const std::string &hostname);
 
     protected:
         // Overridden method
@@ -40,9 +40,9 @@ namespace wrench {
         int main() override;
 
         const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
-        const shared_ptr<StorageServiceProxy>& proxy;
-        const shared_ptr<StorageService>& remote;
-        const shared_ptr<StorageService>& target;
+        const shared_ptr<StorageServiceProxy> &proxy;
+        const shared_ptr<StorageService> &remote;
+        const shared_ptr<StorageService> &target;
     };
 
 }// namespace wrench
