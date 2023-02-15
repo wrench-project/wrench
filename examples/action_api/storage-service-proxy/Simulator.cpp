@@ -1,6 +1,6 @@
 
 /**
- * Copyright (c) 2017-2021. The WRENCH Team.
+ * Copyright (c) 2017-2023. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,10 +13,10 @@
  ** as input an XML platform description file.
  **
  ** Example invocation of the simulator with no logging:
- **    ./wrench-example-xrootd-basic ./xrootd_platform.xml
+ **    ./wrench-example-storage-service-proxy-basic ./proxy_platform.xml
  **
  ** Example invocation of the simulator with simulation controller logging
- **    ./wrench-example-xrootd-basic ./xrootd_platform.xml
+ **    ./wrench-example-storage-service-proxy-basic ./proxy_platform.xml
  **/
 
 #include <iostream>
@@ -53,18 +53,16 @@ int main(int argc, char **argv) {
     auto baremetal_service = simulation->add(new wrench::BareMetalComputeService("Client", {"Client"}, "", {}, {}));
     simulation->add(baremetal_service);
 
-    /* Add the storage services */
+    /* Creat a proxy configure with two storage services (a "remote" and a "cache") */
     auto remote = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Remote",{"/"}));
-    auto target = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Target",{"/"}));
     auto cache = simulation->add(
             wrench::SimpleStorageService::createSimpleStorageService(
-                    "Proxy", /* The cache doesnt HAVE to be on the proxy, but we assume it is */
+                    "Proxy", /* The cache doesn't HAVE to be on the proxy, although in most cases it would be */
                     {"/"},
                     {{wrench::SimpleStorageServiceProperty::CACHING_BEHAVIOR,"LRU"}}
-                    /*make the Cache an LRU cache, this is optional, but probiably the desired behavior*/
+                    /* Make the Cache an LRU cache, this is optional, but probably the desired behavior */
             )
         );
-    /* Create the Proxy */
     auto proxy = simulation->add(
                 wrench::StorageServiceProxy::createRedirectProxy(
                     "Proxy",
@@ -75,8 +73,11 @@ int main(int argc, char **argv) {
                 )
             );
 
+    /* Create another storage service, the "target" */
+    auto target = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Target",{"/"}));
+
     /* Instantiate an execution controller */
-    auto controller = simulation->add(new wrench::Controller(baremetal_service, proxy,remote,target, "root"));
+    auto controller = simulation->add(new wrench::Controller(baremetal_service, proxy, remote, target, "root"));
 
     /* Launch the simulation */
     std::cerr << "Launching the Simulation...\n";
