@@ -141,7 +141,7 @@ namespace wrench {
         auto job_manager = this->createJobManager();
 
         /* Create a compound job that just reads the file */
-        WRENCH_INFO("Submitting a job that should successfully read the file from XRootD");
+        WRENCH_INFO("Submitting a job that should successfully read the file from the Proxy using the default remote");
         auto job1 = job_manager->createCompoundJob("job1");
         /* read a file found on the default remote via the proxy */
         auto fileread1 = job1->addFileReadAction("fileread1", remoteFile, proxy);
@@ -152,8 +152,15 @@ namespace wrench {
         /* Wait and process the next event, which will be a job success */
         this->waitForAndProcessNextEvent();
 
+        /* Create another compound job that reads the file */
+        WRENCH_INFO("Submitting a job that should successfully read the file from Proxy using the non-default target");
+        auto job2 = job_manager->createCompoundJob("job2");
+
         /* read a file found on the non default target remote via the proxy */
-        auto fileread2 = job1->addFileReadAction("fileread2", ProxyLocation::LOCATION(target, proxy,remoteFile));
+        auto fileread2 = job2->addFileReadAction("fileread2", ProxyLocation::LOCATION(target, proxy,remoteFile));
+
+        /* Submit the job that will succeed */
+        job_manager->submitJob(job2, this->bare_metal_compute_service);
 
         /* Wait and process the next event, which will be a job success */
         this->waitForAndProcessNextEvent();

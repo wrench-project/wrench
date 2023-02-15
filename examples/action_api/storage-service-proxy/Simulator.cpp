@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     auto remote = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Remote",{"/"}));
     auto cache = simulation->add(
             wrench::SimpleStorageService::createSimpleStorageService(
-                    "Proxy", /* The cache doesn't HAVE to be on the proxy, although in most cases it would be */
+                    "Proxy", /* The cache doesn't HAVE to be on the proxy, but it really should be otherwise simulation may be inaccurate */
                     {"/"},
                     {{wrench::SimpleStorageServiceProperty::CACHING_BEHAVIOR,"LRU"}}
                     /* Make the Cache an LRU cache, this is optional, but probably the desired behavior */
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
     auto target = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Target",{"/"}));
 
     /* Instantiate an execution controller */
-    auto controller = simulation->add(new wrench::Controller(baremetal_service, proxy, remote, target, "root"));
+    auto controller = simulation->add(new wrench::Controller(baremetal_service, proxy, remote, target, "Client"));
 
     /* Launch the simulation */
     std::cerr << "Launching the Simulation...\n";
