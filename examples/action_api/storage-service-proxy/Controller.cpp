@@ -1,6 +1,6 @@
 
 /**
- * Copyright (c) 2017-2021. The WRENCH Team.
+ * Copyright (c) 2017-2023. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "Controller.h"
 
 /*
- * Helper function for pretty-printed output
+ * Helper functions for pretty-printed output
  */
 std::string padLong(long l) {
     return (l < 10 ? "0" + std::to_string(l) : std::to_string(l));
@@ -45,7 +45,6 @@ std::string formatDate(double time) {
     minutes %= 60;
     long days = hours / 24;
     hours %= 24;
-
     return std::to_string(days) + "-" + padLong(hours) + ':' + padLong(minutes) + ':' + padDouble((double) seconds + ms);
 }
 
@@ -85,7 +84,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
         WRENCH_INFO("Controller starting");
 
-        ///* File Initilization */
+        /** File Initialization **/
 
         /* Add several 12-megabyte file to the simulation, which will
          * then be stored in various places
@@ -94,52 +93,50 @@ namespace wrench {
         auto targetFile = wrench::Simulation::addFile("targetFile", 12 * MBYTE);
         auto cachedFile = wrench::Simulation::addFile("cachedFile", 12 * MBYTE);
 
-        /* create file on the default remote */
+        WRENCH_INFO("Creating files on storage services");
+        /* Create file on the default remote */
         remote->createFile(remoteFile);
 
-        /* create file on the nondefault remote (target) */
+        /* Create file on the non-default remote (target) */
         target->createFile(targetFile);
 
-        /* create a file on default AND in the cache */
+        /* Create a file on default AND in the cache */
         remote->createFile(cachedFile);
         proxy->getCache()->createFile(cachedFile);
 
-        //proxy->createFile(cachedFile);//What this line should do is ambigous and not supported.  Use createFile directly on the underlying storage services
+        //proxy->createFile(cachedFile); // What this line should do is ambiguous and not supported.
+                                         // Instead, use createFile directly on the underlying storage services
 
-
-        ///* File Reading */
-
-        /* read a file found on the default remote via the proxy */
+        /** File Reading **/
+        WRENCH_INFO("Reading files from the proxy");
+        /* Read a file found on the default remote via the proxy */
         proxy->readFile(remoteFile);
 
-        /* another way to do the same */
+        /* Another way to do the same */
         StorageService::readFile(FileLocation::LOCATION(proxy,remoteFile));
 
-
-        /* read a file found on target (non default remote) via the proxy */
+        /* Read a file found on target (non default remote) via the proxy */
         proxy->readFile(target,targetFile);
 
-        /* another way to do the same */
+        /* Another way to do the same */
         StorageService::readFile(ProxyLocation::LOCATION(target,proxy,targetFile));
 
 
-        ///* File Writing */
-
-        /* write to a file found on the default remote via the proxy */
+        /** File Writing **/
+        WRENCH_INFO("Writing files to the proxy");
+        /* Write to a file found on the default remote via the proxy */
         proxy->writeFile(remoteFile);
 
-        /* another way to do the same */
+        /* Another way to do the same */
         StorageService::writeFile(FileLocation::LOCATION(proxy,remoteFile));
 
-
-        /* write to a file found on target (non default remote) via the proxy */
+        /* Write to a file found on target (non default remote) via the proxy */
         proxy->writeFile(target,targetFile);
 
-        /* another way to do the same */
+        /* Another way to do the same */
         StorageService::writeFile(ProxyLocation::LOCATION(target,proxy,targetFile));
 
-        ///* using jobs*/
-
+        /** Using the proxy in jobs **/
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
