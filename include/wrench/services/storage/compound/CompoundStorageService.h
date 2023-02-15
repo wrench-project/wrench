@@ -19,6 +19,9 @@
 
 namespace wrench {
 
+    /**
+     * @brief Specification of a callback
+     */
     using StorageSelectionStrategyCallback = std::function<std::shared_ptr<FileLocation>(
             const std::shared_ptr<DataFile> &,
             const std::set<std::shared_ptr<StorageService>> &,
@@ -81,6 +84,7 @@ namespace wrench {
                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                const std::string &suffix);
 
+	/** @brief Default property values **/
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {CompoundStorageServiceProperty::STORAGE_SELECTION_METHOD, "external"},
                 {CompoundStorageServiceProperty::CACHING_BEHAVIOR, "NONE"},

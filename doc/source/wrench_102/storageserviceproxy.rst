@@ -24,23 +24,23 @@ and an **optional default remote** :cpp:class:`wrench::StorageService`, as well 
    std::shared_ptr<wrench::StorageServiceProxy> proxy; // The proxy
 
    [...]
-   
+
    // Create all storage services as SimpleStorageService
    remote = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Remote", ...));
    cache = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Proxy", ...));
    default = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Default", ...));
-   
+
    //create a Proxy using the cache and default as a default
    proxy=simulation->add(
 			wrench::StorageServiceProxy::createRedirectProxy(
-		    	"Proxy", 
+		    	"Proxy",
 		    	cache,
 		    	remote,
 		    	{{wrench::StorageServiceProxyProperty::UNCACHED_READ_METHOD,"CopyThenRead"}},
 		    	{}
 	        )
    		);
-   		
+
 The :cpp:member:`wrench::StorageServiceProxyProperty::UNCACHED_READ_METHOD` property is important.
 In WRENCH, at least for the time being, a file can not be read while it is still being written to a disk.
 As such, there is no efficient way to say "As the file is being copied to the cache, send the available bytes to
@@ -83,26 +83,26 @@ Once the file has been written/copied to the cache completely, there is no diffe
 
 	cache->createFile(someFile);//create a file on the cache
 	proxy->getCache()->createFile(someOtherFile);//create a file on the cache
-	
+
 	remote->createFile(someFile);//create a file on the remote
-	
-	
+
+
 Using a Proxy
 -------------------------------------
 
 If proxy is given a default remote location, it can be used exactly like a normal storage service, it will simply use the cache
 and default  to the default remote file server if the cache doesn't have the desired file.
-  
+
 .. code:: cpp
 
 	proxy->readFile(someDataFile); // Checks the cache for someDataFile, if it does not exist, checks default
    	readFile(FileLocation::LOCATION(proxy,someDataFile)); // Same, but presumably the file is now cached
 	proxy->writeFile(someDataFile); // Write a file to the default remote and the cache
-	
-	
-If no default location is given, or the file is on a different remote :cpp:class:`wrench::StorageService` either :cpp:class:`wrench::StorageServiceProxy::readFile(wrench::StorageService,wrench::DataFile)` must be used, or the :cpp:class:`wrench::FileLocation` used to locate the file must be a :cpp:class:`wrench::ProxyLocation`. 
 
-:cpp:class:`wrench::ProxyLocation` has the same factories as a normal :cpp:class:`wrench::FileLocation`, except they take an extra :cpp:class:`wrench::StorageService` `target` to use as a remote :cpp:class:`wrench::StorageService`.  There is also a factory that takes any existing location and the `target`.  
+
+If no default location is given, or the file is on a different remote :cpp:class:`wrench::StorageService` either :cpp:class:`wrench::StorageServiceProxy::readFile(wrench::StorageService,wrench::DataFile)` must be used, or the :cpp:class:`wrench::FileLocation` used to locate the file must be a :cpp:class:`wrench::ProxyLocation`.
+
+:cpp:class:`wrench::ProxyLocation` has the same factories as a normal :cpp:class:`wrench::FileLocation`, except they take an extra :cpp:class:`wrench::StorageService` `target` to use as a remote :cpp:class:`wrench::StorageService`.  There is also a factory that takes any existing location and the `target`.
 For this proxy location `ss` should be the proxy to access.
 
 .. code:: cpp
@@ -114,7 +114,7 @@ For this proxy location `ss` should be the proxy to access.
 			someOtherDataFile
 		)
 	);//read the file from the cace, or remote, not default
-    
+
 	proxy.writeFile(remote,someDataFile);//Write a file to the remote
 
 

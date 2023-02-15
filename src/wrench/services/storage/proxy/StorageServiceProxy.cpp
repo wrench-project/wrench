@@ -399,19 +399,27 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                                              WRENCH_PROPERTY_COLLECTION_TYPE properties, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads) : StorageService(hostname,
                                                                                                                                                                   "storage_proxy"),
                                                                                                                                                    cache(cache),
-                                                                                                                                                   remote(default_remote) {
+                                                                                                                                                    remote(default_remote) {
+
 
         this->setProperties(this->default_property_values, std::move(properties));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(message_payloads));
         this->setProperty(StorageServiceProperty::BUFFER_SIZE, cache->getPropertyValueAsString(StorageServiceProperty::BUFFER_SIZE));//the internal cache has the same buffer properties as this service.
+        this->buffer_size = this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
         if (cache and cache->hasMultipleMountPoints()) {
-            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy() A storage service proxy's cache can not have multiple mountpoints");
+            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's cache can not have multiple mountpoints");
         }
         if (remote and remote->hasMultipleMountPoints()) {
-            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy() A storage service proxy's default remote can not have multiple mountpoints");
+            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's default remote can not have multiple mountpoints");
         }
+//        if (cache and default_remote) {
+//            if ((cache->isBufferized() and not default_remote->isBufferized()) or
+//                (not cache->isBufferized() and default_remote->isBufferized())) {
+//                throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): The cache and the default_remote storage services much has the same bufferization mode");
+//        }
+
         string readProperty = getPropertyValueAsString(StorageServiceProxyProperty::UNCACHED_READ_METHOD);
-        WRENCH_DEBUG("%s", readProperty.c_str());
+//        WRENCH_DEBUG("%s", readProperty.c_str());
         if (readProperty == "CopyThenRead") {
             readMethod = &StorageServiceProxy::copyThenRead;
         } else if (readProperty == "MagicRead") {
