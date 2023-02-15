@@ -157,7 +157,7 @@ public:
 private:
     ScratchSpaceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -213,7 +213,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
 
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -285,7 +285,7 @@ public:
 private:
     ScratchSpaceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -716,7 +716,7 @@ public:
 private:
     ScratchSpaceTest *test;
 
-    int main() {
+    int main() override {
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
@@ -785,7 +785,7 @@ TEST_F(ScratchSpaceTest, RaceConditionTest) {
 void ScratchSpaceTest::do_RaceConditionTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -980,7 +980,7 @@ TEST_F(ScratchSpaceTest, ScratchNonScratchPartitionsTest) {
 void ScratchSpaceTest::do_PartitionsTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
