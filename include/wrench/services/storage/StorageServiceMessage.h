@@ -281,7 +281,14 @@ namespace wrench {
     */
     class StorageServiceAckMessage : public StorageServiceMessage {
     public:
+	/**
+	 * @brief Constructor
+	 *
+	 * @param location: the file location
+	 **/
         explicit StorageServiceAckMessage(std::shared_ptr<FileLocation> location) : StorageServiceMessage(0), location(std::move(location)) {}
+
+	/** @brief The location */
         std::shared_ptr<FileLocation> location;
     };
 

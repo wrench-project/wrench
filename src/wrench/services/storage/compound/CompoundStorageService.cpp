@@ -20,6 +20,10 @@ namespace wrench {
      *  @brief Default StorageSelectionStrategyCallback: strategy used by the CompoundStorageService 
      *         when no strategy is provided at instanciation. By default, it returns a nullptr, which 
      *         trigger any request message processing function in CompoundStorageServer to answer negatively.
+     *
+     *  @param file: the file
+     *  @param resources: the set of potential storage services
+     *  @param mapping: helper data structure to find the relevant location for a file
      * 
      *  @return nullptr (instead of a valid FileLocation)
     */
@@ -36,7 +40,12 @@ namespace wrench {
      *         the CompoundStorageService. This use case suppose that any action making use of a FileLocation
      *         referencing this CompoundStorageService will be intercepted before its execution (in a scheduler
      *         for instance) and updated with one of the StorageServices known to this CompoundStorageService.
-    */
+     *
+     *  @param hostname: the name of the host on which this service will run
+     *  @param storage_services: subordinate storage services
+     *  @param property_list: the configurable properties
+     *  @param messagepayload_list: the configurable message payloads
+     */
     CompoundStorageService::CompoundStorageService(const std::string &hostname,
                                                    std::set<std::shared_ptr<StorageService>> storage_services,
                                                    WRENCH_PROPERTY_COLLECTION_TYPE property_list,
@@ -51,7 +60,12 @@ namespace wrench {
      *         file in the request. 
      *         Note that nothing prevents the user from also intercepting some actions (see use case for other 
      *         constructor), but resulting behaviour is undefined.
-    */
+     *  @param hostname: the name of the host on which this service will run
+     *  @param storage_services: subordinate storage services
+     *  @param storage_selection: the storage selection strategy callback
+     *  @param property_list: the configurable properties
+     *  @param messagepayload_list: the configurable message payloads
+     */
     CompoundStorageService::CompoundStorageService(const std::string &hostname,
                                                    std::set<std::shared_ptr<StorageService>> storage_services,
                                                    StorageSelectionStrategyCallback storage_selection,
@@ -60,6 +74,16 @@ namespace wrench {
                                                                                                                                        "_" + std::to_string(getNewUniqueNumber())){};
 
 
+    /**
+     *  @brief Constructor
+     *  @param hostname: the name of the host on which this service will run
+     *  @param storage_services: subordinate storage services
+     *  @param storage_selection: the storage selection strategy callback
+     *  @param storage_selection_user_provided: whether the storage selection is user-provided
+     *  @param property_list: the configurable properties
+     *  @param messagepayload_list: the configurable message payloads
+     *  @param suffix: the suffix to add to the service name
+     */
     CompoundStorageService::CompoundStorageService(
             const std::string &hostname,
             std::set<std::shared_ptr<StorageService>> storage_services,
@@ -109,7 +133,7 @@ namespace wrench {
      * @return 0 on termination
      */
     int CompoundStorageService::main() {
-        //TODO: Use another colour?
+        //TODO: Use another color?
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
         std::string message = "Compound Storage Service " + this->getName() + "  starting on host " + this->getHostname();
         WRENCH_INFO("%s", message.c_str());
@@ -178,6 +202,8 @@ namespace wrench {
     /**
      * @brief Process a received control message
      *
+     * @param message: the simulation message to process
+     *
      * @throw std::runtime_error when receiving an unexpected message type.
      * 
      * @return false if the daemon should terminate
@@ -212,6 +238,8 @@ namespace wrench {
 
     /**
      * @brief Lookup for a DataFile in the internal file mapping of the CompoundStorageService (a simplified FileRegistry)
+     *
+     * @param file: the file of interest
      * 
      * @return A shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or nullptr if it's not.
      */
@@ -234,6 +262,8 @@ namespace wrench {
      *  @brief Lookup for a FileLocation (using its internal DataFile) in the internal file mapping of the CompoundStorageService 
      *         (a simplified FileRegistry) 
      * 
+     *  @param location: the location of interest
+     *
      *  @return A shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or nullptr if it's not.
      */
     std::shared_ptr<FileLocation> CompoundStorageService::lookupFileLocation(const std::shared_ptr<FileLocation> &location) {
@@ -246,6 +276,8 @@ namespace wrench {
      *         try to allocate the file on one of the underlying storage services, using the user-provided 'storage_selection'
      *         callback.
      * 
+     *  @param concrete_file_location: the file of interest
+     *
      *  @return A shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or could be allocated
      *          or nullptr if it's not.
      */
@@ -278,6 +310,8 @@ namespace wrench {
      *         and if it is not found, try to allocate the file on one of the underlying storage services, using the user-provided 
      *         'storage_selection' callback.
      * 
+     *  @param location: the location of interest
+     *
      *  @return A shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or could be allocated
      *          or nullptr if it's not.
      */
@@ -289,6 +323,7 @@ namespace wrench {
      * @brief Handle (and intercept) a file delete request
      *
      * @param msg: The StorageServiceFileDeleteRequestMessage received by a CompoundStorageService
+     *
      * @return true if this process should keep running
      */
     bool CompoundStorageService::processFileDeleteRequest(StorageServiceFileDeleteRequestMessage *msg) {
@@ -326,6 +361,7 @@ namespace wrench {
      * @brief Handle (and intercept) a file lookup request
      *
      * @param msg: The StorageServiceFileLookupRequestMessage received by a CompoundStorageService
+     *
      * @return true if this process should keep running
      */
     bool CompoundStorageService::processFileLookupRequest(StorageServiceFileLookupRequestMessage *msg) {
@@ -364,6 +400,7 @@ namespace wrench {
      * @brief Handle (and intercept) a file copy request
      *
      * @param msg: The StorageServiceFileCopyRequestMessage received by a CompoundStorageService
+     *
      * @return true if this process should keep running
      */
     bool CompoundStorageService::processFileCopyRequest(StorageServiceFileCopyRequestMessage *msg) {
@@ -651,6 +688,14 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Check (outside of simulation time) whether the storage service has a file
+     *
+     * @param file: the file
+     * @param path: the file path
+     *
+     * @return true if the file is present, false otherwise
+     */
     bool CompoundStorageService::hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
         auto file_location = this->lookupFileLocation(file);
         if (!file_location) {

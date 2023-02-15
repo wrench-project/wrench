@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
-<platform version="4.1"> "
-   <zone id="AS0" routing="Full"> "
+<platform version="4.1">
+   <zone id="AS0" routing="Full">
        <host id="Client" speed="1f">
           <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
              <prop id="size" value="100GB"/>

@@ -66,8 +66,9 @@ namespace wrench {
         const std::shared_ptr<StorageService> getCache();
 
 
-        double getLoad();//cache
-                         /**
+        double getLoad(); //cache
+			 
+        /**
          * @brief Factory to create a StorageServiceProxy that can a default destination to forward requests too, and will cache requests as they are made
          * @param hostname: hostname
          * @param cache: The StorageService to use as a Cache
@@ -91,6 +92,7 @@ namespace wrench {
 
         int main();
         bool processNextMessage();
+
         StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService> &cache = nullptr, const std::shared_ptr<StorageService> &default_remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads = {});
 
         /**
@@ -121,11 +123,16 @@ namespace wrench {
         }
 
     protected:
+	    /** @brief Pending operations **/
         std::map<std::shared_ptr<DataFile>, std::vector<unique_ptr<SimulationMessage>>> pending;
+	    /** @brief Cache storage service **/
         std::shared_ptr<StorageService> cache;
+	    /** @brief Remove storage service **/
         std::shared_ptr<StorageService> remote;
+
         /** @brief the function to actually call when handling a file read */
         bool (StorageServiceProxy::*readMethod)(unique_ptr<SimulationMessage> &);
+
         bool commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<SimulationMessage> &message);
         bool copyThenRead(unique_ptr<SimulationMessage> &message);
         bool magicRead(unique_ptr<SimulationMessage> &message);
@@ -167,6 +174,7 @@ namespace wrench {
      */
     class ProxyLocation : public FileLocation {
     public:
+	/** @brief The proxy location's target **/
         const std::shared_ptr<StorageService> target;
 
         /**
@@ -174,6 +182,7 @@ namespace wrench {
 	     * @param target: a (remote) storage service to access, which overrides the default remote
 	     *                service (if any) of the proxy
 	     * @param other: a file location whose storage service should be the proxy
+         * @return a proxy location
 	     */
         static std::shared_ptr<ProxyLocation> LOCATION(
                 const std::shared_ptr<StorageService> &target,
@@ -184,9 +193,10 @@ namespace wrench {
         /**
 	     * @brief Location specifier for a proxy
 	     * @param target: a (remote) storage service to access, which overrides the default remote
-             *                service (if any) of the proxy
+         *                service (if any) of the proxy
 	     * @param ss: The proxy
 	     * @param file: The file
+         * @return a proxy location
 	     */
         static std::shared_ptr<ProxyLocation> LOCATION(
                 const std::shared_ptr<StorageService> &target,
@@ -198,10 +208,12 @@ namespace wrench {
         /**
 	     * @brief Location specifier for a proxy
 	     * @param target: a (remote) storage service to access, which overrides the default remote
-             *                service (if any) of the proxy
+         *                service (if any) of the proxy
 	     * @param ss: The proxy
 	     * @param server_ss: The linux page cache server
 	     * @param file: The file
+         *
+         * @return a proxy location
 	     */
         static std::shared_ptr<ProxyLocation> LOCATION(
                 const std::shared_ptr<StorageService> &target,
@@ -214,10 +226,12 @@ namespace wrench {
         /**
 	     * @brief Location specifier for a proxy
 	     * @param target: a (remote) storage service to access, which overrides the default remote
-             *                service (if any) of the proxy
+         *                service (if any) of the proxy
 	     * @param ss: The proxy
 	     * @param absolute_path: The absolute path
 	     * @param file: The file
+         *
+         * @return a proxy location
 	     */
         static std::shared_ptr<ProxyLocation> LOCATION(
                 const std::shared_ptr<StorageService> &target,
@@ -231,7 +245,15 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
+
         //TODO unique instance factory
+
+        /**
+	     * @brief Constructor
+	     * @param target: a (remote) storage service to access, which overrides the default remote
+         *                service (if any) of the proxy
+	     * @param other: A file location
+	     */
         ProxyLocation(const std::shared_ptr<StorageService> &target, const std::shared_ptr<FileLocation> &other) : FileLocation(*other), target(target) {
             if (target == nullptr) {
                 throw std::invalid_argument("ProxyLocation::LOCATION(): Cannot pass nullptr target");
