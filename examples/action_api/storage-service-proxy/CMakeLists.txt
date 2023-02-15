@@ -16,7 +16,7 @@ add_dependencies(examples wrench-example-storage-service-proxy-basic)
 add_dependencies(wrench-example-storage-service-proxy-basic wrench-example-storage-service-proxy-basic-platform-file)
 
 if (ENABLE_BATSCHED)
-    target_link_libraries(storage-service-proxy-basic
+    target_link_libraries(wrench-example-storage-service-proxy-basic
             wrench
             ${SimGrid_LIBRARY}
             ${Boost_LIBRARIES}
