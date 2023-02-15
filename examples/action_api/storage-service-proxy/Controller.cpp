@@ -62,14 +62,14 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the Controller
      */
     Controller::Controller(const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
-                           const shared_ptr<StorageServiceProxy>& proxy,
-                           const shared_ptr<StorageService>& remote,
-                           const shared_ptr<StorageService>& target,
+                           const shared_ptr<StorageServiceProxy> &proxy,
+                           const shared_ptr<StorageService> &remote,
+                           const shared_ptr<StorageService> &target,
                            const std::string &hostname) : ExecutionController(hostname, "controller"),
                                                           bare_metal_compute_service(bare_metal_compute_service),
                                                           proxy(proxy),
                                                           remote(remote),
-                                                          target(target){}
+                                                          target(target) {}
 
     /**
      * @brief main method of the Controller
@@ -105,7 +105,7 @@ namespace wrench {
         proxy->getCache()->createFile(cachedFile);
 
         //proxy->createFile(cachedFile); // What this line should do is ambiguous and not supported.
-                                         // Instead, use createFile directly on the underlying storage services
+        // Instead, use createFile directly on the underlying storage services
 
         /** File Reading **/
         WRENCH_INFO("Reading files from the proxy");
@@ -113,13 +113,13 @@ namespace wrench {
         proxy->readFile(remoteFile);
 
         /* Another way to do the same */
-        StorageService::readFile(FileLocation::LOCATION(proxy,remoteFile));
+        StorageService::readFile(FileLocation::LOCATION(proxy, remoteFile));
 
         /* Read a file found on target (non default remote) via the proxy */
-        proxy->readFile(target,targetFile);
+        proxy->readFile(target, targetFile);
 
         /* Another way to do the same */
-        StorageService::readFile(ProxyLocation::LOCATION(target,proxy,targetFile));
+        StorageService::readFile(ProxyLocation::LOCATION(target, proxy, targetFile));
 
 
         /** File Writing **/
@@ -128,13 +128,13 @@ namespace wrench {
         proxy->writeFile(remoteFile);
 
         /* Another way to do the same */
-        StorageService::writeFile(FileLocation::LOCATION(proxy,remoteFile));
+        StorageService::writeFile(FileLocation::LOCATION(proxy, remoteFile));
 
         /* Write to a file found on target (non default remote) via the proxy */
-        proxy->writeFile(target,targetFile);
+        proxy->writeFile(target, targetFile);
 
         /* Another way to do the same */
-        StorageService::writeFile(ProxyLocation::LOCATION(target,proxy,targetFile));
+        StorageService::writeFile(ProxyLocation::LOCATION(target, proxy, targetFile));
 
         /** Using the proxy in jobs **/
         /* Create a job manager so that we can create/submit jobs */
@@ -157,7 +157,7 @@ namespace wrench {
         auto job2 = job_manager->createCompoundJob("job2");
 
         /* read a file found on the non default target remote via the proxy */
-        auto fileread2 = job2->addFileReadAction("fileread2", ProxyLocation::LOCATION(target, proxy,remoteFile));
+        auto fileread2 = job2->addFileReadAction("fileread2", ProxyLocation::LOCATION(target, proxy, remoteFile));
 
         /* Submit the job that will succeed */
         job_manager->submitJob(job2, this->bare_metal_compute_service);

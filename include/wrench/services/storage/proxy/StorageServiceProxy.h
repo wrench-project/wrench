@@ -66,8 +66,8 @@ namespace wrench {
         const std::shared_ptr<StorageService> getCache();
 
 
-        double getLoad(); //cache
-			 
+        double getLoad();//cache
+
         /**
          * @brief Factory to create a StorageServiceProxy that can a default destination to forward requests too, and will cache requests as they are made
          * @param hostname: hostname
@@ -123,11 +123,11 @@ namespace wrench {
         }
 
     protected:
-	    /** @brief Pending operations **/
+        /** @brief Pending operations **/
         std::map<std::shared_ptr<DataFile>, std::vector<unique_ptr<SimulationMessage>>> pending;
-	    /** @brief Cache storage service **/
+        /** @brief Cache storage service **/
         std::shared_ptr<StorageService> cache;
-	    /** @brief Remove storage service **/
+        /** @brief Remove storage service **/
         std::shared_ptr<StorageService> remote;
 
         /** @brief the function to actually call when handling a file read */
@@ -174,7 +174,7 @@ namespace wrench {
      */
     class ProxyLocation : public FileLocation {
     public:
-	/** @brief The proxy location's target **/
+        /** @brief The proxy location's target **/
         const std::shared_ptr<StorageService> target;
 
         /**
