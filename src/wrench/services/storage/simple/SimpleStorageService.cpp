@@ -50,7 +50,7 @@ namespace wrench {
             double buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
             bufferized = buffer_size >= 1.0;// more than one byte means bufferized
         } else {
-            property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE] = "0B";  // enforce a zero buffersize
+            property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE] = "0B";// enforce a zero buffersize
         }
 
         if (Simulation::isLinkShutdownSimulationEnabled() and (not bufferized)) {
