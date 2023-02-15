@@ -3,27 +3,29 @@
 StorageServiceProxy
 =====================================
 
-Sometimes you dont want a host to talk directly to the :cpp:class:`wrench::StorageService` that has a file.
+There are cases in which a Controller may not want to talk directly to the :cpp:class:`wrench::StorageService`
+that is known to have a particular file: there is a cache that should be used first in case
+if happens to hold that file.  For making the simulation of such a scenario straightforward,
+WRENCH provides a :cpp:class:`wrench::StorageServiceProxy` abstraction.
 
-Perhapse you have a cache, or a local data manager that you would prefer accesses the file on behalf of the host.
+Creating a Proxy
+-------------------------------------
 
-For this we have :cpp:class:`wrench::StorageServiceProxy` 
-
-#Creating a Proxy
-To create a :cpp:class:`wrench::StorageServiceProxy` use the :cpp:class:`wrench::StorageServiceProxy::createRedirectProxy()`
-This function takes a host to start on, a :cpp:class:`wrench::StorageService` to use as cache (this is assumed to be on the same host), and an optional Default remote :cpp:class:`wrench::StorageService` as well as the standard property and Message_payloads lists.
-
+To create a :cpp:class:`wrench::StorageServiceProxy` use the :cpp:class:`wrench::StorageServiceProxy::createRedirectProxy()` method,
+which takes the name of a host on which the proxy should be running,
+a :cpp:class:`wrench::StorageService` to use as **local cache** (this should be on the same host, otherwise simulation may not be accurate),
+and an **optional default remote** :cpp:class:`wrench::StorageService`, as well as the usual property and message payloads lists.
 
 .. code:: cpp
 
-   std::shared_ptr<wrench::StorageService> cache;//the storage service to use as a cache
-   std::shared_ptr<wrench::StorageService> default;//The storage server to be used as a remote default
-   std::shared_ptr<wrench::StorageService> remote;//another potential remote storage server
-   std::shared_ptr<wrench::StorageServiceProxy> proxy;//the proxy
+   std::shared_ptr<wrench::StorageService> cache;      // The storage service to use as a cache
+   std::shared_ptr<wrench::StorageService> default;    // The storage server to be used as a remote default
+   std::shared_ptr<wrench::StorageService> remote;     // Another potential remote storage server
+   std::shared_ptr<wrench::StorageServiceProxy> proxy; // The proxy
 
    [...]
    
-   //create all StorageServices as SimpleStorageService
+   // Create all storage services as SimpleStorageService
    remote = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Remote", ...));
    cache = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Proxy", ...));
    default = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Default", ...));
@@ -39,36 +41,43 @@ This function takes a host to start on, a :cpp:class:`wrench::StorageService` to
 	        )
    		);
    		
-The :cpp:member:`wrench::StorageServiceProxyProperty::UNCACHED_READ_METHOD` property is important.  Due to a limitation in SimGrid, a file can not be read while it is still being written to a disk.  As such, there is no efficient way to say "As the file is being copied to the cache, send the avaliable bytes to anyone waiting on the file."
-Since this is the desired behavior of a cache, some work arrounds had to be implemented.  Each one has specific advantages and drawbacks, so consider which is best in your specific case.  After a file has entered the cache completely, there is no difference.
-- CopyThenRead copies the file to the cache, and then reads the file from the cache to any waiting hosts.  This option offers the best file-to-cache time, and stresses the network the most realistically, but the file will arive "late" at the actual waiting clients.
+The :cpp:member:`wrench::StorageServiceProxyProperty::UNCACHED_READ_METHOD` property is important.
+In WRENCH, at least for the time being, a file can not be read while it is still being written to a disk.
+As such, there is no efficient way to say "As the file is being copied to the cache, send the available bytes to
+anyone waiting on the file." Since this is the desired behavior of a cache, some work-arounds have been implemented.
+Each one has specific advantages and drawbacks, so consider which is best in your specific case.
+Once the file has been written/copied to the cache completely, there is no difference.
 
-- MagicRead assumes the time to read the file from the cache can be completely amortized while coping the file to the cache, and will copy the file to the cache, then magically send it to anyone waiting.  If this assumption is correct, Magic read allows the file-to-cache and time-to-host time to be accurate.  However, as this does stress the internal network as much.
+- *CopyThenRead* copies the file to the cache and then reads the file from the cache to any waiting hosts. This option offers the best file-to-cache time, and stresses the network the most realistically, but the file will arrive "late" at the actual waiting clients.
 
-- ReadThrough reads the file directly to the host and once the read has finished, it instantly creates the file on the cache.  This assumes the route between the host and the remote server goes through the proxy.  For single client reads, this is the best option offering the best file-to-host accuracy, and correct network stress.  However, the file-to-cache time is slower, and any additional clients waiting on the file will have to wait until cache gets it before reading.
+- *MagicRead* assumes the time to read the file from the cache can be completely amortized while coping the file to the cache, and will copy the file to the cache, then magically send it to anyone waiting. If this assumption is correct, MagicRead allows the file-to-cache and time-to-host time to be accurate.  However,  this does not stress the internal network as much as would be the case in reality.
 
-.. list-table:: Comparison
+- *ReadThrough* reads the file directly to the host and once the read has finished, it instantly creates the file on the cache.  This assumes the route between the host and the remote server goes through the proxy.For single client reads, this is the best option offering the best file-to-host accuracy, and correct network stress.  However, the file-to-cache time is slower, and any additional clients waiting on the file will have to wait until the ache gets it before reading.
 
-   :widths: 25 25 50
+
+.. list-table:: Comparison of the three UNCACHED_READ_METHOD options
+   :widths: 25 25 25 25
    :header-rows: 1
-	* -
-	- CopyThenRead 
-	- MagicRead
-	- ReadThrough
-	* - File-to-Cache Time
-	- Accurate
-	- Accurate
-	- Overestimated
-	* - File-to-host time
-	- Overestimated
-	- Probiably Accurate
-	- Accurate
-	* - Internal Network congestion
-	- Accurate
-	- Underestimated
-	- Accurate
 
-:cpp:class:`wrench::StorageServiceProxy` does not support :cpp:class:`wrench::StorageService::createFile` due to its ambiguiuty.  If you wish to create a file on the remote use `remote->createFile()`.  If you wish to create a file in the cache, use `cache->createFile()` or `proxy->getCache()->createFile()`
+   * - Scheme
+     - File-to-Cache Time
+     - File-to-Host Time
+     - Internal Network Congestion
+   * - **CopyThenRead**
+     - Accurate
+     - Accurate
+     - Overestimated
+   * - MagicRead
+     - Overestimated
+     - Probably Accurate
+     - Accurate
+   * - ReadThrough
+     - Accurate
+     - Underestimated
+     - Accurate
+
+
+:cpp:class:`wrench::StorageServiceProxy` does not support :cpp:class:`wrench::StorageService::createFile` due to it being ambiguous in the case of a proxy. If you wish to create a file on the remote use `remote->createFile()`.  If you wish to create a file in the cache, use `cache->createFile()` or `proxy->getCache()->createFile()`
 
 .. code:: cpp
 
@@ -78,14 +87,17 @@ Since this is the desired behavior of a cache, some work arrounds had to be impl
 	remote->createFile(someFile);//create a file on the remote
 	
 	
-#Using a Proxy
-If proxy is given a default remote location, it can be used exactly like a normal storage service, it will simply use the cache and default remote file server.
+Using a Proxy
+-------------------------------------
+
+If proxy is given a default remote location, it can be used exactly like a normal storage service, it will simply use the cache
+and default  to the default remote file server if the cache doesn't have the desired file.
   
 .. code:: cpp
 
-	proxy->readFile(someDataFile);//Checks the cache for someDataFile, if it does not exist, checks default
-   	readFile(FileLocation::LOCATION(proxy,someDataFile));//same, but presumably the file is now cached
-	proxy->writeFile(someDataFile);//Write a file to the default remote and the cache
+	proxy->readFile(someDataFile); // Checks the cache for someDataFile, if it does not exist, checks default
+   	readFile(FileLocation::LOCATION(proxy,someDataFile)); // Same, but presumably the file is now cached
+	proxy->writeFile(someDataFile); // Write a file to the default remote and the cache
 	
 	
 If no default location is given, or the file is on a different remote :cpp:class:`wrench::StorageService` either :cpp:class:`wrench::StorageServiceProxy::readFile(wrench::StorageService,wrench::DataFile)` must be used, or the :cpp:class:`wrench::FileLocation` used to locate the file must be a :cpp:class:`wrench::ProxyLocation`. 
@@ -97,7 +109,7 @@ For this proxy location `ss` should be the proxy to access.
    	proxy->readFile(remote,someOtherDataFile);
    	readFile(ProxyFileLocation::LOCATION(
 		remote,//target a location other than default
-		FileLocaiton::LOCATION(//the expected location of the file
+		FileLocation::LOCATION(//the expected location of the file
 			proxy, //on the proxy
 			someOtherDataFile
 		)
@@ -105,4 +117,5 @@ For this proxy location `ss` should be the proxy to access.
     
 	proxy.writeFile(remote,someDataFile);//Write a file to the remote
 
-Proxys do not support file copy.  If you wish to copy a file to or from a proxy, use `proxy->getCache()` instead.  
+
+Proxies do not support file copies for now, and copies have to be done directly using the underlying storage services.
