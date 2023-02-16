@@ -455,9 +455,8 @@ namespace wrench {
                 message = S4U_Mailbox::getMessage(answer_mailbox);
                 if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
                     throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                             message->getName() + "] message!");
+                                             message->getName() + "] message (was expecting a StorageServiceAckMessage)!");
                 }
-
             } else {
                 // Otherwise, retrieve the file chunks until the last one is received
                 while (true) {
@@ -478,7 +477,7 @@ namespace wrench {
                     } else {
                         S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
                         throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                                 file_content_message->getName() + "] message!");
+                                                 file_content_message->getName() + "] message! (was expecting a StorageServiceFileContentChunkMessage)");
                     }
                 }
 
@@ -488,7 +487,7 @@ namespace wrench {
                 message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
                 if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
                     throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                             message->getName() + "] message!");
+                                             message->getName() + "] message! (was expecting a StorageServiceAckMessage)");
                 }
             }
         }
