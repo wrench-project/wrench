@@ -714,6 +714,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                 return true;
             }
         } else if (auto msg = dynamic_cast<StorageServiceAckMessage *>(message.get())) {//Our readthrough has finished
+
             if (msg->location->getStorageService() == shared_from_this() or msg->location->getStorageService() == cache) {
                 //this is not a proxied Ack, this is actually directed to us
                 return false;
