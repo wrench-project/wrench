@@ -1127,6 +1127,7 @@ namespace wrench {
         // Add the required disk properties
         disk->set_property("size", std::to_string(capacity_in_bytes) + "B");
         disk->set_property("mount", mount_point);
+        disk->seal();
     }
 
     /**
