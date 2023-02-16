@@ -559,7 +559,26 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
         }
         return false;
     }
+    /**
+     * @brief Detect if a remote file read is already in process for this file.  If it is, return true
+     * @param file the file to find
+     * @return True if the message was processed.  False otherwise
+     */
+    bool StorageServiceProxy::rejectDuplicateRead(const std::shared_ptr<DataFile>& file){
+        bool second=false;
+        std::vector<unique_ptr<SimulationMessage>> &messages = pending[file];
 
+        for (unsigned int i = 0; i < messages.size(); i++) {
+            if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
+                if(second){
+                    return true;
+                }
+                second=true;
+
+            }
+        }
+        return false;
+    }
     /**
      * @brief function for CopyThenRead method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServerFileCopyAnswer.  The only behavioral difference is in uncached files. This copies the file requested to the cache, and forwards the ongoing reads to the cache.  This is the default, and gives the most accurate time-to-cache for a file, and the most accurate network congestion, but overestimates how long the file will take to arive at the end.
      * @param message the message that is being processed
@@ -578,16 +597,12 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
             if (target) {
 
                 pending[msg->location->getFile()].push_back(std::move(message));
-                //TODO add magicRead and readThrough
-                //current is copyThenRead
-                //Magic read: copy to internal->instantly report to client when its done (read answer buffersize 0, then emediatly ack)
-                //Readthrough: read from target to client emediatly, then instantly create on cache.  REQUIRES EXTANT NETWORK PATH
-                //cached behavior for all 3 is the same.
-                //concurrent first read behavior:
-                //copyThenRead: all block until copy finished, then all read
-                //magicRead:    all block until copy finsished, then all magic read
-                //readthrough:  all block until first read is finished, then all others read
-                //do not speed excessive time on readThrough
+                //handle duplicate requests
+                if(rejectDuplicateRead(msg->location->getFile())){
+                    return true;
+
+                }
+
                 StorageService::initiateFileCopy(mailbox, FileLocation::LOCATION(target, msg->location->getFile()), FileLocation::LOCATION(cache, msg->location->getFile()));
             } else {
                 S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
@@ -635,6 +650,11 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
             if (target) {
 
                 pending[msg->location->getFile()].push_back(std::move(message));
+                //handle duplicate requests
+                if(rejectDuplicateRead(msg->location->getFile())){
+                    return true;
+
+                }
                 StorageService::initiateFileCopy(mailbox, FileLocation::LOCATION(target, msg->location->getFile()), FileLocation::LOCATION(cache, msg->location->getFile()));
             } else {
                 S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
@@ -681,6 +701,11 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
             if (target) {
 
                 pending[msg->location->getFile()].push_back(std::move(message));
+                //handle duplicate requests
+                if(rejectDuplicateRead(msg->location->getFile())){
+                    return true;
+
+                }
                 //pending[msg->location->getFile()].push_back(std::move(message));
                 //Readthrough: read from target to client emediatly, then instantly create on cache.  REQUIRES EXTANT NETWORK PATH
                 //readthrough:  all block until first read is finished, then all others read
