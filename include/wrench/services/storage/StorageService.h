@@ -14,7 +14,6 @@
 #include <set>
 
 #include "wrench/services/Service.h"
-#include "wrench/failure_causes/FailureCause.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/job/StandardJob.h"
 #include "wrench/services/storage/storage_helpers/LogicalFileSystem.h"
@@ -24,7 +23,6 @@ namespace wrench {
 
     class Simulation;
     class DataFile;
-    class FailureCause;
     class FileRegistryService;
 
     /**
@@ -39,80 +37,72 @@ namespace wrench {
 
         void stop() override;
 
-        std::map<std::string, double> getFreeSpace();
+        /** File Lookup methods (in simulation) **/
+        static bool lookupFile(const std::shared_ptr<FileLocation> &location) {
+            location->getStorageService()->lookupFile(location->getFile(), location->getPath());
+        }
+        bool lookupFile(const std::shared_ptr<DataFile> &file, const std::string &path = "/") {
+            this->lookupFile(S4U_Daemon::getRunningActorRecvMailbox(), file, path);
+        }
 
-        std::map<std::string, double> getTotalSpace();
-        virtual std::string getMountPoint();
-        virtual std::set<std::string> getMountPoints();
-        virtual bool hasMultipleMountPoints();
-        virtual bool hasMountPoint(const std::string &mp);
+        /** File deletion methods **/
+        static void deleteFile(const std::shared_ptr<FileLocation> &location) {
+            location->getStorageService()->deleteFile(location->getFile(), location->getPath());
+        }
+        void deleteFile(const std::shared_ptr<DataFile> &file, const std::string &path = "/");
 
-        static bool lookupFile(const std::shared_ptr<FileLocation> &location);
-        virtual bool lookupFile(const std::shared_ptr<DataFile> &file);
+        /** File read methods **/
+        static void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+            location->getStorageService()->readFile(location->getFile(), num_bytes, location->getPath());
+        }
+        static void readFile(const std::shared_ptr<FileLocation> &location) {
+            StorageService::readFile(location, location->getFile()->getSize());
+        }
+        void readFile(const std::shared_ptr<DataFile> &file) {
+            this->readFile(file, path, file->getSize(), "/");
+        }
+        void readFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            this->readFile(file, path, file->getSize(), path);
+        }
+        void readFile(const std::shared_ptr<DataFile> &file, double num_bytes) {
+            this->readFile(file, path, file->getSize(), "/");
+        }
+        void readFile(const std::shared_ptr<DataFile> &file, double num_bytes, const std::string &path = "/") {
+            this->readFile(S4U_Daemon::getRunningActorRecvMailbox(), file, num_bytes, path);
+        }
 
-        /**
-         * @brief Check (outside of simulation time) whether the storage service has a file
-         *
-         * @param file: the file
-         *
-         * @return true if the file is present, false otherwise
-         */
-        bool hasFile(const std::shared_ptr<DataFile> &file);
+        /** File write methods **/
+        static void writeFile(const std::shared_ptr<FileLocation> &location) {
+            location->getStorageService()->writeFile(location->getFile(), location->getPath());
+        }
+        void writeFile(const std::shared_ptr<DataFile> &file) {
+            this->writeFile(file, "/");
+        }
+        void writeFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            this->writeFile(S4U_Daemon::getRunningActorRecvMailbox(), file, path);
+        }
 
-        /**
-         * @brief Check (outside of simulation time) whether the storage service has a file
-         *
-         * @param file: the file
-         * @param path: the file path
-	 *
-	 * @return true if the file is present, false otherwise
-         */
-        virtual bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) = 0;
-
-        /**
-         * @brief Get the last write date of a file
-         * @param location: the file location
-         * @return a (simulated) date in seconds
-         */
-        virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) = 0;
-
-        static void deleteFile(const std::shared_ptr<FileLocation> &location,
-                               const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
-        virtual void deleteFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
-
-        static void readFile(const std::shared_ptr<FileLocation> &location);
-        static void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes);
-        virtual void readFile(const std::shared_ptr<DataFile> &file);
-        virtual void readFile(const std::shared_ptr<DataFile> &file, double num_bytes);
-        virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path);
-        virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes);
-
-        static void writeFile(const std::shared_ptr<FileLocation> &location);
-        virtual void writeFile(const std::shared_ptr<DataFile> &file, const std::string &path);
-        virtual void writeFile(const std::shared_ptr<DataFile> &file);
-
-        virtual void createFile(const std::shared_ptr<FileLocation> &location);
-        virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path);
-        virtual void createFile(const std::shared_ptr<DataFile> &file);
-
-        bool isBufferized() const;
-
-        /**
-         * @brief Get the theoretical load of a service
-         * @return the load on the service
-	    */
-        virtual double getLoad() = 0;
+        bool isScratch() const;
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
-        static void readFile(const std::shared_ptr<FileLocation> &location,
-                             simgrid::s4u::Mailbox *answer_mailbox,
-                             double num_bytes);
+        void lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
+                        const std::shared_ptr<DataFile> &file,
+                        const std::string &path);
 
-        bool isScratch() const;
+        void readFile(simgrid::s4u::Mailbox *answer_mailbox,
+                      const std::shared_ptr<DataFile> &file,
+                      double num_bytes,
+                      const std::string &path);
+
+        void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+                       const std::shared_ptr<DataFile> &file,
+                       const std::string &path);
 
         void setScratch();
+
+        // TODO: BELOW IS UNCLEAR
 
         static void copyFile(const std::shared_ptr<FileLocation> &src_location,
                              const std::shared_ptr<FileLocation> &dst_location);
@@ -126,11 +116,6 @@ namespace wrench {
 
         static void writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
-
-        //        StorageService(const std::string &hostname,
-        //                       const std::set<std::string> &mount_points,
-        //                       const std::string &service_name);
-
         StorageService(const std::string &hostname,
                        const std::string &service_name);
 
@@ -141,14 +126,6 @@ namespace wrench {
         friend class SimpleStorageServiceNonBufferized;
         friend class SimpleStorageServiceBufferized;
         friend class CompoundStorageService;
-
-        static void stageFile(const std::shared_ptr<FileLocation> &location);
-
-        /** @brief The service's buffer size */
-        double buffer_size = 10000000;
-
-        /** @brief File systems */
-        std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
 
         /***********************/
         /** \endcond          **/
@@ -162,8 +139,6 @@ namespace wrench {
 
         static void writeOrReadFiles(FileOperation action,
                                      std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
-
-        void stageFile(const std::shared_ptr<DataFile> &file, const std::string &mountpoint, std::string path);
 
         bool is_scratch;
     };

@@ -85,6 +85,15 @@ namespace wrench {
         using StorageService::hasFile;
         bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) override;
 
+        std::string getMountPoint();
+        std::set<std::string> getMountPoints();
+        bool hasMultipleMountPoints();
+        bool hasMountPoint(const std::string &mp);
+
+        std::map<std::string, double> getFreeSpace();
+        std::map<std::string, double> getTotalSpace();
+
+
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -112,6 +121,12 @@ namespace wrench {
 
     private:
         friend class Simulation;
+
+        /** @brief The service's buffer size */
+        double buffer_size = 10000000;
+
+        /** @brief File systems */
+        std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
 
         void validateProperties();
 

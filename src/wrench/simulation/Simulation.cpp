@@ -777,7 +777,7 @@ namespace wrench {
 
         // Put the file on the storage service (not via the service daemon)
         try {
-            StorageService::stageFile(location);
+            location->getStorageService()->createFile(location->getFile(), location->getFullAbsolutePath());
         } catch (std::invalid_argument &e) {
             throw;
         }

@@ -111,6 +111,7 @@ set(HEADER_FILES
         include/wrench/services/network_proximity/NetworkProximityServiceMessagePayload.h
         include/wrench/services/network_proximity/NetworkProximityServiceProperty.h
         include/wrench/services/storage/StorageService.h
+        include/wrench/services/storage/StorageServiceNonSimulationOperations.h
         include/wrench/services/storage/StorageServiceMessagePayload.h
         include/wrench/services/storage/StorageServiceProperty.h
         include/wrench/services/storage/simple/SimpleStorageService.h
