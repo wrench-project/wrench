@@ -7,10 +7,8 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_STORAGESERVICE_H
 #define WRENCH_STORAGESERVICE_H
-
 
 #include <string>
 #include <set>
@@ -21,7 +19,6 @@
 #include "wrench/job/StandardJob.h"
 #include "wrench/services/storage/storage_helpers/LogicalFileSystem.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
-
 
 namespace wrench {
 
@@ -53,7 +50,23 @@ namespace wrench {
         static bool lookupFile(const std::shared_ptr<FileLocation> &location);
         virtual bool lookupFile(const std::shared_ptr<DataFile> &file);
 
+        /**
+         * @brief Check (outside of simulation time) whether the storage service has a file
+         *
+         * @param file: the file
+         *
+         * @return true if the file is present, false otherwise
+         */
         bool hasFile(const std::shared_ptr<DataFile> &file);
+
+        /**
+         * @brief Check (outside of simulation time) whether the storage service has a file
+         *
+         * @param file: the file
+         * @param path: the file path
+	 *
+	 * @return true if the file is present, false otherwise
+         */
         virtual bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) = 0;
 
         /**
@@ -127,6 +140,7 @@ namespace wrench {
         friend class FileTransferThread;
         friend class SimpleStorageServiceNonBufferized;
         friend class SimpleStorageServiceBufferized;
+        friend class CompoundStorageService;
 
         static void stageFile(const std::shared_ptr<FileLocation> &location);
 

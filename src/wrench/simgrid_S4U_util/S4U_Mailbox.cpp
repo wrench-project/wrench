@@ -29,6 +29,8 @@ WRENCH_LOG_CATEGORY(wrench_core_mailbox, "Mailbox");
 
 namespace wrench {
 
+    simgrid::s4u::Mailbox *S4U_Mailbox::NULL_MAILBOX;
+
     std::deque<simgrid::s4u::Mailbox *> S4U_Mailbox::free_mailboxes;
     std::set<simgrid::s4u::Mailbox *> S4U_Mailbox::used_mailboxes;
     std::deque<simgrid::s4u::Mailbox *> S4U_Mailbox::mailboxes_to_drain;
@@ -47,6 +49,10 @@ namespace wrench {
      *
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox) {
+        if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
+            throw std::runtime_error("S4U_Mailbox::getMessage(): Cannot be called with NULL_MAILBOX");
+        }
+
         WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox->get_cname());
         //        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         SimulationMessage *msg;
@@ -76,6 +82,10 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox, double timeout) {
+        if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
+            throw std::runtime_error("S4U_Mailbox::getMessage(): Cannot be called with NULL_MAILBOX");
+        }
+
         if (timeout < 0) {
             return S4U_Mailbox::getMessage(mailbox);
         }
@@ -117,6 +127,11 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      */
     void S4U_Mailbox::putMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg) {
+
+        if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
+            return;
+        }
+
         WRENCH_DEBUG("Putting a %s message (%.2lf bytes) to mailbox '%s'",
                      msg->getName().c_str(), msg->payload,
                      mailbox->get_cname());
@@ -143,6 +158,11 @@ namespace wrench {
      *
      */
     void S4U_Mailbox::dputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg) {
+
+        if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
+            return;
+        }
+
         WRENCH_DEBUG("Dputting a %s message (%.2lf bytes) to mailbox_name '%s'",
                      msg->getName().c_str(), msg->payload,
                      mailbox->get_cname());
@@ -177,6 +197,11 @@ namespace wrench {
     */
     std::shared_ptr<S4U_PendingCommunication>
     S4U_Mailbox::iputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg) {
+
+        if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
+            return nullptr;
+        }
+
         WRENCH_DEBUG("Iputting a %s message (%.2lf bytes) to mailbox_name '%s'",
                      msg->getName().c_str(), msg->payload,
                      mailbox->get_cname());
@@ -212,6 +237,11 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
     */
     std::shared_ptr<S4U_PendingCommunication> S4U_Mailbox::igetMessage(simgrid::s4u::Mailbox *mailbox) {
+
+        if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
+            throw std::runtime_error("S4U_Mailbox::igetMessage(): Cannot be called with NULL_MAILBOX");
+        }
+
         simgrid::s4u::CommPtr comm_ptr = nullptr;
 
         WRENCH_DEBUG("Igetting a message from mailbox_name '%s'", mailbox->get_cname());

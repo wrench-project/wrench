@@ -16,6 +16,7 @@
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.h"
 #include "wrench/services/storage/simple/SimpleStorageService.h"
+#include "wrench/services/storage/compound/CompoundStorageService.h"
 #include "wrench/services/storage/simple/SimpleStorageServiceProperty.h"
 #include "wrench/services/storage/xrootd/Deployment.h"
 #include "wrench/services/storage/xrootd/XRootDProperty.h"
@@ -31,6 +32,7 @@
 #include "wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h"
 #include "wrench/services/network_proximity/NetworkProximityService.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
+#include "wrench/services/storage/proxy/StorageServiceProxy.h"
 
 // Simulation Output Analysis
 #include "wrench/simulation/SimulationTimestamp.h"

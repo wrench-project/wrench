@@ -163,6 +163,8 @@ of interactions with the currently available storage service type:
 
   - :ref:`XRootD storage service <guide-102-xrootd>`
 
+  - :ref:`Storage service proxy <guide-102-storageserviceproxy>`
+
 .. _wrench-102-controller-services-compute:
 
 Interacting with compute services
