@@ -23,7 +23,6 @@ namespace wrench {
 
     class Simulation;
     class DataFile;
-    class FileRegistryService;
 
     /**
      * @brief The storage service base class
@@ -38,71 +37,123 @@ namespace wrench {
         void stop() override;
 
         /** File Lookup methods (in simulation) **/
-        static bool lookupFile(const std::shared_ptr<FileLocation> &location) {
-            location->getStorageService()->lookupFile(location->getFile(), location->getPath());
+        static bool lookupFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            return location->getStorageService()->lookupFile(location);
         }
-        bool lookupFile(const std::shared_ptr<DataFile> &file, const std::string &path = "/") {
-            this->lookupFile(S4U_Daemon::getRunningActorRecvMailbox(), file, path);
+        bool lookupFile(const std::shared_ptr<DataFile> &file) {
+            return this->lookupFile(file, "/");
+        }
+        virtual bool lookupFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            return this->lookupFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
+        }
+        virtual bool lookupFile(const std::shared_ptr<FileLocation> &location) {
+            return this->lookupFile(S4U_Daemon::getRunningActorRecvMailbox(), location, true);
         }
 
         /** File deletion methods **/
-        static void deleteFile(const std::shared_ptr<FileLocation> &location) {
-            location->getStorageService()->deleteFile(location->getFile(), location->getPath());
+        static void deleteFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            location->getStorageService()->deleteFile(location);
         }
-        void deleteFile(const std::shared_ptr<DataFile> &file, const std::string &path = "/");
+        virtual void deleteFile(const std::shared_ptr<DataFile> &file) {
+            this->deleteFile(file, "/");
+        }
+        virtual void deleteFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            this->deleteFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
+        }
+        virtual void deleteFile(const std::shared_ptr<FileLocation> &location) {
+            this->deleteFile(S4U_Daemon::getRunningActorRecvMailbox(), location, true);
+        }
 
         /** File read methods **/
-        static void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
-            location->getStorageService()->readFile(location->getFile(), num_bytes, location->getPath());
+        static void readFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            location->getStorageService()->readFile(location, location->getFile()->getSize());
         }
-        static void readFile(const std::shared_ptr<FileLocation> &location) {
-            StorageService::readFile(location, location->getFile()->getSize());
+        static void readFileAtLocation(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+            location->getStorageService()->readFile(location, num_bytes);
         }
-        void readFile(const std::shared_ptr<DataFile> &file) {
-            this->readFile(file, path, file->getSize(), "/");
+        virtual void readFile(const std::shared_ptr<DataFile> &file) {
+            this->readFile(XXXXwrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, "/"), file->getSize());
         }
-        void readFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            this->readFile(file, path, file->getSize(), path);
+        virtual void readFile(const std::shared_ptr<DataFile> &file, double num_bytes) {
+            this->readFile(XXXXwrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, "/"), num_bytes);
         }
-        void readFile(const std::shared_ptr<DataFile> &file, double num_bytes) {
-            this->readFile(file, path, file->getSize(), "/");
+        virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            this->readFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path), file->getSize());
         }
-        void readFile(const std::shared_ptr<DataFile> &file, double num_bytes, const std::string &path = "/") {
-            this->readFile(S4U_Daemon::getRunningActorRecvMailbox(), file, num_bytes, path);
+        virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes) {
+            this->readFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path), num_bytes);
+        }
+        virtual void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+            this->readFile(S4U_Daemon::getRunningActorRecvMailbox(), location, num_bytes, true);
         }
 
         /** File write methods **/
-        static void writeFile(const std::shared_ptr<FileLocation> &location) {
-            location->getStorageService()->writeFile(location->getFile(), location->getPath());
+        static void writeFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            location->getStorageService()->writeFile(location);
         }
         void writeFile(const std::shared_ptr<DataFile> &file) {
-            this->writeFile(file, "/");
+            this->writeFile(XXXXwrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, "/"));
         }
         void writeFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            this->writeFile(S4U_Daemon::getRunningActorRecvMailbox(), file, path);
+            this->writeFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
+        }
+        void writeFile(const std::shared_ptr<FileLocation> &location) {
+            this->writeFile(S4U_Daemon::getRunningActorRecvMailbox(), location, true);
         }
 
-        bool isScratch() const;
+        /** Non-Simulation methods **/
 
-        /***********************/
-        /** \cond INTERNAL    **/
-        /***********************/
-        void lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
-                        const std::shared_ptr<DataFile> &file,
-                        const std::string &path);
+        /** File lookup methods */
+        bool hasFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            return this->hasFile(location);
+        }
+        virtual bool hasFile(const std::shared_ptr<DataFile> &file) {
+            return this->hasFile(XXXwrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, "/"));
+        }
+        virtual bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            return this->hasFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
+        }
+        virtual bool hasFile(const std::shared_ptr<FileLocation> &location) = 0;
 
-        void readFile(simgrid::s4u::Mailbox *answer_mailbox,
-                      const std::shared_ptr<DataFile> &file,
-                      double num_bytes,
-                      const std::string &path);
+        /** File creation methods */
+        void createFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            this->createFile(location);
+        }
+        virtual void createFile(const std::shared_ptr<DataFile> &file) {
+            this->createFile(XXXXXwrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, "/"));
+        }
+        virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            this->createFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
+        }
+        virtual void createFile(const std::shared_ptr<FileLocation> &location) = 0;
 
-        void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
-                       const std::shared_ptr<DataFile> &file,
-                       const std::string &path);
+        /** File write date methods */
+        void getFileLocationLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+            this->getFileLastWriteDate(location);
+        }
+        virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file) {
+            return this->getFileLastWriteDate(XXXXwrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, "/"));
+        }
+        virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            return this->getFileLastWriteDate(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
+        }
+        virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) = 0;
 
-        void setScratch();
+        /** Service load methods */
+        virtual double getLoad() = 0;
 
-        // TODO: BELOW IS UNCLEAR
+        /** Service total space method */
+        virtual double getTotalSpace() = 0;
+
+        /** Service free space method */
+        virtual double getFreeSpace();
+
+
+        virtual std::string getBaseRootPath() {
+            return "/";
+        }
+
+        // TODO: BELOW IS UNCLEAR IN TERMS OF THE API REWRITE
 
         static void copyFile(const std::shared_ptr<FileLocation> &src_location,
                              const std::shared_ptr<FileLocation> &dst_location);
@@ -116,16 +167,64 @@ namespace wrench {
 
         static void writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
-        StorageService(const std::string &hostname,
-                       const std::string &service_name);
+        bool isBufferized() const {
+            return this->is_bufferized;
+        }
+
+        /**
+         * @brief Determines whether the storage service is a scratch service of a ComputeService
+         * @return true if it is, false otherwise
+         */
+        bool isScratch() const {
+            return this->is_scratch;
+        }
+
 
     protected:
+
         friend class Simulation;
         friend class FileRegistryService;
         friend class FileTransferThread;
         friend class SimpleStorageServiceNonBufferized;
         friend class SimpleStorageServiceBufferized;
         friend class CompoundStorageService;
+        friend class ComputeService;
+        friend class Node;
+
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
+        virtual void deleteFile(simgrid::s4u::Mailbox *answer_mailbox,
+                                const std::shared_ptr<FileLocation> &location,
+                                bool wait_for_answer);
+
+        virtual bool lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
+                                const std::shared_ptr<FileLocation> &location,
+                                bool wait_for_answer);
+
+        virtual void readFile(simgrid::s4u::Mailbox *answer_mailbox,
+                              const std::shared_ptr<FileLocation> &location,
+                              double num_bytes,
+                              bool wait_for_answer);
+
+        virtual void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+                               const std::shared_ptr<FileLocation> &location,
+                               bool wait_for_answer);
+
+        virtual void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
+            // do nothing
+        }
+
+        virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
+            // no nothing
+        }
+
+        StorageService(const std::string &hostname,
+                       const std::string &service_name);
+
+        virtual void setScratch();
+
+
 
         /***********************/
         /** \endcond          **/
@@ -141,6 +240,7 @@ namespace wrench {
                                      std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
         bool is_scratch;
+        bool is_bufferized;
     };
 
     /***********************/

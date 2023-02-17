@@ -60,25 +60,18 @@ namespace wrench {
 
         return 0;
     }
-    /**
-     * @brief Get the total static capacity of the remote storage service (in zero simulation time) if there is no remote, this function is invalid
-     * @return capacity of the storage service (double) for each mount point, in a map
-     */
-    std::map<std::string, double> StorageServiceProxy::getTotalSpace() {
-        if (remote) {
-            return remote->getTotalSpace();
-        }
-        throw runtime_error("Proxy with no default location does not support getTotalSpace()");
-    }
-    bool StorageServiceProxy::hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+
+
+    bool StorageServiceProxy::hasFile(const std::shared_ptr<FileLocation> &location) {
         if (cache) {
-            return cache->hasFile(file, path);
+            return cache->hasFile(location);
         }
         if (remote) {
-            return remote->hasFile(file, path);
+            return remote->hasFile(location);
         }
         return false;
     }
+
     /**
      * @brief Process a received control message
      *
@@ -329,10 +322,10 @@ namespace wrench {
 
 
     /**
-         * @brief Forward to remote server
-         * @param location: the file location
-         * @return a (simulated) date in seconds
-         */
+     * @brief Forward to remote server
+     * @param location: the file location
+     * @return a (simulated) date in seconds
+     */
     double StorageServiceProxy::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
         if (remote) {
             return remote->getFileLastWriteDate(location);
@@ -345,33 +338,16 @@ namespace wrench {
 
 
     /**
-     * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.
-If you want it to start cached, you should also call StorageServiceProxy.getCache().createFile
+     * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile
+     * on the remote service where you wish to create the file. If you want it to start cached, you should also call
+     * StorageServiceProxy.getCache().createFile
      * @param location: the file location
      *
      **/
     void StorageServiceProxy::createFile(const std::shared_ptr<FileLocation> &location) {
-        throw std::runtime_error("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
+        throw std::runtime_error("StorageServiceProxy.createFile(): is ambiguous where the file should go. You should call createFile() on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile()");
     }
-    /**
-     * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.
-If you want it to start cached, you should also call StorageServiceProxy.getCache().createFile
-     * @param file: the file to create
-     * @param path: the file path
-     *
-     **/
-    void StorageServiceProxy::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-        throw std::runtime_error("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
-    }
-    /**
-     * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.
-If you want it to start cached, you should also call StorageServiceProxy.getCache().createFile
-     * @param file: the file to create
-     *
-     **/
-    void StorageServiceProxy::createFile(const std::shared_ptr<DataFile> &file) {
-        throw std::runtime_error("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
-    }
+
     /**
      * Get the load of the cache
      * @return the load of the cache
@@ -464,6 +440,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
      * @param targetServer: the target server
      * @param file: the file
      */
+    void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
         StorageService::readFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }

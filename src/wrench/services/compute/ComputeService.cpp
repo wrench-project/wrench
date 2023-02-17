@@ -475,7 +475,7 @@ namespace wrench {
      */
     double ComputeService::getTotalScratchSpaceSize() {
         // A scratch space SS is always created with a single mount point
-        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace().begin()->second : 0.0;
+        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
     }
 
     /**
@@ -483,8 +483,7 @@ namespace wrench {
      * @return a size (in bytes)
      */
     double ComputeService::getFreeScratchSpaceSize() {
-        // A scratch space SS is always created with a single mount point
-        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace().begin()->second : 0.0;
+        return this->scratch_space_storage_service->getFreeSpace();
     }
 
     /**

@@ -183,6 +183,70 @@ namespace wrench {
     }
 
     /**
+    * @brief Get the total static capacity of the storage service (in zero simulation time)
+    * @return capacity of the storage service in bytes
+    */
+    double SimpleStorageService::getTotalSpace() {
+        double capacity = 0.0;
+        for (auto const &fs: this->file_systems) {
+            capacity += fs.second->getTotalCapacity();
+        }
+        return capacity;
+    }
+
+    std::string SimpleStorageService::getBaseRootPath(){
+            if (this->file_systems.size() == 1) {
+                return this->file_systems.begin()->first;
+            } else {
+                return "/";
+            }
+    }
+
+
+    /**
+ * @brief Get the mount point (will throw is more than one)
+ * @return the (sole) mount point of the service
+ */
+    std::string StorageService::getMountPoint() {
+        if (this->hasMultipleMountPoints()) {
+            throw std::invalid_argument(
+                    "StorageService::getMountPoint(): The storage service has more than one mount point");
+        }
+        return wrench::FileLocation::sanitizePath(this->file_systems.begin()->first);
+    }
+
+    /**
+ * @brief Get the set of mount points
+ * @return the set of mount points
+ */
+    std::set<std::string> SimpleStorageService::getMountPoints() {
+        std::set<std::string> to_return;
+        for (auto const &fs: this->file_systems) {
+            to_return.insert(fs.first);
+        }
+        return to_return;
+    }
+
+    /**
+ * @brief Checked whether the storage service has multiple mount points
+ * @return true whether the service has multiple mount points
+ */
+    bool SimpleStorageService::hasMultipleMountPoints() {
+        return (this->file_systems.size() > 1);
+    }
+
+    /**
+* @brief Checked whether the storage service has a particular mount point
+* @param mp: a mount point
+*
+* @return true whether the service has that mount point
+*/
+    bool SimpleStorageService::hasMountPoint(const std::string &mp) {
+        return (this->file_systems.find(mp) != this->file_systems.end());
+    }
+
+
+    /**
      * @brief Process a free space request
      * @param answer_mailbox: the mailbox to which the notification should be sent
      * @return false if the daemon should terminate
@@ -231,17 +295,23 @@ namespace wrench {
     /**
      * @brief Get a file's last write date at a location (in zero simulated time)
      *
-     * @param location: the file location
+     * @param file: the file
+     * @param path: the path
      *
      * @return the file's last write date, or -1 if the file is not found
      *
      */
-    double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
-        if (location == nullptr) {
+    double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
+        if (!file) {
             throw std::invalid_argument("SimpleStorageService::getFileLastWriteDate(): Invalid nullptr argument");
         }
-        auto fs = this->file_systems[location->getMountPoint()].get();
-        return fs->getFileLastWriteDate(location->getFile(), location->getAbsolutePathAtMountPoint());
+
+        std::string mount_point;
+        std::string path_at_mount_point;
+        this->splitPath(path, mount_point, path_at_mount_point);
+
+        auto fs = this->file_systems[mount_point].get();
+        return fs->getFileLastWriteDate(file, path_at_mount_point);
     }
 
     /**
@@ -252,10 +322,31 @@ namespace wrench {
      * @return true if the file is present, false otherwise
      */
     bool SimpleStorageService::hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-        auto location = wrench::FileLocation::LOCATION(this->getSharedPtr<SimpleStorageService>(), path, file);
-        auto fs = this->file_systems[location->getMountPoint()].get();
-        return fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint());
+        std::string mount_point;
+        std::string path_at_mount_point;
+        if (not this->splitPath(path, mount_point, path_at_mount_point)) {
+            return false;
+        }
+        auto fs = this->file_systems[mount_point].get();
+        return fs->isFileInDirectory(file, path_at_mount_point);
     }
+
+
+    bool SimpleStorageService::splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point) {
+        auto sanitized_path = FileLocation::sanitizePath(path);
+        for (auto const &fs : this->file_systems) {
+            auto mp = fs.first;
+            if (FileLocation::properPathPrefix(mp, sanitized_path)) {
+                mount_point = mp;
+                path_at_mount_point = sanitized_path.erase(0, mp.length());
+                return true;
+            }
+        }
+        return false;
+
+
+    }
+
 
 
 }// namespace wrench
