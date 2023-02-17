@@ -81,8 +81,8 @@ namespace wrench {
                                                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
-        double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
-        using StorageService::hasFile;
+        virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path = "/") override;
+
         bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) override;
 
         std::string getMountPoint();
@@ -90,8 +90,9 @@ namespace wrench {
         bool hasMultipleMountPoints();
         bool hasMountPoint(const std::string &mp);
 
-        std::map<std::string, double> getFreeSpace();
-        std::map<std::string, double> getTotalSpace();
+        double getTotalSpace() override;
+
+        virtual std::string getBaseRootPath() override;
 
 
         /***********************/
@@ -118,15 +119,18 @@ namespace wrench {
                                       simgrid::s4u::Mailbox *answer_mailbox);
         bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox);
 
-
-    private:
-        friend class Simulation;
-
+    protected:
         /** @brief The service's buffer size */
         double buffer_size = 10000000;
 
         /** @brief File systems */
         std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
+
+    private:
+        friend class Simulation;
+
+        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
+
 
         void validateProperties();
 

@@ -9,6 +9,8 @@
 
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
 
+#include <utility>
+
 namespace wrench {
 
     /**
@@ -25,7 +27,7 @@ namespace wrench {
      * @param hostname: the name of the host that has turned on
      */
     HostHasTurnedOnMessage::HostHasTurnedOnMessage(std::string hostname) : HostStateChangeDetectorMessage() {
-        this->hostname = hostname;
+        this->hostname = std::move(hostname);
     }
 
     /**

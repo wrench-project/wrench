@@ -53,18 +53,18 @@ namespace wrench {
                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
-        double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
+        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) override;
 
         double getLoad() override;
 
         // Overload StorageService's implementation.
-        std::map<std::string, double> getTotalSpace();
+        double getTotalSpace() override;
 
         // Overload StorageService's implementation.
-        std::map<std::string, double> getFreeSpace();
+        double getFreeSpace() override;
 
         // Overload StorageService's implementation.
-        void setScratch();
+        void setScratch() override;
 
         /**
          * @brief Method to return the collection of known StorageServices
@@ -145,6 +145,10 @@ namespace wrench {
         StorageSelectionStrategyCallback storage_selection;
 
         bool isStorageSelectionUserProvided;
+
+        /** @brief File systems */ // TODO: Is this really needed now that file_systems are no longer in StorageService.h?
+        std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
+
     };
 
 };// namespace wrench

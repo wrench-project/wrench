@@ -53,10 +53,10 @@ namespace wrench {
      */
     class StorageServiceFreeSpaceAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFreeSpaceAnswerMessage(std::map<std::string, double> free_space, double payload);
+        StorageServiceFreeSpaceAnswerMessage(double free_space, double payload);
 
-        /** @brief The amount of free space in bytes for each mount point, in a map */
-        std::map<std::string, double> free_space;
+        /** @brief The amount of free space in bytes */
+        double free_space;
     };
 
     /**
@@ -65,12 +65,14 @@ namespace wrench {
     class StorageServiceFileLookupRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                               std::shared_ptr<FileLocation> location, double payload);
+                                               std::shared_ptr<FileLocation> &location,
+                                               double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
-        /** @brief The file location (hopefully) */
+        /** @brief The location to lookup */
         std::shared_ptr<FileLocation> location;
+
     };
 
     /**
@@ -93,12 +95,12 @@ namespace wrench {
     class StorageServiceFileDeleteRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileDeleteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                               std::shared_ptr<FileLocation> location,
+                                               const std::shared_ptr<FileLocation> &location,
                                                double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
-        /** @brief The location where the file will be deleted */
+        /** @brief The location to delete  */
         std::shared_ptr<FileLocation> location;
     };
 
@@ -178,18 +180,15 @@ namespace wrench {
     public:
         StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                               simgrid::s4u::Host *requesting_host,
-                                              std::shared_ptr<FileLocation> location,
-                                              double buffer_size,
+                                              std::shared_ptr<FileLocation> &location,
                                               double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The requesting host */
         simgrid::s4u::Host *requesting_host;
-        /** @brief The location to write the file to */
+        /** @brief The file to write */
         std::shared_ptr<FileLocation> location;
-        /** @brief The buffer size to use */
-        double buffer_size;
     };
 
     /**
@@ -197,20 +196,26 @@ namespace wrench {
      */
     class StorageServiceFileWriteAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileWriteAnswerMessage(std::shared_ptr<FileLocation> location,
+        StorageServiceFileWriteAnswerMessage(std::shared_ptr<DataFile> &file,
+                                             std::string &path,
                                              bool success,
                                              std::shared_ptr<FailureCause> failure_cause,
+                                             double buffer_size,
                                              simgrid::s4u::Mailbox *data_write_mailbox_name,
                                              double payload);
 
-        /** @brief The location at which the file should be written */
-        std::shared_ptr<FileLocation> location;
+        /** @brief The file should be written */
+        std::shared_ptr<DataFile> file;
+        /** @brief The file path */
+        std::string path;
         /** @brief Whether the write operation request was accepted or not */
         bool success;
         /** @brief The mailbox on which to send the file */
         simgrid::s4u::Mailbox *data_write_mailbox;
         /** @brief The cause of the failure, if any, or nullptr */
         std::shared_ptr<FailureCause> failure_cause;
+        /** @brief The buffer size to use */
+        double buffer_size;
     };
 
     /**
@@ -229,9 +234,7 @@ namespace wrench {
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The requesting host */
         simgrid::s4u::Host *requesting_host;
-        //        /** @brief The mailbox to which the file content should be sent */
-        //        simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content;
-        /** @brief The location from which to  read the file */
+        /** @brief The file to read */
         std::shared_ptr<FileLocation> location;
         /** @brief The number of bytes to read */
         double num_bytes_to_read;

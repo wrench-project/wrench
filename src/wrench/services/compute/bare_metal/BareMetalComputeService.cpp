@@ -700,11 +700,11 @@ namespace wrench {
         for (auto const &j: this->files_in_scratch) {
             for (auto const &f: j.second) {
                 try {
-                    StorageService::deleteFile(FileLocation::LOCATION(
-                            this->getScratch(),
-                            this->getScratch()->getMountPoint() +
-                                    j.first->getName(),
-                            f));
+                    this->getScratch()->deleteFile(
+                            f,
+                            this->getScratch()->getBaseRootPath() +
+                                    j.first->getName()
+                            );
                 } catch (ExecutionException &e) {
                     throw;
                 }
