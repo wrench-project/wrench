@@ -749,7 +749,7 @@ namespace wrench {
      */
     void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &storage_service,
                                std::string directory_absolute_path) {
-        Simulation::stageFile(FileLocation::LOCATION(storage_service, directory_absolute_path, file));
+        Simulation::stageFile(FileLocation::LOCATION(storage_service, file, directory_absolute_path));
     }
 
     /**

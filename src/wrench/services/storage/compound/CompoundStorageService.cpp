@@ -113,9 +113,9 @@ namespace wrench {
 
         // CSS should be non-bufferized, as it actually doesn't copy / transfer anything
         // and this allows it to receive message requests for copy (otherwise, src storage service might receive it)
-        this->buffer_size = 0;
+        this->is_bufferized = false;
         this->storage_services = storage_services;
-        this->storage_selection = storage_selection;
+        this->storage_selection = std::move(storage_selection);
         this->isStorageSelectionUserProvided = storage_selection_user_provided;
 
         // Dummy logical file system
@@ -145,9 +145,9 @@ namespace wrench {
         for (const auto &ss: this->storage_services) {
             message = " - " + ss->process_name + " on " + ss->getHostname();
             WRENCH_INFO("%s", message.c_str());
-            for (const auto &mnt: ss->getMountPoints()) {
-                WRENCH_INFO("  - %s", mnt.c_str());
-            }
+//            for (const auto &mnt: ss->getMountPoints()) {
+//                WRENCH_INFO("  - %s", mnt.c_str());
+//            }
         }
 
         /** Main loop **/
@@ -296,7 +296,7 @@ namespace wrench {
             WRENCH_DEBUG("lookupOrDesignateStorageService: Registering file %s on storage service %s, at path %s",
                          designatedLocation->getFile()->getID().c_str(),
                          designatedLocation->getStorageService()->getName().c_str(),
-                         designatedLocation->getFullAbsolutePath().c_str());
+                         designatedLocation->getPath().c_str());
 
             // Supposing (and it better be true) that DataFiles are unique throught a given simulation run, even among various jobs.
             this->file_location_mapping[designatedLocation->getFile()] = designatedLocation;
@@ -388,8 +388,8 @@ namespace wrench {
                         msg->answer_mailbox,
                         FileLocation::LOCATION(
                                 designated_location->getStorageService(),
-                                designated_location->getFullAbsolutePath(),
-                                designated_location->getFile()),
+                                designated_location->getFile(),
+                                designated_location->getPath()),
                         designated_location->getStorageService()->getMessagePayloadValue(
                                 StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -667,24 +667,26 @@ namespace wrench {
     /**
      * @brief Get a file's last write date at a location (in zero simulated time)
      *
-     * @param location: the file last write date
-     * 
-     * @throw std::invalid_argument if file is not know to the CompoundStorageService and 
-     *        std::logic_error if file is known but allocated on a StorageService which doesn't implement this method.
+     * @param file: the file
+     * @param path: the path
      *
-     * @return the file's last write date, or -1 if the file is not found
+     * @return -1 if the file is not found
      *
      */
-    double CompoundStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
-        if (!this->lookupFile(location)) {
+    double CompoundStorageService::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
+        if (!this->lookupFile(file, path)) {
             throw std::invalid_argument("CompoundStorageService::getFileLastWriteDate(): File not known to the CompoundStorageService. Unable to forward to underlying StorageService");
         }
+        if ((this->file_location_mapping.find(file) == this->file_location_mapping.end()) or
+            (this->file_location_mapping[file]->getPath() != FileLocation::sanitizePath(path))) {
+            return -1;
+        }
 
-        auto designated_storage_service = std::dynamic_pointer_cast<SimpleStorageService>(*(this->storage_services.find(location->getStorageService())));
+        auto designated_storage_service = std::dynamic_pointer_cast<SimpleStorageService>(this->file_location_mapping[file]->getStorageService());
         if (designated_storage_service) {
-            return designated_storage_service->getFileLastWriteDate(this->file_location_mapping[location->getFile()]);
+            return designated_storage_service->getFileLastWriteDate(file, path);
         } else {
-            throw std::logic_error("CompoundStorageService::getFileLastWriteDate(): File known, but allocated on StorageService that doesn't implement getFileLastWriteDate()");
+            return -1;
         }
     }
 

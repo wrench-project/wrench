@@ -833,12 +833,12 @@ namespace wrench {
      * @return the file's last write date, or -1 if the file is not found
      *
      */
-        double Node::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
-            if (location == nullptr) {
+        double Node::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            if (file == nullptr) {
                 throw std::invalid_argument("Node::getFileLastWriteDate(): Invalid nullptr argument");
             }
             if (internalStorage) {
-                return internalStorage->getFileLastWriteDate(location);
+                return internalStorage->getFileLastWriteDate(file, path);
             } else {
                 throw std::runtime_error("Node::getFileLastWriteDate() called on non storage Node " + hostname);
             }
@@ -901,13 +901,13 @@ namespace wrench {
         *
         * @throw std::invalid_argument
         */
-        void Node::createFile(const std::shared_ptr<DataFile> &file) {
+        void Node::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
             if (internalStorage == nullptr) {
                 throw std::runtime_error("Node::createFile() called on non storage Node " + hostname);
             }
 
             metavisor->files[file].push_back(this->getSharedPtr<Node>());
-            internalStorage->createFile(file);
+            internalStorage->createFile(file, path);
         }
         /**
         * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
@@ -945,14 +945,17 @@ namespace wrench {
         *
         * @throw std::invalid_argument
         */
-        void Node::writeFile(const std::shared_ptr<DataFile> &file) {
+        void Node::writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+                             const std::shared_ptr<DataFile> &file,
+                             const std::string &path,
+                             bool wait_for_answer) {
             if (internalStorage == nullptr) {
                 std::string error_message = "Cannot write file at non-storage XRootD node";
                 throw ExecutionException(
                         std::shared_ptr<FailureCause>(
                                 new NotAllowed(getSharedPtr<Node>(), error_message)));
             }
-            internalStorage->writeFile(file);
+            internalStorage->writeFile(answer_mailbox, file, path, wait_for_answer);
             metavisor->files[file].push_back(this->getSharedPtr<Node>());
         }
 

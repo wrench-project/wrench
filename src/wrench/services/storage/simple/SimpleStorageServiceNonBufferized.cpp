@@ -62,8 +62,8 @@ namespace wrench {
     void SimpleStorageServiceNonBufferized::processTransactionCompletion(const std::shared_ptr<Transaction> &transaction) {
 
         if (transaction->src_location) {
-            transaction->src_location->getStorageService()->file_systems[transaction->src_location->getMountPoint()]->decrementNumRunningTransactionsForFileInDirectory(
-                    transaction->src_location->getFile(), transaction->src_location->getAbsolutePathAtMountPoint());
+            transaction->src_location->getStorageService()->decrementNumRunningOperationsForLocation(
+                    transaction->src_location);
         }
 
         // If I was the source and the destination was bufferized, I am the one creating the file there! (yes,
@@ -72,7 +72,7 @@ namespace wrench {
             transaction->src_location->getStorageService() == shared_from_this() and
             transaction->dst_location != nullptr and
             transaction->dst_location->getStorageService()->isBufferized()) {
-            transaction->dst_location->getStorageService()->file_systems[transaction->dst_location->getMountPoint()]->storeFileInDirectory(transaction->dst_location->getFile(), transaction->dst_location->getAbsolutePathAtMountPoint(), true);
+            transaction->dst_location->getStorageService()->createFile(transaction->dst_location);
         }
 
         // Send back the relevant ack if this was a read
@@ -81,8 +81,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage(transaction->src_location));
         } else if (transaction->src_location == nullptr) {
             WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
-            this->file_systems[transaction->dst_location->getMountPoint()]->storeFileInDirectory(
-                    transaction->dst_location->getFile(), transaction->dst_location->getAbsolutePathAtMountPoint(), true);
+            this->createFile(transaction->dst_location);
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // Maybe no corresponding timestamp.
             //            WRENCH_INFO("Sending back an ack for a successful file read");
@@ -90,8 +89,7 @@ namespace wrench {
         } else {
             if (transaction->dst_location->getStorageService() == shared_from_this()) {
                 WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
-                this->file_systems[transaction->dst_location->getMountPoint()]->storeFileInDirectory(
-                        transaction->dst_location->getFile(), transaction->dst_location->getAbsolutePathAtMountPoint(), true);
+                this->createFile(transaction->dst_location);
                 try {
                     this->simulation->getOutput().addTimestampFileCopyCompletion(
                             Simulation::getCurrentSimulatedDate(), transaction->dst_location->getFile(), transaction->src_location, transaction->dst_location);
@@ -432,10 +430,9 @@ namespace wrench {
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
             // Make the file un-evictable
-            location->getStorageService()->file_systems[location->getMountPoint()]->incrementNumRunningTransactionsForFileInDirectory(
-                    location->getFile(), location->getAbsolutePathAtMountPoint());
+            location->getStorageService()->incrementNumPendingReadsForLocation(location);
 
-            fs->updateReadDate(location->getFile(), location->getAbsolutePathAtMountPoint());
+            fs->updateReadDate(location->getFile(), location->getPath());
 
             // Create the streaming activity
             auto me_host = simgrid::s4u::this_actor::get_host();

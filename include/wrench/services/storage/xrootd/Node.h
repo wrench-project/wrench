@@ -42,12 +42,13 @@ namespace wrench {
             /** \cond DEVELOPER    */
             /***********************/
 
-            void createFile(const std::shared_ptr<DataFile> &file) override;
             void createFile(const std::shared_ptr<DataFile> &file, const string &path) override;
 
-            void writeFile(const std::shared_ptr<DataFile> &file) override;
+            virtual void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+                           const std::shared_ptr<FileLocation> &location,
+                           bool wait_for_answer) override;
 
-            double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
+            virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) override;
 
             /***********************/
             /** \endcond           */
@@ -105,11 +106,7 @@ namespace wrench {
             bool cached(shared_ptr<DataFile> file);
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
 
-
-            void createFile(const std::shared_ptr<FileLocation> &location) override;
-
             double getLoad() override;
-
 
             int main() override;
             bool processNextMessage();

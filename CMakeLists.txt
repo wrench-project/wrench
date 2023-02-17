@@ -111,7 +111,6 @@ set(HEADER_FILES
         include/wrench/services/network_proximity/NetworkProximityServiceMessagePayload.h
         include/wrench/services/network_proximity/NetworkProximityServiceProperty.h
         include/wrench/services/storage/StorageService.h
-        include/wrench/services/storage/StorageServiceNonSimulationOperations.h
         include/wrench/services/storage/StorageServiceMessagePayload.h
         include/wrench/services/storage/StorageServiceProperty.h
         include/wrench/services/storage/simple/SimpleStorageService.h
@@ -313,8 +312,6 @@ set(SOURCE_FILES
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystem.cpp
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystemNoCaching.cpp
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystemLRUCaching.cpp
-        src/wrench/services/memory/Block.cpp
-        src/wrench/services/memory/MemoryManager.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
         include/wrench/simgrid_S4U_util/S4U_DaemonActor.h
@@ -394,7 +391,7 @@ set(TEST_FILES
         test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowParallelModelTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
-        test/services/memory_manager_service/MemoryManagerTest.cpp
+#        test/services/memory_manager_service/MemoryManagerTest.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceOneActionTests.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiActionTests.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiJobTests.cpp
