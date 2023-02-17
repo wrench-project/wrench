@@ -279,7 +279,7 @@ Adding/removing an entry to a file registry service is done as follows:
    [...]
 
    file_registry->addEntry(wrench::FileLocation::LOCATION(some_storage_service, some_file));
-   file_registry->removeEntry(wrench::FileLocatio::LOCATION(some_storage_service, some_file));
+   file_registry->removeEntry(wrench::FileLocation::LOCATION(some_storage_service, some_file));
 
 The :cpp:class:`wrench::FileLocation` class is a convenient abstraction for a
 file that is available at some storage service (with optionally a directory
@@ -329,18 +329,19 @@ to obtain a measure of the network distance between hosts “Host1” and
 
    std::shared_ptr<wrench::NetworkProximityService> np_service;
 
-   double distance = np_service->query(std::make_pair("Host1","Host2"));
+   std::pair<double,double> distance = np_service->getHostPairDistance(std::make_pair("Host1", "Host2"));
 
 This distance corresponds to half the round-trip-time, in seconds,
-between the two hosts. If the service is configured to use the Vivaldi
-coordinate-based system, as in our example above, this distance is
-actually derived from network coordinates, as computed by the Vivaldi
-algorithm. In this case, one can actually ask for these coordinates for
-any given host:
+between the two hosts. The second value of the pair is the timestamp of 
+the oldest measurement uses to compute the proximity value. If the service 
+is configured to use the Vivaldi coordinate-based system, as in our example above, 
+this distance is actually derived from network coordinates, as computed 
+by the Vivaldi algorithm. In this case, one can actually ask for these 
+coordinates for any given host:
 
 .. code:: cpp
 
-   std::pair<double,double> coords = np_service->getCoordinates("Host1");
+   std::pair<std::pair<double,double>, double> coords = np_service->getHostCoordinate("Host1");
 
 See the documentation of :cpp:class:`wrench::NetworkProximityService` 
 for more API member functions.
@@ -405,7 +406,7 @@ functions as follows:
    void TwoTasksAtATimeWMS::processEventStandardJobCompletion(
                   std::shared_ptr<StandardJobCompletedEvent> event) {
      // Retrieve the job that this event is for 
-     auto job = event->job;
+     auto job = event->standard_job;
      // Print some message for each task in the job
      for (auto const &task : job->getTasks()) {
        std::cerr  << "Notified that a standard job has completed task " << task->getID() << std::endl;
@@ -415,7 +416,7 @@ functions as follows:
    void TwoTasksAtATimeWMS::processEventStandardJobFailure(
                   std::shared_ptr<StandardJobFailedEvent> event) {
      // Retrieve the job that this event is for 
-     auto job = event->job;
+     auto job = event->standard_job;
      std::cerr  << "Notified that a standard job has failed (failure cause: ";
      std::cerr << event->failure_cause->toString() << ")" <<  std::endl;
      // Print some message for each task in the job if it has failed
