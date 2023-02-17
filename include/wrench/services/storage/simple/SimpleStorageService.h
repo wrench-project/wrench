@@ -126,10 +126,11 @@ namespace wrench {
         /** @brief File systems */
         std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
 
+        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
+
     private:
         friend class Simulation;
 
-        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
 
 
         void validateProperties();

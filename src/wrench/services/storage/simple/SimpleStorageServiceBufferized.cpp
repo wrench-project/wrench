@@ -149,7 +149,7 @@ namespace wrench {
             return processFileLookupRequest(msg->location, msg->answer_mailbox);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
-            return processFileWriteRequest(msg->location, msg->answer_mailbox, msg->buffer_size);
+            return processFileWriteRequest(msg->location, msg->answer_mailbox);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
             return processFileReadRequest(msg->location, msg->num_bytes_to_read, msg->answer_mailbox);
@@ -184,27 +184,26 @@ namespace wrench {
      * @return true if this process should keep running
      */
     bool SimpleStorageServiceBufferized::processFileWriteRequest(const std::shared_ptr<FileLocation> &location,
-                                                                 simgrid::s4u::Mailbox *answer_mailbox, double buffer_size) {
-
-        if (buffer_size < 1.0) {
-            throw std::runtime_error("SimpleStorageServiceBufferized::processFileWriteRequest(): Cannot process a write requests with a zero buffer size");
-        }
-
+                                                                 simgrid::s4u::Mailbox *answer_mailbox) {
 
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        auto fs = this->file_systems[location->getMountPoint()].get();
+        std::string mountpoint;
+        std::string path_at_mount_point;
+        this->splitPath(location->getPath(), mountpoint, path_at_mount_point);
+
+        auto fs = this->file_systems[mountpoint].get();
         auto file = location->getFile();
 
         // If the file is not already there, do a capacity check/update
         // (If the file is already there, then there will just be an overwrite. Note that
         // if the overwrite fails, then the file will disappear, which is expected)
 
-        bool file_already_there = fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint()) and
-                                  fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint());
+        bool file_already_there = fs->doesDirectoryExist(path_at_mount_point) and
+                                  fs->isFileInDirectory(file, path_at_mount_point);
         if (not file_already_there) {
-            if (not fs->reserveSpace(file, location->getAbsolutePathAtMountPoint())) {
+            if (not fs->reserveSpace(file, path_at_mount_point)) {
                 failure_cause = std::shared_ptr<FailureCause>(
                         new StorageServiceNotEnoughSpace(
                                 file,
@@ -214,8 +213,8 @@ namespace wrench {
 
         if (failure_cause == nullptr) {
 
-            if (not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) {
-                fs->createDirectory(location->getAbsolutePathAtMountPoint());
+            if (not fs->doesDirectoryExist(path_at_mount_point)) {
+                fs->createDirectory(path_at_mount_point);
             }
 
             // Generate a mailbox_name name on which to receive the file
@@ -244,7 +243,7 @@ namespace wrench {
                     nullptr,
                     answer_mailbox,
                     nullptr,
-                    buffer_size);
+                    this->buffer_size);
             ftt->setSimulation(this->simulation);
 
             // Add it to the Pool of pending data communications

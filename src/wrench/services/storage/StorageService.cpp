@@ -325,13 +325,12 @@ namespace wrench {
                             throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                                      file_content_message->getName() + "] message! (was expecting a StorageServiceFileContentChunkMessage)");
                         }
-
                     }
 
                     S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
 
                     //Waiting for the final ack
-                    message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
+                    message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
                     if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
                         throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                                  message->getName() + "] message! (was expecting a StorageServiceAckMessage)");
@@ -339,315 +338,316 @@ namespace wrench {
                 }
             }
         }
+    }
 
 
-        /**
-     * @brief Synchronously and sequentially read a set of files from storage services
-     *
-     * @param locations: a map of files to locations
-     *
-     * @throw std::runtime_error
-     * @throw ExecutionException
-     */
-        void StorageService::readFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
-            StorageService::writeOrReadFiles(READ, std::move(locations));
-        }
+    /**
+ * @brief Synchronously and sequentially read a set of files from storage services
+ *
+ * @param locations: a map of files to locations
+ *
+ * @throw std::runtime_error
+ * @throw ExecutionException
+ */
+    void StorageService::readFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
+        StorageService::writeOrReadFiles(READ, std::move(locations));
+    }
 
-        /**
-     * @brief Synchronously and sequentially upload a set of files from storage services
-     *
-     * @param locations: a map of files to locations
-     *
-     * @throw std::runtime_error
-     * @throw ExecutionException
-     */
-        void StorageService::writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
-            StorageService::writeOrReadFiles(WRITE, std::move(locations));
-        }
+    /**
+ * @brief Synchronously and sequentially upload a set of files from storage services
+ *
+ * @param locations: a map of files to locations
+ *
+ * @throw std::runtime_error
+ * @throw ExecutionException
+ */
+    void StorageService::writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
+        StorageService::writeOrReadFiles(WRITE, std::move(locations));
+    }
 
-        /**
-     * @brief Synchronously and sequentially write/read a set of files to/from storage services
-     *
-     * @param action: FileOperation::READ (download) or FileOperation::WRITE
-     * @param locations: a map of files to locations
-     *
-     * @throw std::runtime_error
-     * @throw ExecutionException
-     */
-        void StorageService::writeOrReadFiles(FileOperation action,
-                                              std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
-            for (auto const &f: locations) {
-                if ((f.first == nullptr) or (f.second == nullptr)) {
-                    throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid argument");
-                }
-            }
-
-            // Create a temporary sorted list of files so that the order in which files are read/written is deterministic!
-            std::map<std::string, std::shared_ptr<DataFile>> sorted_files;
-            for (auto const &f: locations) {
-                sorted_files[f.first->getID()] = f.first;
-            }
-
-            for (auto const &f: sorted_files) {
-                auto file = f.second;
-                auto location = locations[file];
-
-                if (action == READ) {
-                    WRENCH_INFO("Reading file %s from location %s",
-                                file->getID().c_str(),
-                                location->toString().c_str());
-                    StorageService::readFile(location);
-
-                    WRENCH_INFO("File %s read", file->getID().c_str());
-
-                } else {
-                    WRENCH_INFO("Writing file %s to location %s",
-                                file->getID().c_str(),
-                                location->toString().c_str());
-                    StorageService::writeFile(location);
-
-                    WRENCH_INFO("File %s written", file->getID().c_str());
-                }
+    /**
+ * @brief Synchronously and sequentially write/read a set of files to/from storage services
+ *
+ * @param action: FileOperation::READ (download) or FileOperation::WRITE
+ * @param locations: a map of files to locations
+ *
+ * @throw std::runtime_error
+ * @throw ExecutionException
+ */
+    void StorageService::writeOrReadFiles(FileOperation action,
+                                          std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
+        for (auto const &f: locations) {
+            if ((f.first == nullptr) or (f.second == nullptr)) {
+                throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid argument");
             }
         }
 
-        /**
-         * @brief Delete a file on the storage service
-         *
-         * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
-         * @param location: the location to delete
-         * @param wait_for_answer: whether this call should
-         */
-        void StorageService::deleteFile(simgrid::s4u::Mailbox *answer_mailbox,
-                                        const std::shared_ptr<FileLocation> &location,
-                                        bool wait_for_answer) {
-            if (!answer_mailbox or !location) {
-                throw std::invalid_argument("StorageService::deleteFile(): Invalid nullptr arguments");
-            }
-
-            if (location->isScratch()) {
-                throw std::invalid_argument("StorageService::deleteFile(): Cannot be called on a SCRATCH location");
-            }
-
-            assertServiceIsUp(this->shared_from_this());
-
-            // Send a message to the storage service's daemon
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new StorageServiceFileDeleteRequestMessage(
-                                            answer_mailbox,
-                                            location,
-                                            this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
-
-            if (wait_for_answer) {
-
-                // Wait for a reply
-                std::unique_ptr<SimulationMessage> message = nullptr;
-
-                message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-                if (auto msg = dynamic_cast<StorageServiceFileDeleteAnswerMessage *>(message.get())) {
-                    // On failure, throw an exception
-                    if (!msg->success) {
-                        throw ExecutionException(std::move(msg->failure_cause));
-                    }
-                    WRENCH_INFO("Deleted file at %s", location->toString().c_str());
-                } else {
-                    throw std::runtime_error("StorageService::deleteFile(): Unexpected [" + message->getName() + "] message (was expecting StorageServiceFileDeleteAnswerMessage)");
-                }
-            }
+        // Create a temporary sorted list of files so that the order in which files are read/written is deterministic!
+        std::map<std::string, std::shared_ptr<DataFile>> sorted_files;
+        for (auto const &f: locations) {
+            sorted_files[f.first->getID()] = f.first;
         }
 
-        /**
-         * @brief Synchronously ask the storage service to read a file from another storage service
-         *
-         * @param src_location: the location where to read the file
-         * @param dst_location: the location where to write the file
-         *
-         * @throw ExecutionException
-         * @throw std::invalid_argument
-         */
-        void StorageService::copyFile(const std::shared_ptr<FileLocation> &src_location,
-                                      const std::shared_ptr<FileLocation> &dst_location) {
-            if ((src_location == nullptr) || (dst_location == nullptr)) {
-                throw std::invalid_argument("StorageService::copyFile(): Invalid nullptr arguments");
-            }
-            if (src_location->getFile() != dst_location->getFile()) {
-                throw std::invalid_argument("StorageService::copyFile(): src and dst locations should be for the same file");
-            }
+        for (auto const &f: sorted_files) {
+            auto file = f.second;
+            auto location = locations[file];
 
-            assertServiceIsUp(src_location->getStorageService());
-            assertServiceIsUp(dst_location->getStorageService());
+            if (action == READ) {
+                WRENCH_INFO("Reading file %s from location %s",
+                            file->getID().c_str(),
+                            location->toString().c_str());
+                StorageService::readFile(location);
 
-            auto file = src_location->getFile();
-            bool src_is_bufferized = src_location->getStorageService()->isBufferized();
-            bool src_is_non_bufferized = not src_is_bufferized;
-            bool dst_is_bufferized = dst_location->getStorageService()->isBufferized();
-            bool dst_is_non_bufferized = not dst_is_bufferized;
+                WRENCH_INFO("File %s read", file->getID().c_str());
 
-            //        if (src_is_non_bufferized and dst_is_bufferized) {
-            //            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
-            //        }
-
-            simgrid::s4u::Mailbox *mailbox_to_contact;
-            if (dst_is_non_bufferized and !(std::dynamic_pointer_cast<CompoundStorageService>(src_location->getStorageService()))) {
-                mailbox_to_contact = dst_location->getStorageService()->mailbox;
-            } else if (src_is_non_bufferized and !(std::dynamic_pointer_cast<CompoundStorageService>(dst_location->getStorageService()))) {
-                mailbox_to_contact = src_location->getStorageService()->mailbox;
             } else {
-                mailbox_to_contact = dst_location->getStorageService()->mailbox;
+                WRENCH_INFO("Writing file %s to location %s",
+                            file->getID().c_str(),
+                            location->toString().c_str());
+                StorageService::writeFile(location);
+
+                WRENCH_INFO("File %s written", file->getID().c_str());
             }
+        }
+    }
 
-            // Send a message to the daemon of the dst service
-            auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-            src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
-                                                                                                 src_location,
-                                                                                                 dst_location);
+    /**
+     * @brief Delete a file on the storage service
+     *
+     * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
+     * @param location: the location to delete
+     * @param wait_for_answer: whether this call should
+     */
+    void StorageService::deleteFile(simgrid::s4u::Mailbox *answer_mailbox,
+                                    const std::shared_ptr<FileLocation> &location,
+                                    bool wait_for_answer) {
+        if (!answer_mailbox or !location) {
+            throw std::invalid_argument("StorageService::deleteFile(): Invalid nullptr arguments");
+        }
 
-            S4U_Mailbox::putMessage(
-                    mailbox_to_contact,
-                    new StorageServiceFileCopyRequestMessage(
-                            answer_mailbox,
-                            src_location,
-                            dst_location,
-                            nullptr,
-                            dst_location->getStorageService()->getMessagePayloadValue(
-                                    StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+        if (location->isScratch()) {
+            throw std::invalid_argument("StorageService::deleteFile(): Cannot be called on a SCRATCH location");
+        }
+
+        assertServiceIsUp(this->shared_from_this());
+
+        // Send a message to the storage service's daemon
+        S4U_Mailbox::putMessage(this->mailbox,
+                                new StorageServiceFileDeleteRequestMessage(
+                                        answer_mailbox,
+                                        location,
+                                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
+
+        if (wait_for_answer) {
 
             // Wait for a reply
             std::unique_ptr<SimulationMessage> message = nullptr;
 
-            message = S4U_Mailbox::getMessage(answer_mailbox);
+            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
-            if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
-                if (msg->failure_cause) {
+            if (auto msg = dynamic_cast<StorageServiceFileDeleteAnswerMessage *>(message.get())) {
+                // On failure, throw an exception
+                if (!msg->success) {
                     throw ExecutionException(std::move(msg->failure_cause));
                 }
+                WRENCH_INFO("Deleted file at %s", location->toString().c_str());
             } else {
-                throw std::runtime_error("StorageService::copyFile(): Unexpected [" + message->getName() + "] message");
+                throw std::runtime_error("StorageService::deleteFile(): Unexpected [" + message->getName() + "] message (was expecting StorageServiceFileDeleteAnswerMessage)");
             }
         }
+    }
 
-        /**
-         * @brief Asynchronously ask for a file copy between two storage services
-         *
-         * @param answer_mailbox: the mailbox to which a notification message will be sent
-         * @param src_location: the source location
-         * @param dst_location: the destination location
-         *
-         * @throw ExecutionException
-         * @throw std::invalid_argument
-         *
-         */
-        void StorageService::initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox,
-                                              const std::shared_ptr<FileLocation> &src_location,
-                                              const std::shared_ptr<FileLocation> &dst_location) {
-            if ((src_location == nullptr) || (dst_location == nullptr)) {
-                throw std::invalid_argument("StorageService::initiateFileCopy(): Invalid nullptr arguments");
-            }
-            if (src_location->getFile() != dst_location->getFile()) {
-                throw std::invalid_argument("StorageService::initiateFileCopy(): src and dst locations should be for the same file");
-            }
-
-            assertServiceIsUp(src_location->getStorageService());
-            assertServiceIsUp(dst_location->getStorageService());
-
-            auto file = src_location->getFile();
-            bool src_is_bufferized = src_location->getStorageService()->isBufferized();
-            bool src_is_non_bufferized = not src_is_bufferized;
-            bool dst_is_bufferized = dst_location->getStorageService()->isBufferized();
-            bool dst_is_non_bufferized = not dst_is_bufferized;
-
-            //        if (src_is_non_bufferized and dst_is_bufferized) {
-            //            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
-            //        }
-
-            simgrid::s4u::Mailbox *mailbox_to_contact;
-            if (dst_is_non_bufferized) {
-                mailbox_to_contact = dst_location->getStorageService()->mailbox;
-            } else if (src_is_non_bufferized) {
-                mailbox_to_contact = src_location->getStorageService()->mailbox;
-            } else {
-                mailbox_to_contact = dst_location->getStorageService()->mailbox;
-            }
-
-            src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
-                                                                                                 src_location,
-                                                                                                 dst_location);
-
-            // Send a message to the daemon on the dst location
-            S4U_Mailbox::putMessage(
-                    mailbox_to_contact,
-                    new StorageServiceFileCopyRequestMessage(
-                            answer_mailbox,
-                            src_location,
-                            dst_location,
-                            nullptr,
-                            dst_location->getStorageService()->getMessagePayloadValue(
-                                    StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+    /**
+     * @brief Synchronously ask the storage service to read a file from another storage service
+     *
+     * @param src_location: the location where to read the file
+     * @param dst_location: the location where to write the file
+     *
+     * @throw ExecutionException
+     * @throw std::invalid_argument
+     */
+    void StorageService::copyFile(const std::shared_ptr<FileLocation> &src_location,
+                                  const std::shared_ptr<FileLocation> &dst_location) {
+        if ((src_location == nullptr) || (dst_location == nullptr)) {
+            throw std::invalid_argument("StorageService::copyFile(): Invalid nullptr arguments");
+        }
+        if (src_location->getFile() != dst_location->getFile()) {
+            throw std::invalid_argument("StorageService::copyFile(): src and dst locations should be for the same file");
         }
 
+        assertServiceIsUp(src_location->getStorageService());
+        assertServiceIsUp(dst_location->getStorageService());
 
+        auto file = src_location->getFile();
+        bool src_is_bufferized = src_location->getStorageService()->isBufferized();
+        bool src_is_non_bufferized = not src_is_bufferized;
+        bool dst_is_bufferized = dst_location->getStorageService()->isBufferized();
+        bool dst_is_non_bufferized = not dst_is_bufferized;
 
-        /**
-         * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-         * at that location.
-         *
-         * @param location: a file location, must be the same object as the function is invoked on
-         *
-         * @throw std::invalid_argument
-         */
-        void StorageService::createFile(const std::shared_ptr<FileLocation> &location) {
-            if (location->getStorageService() != this->getSharedPtr<StorageService>()) {
-                throw std::invalid_argument("StorageService::createFile(file,location) must be called on the same StorageService that the location uses");
+        //        if (src_is_non_bufferized and dst_is_bufferized) {
+        //            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
+        //        }
+
+        simgrid::s4u::Mailbox *mailbox_to_contact;
+        if (dst_is_non_bufferized and !(std::dynamic_pointer_cast<CompoundStorageService>(src_location->getStorageService()))) {
+            mailbox_to_contact = dst_location->getStorageService()->mailbox;
+        } else if (src_is_non_bufferized and !(std::dynamic_pointer_cast<CompoundStorageService>(dst_location->getStorageService()))) {
+            mailbox_to_contact = src_location->getStorageService()->mailbox;
+        } else {
+            mailbox_to_contact = dst_location->getStorageService()->mailbox;
+        }
+
+        // Send a message to the daemon of the dst service
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
+                                                                                             src_location,
+                                                                                             dst_location);
+
+        S4U_Mailbox::putMessage(
+                mailbox_to_contact,
+                new StorageServiceFileCopyRequestMessage(
+                        answer_mailbox,
+                        src_location,
+                        dst_location,
+                        nullptr,
+                        dst_location->getStorageService()->getMessagePayloadValue(
+                                StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+
+        // Wait for a reply
+        std::unique_ptr<SimulationMessage> message = nullptr;
+
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+
+        if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
+            if (msg->failure_cause) {
+                throw ExecutionException(std::move(msg->failure_cause));
             }
-            stageFile(location->getFile(), location->getMountPoint(),
-                      location->getAbsolutePathAtMountPoint());
+        } else {
+            throw std::runtime_error("StorageService::copyFile(): Unexpected [" + message->getName() + "] message");
         }
+    }
 
-        /**
-     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-     * at that location.
-
-    *
-    * @param file: a file
-    * @param path: path to file
-    *
-    */
-        void StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-
-            createFile(FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
-        }
-
-        /**
-     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-     * at that location.
-     * @param file: a file
+    /**
+     * @brief Asynchronously ask for a file copy between two storage services
+     *
+     * @param answer_mailbox: the mailbox to which a notification message will be sent
+     * @param src_location: the source location
+     * @param dst_location: the destination location
+     *
+     * @throw ExecutionException
+     * @throw std::invalid_argument
      *
      */
-        void StorageService::createFile(const std::shared_ptr<DataFile> &file) {
-
-            createFile(FileLocation::LOCATION(this->getSharedPtr<StorageService>(), getMountPoint(), file));
+    void StorageService::initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox,
+                                          const std::shared_ptr<FileLocation> &src_location,
+                                          const std::shared_ptr<FileLocation> &dst_location) {
+        if ((src_location == nullptr) || (dst_location == nullptr)) {
+            throw std::invalid_argument("StorageService::initiateFileCopy(): Invalid nullptr arguments");
+        }
+        if (src_location->getFile() != dst_location->getFile()) {
+            throw std::invalid_argument("StorageService::initiateFileCopy(): src and dst locations should be for the same file");
         }
 
-        /**
-         * @brief Determines whether the storage service is bufferized
-         * @return true if bufferized, false otherwise
-         */
-        bool StorageService::isBufferized() const {
-            return this->buffer_size > 1;
+        assertServiceIsUp(src_location->getStorageService());
+        assertServiceIsUp(dst_location->getStorageService());
+
+        auto file = src_location->getFile();
+        bool src_is_bufferized = src_location->getStorageService()->isBufferized();
+        bool src_is_non_bufferized = not src_is_bufferized;
+        bool dst_is_bufferized = dst_location->getStorageService()->isBufferized();
+        bool dst_is_non_bufferized = not dst_is_bufferized;
+
+        //        if (src_is_non_bufferized and dst_is_bufferized) {
+        //            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
+        //        }
+
+        simgrid::s4u::Mailbox *mailbox_to_contact;
+        if (dst_is_non_bufferized) {
+            mailbox_to_contact = dst_location->getStorageService()->mailbox;
+        } else if (src_is_non_bufferized) {
+            mailbox_to_contact = src_location->getStorageService()->mailbox;
+        } else {
+            mailbox_to_contact = dst_location->getStorageService()->mailbox;
         }
 
-        /**
-         * @brief Determines whether the storage service has the file. This doesn't simulate anything and is merely a zero-simulated-time data structure lookup.
-         * If you want to simulate the overhead of querying the StorageService, instead use lookupFile().
-         *
-         * @param file a file
-         *
-         * @return true if the file is present, false otherwise
-         */
-        bool StorageService::hasFile(const shared_ptr<DataFile> &file) {
-            return this->hasFile(file, this->getMountPoint());
+        src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
+                                                                                             src_location,
+                                                                                             dst_location);
+
+        // Send a message to the daemon on the dst location
+        S4U_Mailbox::putMessage(
+                mailbox_to_contact,
+                new StorageServiceFileCopyRequestMessage(
+                        answer_mailbox,
+                        src_location,
+                        dst_location,
+                        nullptr,
+                        dst_location->getStorageService()->getMessagePayloadValue(
+                                StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+    }
+
+
+
+    /**
+     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+     * at that location.
+     *
+     * @param location: a file location, must be the same object as the function is invoked on
+     *
+     * @throw std::invalid_argument
+     */
+    void StorageService::createFile(const std::shared_ptr<FileLocation> &location) {
+        if (location->getStorageService() != this->getSharedPtr<StorageService>()) {
+            throw std::invalid_argument("StorageService::createFile(file,location) must be called on the same StorageService that the location uses");
         }
+        stageFile(location->getFile(), location->getMountPoint(),
+                  location->getAbsolutePathAtMountPoint());
+    }
+
+    /**
+ * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+ * at that location.
+
+*
+* @param file: a file
+* @param path: path to file
+*
+*/
+    void StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+
+        createFile(FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
+    }
+
+    /**
+ * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+ * at that location.
+ * @param file: a file
+ *
+ */
+    void StorageService::createFile(const std::shared_ptr<DataFile> &file) {
+
+        createFile(FileLocation::LOCATION(this->getSharedPtr<StorageService>(), getMountPoint(), file));
+    }
+
+    /**
+     * @brief Determines whether the storage service is bufferized
+     * @return true if bufferized, false otherwise
+     */
+    bool StorageService::isBufferized() const {
+        return this->buffer_size > 1;
+    }
+
+    /**
+     * @brief Determines whether the storage service has the file. This doesn't simulate anything and is merely a zero-simulated-time data structure lookup.
+     * If you want to simulate the overhead of querying the StorageService, instead use lookupFile().
+     *
+     * @param file a file
+     *
+     * @return true if the file is present, false otherwise
+     */
+    bool StorageService::hasFile(const shared_ptr<DataFile> &file) {
+        return this->hasFile(file, this->getMountPoint());
+    }
 
 
-    }// namespace wrench
+}// namespace wrench

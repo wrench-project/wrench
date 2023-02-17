@@ -196,18 +196,15 @@ namespace wrench {
      */
     class StorageServiceFileWriteAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileWriteAnswerMessage(std::shared_ptr<DataFile> &file,
-                                             std::string &path,
+        StorageServiceFileWriteAnswerMessage(std::shared_ptr<FileLocation> &location,
                                              bool success,
                                              std::shared_ptr<FailureCause> failure_cause,
                                              double buffer_size,
                                              simgrid::s4u::Mailbox *data_write_mailbox_name,
                                              double payload);
 
-        /** @brief The file should be written */
-        std::shared_ptr<DataFile> file;
-        /** @brief The file path */
-        std::string path;
+        /** @brief The file location hould be written */
+        std::shared_ptr<FileLocation> location;
         /** @brief Whether the write operation request was accepted or not */
         bool success;
         /** @brief The mailbox on which to send the file */

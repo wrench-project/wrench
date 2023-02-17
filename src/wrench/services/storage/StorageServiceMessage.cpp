@@ -69,19 +69,17 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                                                                   std::shared_ptr<FileLocation> &file,
-                                                                                   std::string &path,
+                                                                                   std::shared_ptr<FileLocation> &location,
                                                                                    double payload)
         : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || (file == nullptr)) {
+        if ((answer_mailbox == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(): Invalid nullptr arguments");
         }
 #endif
         this->answer_mailbox = answer_mailbox;
-        this->file = file;
-        this->path = path;
+        this->location = location;
     }
 
     /**
@@ -264,8 +262,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(std::shared_ptr<DataFile> &file,
-                                                                               std::string &path,
+    StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(std::shared_ptr<FileLocation> &location,
                                                                                bool success,
                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                simgrid::s4u::Mailbox *data_write_mailbox,
@@ -280,8 +277,7 @@ namespace wrench {
                     "StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(): Invalid arguments");
         }
 #endif
-        this->file = file;
-        this->path = path;
+        this->location = location;
         this->success = success;
         this->failure_cause = std::move(failure_cause);
         this->data_write_mailbox = data_write_mailbox;
