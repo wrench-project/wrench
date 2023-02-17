@@ -21,6 +21,8 @@
 #include <wrench/services/compute/htcondor/HTCondorNegotiatorService.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/NotAllowed.h>
+#include <wrench/failure_causes/NotEnoughResources.h>
 
 #include <memory>
 
@@ -453,13 +455,18 @@ namespace wrench {
      * @param service_specific_arguments: the service-specific argument
      * @return true or false
      */
-    bool HTCondorCentralManagerService::jobCanRunSomewhere(
-            std::shared_ptr<CompoundJob> job,
+    std::shared_ptr<FailureCause> HTCondorCentralManagerService::jobCanRunSomewhere(
+            const std::shared_ptr<CompoundJob> &job,
             std::map<std::string, std::string> service_specific_arguments) {
+
+        std::shared_ptr<FailureCause> failure_cause;
+        bool there_is_a_grid_appropriate_service = false;
+
         bool is_grid_universe =
                 (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
                 (service_specific_arguments["-universe"] == "grid");
         bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
+
 
         bool found_one = false;
         for (auto const &cs: this->compute_services) {
@@ -469,6 +476,10 @@ namespace wrench {
             }
             if ((not is_grid_universe) and (std::dynamic_pointer_cast<BareMetalComputeService>(cs) == nullptr)) {
                 continue;
+            }
+            if (((is_grid_universe and (std::dynamic_pointer_cast<BatchComputeService>(cs))) or
+                 ((not is_grid_universe) and (std::dynamic_pointer_cast<BareMetalComputeService>(cs))))) {
+                there_is_a_grid_appropriate_service = true;
             }
 
             // Check for resources for a grid universe job
@@ -522,7 +533,19 @@ namespace wrench {
             break;
         }
 
-        return found_one;
+        if (not there_is_a_grid_appropriate_service) {
+            std::string error_message;
+            if (is_grid_universe) {
+                error_message = "Grid universe jobs not supported";
+            } else {
+                error_message = "Non-grid universe jobs not supported";
+            }
+            return std::make_shared<NotAllowed>(this->shared_from_this(), error_message);
+        } else if (not found_one) {
+            return std::make_shared<NotEnoughResources>(job, this->shared_from_this());
+        } else {
+            return nullptr;
+        }
     }
 
     /**

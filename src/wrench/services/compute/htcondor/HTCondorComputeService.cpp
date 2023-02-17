@@ -274,11 +274,12 @@ namespace wrench {
         WRENCH_INFO("Asked to run compound job %s, which has %zu actions", job->getName().c_str(), job->getActions().size());
 
         // Check that the job can run on some child service
-        if (not this->central_manager->jobCanRunSomewhere(job, service_specific_args)) {
+        auto failure_cause = this->central_manager->jobCanRunSomewhere(job, service_specific_args);
+        if (failure_cause) {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitCompoundJobAnswerMessage(
-                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(new NotEnoughResources(job, this->getSharedPtr<HTCondorComputeService>())),
+                            job, this->getSharedPtr<HTCondorComputeService>(), false, failure_cause,
                             this->getMessagePayloadValue(
                                     HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
             return;
@@ -382,7 +383,14 @@ namespace wrench {
      * @param service_specific_args: the service-specific arguments (useful for some services)
      */
     void HTCondorComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
-        throw std::invalid_argument("Jobs submitted to an HT-Condor compute service cannot make use of scratch");
+        for (auto const &cs: this->central_manager->compute_services) {
+            if (not cs->hasScratch()) {
+                throw std::invalid_argument(
+                        "HTCondorComputeService::validateJobsUseOfScratch(): This HTCondor service cannot"
+                        " handle jobs that use scratch space because at least one of its subordinate compute "
+                        "service doesn't have scratch space");
+            }
+        }
     }
 
     /**

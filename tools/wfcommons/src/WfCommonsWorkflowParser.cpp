@@ -165,14 +165,16 @@ namespace wrench {
 
                     // task bytes read
                     try {
-                        task->setBytesRead(job.at("bytesRead"));
+                        double bytes_read_in_KB = job.at("bytesRead");
+                        task->setBytesRead(1000.0 * bytes_read_in_KB);
                     } catch (nlohmann::json::out_of_range &e) {
                         // do nothing
                     }
 
                     // task bytes written
                     try {
-                        task->setBytesWritten(job.at("bytesWritten"));
+                        double bytes_written_in_KB = job.at("bytesWritten");
+                        task->setBytesWritten(1000.0 * bytes_written_in_KB);
                     } catch (nlohmann::json::out_of_range &e) {
                         // do nothing
                     }
@@ -181,7 +183,8 @@ namespace wrench {
                     std::vector<nlohmann::json> files = job.at("files");
 
                     for (auto &f: files) {
-                        double size = f.at("size");
+                        double size_in_KB = f.at("size");
+                        double size_in_bytes = size_in_KB * 1000;
                         std::string link = f.at("link");
                         std::string id = f.at("name");
                         std::shared_ptr<wrench::DataFile> workflow_file = nullptr;
@@ -190,7 +193,7 @@ namespace wrench {
                             workflow_file = workflow->getFileByID(id);
                         } catch (const std::invalid_argument &ia) {
                             // making a new file
-                            workflow_file = workflow->addFile(id, size);
+                            workflow_file = workflow->addFile(id, size_in_bytes);
                         }
                         if (link == "input") {
                             task->addInputFile(workflow_file);

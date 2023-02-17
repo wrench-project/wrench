@@ -32,7 +32,7 @@ namespace wrench {
     class FileLocation {
 
     public:
-        ~FileLocation();
+        virtual ~FileLocation();
 
         /**
          * @brief Static location that denotes a compute service's scratch space
@@ -51,8 +51,10 @@ namespace wrench {
 
         std::shared_ptr<DataFile> getFile();
         std::shared_ptr<StorageService> getStorageService();
+        std::shared_ptr<StorageService> setStorageService(std::shared_ptr<StorageService> storage_service);
         std::shared_ptr<StorageService> getServerStorageService();
         std::string getMountPoint();
+        std::string setMountPoint(std::string mount_point);
         std::string getAbsolutePathAtMountPoint();
         std::string getFullAbsolutePath();
         bool isScratch() const;
@@ -98,7 +100,7 @@ namespace wrench {
 
     private:
         friend class LogicalFileSystem;
-
+        friend class Simulation;
 
         /**
          * @brief Constructor
@@ -106,7 +108,7 @@ namespace wrench {
          * @param mp: the mount point path
          * @param apamp: the absolute path
          * @param file: the file
-	 * @param is_scratch: whether the location is a SCRATCH location
+	     * @param is_scratch: whether the location is a SCRATCH location
          */
         FileLocation(std::shared_ptr<StorageService> ss, std::string mp, std::string apamp, std::shared_ptr<DataFile> file, bool is_scratch) : storage_service(std::move(ss)),
                                                                                                                                                mount_point(std::move(mp)),

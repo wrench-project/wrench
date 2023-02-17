@@ -70,4 +70,6 @@ ${INSTALL_DIR}/workflow_api/condor-grid-example/wrench-example-condor-grid-unive
 echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/XRootD/wrench-example-xrootd-basic xrootd_platform.xml${normal}"
 ${INSTALL_DIR}/action_api/XRootD/wrench-example-xrootd-basic ${INSTALL_DIR}/action_api/XRootD/xrootd_platform.xml
 
+echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/storage-service-proxy/wrench-example-storage-service-proxy-basic proxy_platform.xml${normal}"
+${INSTALL_DIR}/action_api/storage-service-proxy/wrench-example-storage-service-proxy-basic ${INSTALL_DIR}/action_api/storage-service-proxy/proxy_platform.xml
 
