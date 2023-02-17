@@ -20,6 +20,9 @@ namespace wrench {
      */
     class ComputeServiceProperty : public ServiceProperty {
     public:
+        /** @brief The buffer size of the compute service's scratch space (see documentation of StorageServiceProperty::BUFFER_SIZE)
+         **/
+        DECLARE_PROPERTY_NAME(SCRATCH_SPACE_BUFFER_SIZE);
     };
 }// namespace wrench
 

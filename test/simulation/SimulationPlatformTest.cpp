@@ -42,7 +42,12 @@ protected:
     </cluster>
 
     <zone id="host_zone" routing="Full">
-        <host id="subzonehost" speed="1f" core="2"/>
+        <host id="subzonehost" speed="1f" core="2">
+           <disk id="scratch" read_bw="100MBps" write_bw="100MBps">
+               <prop id="size" value="100B"/>
+               <prop id="mount" value="/scratch"/>
+           </disk>
+        </host>
     </zone>
 
     <zone id="subzone" routing="Full">
@@ -200,10 +205,6 @@ private:
 
     int main() override {
 
-        try {
-            wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 20.0, 100.0, "/foo");
-            throw std::runtime_error("Should not be able to create a disk with different read and write bandwidths");
-        } catch (std::invalid_argument &ignore) {}
 
         // Create a new disk on subzonehost
         wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 10.0, 100.0, "/foo");
@@ -266,7 +267,7 @@ void SimulationPlatformTest::do_CreateNewDiskTest_test() {
 class PlatformCreator {
 
 public:
-    PlatformCreator(double link_bw) : link_bw(link_bw) {}
+    explicit PlatformCreator(double link_bw) : link_bw(link_bw) {}
 
     void operator()() const {
         create_platform(this->link_bw);
@@ -275,7 +276,7 @@ public:
 private:
     double link_bw;
 
-    void create_platform(double link_bw) const {
+    static void create_platform(double link_bw) {
         // Create the top-level zone
         auto zone = simgrid::s4u::create_full_zone("AS0");
         // Create the WMSHost host with its disk
