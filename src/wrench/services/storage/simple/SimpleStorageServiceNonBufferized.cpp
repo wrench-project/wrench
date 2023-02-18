@@ -407,7 +407,7 @@ namespace wrench {
 
 
         //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
-        if (not this->file_systems[getMountPoint()]->doesDirectoryExist(
+        if (not this->file_systems[mount_point]->doesDirectoryExist(
                     path_at_mount_point)) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new InvalidDirectoryPath(
