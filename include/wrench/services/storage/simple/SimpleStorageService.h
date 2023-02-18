@@ -74,6 +74,13 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
+        using StorageService::readFile;
+        using StorageService::writeFile;
+        using StorageService::deleteFile;
+        using StorageService::lookupFile;
+        using StorageService::createFile;
+        using StorageService::hasFile;
+
         ~SimpleStorageService() override;
 
         static SimpleStorageService *createSimpleStorageService(const std::string &hostname,

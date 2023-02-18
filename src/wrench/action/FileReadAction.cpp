@@ -79,7 +79,7 @@ namespace wrench {
         for (unsigned long i = 0; i < this->file_locations.size(); i++) {
             if (this->file_locations[i]->isScratch()) {
                 auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
-                this->file_locations[i] = FileLocation::LOCATION(cs->getScratch(), this->file_locations[i]->getFile(), cs->getScratch()->getBaseRootPath() + "/" + this->getJob()->getName());
+                this->file_locations[i] = FileLocation::LOCATION(cs->getScratch(), cs->getScratch()->getBaseRootPath() + "/" + this->getJob()->getName(), this->file_locations[i]->getFile());
             }
         }
         // File read

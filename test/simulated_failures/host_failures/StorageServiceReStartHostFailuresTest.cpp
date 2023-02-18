@@ -126,14 +126,14 @@ private:
         auto file = this->test->workflow->getFileByID("file");
         auto storage_service = this->test->storage_service;
         try {
-            wrench::StorageService::readFile(wrench::FileLocation::LOCATION(storage_service, file));
+            wrench::StorageService::readFileAtLocation(wrench::FileLocation::LOCATION(storage_service, file));
             throw std::runtime_error("Should not have been able to read the file (first attempt)");
         } catch (wrench::ExecutionException &e) {
             // Expected
         }
         wrench::Simulation::sleep(1000);
         try {
-            wrench::StorageService::readFile(wrench::FileLocation::LOCATION(storage_service, file));
+            wrench::StorageService::readFileAtLocation(wrench::FileLocation::LOCATION(storage_service, file));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should have been able to read the file (second attempt)");
         }
@@ -151,14 +151,14 @@ private:
         resurector->start(murderer, true, false);// Daemonized, no auto-restart
 
         try {
-            wrench::StorageService::readFile(wrench::FileLocation::LOCATION(storage_service, file));
+            wrench::StorageService::readFileAtLocation(wrench::FileLocation::LOCATION(storage_service, file));
             throw std::runtime_error("Should not have been able to read the file (first attempt)");
         } catch (wrench::ExecutionException &e) {
             // Expected
         }
         wrench::Simulation::sleep(1000);
         try {
-            wrench::StorageService::readFile(wrench::FileLocation::LOCATION(storage_service, file));
+            wrench::StorageService::readFileAtLocation(wrench::FileLocation::LOCATION(storage_service, file));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should  have been able to read the file (second attempt)");
         }

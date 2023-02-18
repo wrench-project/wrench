@@ -1219,9 +1219,9 @@ private:
 
         auto file_1 = this->test->workflow->addFile("file_1", 1.00 * 1000 * 1000);
 
-        wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
-        wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(this->test->ss2, file_1));
-        wrench::StorageService::readFile(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
+        wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
+        wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss2, file_1));
+        wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
         return 0;
     }
 };
