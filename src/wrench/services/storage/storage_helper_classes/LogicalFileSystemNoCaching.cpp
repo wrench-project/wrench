@@ -52,7 +52,6 @@ namespace wrench {
             createDirectory(fixed_path);
         }
 
-
         bool file_already_there = this->content[fixed_path].find(file) != this->content[fixed_path].end();
 
         this->content[fixed_path][file] = std::make_shared<LogicalFileSystemNoCaching::FileOnDiskNoCaching>(S4U_Simulation::getClock());

@@ -47,7 +47,7 @@ namespace wrench {
             return this->lookupFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
         }
         virtual bool lookupFile(const std::shared_ptr<FileLocation> &location) {
-            return this->lookupFile(S4U_Daemon::getRunningActorRecvMailbox(), location, true);
+            return this->lookupFile(S4U_Daemon::getRunningActorRecvMailbox(), location);
         }
 
         /** File deletion methods **/
@@ -148,7 +148,6 @@ namespace wrench {
         /** Service free space method */
         virtual double getFreeSpace();
 
-
         virtual std::string getBaseRootPath() {
             return "/";
         }
@@ -158,7 +157,6 @@ namespace wrench {
         static void copyFile(const std::shared_ptr<FileLocation> &src_location,
                              const std::shared_ptr<FileLocation> &dst_location);
 
-
         static void initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox,
                                      const std::shared_ptr<FileLocation> &src_location,
                                      const std::shared_ptr<FileLocation> &dst_location);
@@ -167,9 +165,12 @@ namespace wrench {
 
         static void writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
-        bool isBufferized() const {
-            return this->is_bufferized;
-        }
+        virtual bool isBufferized() const = 0;
+
+        virtual double getBufferSize() const = 0;
+
+        virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) = 0;
+        virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) = 0;
 
         /**
          * @brief Determines whether the storage service is a scratch service of a ComputeService
@@ -178,7 +179,6 @@ namespace wrench {
         bool isScratch() const {
             return this->is_scratch;
         }
-
 
     protected:
 
@@ -199,8 +199,7 @@ namespace wrench {
                                 bool wait_for_answer);
 
         virtual bool lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
-                                const std::shared_ptr<FileLocation> &location,
-                                bool wait_for_answer);
+                                const std::shared_ptr<FileLocation> &location);
 
         virtual void readFile(simgrid::s4u::Mailbox *answer_mailbox,
                               const std::shared_ptr<FileLocation> &location,
@@ -224,8 +223,6 @@ namespace wrench {
 
         virtual void setScratch();
 
-
-
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -240,7 +237,6 @@ namespace wrench {
                                      std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
         bool is_scratch;
-        bool is_bufferized;
     };
 
     /***********************/

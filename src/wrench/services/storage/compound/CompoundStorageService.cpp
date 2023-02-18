@@ -113,7 +113,6 @@ namespace wrench {
 
         // CSS should be non-bufferized, as it actually doesn't copy / transfer anything
         // and this allows it to receive message requests for copy (otherwise, src storage service might receive it)
-        this->is_bufferized = false;
         this->storage_services = storage_services;
         this->storage_selection = std::move(storage_selection);
         this->isStorageSelectionUserProvided = storage_selection_user_provided;
@@ -523,6 +522,7 @@ namespace wrench {
                                 false,
                                 std::shared_ptr<FailureCause>(new FileNotFound(msg->location)),
                                 nullptr,
+                                0,
                                 this->getMessagePayloadValue(
                                         CompoundStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
             } catch (wrench::ExecutionException &e) {}
@@ -537,7 +537,6 @@ namespace wrench {
                         msg->answer_mailbox,
                         msg->requesting_host,
                         designated_location,
-                        0,
                         this->getMessagePayloadValue(
                                 StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -573,7 +572,7 @@ namespace wrench {
         WRENCH_DEBUG("processFileReadRequest: Going to read file %s on storage service %s, at path %s",
                      designated_location->getFile()->getID().c_str(),
                      designated_location->getStorageService()->getName().c_str(),
-                     designated_location->getFullAbsolutePath().c_str());
+                     designated_location->getPath().c_str());
 
         S4U_Mailbox::putMessage(
                 designated_location->getStorageService()->mailbox,
@@ -605,16 +604,14 @@ namespace wrench {
      * 
      * @return A map of service name and total capacity of all disks for each service.
      */
-    std::map<std::string, double> CompoundStorageService::getTotalSpace() {
+    double CompoundStorageService::getTotalSpace() {
         WRENCH_INFO("CompoundStorageService::getTotalSpace");
-        std::map<std::string, double> to_return;
+        double free_space = 0.0;
         for (const auto &service: this->storage_services) {
             auto service_name = service->getName();
-            auto service_capacity = service->getTotalSpace();
-            to_return[service_name] = std::accumulate(service_capacity.begin(), service_capacity.end(), 0,
-                                                      [](const std::size_t previous, const auto &element) { return previous + element.second; });
+            free_space += service->getTotalSpace();
         }
-        return to_return;
+        return free_space;
     }
 
     /**
@@ -628,20 +625,14 @@ namespace wrench {
      * @throw std::runtime_error
      *
      */
-    std::map<std::string, double> CompoundStorageService::getFreeSpace() {
+    double CompoundStorageService::getFreeSpace() {
         WRENCH_DEBUG("CompoundStorageService::getFreeSpace Forwarding request to internal services");
 
-        std::map<std::string, double> to_return = {};
-        std::map<std::string, simgrid::s4u::Mailbox *> mailboxes = {};
-
+        double free_space = 0.0;
         for (const auto &service: this->storage_services) {
-            auto free_space = service->getFreeSpace();
-
-            to_return[service->getName()] = std::accumulate(free_space.begin(), free_space.end(), 0,
-                                                            [](const std::size_t previous, const auto &element) { return previous + element.second; });
+            free_space += service->getFreeSpace();
         }
-
-        return to_return;
+        return free_space;
     }
 
     /** 
@@ -704,9 +695,9 @@ namespace wrench {
             WRENCH_DEBUG("hasFile: File %s not found", file->getID().c_str());
             return false;
         }
-        if (file_location->getAbsolutePathAtMountPoint() != path) {
+        if (file_location->getPath() != path) {
             WRENCH_DEBUG("hasFile: File %s found, but path %s doesn't match internal path %s",
-                         file->getID().c_str(), path.c_str(), file_location->getAbsolutePathAtMountPoint().c_str());
+                         file->getID().c_str(), path.c_str(), file_location->getPath().c_str());
             return false;
         }
 
