@@ -140,6 +140,8 @@ namespace wrench {
 
         double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
 
+        simgrid::s4u::Disk *getDiskForPathOrNull(const std::string &path);
+
 
         /***********************/
         /** \endcond          **/

@@ -10,6 +10,7 @@
 #include <memory>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
+#include <wrench/services/storage/simple/SimpleStorageService.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
 #include <wrench/services/storage/compound/CompoundStorageService.h>
 #include <boost/algorithm/string/split.hpp>
@@ -332,6 +333,17 @@ namespace wrench {
         }
 
         return true;
+    }
+
+    simgrid::s4u::Disk *FileLocation::getDiskOrNull() {
+        if (this->is_scratch) {
+            return nullptr;
+        }
+        auto sss = std::dynamic_pointer_cast<SimpleStorageService>(this->storage_service);
+        if (not sss) {
+            return nullptr;
+        }
+        return sss->getDiskForPathOrNull(this->path);
     }
 
 

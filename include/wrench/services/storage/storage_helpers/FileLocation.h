@@ -14,6 +14,7 @@
 #include <iostream>
 #include <utility>
 #include <unordered_map>
+#include <simgrid/s4u.hpp>
 
 
 namespace wrench {
@@ -23,6 +24,7 @@ namespace wrench {
     /***********************/
 
     class StorageService;
+    class SimpleStorageService;
     class DataFile;
 
     /**
@@ -100,6 +102,7 @@ namespace wrench {
     private:
         friend class LogicalFileSystem;
         friend class Simulation;
+        friend class SimpleStorageServiceNonBufferized;
 
         /**
          * @brief Constructor
@@ -112,22 +115,23 @@ namespace wrench {
                                                                                                                               path(std::move(path)),
                                                                                                                               file(std::move(file)),
                                                                                                                               is_scratch(is_scratch) {}
-        std::shared_ptr<StorageService> storage_service;
-#ifdef PAGE_CACHE_SIMULATION
-        std::shared_ptr<StorageService> server_storage_service;
-#endif
-
-        std::string path;
-        std::shared_ptr<DataFile> file;
-
-        bool is_scratch;
-
         static std::shared_ptr<FileLocation> createFileLocation(const std::shared_ptr<StorageService> &ss,
                                                                 const std::shared_ptr<DataFile> &file,
                                                                 const std::string &path,
                                                                 bool is_scratch);
 
+        simgrid::s4u::Disk *getDiskOrNull();
+
         static void reclaimFileLocations();
+
+#ifdef PAGE_CACHE_SIMULATION
+        std::shared_ptr<StorageService> server_storage_service;
+#endif
+
+        std::shared_ptr<StorageService> storage_service;
+        std::string path;
+        std::shared_ptr<DataFile> file;
+        bool is_scratch;
 
         static std::unordered_map<std::string, std::shared_ptr<FileLocation>> file_location_map;
         static size_t file_location_map_previous_size;
