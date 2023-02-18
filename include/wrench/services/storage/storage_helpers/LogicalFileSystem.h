@@ -68,7 +68,7 @@ namespace wrench {
                                                                           const std::string &eviction_policy = "NONE");
 
         void init();
-        bool isInitialized();
+        bool isInitialized() const;
 
         double getTotalCapacity();
         double getFreeSpace();

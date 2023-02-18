@@ -119,8 +119,8 @@ namespace wrench {
         virtual bool hasFile(const std::shared_ptr<FileLocation> &location) = 0;
 
         /** File creation methods */
-        void createFileAtLocation(const std::shared_ptr<FileLocation> &location) {
-            this->createFile(location);
+        static void createFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            location->getStorageService()->createFile(location);
         }
         void createFile(const std::shared_ptr<DataFile> &file) {
             this->createFile(file, "/");

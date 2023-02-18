@@ -385,11 +385,10 @@ namespace wrench {
         this->file_systems[mount_point]->incrementNumRunningTransactionsForFileInDirectory(location->getFile(), path_at_mount_point);
     }
 
-
     void SimpleStorageService::createFile(const std::shared_ptr<FileLocation> &location)  {
         std::string mount_point, path_at_mount_point;
         this->splitPath(location->getPath(), mount_point, path_at_mount_point);
-        bool enough_space = this->file_systems[mount_point]->reserveSpace(location->getFile(), path_at_mount_point);
+        bool enough_space = (this->file_systems[mount_point]->getFreeSpace() >= location->getFile()->getSize());
         if (!enough_space) {
             throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(
                     location->getFile(), location->getStorageService()));
