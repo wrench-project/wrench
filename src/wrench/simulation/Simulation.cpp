@@ -12,6 +12,7 @@
 #include <csignal>
 #include <simgrid/plugins/live_migration.h>
 
+#include <wrench/exceptions//ExecutionException.h>
 #include <wrench/execution_controller/ExecutionController.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
@@ -743,9 +744,11 @@ namespace wrench {
 
         // Put the file on the storage service (not via the service daemon)
         try {
+            std:cerr << "CALLING CREATE FILE\n";
             location->getStorageService()->createFile(location);
-        } catch (std::invalid_argument &e) {
-            throw;
+        } catch (ExecutionException &e) {
+            std::cerr << "THRWOING INVALID\n";
+            throw std::invalid_argument("Simulation::stageFile(): Not enough space on disk");
         }
 
         // Update all file registry services (perhaps none)
