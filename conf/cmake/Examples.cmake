@@ -13,7 +13,7 @@ add_subdirectory(examples/workflow_api/basic-examples/batch-bag-of-tasks EXCLUDE
 add_subdirectory(examples/workflow_api/basic-examples/batch-pilot-job EXCLUDE_FROM_ALL)
 add_subdirectory(examples/workflow_api/real-workflow-example EXCLUDE_FROM_ALL)
 add_subdirectory(examples/workflow_api/condor-grid-example EXCLUDE_FROM_ALL)
-add_subdirectory(examples/workflow_api/basic-examples/io-pagecache EXCLUDE_FROM_ALL)
+#add_subdirectory(examples/workflow_api/basic-examples/io-pagecache EXCLUDE_FROM_ALL)
 
 add_subdirectory(examples/action_api/bare-metal-bag-of-actions EXCLUDE_FROM_ALL)
 add_subdirectory(examples/action_api/batch-bag-of-actions EXCLUDE_FROM_ALL)

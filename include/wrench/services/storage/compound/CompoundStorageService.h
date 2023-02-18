@@ -42,6 +42,14 @@ namespace wrench {
      */
     class CompoundStorageService : public StorageService {
     public:
+
+        using StorageService::readFile;
+        using StorageService::writeFile;
+        using StorageService::deleteFile;
+        using StorageService::lookupFile;
+        using StorageService::createFile;
+        using StorageService::hasFile;
+
         CompoundStorageService(const std::string &hostname,
                                std::set<std::shared_ptr<StorageService>> storage_services,
                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
@@ -53,7 +61,7 @@ namespace wrench {
                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
-        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) override;
+        double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
 
         double getLoad() override;
 
@@ -66,12 +74,24 @@ namespace wrench {
         // Overload StorageService's implementation.
         void setScratch() override;
 
-        virtual bool isBufferized() const override {
+        bool isBufferized() const override {
             return false;
         }
 
-        virtual double getBufferSize() const override {
+        double getBufferSize() const override {
             return 0;
+        }
+
+        bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
+            throw std::runtime_error("CompoundStorageService::reserveSpace(): not implemented");
+        }
+
+        void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
+            throw std::runtime_error("CompoundStorageService::unreserveSpace(): not implemented");
+        }
+
+        void createFile(const std::shared_ptr<FileLocation> &location) override {
+            throw std::runtime_error("CompoundStorageService::createFile(): not implemented");
         }
 
         /**
@@ -123,7 +143,7 @@ namespace wrench {
 
         bool processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox);
 
-        bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) override;
+        bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
     private:
         friend class Simulation;

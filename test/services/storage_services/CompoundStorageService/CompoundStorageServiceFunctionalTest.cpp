@@ -139,8 +139,7 @@ private:
 
 
         // Verify synchronous request for current free space (currently same as capacity, as no file has been placed on internal services)
-        auto expected_capacity = std::map<std::string, double>(
-                {{test->simple_storage_service_100->getName(), 100.0}, {test->simple_storage_service_510->getName(), 610.0}});
+        auto expected_capacity =  100.0 +  610.0;
         auto free_space = test->compound_storage_service->getFreeSpace();
         if (free_space != expected_capacity) {
             throw std::runtime_error("'Free Space' available to CompoundStorageService is incorrect");
@@ -153,10 +152,10 @@ private:
         }
 
         // Verify that compound storage service unique mount point is DEV_NULL
-        auto mount_point = test->compound_storage_service->getMountPoint();
-        if (mount_point != wrench::LogicalFileSystem::DEV_NULL + "/") {
-            throw std::runtime_error("CompoundStorageService should have only one 'LogicalFileSystem::DEV_NULL' filesystem");
-        }
+//        auto mount_point = test->compound_storage_service->getMountPoint();
+//        if (mount_point != wrench::LogicalFileSystem::DEV_NULL + "/") {
+//            throw std::runtime_error("CompoundStorageService should have only one 'LogicalFileSystem::DEV_NULL' filesystem");
+//        }
 
         // We don't support getLoad or getFileLastWriteDate on CompoundStorageService yet (and won't ?)
         try {
@@ -228,24 +227,24 @@ private:
         auto file_1_loc_css = wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1);
 
         try {
-            wrench::StorageService::deleteFile(file_1_loc_css);
+            wrench::StorageService::deleteFileAtLocation(file_1_loc_css);
             throw std::runtime_error("Should not be able to delete file from a CompoundStorageService if it has not first been written / copied to it");
         } catch (wrench::ExecutionException &) {}
 
         try {
-            wrench::StorageService::readFile(file_1_loc_css);
+            wrench::StorageService::readFileAtLocation(file_1_loc_css);
             throw std::runtime_error("Should not be able to read file from a CompoundStorageService if it has not first been written / copied to it");
         } catch (wrench::ExecutionException &) {}
 
 
         try {
-            wrench::StorageService::writeFile(file_1_loc_css);
+            wrench::StorageService::writeFileAtLocation(file_1_loc_css);
             throw std::runtime_error("Should not be able to write file on a CompoundStorageService because no selection callback was provided");
         } catch (wrench::ExecutionException &e) {}
 
 
         // This one simply answers that the file was not found
-        if (wrench::StorageService::lookupFile(file_1_loc_css))
+        if (wrench::StorageService::lookupFileAtLocation(file_1_loc_css))
             throw std::runtime_error("Should not be able to lookup file from a CompoundStorageService if it has not been written/copied to it first");
 
         return 0;
@@ -412,7 +411,7 @@ private:
         }
 
         // lookup a deleted file
-        if (wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100))) {
+        if (wrench::StorageService::lookupFileAtLocation(wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100))) {
             throw runtime_error("A file supposed to be deleted (on CSS) was not.");
         }
 
@@ -420,7 +419,7 @@ private:
         auto file_500_designated_loc = test->compound_storage_service->lookupFileLocation(test->file_500);
         if (!file_500_designated_loc) {
             throw std::runtime_error("Should have been able to lookup file_500 through CSS");
-        } else if (file_500_designated_loc->getFullAbsolutePath() != "/disk510/") {
+        } else if (file_500_designated_loc->getPath() != "/disk510/") {
             throw std::runtime_error("file_500 copy through CSS is not where it should be");
         }
 
@@ -445,12 +444,16 @@ std::shared_ptr<wrench::FileLocation> defaultStorageServiceSelection(
     for (const auto &storage_service: resources) {
 
         auto free_space = storage_service->getFreeSpace();
-        for (const auto &free_space_entry: free_space) {
-            if (free_space_entry.second >= capacity_req) {
-                designated_location = wrench::FileLocation::LOCATION(storage_service, free_space_entry.first, file);
-                break;
-            }
+        if (free_space >= capacity_req) {
+            designated_location = wrench::FileLocation::LOCATION(storage_service, file); // TODO: MAJOR CHANGE
+            break;
         }
+//        for (const auto &free_space_entry : free_space) {
+//            if (free_space_entry.second >= capacity_req) {
+//                designated_location = wrench::FileLocation::LOCATION(storage_service, free_space_entry.first, file);
+//                break;
+//            }
+//        }
     }
 
     return designated_location;

@@ -387,8 +387,8 @@ namespace wrench {
                         msg->answer_mailbox,
                         FileLocation::LOCATION(
                                 designated_location->getStorageService(),
-                                designated_location->getFile(),
-                                designated_location->getPath()),
+                                designated_location->getPath(),
+                                designated_location->getFile()),
                         designated_location->getStorageService()->getMessagePayloadValue(
                                 StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -664,18 +664,20 @@ namespace wrench {
      * @return -1 if the file is not found
      *
      */
-    double CompoundStorageService::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
-        if (!this->lookupFile(file, path)) {
+    double CompoundStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+        if (!this->hasFile(location)) {
             throw std::invalid_argument("CompoundStorageService::getFileLastWriteDate(): File not known to the CompoundStorageService. Unable to forward to underlying StorageService");
         }
+        auto file = location->getFile();
+
         if ((this->file_location_mapping.find(file) == this->file_location_mapping.end()) or
-            (this->file_location_mapping[file]->getPath() != FileLocation::sanitizePath(path))) {
+            (this->file_location_mapping[file]->getPath() != FileLocation::sanitizePath(location->getPath()))) {
             return -1;
         }
 
         auto designated_storage_service = std::dynamic_pointer_cast<SimpleStorageService>(this->file_location_mapping[file]->getStorageService());
         if (designated_storage_service) {
-            return designated_storage_service->getFileLastWriteDate(file, path);
+            return designated_storage_service->getFileLastWriteDate(location);
         } else {
             return -1;
         }
@@ -689,15 +691,15 @@ namespace wrench {
      *
      * @return true if the file is present, false otherwise
      */
-    bool CompoundStorageService::hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-        auto file_location = this->lookupFileLocation(file);
+    bool CompoundStorageService::hasFile(const std::shared_ptr<FileLocation> &location) {
+        auto file_location = this->lookupFileLocation(location->getFile());
         if (!file_location) {
-            WRENCH_DEBUG("hasFile: File %s not found", file->getID().c_str());
+            WRENCH_DEBUG("hasFile: File %s not found", location->getFile()->getID().c_str());
             return false;
         }
-        if (file_location->getPath() != path) {
+        if (file_location->getPath() != location->getPath()) {
             WRENCH_DEBUG("hasFile: File %s found, but path %s doesn't match internal path %s",
-                         file->getID().c_str(), path.c_str(), file_location->getPath().c_str());
+                         location->getFile()->getID().c_str(), location->getPath().c_str(), file_location->getPath().c_str());
             return false;
         }
 

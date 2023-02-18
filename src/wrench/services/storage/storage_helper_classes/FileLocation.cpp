@@ -101,7 +101,7 @@ namespace wrench {
         if (!ss or !file) {
             throw std::invalid_argument("FileLocation::LOCATION(): invalid nullptr arguments");
         }
-        return LOCATION(ss, file, "/");
+        return LOCATION(ss, "/", file);
     }
 
 #ifdef PAGE_CACHE_SIMULATION
@@ -139,8 +139,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss,
-                                                         const std::shared_ptr<DataFile> &file,
-                                                         const std::string &path) {
+                                                         const std::string &path,
+                                                         const std::shared_ptr<DataFile> &file) {
         if (ss == nullptr) {
             throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr storage service");
         }
@@ -199,6 +199,7 @@ namespace wrench {
         return this->file;
     }
 
+#ifdef PAGE_CACHE_SIMULATION
     /**
      * @brief Get the location's server storage service
      * @return a storage service
@@ -209,6 +210,7 @@ namespace wrench {
         }
         return this->server_storage_service;
     }
+#endif
 
     /**
      * @brief Get the location's path

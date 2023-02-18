@@ -113,13 +113,13 @@ namespace wrench {
         proxy->readFile(remoteFile);
 
         /* Another way to do the same */
-        StorageService::readFile(FileLocation::LOCATION(proxy, remoteFile));
+        StorageService::readFileAtLocation(FileLocation::LOCATION(proxy, remoteFile));
 
         /* Read a file found on target (non default remote) via the proxy */
         proxy->readFile(target, targetFile);
 
         /* Another way to do the same */
-        StorageService::readFile(ProxyLocation::LOCATION(target, proxy, targetFile));
+        StorageService::readFileAtLocation(ProxyLocation::LOCATION(target, proxy, targetFile));
 
 
         /** File Writing **/
@@ -128,13 +128,13 @@ namespace wrench {
         proxy->writeFile(remoteFile);
 
         /* Another way to do the same */
-        StorageService::writeFile(FileLocation::LOCATION(proxy, remoteFile));
+        StorageService::writeFileAtLocation(FileLocation::LOCATION(proxy, remoteFile));
 
         /* Write to a file found on target (non default remote) via the proxy */
         proxy->writeFile(target, targetFile);
 
         /* Another way to do the same */
-        StorageService::writeFile(ProxyLocation::LOCATION(target, proxy, targetFile));
+        StorageService::writeFileAtLocation(ProxyLocation::LOCATION(target, proxy, targetFile));
 
         /** Using the proxy in jobs **/
         /* Create a job manager so that we can create/submit jobs */

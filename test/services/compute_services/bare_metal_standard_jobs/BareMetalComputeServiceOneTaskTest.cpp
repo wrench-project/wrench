@@ -797,20 +797,20 @@ private:
 
         // bogus lookup #1
         try {
-            wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service1, nullptr));
+            wrench::StorageService::lookupFileAtLocation(wrench::FileLocation::LOCATION(this->test->storage_service1, nullptr));
             throw std::runtime_error("Should not have been able to lookup a nullptr file");
         } catch (std::invalid_argument &e) {
         }
 
         // bogus lookup #2
         try {
-            wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(nullptr, this->test->output_file));
+            wrench::StorageService::lookupFileAtLocation(wrench::FileLocation::LOCATION(nullptr, this->test->output_file));
             throw std::runtime_error("Should not have been able to lookup a nullptr storage service");
         } catch (std::invalid_argument &e) {
         }
 
 
-        if (!wrench::StorageService::lookupFile(
+        if (!wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->output_file))) {
             throw std::runtime_error("Output file not written to storage service");
         }
@@ -938,20 +938,20 @@ private:
 
         // bogus lookup #1
         try {
-            wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service1, nullptr));
+            wrench::StorageService::lookupFileAtLocation(wrench::FileLocation::LOCATION(this->test->storage_service1, nullptr));
             throw std::runtime_error("Should not have been able to lookup a nullptr file");
         } catch (std::invalid_argument &e) {
         }
 
         // bogus lookup #2
         try {
-            wrench::StorageService::lookupFile((std::shared_ptr<wrench::FileLocation>) nullptr);
+            wrench::StorageService::lookupFileAtLocation((std::shared_ptr<wrench::FileLocation>) nullptr);
             throw std::runtime_error("Should not have been able to lookup a nullptr location");
         } catch (std::invalid_argument &e) {
         }
 
 
-        if (!wrench::StorageService::lookupFile(
+        if (!wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->output_file))) {
             throw std::runtime_error("Output file not written to storage service");
         }
@@ -1066,7 +1066,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service1,
                                                    "/scratch/" + job->getName(), this->test->output_file))) {
             throw std::runtime_error("Output file not written to storage service");
@@ -1193,19 +1193,19 @@ private:
         }
 
         // Test file locations
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->input_file))) {
             throw std::runtime_error("Input file should be on Storage Service #1");
         }
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->output_file))) {
             throw std::runtime_error("Output file should be on Storage Service #1");
         }
-        if (wrench::StorageService::lookupFile(
+        if (wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->input_file))) {
             throw std::runtime_error("Input file should not be on Storage Service #2");
         }
-        if (wrench::StorageService::lookupFile(
+        if (wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->output_file))) {
             throw std::runtime_error("Output file should not be on Storage Service #2");
         }
@@ -1343,11 +1343,11 @@ private:
         }
 
         // Test file locations
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->input_file))) {
             throw std::runtime_error("Input file should be on Storage Service #2");
         }
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service3, this->test->input_file))) {
             throw std::runtime_error("Input file should be on Storage Service #3");
         }
@@ -1466,7 +1466,7 @@ private:
         }
 
         // Test file locations
-        if (wrench::StorageService::lookupFile(
+        if (wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->input_file))) {
             throw std::runtime_error("Input file should not be on Storage Service #2");
         }
@@ -1556,7 +1556,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Remove the staged file!
-        wrench::StorageService::deleteFile(
+        wrench::StorageService::deleteFileAtLocation(
                 wrench::FileLocation::LOCATION(test->storage_service1, test->input_file));
 
         // Create a job ubmit the job

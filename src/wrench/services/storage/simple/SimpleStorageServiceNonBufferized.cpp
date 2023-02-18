@@ -154,6 +154,7 @@ namespace wrench {
         //        WRENCH_INFO("STREAMS RUNNING: %zu", this->pending_transactions.size());
 
         // If writeback device simulation is activated
+#ifdef PAGE_CACHE_SIMULATION
         if (Simulation::isPageCachingEnabled()) {
             //  Find the "memory" disk (we know there is one)
             auto host = S4U_Simulation::get_host_or_vm_by_name(this->getHostname());
@@ -173,6 +174,8 @@ namespace wrench {
             // Start periodical flushing via a memory manager
             this->memory_manager = MemoryManager::initAndStart(this->simulation, memory_disk, 0.4, 5, 30, this->hostname);
         }
+#endif
+
 
         /** Main loop **/
         bool comm_ptr_has_been_posted = false;
