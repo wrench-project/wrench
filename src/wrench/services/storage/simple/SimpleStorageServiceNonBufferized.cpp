@@ -82,7 +82,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage(transaction->src_location));
         } else if (transaction->src_location == nullptr) {
             WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
-            this->createFile(transaction->dst_location);
+            StorageService::createFileAtLocation(transaction->dst_location);
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // Maybe no corresponding timestamp.
             //            WRENCH_INFO("Sending back an ack for a successful file read");
@@ -131,12 +131,6 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
         std::string message = "Simple Storage Service (Non-Bufferized) " + this->getName() + "  starting on host " + this->getHostname();
         WRENCH_INFO("%s", message.c_str());
-
-        for (auto const &mp: this->file_systems) {
-            if (not mp.second->isInitialized()) {
-                mp.second->init();
-            }
-        }
 
         // In case this was a restart!
         this->stream_to_transactions.clear();
