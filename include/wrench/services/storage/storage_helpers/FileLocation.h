@@ -38,20 +38,24 @@ namespace wrench {
          */
         static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService> &ss, const std::shared_ptr<DataFile> &file);
 
+#ifdef PAGE_CACHE_SIMuLATION
         static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService> &ss,
                                                       const std::shared_ptr<StorageService> server_ss,
                                                       const std::shared_ptr<DataFile> &file);
+#endif
 
         static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService> &ss,
-                                                      const std::shared_ptr<DataFile> &file,
-                                                      const std::string &path);
+                                                      const std::string &path,
+                                                      const std::shared_ptr<DataFile> &file);
 
         static std::shared_ptr<FileLocation> SCRATCH(const std::shared_ptr<DataFile> &file);
 
         std::shared_ptr<DataFile> getFile();
         std::shared_ptr<StorageService> getStorageService();
         std::shared_ptr<StorageService> setStorageService(std::shared_ptr<StorageService> &storage_service);
+#ifdef PAGE_CACHE_SIMULATION
         std::shared_ptr<StorageService> getServerStorageService();
+#endif
         std::string getPath();
         bool isScratch() const;
         std::string toString();
@@ -109,7 +113,9 @@ namespace wrench {
                                                                                                                               file(std::move(file)),
                                                                                                                               is_scratch(is_scratch) {}
         std::shared_ptr<StorageService> storage_service;
+#ifdef PAGE_CACHE_SIMULATION
         std::shared_ptr<StorageService> server_storage_service;
+#endif
 
         std::string path;
         std::shared_ptr<DataFile> file;

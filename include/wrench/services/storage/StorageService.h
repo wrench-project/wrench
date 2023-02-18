@@ -44,7 +44,7 @@ namespace wrench {
             return this->lookupFile(file, "/");
         }
         virtual bool lookupFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            return this->lookupFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
+            return this->lookupFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
         }
         virtual bool lookupFile(const std::shared_ptr<FileLocation> &location) {
             return this->lookupFile(S4U_Daemon::getRunningActorRecvMailbox(), location);
@@ -54,11 +54,11 @@ namespace wrench {
         static void deleteFileAtLocation(const std::shared_ptr<FileLocation> &location) {
             location->getStorageService()->deleteFile(location);
         }
-        virtual void deleteFile(const std::shared_ptr<DataFile> &file) {
+        void deleteFile(const std::shared_ptr<DataFile> &file) {
             this->deleteFile(file, "/");
         }
         virtual void deleteFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            this->deleteFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
+            this->deleteFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
         }
         virtual void deleteFile(const std::shared_ptr<FileLocation> &location) {
             this->deleteFile(S4U_Daemon::getRunningActorRecvMailbox(), location, true);
@@ -71,17 +71,20 @@ namespace wrench {
         static void readFileAtLocation(const std::shared_ptr<FileLocation> &location, double num_bytes) {
             location->getStorageService()->readFile(location, num_bytes);
         }
-        virtual void readFile(const std::shared_ptr<DataFile> &file) {
+        void readFile(const std::shared_ptr<DataFile> &file) {
             this->readFile(file, "/", file->getSize());
         }
-        virtual void readFile(const std::shared_ptr<DataFile> &file, double num_bytes) {
+        void readFile(const std::shared_ptr<DataFile> &file, double num_bytes) {
             this->readFile(file, "/", num_bytes);
         }
         virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
             this->readFile(file, path, file->getSize());
         }
         virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes) {
-            this->readFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path), num_bytes);
+            this->readFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file), num_bytes);
+        }
+        void readFile(const std::shared_ptr<FileLocation> &location) {
+            this->readFile(S4U_Daemon::getRunningActorRecvMailbox(), location, location->getFile()->getSize(), true);
         }
         virtual void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
             this->readFile(S4U_Daemon::getRunningActorRecvMailbox(), location, num_bytes, true);
@@ -94,10 +97,10 @@ namespace wrench {
         void writeFile(const std::shared_ptr<DataFile> &file) {
             this->writeFile(file, "/");
         }
-        void writeFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            this->writeFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
+        virtual void writeFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            this->writeFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
         }
-        void writeFile(const std::shared_ptr<FileLocation> &location) {
+        virtual void writeFile(const std::shared_ptr<FileLocation> &location) {
             this->writeFile(S4U_Daemon::getRunningActorRecvMailbox(), location, true);
         }
 
@@ -107,11 +110,11 @@ namespace wrench {
         bool hasFileAtLocation(const std::shared_ptr<FileLocation> &location) {
             return this->hasFile(location);
         }
-        virtual bool hasFile(const std::shared_ptr<DataFile> &file) {
+        bool hasFile(const std::shared_ptr<DataFile> &file) {
             return this->hasFile(file, "/");
         }
         virtual bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            return this->hasFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
+            return this->hasFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
         }
         virtual bool hasFile(const std::shared_ptr<FileLocation> &location) = 0;
 
@@ -119,11 +122,11 @@ namespace wrench {
         void createFileAtLocation(const std::shared_ptr<FileLocation> &location) {
             this->createFile(location);
         }
-        virtual void createFile(const std::shared_ptr<DataFile> &file) {
+        void createFile(const std::shared_ptr<DataFile> &file) {
             this->createFile(file, "/");
         }
         virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            this->createFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
+            this->createFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
         }
         virtual void createFile(const std::shared_ptr<FileLocation> &location) = 0;
 
@@ -131,11 +134,11 @@ namespace wrench {
         void getFileLocationLastWriteDate(const std::shared_ptr<FileLocation> &location) {
             this->getFileLastWriteDate(location);
         }
-        virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file) {
+        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file) {
             return this->getFileLastWriteDate(file, "/");
         }
         virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            return this->getFileLastWriteDate(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file, path));
+            return this->getFileLastWriteDate(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
         }
         virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) = 0;
 
@@ -180,17 +183,6 @@ namespace wrench {
             return this->is_scratch;
         }
 
-    protected:
-
-        friend class Simulation;
-        friend class FileRegistryService;
-        friend class FileTransferThread;
-        friend class SimpleStorageServiceNonBufferized;
-        friend class SimpleStorageServiceBufferized;
-        friend class CompoundStorageService;
-        friend class ComputeService;
-        friend class Node;
-
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
@@ -217,6 +209,18 @@ namespace wrench {
         virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
             // no nothing
         }
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
+
+    protected:
+
+        friend class ComputeService;
+
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
 
         StorageService(const std::string &hostname,
                        const std::string &service_name);

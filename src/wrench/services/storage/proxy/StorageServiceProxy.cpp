@@ -122,7 +122,7 @@ namespace wrench {
                         target->mailbox,
                         new StorageServiceFileLookupRequestMessage(
                                 mailbox,
-                                FileLocation::LOCATION(target, msg->location->getFile(), msg->location->getPath()),
+                                FileLocation::LOCATION(target, msg->location->getPath(), msg->location->getFile()),
                                 target->getMessagePayloadValue(
                                         StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
             } else {
@@ -256,8 +256,8 @@ namespace wrench {
         return true;
     }
     /**
-     * @brief Synchronously asks the remote storage service for its capacity at all its
-     *        mount points.  invalid if there is no default location
+     * @brief Synchronously asks the proxy service for its capacity (which returns
+     *        the remote)
      * @return The free space in bytes of each mount point, as a map
      *
      */
@@ -267,6 +267,20 @@ namespace wrench {
         }
         throw runtime_error("Proxy with no default location does not support getFreeSpace()");
     }
+
+    /**
+     * @brief Synchronously asks the proxy service for its total capacity (which returns
+     *        the remote)
+     * @return The free space in bytes of each mount point, as a map
+     *
+     */
+    double StorageServiceProxy::getTotalSpace() {
+        if (remote) {
+            return remote->getTotalSpace();
+        }
+        throw runtime_error("Proxy with no default location does not support getTotalSpace()");
+    }
+
 
 //    /**
 //     * @brief Get the mount point of the remote server (will throw is more than one).  If there isnt a default, returns DEV_NUL
@@ -448,15 +462,15 @@ namespace wrench {
      * @return true if the file is present, false otherwise
      */
     bool StorageServiceProxy::lookupFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
-        return StorageService::lookupFileAtLocation(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
+        return StorageService::lookupFileAtLocation(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), file));
     }
 
     /**
      * @brief Read a file
      * @param file: the file
      */
-    void StorageServiceProxy::readFile(const std::shared_ptr<DataFile> &file) {
-        StorageService::readFileAtLocation(ProxyLocation::LOCATION(remote, std::static_pointer_cast<StorageService>(shared_from_this()), file));
+    void StorageServiceProxy::readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+        StorageService::readFileAtLocation(ProxyLocation::LOCATION(remote, this->getSharedPtr<StorageService>(), location->getFile()));
     }
 
     /**
@@ -465,7 +479,7 @@ namespace wrench {
      * @param file: the file
      */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
-        StorageService::readFileAtLocation(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
+        StorageService::readFileAtLocation(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), file));
     }
 
     /**
@@ -475,7 +489,7 @@ namespace wrench {
  * @param num_bytes: the number of bytes to read
  */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, double num_bytes) {
-        StorageService::readFileAtLocation(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file), num_bytes);
+        StorageService::readFileAtLocation(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), file), num_bytes);
     }
 
     /**
@@ -485,7 +499,7 @@ namespace wrench {
  * @param path: the file path
  */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path) {
-        StorageService::readFileAtLocation(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file));
+        StorageService::readFileAtLocation(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), path, file));
     }
 
     /**
@@ -541,7 +555,7 @@ namespace wrench {
                     new StorageServiceFileReadRequestMessage(
                             msg->answer_mailbox,
                             msg->requesting_host,//msg->mailbox_to_receive_the_file_content,
-                            FileLocation::LOCATION(cache, msg->location->getFile(), msg->location->getPath()),
+                            FileLocation::LOCATION(cache, msg->location->getPath(), msg->location->getFile()),
                             msg->num_bytes_to_read, 0));
             return true;
 
@@ -686,7 +700,7 @@ namespace wrench {
                 //do not speed excessive time on readThrough
                 auto forward = new StorageServiceFileReadRequestMessage(msg);
                 forward->answer_mailbox = mailbox;                                                                                 //setup intercept mailbox
-                forward->location = FileLocation::LOCATION(target, msg->location->getFile(), msg->location->getPath());//hyjack locaiton to be on target
+                forward->location = FileLocation::LOCATION(target, msg->location->getPath(), msg->location->getFile());//hyjack locaiton to be on target
                 S4U_Mailbox::putMessage(target->mailbox, forward);                                                                 //send to target
             } else {
                 S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));

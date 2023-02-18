@@ -143,9 +143,8 @@ private:
 
         // Do the same thing but kill the FileRegistryService first
 
-        wrench::StorageService::deleteFile(
-                wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src_file_1),
-                file_registry_service);
+        wrench::StorageService::deleteFileAtLocation(
+                wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src_file_1));
         file_registry_service->stop();
         try {
             data_movement_manager->doSynchronousFileCopy(
@@ -314,7 +313,7 @@ private:
             throw std::runtime_error("File registry service should not have been updated");
         }
 
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src2_file_2))) {
             throw std::runtime_error("Asynchronous file copy should have completed even though the FileRegistryService was down.");
         }

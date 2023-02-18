@@ -279,9 +279,11 @@ namespace wrench {
             }
 
             try {
+#ifdef PAGE_CACHE_SIMULATION
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
                 }
+#endif
 
                 // Receive chunks and write them to disk
                 while (not done) {
@@ -290,6 +292,7 @@ namespace wrench {
 
                     // In NFS, write to cache only if the current host not the server host where the f is stored
                     // If the current host is f server, write to disk directly
+#ifdef PAGE_CACHE_SIMULATION
                     if (Simulation::isPageCachingEnabled()) {
                         bool write_locally = location->getServerStorageService() == nullptr;
 
@@ -299,6 +302,7 @@ namespace wrench {
                             simulation->writeThroughWithMemoryCache(f, msg->payload, location);
                         }
                     } else {
+#endif
                         // Write to disk
                         auto dst_ss = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService());
                         if (!dst_ss) {
@@ -306,7 +310,9 @@ namespace wrench {
                         }
                         simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
                                                 dst_ss->getPathMountPoint(location->getPath()));
+#ifdef PAGE_CACHE_SIMULATION
                     }
+#endif
 
                     // Wait for the comm to finish
                     msg = req->wait();
@@ -321,6 +327,7 @@ namespace wrench {
                 }
 
                 // I/O for the last chunk
+#ifdef PAGE_CACHE_SIMULATION
                 if (Simulation::isPageCachingEnabled()) {
                     bool write_locally = location->getServerStorageService() == nullptr;
 
@@ -330,6 +337,7 @@ namespace wrench {
                         simulation->writeThroughWithMemoryCache(f, msg->payload, location);
                     }
                 } else {
+#endif
                     //                     Write to disk
                     auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
                     if (!ss) {
@@ -337,11 +345,15 @@ namespace wrench {
                     }
                     simulation->writeToDisk(msg->payload, ss->hostname,
                                             ss->getPathMountPoint(location->getPath()));
+#ifdef PAGE_CACHE_SIMULATION
                 }
+#endif
 
+#ifdef PAGE_CACHE_SIMULATION
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
                 }
+#endif
             } catch (ExecutionException &e) {
                 throw;
             }
@@ -373,16 +385,20 @@ namespace wrench {
                 // Sending a zero-byte f is really sending a 1-byte f
                 double remaining = std::max<double>(1, num_bytes);
 
+#ifdef PAGE_CACHE_SIMULATION
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
                 }
+#endif
 
                 while (remaining > DBL_EPSILON) {
                     double chunk_size = std::min<double>(this->buffer_size, remaining);
 
+#ifdef PAGE_CACHE_SIMULATION
                     if (Simulation::isPageCachingEnabled()) {
                         simulation->readWithMemoryCache(f, chunk_size, location);
                     } else {
+#endif
                         WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
                         auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
                         if (!ss) {
@@ -390,7 +406,9 @@ namespace wrench {
                         }
                         simulation->readFromDisk(chunk_size, ss->hostname,
                                                  ss->getPathMountPoint(location->getPath()));
+#ifdef PAGE_CACHE_SIMULATION
                     }
+#endif
 
                     remaining -= this->buffer_size;
                     if (req) {
@@ -403,9 +421,11 @@ namespace wrench {
                                                            this->file,
                                                            chunk_size, (remaining <= 0)));
                 }
+#ifdef PAGE_CACHE_SIMULATION
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
                 }
+#endif
                 req->wait();
                 WRENCH_INFO("Bytes sent over the network were received");
             } catch (std::shared_ptr<NetworkError> &e) {
@@ -574,14 +594,18 @@ namespace wrench {
                 //                    WRENCH_INFO("Downloaded of %f of f  %s from location %s",
                 //                                msg->payload, f->getID().c_str(), src_loc->toString().c_str());
                 // Do the I/O
+#ifdef PAGE_CACHE_SIMULATION
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->writebackWithMemoryCache(f, msg->payload, dst_loc, false);
                 } else {
+#endif
                     // Write to disk
                     simulation->writeToDisk(msg->payload,
                                             dst_ss->getHostname(),
                                             dst_ss->getPathMountPoint(dst_loc->getPath()));
+#ifdef PAGE_CACHE_SIMULATION
                 }
+#endif
                 // Wait for the comm to finish
                 //                    WRENCH_INFO("Wrote of %f of f  %s", msg->payload, f->getID().c_str());
                 msg = req->wait();
@@ -598,14 +622,18 @@ namespace wrench {
             S4U_Mailbox::retireTemporaryMailbox(mailbox_to_receive_the_file_content);
 
             // Do the I/O for the last chunk
+#ifdef PAGE_CACHE_SIMULATION
             if (Simulation::isPageCachingEnabled()) {
                 simulation->writebackWithMemoryCache(f, msg->payload, dst_loc, false);
             } else {
+#endif
                 // Write to disk
                 simulation->writeToDisk(msg->payload,
                                         dst_ss->getHostname(),
                                         dst_ss->getPathMountPoint(dst_loc->getPath()));
+#ifdef PAGE_CACHE_SIMULATION
             }
+#endif
         } catch (ExecutionException &e) {
             S4U_Mailbox::retireTemporaryMailbox(mailbox_to_receive_the_file_content);
             throw;

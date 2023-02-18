@@ -157,15 +157,14 @@ namespace wrench {
                                                                          cached.size(),
                                                          msg->answered));
                     } else {
-                        if (children.size() > 0) {
+                        if (!children.empty()) {
 
                             map<Node *, vector<stack<Node *>>> splitStacks = splitStack(msg->search_stack);
                             S4U_Simulation::compute(
                                     this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                             WRENCH_DEBUG("Advanced Broadcast to %zu hosts", splitStacks.size());
 
-
-                            for (auto entry: splitStacks) {
+                            for (auto const &entry: splitStacks) {
                                 if (entry.first == this) {//this node was the target
                                     if (internalStorage && //check the storage, it SHOULD be there, but we should check still
                                         internalStorage->hasFile(msg->file)) {
@@ -625,20 +624,22 @@ namespace wrench {
                 if (not internalStorage) {
                     // Reply this is not allowed
                     std::string error_message = "Cannot write file at non-storage XRootD node";
+                    auto location = FileLocation::LOCATION(this->getSharedPtr<Node>(), file);
                     S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                              new StorageServiceFileWriteAnswerMessage(
-                                                     FileLocation::LOCATION(getSharedPtr<Node>(), file),
+                                                     location,
                                                      false,
                                                      std::shared_ptr<FailureCause>(
                                                              new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                                     nullptr,
                                                      0,
                                                      getMessagePayloadValue(MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
 
                 } else {
                     // Forward the message
                     msg->location = FileLocation::LOCATION(internalStorage, file);
-                    msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
-                            SimpleStorageServiceProperty::BUFFER_SIZE);
+//                    msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
+//                            SimpleStorageServiceProperty::BUFFER_SIZE);
                     S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
                 }
 
@@ -648,12 +649,14 @@ namespace wrench {
                     // Reply this is not allowed
                     if (msg->answer_mailbox) {
                         std::string error_message = "Cannot copy file to/from non-storage XRooD node";
+                        auto location = FileLocation::LOCATION(getSharedPtr<Node>(), file);
                         S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                                  new StorageServiceFileWriteAnswerMessage(
-                                                         FileLocation::LOCATION(getSharedPtr<Node>(), file),
+                                                         location,
                                                          false,
                                                          std::shared_ptr<FailureCause>(
                                                                  new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                                         nullptr,
                                                          0,
                                                          getMessagePayloadValue(MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
                     }
@@ -776,8 +779,8 @@ namespace wrench {
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
             cache.maxCacheTime = getPropertyValueAsTimeInSecond(Property::CACHE_MAX_LIFETIME);
             this->deployment = deployment;
-            this->buffer_size = DBL_MAX;// Not used, but letting it be zero will raise unwanted exception since
-            // clients "think" that they're talking to a real storage service
+//            this->buffer_size = DBL_MAX;// Not used, but letting it be zero will raise unwanted exception since
+//            // clients "think" that they're talking to a real storage service
         }
 
         /**
@@ -834,12 +837,12 @@ namespace wrench {
      * @return the file's last write date, or -1 if the file is not found
      *
      */
-        double Node::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            if (file == nullptr) {
+        double Node::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
                 throw std::invalid_argument("Node::getFileLastWriteDate(): Invalid nullptr argument");
             }
             if (internalStorage) {
-                return internalStorage->getFileLastWriteDate(file, path);
+                return internalStorage->getFileLastWriteDate(location);
             } else {
                 throw std::runtime_error("Node::getFileLastWriteDate() called on non storage Node " + hostname);
             }
@@ -896,20 +899,7 @@ namespace wrench {
             }
             return ret;
         }
-        /**
-        * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
-        * @param file: A shared pointer to a file
-        *
-        * @throw std::invalid_argument
-        */
-        void Node::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            if (internalStorage == nullptr) {
-                throw std::runtime_error("Node::createFile() called on non storage Node " + hostname);
-            }
 
-            metavisor->files[file].push_back(this->getSharedPtr<Node>());
-            internalStorage->createFile(file, path);
-        }
         /**
         * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
         * @param location: a file location, must be the same object as the function is invoked on
@@ -922,23 +912,9 @@ namespace wrench {
             }
 
             internalStorage->createFile(location);
-
             metavisor->files[location->getFile()].push_back(this->getSharedPtr<Node>());
         }
-        /**
-        * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
-        * @param file: A shared pointer to a file
-        * @param path: a path at the node's mount point
-        *
-        * @throw std::invalid_argument
-        */
-        void Node::createFile(const std::shared_ptr<DataFile> &file, const string &path) {
-            if (internalStorage == nullptr) {
-                throw std::runtime_error("Node::createFile() called on non storage Node " + hostname);
-            }
-            internalStorage->createFile(file, path);
-            metavisor->files[file].push_back(this->getSharedPtr<Node>());
-        }
+
 
         /**
         * @brief write a file on this node.
@@ -947,8 +923,7 @@ namespace wrench {
         * @throw std::invalid_argument
         */
         void Node::writeFile(simgrid::s4u::Mailbox *answer_mailbox,
-                             const std::shared_ptr<DataFile> &file,
-                             const std::string &path,
+                             const std::shared_ptr<FileLocation> &location,
                              bool wait_for_answer) {
             if (internalStorage == nullptr) {
                 std::string error_message = "Cannot write file at non-storage XRootD node";
@@ -956,8 +931,8 @@ namespace wrench {
                         std::shared_ptr<FailureCause>(
                                 new NotAllowed(getSharedPtr<Node>(), error_message)));
             }
-            internalStorage->writeFile(answer_mailbox, file, path, wait_for_answer);
-            metavisor->files[file].push_back(this->getSharedPtr<Node>());
+            internalStorage->writeFile(answer_mailbox, location, wait_for_answer);
+            metavisor->files[location->getFile()].push_back(this->getSharedPtr<Node>());
         }
 
 
@@ -1002,12 +977,52 @@ namespace wrench {
          * @param path the path
          * @return true if the file is present, false otherwise
          */
-        bool Node::hasFile(const shared_ptr<DataFile> &file, const string &path) {
+        bool Node::hasFile(const shared_ptr<FileLocation> &location) {
             if (internalStorage)
-                return internalStorage->hasFile(file, path);
+                return internalStorage->hasFile(location);
             //return false;//no internal storage here, so I dont have any files.  But I am pretending to have some, so its reasonable to ask.
             //alternativly
-            return !constructFileSearchTree(metavisor->getFileNodes(file)).empty();//meta search the subtree for the file.  If its in the subtree we can find a route to it, so we have it
+            return !constructFileSearchTree(metavisor->getFileNodes(location->getFile())).empty();//meta search the subtree for the file.  If its in the subtree we can find a route to it, so we have it
+        }
+
+        double Node::getTotalSpace() {
+            if (internalStorage) {
+                return internalStorage->getTotalSpace();
+            } else {
+                return 0;
+            }
+        }
+
+        bool Node::isBufferized() const {
+            if (internalStorage) {
+                return internalStorage->isBufferized();
+            } else {
+                throw std::runtime_error("Node::isBufferized() called on non storage Node " + hostname);
+            }
+        }
+
+        double Node::getBufferSize() const {
+            if (internalStorage) {
+                return internalStorage->getBufferSize();
+            } else {
+                throw std::runtime_error("Node::getBufferSize() called on non storage Node " + hostname);
+            }
+        }
+
+        bool Node::reserveSpace(std::shared_ptr<FileLocation> &location) {
+            if (internalStorage) {
+                return internalStorage->reserveSpace(location);
+            } else {
+                throw std::runtime_error("Node::reserveSpace() called on non storage Node " + hostname);
+            }
+        }
+
+        void Node::unreserveSpace(std::shared_ptr<FileLocation> &location){
+            if (internalStorage) {
+                internalStorage->unreserveSpace(location);
+            } else {
+                throw std::runtime_error("Node::unreserveSpace() called on non storage Node " + hostname);
+            }
         }
 
 

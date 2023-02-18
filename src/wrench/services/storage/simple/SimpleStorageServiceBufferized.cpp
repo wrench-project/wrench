@@ -100,9 +100,11 @@ namespace wrench {
                 }
             }
 
+#ifdef PAGE_CACHE_SIMULATION
             // Start periodical flushing via a memory manager
             this->memory_manager = MemoryManager::initAndStart(this->simulation, memory_disk, 0.4, 5, 30, this->hostname);
             //            memory_manager_ptr->log();
+#endif
         }
 
         /** Main loop **/

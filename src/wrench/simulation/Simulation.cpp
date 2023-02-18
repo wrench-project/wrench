@@ -749,7 +749,7 @@ namespace wrench {
      */
     void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &storage_service,
                                std::string directory_absolute_path) {
-        Simulation::stageFile(FileLocation::LOCATION(storage_service, file, directory_absolute_path));
+        Simulation::stageFile(FileLocation::LOCATION(storage_service, directory_absolute_path, file));
     }
 
     /**
@@ -896,6 +896,7 @@ namespace wrench {
                                                           temp_unique_sequence_number);
     }
 
+#ifdef PAGE_CACHE_SIMULATION
     /**
      * @brief Read file locally, only available if writeback is activated.
      *
@@ -935,7 +936,7 @@ namespace wrench {
         //        Anonymous used by application
         mem_mng->useAnonymousMemory(n_bytes);
 
-        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getPath(), n_bytes,
                                                          temp_unique_sequence_number);
     }
 
@@ -987,7 +988,7 @@ namespace wrench {
             remaining -= to_cache;
         }
 
-        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getPath(), n_bytes,
                                                           temp_unique_sequence_number);
     }
 
@@ -1004,12 +1005,16 @@ namespace wrench {
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, location->getPath(), n_bytes,
                                                      temp_unique_sequence_number);
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
 
         // Write to disk
+        auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
+        if (!ss) {
+            throw ...
+        }
         this->writeToDisk(n_bytes, hostname, location->getMountPoint());
 
         mem_mng->evict(n_bytes - mem_mng->getFreeMemory(), file->getID());
@@ -1018,6 +1023,7 @@ namespace wrench {
         this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
                                                           temp_unique_sequence_number);
     }
+#endif
 
     /**
      * @brief Find MemoryManager running on a host based on hostname
