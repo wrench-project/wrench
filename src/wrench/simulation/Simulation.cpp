@@ -725,34 +725,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
-     *
-     * @param file: a file to stage on a storage service
-     * @param storage_service: a storage service
-     *
-     * @throw std::runtime_error
-     * @throw std::invalid_argument
-     */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &storage_service) {
-        Simulation::stageFile(FileLocation::LOCATION(storage_service, file));
-    }
-
-    /**
-     * @brief Stage a copy of a file at a storage service in a particular directory
-     *
-     * @param file: a file to stage on a storage service
-     * @param storage_service: a storage service
-     * @param directory_absolute_path: the absolute path of the directory where the file should be stored
-     *
-     * @throw std::runtime_error
-     * @throw std::invalid_argument
-     */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &storage_service,
-                               std::string directory_absolute_path) {
-        Simulation::stageFile(FileLocation::LOCATION(storage_service, directory_absolute_path, file));
-    }
-
-    /**
      * @brief State a copy of a file at a location, and update the file registry service
      * @param location: the file location
      */
@@ -778,7 +750,6 @@ namespace wrench {
         // Put the file on the storage service (not via the service daemon)
         try {
             location->getStorageService()->createFile(location);
-//            StorageService::createFileAtLocation(location);
         } catch (std::invalid_argument &e) {
             throw;
         }
@@ -787,29 +758,6 @@ namespace wrench {
         for (const auto &frs: this->file_registry_services) {
             frs->addEntryToDatabase(location);
         }
-    }
-    /**
-     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-     * at that location.
-     *
-     * @param location: a file location
-     *
-     * @throw std::invalid_argument
-     */
-
-    void Simulation::createFile(const std::shared_ptr<FileLocation> &location) {
-        location->getStorageService()->createFile(location);
-    }
-    /**
-     * @brief Store a file on a particular file server ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-     * at that location.
-     * @param file: a file
-     * @param service: a storage service
-     *
-     * @throw std::invalid_argument
-     */
-    [[deprecated("Replaced by StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location), do not use if using XRootD or other distributed file system")]] void Simulation::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &service) {
-        service->createFile(file);
     }
 
     /**

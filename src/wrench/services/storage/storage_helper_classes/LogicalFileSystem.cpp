@@ -113,7 +113,7 @@ namespace wrench {
      * @brief Determine whether the file system has been initialized
      * @return true or false
      */
-    bool LogicalFileSystem::isInitialized() {
+    bool LogicalFileSystem::isInitialized() const {
         return this->initialized;
     }
 
@@ -253,7 +253,7 @@ namespace wrench {
      * @return the free space in bytes
      */
     double LogicalFileSystem::getFreeSpace() {
-        assertInitHasBeenCalled();
+//        assertInitHasBeenCalled();
         return this->free_space;
     }
 

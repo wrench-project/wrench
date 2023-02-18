@@ -767,7 +767,7 @@ namespace wrench {
 
             this->stream_to_transactions[sg_iostream] = transaction;
             this->running_transactions.push_back(transaction);
-            sg_iostream->vetoable_start();
+            sg_iostream->start();
         }
     }
 

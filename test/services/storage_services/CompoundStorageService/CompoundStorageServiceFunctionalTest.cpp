@@ -192,7 +192,7 @@ private:
         // File copy, CSS as src, file not known:
         {
             auto file_1_loc_ss = wrench::FileLocation::LOCATION(test->simple_storage_service_100, test->file_1);
-            this->simulation->createFile(file_1_loc_ss);
+            wrench::StorageService::createFileAtLocation(file_1_loc_ss);
             auto file_1_loc_css = wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1);
 
             try {
@@ -209,7 +209,7 @@ private:
         // File copy, CSS as dst, file can't be allocated (no callback provided) - src file exists:
         {
             auto file_1_loc_ss = wrench::FileLocation::LOCATION(test->simple_storage_service_100, test->file_1);
-            this->simulation->createFile(file_1_loc_ss);
+            wrench::StorageService::createFileAtLocation(file_1_loc_ss);
             auto file_1_loc_css = wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1);
 
             try {
@@ -352,7 +352,7 @@ private:
         auto job1 = job_manager->createCompoundJob("job1");
 
         // Copy from buffered simple storage to CSS (which uses a non-buffered simplestorage service)
-        simulation->createFile(wrench::FileLocation::LOCATION(test->simple_storage_service_1000, "/disk1000/", test->file_500));
+        wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(test->simple_storage_service_1000, "/disk1000/", test->file_500));
         auto fileCopyActionSS_CSS = job1->addFileCopyAction(
                 "fileCopySrcBufDstCSSNBuff",
                 wrench::FileLocation::LOCATION(test->simple_storage_service_1000, "/disk1000/", test->file_500),
@@ -557,7 +557,7 @@ private:
 
         // 2 - Copy from SS to CSS, using a file that is too big to be allocated
         auto jobCopySizeError = job_manager->createCompoundJob("jobCopySizeError");
-        simulation->createFile(wrench::FileLocation::LOCATION(test->simple_storage_service_1000, "/disk1000/", test->file_1000));
+        wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(test->simple_storage_service_1000, "/disk1000/", test->file_1000));
         auto fileCopyActionSS_CSS = jobCopySizeError->addFileCopyAction(
                 "fileCopySrcSS_DstCSS",
                 wrench::FileLocation::LOCATION(test->simple_storage_service_1000, "/disk1000/", test->file_1000),
