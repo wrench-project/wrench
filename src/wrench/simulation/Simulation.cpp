@@ -725,7 +725,7 @@ namespace wrench {
     }
 
     /**
-     * @brief State a copy of a file at a location, and update the file registry service
+     * @brief Stage a copy of a file at a location (and add entries to all file registry services, if any)
      * @param location: the file location
      */
     void Simulation::stageFile(const std::shared_ptr<FileLocation> &location) {
@@ -741,12 +741,6 @@ namespace wrench {
             throw std::runtime_error(" Simulation::stageFile(): Cannot stage a file once the simulation has started");
         }
 
-        // Check that a FileRegistryService has been set
-        if (this->file_registry_services.empty()) {
-            throw std::runtime_error(
-                    "Simulation::stageFile(): At least one FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
-        }
-
         // Put the file on the storage service (not via the service daemon)
         try {
             location->getStorageService()->createFile(location);
@@ -754,7 +748,7 @@ namespace wrench {
             throw;
         }
 
-        // Update all file registry services
+        // Update all file registry services (perhaps none)
         for (const auto &frs: this->file_registry_services) {
             frs->addEntryToDatabase(location);
         }

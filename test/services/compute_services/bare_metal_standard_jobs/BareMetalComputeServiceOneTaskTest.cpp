@@ -374,8 +374,6 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
     ASSERT_NO_THROW(wms = simulation->add(
                             new NoopTestWMS(this, hostname)));
 
-    ASSERT_THROW(simulation->stageFile(input_file, storage_service1), std::runtime_error);
-
     simulation->add(new wrench::FileRegistryService(hostname));
 
     ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
