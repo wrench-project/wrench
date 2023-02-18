@@ -179,7 +179,7 @@ namespace wrench {
          */
         double total_capacity;
         /**
-         * @brief current amout of free space
+         * @brief current amount of free space
          */
         double free_space = 0;
         /**

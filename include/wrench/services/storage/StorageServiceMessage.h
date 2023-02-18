@@ -65,7 +65,7 @@ namespace wrench {
     class StorageServiceFileLookupRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                               std::shared_ptr<FileLocation> &location,
+                                               const std::shared_ptr<FileLocation> &location,
                                                double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
@@ -180,7 +180,7 @@ namespace wrench {
     public:
         StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                               simgrid::s4u::Host *requesting_host,
-                                              std::shared_ptr<FileLocation> &location,
+                                              const std::shared_ptr<FileLocation> &location,
                                               double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
@@ -199,8 +199,8 @@ namespace wrench {
         StorageServiceFileWriteAnswerMessage(std::shared_ptr<FileLocation> &location,
                                              bool success,
                                              std::shared_ptr<FailureCause> failure_cause,
-                                             double buffer_size,
                                              simgrid::s4u::Mailbox *data_write_mailbox_name,
+                                             double buffer_size,
                                              double payload);
 
         /** @brief The file location hould be written */

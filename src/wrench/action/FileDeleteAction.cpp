@@ -60,7 +60,7 @@ namespace wrench {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File write
-        StorageService::deleteFile(this->file_location);
+        StorageService::deleteFileAtLocation(this->file_location);
     }
 
     /**

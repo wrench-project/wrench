@@ -9,6 +9,7 @@
 
 #include <wrench/failure_causes/InvalidDirectoryPath.h>
 #include <wrench/failure_causes/FileNotFound.h>
+#include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
 
 #include <wrench/services/storage/simple/SimpleStorageService.h>
 #include <wrench/services/storage/simple/SimpleStorageServiceBufferized.h>
@@ -64,6 +65,8 @@ namespace wrench {
             return (SimpleStorageService *) (new SimpleStorageServiceNonBufferized(hostname, mount_points, property_list, messagepayload_list));
         }
     }
+
+
 
 
     /**
@@ -133,24 +136,33 @@ namespace wrench {
             simgrid::s4u::Mailbox *answer_mailbox) {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        auto fs = this->file_systems[location->getMountPoint()].get();
-        auto file = location->getFile();
+        std::string mount_point;
+        std::string path_at_mount_point;
 
-        if ((not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) or
-            (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint()))) {
-            // If this is scratch, we don't care, perhaps it was taken care of elsewhere...
-            if (not this->isScratch()) {
-                failure_cause = std::shared_ptr<FailureCause>(
-                        new FileNotFound(location));
-            }
+        if (not this->splitPath(location->getPath(), mount_point, path_at_mount_point)) {
+            failure_cause = std::shared_ptr<FailureCause>(
+                    new FileNotFound(location));
         } else {
-            fs->removeFileFromDirectory(file, location->getAbsolutePathAtMountPoint());
+
+            auto fs = this->file_systems[mount_point].get();
+            auto file = location->getFile();
+
+            if ((not fs->doesDirectoryExist(path_at_mount_point)) or
+                (not fs->isFileInDirectory(file, path_at_mount_point))) {
+                // If this is scratch, we don't care, perhaps it was taken care of elsewhere...
+                if (not this->isScratch()) {
+                    failure_cause = std::shared_ptr<FailureCause>(
+                            new FileNotFound(location));
+                }
+            } else {
+                fs->removeFileFromDirectory(file, path_at_mount_point);
+            }
         }
 
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new StorageServiceFileDeleteAnswerMessage(
-                        file,
+                        location->getFile(),
                         this->getSharedPtr<SimpleStorageService>(),
                         (failure_cause == nullptr),
                         failure_cause,
@@ -169,14 +181,25 @@ namespace wrench {
     bool SimpleStorageService::processFileLookupRequest(
             const std::shared_ptr<FileLocation> &location,
             simgrid::s4u::Mailbox *answer_mailbox) {
-        auto fs = this->file_systems[location->getMountPoint()].get();
-        auto file = location->getFile();
-        bool file_found = fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint());
+
+        bool file_found;
+
+        std::string mount_point;
+        std::string path_at_mount_point;
+
+        if (not this->splitPath(location->getPath(), mount_point, path_at_mount_point)) {
+            file_found = false;
+        } else {
+            auto fs = this->file_systems[mount_point].get();
+            auto file = location->getFile();
+            file_found = fs->isFileInDirectory(file, path_at_mount_point);
+        }
 
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new StorageServiceFileLookupAnswerMessage(
-                        file, file_found,
+                        location->getFile(),
+                        file_found,
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
         return true;
@@ -203,11 +226,11 @@ namespace wrench {
     }
 
 
-    /**
+/**
  * @brief Get the mount point (will throw is more than one)
  * @return the (sole) mount point of the service
  */
-    std::string StorageService::getMountPoint() {
+    std::string SimpleStorageService::getMountPoint() {
         if (this->hasMultipleMountPoints()) {
             throw std::invalid_argument(
                     "StorageService::getMountPoint(): The storage service has more than one mount point");
@@ -252,12 +275,11 @@ namespace wrench {
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox) {
-        std::map<std::string, double> free_space;
+        double free_space = 0;
 
         for (auto const &mp: this->file_systems) {
-            free_space[mp.first] = mp.second->getFreeSpace();
+            free_space += mp.second->getFreeSpace();
         }
-
 
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
@@ -321,14 +343,14 @@ namespace wrench {
      * @param path the path
      * @return true if the file is present, false otherwise
      */
-    bool SimpleStorageService::hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+    bool SimpleStorageService::hasFile(const std::shared_ptr<FileLocation> &location) {
         std::string mount_point;
         std::string path_at_mount_point;
-        if (not this->splitPath(path, mount_point, path_at_mount_point)) {
+        if (not this->splitPath(location->getPath(), mount_point, path_at_mount_point)) {
             return false;
         }
         auto fs = this->file_systems[mount_point].get();
-        return fs->isFileInDirectory(file, path_at_mount_point);
+        return fs->isFileInDirectory(location->getFile(), path_at_mount_point);
     }
 
 
@@ -347,6 +369,42 @@ namespace wrench {
 
     }
 
+    void SimpleStorageService::decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
+        std::string mount_point;
+        std::string path_at_mount_point;
+
+        this->splitPath(location->getPath(), mount_point, path_at_mount_point);
+        this->file_systems[mount_point]->decrementNumRunningTransactionsForFileInDirectory(location->getFile(), path_at_mount_point);
+    }
+
+    void SimpleStorageService::incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
+        std::string mount_point;
+        std::string path_at_mount_point;
+
+        this->splitPath(location->getPath(), mount_point, path_at_mount_point);
+        this->file_systems[mount_point]->incrementNumRunningTransactionsForFileInDirectory(location->getFile(), path_at_mount_point);
+    }
+
+
+    void SimpleStorageService::createFile(const std::shared_ptr<FileLocation> &location)  {
+        std::string mount_point, path_at_mount_point;
+        this->splitPath(location->getPath(), mount_point, path_at_mount_point);
+        bool enough_space = this->file_systems[mount_point]->reserveSpace(location->getFile(), path_at_mount_point);
+        if (!enough_space) {
+            throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(
+                    location->getFile(), location->getStorageService()));
+        }
+        this->file_systems[mount_point]->storeFileInDirectory(location->getFile(), path_at_mount_point, false);
+    }
+
+
+    double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+        std::string mount_point, path_at_mount_point;
+        if (not this->splitPath(location->getPath(), mount_point, path_at_mount_point)) {
+            return -1.0;
+        }
+        this->file_systems[mount_point]->getFileLastWriteDate(location->getFile(), path_at_mount_point);
+    }
 
 
 }// namespace wrench

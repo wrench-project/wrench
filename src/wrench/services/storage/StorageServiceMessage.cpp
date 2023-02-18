@@ -69,7 +69,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                                                                   std::shared_ptr<FileLocation> &location,
+                                                                                   const std::shared_ptr<FileLocation> &location,
                                                                                    double payload)
         : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -114,19 +114,17 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                                                                   const std::shared_ptr<DataFile> &file,
-                                                                                   std::string &path,
+                                                                                   const std::shared_ptr<FileLocation> &location,
                                                                                    double payload)
         : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || (file == nullptr)) {
+        if ((answer_mailbox == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(): Invalid arguments");
         }
 #endif
         this->answer_mailbox = answer_mailbox;
-        this->file = std::move(file);
-        this->path = path;
+        this->location = location;
     }
 
     /**
@@ -237,7 +235,7 @@ namespace wrench {
     */
     StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                  simgrid::s4u::Host *requesting_host,
-                                                                                 std::shared_ptr<FileLocation> location,
+                                                                                 const std::shared_ptr<FileLocation> &location,
                                                                                  double payload)
         : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -269,7 +267,7 @@ namespace wrench {
                                                                                double buffer_size,
                                                                                double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((file == nullptr) ||
+        if ((location == nullptr) ||
             (success && (data_write_mailbox == nullptr)) ||
             (!success && (data_write_mailbox != nullptr)) ||
             (success && (failure_cause != nullptr)) || (!success && (failure_cause == nullptr))) {

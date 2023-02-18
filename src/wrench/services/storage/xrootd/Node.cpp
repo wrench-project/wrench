@@ -164,9 +164,10 @@ namespace wrench {
                                     this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                             WRENCH_DEBUG("Advanced Broadcast to %zu hosts", splitStacks.size());
 
+
                             for (auto entry: splitStacks) {
                                 if (entry.first == this) {//this node was the target
-                                    if (internalStorage &&//check the storage, it SHOULD be there, but we should check still
+                                    if (internalStorage && //check the storage, it SHOULD be there, but we should check still
                                         internalStorage->hasFile(msg->file)) {
                                         //File in internal storage
                                         cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));

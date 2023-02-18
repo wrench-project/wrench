@@ -300,8 +300,12 @@ namespace wrench {
                         }
                     } else {
                         // Write to disk
+                        auto dst_ss = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService());
+                        if (!dst_ss) {
+                            throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Storage Service should be a SimpleStorageService for disk write");
+                        }
                         simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
-                                                location->getMountPoint());
+                                                dst_ss->getPathMountPoint(location->getPath()));
                     }
 
                     // Wait for the comm to finish
@@ -327,8 +331,12 @@ namespace wrench {
                     }
                 } else {
                     //                     Write to disk
-                    simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
-                                            location->getMountPoint());
+                    auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
+                    if (!ss) {
+                        throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
+                    }
+                    simulation->writeToDisk(msg->payload, ss->hostname,
+                                            ss->getPathMountPoint(location->getPath()));
                 }
 
                 if (Simulation::isPageCachingEnabled()) {
@@ -376,8 +384,12 @@ namespace wrench {
                         simulation->readWithMemoryCache(f, chunk_size, location);
                     } else {
                         WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
-                        simulation->readFromDisk(chunk_size, location->getStorageService()->hostname,
-                                                 location->getMountPoint());
+                        auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
+                        if (!ss) {
+                            throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
+                        }
+                        simulation->readFromDisk(chunk_size, ss->hostname,
+                                                 ss->getPathMountPoint(location->getPath()));
                     }
 
                     remaining -= this->buffer_size;
@@ -416,7 +428,7 @@ namespace wrench {
         double to_send = std::min<double>(this->buffer_size, remaining);
 
         if ((src_loc->getStorageService() == dst_loc->getStorageService()) and
-            (src_loc->getFullAbsolutePath() == dst_loc->getFullAbsolutePath())) {
+            (src_loc->getPath() == dst_loc->getPath())) {
             WRENCH_INFO(
                     "FileTransferThread::copyFileLocally(): Copying f %s onto itself at location %s... ignoring",
                     f->getID().c_str(), src_loc->toString().c_str());
@@ -429,14 +441,24 @@ namespace wrench {
                     "FileTransferThread::copyFileLocally(): Zero buffer size not implemented yet");
 
         } else {
+            auto src_ss = std::dynamic_pointer_cast<SimpleStorageService>(src_loc->getStorageService());
+            if (!src_ss) {
+                throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Disk operation can only be to a SimpleStorageService");
+            }
+            auto src_mount_point = src_ss->getPathMountPoint(src_loc->getPath());
+            auto dst_ss = std::dynamic_pointer_cast<SimpleStorageService>(dst_loc->getStorageService());
+            if (!dst_ss) {
+                throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Disk operation can only be to a SimpleStorageService");
+            }
+            auto dst_mount_point = dst_ss->getPathMountPoint(dst_loc->getPath());
+
             // Read the first chunk
-            simulation->readFromDisk(to_send, src_loc->getStorageService()->hostname,
-                                     src_loc->getMountPoint());
+            simulation->readFromDisk(to_send, src_ss->hostname,src_mount_point);
             // start the pipeline
             while (remaining - this->buffer_size > DBL_EPSILON) {
                 simulation->readFromDiskAndWriteToDiskConcurrently(
                         this->buffer_size, this->buffer_size, src_loc->getStorageService()->hostname,
-                        src_loc->getMountPoint(), dst_loc->getMountPoint());
+                        src_mount_point, dst_mount_point);
 
                 //
                 //                simulation->writeToDisk(this->buffer_size, dst_loc->getStorageService()->hostname,
@@ -448,7 +470,7 @@ namespace wrench {
             }
             // Write the last chunk
             simulation->writeToDisk(remaining, dst_loc->getStorageService()->hostname,
-                                    dst_loc->getMountPoint());
+                                    dst_mount_point);
         }
     }
 
@@ -472,8 +494,8 @@ namespace wrench {
                     f->getID().c_str(), src_loc->toString().c_str());
 
         // Check that the buffer size is compatible
-        if (((this->buffer_size < DBL_EPSILON) && (src_loc->getStorageService()->buffer_size > DBL_EPSILON)) or
-            ((this->buffer_size > DBL_EPSILON) && (src_loc->getStorageService()->buffer_size < DBL_EPSILON))) {
+        if (((this->buffer_size < DBL_EPSILON) && (src_loc->getStorageService()->getBufferSize() > DBL_EPSILON)) or
+            ((this->buffer_size > DBL_EPSILON) && (src_loc->getStorageService()->getBufferSize() < DBL_EPSILON))) {
             throw std::invalid_argument("FileTransferThread::downloadFileFromStorageService(): "
                                         "Incompatible buffer size specs (both must be zero, or both must be non-zero");
         }
@@ -542,6 +564,10 @@ namespace wrench {
             }
 
             // Receive chunks and write them to disk
+            auto dst_ss = std::dynamic_pointer_cast<SimpleStorageService>(dst_loc->getStorageService());
+            if (!dst_ss) {
+                throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Storage Service should be a SimpleStorageService for disk operations");
+            }
             while (not done) {
                 // Issue the receive
                 auto req = S4U_Mailbox::igetMessage(mailbox_to_receive_the_file_content);
@@ -553,8 +579,8 @@ namespace wrench {
                 } else {
                     // Write to disk
                     simulation->writeToDisk(msg->payload,
-                                            dst_loc->getStorageService()->getHostname(),
-                                            dst_loc->getMountPoint());
+                                            dst_ss->getHostname(),
+                                            dst_ss->getPathMountPoint(dst_loc->getPath()));
                 }
                 // Wait for the comm to finish
                 //                    WRENCH_INFO("Wrote of %f of f  %s", msg->payload, f->getID().c_str());
@@ -577,8 +603,8 @@ namespace wrench {
             } else {
                 // Write to disk
                 simulation->writeToDisk(msg->payload,
-                                        dst_loc->getStorageService()->getHostname(),
-                                        dst_loc->getMountPoint());
+                                        dst_ss->getHostname(),
+                                        dst_ss->getPathMountPoint(dst_loc->getPath()));
             }
         } catch (ExecutionException &e) {
             S4U_Mailbox::retireTemporaryMailbox(mailbox_to_receive_the_file_content);

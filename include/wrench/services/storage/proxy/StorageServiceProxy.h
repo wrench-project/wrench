@@ -46,7 +46,7 @@ namespace wrench {
 	 */
         double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override; //forward
 
-        virtual void deleteFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
+        virtual void deleteFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
 
         virtual bool lookupFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
 
@@ -65,6 +65,18 @@ namespace wrench {
 
 
         double getLoad() override;//cache
+
+        virtual bool isBufferized() const override; //cache
+
+        virtual double getBufferSize() const override; //cache
+
+        virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
+                throw std::runtime_error("StorageServiceProxy::reserveSpace(): should be be called");
+        };
+
+        virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
+            throw std::runtime_error("StorageServiceProxy::unreserveSpace(): should be be called");
+        };
 
         /**
          * @brief Factory to create a StorageServiceProxy that can a default destination to forward requests too, and will cache requests as they are made
@@ -139,7 +151,7 @@ namespace wrench {
     private:
         /** @brief Default property values */
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {StorageServiceProperty::BUFFER_SIZE, "10000000"},// 10 MEGA BYTE
+//                {StorageServiceProperty::BUFFER_SIZE, "10000000"},// 10 MEGA BYTE
                 {StorageServiceProperty::CACHING_BEHAVIOR, "NONE"},
                 {StorageServiceProxyProperty::UNCACHED_READ_METHOD, "CopyThenRead"},
                 {StorageServiceProxyProperty::MESSAGE_OVERHEAD, "0"}};

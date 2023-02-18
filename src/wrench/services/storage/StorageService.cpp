@@ -147,6 +147,7 @@ namespace wrench {
                 }
 
             } else {
+                auto file = location->getFile();
                 // Bufferized
                 double remaining = file->getSize();
                 while (remaining - buffer_size > DBL_EPSILON) {
@@ -209,13 +210,11 @@ namespace wrench {
      * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
      * @param file: the file to lookup
      * @param path: the file path
-     * @param wait_for_answer: whether this call should wait for an answer
      *
      * @return true if the file is present, false otherwise
      */
     bool StorageService::lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
-                                    const std::shared_ptr<FileLocation> &location,
-                                    bool wait_for_answer) {
+                                    const std::shared_ptr<FileLocation> &location) {
         if (!answer_mailbox or !location) {
             throw std::invalid_argument("StorageService::lookupFile(): Invalid nullptr arguments");
         }
@@ -231,7 +230,6 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (wait_for_answer) {
             // Wait for a reply
             auto message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
@@ -240,7 +238,6 @@ namespace wrench {
             } else {
                 throw std::runtime_error("StorageService::lookupFile(): Unexpected [" + message->getName() + "] message (was expecting StorageServiceFileLookupAnswerMessage)");
             }
-        }
     }
 
 
@@ -396,7 +393,7 @@ namespace wrench {
                 WRENCH_INFO("Reading file %s from location %s",
                             file->getID().c_str(),
                             location->toString().c_str());
-                StorageService::readFile(location);
+                StorageService::readFileAtLocation(location);
 
                 WRENCH_INFO("File %s read", file->getID().c_str());
 
@@ -404,7 +401,7 @@ namespace wrench {
                 WRENCH_INFO("Writing file %s to location %s",
                             file->getID().c_str(),
                             location->toString().c_str());
-                StorageService::writeFile(location);
+                StorageService::writeFileAtLocation(location);
 
                 WRENCH_INFO("File %s written", file->getID().c_str());
             }
@@ -588,66 +585,65 @@ namespace wrench {
 
 
 
-    /**
-     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-     * at that location.
-     *
-     * @param location: a file location, must be the same object as the function is invoked on
-     *
-     * @throw std::invalid_argument
-     */
-    void StorageService::createFile(const std::shared_ptr<FileLocation> &location) {
-        if (location->getStorageService() != this->getSharedPtr<StorageService>()) {
-            throw std::invalid_argument("StorageService::createFile(file,location) must be called on the same StorageService that the location uses");
-        }
-        stageFile(location->getFile(), location->getMountPoint(),
-                  location->getAbsolutePathAtMountPoint());
-    }
+//    /**
+//     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+//     * at that location.
+//     *
+//     * @param location: a file location, must be the same object as the function is invoked on
+//     *
+//     * @throw std::invalid_argument
+//     */
+//    void StorageService::createFile(const std::shared_ptr<FileLocation> &location) {
+//        if (location->getStorageService() != this->getSharedPtr<StorageService>()) {
+//            throw std::invalid_argument("StorageService::createFile(file,location) must be called on the same StorageService that the location uses");
+//        }
+//        stageFile(location->getFile(), location->getPath());
+//    }
 
-    /**
- * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
- * at that location.
+//    /**
+// * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+// * at that location.
+//
+//*
+//* @param file: a file
+//* @param path: path to file
+//*
+//*/
+//    void StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+//
+//        createFile(FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
+//    }
 
-*
-* @param file: a file
-* @param path: path to file
-*
-*/
-    void StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+//    /**
+// * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+// * at that location.
+// * @param file: a file
+// *
+// */
+//    void StorageService::createFile(const std::shared_ptr<DataFile> &file) {
+//
+//        createFile(FileLocation::LOCATION(this->getSharedPtr<StorageService>(), getMountPoint(), file));
+//    }
 
-        createFile(FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
-    }
+//    /**
+//     * @brief Determines whether the storage service is bufferized
+//     * @return true if bufferized, false otherwise
+//     */
+//    bool StorageService::isBufferized() const {
+//        return this->buffer_size > 1;
+//    }
 
-    /**
- * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
- * at that location.
- * @param file: a file
- *
- */
-    void StorageService::createFile(const std::shared_ptr<DataFile> &file) {
-
-        createFile(FileLocation::LOCATION(this->getSharedPtr<StorageService>(), getMountPoint(), file));
-    }
-
-    /**
-     * @brief Determines whether the storage service is bufferized
-     * @return true if bufferized, false otherwise
-     */
-    bool StorageService::isBufferized() const {
-        return this->buffer_size > 1;
-    }
-
-    /**
-     * @brief Determines whether the storage service has the file. This doesn't simulate anything and is merely a zero-simulated-time data structure lookup.
-     * If you want to simulate the overhead of querying the StorageService, instead use lookupFile().
-     *
-     * @param file a file
-     *
-     * @return true if the file is present, false otherwise
-     */
-    bool StorageService::hasFile(const shared_ptr<DataFile> &file) {
-        return this->hasFile(file, this->getMountPoint());
-    }
+//    /**
+//     * @brief Determines whether the storage service has the file. This doesn't simulate anything and is merely a zero-simulated-time data structure lookup.
+//     * If you want to simulate the overhead of querying the StorageService, instead use lookupFile().
+//     *
+//     * @param file a file
+//     *
+//     * @return true if the file is present, false otherwise
+//     */
+//    bool StorageService::hasFile(const shared_ptr<DataFile> &file) {
+//        return this->hasFile(file, this->getMountPoint());
+//    }
 
 
 }// namespace wrench

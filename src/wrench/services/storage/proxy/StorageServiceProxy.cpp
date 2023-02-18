@@ -111,7 +111,7 @@ namespace wrench {
                 target = location->target;
             }
             //cerr<<"FILE LOOKUP!!!! "<<remote<<" "<<target<<endl;
-            if (cache->hasFile(msg->location->getFile(), msg->location->getFullAbsolutePath())) {//forward request to cache
+            if (cache->hasFile(msg->location)) { //forward request to cache
                 //cerr<<"File cached"<<endl;
                 S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileLookupAnswerMessage(msg->location->getFile(), true, StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
 
@@ -122,7 +122,7 @@ namespace wrench {
                         target->mailbox,
                         new StorageServiceFileLookupRequestMessage(
                                 mailbox,
-                                FileLocation::LOCATION(target, msg->location->getMountPoint(), msg->location->getFile()),
+                                FileLocation::LOCATION(target, msg->location->getFile(), msg->location->getPath()),
                                 target->getMessagePayloadValue(
                                         StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
             } else {
@@ -169,9 +169,9 @@ namespace wrench {
                     pending[msg->location->getFile()].push_back(std::move(message));
                     WRENCH_INFO("Adding pending write");
                 }
-                S4U_Mailbox::putMessage(cache->mailbox, new StorageServiceFileWriteRequestMessage(mailbox, msg->requesting_host, FileLocation::LOCATION(cache, msg->location->getFile()), msg->buffer_size, 0));
+                S4U_Mailbox::putMessage(cache->mailbox, new StorageServiceFileWriteRequestMessage(mailbox, msg->requesting_host, FileLocation::LOCATION(cache, msg->location->getFile()), 0));
             } else {
-                S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileWriteAnswerMessage(msg->location, false, std::make_shared<HostError>(hostname), 0, StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD));
+                S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileWriteAnswerMessage(msg->location, false, std::make_shared<HostError>(hostname), nullptr, 0, StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD));
             }
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
@@ -261,64 +261,84 @@ namespace wrench {
      * @return The free space in bytes of each mount point, as a map
      *
      */
-    std::map<std::string, double> StorageServiceProxy::getFreeSpace() {
+    double StorageServiceProxy::getFreeSpace() {
         if (remote) {
             return remote->getFreeSpace();
         }
         throw runtime_error("Proxy with no default location does not support getFreeSpace()");
     }
-    /**
-     * @brief Get the mount point of the remote server (will throw is more than one).  If there isnt a default, returns DEV_NUL
-     * @return the (sole) mount point of the service
-     */
-    std::string StorageServiceProxy::getMountPoint() {
-        if (remote) {
-            return remote->getMountPoint();
-        }
-        if (cache) {
-            return cache->getMountPoint();
-        }
-        return LogicalFileSystem::DEV_NULL;
-    }
-    /**
-     * @brief Get the set of mount points of the remote server, if not returns {}
-     * @return the set of mount points
-     */
-    std::set<std::string> StorageServiceProxy::getMountPoints() {
-        if (remote) {
-            return remote->getMountPoints();
-        }
-        if (cache) {
-            return cache->getMountPoints();
-        }
-        return {};
-    }
-    /**
-     * @brief Checked whether the remote storage service has multiple mount points
-     * @return true whether the service has multiple mount points
-     */
-    bool StorageServiceProxy::hasMultipleMountPoints() {
-        if (remote) {
-            return remote->hasMultipleMountPoints();
-        }
 
-        return false;
-    }
-    /**
-    * @brief Checked whether the remote storage service has a particular mount point
-    * @param mp: a mount point
-    *
-    * @return true whether the service has that mount point
-    */
-    bool StorageServiceProxy::hasMountPoint(const std::string &mp) {
-        if (remote) {
-            return remote->hasMountPoint(mp);
-        }
+//    /**
+//     * @brief Get the mount point of the remote server (will throw is more than one).  If there isnt a default, returns DEV_NUL
+//     * @return the (sole) mount point of the service
+//     */
+//    std::string StorageServiceProxy::getMountPoint() {
+//        if (remote) {
+//            return remote->getMountPoint();
+//        }
+//        if (cache) {
+//            return cache->getMountPoint();
+//        }
+//        return LogicalFileSystem::DEV_NULL;
+//    }
+
+    bool StorageServiceProxy::isBufferized() const {
         if (cache) {
-            return cache->hasMountPoint(mp);
+            return cache->isBufferized();
+        } else {
+            return false;   // Not sure that makes sense
         }
-        return false;
     }
+
+
+    double StorageServiceProxy::getBufferSize() const {
+        if (cache) {
+            return cache->getBufferSize();
+        } else {
+            return 0;   // Not sure that makes sense
+        }
+    }
+
+
+//    /**
+//     * @brief Get the set of mount points of the remote server, if not returns {}
+//     * @return the set of mount points
+//     */
+//    std::set<std::string> StorageServiceProxy::getMountPoints() {
+//        if (remote) {
+//            return remote->getMountPoints();
+//        }
+//        if (cache) {
+//            return cache->getMountPoints();
+//        }
+//        return {};
+//    }
+//    /**
+//     * @brief Checked whether the remote storage service has multiple mount points
+//     * @return true whether the service has multiple mount points
+//     */
+//    bool StorageServiceProxy::hasMultipleMountPoints() {
+//        if (remote) {
+//            return remote->hasMultipleMountPoints();
+//        }
+//
+//        return false;
+//    }
+//    /**
+//    * @brief Checked whether the remote storage service has a particular mount point
+//    * @param mp: a mount point
+//    *
+//    * @return true whether the service has that mount point
+//    */
+//    bool StorageServiceProxy::hasMountPoint(const std::string &mp) {
+//        if (remote) {
+//            return remote->hasMountPoint(mp);
+//        }
+//        if (cache) {
+//            return cache->hasMountPoint(mp);
+//        }
+//        return false;
+//    }
 
 
     /**
@@ -378,20 +398,23 @@ namespace wrench {
                                                                                                                                                    remote(default_remote) {
 
 
+        if (properties.find(StorageServiceProperty::BUFFER_SIZE) != properties.end()) {
+            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): You cannot pass a buffer size property to a StorageServiceProxy");
+        }
         this->setProperties(this->default_property_values, std::move(properties));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(message_payloads));
         this->setProperty(StorageServiceProperty::BUFFER_SIZE, cache->getPropertyValueAsString(StorageServiceProperty::BUFFER_SIZE));//the internal cache has the same buffer properties as this service.
-        this->buffer_size = this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
-        if (cache and cache->hasMultipleMountPoints()) {
-            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's cache can not have multiple mountpoints");
-        }
-        if (remote and remote->hasMultipleMountPoints()) {
-            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's default remote can not have multiple mountpoints");
-        }
+
+//        if (cache and cache->hasMultipleMountPoints()) {
+//            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's cache can not have multiple mountpoints");
+//        }
+//        if (remote and remote->hasMultipleMountPoints()) {
+//            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's default remote can not have multiple mountpoints");
+//        }
         //        if (cache and default_remote) {
         //            if ((cache->isBufferized() and not default_remote->isBufferized()) or
         //                (not cache->isBufferized() and default_remote->isBufferized())) {
-        //                throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): The cache and the default_remote storage services much has the same bufferization mode");
+        //                throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): The cache and the default_remote storage services must has the same bufferization mode");
         //        }
 
         string readProperty = getPropertyValueAsString(StorageServiceProxyProperty::UNCACHED_READ_METHOD);
@@ -406,14 +429,15 @@ namespace wrench {
             throw invalid_argument("Unknown value " + readProperty + " for StorageServiceProxyProperty::UNCACHED_READ_METHOD");
         }
     }
+
     /**
      * @brief Delete a file
      * @param targetServer
      * @param file
      * @param file_registry_service
      */
-    void StorageServiceProxy::deleteFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service) {
-        StorageService::deleteFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file), file_registry_service);
+    void StorageServiceProxy::deleteFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
+        StorageService::deleteFileAtLocation(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
 
     /**
@@ -424,7 +448,7 @@ namespace wrench {
      * @return true if the file is present, false otherwise
      */
     bool StorageServiceProxy::lookupFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
-        return StorageService::lookupFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
+        return StorageService::lookupFileAtLocation(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
 
     /**
@@ -432,7 +456,7 @@ namespace wrench {
      * @param file: the file
      */
     void StorageServiceProxy::readFile(const std::shared_ptr<DataFile> &file) {
-        StorageService::readFile(ProxyLocation::LOCATION(remote, std::static_pointer_cast<StorageService>(shared_from_this()), file));
+        StorageService::readFileAtLocation(ProxyLocation::LOCATION(remote, std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
 
     /**
@@ -441,85 +465,83 @@ namespace wrench {
      * @param file: the file
      */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
-    void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
-        StorageService::readFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
+        StorageService::readFileAtLocation(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
 
     /**
-     * @brief Read a file
-     * @param targetServer: the target server
-     * @param file: the file
-     * @param num_bytes: the number of bytes to read
-     */
+ * @brief Read a file
+ * @param targetServer: the target server
+ * @param file: the file
+ * @param num_bytes: the number of bytes to read
+ */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, double num_bytes) {
-        StorageService::readFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file), num_bytes);
+        StorageService::readFileAtLocation(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file), num_bytes);
     }
 
     /**
-     * @brief Read a file
-     * @param targetServer: the target server
-     * @param file: the file
-     * @param path: the file path
-     */
+ * @brief Read a file
+ * @param targetServer: the target server
+ * @param file: the file
+ * @param path: the file path
+ */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path) {
-        StorageService::readFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file));
+        StorageService::readFileAtLocation(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file));
     }
 
     /**
-     * @brief Read a file
-     * @param targetServer: the target server
-     * @param file: the file
-     * @param path: the file path
-     * @param num_bytes: the number of bytes to read
-     */
+ * @brief Read a file
+ * @param targetServer: the target server
+ * @param file: the file
+ * @param path: the file path
+ * @param num_bytes: the number of bytes to read
+ */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes) {
-        StorageService::readFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file), num_bytes);
+        StorageService::readFileAtLocation(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file), num_bytes);
     }
 
     /**
-     * @brief Write a file
-     * @param targetServer: the target server
-     * @param file: the file
-     * @param path: the file path
-     */
+ * @brief Write a file
+ * @param targetServer: the target server
+ * @param file: the file
+ * @param path: the file path
+ */
     void StorageServiceProxy::writeFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path) {
-        StorageService::writeFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file));
+        StorageService::writeFileAtLocation(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file));
     }
 
     /**
-     * @brief Write a file
-     * @param targetServer: the target server
-     * @param file: the file
-     */
+ * @brief Write a file
+ * @param targetServer: the target server
+ * @param file: the file
+ */
     void StorageServiceProxy::writeFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
-        StorageService::writeFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
+        StorageService::writeFileAtLocation(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
 
     /**
-     * @brief Get the proxy's associated cache
-     *
-     * @return the cache storage service
-     */
+ * @brief Get the proxy's associated cache
+ *
+ * @return the cache storage service
+ */
     const std::shared_ptr<StorageService> StorageServiceProxy::getCache() {
         return this->cache;
     }
 
     /**
-     * @brief Check the cache and ongoing reads for the requested file.  If it is, this function handles the rest of reading it.
-     * @param msg the message that is being processed
-     * @param message the raw unique_ptr for the message.  Assumed to be the same as msg, passed to avoid second cast.
-     * @return True if the file is cached, false otherwise
-     */
-    bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<SimulationMessage> &message) {
-        if (cache->hasFile(msg->location->getFile(), msg->location->getFullAbsolutePath())) {//check cache
+ * @brief Check the cache and ongoing reads for the requested file.  If it is, this function handles the rest of reading it.
+ * @param msg the message that is being processed
+ * @param message the raw unique_ptr for the message.  Assumed to be the same as msg, passed to avoid second cast.
+ * @return True if the file is cached, false otherwise
+ */
+    bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage * msg, unique_ptr<SimulationMessage> & message) {
+        if (cache->hasFile(msg->location->getFile(), msg->location->getPath())) {//check cache
             WRENCH_INFO("Forwarding to cache reply mailbox %s", msg->answer_mailbox->get_name().c_str());
             S4U_Mailbox::putMessage(
                     cache->mailbox,
                     new StorageServiceFileReadRequestMessage(
                             msg->answer_mailbox,
                             msg->requesting_host,//msg->mailbox_to_receive_the_file_content,
-                            FileLocation::LOCATION(cache, msg->location->getMountPoint(),
-                                                   msg->location->getFile()),
+                            FileLocation::LOCATION(cache, msg->location->getFile(), msg->location->getPath()),
                             msg->num_bytes_to_read, 0));
             return true;
 
@@ -538,11 +560,11 @@ namespace wrench {
     }
 
     /**
-     * @brief function for CopyThenRead method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServerFileCopyAnswer.  The only behavioral difference is in uncached files. This copies the file requested to the cache, and forwards the ongoing reads to the cache.  This is the default, and gives the most accurate time-to-cache for a file, and the most accurate network congestion, but overestimates how long the file will take to arive at the end.
-     * @param message the message that is being processed
-     * @return True if the message was processed by this function.  False otherwise
-     */
-    bool StorageServiceProxy::copyThenRead(unique_ptr<SimulationMessage> &message) {
+ * @brief function for CopyThenRead method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServerFileCopyAnswer.  The only behavioral difference is in uncached files. This copies the file requested to the cache, and forwards the ongoing reads to the cache.  This is the default, and gives the most accurate time-to-cache for a file, and the most accurate network congestion, but overestimates how long the file will take to arive at the end.
+ * @param message the message that is being processed
+ * @return True if the message was processed by this function.  False otherwise
+ */
+    bool StorageServiceProxy::copyThenRead(unique_ptr<SimulationMessage> & message) {
         WRENCH_DEBUG("Trying copyThenRead(message)");
         if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
             if (commonReadFile(msg, message)) {
@@ -594,11 +616,11 @@ namespace wrench {
         return false;
     }
     /**
-    * @brief function for MagicRead method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServerFileCopyAnswer.  The only behavioral difference is in uncached files.  This copies the file to the cache, and then instantly "magically" transfers the file to anyone waiting on it. This gives the most accurate time-to-cache, and a reasonably accurate arrival time by assuming the bottleneck is the bandwidth from cache to remote, not the internal network.  This does sacrifice some internal network congestion.
-    * @param message the message that is being processed
-    * @return True if the message was processed by this function.  False otherwise
-    */
-    bool StorageServiceProxy::magicRead(unique_ptr<SimulationMessage> &message) {
+* @brief function for MagicRead method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServerFileCopyAnswer.  The only behavioral difference is in uncached files.  This copies the file to the cache, and then instantly "magically" transfers the file to anyone waiting on it. This gives the most accurate time-to-cache, and a reasonably accurate arrival time by assuming the bottleneck is the bandwidth from cache to remote, not the internal network.  This does sacrifice some internal network congestion.
+* @param message the message that is being processed
+* @return True if the message was processed by this function.  False otherwise
+*/
+    bool StorageServiceProxy::magicRead(unique_ptr<SimulationMessage> & message) {
         WRENCH_DEBUG("Trying magicRead(message)");
         if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
             //Same FileRead as ReadThenCopy, only CopyAnswer should be different
@@ -640,11 +662,11 @@ namespace wrench {
         return false;
     }
     /**
-     * @brief function for CopyThenRead ReadThrough method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServiceAnswerMessage and some StorageService Ack messages. The only behavioral difference is in uncached files.  This reads the file directly to the client with the proxy acting as a mediary.  Once the write finishes, the file is instantly created on the cache.  Assuming the network is configured properly, this gives the best network congestion and time-to-arival estimate, but at the cost of time-to-cache, which it over estimates.  Concurrent reads will wait until the file is cached.
-     * @param message the message that is being processed
-     * @return True if the message was processed by this function.  False otherwise
-     */
-    bool StorageServiceProxy::readThrough(unique_ptr<SimulationMessage> &message) {
+ * @brief function for CopyThenRead ReadThrough method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServiceAnswerMessage and some StorageService Ack messages. The only behavioral difference is in uncached files.  This reads the file directly to the client with the proxy acting as a mediary.  Once the write finishes, the file is instantly created on the cache.  Assuming the network is configured properly, this gives the best network congestion and time-to-arival estimate, but at the cost of time-to-cache, which it over estimates.  Concurrent reads will wait until the file is cached.
+ * @param message the message that is being processed
+ * @return True if the message was processed by this function.  False otherwise
+ */
+    bool StorageServiceProxy::readThrough(unique_ptr<SimulationMessage> & message) {
         WRENCH_DEBUG("Trying readThrough(message)");
         if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
 
@@ -664,7 +686,7 @@ namespace wrench {
                 //do not speed excessive time on readThrough
                 auto forward = new StorageServiceFileReadRequestMessage(msg);
                 forward->answer_mailbox = mailbox;                                                                                 //setup intercept mailbox
-                forward->location = FileLocation::LOCATION(target, msg->location->getFullAbsolutePath(), msg->location->getFile());//hyjack locaiton to be on target
+                forward->location = FileLocation::LOCATION(target, msg->location->getFile(), msg->location->getPath());//hyjack locaiton to be on target
                 S4U_Mailbox::putMessage(target->mailbox, forward);                                                                 //send to target
             } else {
                 S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
@@ -721,4 +743,5 @@ namespace wrench {
         }
         return false;
     }
+
 }// namespace wrench
