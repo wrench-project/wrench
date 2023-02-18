@@ -406,5 +406,14 @@ namespace wrench {
         return this->file_systems[mount_point]->getFileLastWriteDate(location->getFile(), path_at_mount_point);
     }
 
+    simgrid::s4u::Disk *SimpleStorageService::getDiskForPathOrNull(const string &path) {
+        std::string mount_point, path_at_mount_point;
+        bool success = this->splitPath(path, mount_point, path_at_mount_point);
+        if (not success) {
+            return nullptr;
+        }
+        return this->file_systems[mount_point]->getDisk();
+    }
+
 
 }// namespace wrench

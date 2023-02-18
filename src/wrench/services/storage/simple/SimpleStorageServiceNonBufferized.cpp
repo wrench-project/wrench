@@ -482,30 +482,12 @@ namespace wrench {
 
         auto src_host = simgrid::s4u::Host::by_name(src_location->getStorageService()->getHostname());
         auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
-        // TODO: This disk identification is really ugly and likely slow
-        simgrid::s4u::Disk *src_disk = nullptr;
-        std::string src_mount_point;
-        std::string src_path_at_mount_point;
-        this->splitPath(src_location->getPath(), src_mount_point, src_path_at_mount_point);
-        auto src_location_sanitized_mount_point = FileLocation::sanitizePath(src_mount_point + "/");
-        for (auto const &d: src_host->get_disks()) {
-            if (src_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
-                src_disk = d;
-            }
-        }
+
+        auto src_disk = src_location->getDiskOrNull();
         if (src_disk == nullptr) {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(): source disk not found - internal error");
         }
-        simgrid::s4u::Disk *dst_disk = nullptr;
-        std::string dst_mount_point;
-        std::string dst_path_at_mount_point;
-        this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point);
-        auto dst_location_sanitized_mount_point = FileLocation::sanitizePath(dst_mount_point + "/");
-        for (auto const &d: dst_host->get_disks()) {
-            if (dst_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
-                dst_disk = d;
-            }
-        }
+        auto dst_disk = dst_location->getDiskOrNull();
         if (dst_disk == nullptr) {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(): destination disk not found - internal error");
         }
@@ -516,7 +498,7 @@ namespace wrench {
         bool src_could_be_contacted = true;
         std::shared_ptr<FailureCause> src_could_not_be_contacted_failure_cause;
 
-
+        //TODO: Should the lookup below be a hasFile()?
         try {
             src_has_the_file = src_location->getStorageService()->lookupFile(src_location);
         } catch (wrench::ExecutionException &e) {
@@ -565,6 +547,10 @@ namespace wrench {
             }
             return true;
         }
+
+        std::string dst_mount_point;
+        std::string dst_path_at_mount_point;
+        this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point);
 
         auto fs = this->file_systems[dst_mount_point].get();
 
