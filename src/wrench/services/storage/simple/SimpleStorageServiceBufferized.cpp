@@ -57,6 +57,7 @@ namespace wrench {
                                                                    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
                                                                                                                                                      "_" + std::to_string(getNewUniqueNumber())) {
         this->buffer_size = this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
+        this->is_bufferized = true;
     }
 
     /**
@@ -183,7 +184,7 @@ namespace wrench {
      * @param buffer_size: the buffer size to use
      * @return true if this process should keep running
      */
-    bool SimpleStorageServiceBufferized::processFileWriteRequest(const std::shared_ptr<FileLocation> &location,
+    bool SimpleStorageServiceBufferized::processFileWriteRequest(std::shared_ptr<FileLocation> &location,
                                                                  simgrid::s4u::Mailbox *answer_mailbox) {
 
         // Figure out whether this succeeds or not
@@ -229,6 +230,7 @@ namespace wrench {
                             true,
                             nullptr,
                             file_reception_mailbox,
+                            this->buffer_size,
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
 
@@ -258,6 +260,7 @@ namespace wrench {
                             false,
                             failure_cause,
                             nullptr,
+                            0,
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
         }
@@ -280,18 +283,22 @@ namespace wrench {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
         auto file = location->getFile();
 
-        auto fs = this->file_systems[location->getMountPoint()].get();
+        std::string mount_point;
+        std::string path_at_mount_point;
+        this->splitPath(location->getPath(), mount_point, path_at_mount_point);
+
+        auto fs = this->file_systems[mount_point].get();
 
         //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
-        if (not this->file_systems[location->getMountPoint()]->doesDirectoryExist(
-                    location->getAbsolutePathAtMountPoint())) {
+        if (not this->file_systems[mount_point]->doesDirectoryExist(
+                path_at_mount_point)) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new InvalidDirectoryPath(
                             this->getSharedPtr<SimpleStorageService>(),
-                            location->getMountPoint() + "/" +
-                                    location->getAbsolutePathAtMountPoint()));
+                            mount_point + "/" +
+                            path_at_mount_point));
         } else {
-            if (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint())) {
+            if (not fs->isFileInDirectory(file, path_at_mount_point)) {
                 WRENCH_INFO(
                         "Received a read request for a file I don't have (%s)", location->toString().c_str());
                 failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));
@@ -339,11 +346,11 @@ namespace wrench {
             this->pending_file_transfer_threads.push_front(ftt);
 
             // Update the file read date in the file system
-            fs->updateReadDate(file, location->getAbsolutePathAtMountPoint());
+            fs->updateReadDate(file, path_at_mount_point);
 
             // Mark the file as unevictable
-            this->file_systems[location->getMountPoint()]->incrementNumRunningTransactionsForFileInDirectory(
-                    location->getFile(), location->getAbsolutePathAtMountPoint());
+            this->file_systems[mount_point]->incrementNumRunningTransactionsForFileInDirectory(
+                    location->getFile(), path_at_mount_point);
         }
 
         return true;
@@ -357,20 +364,25 @@ namespace wrench {
      * @return
      */
     bool SimpleStorageServiceBufferized::processFileCopyRequest(
-            const std::shared_ptr<FileLocation> &src_location,
-            const std::shared_ptr<FileLocation> &dst_location,
+            std::shared_ptr<FileLocation> &src_location,
+            std::shared_ptr<FileLocation> &dst_location,
             simgrid::s4u::Mailbox *answer_mailbox) {
-        auto fs = this->file_systems[dst_location->getMountPoint()].get();
+
+
         auto file = src_location->getFile();
+
+        bool i_am_the_source = (src_location->getStorageService() == this->getSharedPtr<StorageService>());
 
         // Check that the source has it
         bool src_has_the_file;
         bool src_could_be_contacted = true;
         std::shared_ptr<FailureCause> src_could_not_be_contacted_failure_cause;
-
-        if (src_location->getStorageService() == this->getSharedPtr<StorageService>()) {
-            src_has_the_file = this->file_systems[src_location->getMountPoint()]->isFileInDirectory(
-                    src_location->getFile(), src_location->getAbsolutePathAtMountPoint());
+        src_has_the_file = src_location->getStorageService()->lookupFile(src_location);
+        if (i_am_the_source) {
+            std::string src_mount_point;
+            std::string src_path_at_mount_point;
+            this->splitPath(dst_location->getPath(), src_mount_point, src_path_at_mount_point);
+            src_has_the_file = this->file_systems[src_mount_point]->isFileInDirectory(src_location->getFile(), src_path_at_mount_point);
         } else {
             try {
                 src_has_the_file = src_location->getStorageService()->lookupFile(src_location);
@@ -421,9 +433,11 @@ namespace wrench {
             return true;
         }
 
+        bool file_already_there_at_destination = StorageService::hasFileAtLocation(dst_location);
+
         // If file is not already here, reserve space for it
-        bool file_already_here = fs->isFileInDirectory(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint());
-        if ((not file_already_here) and (not fs->reserveSpace(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint()))) {
+        if ((not file_already_there_at_destination) and
+            (not dst_location->getStorageService()->reserveSpace(dst_location))) {
             this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
 
             try {
@@ -467,8 +481,7 @@ namespace wrench {
         ftt->setSimulation(this->simulation);
         this->pending_file_transfer_threads.push_back(ftt);
 
-        src_location->getStorageService()->file_systems[src_location->getMountPoint()]->incrementNumRunningTransactionsForFileInDirectory(
-                src_location->getFile(), src_location->getAbsolutePathAtMountPoint());
+        src_location->getStorageService()->incrementNumRunningOperationsForLocation(src_location);
 
         return true;
     }
@@ -520,17 +533,19 @@ namespace wrench {
         }
 
         if (src_location) {
-            src_location->getStorageService()->file_systems[src_location->getMountPoint()]->decrementNumRunningTransactionsForFileInDirectory(
-                    src_location->getFile(), src_location->getAbsolutePathAtMountPoint());
+            src_location->getStorageService()->decrementNumRunningOperationsForLocation(src_location);
         }
 
         // Was the destination me?
         if (dst_location and (dst_location->getStorageService().get() == this)) {
             auto file = dst_location->getFile();
+            std::string dst_mount_point;
+            std::string dst_path_at_mount_point;
+            this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point);
             if (success) {
                 WRENCH_INFO("File %s stored!", file->getID().c_str());
-                this->file_systems[dst_location->getMountPoint()]->storeFileInDirectory(
-                        file, dst_location->getAbsolutePathAtMountPoint(), true);
+                this->file_systems[dst_mount_point]->storeFileInDirectory(
+                        file, dst_path_at_mount_point, true);
                 // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
                 // Maybe no corresponding timestamp.
                 try {
@@ -540,8 +555,7 @@ namespace wrench {
 
             } else {
                 // Process the failure, meaning, just un-decrease the free space
-                this->file_systems[dst_location->getMountPoint()]->unreserveSpace(
-                        file, dst_location->getAbsolutePathAtMountPoint());
+                this->file_systems[dst_mount_point]->unreserveSpace(file, dst_path_at_mount_point);
             }
         }
 

@@ -53,6 +53,7 @@ namespace wrench {
                                                                                                                                                            "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {
 
         this->buffer_size = 0;
+        this->is_bufferized = false;
     }
 
     /**
@@ -268,7 +269,7 @@ namespace wrench {
 
         } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message)) {
             return processFileWriteRequest(msg->location, msg->answer_mailbox,
-                                           msg->requesting_host, msg->buffer_size);
+                                           msg->requesting_host);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message)) {
             return processFileReadRequest(msg->location,
@@ -296,9 +297,8 @@ namespace wrench {
      * @param buffer_size: the buffer size to use
      * @return true if this process should keep running
      */
-    bool SimpleStorageServiceNonBufferized::processFileWriteRequest(const std::shared_ptr<FileLocation> &location,
-                                                                    simgrid::s4u::Mailbox *answer_mailbox, simgrid::s4u::Host *requesting_host,
-                                                                    double buffer_size) {
+    bool SimpleStorageServiceNonBufferized::processFileWriteRequest(std::shared_ptr<FileLocation> &location,
+                                                                    simgrid::s4u::Mailbox *answer_mailbox, simgrid::s4u::Host *requesting_host) {
 
         if (buffer_size >= 1.0) {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileWriteRequest(): Cannot process a write requests with a non-zero buffer size");
@@ -307,15 +307,18 @@ namespace wrench {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        auto fs = this->file_systems[location->getMountPoint()].get();
+        std::string mount_point;
+        std::string path_at_mount_point;
+        this->splitPath(location->getPath(), mount_point, path_at_mount_point);
+        auto fs = this->file_systems[mount_point].get();
         auto file = location->getFile();
 
         // If the file is not already there, do a capacity check/update
         // (If the file is already there, then there will just be an overwrite. Note that
         // if the overwrite fails, then the file will disappear, which is expected)
 
-        bool file_already_there = fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint()) and fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint());
-        if ((not file_already_there) and (not fs->reserveSpace(file, location->getAbsolutePathAtMountPoint()))) {
+        bool file_already_there = fs->doesDirectoryExist(path_at_mount_point) and fs->isFileInDirectory(file, path_at_mount_point);
+        if ((not file_already_there) and (not fs->reserveSpace(file, path_at_mount_point))) {
             try {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox,
@@ -327,6 +330,7 @@ namespace wrench {
                                                 file,
                                                 this->getSharedPtr<SimpleStorageService>())),
                                 nullptr,
+                                0,
                                 this->getMessagePayloadValue(
                                         SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
             } catch (wrench::ExecutionException &e) {
@@ -336,8 +340,8 @@ namespace wrench {
         }
 
         // At this point we're good
-        if (not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) {
-            fs->createDirectory(location->getAbsolutePathAtMountPoint());
+        if (not fs->doesDirectoryExist(path_at_mount_point)) {
+            fs->createDirectory(path_at_mount_point);
         }
 
         // Reply with a "go ahead, send me the file" message
@@ -348,6 +352,7 @@ namespace wrench {
                         true,
                         nullptr,
                         nullptr,
+                        this->buffer_size,
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
 
@@ -393,18 +398,23 @@ namespace wrench {
         LogicalFileSystem *fs = nullptr;
         auto file = location->getFile();
 
+        std::string mount_point;
+        std::string path_at_mount_point;
+        this->splitPath(location->getPath(), mount_point, path_at_mount_point);
+
+
         //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
-        if (not this->file_systems[location->getMountPoint()]->doesDirectoryExist(
-                    location->getAbsolutePathAtMountPoint())) {
+        if (not this->file_systems[getMountPoint()]->doesDirectoryExist(
+                    path_at_mount_point)) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new InvalidDirectoryPath(
                             this->getSharedPtr<SimpleStorageService>(),
-                            location->getMountPoint() + "/" +
-                                    location->getAbsolutePathAtMountPoint()));
+                            mount_point + "/" +
+                                    path_at_mount_point));
         } else {
-            fs = this->file_systems[location->getMountPoint()].get();
+            fs = this->file_systems[mount_point].get();
 
-            if (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint())) {
+            if (not fs->isFileInDirectory(file, path_at_mount_point)) {
                 WRENCH_INFO(
                         "Received a read request for a file I don't have (%s)", location->toString().c_str());
                 failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));
@@ -430,7 +440,7 @@ namespace wrench {
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
             // Make the file un-evictable
-            location->getStorageService()->incrementNumPendingReadsForLocation(location);
+            location->getStorageService()->incrementNumRunningOperationsForLocation(location);
 
             fs->updateReadDate(location->getFile(), location->getPath());
 
@@ -465,8 +475,8 @@ namespace wrench {
      * @return
      */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(
-            const std::shared_ptr<FileLocation> &src_location,
-            const std::shared_ptr<FileLocation> &dst_location,
+            std::shared_ptr<FileLocation> &src_location,
+            std::shared_ptr<FileLocation> &dst_location,
             simgrid::s4u::Mailbox *answer_mailbox) {
 
         WRENCH_INFO("FileCopyRequest: %s -> %s",
@@ -477,7 +487,10 @@ namespace wrench {
         auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
         // TODO: This disk identification is really ugly and likely slow
         simgrid::s4u::Disk *src_disk = nullptr;
-        auto src_location_sanitized_mount_point = FileLocation::sanitizePath(src_location->getMountPoint() + "/");
+        std::string src_mount_point;
+        std::string src_path_at_mount_point;
+        this->splitPath(src_location->getPath(), src_mount_point, src_path_at_mount_point);
+        auto src_location_sanitized_mount_point = FileLocation::sanitizePath(src_mount_point + "/");
         for (auto const &d: src_host->get_disks()) {
             if (src_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
                 src_disk = d;
@@ -487,7 +500,10 @@ namespace wrench {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(): source disk not found - internal error");
         }
         simgrid::s4u::Disk *dst_disk = nullptr;
-        auto dst_location_sanitized_mount_point = FileLocation::sanitizePath(dst_location->getMountPoint() + "/");
+        std::string dst_mount_point;
+        std::string dst_path_at_mount_point;
+        this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point);
+        auto dst_location_sanitized_mount_point = FileLocation::sanitizePath(dst_mount_point + "/");
         for (auto const &d: dst_host->get_disks()) {
             if (dst_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
                 dst_disk = d;
@@ -553,11 +569,11 @@ namespace wrench {
             return true;
         }
 
-        auto fs = this->file_systems[dst_location->getMountPoint()].get();
+        auto fs = this->file_systems[dst_mount_point].get();
 
         // If file is not already here, reserve space for it
-        bool file_is_already_here = fs->isFileInDirectory(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint());
-        if ((not file_is_already_here) and (not fs->reserveSpace(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint()))) {
+        bool file_is_already_here = fs->isFileInDirectory(dst_location->getFile(), dst_path_at_mount_point);
+        if ((not file_is_already_here) and (not fs->reserveSpace(dst_location->getFile(), dst_path_at_mount_point))) {
             this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
             try {
                 S4U_Mailbox::putMessage(
@@ -579,8 +595,7 @@ namespace wrench {
             return true;
         }
 
-        src_location->getStorageService()->file_systems[src_location->getMountPoint()]->incrementNumRunningTransactionsForFileInDirectory(
-                src_location->getFile(), src_location->getAbsolutePathAtMountPoint());
+        src_location->getStorageService()->incrementNumRunningOperationsForLocation(src_location);
 
         // At this point, there is enough space
         // Create a Transaction
@@ -608,8 +623,8 @@ namespace wrench {
      * @return
      */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequestIAmTheSource(
-            const std::shared_ptr<FileLocation> &src_location,
-            const std::shared_ptr<FileLocation> &dst_location,
+            std::shared_ptr<FileLocation> &src_location,
+            std::shared_ptr<FileLocation> &dst_location,
             simgrid::s4u::Mailbox *answer_mailbox) {
 
         WRENCH_INFO("FileCopyRequest: %s -> %s",
@@ -621,7 +636,10 @@ namespace wrench {
         auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
         // TODO: This disk identification is really ugly and likely slow
         simgrid::s4u::Disk *src_disk = nullptr;
-        auto src_location_sanitized_mount_point = FileLocation::sanitizePath(src_location->getMountPoint() + "/");
+        std::string src_mount_point;
+        std::string src_path_at_mount_point;
+        this->splitPath(src_location->getPath(), src_mount_point, src_path_at_mount_point);
+        auto src_location_sanitized_mount_point = FileLocation::sanitizePath(src_mount_point + "/");
         for (auto const &d: src_host->get_disks()) {
             if (src_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
                 src_disk = d;
@@ -631,7 +649,10 @@ namespace wrench {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmTheSource(): source disk not found - internal error");
         }
         simgrid::s4u::Disk *dst_disk = nullptr;
-        auto dst_location_sanitized_mount_point = FileLocation::sanitizePath(dst_location->getMountPoint() + "/");
+        std::string dst_mount_point;
+        std::string dst_path_at_mount_point;
+        this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point);
+        auto dst_location_sanitized_mount_point = FileLocation::sanitizePath(dst_mount_point + "/");
         for (auto const &d: dst_host->get_disks()) {
             if (dst_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
                 dst_disk = d;
@@ -643,10 +664,10 @@ namespace wrench {
 
         auto file = src_location->getFile();
 
-        auto my_fs = this->file_systems[src_location->getMountPoint()].get();
+        auto my_fs = this->file_systems[src_mount_point].get();
 
         // Do I have the file
-        if (not my_fs->isFileInDirectory(src_location->getFile(), src_location->getAbsolutePathAtMountPoint())) {
+        if (not my_fs->isFileInDirectory(src_location->getFile(), src_path_at_mount_point)) {
             try {
                 S4U_Mailbox::putMessage(
                         answer_mailbox,
@@ -670,12 +691,13 @@ namespace wrench {
         // At this point, I have the file
 
         // Can file fit at the destination?
-        auto dst_file_system = dst_location->getStorageService()->file_systems[dst_location->getMountPoint()].get();
-        bool file_already_at_destination = dst_file_system->isFileInDirectory(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint());
+//        auto dst_file_system = dst_location->getStorageService()->file_systems[dst_location->getMountPoint()].get();
+//        bool file_already_at_destination = dst_file_system->isFileInDirectory(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint());
+        bool file_already_at_destination = StorageService::hasFileAtLocation(dst_location);
 
         // If not already at destination make space for it, and if not possible, then return an error
         if (not file_already_at_destination) {
-            if (not dst_file_system->reserveSpace(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint())) {
+            if (not dst_location->getStorageService()->reserveSpace(dst_location)) {
                 try {
                     S4U_Mailbox::putMessage(
                             answer_mailbox,
@@ -701,8 +723,7 @@ namespace wrench {
         uint64_t transfer_size;
         transfer_size = (uint64_t) (file->getSize());
 
-        src_location->getStorageService()->file_systems[src_location->getMountPoint()]->incrementNumRunningTransactionsForFileInDirectory(
-                src_location->getFile(), src_location->getAbsolutePathAtMountPoint());
+        src_location->getStorageService()->incrementNumRunningOperationsForLocation(src_location);
 
         // Create a Transaction
         auto transaction = std::make_shared<Transaction>(

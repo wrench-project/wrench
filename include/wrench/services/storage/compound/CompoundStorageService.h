@@ -66,6 +66,14 @@ namespace wrench {
         // Overload StorageService's implementation.
         void setScratch() override;
 
+        virtual bool isBufferized() const override {
+            return false;
+        }
+
+        virtual double getBufferSize() const override {
+            return 0;
+        }
+
         /**
          * @brief Method to return the collection of known StorageServices
          */

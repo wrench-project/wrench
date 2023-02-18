@@ -777,7 +777,8 @@ namespace wrench {
 
         // Put the file on the storage service (not via the service daemon)
         try {
-            location->getStorageService()->createFile(location->getFile(), location->getFullAbsolutePath());
+            location->getStorageService()->createFile(location);
+//            StorageService::createFileAtLocation(location);
         } catch (std::invalid_argument &e) {
             throw;
         }
@@ -907,7 +908,7 @@ namespace wrench {
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, location->getPath(), n_bytes,
                                                     temp_unique_sequence_number);
 
         auto mem_mng = getMemoryManagerByHost(hostname);
