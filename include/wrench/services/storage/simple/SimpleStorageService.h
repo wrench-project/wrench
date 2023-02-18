@@ -147,7 +147,7 @@ namespace wrench {
 
     protected:
         SimpleStorageService(const std::string &hostname,
-                             std::set<std::string> mount_points,
+                             const std::set<std::string>& mount_points,
                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                              const std::string &suffix);

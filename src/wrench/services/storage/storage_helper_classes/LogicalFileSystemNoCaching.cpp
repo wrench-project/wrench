@@ -34,16 +34,12 @@ namespace wrench {
      *
      * @param file: the file to store
      * @param absolute_path: the directory's absolute path (at the mount point)
-     * @param must_be_initialized: whether the file system is initialized
      *
      * @throw std::invalid_argument
      */
-    void LogicalFileSystemNoCaching::storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path, bool must_be_initialized) {
+    void LogicalFileSystemNoCaching::storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return;
-        }
-        if (must_be_initialized) {
-            assertInitHasBeenCalled();
         }
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
@@ -54,14 +50,17 @@ namespace wrench {
 
         bool file_already_there = this->content[fixed_path].find(file) != this->content[fixed_path].end();
 
-        this->content[fixed_path][file] = std::make_shared<LogicalFileSystemNoCaching::FileOnDiskNoCaching>(S4U_Simulation::getClock());
-
         std::string key = FileLocation::sanitizePath(fixed_path) + file->getID();
         if (this->reserved_space.find(key) != this->reserved_space.end()) {
             this->reserved_space.erase(key);
         } else if (not file_already_there) {
             this->free_space -= file->getSize();
         }
+        if (this->free_space < 0) {
+            throw std::runtime_error("LogicalFileSystemNoCaching::storeFileInDirectory(): free space is <0, should never happen");
+        }
+
+        this->content[fixed_path][file] = std::make_shared<LogicalFileSystemNoCaching::FileOnDiskNoCaching>(S4U_Simulation::getClock());
     }
 
     /**
@@ -75,7 +74,6 @@ namespace wrench {
         if (devnull) {
             return;
         }
-        assertInitHasBeenCalled();
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
         assertDirectoryExist(fixed_path);
@@ -94,7 +92,6 @@ namespace wrench {
         if (devnull) {
             return;
         }
-        assertInitHasBeenCalled();
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
         assertDirectoryExist(fixed_path);

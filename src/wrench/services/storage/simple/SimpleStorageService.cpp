@@ -99,7 +99,7 @@ namespace wrench {
      */
     SimpleStorageService::SimpleStorageService(
             const std::string &hostname,
-            std::set<std::string> mount_points,
+            const std::set<std::string>& mount_points,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             const std::string &suffix) : StorageService(hostname, "simple_storage" + suffix) {
@@ -388,12 +388,13 @@ namespace wrench {
     void SimpleStorageService::createFile(const std::shared_ptr<FileLocation> &location)  {
         std::string mount_point, path_at_mount_point;
         this->splitPath(location->getPath(), mount_point, path_at_mount_point);
+        this->file_systems[mount_point]->unreserveSpace(location->getFile(), path_at_mount_point);
         bool enough_space = (this->file_systems[mount_point]->getFreeSpace() >= location->getFile()->getSize());
         if (!enough_space) {
             throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(
                     location->getFile(), location->getStorageService()));
         }
-        this->file_systems[mount_point]->storeFileInDirectory(location->getFile(), path_at_mount_point, false);
+        this->file_systems[mount_point]->storeFileInDirectory(location->getFile(), path_at_mount_point);
     }
 
 
@@ -402,7 +403,7 @@ namespace wrench {
         if (not this->splitPath(location->getPath(), mount_point, path_at_mount_point)) {
             return -1.0;
         }
-        this->file_systems[mount_point]->getFileLastWriteDate(location->getFile(), path_at_mount_point);
+        return this->file_systems[mount_point]->getFileLastWriteDate(location->getFile(), path_at_mount_point);
     }
 
 

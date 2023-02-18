@@ -68,12 +68,6 @@ namespace wrench {
     int SimpleStorageServiceBufferized::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
-        for (auto const &mp: this->file_systems) {
-            if (not mp.second->isInitialized()) {
-                mp.second->init();
-            }
-        }
-
         std::string message = "Simple Storage Service (Bufferized) " + this->getName() + "  starting on host " + this->getHostname();
         WRENCH_INFO("%s", message.c_str());
         for (auto const &fs: this->file_systems) {
@@ -547,7 +541,7 @@ namespace wrench {
             if (success) {
                 WRENCH_INFO("File %s stored!", file->getID().c_str());
                 this->file_systems[dst_mount_point]->storeFileInDirectory(
-                        file, dst_path_at_mount_point, true);
+                        file, dst_path_at_mount_point);
                 // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
                 // Maybe no corresponding timestamp.
                 try {

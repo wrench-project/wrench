@@ -762,7 +762,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -773,7 +773,8 @@ private:
                                                    {test->output_file, wrench::FileLocation::LOCATION(
                                                                                test->storage_service1, "/disk1", test->output_file)}});
 
-
+        std::cerr << "TOTAL SPACE = " << this->test->storage_service1->getTotalSpace() << "\n";
+        std::cerr << "FREE SPACE = " << this->test->storage_service1->getFreeSpace() << "\n";
         // Submit the job
         test->task->getStateAsString();
         job_manager->submitJob(job, test->compute_service);
@@ -786,7 +787,8 @@ private:
         } catch (std::invalid_argument &ignore) {}
 
         test->task->getStateAsString();
-        // Wait for the workflow execution event
+
+        // Wait for the  execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
@@ -813,7 +815,6 @@ private:
             throw std::runtime_error("Output file not written to storage service");
         }
 
-
         return 0;
     }
 };
@@ -825,10 +826,10 @@ TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithLocationMap) {
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-    //    argv[1] = strdup("--wrench-full-log");
+        argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -855,10 +856,9 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
-                            new ExecutionWithLocationMapTestWMS(
-                                    this, hostname)));
+                            new ExecutionWithLocationMapTestWMS(this, hostname)));
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));

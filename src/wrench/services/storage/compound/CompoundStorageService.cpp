@@ -137,9 +137,6 @@ namespace wrench {
         std::string message = "Compound Storage Service " + this->getName() + "  starting on host " + this->getHostname();
         WRENCH_INFO("%s", message.c_str());
 
-        // Init file system. There is always only one built-in LogicalFilesystem, with a DEV_NULL mount point.
-        for (auto const &fs: this->file_systems) { fs.second->init(); };
-
         WRENCH_INFO("Registered underlying storage services:");
         for (const auto &ss: this->storage_services) {
             message = " - " + ss->process_name + " on " + ss->getHostname();
