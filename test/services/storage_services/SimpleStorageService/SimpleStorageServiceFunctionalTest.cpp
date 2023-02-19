@@ -591,10 +591,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -998,7 +998,6 @@ private:
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
-        std::cerr << "DOING A FILE COPY\n";
         // Do the file copy while space doesn't fit
         try {
             data_movement_manager->doSynchronousFileCopy(
@@ -1036,8 +1035,6 @@ private:
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Copying a file onto itself shouldn't lead to an exception (just a printed warning)");
         }
-
-        std::cerr << "THAT WORKED!\n";
 
         // Do the file copy for a file that's not there
 
@@ -1131,8 +1128,6 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test(dou
     argv[0] = strdup("unit_test");
 //    argv[1] = strdup("--wrench-full-log");
 //    argv[2] = strdup("--log=wrench_core_mailbox.t=debug");
-
-    std::cerr << "BUFFER SIZE = " << buffer_size << "\n";
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

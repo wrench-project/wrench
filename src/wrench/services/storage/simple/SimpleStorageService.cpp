@@ -386,6 +386,9 @@ namespace wrench {
     }
 
     void SimpleStorageService::createFile(const std::shared_ptr<FileLocation> &location)  {
+        // If the file's already there, nothing to do
+        if (StorageService::hasFileAtLocation(location)) return;
+
         std::string mount_point, path_at_mount_point;
         this->splitPath(location->getPath(), mount_point, path_at_mount_point);
         this->file_systems[mount_point]->unreserveSpace(location->getFile(), path_at_mount_point);
