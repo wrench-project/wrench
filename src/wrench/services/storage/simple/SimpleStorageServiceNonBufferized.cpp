@@ -81,16 +81,16 @@ namespace wrench {
             //            WRENCH_INFO("Sending back an ack for a successful file read");
             S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage(transaction->src_location));
         } else if (transaction->src_location == nullptr) {
-            WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
             StorageService::createFileAtLocation(transaction->dst_location);
+            WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // Maybe no corresponding timestamp.
             //            WRENCH_INFO("Sending back an ack for a successful file read");
             S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage(transaction->dst_location));
         } else {
             if (transaction->dst_location->getStorageService() == shared_from_this()) {
-                WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
                 this->createFile(transaction->dst_location);
+                WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
                 try {
                     this->simulation->getOutput().addTimestampFileCopyCompletion(
                             Simulation::getCurrentSimulatedDate(), transaction->dst_location->getFile(), transaction->src_location, transaction->dst_location);
@@ -306,34 +306,38 @@ namespace wrench {
         auto file = location->getFile();
 
         // If the file is not already there, do a capacity check/update
-        // (If the file is already there, then there will just be an overwrite. Note that
-        // if the overwrite fails, then the file will disappear, which is expected)
-
+        // (If the file is already there, then there will just be an overwrite.
         bool file_already_there = fs->doesDirectoryExist(path_at_mount_point) and fs->isFileInDirectory(file, path_at_mount_point);
-        if ((not file_already_there) and (not fs->reserveSpace(file, path_at_mount_point))) {
-            try {
-                S4U_Mailbox::dputMessage(
-                        answer_mailbox,
-                        new StorageServiceFileWriteAnswerMessage(
-                                location,
-                                false,
-                                std::shared_ptr<FailureCause>(
-                                        new StorageServiceNotEnoughSpace(
-                                                file,
-                                                this->getSharedPtr<SimpleStorageService>())),
-                                nullptr,
-                                0,
-                                this->getMessagePayloadValue(
-                                        SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (wrench::ExecutionException &e) {
-                return true;
-            }
-            return true;
-        }
 
-        // At this point we're good
-        if (not fs->doesDirectoryExist(path_at_mount_point)) {
-            fs->createDirectory(path_at_mount_point);
+        if (not file_already_there) {
+
+            // Reserve space
+            bool success = fs->reserveSpace(file, path_at_mount_point);
+            if (not success) {
+                try {
+                    S4U_Mailbox::dputMessage(
+                            answer_mailbox,
+                            new StorageServiceFileWriteAnswerMessage(
+                                    location,
+                                    false,
+                                    std::shared_ptr<FailureCause>(
+                                            new StorageServiceNotEnoughSpace(
+                                                    file,
+                                                    this->getSharedPtr<SimpleStorageService>())),
+                                    nullptr,
+                                    0,
+                                    this->getMessagePayloadValue(
+                                            SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+                } catch (wrench::ExecutionException &e) {
+                    return true;
+                }
+            }
+
+            // Create directory
+            if (not fs->doesDirectoryExist(path_at_mount_point)) {
+                fs->createDirectory(path_at_mount_point);
+            }
+
         }
 
         // Reply with a "go ahead, send me the file" message

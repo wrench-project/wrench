@@ -38,6 +38,9 @@ namespace wrench {
 
         /** File Lookup methods (in simulation) **/
         static bool lookupFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::lookupFileAtLocation(): invalid argument argument");
+            }
             return location->getStorageService()->lookupFile(location);
         }
         bool lookupFile(const std::shared_ptr<DataFile> &file) {
@@ -52,6 +55,9 @@ namespace wrench {
 
         /** File deletion methods **/
         static void deleteFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::deleteFileAtLocation(): invalid argument argument");
+            }
             location->getStorageService()->deleteFile(location);
         }
         void deleteFile(const std::shared_ptr<DataFile> &file) {
@@ -66,9 +72,15 @@ namespace wrench {
 
         /** File read methods **/
         static void readFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::readFileAtLocation(): invalid argument argument");
+            }
             location->getStorageService()->readFile(location, location->getFile()->getSize());
         }
         static void readFileAtLocation(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::readFileAtLocation(): invalid argument argument");
+            }
             location->getStorageService()->readFile(location, num_bytes);
         }
         void readFile(const std::shared_ptr<DataFile> &file) {
@@ -92,6 +104,9 @@ namespace wrench {
 
         /** File write methods **/
         static void writeFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::writeFileAtLocation(): invalid argument argument");
+            }
             location->getStorageService()->writeFile(location);
         }
         void writeFile(const std::shared_ptr<DataFile> &file) {
@@ -108,6 +123,9 @@ namespace wrench {
 
         /** File lookup methods */
         static bool hasFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::hasFileAtLocation(): invalid argument argument");
+            }
             return location->getStorageService()->hasFile(location);
         }
         bool hasFile(const std::shared_ptr<DataFile> &file) {
@@ -120,6 +138,9 @@ namespace wrench {
 
         /** File creation methods */
         static void createFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::createFileAtLocation(): invalid argument argument");
+            }
             location->getStorageService()->createFile(location);
         }
         void createFile(const std::shared_ptr<DataFile> &file) {
@@ -132,6 +153,9 @@ namespace wrench {
 
         /** File write date methods */
         void getFileLocationLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::getFileLocationLastWriteDate(): invalid argument argument");
+            }
             this->getFileLastWriteDate(location);
         }
         double getFileLastWriteDate(const std::shared_ptr<DataFile> &file) {
