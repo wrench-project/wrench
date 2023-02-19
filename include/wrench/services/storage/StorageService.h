@@ -107,8 +107,8 @@ namespace wrench {
         /** Non-Simulation methods **/
 
         /** File lookup methods */
-        bool hasFileAtLocation(const std::shared_ptr<FileLocation> &location) {
-            return this->hasFile(location);
+        static bool hasFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            return location->getStorageService()->hasFile(location);
         }
         bool hasFile(const std::shared_ptr<DataFile> &file) {
             return this->hasFile(file, "/");

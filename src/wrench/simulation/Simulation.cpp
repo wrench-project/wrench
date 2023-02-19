@@ -744,10 +744,8 @@ namespace wrench {
 
         // Put the file on the storage service (not via the service daemon)
         try {
-            std:cerr << "CALLING CREATE FILE\n";
             location->getStorageService()->createFile(location);
         } catch (ExecutionException &e) {
-            std::cerr << "THRWOING INVALID\n";
             throw std::invalid_argument("Simulation::stageFile(): Not enough space on disk");
         }
 
