@@ -361,6 +361,9 @@ namespace wrench {
      * @return a (simulated) date in seconds
      */
     double StorageServiceProxy::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+        if (location == nullptr) {
+            throw std::invalid_argument("StorageServiceProxy::getFileLastWriteDate(): Invalid nullptr argument");
+        }
         if (remote) {
             return remote->getFileLastWriteDate(location);
         }

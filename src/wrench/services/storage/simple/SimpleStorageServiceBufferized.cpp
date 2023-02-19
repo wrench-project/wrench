@@ -77,6 +77,7 @@ namespace wrench {
             WRENCH_INFO("%s", message.c_str());
         }
 
+#ifdef PAGE_CACHE_SIMULATION
         // If writeback device simulation is activated
         if (Simulation::isPageCachingEnabled()) {
             //  Find the "memory" disk (we know there is one)
@@ -93,13 +94,11 @@ namespace wrench {
                     break;
                 }
             }
-
-#ifdef PAGE_CACHE_SIMULATION
             // Start periodical flushing via a memory manager
             this->memory_manager = MemoryManager::initAndStart(this->simulation, memory_disk, 0.4, 5, 30, this->hostname);
             //            memory_manager_ptr->log();
-#endif
         }
+#endif
 
         /** Main loop **/
         while (this->processNextMessage()) {
@@ -367,48 +366,9 @@ namespace wrench {
 
         auto file = src_location->getFile();
 
-        bool i_am_the_source = (src_location->getStorageService() == this->getSharedPtr<StorageService>());
 
         // Check that the source has it
-        bool src_has_the_file;
-        bool src_could_be_contacted = true;
-        std::shared_ptr<FailureCause> src_could_not_be_contacted_failure_cause;
-        src_has_the_file = src_location->getStorageService()->lookupFile(src_location);
-        if (i_am_the_source) {
-            std::string src_mount_point;
-            std::string src_path_at_mount_point;
-            this->splitPath(dst_location->getPath(), src_mount_point, src_path_at_mount_point);
-            src_has_the_file = this->file_systems[src_mount_point]->isFileInDirectory(src_location->getFile(), src_path_at_mount_point);
-        } else {
-            try {
-                src_has_the_file = src_location->getStorageService()->lookupFile(src_location);
-            } catch (wrench::ExecutionException &e) {
-                src_could_be_contacted = false;
-                src_could_not_be_contacted_failure_cause = e.getCause();
-            }
-        }
-
-        // If the src could not be contacted, send back an error
-        if (not src_could_be_contacted) {
-            try {
-                S4U_Mailbox::putMessage(
-                        answer_mailbox,
-                        new StorageServiceFileCopyAnswerMessage(
-                                src_location,
-                                dst_location,
-                                nullptr, false,
-                                false,
-                                src_could_not_be_contacted_failure_cause,
-                                this->getMessagePayloadValue(
-                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-
-            } catch (ExecutionException &e) {
-                return true;
-            }
-            return true;
-        }
-
-        if (not src_has_the_file) {
+        if (not StorageService::hasFileAtLocation(src_location)) {
             try {
                 S4U_Mailbox::putMessage(
                         answer_mailbox,
@@ -429,6 +389,7 @@ namespace wrench {
             return true;
         }
 
+        bool i_am_the_source = (src_location->getStorageService() == this->getSharedPtr<StorageService>());
         bool file_already_there_at_destination = StorageService::hasFileAtLocation(dst_location);
 
         // If file is not already here, reserve space for it

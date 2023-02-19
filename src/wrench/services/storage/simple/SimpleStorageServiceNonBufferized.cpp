@@ -273,12 +273,7 @@ namespace wrench {
                                           msg->num_bytes_to_read, msg->answer_mailbox, msg->requesting_host);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message)) {
-            if (msg->src->getStorageService() != this->getSharedPtr<StorageService>()) {
-                return processFileCopyRequestIAmNotTheSource(msg->src, msg->dst, msg->answer_mailbox);
-            } else {
-                return processFileCopyRequestIAmTheSource(msg->src, msg->dst, msg->answer_mailbox);
-            }
-
+            return processFileCopyRequest(msg->src, msg->dst, msg->answer_mailbox);
         } else {
             throw std::runtime_error(
                     "SimpleStorageServiceNonBufferized::processNextMessage(): Unexpected [" + message->getName() + "] message");
@@ -402,12 +397,12 @@ namespace wrench {
 
         //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
         if (not this->file_systems[mount_point]->doesDirectoryExist(
-                    path_at_mount_point)) {
+                path_at_mount_point)) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new InvalidDirectoryPath(
                             this->getSharedPtr<SimpleStorageService>(),
                             mount_point + "/" +
-                                    path_at_mount_point));
+                            path_at_mount_point));
         } else {
             fs = this->file_systems[mount_point].get();
 
@@ -494,60 +489,6 @@ namespace wrench {
 
         auto file = src_location->getFile();
 
-        bool src_has_the_file;
-        bool src_could_be_contacted = true;
-        std::shared_ptr<FailureCause> src_could_not_be_contacted_failure_cause;
-
-        //TODO: Should the lookup below be a hasFile()?
-        try {
-            src_has_the_file = src_location->getStorageService()->lookupFile(src_location);
-        } catch (wrench::ExecutionException &e) {
-            src_could_be_contacted = false;
-            src_could_not_be_contacted_failure_cause = e.getCause();
-        }
-
-        // If the src could not be contacted, send back an error
-        if (not src_could_be_contacted) {
-            try {
-                S4U_Mailbox::putMessage(
-                        answer_mailbox,
-                        new StorageServiceFileCopyAnswerMessage(
-                                src_location,
-                                dst_location,
-                                nullptr, false,
-                                false,
-                                src_could_not_be_contacted_failure_cause,
-                                this->getMessagePayloadValue(
-                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-
-            } catch (ExecutionException &e) {
-                return true;
-            }
-            return true;
-        }
-
-        // If the src doesn't have the file, return an error
-        if (not src_has_the_file) {
-            try {
-                S4U_Mailbox::putMessage(
-                        answer_mailbox,
-                        new StorageServiceFileCopyAnswerMessage(
-                                src_location,
-                                dst_location,
-                                nullptr, false,
-                                false,
-                                std::shared_ptr<FailureCause>(
-                                        new FileNotFound(
-                                                src_location)),
-                                this->getMessagePayloadValue(
-                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-
-            } catch (ExecutionException &e) {
-                return true;
-            }
-            return true;
-        }
-
         std::string dst_mount_point;
         std::string dst_path_at_mount_point;
         this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point);
@@ -617,36 +558,22 @@ namespace wrench {
         // TODO: This code is duplicated with the IAmNotTheSource version of this method
         auto src_host = simgrid::s4u::Host::by_name(src_location->getStorageService()->getHostname());
         auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
-        // TODO: This disk identification is really ugly and likely slow
-        simgrid::s4u::Disk *src_disk = nullptr;
-        std::string src_mount_point;
-        std::string src_path_at_mount_point;
-        this->splitPath(src_location->getPath(), src_mount_point, src_path_at_mount_point);
-        auto src_location_sanitized_mount_point = FileLocation::sanitizePath(src_mount_point + "/");
-        for (auto const &d: src_host->get_disks()) {
-            if (src_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
-                src_disk = d;
-            }
-        }
+
+        auto src_disk = src_location->getDiskOrNull();
         if (src_disk == nullptr) {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmTheSource(): source disk not found - internal error");
         }
-        simgrid::s4u::Disk *dst_disk = nullptr;
-        std::string dst_mount_point;
-        std::string dst_path_at_mount_point;
-        this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point);
-        auto dst_location_sanitized_mount_point = FileLocation::sanitizePath(dst_mount_point + "/");
-        for (auto const &d: dst_host->get_disks()) {
-            if (dst_location_sanitized_mount_point == FileLocation::sanitizePath(std::string(d->get_property("mount")) + "/")) {
-                dst_disk = d;
-            }
-        }
+        auto dst_disk = dst_location->getDiskOrNull();
         if (dst_disk == nullptr) {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmTheSource(): destination disk not found - internal error");
         }
 
         auto file = src_location->getFile();
 
+        std::string src_mount_point;
+        std::string src_path_at_mount_point;
+        this->splitPath(src_location->getPath(), src_mount_point, src_path_at_mount_point);
+        auto fs = this->file_systems[src_mount_point].get();
         auto my_fs = this->file_systems[src_mount_point].get();
 
         // Do I have the file
@@ -741,7 +668,7 @@ namespace wrench {
                                                                transaction->src_disk,
                                                                transaction->dst_host,
                                                                transaction->dst_disk)
-                                       ->set_size((uint64_t) (transaction->transfer_size));
+                    ->set_size((uint64_t) (transaction->transfer_size));
 
             transaction->stream = sg_iostream;
 
@@ -759,5 +686,32 @@ namespace wrench {
         return (double) this->running_transactions.size() + (double) this->pending_transactions.size();
     }
 
+
+    bool SimpleStorageServiceNonBufferized::processFileCopyRequest(std::shared_ptr<FileLocation> &src,
+                                                                   std::shared_ptr<FileLocation> &dst,
+                                                                   simgrid::s4u::Mailbox *answer_mailbox) {
+
+        // Check that src has the file
+        if (not StorageService::hasFileAtLocation(src)) {
+            S4U_Mailbox::dputMessage(
+                    answer_mailbox,
+                    new StorageServiceFileCopyAnswerMessage(
+                            src,
+                            dst,
+                            nullptr, false,
+                            false,
+                            std::make_shared<FileNotFound>(src),
+                            this->getMessagePayloadValue(
+                                    SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+
+            return true;
+        }
+
+        if (src->getStorageService() != this->getSharedPtr<StorageService>()) {
+            return processFileCopyRequestIAmNotTheSource(src, dst, answer_mailbox);
+        } else {
+            return processFileCopyRequestIAmTheSource(src, dst, answer_mailbox);
+        }
+    }
 
 }// namespace wrench
