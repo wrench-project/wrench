@@ -773,8 +773,8 @@ private:
                                                    {test->output_file, wrench::FileLocation::LOCATION(
                                                                                test->storage_service1, "/disk1", test->output_file)}});
 
-        std::cerr << "TOTAL SPACE = " << this->test->storage_service1->getTotalSpace() << "\n";
-        std::cerr << "FREE SPACE = " << this->test->storage_service1->getFreeSpace() << "\n";
+//        std::cerr << "TOTAL SPACE = " << this->test->storage_service1->getTotalSpace() << "\n";
+//        std::cerr << "FREE SPACE = " << this->test->storage_service1->getFreeSpace() << "\n";
         // Submit the job
         test->task->getStateAsString();
         job_manager->submitJob(job, test->compute_service);
@@ -826,10 +826,10 @@ TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithLocationMap) {
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-        argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
