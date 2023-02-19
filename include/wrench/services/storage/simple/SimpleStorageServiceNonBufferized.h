@@ -126,6 +126,12 @@ namespace wrench {
                                double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox,
                                simgrid::s4u::Host *requesting_host);
 
+
+        bool processFileCopyRequest(
+                std::shared_ptr<FileLocation> &src,
+                std::shared_ptr<FileLocation> &dst,
+                simgrid::s4u::Mailbox *answer_mailbox);
+
         bool processFileCopyRequestIAmTheSource(
                 std::shared_ptr<FileLocation> &src,
                 std::shared_ptr<FileLocation> &dst,

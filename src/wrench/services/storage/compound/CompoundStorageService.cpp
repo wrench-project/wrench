@@ -662,6 +662,9 @@ namespace wrench {
      *
      */
     double CompoundStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+        if (location == nullptr) {
+            throw std::invalid_argument("CompoundStorageService::getFileLastWriteDate(): Invalid nullptr argument");
+        }
         if (!this->hasFile(location)) {
             throw std::invalid_argument("CompoundStorageService::getFileLastWriteDate(): File not known to the CompoundStorageService. Unable to forward to underlying StorageService");
         }

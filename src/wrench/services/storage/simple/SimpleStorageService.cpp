@@ -399,6 +399,9 @@ namespace wrench {
 
 
     double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+        if (location == nullptr) {
+            throw std::invalid_argument("SimpleStorageService::getFileLastWriteDate(): Invalid nullptr argument");
+        }
         std::string mount_point, path_at_mount_point;
         if (not this->splitPath(location->getPath(), mount_point, path_at_mount_point)) {
             return -1.0;
