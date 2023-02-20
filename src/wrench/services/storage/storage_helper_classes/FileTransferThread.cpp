@@ -216,6 +216,7 @@ namespace wrench {
 
         } else if (((this->src_location) and (this->dst_location) and
                     (this->dst_location->getStorageService() == this->parent))) {
+
             /** Downloading a file from another storage service */
             try {
                 downloadFileFromStorageService(this->file, this->src_location, this->dst_location);
