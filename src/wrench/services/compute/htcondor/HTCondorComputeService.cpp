@@ -203,6 +203,8 @@ namespace wrench {
         this->central_manager->setSimulation(this->simulation);
         this->central_manager->start(this->central_manager, true, false);// Daemonized, no auto-restart
 
+        // Start the Scratch Storage Service
+        this->startScratchStorageService();
 
         // main loop
         while (this->processNextMessage()) {
@@ -385,6 +387,8 @@ namespace wrench {
     void HTCondorComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
         for (auto const &cs: this->central_manager->compute_services) {
             if (not cs->hasScratch()) {
+            std::cerr << "NOT HAS SCRATCH: " << cs->getName() << "\n";
+            std::cerr << "cs->getScratch() NULL? " << (cs->getScratch() == nullptr) << "\n";
                 throw std::invalid_argument(
                         "HTCondorComputeService::validateJobsUseOfScratch(): This HTCondor service cannot"
                         " handle jobs that use scratch space because at least one of its subordinate compute "
