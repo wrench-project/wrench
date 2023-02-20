@@ -78,8 +78,6 @@ namespace wrench {
         // Create the S4U simulation wrapper
         this->s4u_simulation = std::make_unique<S4U_Simulation>();
 
-        // Create the global lock
-        this->global_lock = simgrid::s4u::Mutex::create();
     }
 
     /**
@@ -1306,7 +1304,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::shared_ptr<StorageService> Simulation::startNewService(StorageService *service) {
-        std::cerr << "IN START NEW SERVICE!@##\n";
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
         }
@@ -1315,14 +1312,11 @@ namespace wrench {
             throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
         }
 
-        std::cerr << "IN START NEW SERVICE\n";
 
         service->simulation = this;
         std::shared_ptr<StorageService> shared_ptr = std::shared_ptr<StorageService>(service);
         this->storage_services.insert(shared_ptr);
-        std::cerr << "STARTING NEW SEVICE\n";
         shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
-        std::cerr << "STARTED " << service->getName() << "\n";
 
         return shared_ptr;
     }

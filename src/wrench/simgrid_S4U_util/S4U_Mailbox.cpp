@@ -342,10 +342,6 @@ namespace wrench {
      * @return
      */
     simgrid::s4u::Mailbox *S4U_Mailbox::generateUniqueMailbox(const std::string &prefix) {
-        std::cerr << "IN GENE\n";
-        auto mb =  simgrid::s4u::Mailbox::by_name(prefix + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber()));
-        std::cerr << "IN GENE2\n";
-        return mb;
         return simgrid::s4u::Mailbox::by_name(prefix + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber()));
     }
 

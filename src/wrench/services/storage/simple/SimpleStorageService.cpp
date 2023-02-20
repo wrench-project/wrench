@@ -47,7 +47,6 @@ namespace wrench {
         bool bufferized = false;// By default, non-bufferized
                                 //        bool bufferized = true; // By default, bufferized
 
-        std::cerr << "IN CREATE SIMPLe\n";
         if (property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != property_list.end()) {
             double buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
             bufferized = buffer_size >= 1.0;// more than one byte means bufferized
@@ -60,14 +59,10 @@ namespace wrench {
                                      "storage services and also simulate link shutdowns. This feature is not implemented yet.");
         }
 
-        std::cerr << "HERARAERAR\n";
         if (bufferized) {
-            std::cerr << "RETURNING BUFFEREISR\n";
             auto sss = (SimpleStorageService *) (new SimpleStorageServiceBufferized(hostname, mount_points, property_list, messagepayload_list));
-            std::cerr << "RETURNING FFFFFFFFF\n";
             return sss;
         } else {
-            std::cerr << "RETURNING NON-BUFFEREISR\n";
             return (SimpleStorageService *) (new SimpleStorageServiceNonBufferized(hostname, mount_points, property_list, messagepayload_list));
         }
     }
@@ -110,7 +105,6 @@ namespace wrench {
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             const std::string &suffix) : StorageService(hostname, "simple_storage" + suffix) {
 
-        std::cerr << "IN SIMPLE STORAGE SERVICE CONS\n";
         this->setProperties(this->default_property_values, std::move(property_list));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
         this->validateProperties();
@@ -129,7 +123,6 @@ namespace wrench {
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(
                 SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-        std::cerr << "IN SIMPLE STORAGE SERVICE CONS (RETURNING)\n";
     }
 
 
