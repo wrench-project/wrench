@@ -72,7 +72,7 @@ namespace wrench {
         double getFreeSpace() override;
 
         // Overload StorageService's implementation.
-        void setScratch() override;
+        void setIsScratch(bool is_scratch) override;
 
         bool isBufferized() const override {
             return false;

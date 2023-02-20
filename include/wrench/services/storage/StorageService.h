@@ -249,7 +249,7 @@ namespace wrench {
         StorageService(const std::string &hostname,
                        const std::string &service_name);
 
-        virtual void setScratch();
+        virtual void setIsScratch(bool is_scratch);
 
         /***********************/
         /** \endcond          **/

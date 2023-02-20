@@ -45,10 +45,11 @@ namespace wrench {
 
 
     /**
-     * @brief Indicate that this storage service is a scratch service of a ComputeService
+     * @brief Indicate whether this storage service is a scratch service of a ComputeService
+     * @param is_scratch: true if scratch, false otherwise
      */
-    void StorageService::setScratch() {
-        this->is_scratch = true;
+    void StorageService::setIsScratch(bool is_scratch) {
+        this->is_scratch = is_scratch;
     }
 
 

@@ -152,23 +152,41 @@ namespace wrench {
                                    const std::string &service_name,
                                    const std::string &scratch_space_mount_point) : Service(hostname, service_name) {
         this->state = ComputeService::UP;
+        this->scratch_space_mount_point = scratch_space_mount_point;
 
+    }
+
+    void ComputeService::startScratchStorageService() {
+        std::cerr << "1. CALLING startScratchStorageService (" << this->getName() << "\n";
+        std::cerr << "1.1. CALLING startScratchStorageService (" << this->getName() << ") : " << this->scratch_space_mount_point << "\n";
+        if (this->scratch_space_storage_service) return;
+
+        std::cerr << "2. CALLING startScratchStorageService (" << this->getName() << "\n";
         if (not scratch_space_mount_point.empty()) {
-            double buffer_size = 10000000;// TODO: Make this configurable?
+          std::cerr << "4. CALLING startScratchStorageService (" << this->getName() << "\n";
+            double buffer_size = 1000000000;// TODO: Make this configurable?
             try {
+
+                std::cerr << "WTF\n";
+                auto ss = SimpleStorageService::createSimpleStorageService(
+                                  hostname,
+                                  {scratch_space_mount_point},
+                                  {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {});
+
+                std::cerr << "WTF1\n";
                 this->scratch_space_storage_service =
-                        std::shared_ptr<StorageService>(
-                                SimpleStorageService::createSimpleStorageService(hostname, {scratch_space_mount_point},
-                                                                                 {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {}));
-                this->scratch_space_storage_service->setScratch();
-                this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(
-                        this->scratch_space_storage_service);
+                        this->simulation->startNewService(ss);
+                std::cerr << "33333333: " << this->scratch_space_storage_service->getName() << "\n";
+
             } catch (std::runtime_error &e) {
+                std::cerr << "THROWING " << e.what() << "\n";
                 throw;
             }
+            std::cerr << "RHDED\n";
         } else {
             this->scratch_space_storage_service = nullptr;
         }
+        std::cerr << "5. AT THIS POINT " << this->getName() << " strach_service = " << (this->scratch_space_storage_service == nullptr) << "\n";
     }
 
     /**
@@ -370,11 +388,11 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
-                                                       answer_mailbox,
-                                                       num_cores,
-                                                       ram,
-                                                       this->getMessagePayloadValue(
-                                                               ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
+                answer_mailbox,
+                num_cores,
+                ram,
+                this->getMessagePayloadValue(
+                        ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -450,10 +468,10 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
-                                                       answer_mailbox,
-                                                       key,
-                                                       this->getMessagePayloadValue(
-                                                               ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
+                answer_mailbox,
+                key,
+                this->getMessagePayloadValue(
+                        ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -494,13 +512,13 @@ namespace wrench {
         return this->scratch_space_storage_service;
     }
 
-    /**
-    * @brief Get a shared pointer to the compute service's scratch storage space
-    * @return a shared pointer to the shared scratch space
-    */
-    std::shared_ptr<StorageService> ComputeService::getScratchSharedPtr() {
-        return this->scratch_space_storage_service_shared_ptr;
-    }
+//    /**
+//    * @brief Get a shared pointer to the compute service's scratch storage space
+//    * @return a shared pointer to the shared scratch space
+//    */
+//    std::shared_ptr<StorageService> ComputeService::getScratchSharedPtr() {
+//        return this->scratch_space_storage_service_shared_ptr;
+//    }
 
     /**
     * @brief Checks if the compute service has a scratch space
@@ -527,7 +545,7 @@ namespace wrench {
      */
     void ComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
         if (not this->hasScratch()) {
-            throw std::invalid_argument("Compute service does not have scratch space");
+            throw std::invalid_argument("Compute service (" + this->getName() + ") does not have scratch space");
         }
     }
 

@@ -404,6 +404,9 @@ namespace wrench {
             termination_detector->start(termination_detector, true, false);// Daemonized, no auto-restart
         }
 
+        // Start the Scratch Storage Service
+        this->startScratchStorageService();
+
         /** Main loop **/
         while (this->processNextMessage()) {
             dispatchReadyActions();

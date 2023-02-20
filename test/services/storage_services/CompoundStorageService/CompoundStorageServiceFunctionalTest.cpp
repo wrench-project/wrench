@@ -178,7 +178,7 @@ private:
         }
 
         try {
-            test->compound_storage_service->setScratch();
+            test->compound_storage_service->setIsScratch(true);
             throw std::runtime_error("CompoundStorageService can't be setup as a scratch space");
         } catch (std::logic_error &e) {}
 
