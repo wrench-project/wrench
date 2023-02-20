@@ -185,7 +185,6 @@ namespace wrench {
         static bool isEnergySimulationEnabled();
         static bool isSurfPrecisionSetByUser();
 
-
         /***********************/
         /** \endcond           */
         /***********************/

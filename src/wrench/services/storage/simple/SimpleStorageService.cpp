@@ -63,7 +63,9 @@ namespace wrench {
         std::cerr << "HERARAERAR\n";
         if (bufferized) {
             std::cerr << "RETURNING BUFFEREISR\n";
-            return (SimpleStorageService *) (new SimpleStorageServiceBufferized(hostname, mount_points, property_list, messagepayload_list));
+            auto sss = (SimpleStorageService *) (new SimpleStorageServiceBufferized(hostname, mount_points, property_list, messagepayload_list));
+            std::cerr << "RETURNING FFFFFFFFF\n";
+            return sss;
         } else {
             std::cerr << "RETURNING NON-BUFFEREISR\n";
             return (SimpleStorageService *) (new SimpleStorageServiceNonBufferized(hostname, mount_points, property_list, messagepayload_list));
@@ -108,6 +110,7 @@ namespace wrench {
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             const std::string &suffix) : StorageService(hostname, "simple_storage" + suffix) {
 
+        std::cerr << "IN SIMPLE STORAGE SERVICE CONS\n";
         this->setProperties(this->default_property_values, std::move(property_list));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
         this->validateProperties();
@@ -126,6 +129,7 @@ namespace wrench {
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(
                 SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+        std::cerr << "IN SIMPLE STORAGE SERVICE CONS (RETURNING)\n";
     }
 
 

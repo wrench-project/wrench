@@ -77,6 +77,9 @@ namespace wrench {
 
         // Create the S4U simulation wrapper
         this->s4u_simulation = std::make_unique<S4U_Simulation>();
+
+        // Create the global lock
+        this->global_lock = simgrid::s4u::Mutex::create();
     }
 
     /**
