@@ -157,37 +157,24 @@ namespace wrench {
     }
 
     void ComputeService::startScratchStorageService() {
-        std::cerr << "1. CALLING startScratchStorageService (" << this->getName() << "\n";
-        std::cerr << "1.1. CALLING startScratchStorageService (" << this->getName() << ") : " << this->scratch_space_mount_point << "\n";
-        if (this->scratch_space_storage_service) return;
+        if (this->scratch_space_storage_service) return; // Already started by somebody else
+        if (this->scratch_space_mount_point.empty()) return; // No mount point provided
 
-        std::cerr << "2. CALLING startScratchStorageService (" << this->getName() << "\n";
-        if (not scratch_space_mount_point.empty()) {
-          std::cerr << "4. CALLING startScratchStorageService (" << this->getName() << "\n";
-            double buffer_size = 1000000000;// TODO: Make this configurable?
-            try {
+        double buffer_size = 1000000000;// TODO: Make this configurable?
+        try {
 
-                std::cerr << "WTF\n";
-                auto ss = SimpleStorageService::createSimpleStorageService(
-                                  hostname,
-                                  {scratch_space_mount_point},
-                                  {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {});
+            auto ss = SimpleStorageService::createSimpleStorageService(
+                    hostname,
+                    {scratch_space_mount_point},
+                    {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {});
 
-                std::cerr << "WTF1\n";
-                ss->setIsScratch(true);
-                this->scratch_space_storage_service =
-                        this->simulation->startNewService(ss);
-                std::cerr << "33333333: " << this->scratch_space_storage_service->getName() << "\n";
+            ss->setIsScratch(true);
+            this->scratch_space_storage_service =
+                    this->simulation->startNewService(ss);
 
-            } catch (std::runtime_error &e) {
-                std::cerr << "THROWING " << e.what() << "\n";
-                throw;
-            }
-            std::cerr << "RHDED\n";
-        } else {
-            this->scratch_space_storage_service = nullptr;
+        } catch (std::runtime_error &e) {
+            throw;
         }
-        std::cerr << "5. AT THIS POINT " << this->getName() << " strach_service = " << (this->scratch_space_storage_service == nullptr) << "\n";
     }
 
     /**
@@ -526,7 +513,7 @@ namespace wrench {
     * @return true if the compute service has some scratch storage space, false otherwise
     */
     bool ComputeService::hasScratch() const {
-        return (this->scratch_space_storage_service != nullptr);
+        return (not this->scratch_space_mount_point.empty()) or (this->scratch_space_storage_service != nullptr);
     }
 
     /**

@@ -38,7 +38,6 @@ namespace wrench {
      * @param process_name_prefix: the prefix of the name of the simulated process/actor
      */
     S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix) {
-        std::cerr << "IN S4U_DAMON CONST\n";
         if (not simgrid::s4u::Engine::is_initialized()) {
             throw std::runtime_error("Simulation must be initialized before services can be created");
         }
@@ -75,14 +74,10 @@ namespace wrench {
         unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
         //        this->initial_mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
         //        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
-        std::cerr << "s$UD: HERE1\n";
         this->mailbox = S4U_Mailbox::generateUniqueMailbox("mb");
-        std::cerr << "s$UD: HERE2\n";
         this->recv_mailbox = S4U_Mailbox::generateUniqueMailbox("rmb");
-        std::cerr << "s$UD: HERE3\n";
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
         this->has_returned_from_main = false;
-        std::cerr << "s$UD: ASD\n";
     }
 
     S4U_Daemon::~S4U_Daemon() {
