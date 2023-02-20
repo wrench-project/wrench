@@ -63,6 +63,7 @@ namespace wrench {
         static double getHostMemoryCapacity(const std::string &hostname);
         static unsigned long getHostNumCores(const std::string &hostname);
         static double getHostFlopRate(const std::string &hostname);
+        static bool hostHasMountPoint(const std::string &hostname, const std::string &scratch_space_mount_point);
 
         static std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
         static void removeFile(const std::shared_ptr<DataFile> &file);

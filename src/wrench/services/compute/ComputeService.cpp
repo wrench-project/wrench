@@ -152,7 +152,12 @@ namespace wrench {
                                    const std::string &service_name,
                                    const std::string &scratch_space_mount_point) : Service(hostname, service_name) {
         this->state = ComputeService::UP;
+        // Check that mount point makes sense
+        if (not Simulation::hostHasMountPoint(hostname, scratch_space_mount_point)) {
+            throw std::invalid_argument("ComputeService::ComputeService(): Host " + hostname + " does not have a disk mounted at " + scratch_space_mount_point);
+        }
         this->scratch_space_mount_point = scratch_space_mount_point;
+
 
     }
 
