@@ -104,8 +104,6 @@ namespace wrench {
                     new StorageServiceFileCopyAnswerMessage(
                             transaction->src_location,
                             transaction->dst_location,
-                            nullptr,
-                            false,
                             true,
                             nullptr,
                             this->getMessagePayloadValue(
@@ -509,7 +507,6 @@ namespace wrench {
                         new StorageServiceFileCopyAnswerMessage(
                                 src_location,
                                 dst_location,
-                                nullptr, false,
                                 false,
                                 std::shared_ptr<FailureCause>(
                                         new StorageServiceNotEnoughSpace(
@@ -588,7 +585,6 @@ namespace wrench {
                         new StorageServiceFileCopyAnswerMessage(
                                 src_location,
                                 dst_location,
-                                nullptr, false,
                                 false,
                                 std::shared_ptr<FailureCause>(
                                         new FileNotFound(
@@ -618,7 +614,6 @@ namespace wrench {
                             new StorageServiceFileCopyAnswerMessage(
                                     src_location,
                                     dst_location,
-                                    nullptr, false,
                                     false,
                                     std::shared_ptr<FailureCause>(
                                             new StorageServiceNotEnoughSpace(dst_location->getFile(),
@@ -702,7 +697,6 @@ namespace wrench {
                     new StorageServiceFileCopyAnswerMessage(
                             src,
                             dst,
-                            nullptr, false,
                             false,
                             std::make_shared<FileNotFound>(src),
                             this->getMessagePayloadValue(

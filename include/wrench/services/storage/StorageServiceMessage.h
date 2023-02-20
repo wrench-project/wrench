@@ -17,7 +17,6 @@
 
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/failure_causes/FailureCause.h"
-#include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/simulation/SimulationOutput.h"
@@ -133,7 +132,6 @@ namespace wrench {
         StorageServiceFileCopyRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                              std::shared_ptr<FileLocation> src,
                                              std::shared_ptr<FileLocation> dst,
-                                             std::shared_ptr<FileRegistryService> file_registry_service,
                                              double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
@@ -142,8 +140,6 @@ namespace wrench {
         std::shared_ptr<FileLocation> src;
         /** @brief The destination location */
         std::shared_ptr<FileLocation> dst;
-        /** @brief The file registry service to update, or none if nullptr */
-        std::shared_ptr<FileRegistryService> file_registry_service;
     };
 
     /**
@@ -153,8 +149,6 @@ namespace wrench {
     public:
         StorageServiceFileCopyAnswerMessage(std::shared_ptr<FileLocation> src,
                                             std::shared_ptr<FileLocation> dst,
-                                            std::shared_ptr<FileRegistryService> file_registry_service,
-                                            bool file_registry_service_updated,
                                             bool success, std::shared_ptr<FailureCause> cause,
                                             double payload);
 
@@ -162,10 +156,6 @@ namespace wrench {
         std::shared_ptr<FileLocation> src;
         /** @brief The destination location */
         std::shared_ptr<FileLocation> dst;
-        /** @brief The file registry service that the user had requested be updated, or nullptr if none */
-        std::shared_ptr<FileRegistryService> file_registry_service;
-        /** @brief Whether a file registry service has been updated or not */
-        bool file_registry_service_updated;
         /** @brief Whether the copy was successful */
         bool success;
         /** @brief The cause of the failure, or nullptr if success */

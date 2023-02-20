@@ -270,10 +270,7 @@ private:
         }
 
 
-        if (!async_dual_copy_event2_real->file_registry_service_updated) {
-            throw std::runtime_error("Asynchronous file copy should have set the event's file_registry_service_updated variable to true");
-        }
-
+//
         if (!double_copy_failed) {
             throw std::runtime_error("Synchronous file copy should have failed.");
         }
@@ -309,9 +306,7 @@ private:
             throw std::runtime_error("Asynchronous file copy should have completed");
         }
 
-        if (async_copy_event2_real->file_registry_service_updated) {
-            throw std::runtime_error("File registry service should not have been updated");
-        }
+//
 
         if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src2_file_2))) {
