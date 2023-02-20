@@ -1040,6 +1040,16 @@ namespace wrench {
     }
 
     /**
+     * @brief Determine if a host has a disk mounted at some mount point
+     * @param hostname: the hostname
+     * @param mount_point: the mount point
+     * @return true or false
+     */
+    bool Simulation::hostHasMountPoint(const std::string &hostname, const std::string &mount_point) {
+        return S4U_Simulation::hostHasMountPoint(hostname, mount_point);
+    }
+
+    /**
      * @brief Returns whether a host is on or not
      * @param hostname: the hostname
      * @return true or false
