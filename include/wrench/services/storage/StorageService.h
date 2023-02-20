@@ -179,8 +179,6 @@ namespace wrench {
             return "/";
         }
 
-        // TODO: BELOW IS UNCLEAR IN TERMS OF THE API REWRITE
-
         static void copyFile(const std::shared_ptr<FileLocation> &src_location,
                              const std::shared_ptr<FileLocation> &dst_location);
 
@@ -192,8 +190,8 @@ namespace wrench {
 
         static void writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
-        virtual bool isBufferized() const = 0;
 
+        virtual bool isBufferized() const = 0;
         virtual double getBufferSize() const = 0;
 
         virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) = 0;
