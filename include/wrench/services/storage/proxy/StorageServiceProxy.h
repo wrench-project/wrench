@@ -58,7 +58,7 @@ namespace wrench {
 
         void createFile(const std::shared_ptr<FileLocation> &location) override;
 
-        const std::shared_ptr<StorageService> getCache();
+        std::shared_ptr<StorageService> getCache();
 
 
         double getLoad() override;//cache
