@@ -228,7 +228,10 @@ namespace wrench {
                 msg_to_send_back->failure_cause = failure_cause;
             }
         } else {
-            throw std::runtime_error("FileTransferThread::main(): Invalid src/dst combination");
+            throw std::runtime_error("FileTransferThread::main(): Invalid src/dst combination (" +
+                                     (src_location ? src_location->toString() : "nullptr") +
+                                     "; " +
+                                     (dst_location ? dst_location->toString() : "nullptr") + ")");
         }
 
         // Call retire on all mailboxes passed, which is pretty brute force be should work

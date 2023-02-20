@@ -293,13 +293,13 @@ private:
         CUSTOM_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, true, failure_cause, 666),
                      std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), location, location, nullptr, 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), location, location, 666));
         CUSTOM_THROW(new wrench::StorageServiceFileCopyRequestMessage(nullptr, location, location, nullptr, 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::StorageServiceFileCopyRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), nullptr, location, nullptr, 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::StorageServiceFileCopyRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), location, nullptr, nullptr, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(location, location, nullptr, false, true, nullptr, 666));
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(location, location, nullptr, false, false, failure_cause, 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(location, location, true, nullptr, 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(location, location, false, failure_cause, 666));
         CUSTOM_THROW(new wrench::StorageServiceFileCopyAnswerMessage(nullptr, nullptr, nullptr, false, true, nullptr, 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::StorageServiceFileCopyAnswerMessage(location, nullptr, nullptr, false, true, nullptr, 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::StorageServiceFileCopyAnswerMessage(location, nullptr, nullptr, true, true, nullptr, 666), std::invalid_argument);

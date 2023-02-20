@@ -162,7 +162,6 @@ namespace wrench {
     * @param answer_mailbox: the mailbox to which to send the answer (if nullptr, no answer will be sent)
     * @param src: the source location
     * @param dst: the destination location
-    * @param file_registry_service: the file registry service to update (nullptr if none)
     * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
@@ -170,7 +169,6 @@ namespace wrench {
     StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                std::shared_ptr<FileLocation> src,
                                                                                std::shared_ptr<FileLocation> dst,
-                                                                               std::shared_ptr<FileRegistryService> file_registry_service,
                                                                                double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullpr) || (src == nullptr) || (dst == nullptr)) {
@@ -181,15 +179,12 @@ namespace wrench {
         this->answer_mailbox = answer_mailbox;
         this->src = std::move(src);
         this->dst = std::move(dst);
-        this->file_registry_service = std::move(file_registry_service);
     }
 
     /**
      * @brief Constructor
      * @param src: the source location
      * @param dst: the destination location
-     * @param file_registry_service: the file registry service to update (nullptr if none)
-     * @param file_registry_service_updated: whether the file registry service was updated
      * @param success: true on success, false otherwise
      * @param failure_cause: the cause of a failure (nullptr if success==true)
      * @param payload: the message size in bytes
@@ -198,8 +193,6 @@ namespace wrench {
      */
     StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(std::shared_ptr<FileLocation> src,
                                                                              std::shared_ptr<FileLocation> dst,
-                                                                             std::shared_ptr<FileRegistryService> file_registry_service,
-                                                                             bool file_registry_service_updated,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
                                                                              double payload)
@@ -207,19 +200,15 @@ namespace wrench {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((src == nullptr) || (dst == nullptr) ||
             (success && (failure_cause != nullptr)) ||
-            (!success && (failure_cause == nullptr)) ||
-            ((file_registry_service == nullptr) and (file_registry_service_updated))) {
+            (!success && (failure_cause == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(): Invalid arguments");
         }
 #endif
         this->src = std::move(src);
         this->dst = std::move(dst);
-        this->file_registry_service = file_registry_service;
-        this->file_registry_service_updated = file_registry_service_updated;
         this->success = success;
         this->failure_cause = std::move(failure_cause);
-        this->file_registry_service = file_registry_service;
     }
 
     /**
