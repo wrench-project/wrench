@@ -47,6 +47,7 @@ namespace wrench {
         bool bufferized = false;// By default, non-bufferized
                                 //        bool bufferized = true; // By default, bufferized
 
+        std::cerr << "IN CREATE SIMPLe\n";
         if (property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != property_list.end()) {
             double buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
             bufferized = buffer_size >= 1.0;// more than one byte means bufferized
@@ -59,9 +60,12 @@ namespace wrench {
                                      "storage services and also simulate link shutdowns. This feature is not implemented yet.");
         }
 
+        std::cerr << "HERARAERAR\n";
         if (bufferized) {
+            std::cerr << "RETURNING BUFFEREISR\n";
             return (SimpleStorageService *) (new SimpleStorageServiceBufferized(hostname, mount_points, property_list, messagepayload_list));
         } else {
+            std::cerr << "RETURNING NON-BUFFEREISR\n";
             return (SimpleStorageService *) (new SimpleStorageServiceNonBufferized(hostname, mount_points, property_list, messagepayload_list));
         }
     }

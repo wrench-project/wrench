@@ -577,14 +577,14 @@ namespace wrench {
                 storage_service->start(storage_service, true, true);// Daemonized, AUTO-RESTART
             }
 
-            // Start the scratch services
-            for (const auto &compute_service: this->compute_services) {
-                if (compute_service->hasScratch()) {
-                    compute_service->getScratch()->simulation = this;
-                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
-                                                         false);// Daemonized, no auto-restart
-                }
-            }
+//            // Start the scratch services
+//            for (const auto &compute_service: this->compute_services) {
+//                if (compute_service->hasScratch()) {
+//                    compute_service->getScratch()->simulation = this;
+//                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
+//                                                         false);// Daemonized, no auto-restart
+//                }
+//            }
 
             // Start the network proximity services
             for (const auto &network_proximity_service: this->network_proximity_services) {
@@ -1285,10 +1285,10 @@ namespace wrench {
         std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
         this->compute_services.insert(shared_ptr);
         shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
-        if (service->hasScratch()) {
-            service->getScratch()->simulation = this;
-            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
-        }
+//        if (service->hasScratch()) {
+//            service->getScratch()->simulation = this;
+//            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
+//        }
 
         return shared_ptr;
     }
@@ -1303,6 +1303,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::shared_ptr<StorageService> Simulation::startNewService(StorageService *service) {
+        std::cerr << "IN START NEW SERVICE!@##\n";
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
         }
@@ -1311,10 +1312,14 @@ namespace wrench {
             throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
         }
 
+        std::cerr << "IN START NEW SERVICE\n";
+
         service->simulation = this;
         std::shared_ptr<StorageService> shared_ptr = std::shared_ptr<StorageService>(service);
         this->storage_services.insert(shared_ptr);
+        std::cerr << "STARTING NEW SEVICE\n";
         shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
+        std::cerr << "STARTED " << service->getName() << "\n";
 
         return shared_ptr;
     }

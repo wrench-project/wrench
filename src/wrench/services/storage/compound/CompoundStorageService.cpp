@@ -633,11 +633,11 @@ namespace wrench {
     }
 
     /** 
-     *  @brief setScratch can't be used on a CompoundStorageService because it doesn't have any actual storage resources.
+     *  @brief setIsScratch can't be used on a CompoundStorageService because it doesn't have any actual storage resources.
      *  
      *  @throw std::logic_error
      */
-    void CompoundStorageService::setScratch() {
+    void CompoundStorageService::setIsScratch(bool is_scratch) {
         WRENCH_WARN("CompoundStorageService::setScratch Forbidden because CompoundStorageService doesn't manage any storage resources itself");
         throw std::logic_error("CompoundStorageService can't be setup as a scratch space, it is only an abstraction layer.");
     }
