@@ -374,7 +374,6 @@ namespace wrench {
                         new StorageServiceFileCopyAnswerMessage(
                                 src_location,
                                 dst_location,
-                                nullptr, false,
                                 false,
                                 std::shared_ptr<FailureCause>(
                                         new FileNotFound(
@@ -402,7 +401,6 @@ namespace wrench {
                         new StorageServiceFileCopyAnswerMessage(
                                 src_location,
                                 dst_location,
-                                nullptr, false,
                                 false,
                                 std::shared_ptr<FailureCause>(
                                         new StorageServiceNotEnoughSpace(
@@ -542,8 +540,6 @@ namespace wrench {
                     new StorageServiceFileCopyAnswerMessage(
                             src_location,
                             dst_location,
-                            nullptr,
-                            false,
                             success,
                             std::move(failure_cause),
                             this->getMessagePayloadValue(

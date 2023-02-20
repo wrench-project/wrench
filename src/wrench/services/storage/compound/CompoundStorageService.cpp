@@ -424,8 +424,6 @@ namespace wrench {
                         new StorageServiceFileCopyAnswerMessage(
                                 msg->src,
                                 msg->dst,
-                                nullptr,
-                                false,
                                 false,
                                 std::shared_ptr<FailureCause>(new NotAllowed(
                                         this->getSharedPtr<CompoundStorageService>(),
@@ -460,8 +458,6 @@ namespace wrench {
                         new StorageServiceFileCopyAnswerMessage(
                                 msg->src,
                                 msg->dst,
-                                nullptr,
-                                false,
                                 false,
                                 failure_cause,
                                 this->getMessagePayloadValue(
@@ -491,7 +487,6 @@ namespace wrench {
                         msg->answer_mailbox,
                         final_src,
                         final_dst,
-                        nullptr,
                         final_dst->getStorageService()->getMessagePayloadValue(
                                 StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
 

@@ -12,7 +12,6 @@
 #include <wrench/services/storage/xrootd/Deployment.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/failure_causes/NetworkError.h>
 #include <wrench/failure_causes/FileNotFound.h>
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/storage/xrootd/XRootDMessage.h"
@@ -153,8 +152,8 @@ namespace wrench {
                                                          msg->file,
                                                          cached,
                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
-                                                                         cached.size(),
+                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                                         cached.size(),
                                                          msg->answered));
                     } else {
                         if (!children.empty()) {
@@ -178,7 +177,7 @@ namespace wrench {
                                                                          msg->file,
                                                                          set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
                                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                                          msg->answered));
                                     }
                                 } else {
@@ -202,7 +201,7 @@ namespace wrench {
                                                              msg->file,
                                                              set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
                                                              getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                     getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                             getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                              msg->answered));
                         }
                     }
@@ -214,7 +213,7 @@ namespace wrench {
                     }
                     if (internalStorage) {
                         //File in internal storage
-                        StorageService::deleteFile(FileLocation::LOCATION(internalStorage, msg->file));
+                        internalStorage->deleteFile(msg->file);
                     }
 
                     S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
@@ -477,8 +476,8 @@ namespace wrench {
                                                      msg->file,
                                                      cached,
                                                      getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                             getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
-                                                                     cached.size(),
+                                                     getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                                     cached.size(),
                                                      msg->answered));
                 } else {//File Not Cached
                     if (internalStorage &&
@@ -494,7 +493,7 @@ namespace wrench {
                                                          msg->file,
                                                          set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                          msg->answered));
                     } else {//File not in internal storage or cache
                         if (children.size() > 0 &&
@@ -605,7 +604,7 @@ namespace wrench {
                 if (internalStorage) {
                     //File in internal storage
                     try {
-                        StorageService::deleteFile(FileLocation::LOCATION(internalStorage, msg->file));
+                        internalStorage->deleteFile(msg->file);
                     } catch (ExecutionException &e) {
                         //we don't actually care if this fails, that just means the file
                         // we tried to delete wasn't there already.  Big whoop.
@@ -651,13 +650,12 @@ namespace wrench {
                         std::string error_message = "Cannot copy file to/from non-storage XRooD node";
                         auto location = FileLocation::LOCATION(getSharedPtr<Node>(), file);
                         S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                                 new StorageServiceFileWriteAnswerMessage(
-                                                         location,
+                                                 new StorageServiceFileCopyAnswerMessage(
+                                                         msg->src,
+                                                         msg->dst,
                                                          false,
                                                          std::shared_ptr<FailureCause>(
                                                                  new NotAllowed(getSharedPtr<Node>(), error_message)),
-                                                         nullptr,
-                                                         0,
                                                          getMessagePayloadValue(MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
                     }
 
@@ -769,7 +767,7 @@ namespace wrench {
         *
         */
         Node::Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootD") {
+                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootDNode") {
 
             // Create /dev/null mountpoint so that Locations can be created
             this->file_systems[LogicalFileSystem::DEV_NULL] =
@@ -931,10 +929,15 @@ namespace wrench {
                         std::shared_ptr<FailureCause>(
                                 new NotAllowed(getSharedPtr<Node>(), error_message)));
             }
-            internalStorage->writeFile(answer_mailbox, location, wait_for_answer);
+            // Replace the location with
+            // TODO: THIS LOCATION REWRITE WAS DONE TO FIX SOMETHING BUT HENRI HAS NO
+            // TODO: IDEA HOW COME IT EVERY WORKED BEFORE SINCE THE FTT INSINCE INTERNALSTORAGE
+            // TODO: WILL SAY "THIS IS NOT ME, MY PARENT IS THE INTERNALSTORAGE, NOT THE NODE"
+            auto new_location = FileLocation::LOCATION(internalStorage, location->getPath(), location->getFile());
+            internalStorage->writeFile(answer_mailbox, new_location, wait_for_answer);
+//            internalStorage->writeFile(answer_mailbox, location, wait_for_answer);
             metavisor->files[location->getFile()].push_back(this->getSharedPtr<Node>());
         }
-
 
         /**
          * @brief Adds a child, which will be a supervisor, to a node
@@ -997,6 +1000,7 @@ namespace wrench {
             if (internalStorage) {
                 return internalStorage->isBufferized();
             } else {
+                return 0; // TODO: IS THIS A GOOD IDEA? MAY MESS UP COPYING???
                 throw std::runtime_error("Node::isBufferized() called on non storage Node " + hostname);
             }
         }

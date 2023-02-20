@@ -91,7 +91,7 @@ namespace wrench {
         } else if (auto m = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
             if (m->success) {
                 return std::shared_ptr<FileCopyCompletedEvent>(new FileCopyCompletedEvent(
-                        m->src->getFile(), m->src, m->dst, m->file_registry_service, m->file_registry_service_updated));
+                        m->src->getFile(), m->src, m->dst));
 
             } else {
                 return std::shared_ptr<FileCopyFailedEvent>(

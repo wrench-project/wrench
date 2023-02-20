@@ -495,6 +495,7 @@ namespace wrench {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
         }
 
+
         // Send a message to the daemon of the dst service
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
@@ -507,7 +508,6 @@ namespace wrench {
                         answer_mailbox,
                         src_location,
                         dst_location,
-                        nullptr,
                         dst_location->getStorageService()->getMessagePayloadValue(
                                 StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -579,7 +579,6 @@ namespace wrench {
                         answer_mailbox,
                         src_location,
                         dst_location,
-                        nullptr,
                         dst_location->getStorageService()->getMessagePayloadValue(
                                 StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
     }
