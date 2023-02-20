@@ -220,7 +220,7 @@ namespace wrench {
 
     std::string SimpleStorageService::getBaseRootPath(){
             if (this->file_systems.size() == 1) {
-                return this->file_systems.begin()->first;
+                return this->file_systems.begin()->first + "/";
             } else {
                 return "/";
             }
