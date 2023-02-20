@@ -174,6 +174,7 @@ namespace wrench {
                                   {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {});
 
                 std::cerr << "WTF1\n";
+                ss->setIsScratch(true);
                 this->scratch_space_storage_service =
                         this->simulation->startNewService(ss);
                 std::cerr << "33333333: " << this->scratch_space_storage_service->getName() << "\n";

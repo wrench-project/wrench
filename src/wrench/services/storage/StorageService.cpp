@@ -38,6 +38,7 @@ namespace wrench {
     StorageService::StorageService(const std::string &hostname,
                                    const std::string &service_name) : Service(hostname, service_name) {
 
+        std::cerr << "IN STORAGE SERVICE CONS\n";
         this->state = StorageService::UP;
         this->is_scratch = false;
     }

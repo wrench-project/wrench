@@ -44,6 +44,7 @@ namespace wrench {
      * @param process_name_prefix: the prefix for the process name
      */
     Service::Service(std::string hostname, std::string process_name_prefix) : S4U_Daemon(hostname, process_name_prefix) {
+        std::cerr << " IN SERVICE CONS\n";
         this->name = process_name_prefix;
     }
 
