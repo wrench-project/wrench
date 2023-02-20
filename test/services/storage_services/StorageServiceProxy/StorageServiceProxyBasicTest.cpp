@@ -127,6 +127,7 @@ private:
             }
         }
 
+
         // Try to lookup file2 from remote although it is on target
         auto start = simulation->getCurrentSimulatedDate();
         if (proxy->lookupFile(test->remote, file2)) {
@@ -167,7 +168,6 @@ private:
         // read file2 via proxy and target
         proxy->readFile(this->test->target, file2);
         auto secondFile = simulation->getCurrentSimulatedDate();
-
 
         if (firstFile - start < (secondFile - firstFile) * 1.2) {
             throw std::runtime_error("caching was not significantly faster than not caching for file read");
@@ -264,9 +264,10 @@ void StorageServiceProxyBasicTest::do_BasicFunctionality_test(bool arg, std::str
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //   argv[1] = strdup("--wrench-full-log");
-    //argv[2] = strdup("--log=wrench_core_mailbox.threshold=debug");
+//       argv[1] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--log=wrench_core_mailbox.threshold=debug");
     //argv[2] = strdup("--log=wrench_core_proxy_file_server.threshold=debug");
+//       argv[2] = strdup("-- --cfg=contexts/stack-size:28192");
     simulation->init(&argc, argv);
 
     simulation->instantiatePlatform(platform_file_path);

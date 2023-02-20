@@ -77,7 +77,11 @@ private:
     std::shared_ptr<wrench::StorageService> storage_service;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;
 
-    int main() {
+    int main() override {
+
+        // TODO: This test is now stupid since the delete no longer takes
+        // TODO: a file registry as parameter and register/unregister has to be
+        // TODO: done 100% by hand
 
         // register both files
         std::shared_ptr<wrench::DataFile> file_1 = this->test->file_1;
@@ -102,6 +106,8 @@ private:
             throw std::runtime_error("StorageService should have deleted file_2");
         }
 
+        file_registry_service->removeEntry(wrench::FileLocation::LOCATION(storage_service, file_2));
+
         if (!file_registry_service->lookupEntry(file_2).empty()) {
             throw std::runtime_error("The file_2 should not be registered with the FileRegistryService");
         }
@@ -110,7 +116,11 @@ private:
     }
 };
 
-TEST_F(SimpleStorageServiceDeleteRegisterTest, DeleteAndRegister) {
+// TODO: This test is now stupid since the delete no longer takes
+// TODO: a file registry as parameter and register/unregister has to be
+// TODO: done 100% by hand
+
+TEST_F(SimpleStorageServiceDeleteRegisterTest, DISABLED_DeleteAndRegister) {
     DO_TEST_WITH_FORK_ONE_ARG(do_DeleteRegisterTest, 100000);
     DO_TEST_WITH_FORK_ONE_ARG(do_DeleteRegisterTest, 0);
 }
