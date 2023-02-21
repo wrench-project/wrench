@@ -398,7 +398,6 @@ private:
         job1->addActionDependency(readWrittenFile2, fileDeleteAction);
         actions.push_back(fileDeleteAction);
 
-        std::cerr << "SUBMITTING THE JOB\n";
         job_manager->submitJob(job1, test->compute_service, {});
 
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();

@@ -729,8 +729,7 @@ private:
             auto cause = e.getCause();
             if (auto real_cause = std::dynamic_pointer_cast<wrench::InvalidDirectoryPath>(e.getCause())) {
                 real_cause->toString();         // Coverage
-                real_cause->getInvalidPath();   // Coverage
-                real_cause->getStorageService();// Coverage
+                real_cause->getLocation();   // Coverage
             } else if (auto real_cause = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause())) {
                 real_cause->toString();   // Coverage
                 real_cause->getFile();    // Coverage
