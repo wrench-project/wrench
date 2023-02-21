@@ -173,7 +173,10 @@ namespace wrench {
         virtual double getTotalSpace() = 0;
 
         /** Service free space method */
-        virtual double getFreeSpace();
+        double getTotalFreeSpace();
+
+        /** Service free space method */
+        virtual double getTotalFreeSpaceAtPath(const std::string &path);
 
         virtual std::string getBaseRootPath() {
             return "/";

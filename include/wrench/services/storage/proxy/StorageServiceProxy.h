@@ -34,7 +34,7 @@ namespace wrench {
 
 
         double getTotalSpace() override;
-        double getFreeSpace() override;
+        double getTotalFreeSpaceAtPath(const std::string &path) override;
 
         /**
 	 * @brief Get the last write date of a file
