@@ -39,9 +39,10 @@ it possible to lookup, delete, read, and write files. For instance:
 
    // Check whether the storage service holds the file at path /data/ and delete it if so
    auto file_location = wrench::FileLocation::LOCATION(storage_service, "/data/", some_file);
-   if (wrench::StorageService::lookupFile(file_location) {
-     std::cerr << "File found!" << std::endl;
-     wrench::StorageService::deleteFile(file_location, file_registry);
+   if (wrench::StorageService::lookupFile(file_location))
+   {
+      std::cerr << "File found!" << std::endl;
+      wrench::StorageService::deleteFile(file_location, file_registry);
    }
 
 Note that the file registry service is passed to the
@@ -58,12 +59,12 @@ spend time doing file I/O, it is easily done:
 
    // Read some file from the "/" path at some storage service. 
    // This does not change the simulation state besides simulating a time overhead during which the execution controller is busy
-   wrench::StorageService::readFile(wrench::FileLocation::LOCATION(storage_service, "/", some_file);
+   wrench::StorageService::readFile(wrench::FileLocation::LOCATION(storage_service, "/", some_file));
 
    // Write some file to the "/stuff/" path at some storage service. 
    // This simulates a time overhead after which the storage service will host the file. It
    // is a good idea to then add an entry to the file registry service
-   wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(storage_service, "/stuff/", some_file);
+   wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(storage_service, "/stuff/", some_file));
 
 An operation commonly performed by an execution controller is copying
 files between storage services (e.g., to enforce some data locality).
@@ -87,7 +88,6 @@ an example in which a file is copied between storage services:
    // Asynchronously copy some_file from storage_service2 to storage_service3
    data_movement_manager->initiateAsynchronousFileCopy(wrench::FileLocation::LOCATION(storage_service2, some_file), wrench::FileLocation::LOCATION(storage_service3, some_file));
 
-   [...]
 
    // Wait for and process the next event (may be a file copy completion or failure)
    this->waitForAndProcessNextEvent();
