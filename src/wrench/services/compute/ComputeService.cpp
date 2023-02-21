@@ -494,7 +494,7 @@ namespace wrench {
      * @return a size (in bytes)
      */
     double ComputeService::getFreeScratchSpaceSize() {
-        return this->scratch_space_storage_service->getFreeSpace();
+        return this->scratch_space_storage_service->getTotalFreeSpace();
     }
 
     /**

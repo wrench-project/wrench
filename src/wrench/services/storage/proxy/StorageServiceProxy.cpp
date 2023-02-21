@@ -258,12 +258,14 @@ namespace wrench {
     /**
      * @brief Synchronously asks the proxy service for its capacity (which returns
      *        the remote)
+     *
+     * @param path: the path
      * @return The free space in bytes of each mount point, as a map
      *
      */
-    double StorageServiceProxy::getFreeSpace() {
+    double StorageServiceProxy::getTotalFreeSpaceAtPath(const std::string &path) {
         if (remote) {
-            return remote->getFreeSpace();
+            return remote->getTotalFreeSpaceAtPath(path);
         }
         throw runtime_error("Proxy with no default location does not support getFreeSpace()");
     }

@@ -219,7 +219,7 @@ private:
         // Send a free space request
         double free_space;
         try {
-            free_space = this->test->storage_service_100->getFreeSpace();
+            free_space = this->test->storage_service_100->getTotalFreeSpace();
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
@@ -343,7 +343,7 @@ private:
 
         // Check that the storage capacity is back to what it should be
         try {
-            free_space = this->test->storage_service_100->getFreeSpace();
+            free_space = this->test->storage_service_100->getTotalFreeSpace();
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
@@ -410,7 +410,7 @@ private:
 
         // Check that the free space has been updated at the destination
         try {
-            free_space = this->test->storage_service_100->getFreeSpace();
+            free_space = this->test->storage_service_100->getTotalFreeSpace();
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
@@ -560,7 +560,7 @@ private:
         }
 
         try {
-            this->test->storage_service_100->getFreeSpace();
+            this->test->storage_service_100->getTotalFreeSpace();
             throw std::runtime_error("Should not be able to get free space info from a DOWN service");
         } catch (wrench::ExecutionException &e) {
             // Check Exception

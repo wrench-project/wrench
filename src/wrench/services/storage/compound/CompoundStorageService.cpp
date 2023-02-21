@@ -400,6 +400,8 @@ namespace wrench {
      * @return true if this process should keep running
      */
     bool CompoundStorageService::processFileCopyRequest(StorageServiceFileCopyRequestMessage *msg) {
+
+        std::cerr << "IN PROCESS FILE COPY REQUEST\n";
         // If source location references a CSS, it must already be known to the CSS
         auto final_src = msg->src;
         if (std::dynamic_pointer_cast<CompoundStorageService>(msg->src->getStorageService())) {
@@ -410,6 +412,8 @@ namespace wrench {
         if (std::dynamic_pointer_cast<CompoundStorageService>(msg->dst->getStorageService())) {
             final_dst = this->lookupOrDesignateStorageService(msg->dst);
         }
+
+        std::cerr << "FINAL DST = " << final_dst->toString() << "\n";
 
         // Error case - src
         if (!final_src) {
@@ -593,11 +597,13 @@ namespace wrench {
 
     /**
      * @brief Get the total space across all internal services known by the CompoundStorageService
-     * 
-     * @return A map of service name and total capacity of all disks for each service.
+     *
+     * @param path: the path
+     *
+     * @return A number of bytes
      */
     double CompoundStorageService::getTotalSpace() {
-        WRENCH_INFO("CompoundStorageService::getTotalSpace");
+//        WRENCH_INFO("CompoundStorageService::getTotalSpace");
         double free_space = 0.0;
         for (const auto &service: this->storage_services) {
             auto service_name = service->getName();
@@ -617,12 +623,12 @@ namespace wrench {
      * @throw std::runtime_error
      *
      */
-    double CompoundStorageService::getFreeSpace() {
+    double CompoundStorageService::getTotalFreeSpaceAtPath(const std::string &path) {
         WRENCH_DEBUG("CompoundStorageService::getFreeSpace Forwarding request to internal services");
 
         double free_space = 0.0;
         for (const auto &service: this->storage_services) {
-            free_space += service->getFreeSpace();
+            free_space += service->getTotalFreeSpaceAtPath(path);
         }
         return free_space;
     }

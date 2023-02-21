@@ -180,19 +180,37 @@ namespace wrench {
     /***************************************************************/
 
     /**
-     * @brief Synchronously asks the storage service for its free space capacity
-     * @return The free space in bytes of each mount point, as a map
+     * @brief Synchronously asks the storage service for its total free space capacity, that is,
+     *  the total capacity at the "/" path.
+     *  Note that this doesn't mean that that free space could be used to store a single
+     *  file, as the storage service may have file systems at multiple mount points, may me
+     *  a front-end for a set of storage systems, etc.
+     * @return A number of bytes
      *
      */
-    double StorageService::getFreeSpace() {
+    double StorageService::getTotalFreeSpace() {
+        return this->getTotalFreeSpaceAtPath("/");
+    }
+
+    /**
+     * @brief Synchronously asks the storage service for its total free space capacity
+     * at a particular path. Note that this doesn't mean that that free space could be used to store a single
+     *  file, as the storage service may have file systems at multiple mount points, may be
+     *  a front-end for a set of storage systems, etc.
+     *  @param path a path (if empty, "/" will be used)
+     *
+     *  @return A number of bytes
+     */
+    double StorageService::getTotalFreeSpaceAtPath(const std::string &path) {
         assertServiceIsUp();
 
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         S4U_Mailbox::putMessage(this->mailbox, new StorageServiceFreeSpaceRequestMessage(
-                answer_mailbox,
-                this->getMessagePayloadValue(
-                        StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+                                                       answer_mailbox,
+                                                       path,
+                                                       this->getMessagePayloadValue(
+                                                               StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
         std::unique_ptr<SimulationMessage> message = nullptr;

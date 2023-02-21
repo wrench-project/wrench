@@ -69,7 +69,7 @@ namespace wrench {
         double getTotalSpace() override;
 
         // Overload StorageService's implementation.
-        double getFreeSpace() override;
+        double getTotalFreeSpaceAtPath(const std::string &path) override;
 
         // Overload StorageService's implementation.
         void setIsScratch(bool is_scratch) override;
