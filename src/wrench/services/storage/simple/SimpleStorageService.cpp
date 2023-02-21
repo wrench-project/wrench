@@ -326,7 +326,7 @@ namespace wrench {
      * @param file: the file
      * @param path: the path
      *
-     * @return the file's last write date, or -1 if the file is not found
+     * @return the file's last write date, or -1 if the file is not found or if the path is invalid
      *
      */
     double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
@@ -336,7 +336,9 @@ namespace wrench {
 
         std::string mount_point;
         std::string path_at_mount_point;
-        this->splitPath(path, mount_point, path_at_mount_point);
+        if (not this->splitPath(path, mount_point, path_at_mount_point)) {
+            return -1.0;
+        }
 
         auto fs = this->file_systems[mount_point].get();
         return fs->getFileLastWriteDate(file, path_at_mount_point);
