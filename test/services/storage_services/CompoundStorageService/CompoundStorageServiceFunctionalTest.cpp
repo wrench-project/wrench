@@ -139,7 +139,7 @@ private:
 
 
         // Verify synchronous request for current free space (currently same as capacity, as no file has been placed on internal services)
-        auto expected_capacity =  100.0 +  610.0;
+        auto expected_capacity =  100.0 +  510.0;
         auto free_space = test->compound_storage_service->getTotalFreeSpace();
         if (free_space != expected_capacity) {
             throw std::runtime_error("'Free Space' available to CompoundStorageService is incorrect");
@@ -295,7 +295,7 @@ void CompoundStorageServiceFunctionalTest::do_BasicFunctionality_test() {
                                                                      {}, {})));
     // Bufferized
     ASSERT_NO_THROW(simple_storage_service_510 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk100", "/disk510"},
+            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk510"},
                                                                      {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "1000000"}}, {})));
 
     // Fail to create a Compound Storage Service (no storage services provided)
@@ -353,7 +353,7 @@ private:
 
         wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(test->simple_storage_service_1000, "/disk1000/", test->file_500));
 
-        // Doing a plan file copy just for kicks
+        // Doing a plain file copy just for kicks
         wrench::StorageService::copyFile(wrench::FileLocation::LOCATION(test->simple_storage_service_1000, "/disk1000/", test->file_500),
                                          wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_500));
 
@@ -378,22 +378,22 @@ private:
         actions.push_back(fileReadAction);
 
         // Write another file to the CSS
-        auto fileWriteAction = job1->addFileWriteAction("fileWrite1", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100));
+        auto fileWriteAction = job1->addFileWriteAction("fileWrite1", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_10));
         job1->addActionDependency(fileReadAction, fileWriteAction);
         actions.push_back(fileWriteAction);
 
         // Read the file directly from underlying storage service (in this case we know the file will be on simple_storage_service_510, disk 100)
-        auto readWrittenFile = job1->addFileReadAction("directReadFile", wrench::FileLocation::LOCATION(test->simple_storage_service_510, "/disk100/", test->file_100));
+        auto readWrittenFile = job1->addFileReadAction("directReadFile", wrench::FileLocation::LOCATION(test->simple_storage_service_510, "/disk100/", test->file_10));
         job1->addActionDependency(fileWriteAction, readWrittenFile);
         actions.push_back(readWrittenFile);
 
         // Read it as well through the CSS
-        auto readWrittenFile2 = job1->addFileReadAction("directReadFile2", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100));
+        auto readWrittenFile2 = job1->addFileReadAction("directReadFile2", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_10));
         job1->addActionDependency(fileWriteAction, readWrittenFile2);
         actions.push_back(readWrittenFile2);
 
         // Delete file from CSS
-        auto fileDeleteAction = job1->addFileDeleteAction("fileDelete", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100));
+        auto fileDeleteAction = job1->addFileDeleteAction("fileDelete", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_10));
         job1->addActionDependency(readWrittenFile, fileDeleteAction);
         job1->addActionDependency(readWrittenFile2, fileDeleteAction);
         actions.push_back(fileDeleteAction);
@@ -421,6 +421,8 @@ private:
                 throw std::runtime_error("One of the actions did not complete");
             }
         }
+
+        std::cerr << "SUBMITTED THE JOB\n";
 
         // lookup a deleted file
         if (wrench::StorageService::lookupFileAtLocation(wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100))) {
@@ -698,7 +700,7 @@ void CompoundStorageServiceFunctionalTest::do_BasicError_test() {
 
     // Non-bufferized
     ASSERT_NO_THROW(simple_storage_service_510 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk100", "/disk510"},
+            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk510"},
                                                                      {}, {})));
 
     // Create a valid Compound Storage Service (using a non-bufferized storage service in this case) with a user-provided callback
@@ -706,7 +708,7 @@ void CompoundStorageServiceFunctionalTest::do_BasicError_test() {
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
             new wrench::CompoundStorageService(compound_storage, {simple_storage_service_510}, defaultStorageServiceSelection)));
 
-    // Create a Controler
+    // Create a Controller
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new CompoundStorageServiceErrorTestCtrl(this, compute)));
