@@ -294,48 +294,59 @@ namespace wrench {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileWriteRequest(): Cannot process a write requests with a non-zero buffer size");
         }
 
+        auto file = location->getFile();
+        LogicalFileSystem *fs;
+
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
         std::string mount_point;
         std::string path_at_mount_point;
-        this->splitPath(location->getPath(), mount_point, path_at_mount_point);
-        auto fs = this->file_systems[mount_point].get();
-        auto file = location->getFile();
+        if (not this->splitPath(location->getPath(), mount_point, path_at_mount_point)) {
+            failure_cause = std::make_shared<InvalidDirectoryPath>(location);
+        } else {
+            fs = this->file_systems[mount_point].get();
 
-        // If the file is not already there, do a capacity check/update
-        // (If the file is already there, then there will just be an overwrite.
-        bool file_already_there = fs->doesDirectoryExist(path_at_mount_point) and fs->isFileInDirectory(file, path_at_mount_point);
+            // If the file is not already there, do a capacity check/update
+            // (If the file is already there, then there will just be an overwrite.
+            bool file_already_there = fs->doesDirectoryExist(path_at_mount_point) and fs->isFileInDirectory(file, path_at_mount_point);
 
-        if (not file_already_there) {
-
-            // Reserve space
-            bool success = fs->reserveSpace(file, path_at_mount_point);
-            if (not success) {
-                try {
-                    S4U_Mailbox::dputMessage(
-                            answer_mailbox,
-                            new StorageServiceFileWriteAnswerMessage(
-                                    location,
-                                    false,
-                                    std::shared_ptr<FailureCause>(
-                                            new StorageServiceNotEnoughSpace(
-                                                    file,
-                                                    this->getSharedPtr<SimpleStorageService>())),
-                                    nullptr,
-                                    0,
-                                    this->getMessagePayloadValue(
-                                            SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
-                } catch (wrench::ExecutionException &e) {
-                    return true;
+            if (not file_already_there) {
+                // Reserve space
+                bool success = fs->reserveSpace(file, path_at_mount_point);
+                if (not success) {
+                    failure_cause = std::shared_ptr<FailureCause>(
+                            new StorageServiceNotEnoughSpace(
+                                    file,
+                                    this->getSharedPtr<SimpleStorageService>()));
                 }
             }
+        }
 
-            // Create directory
-            if (not fs->doesDirectoryExist(path_at_mount_point)) {
-                fs->createDirectory(path_at_mount_point);
+        if (failure_cause) {
+            try {
+                S4U_Mailbox::dputMessage(
+                        answer_mailbox,
+                        new StorageServiceFileWriteAnswerMessage(
+                                location,
+                                false,
+                                std::shared_ptr<FailureCause>(
+                                        new StorageServiceNotEnoughSpace(
+                                                file,
+                                                this->getSharedPtr<SimpleStorageService>())),
+                                nullptr,
+                                0,
+                                this->getMessagePayloadValue(
+                                        SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+            } catch (wrench::ExecutionException &e) {
+                return true;
             }
+            return true;
+        }
 
+        // Create directory if need be
+        if (not fs->doesDirectoryExist(path_at_mount_point)) {
+            fs->createDirectory(path_at_mount_point);
         }
 
         // Reply with a "go ahead, send me the file" message
@@ -368,18 +379,17 @@ namespace wrench {
         // Add it to the Pool of pending data communications
         this->pending_transactions.push_back(transaction);
 
-
         return true;
     }
 
-    /**
-     * @brief Handle a file read request
-     * @param location: the file's location
-     * @param num_bytes_to_read: the number of bytes to read
-     * @param answer_mailbox: the mailbox to which the answer should be sent
-     * @param requesting_host: the requesting_host
-     * @return
-     */
+/**
+ * @brief Handle a file read request
+ * @param location: the file's location
+ * @param num_bytes_to_read: the number of bytes to read
+ * @param answer_mailbox: the mailbox to which the answer should be sent
+ * @param requesting_host: the requesting_host
+ * @return
+ */
     bool SimpleStorageServiceNonBufferized::processFileReadRequest(
             const std::shared_ptr<FileLocation> &location,
             double num_bytes_to_read,
@@ -394,17 +404,10 @@ namespace wrench {
 
         std::string mount_point;
         std::string path_at_mount_point;
-        this->splitPath(location->getPath(), mount_point, path_at_mount_point);
-
-
-        //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
-        if (not this->file_systems[mount_point]->doesDirectoryExist(
-                path_at_mount_point)) {
+        if ((not this->splitPath(location->getPath(), mount_point, path_at_mount_point)) or
+            (not this->file_systems[mount_point]->doesDirectoryExist(path_at_mount_point))) {
             failure_cause = std::shared_ptr<FailureCause>(
-                    new InvalidDirectoryPath(
-                            this->getSharedPtr<SimpleStorageService>(),
-                            mount_point + "/" +
-                            path_at_mount_point));
+                    new InvalidDirectoryPath(location));
         } else {
             fs = this->file_systems[mount_point].get();
 
@@ -461,13 +464,13 @@ namespace wrench {
         return true;
     }
 
-    /**
-     * @brief Handle a file copy request
-     * @param src_location: the source location
-     * @param dst_location: the destination location
-     * @param answer_mailbox: the mailbox to which the answer should be sent
-     * @return
-     */
+/**
+ * @brief Handle a file copy request
+ * @param src_location: the source location
+ * @param dst_location: the destination location
+ * @param answer_mailbox: the mailbox to which the answer should be sent
+ * @return
+ */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(
             std::shared_ptr<FileLocation> &src_location,
             std::shared_ptr<FileLocation> &dst_location,
@@ -490,16 +493,29 @@ namespace wrench {
         }
 
         auto file = src_location->getFile();
+        LogicalFileSystem *fs;
+        std::shared_ptr<FailureCause> failure_cause = nullptr;
 
         std::string dst_mount_point;
         std::string dst_path_at_mount_point;
-        this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point);
+        if (not this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point)) {
+            failure_cause = std::make_shared<InvalidDirectoryPath>(dst_location);
+        }
 
-        auto fs = this->file_systems[dst_mount_point].get();
+        if (!failure_cause) {
 
-        // If file is not already here, reserve space for it
-        bool file_is_already_here = fs->isFileInDirectory(dst_location->getFile(), dst_path_at_mount_point);
-        if ((not file_is_already_here) and (not fs->reserveSpace(dst_location->getFile(), dst_path_at_mount_point))) {
+            fs = this->file_systems[dst_mount_point].get();
+
+            // If file is not already here, reserve space for it
+            bool file_is_already_here = fs->isFileInDirectory(dst_location->getFile(), dst_path_at_mount_point);
+            if ((not file_is_already_here) and (not fs->reserveSpace(dst_location->getFile(), dst_path_at_mount_point))) {
+                failure_cause = std::make_shared<StorageServiceNotEnoughSpace>(
+                        file,
+                        this->getSharedPtr<SimpleStorageService>());
+            }
+        }
+
+        if (failure_cause) {
             this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
             try {
                 S4U_Mailbox::putMessage(
@@ -540,13 +556,13 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Handle a file copy request
-     * @param src_location: the source location
-     * @param dst_location: the destination location
-     * @param answer_mailbox: the mailbox to which the answer should be sent
-     * @return
-     */
+/**
+ * @brief Handle a file copy request
+ * @param src_location: the source location
+ * @param dst_location: the destination location
+ * @param answer_mailbox: the mailbox to which the answer should be sent
+ * @return
+ */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequestIAmTheSource(
             std::shared_ptr<FileLocation> &src_location,
             std::shared_ptr<FileLocation> &dst_location,
@@ -573,7 +589,25 @@ namespace wrench {
 
         std::string src_mount_point;
         std::string src_path_at_mount_point;
-        this->splitPath(src_location->getPath(), src_mount_point, src_path_at_mount_point);
+
+        if (not this->splitPath(src_location->getPath(), src_mount_point, src_path_at_mount_point)) {
+            try {
+                S4U_Mailbox::putMessage(
+                        answer_mailbox,
+                        new StorageServiceFileCopyAnswerMessage(
+                                src_location,
+                                dst_location,
+                                false,
+                                std::make_shared<InvalidDirectoryPath>(src_location),
+                                this->getMessagePayloadValue(
+                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+
+            } catch (ExecutionException &e) {
+                return true;
+            }
+            return true;
+        }
+
         auto fs = this->file_systems[src_mount_point].get();
         auto my_fs = this->file_systems[src_mount_point].get();
 
@@ -651,7 +685,7 @@ namespace wrench {
         return true;
     }
 
-    /**
+/**
 * @brief Start pending file transfer threads if any and if possible
 */
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
@@ -677,7 +711,7 @@ namespace wrench {
         }
     }
 
-    /**
+/**
 * @brief Get the load (number of concurrent reads) on the storage service
 * @return the load on the service
 */

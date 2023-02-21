@@ -181,28 +181,34 @@ namespace wrench {
     bool SimpleStorageServiceBufferized::processFileWriteRequest(std::shared_ptr<FileLocation> &location,
                                                                  simgrid::s4u::Mailbox *answer_mailbox) {
 
+        auto file = location->getFile();
+        LogicalFileSystem *fs;
+
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
         std::string mountpoint;
         std::string path_at_mount_point;
-        this->splitPath(location->getPath(), mountpoint, path_at_mount_point);
+        if (not this->splitPath(location->getPath(), mountpoint, path_at_mount_point)) {
+            failure_cause = std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
+        }
 
-        auto fs = this->file_systems[mountpoint].get();
-        auto file = location->getFile();
+        if (not failure_cause) {
+            fs = this->file_systems[mountpoint].get();
 
-        // If the file is not already there, do a capacity check/update
-        // (If the file is already there, then there will just be an overwrite. Note that
-        // if the overwrite fails, then the file will disappear, which is expected)
+            // If the file is not already there, do a capacity check/update
+            // (If the file is already there, then there will just be an overwrite. Note that
+            // if the overwrite fails, then the file will disappear, which is expected)
 
-        bool file_already_there = fs->doesDirectoryExist(path_at_mount_point) and
-                                  fs->isFileInDirectory(file, path_at_mount_point);
-        if (not file_already_there) {
-            if (not fs->reserveSpace(file, path_at_mount_point)) {
-                failure_cause = std::shared_ptr<FailureCause>(
-                        new StorageServiceNotEnoughSpace(
-                                file,
-                                this->getSharedPtr<SimpleStorageService>()));
+            bool file_already_there = fs->doesDirectoryExist(path_at_mount_point) and
+                                      fs->isFileInDirectory(file, path_at_mount_point);
+            if (not file_already_there) {
+                if (not fs->reserveSpace(file, path_at_mount_point)) {
+                    failure_cause = std::shared_ptr<FailureCause>(
+                            new StorageServiceNotEnoughSpace(
+                                    file,
+                                    this->getSharedPtr<SimpleStorageService>()));
+                }
             }
         }
 
@@ -279,32 +285,24 @@ namespace wrench {
 
         std::string mount_point;
         std::string path_at_mount_point;
-        this->splitPath(location->getPath(), mount_point, path_at_mount_point);
-
-        auto fs = this->file_systems[mount_point].get();
-
-        //        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
-        if (not this->file_systems[mount_point]->doesDirectoryExist(
-                path_at_mount_point)) {
+        if ((not this->splitPath(location->getPath(), mount_point, path_at_mount_point)) or
+            (not this->file_systems[mount_point]->doesDirectoryExist(path_at_mount_point))) {
             failure_cause = std::shared_ptr<FailureCause>(
-                    new InvalidDirectoryPath(
-                            this->getSharedPtr<SimpleStorageService>(),
-                            mount_point + "/" +
-                            path_at_mount_point));
+                    new InvalidDirectoryPath(location));
         } else {
-            if (not fs->isFileInDirectory(file, path_at_mount_point)) {
+            if (not this->file_systems[mount_point]->isFileInDirectory(file, path_at_mount_point)) {
                 WRENCH_INFO(
                         "Received a read request for a file I don't have (%s)", location->toString().c_str());
                 failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));
             }
         }
 
+
         bool success = (failure_cause == nullptr);
         simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content = nullptr;
         if (success) {
             mailbox_to_receive_the_file_content = S4U_Mailbox::getTemporaryMailbox();
         }
-
 
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
         S4U_Mailbox::dputMessage(
@@ -320,8 +318,6 @@ namespace wrench {
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
-
-
             // Create a FileTransferThread
             auto ftt = std::make_shared<FileTransferThread>(
                     this->hostname,
@@ -340,7 +336,7 @@ namespace wrench {
             this->pending_file_transfer_threads.push_front(ftt);
 
             // Update the file read date in the file system
-            fs->updateReadDate(file, path_at_mount_point);
+            this->file_systems[mount_point]->updateReadDate(file, path_at_mount_point);
 
             // Mark the file as unevictable
             this->file_systems[mount_point]->incrementNumRunningTransactionsForFileInDirectory(
@@ -495,7 +491,9 @@ namespace wrench {
             auto file = dst_location->getFile();
             std::string dst_mount_point;
             std::string dst_path_at_mount_point;
-            this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point);
+            if (not this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point)) {
+                throw std::runtime_error("SimpleStorageServiceBufferized::processFileTransferThreadNotification(): splitPath should not have failed on the dst_location");
+            }
             if (success) {
                 WRENCH_INFO("File %s stored!", file->getID().c_str());
                 this->file_systems[dst_mount_point]->storeFileInDirectory(
