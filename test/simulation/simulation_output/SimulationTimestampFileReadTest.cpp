@@ -168,7 +168,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileReadBasicTestWMS(
                             this, host1)));
 

@@ -461,7 +461,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing2_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new LoadBalancing2TestWMS(
                                     this, "Host1")));

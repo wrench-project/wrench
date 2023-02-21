@@ -346,7 +346,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
 
@@ -418,7 +418,7 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
 
@@ -475,7 +475,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
 

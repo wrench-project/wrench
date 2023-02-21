@@ -247,7 +247,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new SimpleScratchSpaceTestWMS(
                                     this, hostname)));
@@ -468,7 +468,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new SimpleScratchSpaceFailureTestWMS(
                                     this, hostname)));
@@ -810,7 +810,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ScratchSpaceRaceConditionTestWMS(this, hostname)));
 

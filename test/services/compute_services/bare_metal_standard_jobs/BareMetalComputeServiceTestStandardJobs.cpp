@@ -1416,7 +1416,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BareMetalComputeServiceCompletedJobTerminationTestWMS(
                                     this, hostname)));
@@ -1546,7 +1546,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
                                     this, hostname)));
@@ -1670,7 +1670,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
                                     this, hostname)));

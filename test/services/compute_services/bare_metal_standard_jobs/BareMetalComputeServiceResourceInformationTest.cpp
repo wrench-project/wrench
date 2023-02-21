@@ -263,7 +263,7 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
 
     // Create the WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ResourceInformationTestWMS(
                                     this, "Host1")));
