@@ -279,7 +279,7 @@ void S4U_SimulationTest::do_basicAPI_Test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new S4U_SimulationAPITestWMS(
                                     this, hostname)));

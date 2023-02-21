@@ -397,7 +397,7 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new SimpleFCFSQueueWaitTimePredictionWMS(this, hostname)));
 
@@ -496,7 +496,7 @@ void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BrokenQueueWaitTimePredictionWMS(
                                     this, hostname)));

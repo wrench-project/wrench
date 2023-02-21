@@ -127,7 +127,7 @@ void BatchServiceAvailabilityTimeLineTest::do_NodeAvailabilityTimeLineTest_test(
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new NodeAvailabilityTimelineTestWMS(this, hostname)));
 
@@ -208,7 +208,7 @@ void BatchServiceAvailabilityTimeLineTest::do_CoreAvailabilityTimeLineTest_test(
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new CoreAvailabilityTimelineTestWMS(hostname)));
 

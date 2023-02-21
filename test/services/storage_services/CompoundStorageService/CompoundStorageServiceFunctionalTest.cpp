@@ -383,7 +383,7 @@ private:
         actions.push_back(fileWriteAction);
 
         // Read the file directly from underlying storage service (in this case we know the file will be on simple_storage_service_510, disk 100)
-        auto readWrittenFile = job1->addFileReadAction("directReadFile", wrench::FileLocation::LOCATION(test->simple_storage_service_510, "/disk100/", test->file_10));
+        auto readWrittenFile = job1->addFileReadAction("directReadFile", wrench::FileLocation::LOCATION(test->simple_storage_service_510, "/disk510/", test->file_10));
         job1->addActionDependency(fileWriteAction, readWrittenFile);
         actions.push_back(readWrittenFile);
 
@@ -402,10 +402,10 @@ private:
 
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
 
-        for (auto const &action : job1->getActions()) {
-            std::cerr << " - " << action->getName() << ": " << action->getStateAsString() << "\n";
-            std::cerr << "     " << (action->getFailureCause() ? action->getFailureCause()->toString() : "") << "\n";
-        }
+//        for (auto const &action : job1->getActions()) {
+//            std::cerr << " - " << action->getName() << ": " << action->getStateAsString() << "\n";
+//            std::cerr << "     " << (action->getFailureCause() ? action->getFailureCause()->toString() : "") << "\n";
+//        }
 
         if (not std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
@@ -421,7 +421,6 @@ private:
             }
         }
 
-        std::cerr << "SUBMITTED THE JOB\n";
 
         // lookup a deleted file
         if (wrench::StorageService::lookupFileAtLocation(wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100))) {
@@ -432,8 +431,8 @@ private:
         auto file_500_designated_loc = test->compound_storage_service->lookupFileLocation(test->file_500);
         if (!file_500_designated_loc) {
             throw std::runtime_error("Should have been able to lookup file_500 through CSS");
-        } else if (file_500_designated_loc->getPath() != "/disk510/") {
-            throw std::runtime_error("file_500 copy through CSS is not where it should be");
+        } else if (file_500_designated_loc->getPath() != "/") { // TODO: HENRI CHANGED THIS TO "/" which is the logical path (used to say "/diskXXX/" which is physical)
+            throw std::runtime_error("file_500 copy through CSS is not where it should be (got path: " + file_500_designated_loc->getPath());
         }
 
         return 0;
@@ -454,11 +453,9 @@ std::shared_ptr<wrench::FileLocation> defaultStorageServiceSelection(
 
     std::shared_ptr<wrench::FileLocation> designated_location = nullptr;
 
-    std::cerr << "CAPACITY REQUIREMENT = " << capacity_req << "\n";
     for (const auto &storage_service: resources) {
 
         auto free_space = storage_service->getTotalFreeSpace();
-        std::cerr << "FREESPACE: " << storage_service->getName() << "  " << free_space << "\n";
         if (free_space >= capacity_req) {
             designated_location = wrench::FileLocation::LOCATION(storage_service, file); // TODO: MAJOR CHANGE
             break;

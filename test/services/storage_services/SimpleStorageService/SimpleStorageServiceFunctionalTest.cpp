@@ -1363,7 +1363,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test(do
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(
                     this, hostname)));
@@ -1617,7 +1617,7 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test(double buffer_size) 
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
             new PartitionsTestWMS(
                     this, hostname)));
@@ -1730,7 +1730,7 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test(double buffer_size) {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
             new FileWriteTestWMS(
                     this, hostname)));

@@ -193,7 +193,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test() {
     ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/"})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskBasicTestWMS(
                             this, wms_host)));
 
@@ -385,7 +385,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
 
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskMultipleTestWMS(
                             this, wms_host)));
 
@@ -581,7 +581,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
                                                                                                                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskTerminateAndFailTestWMS(
                             this, wms_host)));
 

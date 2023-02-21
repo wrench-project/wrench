@@ -172,7 +172,7 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
 
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileWriteBasicTestWMS(
                             this, host1)));
 
