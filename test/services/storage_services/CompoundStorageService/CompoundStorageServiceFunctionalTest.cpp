@@ -520,9 +520,12 @@ void CompoundStorageServiceFunctionalTest::do_BasicInterceptFunctionality_test()
                                                                      {}, {})));
 
     // Non-bufferized
+//    ASSERT_NO_THROW(simple_storage_service_510 = simulation->add(
+//            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk100", "/disk510"},
+//                                                                     {}, {})));
     ASSERT_NO_THROW(simple_storage_service_510 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk100", "/disk510"},
-                                                                     {}, {})));
+                            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk510"},
+                                                                                     {}, {})));
 
     // Create a valid Compound Storage Service (using a non-bufferized storage service in this case) with a user-provided callback
     ASSERT_NO_THROW(compound_storage_service = simulation->add(

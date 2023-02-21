@@ -97,12 +97,20 @@ namespace wrench {
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
         if (storage_services.empty()) {
-            throw std::invalid_argument("Got an empty list of SimpleStorageServices for CompoundStorageService."
-                                        "Must specify at least one valid SimpleStorageService");
+            throw std::invalid_argument("Got an empty list of StorageServices for CompoundStorageService."
+                                        "Must specify at least one valid StorageService");
         }
 
         if (std::any_of(storage_services.begin(), storage_services.end(), [](const auto &elem) { return elem == NULL; })) {
-            throw std::invalid_argument("One of the SimpleStorageServices provided is not initialized");
+            throw std::invalid_argument("One of the StorageServices provided is not initialized");
+        }
+
+        /* For now, we do not allow storage services that are simple with more than one mount point */
+        if (std::any_of(storage_services.begin(), storage_services.end(), [](const auto &elem) {
+                auto sss = std::dynamic_pointer_cast<SimpleStorageService>(elem);
+                return sss->hasMultipleMountPoints();
+            })) {
+            throw std::invalid_argument("One of the SimpleStorageServices provided has more than one mount point, which is currently not allowed");
         }
 
         /* // This should eventually be allowed, currently trying to fix it.
@@ -401,7 +409,6 @@ namespace wrench {
      */
     bool CompoundStorageService::processFileCopyRequest(StorageServiceFileCopyRequestMessage *msg) {
 
-        std::cerr << "IN PROCESS FILE COPY REQUEST\n";
         // If source location references a CSS, it must already be known to the CSS
         auto final_src = msg->src;
         if (std::dynamic_pointer_cast<CompoundStorageService>(msg->src->getStorageService())) {
@@ -413,7 +420,7 @@ namespace wrench {
             final_dst = this->lookupOrDesignateStorageService(msg->dst);
         }
 
-        std::cerr << "FINAL DST = " << final_dst->toString() << "\n";
+//        std::cerr << "FINAL DST = " << (final_dst == nullptr) << "\n";
 
         // Error case - src
         if (!final_src) {
