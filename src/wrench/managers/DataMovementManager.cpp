@@ -196,17 +196,17 @@ namespace wrench {
                 }
             }
 
-//            bool file_registry_service_updated = false;
-//            if (request.file_registry_service) {
-//                WRENCH_INFO("Trying to do a register");
-//                try {
-//                    request.file_registry_service->addEntry(request.dst);
-//                    file_registry_service_updated = true;
-//                } catch (ExecutionException &e) {
-//                    WRENCH_INFO("Oops, couldn't do it");
-//                    // don't throw, just keep file_registry_service_update to false
-//                }
-//            }
+            bool file_registry_service_updated = false;
+            if (request.file_registry_service) {
+                WRENCH_INFO("Trying to do a register");
+                try {
+                    request.file_registry_service->addEntry(request.dst);
+                    file_registry_service_updated = true;
+                } catch (ExecutionException &e) {
+                    WRENCH_INFO("Oops, couldn't do it");
+                    // don't throw, just keep file_registry_service_update to false
+                }
+            }
 
             // Forward it back
             S4U_Mailbox::dputMessage(this->creator_mailbox,
