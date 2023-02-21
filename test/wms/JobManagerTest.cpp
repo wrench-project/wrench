@@ -151,7 +151,7 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new JobManagerConstructorTestWMS(
                                     this, workflow, hostname)));
@@ -322,7 +322,7 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new JobManagerCreateJobTestWMS(
                                     this, hostname)));
@@ -406,7 +406,7 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new JobManagerSubmitJobTestWMS(
                                     this, hostname)));
@@ -531,7 +531,7 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new JobManagerResubmitJobTestWMS(
                                     this, "Host1")));
@@ -666,7 +666,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new JobManagerTerminateJobTestWMS(
                                     this, "Host1")));

@@ -405,7 +405,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
     }
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     wms = simulation->add(
             new StorageServiceLinkFailuresTestWMS(
                     this, "Host1"));

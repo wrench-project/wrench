@@ -197,7 +197,7 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
     // Create a WMS
     std::string stable_host = "StableHost";
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new StorageServiceRestartTestWMS(this, stable_host)));
 

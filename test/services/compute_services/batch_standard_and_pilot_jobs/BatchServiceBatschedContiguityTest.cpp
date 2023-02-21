@@ -241,7 +241,7 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobContiguousAllocationTestWMS(
                             this, hostname)));
 

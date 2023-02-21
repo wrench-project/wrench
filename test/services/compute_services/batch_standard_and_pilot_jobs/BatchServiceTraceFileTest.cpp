@@ -205,7 +205,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BatchTraceFileReplayTestWMS(
                                     this, hostname)));
@@ -284,7 +284,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BatchTraceFileReplayTestWithFailedJobWMS(
                                     this, hostname)));
@@ -375,7 +375,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWFBatchServiceShutdown_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFBatchServiceShutdownTestWMS(
                             this, hostname)));
 
@@ -726,7 +726,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFTestWMS(
                             this, hostname)));
 
@@ -888,7 +888,7 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesSWF_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFRequestedTimesTestWMS(
                             this, hostname)));
 
@@ -1040,7 +1040,7 @@ void BatchServiceTest::do_WorkloadTraceFileDifferentTimeOriginSWF_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFDifferentTimeOriginTestWMS(
                             this, hostname)));
 
@@ -1581,7 +1581,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileJSONTestWMS(
                             this, hostname)));
 
@@ -1722,7 +1722,7 @@ void BatchServiceTest::do_GetQueueState_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new GetQueueStateTestWMS(this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
