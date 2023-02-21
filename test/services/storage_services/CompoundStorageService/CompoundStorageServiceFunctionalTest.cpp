@@ -481,11 +481,11 @@ void CompoundStorageServiceFunctionalTest::do_BasicInterceptFunctionality_test()
     // xbt_log_control_set("wrench_core_file_transfer_thread.thres:info");
     // xbt_log_control_set("wrench_core_storage_service.thres:info");
 
-    int argc = 3;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
-    argv[2] = strdup("--log=wrench_core_mailbox.t=debug");
+//    argv[1] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--log=wrench_core_mailbox.t=debug");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
