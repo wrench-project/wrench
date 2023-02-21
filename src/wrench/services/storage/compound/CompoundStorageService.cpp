@@ -110,7 +110,8 @@ namespace wrench {
                 auto sss = std::dynamic_pointer_cast<SimpleStorageService>(elem);
                 return sss->hasMultipleMountPoints();
             })) {
-            throw std::invalid_argument("One of the SimpleStorageServices provided has more than one mount point, which is currently not allowed");
+            throw std::invalid_argument("One of the SimpleStorageServices provided has more than one mount point. "
+                                        "In the current state of the implementation this is currently not allowed");
         }
 
         /* // This should eventually be allowed, currently trying to fix it.
