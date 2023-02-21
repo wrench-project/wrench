@@ -112,7 +112,7 @@ private:
     DataMovementManagerCopyRegisterTest *test;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;
 
-    int main() {
+    int main() override {
 
 
         auto data_movement_manager = this->createDataMovementManager();
@@ -162,7 +162,6 @@ private:
         file_registry_service->setSimulation(this->simulation);
         file_registry_service->start(file_registry_service, true, false);
 
-
         // try asynchronous copy and register
         std::shared_ptr<wrench::ExecutionEvent> async_copy_event;
 
@@ -197,6 +196,7 @@ private:
         if (not found) {
             throw std::runtime_error("Asynchronous file copy succeeded but file was not registered at DstHost.");
         }
+
 
         // try 2 asynchronous copies of the same file
         bool double_copy_failed = false;
@@ -331,6 +331,7 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
