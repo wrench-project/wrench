@@ -1219,7 +1219,7 @@ private:
         auto file_1 = this->test->workflow->addFile("file_1", 1.00 * 1000 * 1000);
 
         wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
-        wrench::StorageService::readFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss2, file_1));
+        wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss2, file_1));
         wrench::StorageService::readFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
         return 0;
     }
@@ -1231,10 +1231,10 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpDiskOperationsTest) {
 
 void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
