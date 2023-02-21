@@ -41,10 +41,12 @@ namespace wrench {
      */
     class StorageServiceFreeSpaceRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFreeSpaceRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, double payload);
+        StorageServiceFreeSpaceRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, const std::string &path, double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The path */
+        std::string path;
     };
 
     /**

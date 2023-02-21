@@ -194,7 +194,7 @@ private:
         if (file == nullptr) {
             return;
         }
-        auto space = source->getFreeSpace();
+        auto space = source->getTotalFreeSpace();
 
         if (space < STORAGE_SERVICE_CAPACITY * .25) {
             wrench::StorageService::deleteFileAtLocation(wrench::FileLocation::LOCATION(source, file));

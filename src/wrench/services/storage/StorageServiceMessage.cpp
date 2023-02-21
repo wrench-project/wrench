@@ -31,11 +31,13 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
+    * @param path: the path
     * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
     */
     StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                                                                                 const std::string &path,
                                                                                  double payload)
         : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -45,6 +47,11 @@ namespace wrench {
         }
 #endif
         this->answer_mailbox = answer_mailbox;
+        if (path.empty()) {
+            this->path = "/";
+        } else {
+            this->path = path;
+        }
     }
 
     /**
