@@ -124,19 +124,19 @@ namespace wrench {
 
     protected:
         /** @brief Pending operations **/
-        std::map<std::shared_ptr<DataFile>, std::vector<unique_ptr<SimulationMessage>>> pending;
+        std::map<std::shared_ptr<DataFile>, std::vector<unique_ptr<ServiceMessage>>> pending;
         /** @brief Cache storage service **/
         std::shared_ptr<StorageService> cache;
         /** @brief Remove storage service **/
         std::shared_ptr<StorageService> remote;
 
         /** @brief the function to actually call when handling a file read */
-        bool (StorageServiceProxy::*readMethod)(unique_ptr<SimulationMessage> &);
+        bool (StorageServiceProxy::*readMethod)(unique_ptr<ServiceMessage> &);
 
-        bool commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<SimulationMessage> &message);
-        bool copyThenRead(unique_ptr<SimulationMessage> &message);
-        bool magicRead(unique_ptr<SimulationMessage> &message);
-        bool readThrough(unique_ptr<SimulationMessage> &message);
+        bool commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<ServiceMessage> &message);
+        bool copyThenRead(unique_ptr<ServiceMessage> &message);
+        bool magicRead(unique_ptr<ServiceMessage> &message);
+        bool readThrough(unique_ptr<ServiceMessage> &message);
 
     private:
         /** @brief Default property values */
