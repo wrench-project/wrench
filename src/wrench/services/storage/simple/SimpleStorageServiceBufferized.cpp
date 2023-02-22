@@ -135,7 +135,7 @@ namespace wrench {
             return processStopDaemonRequest(msg->ack_mailbox);
 
         } else if (auto msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage *>(message.get())) {
-            return processFreeSpaceRequest(msg->answer_mailbox);
+            return processFreeSpaceRequest(msg->answer_mailbox, msg->path);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
             return processFileDeleteRequest(msg->location, msg->answer_mailbox);

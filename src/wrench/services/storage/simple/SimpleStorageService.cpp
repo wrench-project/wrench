@@ -278,13 +278,17 @@ namespace wrench {
     /**
      * @brief Process a free space request
      * @param answer_mailbox: the mailbox to which the notification should be sent
+     * @param path: the path at which free space is requested
      * @return false if the daemon should terminate
      */
-    bool SimpleStorageService::processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox) {
+    bool SimpleStorageService::processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox, const std::string &path) {
         double free_space = 0;
 
+        auto sanitized_path = FileLocation::sanitizePath(path);
         for (auto const &mp: this->file_systems) {
-            free_space += mp.second->getFreeSpace();
+            if ((sanitized_path == "/") or (sanitized_path == FileLocation::sanitizePath(mp.first))) {
+                free_space += mp.second->getFreeSpace();
+            }
         }
 
         S4U_Mailbox::dputMessage(
