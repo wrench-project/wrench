@@ -74,22 +74,43 @@ namespace wrench {
         // Overload StorageService's implementation.
         void setIsScratch(bool is_scratch) override;
 
+        /**
+         * @brief Determine whether the storage service is bufferized
+         * @return true if bufferized, false otherwise
+         */
         bool isBufferized() const override {
             return false;
         }
 
+	/**
+         * @brief Determine the storage service's buffer size
+         * @return a size in bytes
+         */
         double getBufferSize() const override {
             return 0;
         }
 
+	/**
+         * @brief Reserve space at the storage service
+         * @param location a location
+         * @return true if success, false otherwise
+         */
         bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
             throw std::runtime_error("CompoundStorageService::reserveSpace(): not implemented");
         }
 
+	/**
+        * @brief Unreserve space at the storage service
+        * @param location a location
+        */
         void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
             throw std::runtime_error("CompoundStorageService::unreserveSpace(): not implemented");
         }
 
+	/**
+         * @brief Create a file at the storage service (in zero simulated time)
+         * @param location a location
+         */
         void createFile(const std::shared_ptr<FileLocation> &location) override {
             throw std::runtime_error("CompoundStorageService::createFile(): not implemented");
         }
