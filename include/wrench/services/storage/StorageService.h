@@ -220,83 +220,179 @@ namespace wrench {
         /** Non-Simulation methods **/
 
         /** File lookup methods */
+
+        /**
+         * @brief Determines whether a file is present at a location (in zero simulated time)
+         * @param location a location
+         * @return true if the file is present, false otherwise
+         */
         static bool hasFileAtLocation(const std::shared_ptr<FileLocation> &location) {
             if (location == nullptr) {
                 throw std::invalid_argument("StorageService::hasFileAtLocation(): invalid argument argument");
             }
             return location->getStorageService()->hasFile(location);
         }
+        /**
+         * @brief Determines whether a file is present at the storage service (in zero simulated time)
+         * @param file a file
+         * @return true if the file is present, false otherwise
+         */
         bool hasFile(const std::shared_ptr<DataFile> &file) {
             return this->hasFile(file, "/");
         }
+        /**
+         * @brief Determines whether a file is present at the storage service (in zero simulated time)
+         * @param file a file
+         * @param path a path
+         * @return true if the file is present, false otherwise
+         */
         virtual bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
             return this->hasFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
         }
+        /**
+         * @brief Determines whether a file is present at the storage service (in zero simulated time)
+         * @param location a location
+         * @return true if the file is present, false otherwise
+         */
         virtual bool hasFile(const std::shared_ptr<FileLocation> &location) = 0;
 
         /** File creation methods */
+        /**
+         * @brief Create a file at a location (in zero simulated time)
+         * @param location a location
+         */
         static void createFileAtLocation(const std::shared_ptr<FileLocation> &location) {
             if (location == nullptr) {
                 throw std::invalid_argument("StorageService::createFileAtLocation(): invalid argument argument");
             }
             location->getStorageService()->createFile(location);
         }
+        /**
+         * @brief Create a file at the storage service (in zero simulated time)
+         * @param file a file
+         */
         void createFile(const std::shared_ptr<DataFile> &file) {
             this->createFile(file, "/");
         }
+        /**
+         * @brief Create a file at the storage service (in zero simulated time)
+         * @param location a location
+         * @param path a path
+         */
         virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
             this->createFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
         }
+        /**
+         * @brief Create a file at the storage service (in zero simulated time)
+         * @param location a location
+         */
         virtual void createFile(const std::shared_ptr<FileLocation> &location) = 0;
 
         /** File write date methods */
-        void getFileLocationLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+        /**
+         * @brief Get a file's last write date at a location (in zero simulated time)
+         * @param location  a location
+         * @param a date in seconds
+         */
+        double getFileLocationLastWriteDate(const std::shared_ptr<FileLocation> &location) {
             if (location == nullptr) {
                 throw std::invalid_argument("StorageService::getFileLocationLastWriteDate(): invalid argument argument");
             }
             this->getFileLastWriteDate(location);
         }
+        /**
+         * @brief Get a file's last write date at the storage service (in zero simulated time)
+         * @param file  a file
+         * @param a date in seconds
+         */
         double getFileLastWriteDate(const std::shared_ptr<DataFile> &file) {
             return this->getFileLastWriteDate(file, "/");
         }
+        /**
+         * @brief Get a file's last write date at the storage service (in zero simulated time)
+         * @param file  a file
+         * @param path a path
+         * @param a date in seconds
+         */
         virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
             return this->getFileLastWriteDate(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
         }
+        /**
+         * @brief Get a file's last write date at the storage service (in zero simulated time)
+         * @param file  a location
+         * @param a date in seconds
+         */
         virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) = 0;
 
         /** Service load methods */
+        /**
+         * @brief Get the storage service's load
+         * @return a load metric
+         */
         virtual double getLoad() = 0;
 
         /** Service total space method */
+        /**
+         * @brief Get the storage service's total space (in zero simulated time)
+         * @return a capacity in bytes
+         */
         virtual double getTotalSpace() = 0;
 
         /** Service free space method */
+        /**
+         * @brief Get the storage service's total free space (incurs simulated overhead)
+         * @return a capacity in bytes
+         */
         double getTotalFreeSpace();
 
         /** Service free space method */
+        /**
+         * @brief Get the storage service's free space at a path (incurs simulated overhead)
+         * @brief path a path
+         * @return a capacity in bytes
+         */
         virtual double getTotalFreeSpaceAtPath(const std::string &path);
 
+        /**
+         * @brief Get the storage's service base root path
+         * @return a path
+         */
         virtual std::string getBaseRootPath() {
             return "/";
         }
 
+        /**
+         * @brief Copy a file from one location to another
+         * @param src_location a source location
+         * @param dst_location a destination location
+         */
         static void copyFile(const std::shared_ptr<FileLocation> &src_location,
                              const std::shared_ptr<FileLocation> &dst_location);
 
-        static void initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox,
-                                     const std::shared_ptr<FileLocation> &src_location,
-                                     const std::shared_ptr<FileLocation> &dst_location);
-
+        /**
+         * @brief Helper method to read multiple files
+         *
+         * @param locations a map of files to locations
+         */
         static void readFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
+        /**
+         * @brief Helper method to write multiple files
+         *
+         * @param locations a map of files to locations
+         */
         static void writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
-
+        /**
+         * @brief Determine whether the storage service is bufferized
+         * @return true if bufferized, false otherwise
+         */
         virtual bool isBufferized() const = 0;
+        /**
+         * @brief Determine the storage service's buffer size
+         * @return a size in bytes
+         */
         virtual double getBufferSize() const = 0;
-
-        virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) = 0;
-        virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) = 0;
 
         /**
          * @brief Determines whether the storage service is a scratch service of a ComputeService
@@ -309,6 +405,30 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
+
+        /**
+         * @brief Initiate a file copy from one location to another
+         * @param answer_mailbox a mailbox on which to receive completion/failure notification
+         * @param src_location a source location
+         * @param dst_location a destination location
+         */
+        static void initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox,
+                                     const std::shared_ptr<FileLocation> &src_location,
+                                     const std::shared_ptr<FileLocation> &dst_location);
+
+        /**
+         * @brief Reserve space at the storage service
+         * @param location a location
+         * @return true if success, false otherwise
+         */
+        virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) = 0;
+
+        /**
+         * @brief Unreserve space at the storage service
+         * @param location a location
+         */
+        virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) = 0;
+
         virtual void deleteFile(simgrid::s4u::Mailbox *answer_mailbox,
                                 const std::shared_ptr<FileLocation> &location,
                                 bool wait_for_answer);

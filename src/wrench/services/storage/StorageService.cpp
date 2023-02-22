@@ -101,8 +101,7 @@ namespace wrench {
      * @brief Synchronously write a file to the storage service
      *
      * @param answer_mailbox: the mailbox on which to expect the answer
-     * @param file: the file
-     * @param path: the file path
+     * @param location: the location
      * @param wait_for_answer: whether to wait for the answer
      *
      * @throw ExecutionException
@@ -227,8 +226,7 @@ namespace wrench {
      * @brief Asks the storage service whether it holds a file
      *
      * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
-     * @param file: the file to lookup
-     * @param path: the file path
+     * @param location: the location to lookup
      *
      * @return true if the file is present, false otherwise
      */
@@ -264,9 +262,8 @@ namespace wrench {
      * @brief Read a file from the storage service
      *
      * @param answer_mailbox: the mailbox on which to expect the answer
-     * @param file: the file
-     * @param num_bytes: number of bytes to read
-     * @param path: the file path
+     * @param location: the location
+     * @param num_bytes: the number of bytes to read
      * @param wait_for_answer: whether to wait for the answer
      */
     void StorageService::readFile(simgrid::s4u::Mailbox *answer_mailbox,
