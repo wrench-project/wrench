@@ -38,22 +38,33 @@ namespace wrench {
 
 
     class WorkflowTask;
+    /**
+     * @brief Since im not sure how to call WRENCH_DEBUG from an h file, I just made this function to do the logging for the template getMessage functions.  It also has the added bonus of checking for inheritance
+     *
+     * @param mailbox: the mailbox so we can get its name
+     * @param type: a pointer to the message so we have its type
+     *
+     */
+   void S4U_Mailbox::templateWaitingLog(const simgrid::s4u::Mailbox* mailbox ,std::string type) {
 
+       WRENCH_DEBUG("Getting a message of type <%s> from mailbox_name '%s'",type.c_str() , mailbox->get_cname());
+   }
     /**
      * @brief Synchronously receive a message from a mailbox
      *
      * @param mailbox: the mailbox
+     * @param log: should the log message be printed (default true), its type is void\* to prevent c++ implicitly casting ints to it, but it is being used like a bool
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
      * @throw std::shared_ptr<NetworkError>
      *
      */
-    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox) {
+    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox,void* log) {
         if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
             throw std::runtime_error("S4U_Mailbox::getMessage(): Cannot be called with NULL_MAILBOX");
         }
 
-        WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox->get_cname());
+        if(log) WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox->get_cname());
         //        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         SimulationMessage *msg;
         try {
@@ -77,11 +88,12 @@ namespace wrench {
      *
      * @param mailbox: the mailbox
      * @param timeout:  a timeout value in seconds (<0 means never timeout)
+     * @param log: should the log message be printed (default true), its type is void\* to prevent c++ implicitly casting ints to it, but it is being used like a bool
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
      * @throw std::shared_ptr<NetworkError>
      */
-    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox, double timeout) {
+    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox, double timeout,void* log ) {
         if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
             throw std::runtime_error("S4U_Mailbox::getMessage(): Cannot be called with NULL_MAILBOX");
         }
@@ -90,7 +102,7 @@ namespace wrench {
             return S4U_Mailbox::getMessage(mailbox);
         }
 
-        WRENCH_DEBUG("Getting a message from mailbox_name '%s' with timeout %lf sec", mailbox->get_cname(), timeout);
+        if(log)WRENCH_DEBUG("Getting a message from mailbox_name '%s' with timeout %lf sec", mailbox->get_cname(), timeout);
         //        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         //        void *data = nullptr;
         wrench::SimulationMessage *msg;

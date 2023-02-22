@@ -95,6 +95,7 @@ private:
         WRENCH_INFO("Initiating Read "+order);
         //read file again to check cache
         proxy->readFile(file1);
+        //proxy->getCache()->readFile(file1);
 
 
 
@@ -117,12 +118,12 @@ void StorageServiceProxySimultaneousTest::do_Simultaneous_test(std::string mode)
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 4;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
-    //argv[1] = strdup("--log=wrench_core_mailbox.threshold=debug");
-    //argv[1] = strdup("--log=wrench_core_proxy_file_server.threshold=debug");
+    argv[3] = strdup("--wrench-full-log");
+    argv[1] = strdup("--log=wrench_core_mailbox.threshold=debug");
+    argv[2] = strdup("--log=wrench_core_proxy_file_server.threshold=debug");
     simulation->init(&argc, argv);
 
     simulation->instantiatePlatform(platform_file_path);
@@ -155,6 +156,7 @@ void StorageServiceProxySimultaneousTest::do_Simultaneous_test(std::string mode)
 
     // Create a copy file1 on remote
     remote->createFile(file1);
+    //cache->createFile(file1);
     // Create an execution controller
     auto controller1 = simulation->add(new StorageServiceProxySimultaneousTestExecutionController(this, "Client",file1, true));
     auto controller2 = simulation->add(new StorageServiceProxySimultaneousTestExecutionController(this, "Client",file1, false));
