@@ -107,7 +107,7 @@ namespace wrench {
         }
         /**
          * @brief Delete a file at the storage service (incurs simulated overheads)
-         * @param file a location
+         * @param location a location
          */
         virtual void deleteFile(const std::shared_ptr<FileLocation> &location) {
             this->deleteFile(S4U_Daemon::getRunningActorRecvMailbox(), location, true);
@@ -292,7 +292,7 @@ namespace wrench {
         /**
          * @brief Get a file's last write date at a location (in zero simulated time)
          * @param location  a location
-         * @param a date in seconds
+         * @param a date in seconds, or -1 if the file is not found
          */
         double getFileLocationLastWriteDate(const std::shared_ptr<FileLocation> &location) {
             if (location == nullptr) {

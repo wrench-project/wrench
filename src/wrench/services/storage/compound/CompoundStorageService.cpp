@@ -624,7 +624,9 @@ namespace wrench {
      * @brief Synchronously asks the storage services inside the compound storage service 
      *        for their free space at all of their mount points
      * 
-     * @return The free space in bytes of each mount point, as a map
+     * @param path a path
+     *
+     * @return The free space in bytes at the path
      *
      * @throw ExecutionException
      *
@@ -664,11 +666,9 @@ namespace wrench {
     /**
      * @brief Get a file's last write date at a location (in zero simulated time)
      *
-     * @param file: the file
-     * @param path: the path
+     * @param file: the location
      *
-     * @return -1 if the file is not found
-     *
+     * @return a date in seconds, or -1 if the file is not found
      */
     double CompoundStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
         if (location == nullptr) {
@@ -695,8 +695,7 @@ namespace wrench {
     /**
      * @brief Check (outside of simulation time) whether the storage service has a file
      *
-     * @param file: the file
-     * @param path: the file path
+     * @param location a location
      *
      * @return true if the file is present, false otherwise
      */
