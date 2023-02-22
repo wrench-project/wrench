@@ -228,6 +228,39 @@ private:
                     "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 90.0");
         }
 
+        // Send a free space request at a path (without the slash)
+        try {
+            free_space = this->test->storage_service_100->getTotalFreeSpaceAtPath("/disk100");
+        } catch (wrench::ExecutionException &e) {
+            throw std::runtime_error("Should be able to get a storage's service free space at a path");
+        }
+        if (free_space != 90.0) {
+            throw std::runtime_error(
+                    "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 90.0");
+        }
+
+        // Send a free space request at a path (with the slash)
+        try {
+            free_space = this->test->storage_service_100->getTotalFreeSpaceAtPath("/disk100/");
+        } catch (wrench::ExecutionException &e) {
+            throw std::runtime_error("Should be able to get a storage's service free space at a path");
+        }
+        if (free_space != 90.0) {
+            throw std::runtime_error(
+                    "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 90.0");
+        }
+
+        // Send a free space request at a bogus path
+        try {
+            free_space = this->test->storage_service_100->getTotalFreeSpaceAtPath("bogus");
+        } catch (wrench::ExecutionException &ignore) {
+            throw std::runtime_error("Should be able to get a storage's service free space, even at a bogus path");
+        }
+        if (free_space != 0.0) {
+            throw std::runtime_error(
+                    "Free space on storage service at a bogus path should be 0.0");
+        }
+
         // Bogus read
         try {
             wrench::StorageService::readFileAtLocation(wrench::FileLocation::LOCATION(this->test->storage_service_100, nullptr));

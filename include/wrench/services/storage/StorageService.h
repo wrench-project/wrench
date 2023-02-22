@@ -67,7 +67,7 @@ namespace wrench {
          * @return true if the file is present, or false
          */
         virtual bool lookupFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            return this->lookupFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
+            return this->lookupFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
         /**
          * @brief Lookup whether a file exists at a location on the storage service (incurs simulated overheads)
@@ -103,7 +103,7 @@ namespace wrench {
          * @param path a path
          */
         virtual void deleteFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            this->deleteFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
+            this->deleteFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
         /**
          * @brief Delete a file at the storage service (incurs simulated overheads)
@@ -156,7 +156,7 @@ namespace wrench {
          * @param path a path
          */
         virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            this->readFile(file, path, file->getSize());
+            this->readFile(file, FileLocation::sanitizePath(path), file->getSize());
         }
         /**
          * @brief Read a file at the storage service (incurs simulated overheads)
@@ -165,7 +165,7 @@ namespace wrench {
          * @param num_bytes a number of bytes to read
          */
         virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes) {
-            this->readFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file), num_bytes);
+            this->readFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file), num_bytes);
         }
         /**
          * @brief Read a file at the storage service (incurs simulated overheads)
@@ -207,7 +207,7 @@ namespace wrench {
          * @param path a path
          */
         virtual void writeFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            this->writeFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
+            this->writeFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
         /**
          * @brief Write a file at the storage service (incurs simulated overheads)
@@ -247,7 +247,7 @@ namespace wrench {
          * @return true if the file is present, false otherwise
          */
         virtual bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            return this->hasFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
+            return this->hasFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
         /**
          * @brief Determines whether a file is present at the storage service (in zero simulated time)
@@ -280,7 +280,7 @@ namespace wrench {
          * @param path a path
          */
         virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            this->createFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
+            this->createFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
         /**
          * @brief Create a file at the storage service (in zero simulated time)
@@ -298,7 +298,7 @@ namespace wrench {
             if (location == nullptr) {
                 throw std::invalid_argument("StorageService::getFileLocationLastWriteDate(): invalid argument argument");
             }
-            this->getFileLastWriteDate(location);
+            return this->getFileLastWriteDate(location);
         }
         /**
          * @brief Get a file's last write date at the storage service (in zero simulated time)
@@ -315,7 +315,7 @@ namespace wrench {
          * @param a date in seconds
          */
         virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            return this->getFileLastWriteDate(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
+            return this->getFileLastWriteDate(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
         /**
          * @brief Get a file's last write date at the storage service (in zero simulated time)

@@ -165,7 +165,8 @@ namespace wrench {
                                       simgrid::s4u::Mailbox *answer_mailbox);
         bool processFileLookupRequest(const std::shared_ptr<FileLocation> &location,
                                       simgrid::s4u::Mailbox *answer_mailbox);
-        bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox);
+        bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox,
+                                     const std::string &path);
 
     protected:
         /** @brief The service's buffer size */
