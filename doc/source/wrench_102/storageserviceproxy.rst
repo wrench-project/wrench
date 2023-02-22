@@ -106,6 +106,7 @@ If no default location is given, or the file is on a different remote :cpp:class
 For this proxy location `ss` should be the proxy to access.
 
 .. code:: cpp
+
    	proxy->readFile(remote,someOtherDataFile);
    	readFile(ProxyFileLocation::LOCATION(
 		remote,//target a location other than default
