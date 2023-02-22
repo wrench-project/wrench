@@ -34,6 +34,15 @@ namespace wrench {
     class S4U_Mailbox {
 
     public:
+        /**
+     * @brief Synchronously receive a message from a mailbox
+     *
+     * @param mailbox: the mailbox
+     * @param error_prefix: any string you wish to prefix the error message with
+     * @return the message, in a unique_ptr of the type specified.  Otherwise throws a runtime_error
+     *
+     * @throw std::shared_ptr<NetworkError>
+     */
         template<class TMessageType>
         static std::unique_ptr<TMessageType> getMessage(simgrid::s4u::Mailbox *mailbox,const std::string& error_prefix=""){
             #ifndef NDEBUG
@@ -43,7 +52,7 @@ namespace wrench {
             #endif
 
 
-            auto message=S4U_Mailbox::getMessage(mailbox,nullptr);
+            auto message=S4U_Mailbox::getMessage(mailbox,false);
             if(auto msg=dynamic_cast<TMessageType*>(message.get())){
                 message.release();
                 return std::unique_ptr<TMessageType>(msg);
@@ -53,12 +62,23 @@ namespace wrench {
                 throw std::runtime_error(error_prefix+"Unexpected [" + message->getName() + "] message while waiting for "+ tn.c_str());
             }
         }
+        /**
+     * @brief Synchronously receive a message from a mailbox
+     *
+     * @param mailbox: the mailbox
+     * @param error_prefix: any string you wish to prefix the error message with
+     * @param timeout:  a timeout value in seconds (<0 means never timeout)
+     *
+     * @return the message, in a unique_ptr of the type specified.  Otherwise throws a runtime_error
+     *
+     * @throw std::shared_ptr<NetworkError>
+     */
         template<class TMessageType>
         static std::unique_ptr<TMessageType> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout,const std::string& error_prefix=""){
 
             templateWaitingLog(mailbox,(TMessageType*)nullptr);
 
-            auto message=S4U_Mailbox::getMessage(mailbox,timeout,nullptr);
+            auto message=S4U_Mailbox::getMessage(mailbox,timeout,false);
             if(auto msg=dynamic_cast<TMessageType>(message.get())){
                 message.release();
                 return std::unique_ptr<TMessageType>(msg);
@@ -66,9 +86,29 @@ namespace wrench {
                 throw std::runtime_error(error_prefix+"Unexpected [" + message->getName() + "] message while waiting for "+ WRENCH_BOOST_DEMANGLE_TYPE((TMessageType)nullptr));
             }
         }
-
-        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox,void* log=(void*)1);
-        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout,void* log=(void*)1);
+        /**
+     * @brief Synchronously receive a message from a mailbox
+     *
+     * @param mailbox: the mailbox
+     * @return the message, or nullptr (in which case it's likely a brutal termination)
+     *
+     * @throw std::shared_ptr<NetworkError>
+     */
+        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox){
+                return getMessage(mailbox,true);
+        }
+        /**
+     * @brief Synchronously receive a message from a mailbox, with a timeout
+     *
+     * @param mailbox: the mailbox
+     * @param timeout:  a timeout value in seconds (<0 means never timeout)
+     * @return the message, or nullptr (in which case it's likely a brutal termination)
+     *
+     * @throw std::shared_ptr<NetworkError>
+     */
+        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout){
+                return getMessage(mailbox, timeout,true);
+        }
         static void putMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *m);
         static void dputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg);
         static std::shared_ptr<S4U_PendingCommunication> iputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg);
@@ -96,6 +136,8 @@ namespace wrench {
 
 
     private:
+        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox,bool log);
+        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout,bool log);
         static std::deque<simgrid::s4u::Mailbox *> free_mailboxes;
         static std::set<simgrid::s4u::Mailbox *> used_mailboxes;
         static std::deque<simgrid::s4u::Mailbox *> mailboxes_to_drain;
