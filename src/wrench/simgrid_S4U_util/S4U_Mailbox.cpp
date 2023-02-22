@@ -53,13 +53,13 @@ namespace wrench {
      * @brief Synchronously receive a message from a mailbox
      *
      * @param mailbox: the mailbox
-     * @param log: should the log message be printed (default true), its type is void\* to prevent c++ implicitly casting ints to it, but it is being used like a bool
+     * @param log: should the log message be printed
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
      * @throw std::shared_ptr<NetworkError>
      *
      */
-    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox,void* log) {
+    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox,bool log) {
         if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
             throw std::runtime_error("S4U_Mailbox::getMessage(): Cannot be called with NULL_MAILBOX");
         }
@@ -88,12 +88,12 @@ namespace wrench {
      *
      * @param mailbox: the mailbox
      * @param timeout:  a timeout value in seconds (<0 means never timeout)
-     * @param log: should the log message be printed (default true), its type is void\* to prevent c++ implicitly casting ints to it, but it is being used like a bool
+     * @param log: should the log message be printed
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
      * @throw std::shared_ptr<NetworkError>
      */
-    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox, double timeout,void* log ) {
+    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox, double timeout,bool log ) {
         if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
             throw std::runtime_error("S4U_Mailbox::getMessage(): Cannot be called with NULL_MAILBOX");
         }
