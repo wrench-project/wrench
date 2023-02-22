@@ -47,14 +47,14 @@ namespace wrench {
         //}
         std::string message =
                 "Proxy Server " + this->getName() + "  starting on host " + this->getHostname();
-        WRENCH_INFO("%s",
+        WRENCH_DEBUG("%s",
                     message.c_str());
 
         /** Main loop **/
         while (this->processNextMessage()) {
         }
 
-        WRENCH_INFO("Proxy Server Node %s on host %s cleanly terminating!",
+        WRENCH_DEBUG("Proxy Server Node %s on host %s cleanly terminating!",
                     this->getName().c_str(),
                     S4U_Simulation::getHostName().c_str());
 
@@ -88,14 +88,14 @@ namespace wrench {
         //S4U_Simulation::compute(flops);
         S4U_Simulation::computeZeroFlop();
         // Wait for a message
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<ServiceMessage> message = nullptr;
 
 
         S4U_Simulation::compute(this->getPropertyValueAsDouble(StorageServiceProxyProperty::MESSAGE_OVERHEAD));
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
+            message = S4U_Mailbox::getMessage<ServiceMessage>(this->mailbox);
         } catch (ExecutionException &e) {
-            WRENCH_INFO(
+            WRENCH_DEBUG(
                     "Got a network error while getting some message... ignoring");
             return true;// oh well
         }
@@ -167,14 +167,14 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
             auto target = remote;
             if (auto location = std::dynamic_pointer_cast<ProxyLocation>(msg->location)) {
-                //WRENCH_INFO("Proxy Location");
+                //WRENCH_DEBUG("Proxy Location");
                 target = location->target;
             }
             //cerr<<"writing"<<target<<" "<<remote<<endl;
             if (cache) {     //check cache
                 if (target) {//check that someone is waiting for this message
                     pending[msg->location->getFile()].push_back(std::move(message));
-                    WRENCH_INFO("Adding pending write");
+                    WRENCH_DEBUG("Adding pending write");
                 }
                 S4U_Mailbox::dputMessage(cache->mailbox, new StorageServiceFileWriteRequestMessage(mailbox, msg->requesting_host, FileLocation::LOCATION(cache, msg->location->getFile()), msg->buffer_size, 0));
             } else {
@@ -211,7 +211,7 @@ namespace wrench {
             //            }
             //            throw std::runtime_error( "StorageServiceProxy:processNextMessage(): Unexpected [" + message->getName() + "] message that either could not be forwared");
         } else if (auto msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {//Our remote lookup has finished
-            std::vector<unique_ptr<SimulationMessage>> &messages = pending[msg->file];
+            std::vector<unique_ptr<ServiceMessage>> &messages = pending[msg->file];
             for (unsigned int i = 0; i < messages.size(); i++) {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(messages[i].get())) {
                     S4U_Mailbox::dputMessage(tmpMsg->answer_mailbox, new StorageServiceFileLookupAnswerMessage(*msg));
@@ -221,14 +221,14 @@ namespace wrench {
                 }
             }
         } else if (auto msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {//forward through
-            //WRENCH_INFO("Got write answer");
-            std::vector<unique_ptr<SimulationMessage>> &messages = pending[msg->location->getFile()];
+            //WRENCH_DEBUG("Got write answer");
+            std::vector<unique_ptr<ServiceMessage>> &messages = pending[msg->location->getFile()];
             for (unsigned int i = 0; i < messages.size(); i++) {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(messages[i].get())) {
-                    //WRENCH_INFO("Forwarding");
+                    //WRENCH_DEBUG("Forwarding");
                     S4U_Mailbox::dputMessage(tmpMsg->answer_mailbox, new StorageServiceFileWriteAnswerMessage(*msg));
                     if (!msg->success) {//the the file write failed, there will be no ack message
-                        //WRENCH_INFO("write failed");
+                        //WRENCH_DEBUG("write failed");
                         std::swap(messages[i], messages.back());
                         messages.pop_back();
                         i--;
@@ -238,7 +238,7 @@ namespace wrench {
 
 
         } else if (auto msg = dynamic_cast<StorageServiceAckMessage *>(message.get())) {//our file write has finished
-            std::vector<unique_ptr<SimulationMessage>> &messages = pending[msg->location->getFile()];
+            std::vector<unique_ptr<ServiceMessage>> &messages = pending[msg->location->getFile()];
             for (unsigned int i = 0; i < messages.size(); i++) {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(messages[i].get())) {
 
@@ -247,7 +247,7 @@ namespace wrench {
                     if (auto location = std::dynamic_pointer_cast<ProxyLocation>(tmpMsg->location)) {
                         target = location->target;
                     }
-                    //WRENCH_INFO("initiating file copy");
+                    //WRENCH_DEBUG("initiating file copy");
                     // Initiate File Copy but not wanting to receive an answer, hence the NULL_MAILBOX
                     initiateFileCopy(S4U_Mailbox::NULL_MAILBOX, FileLocation::LOCATION(cache, msg->location->getFile()), FileLocation::LOCATION(target, msg->location->getFile()));
 
@@ -429,6 +429,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
         } else {
             throw invalid_argument("Unknown value " + readProperty + " for StorageServiceProxyProperty::UNCACHED_READ_METHOD");
         }
+        this->network_timeout = -1.0;//turn off network time out.  A proxy will wait to respond to a second file request until it has downloaded the file completely.  For large files this can easily excede any reasonable timeout.  So we dissable it completely
     }
     /**
      * @brief Delete a file
@@ -533,9 +534,9 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
      * @param message the raw unique_ptr for the message.  Assumed to be the same as msg, passed to avoid second cast.
      * @return True if the file is cached, false otherwise
      */
-    bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<SimulationMessage> &message) {
+    bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<ServiceMessage> &message) {
         if (cache->hasFile(msg->location->getFile(), msg->location->getFullAbsolutePath())) {//check cache
-            WRENCH_INFO("Forwarding to cache reply mailbox %s", msg->answer_mailbox->get_name().c_str());
+            WRENCH_DEBUG("Forwarding to cache mailbox, reply to %s", msg->answer_mailbox->get_name().c_str());
             S4U_Mailbox::dputMessage(
                     cache->mailbox,
                     new StorageServiceFileReadRequestMessage(
@@ -547,7 +548,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
             return true;
 
         } else {
-            std::vector<unique_ptr<SimulationMessage>> &messages = pending[msg->location->getFile()];
+            std::vector<unique_ptr<ServiceMessage>> &messages = pending[msg->location->getFile()];
             for (unsigned int i = 0; i < messages.size(); i++) {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(messages[i].get())) {
                     //there is A writeRequest for this file in progress, ignore
@@ -565,14 +566,14 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
      * @return True if the message was processed.  False otherwise
      */
     bool StorageServiceProxy::rejectDuplicateRead(const std::shared_ptr<DataFile>& file){
-        WRENCH_INFO("Looking for Duplicate Read");
+        WRENCH_DEBUG("Looking for Duplicate Read");
         bool second=false;
-        std::vector<unique_ptr<SimulationMessage>> &messages = pending[file];
+        std::vector<unique_ptr<ServiceMessage>> &messages = pending[file];
 
         for (unsigned int i = 0; i < messages.size(); i++) {
             if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
                 if(second){
-                    WRENCH_INFO("Duplicate remote read detected, Queuing");
+                    WRENCH_DEBUG("Duplicate remote read detected, Queuing");
                     return true;
                 }
                 second=true;
@@ -586,7 +587,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
      * @param message the message that is being processed
      * @return True if the message was processed by this function.  False otherwise
      */
-    bool StorageServiceProxy::copyThenRead(unique_ptr<SimulationMessage> &message) {
+    bool StorageServiceProxy::copyThenRead(unique_ptr<ServiceMessage> &message) {
         WRENCH_DEBUG("Trying copyThenRead(message)");
         if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
             if (commonReadFile(msg, message)) {
@@ -611,7 +612,8 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
             }
             return true;
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {//Our remote read request has finished
-            std::vector<unique_ptr<SimulationMessage>> &messages = pending[msg->src->getFile()];
+            std::vector<unique_ptr<ServiceMessage>> &messages = pending[msg->src->getFile()];
+
             for (unsigned int i = 0; i < messages.size(); i++) {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
                     if (msg->success) {
@@ -638,7 +640,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
     * @param message the message that is being processed
     * @return True if the message was processed by this function.  False otherwise
     */
-    bool StorageServiceProxy::magicRead(unique_ptr<SimulationMessage> &message) {
+    bool StorageServiceProxy::magicRead(unique_ptr<ServiceMessage> &message) {
         WRENCH_DEBUG("Trying magicRead(message)");
         if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
             //Same FileRead as ReadThenCopy, only CopyAnswer should be different
@@ -663,7 +665,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
             }
             return true;
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {//Our remote read request has finished
-            std::vector<unique_ptr<SimulationMessage>> &messages = pending[msg->src->getFile()];
+            std::vector<unique_ptr<ServiceMessage>> &messages = pending[msg->src->getFile()];
             for (unsigned int i = 0; i < messages.size(); i++) {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
                     if (msg->success) {
@@ -689,7 +691,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
      * @param message the message that is being processed
      * @return True if the message was processed by this function.  False otherwise
      */
-    bool StorageServiceProxy::readThrough(unique_ptr<SimulationMessage> &message) {
+    bool StorageServiceProxy::readThrough(unique_ptr<ServiceMessage> &message) {
         WRENCH_DEBUG("Trying readThrough(message)");
         if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
 
@@ -746,7 +748,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                 //this is not a proxied Ack, this is actually directed to us
                 return false;
             }
-            std::vector<unique_ptr<SimulationMessage>> &messages = pending[msg->location->getFile()];
+            std::vector<unique_ptr<ServiceMessage>> &messages = pending[msg->location->getFile()];
             bool first = true;
             for (unsigned int i = 0; i < messages.size(); i++) {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
