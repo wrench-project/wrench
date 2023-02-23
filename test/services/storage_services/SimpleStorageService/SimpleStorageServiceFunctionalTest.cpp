@@ -293,6 +293,7 @@ private:
             } catch (std::invalid_argument &e) {
             }
 
+
             // Read a file on a storage service
             try {
                 std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> locations;
@@ -573,6 +574,11 @@ private:
                         "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
             }
         }
+
+        // Bogus write file with nullptr location
+        try {
+            wrench::StorageService::writeFileAtLocation(nullptr);
+        } catch (std::invalid_argument &ignore) {}
 
         try {
             wrench::StorageService::writeFileAtLocation(
