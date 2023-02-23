@@ -66,23 +66,7 @@ namespace wrench {
 
         double getBufferSize() const override; //cache
 
-        /**
-         * @brief Reserve space at the storage service
-         * @param location a location
-         * @return true if success, false otherwise
-         */
-        bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
-                throw std::runtime_error("StorageServiceProxy::reserveSpace(): should not be called");
-        };
-
-
-        /**
-         * @brief Unreserve space at the storage service
-         * @param location a location
-         */
-        void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
-            throw std::runtime_error("StorageServiceProxy::unreserveSpace(): should not be called");
-        };
+        bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
         /**
          * @brief Factory to create a StorageServiceProxy that can a default destination to forward requests too, and will cache requests as they are made
@@ -100,7 +84,6 @@ namespace wrench {
             return std::make_shared<StorageServiceProxy>(hostname, cache, remote, properties, message_payloads);
         }
 
-        bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -111,6 +94,24 @@ namespace wrench {
         bool rejectDuplicateRead(const std::shared_ptr<DataFile>&  file);
 
         explicit StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService> &cache = nullptr, const std::shared_ptr<StorageService> &default_remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads = {});
+
+        /**
+         * @brief Reserve space at the storage service
+         * @param location a location
+         * @return true if success, false otherwise
+         */
+        bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
+                throw std::runtime_error("StorageServiceProxy::reserveSpace(): should not be called");
+        };
+
+
+        /**
+         * @brief Unreserve space at the storage service
+         * @param location a location
+         */
+        void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
+            throw std::runtime_error("StorageServiceProxy::unreserveSpace(): should not be called");
+        };
 
 
         /**

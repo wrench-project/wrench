@@ -92,12 +92,10 @@ private:
         if(order){
             simulation->sleep(1);
         }
-        WRENCH_INFO("Initiating Read "+order);
+        WRENCH_INFO("Initiating Read %d", order);
         //read file again to check cache
         proxy->readFile(file1);
         //proxy->getCache()->readFile(file1);
-
-
 
         WRENCH_INFO("Terminating");
         return 0;
