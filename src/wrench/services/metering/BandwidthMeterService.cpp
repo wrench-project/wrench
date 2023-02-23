@@ -106,7 +106,7 @@ namespace wrench {
                     this->time_to_next_measurement.end(),
                     [](decltype(this->time_to_next_measurement)::value_type &lhs,
                        decltype(this->time_to_next_measurement)::value_type &rhs) {
-                        return lhs.second < rhs.second;
+                      return lhs.second < rhs.second;
                     });
 
             double time_to_next_measure = min_el->second;
@@ -144,20 +144,13 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool BandwidthMeterService::processNextMessage(double timeout) {
-        std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox, timeout);
+            auto msg = S4U_Mailbox::getMessage<ServiceStopDaemonMessage>(this->mailbox, timeout, "BandwidthMeter::waitForNextMessage(): Received an");
+            return false;
         } catch (ExecutionException &e) {
             return true;
         }
-
-        if (dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-            // There shouldn't be any need to clean any state up
-            return false;
-        }
-
-        throw std::runtime_error("BandwidthMeter::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
     }
 
 
