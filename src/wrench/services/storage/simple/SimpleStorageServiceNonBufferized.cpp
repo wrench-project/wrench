@@ -334,7 +334,7 @@ namespace wrench {
                                         new StorageServiceNotEnoughSpace(
                                                 file,
                                                 this->getSharedPtr<SimpleStorageService>())),
-                                nullptr,
+                                {},
                                 0,
                                 this->getMessagePayloadValue(
                                         SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
@@ -356,7 +356,7 @@ namespace wrench {
                         location,
                         true,
                         nullptr,
-                        nullptr,
+                        {},
                         this->buffer_size,
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
@@ -431,6 +431,7 @@ namespace wrench {
                         failure_cause,
                         nullptr,// non-bufferized = no chunk-receiving mailbox
                         buffer_size,
+                        1,
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
 

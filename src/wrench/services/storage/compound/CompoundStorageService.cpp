@@ -525,7 +525,7 @@ namespace wrench {
                                 msg->location,
                                 false,
                                 std::shared_ptr<FailureCause>(new FileNotFound(msg->location)),
-                                nullptr,
+                                {},
                                 0,
                                 this->getMessagePayloadValue(
                                         CompoundStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
@@ -566,6 +566,7 @@ namespace wrench {
                                 std::shared_ptr<FailureCause>(new FileNotFound(msg->location)),
                                 nullptr,
                                 0,
+                                1,
                                 this->getMessagePayloadValue(
                                         CompoundStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
             } catch (wrench::ExecutionException &e) {}
