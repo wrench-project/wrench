@@ -494,6 +494,7 @@ set(TEST_FILES
         test/simulation/S4U_MailboxTest.cpp
         test/misc/UnitParserTest.cpp
         test/services/storage_services/StorageServiceProxy/StorageServiceProxyBasicTest.cpp
+        test/services/storage_services/StorageServiceProxy/StorageServiceProxySequentialTest.cpp
         )
 
 
