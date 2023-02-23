@@ -403,6 +403,10 @@ namespace wrench {
         }
 
         /***********************/
+        /** \endcond          **/
+        /***********************/
+
+        /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
@@ -465,11 +469,11 @@ namespace wrench {
 
     protected:
 
-        friend class ComputeService;
-
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
+
+        friend class ComputeService;
 
         StorageService(const std::string &hostname,
                        const std::string &service_name);
@@ -492,9 +496,6 @@ namespace wrench {
         bool is_scratch;
     };
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
 
 }// namespace wrench
 
