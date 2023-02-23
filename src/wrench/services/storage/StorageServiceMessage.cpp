@@ -331,6 +331,7 @@ namespace wrench {
      * @param failure_cause: the cause of the failure (or nullptr on success)
      * @param mailbox_to_receive_the_file_content: the mailbox to which to send the file content (or nullptr if none)
      * @param buffer_size: the buffer size that will be used
+     * @param number_of_sources: the number of sources that will send file chunks over
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
