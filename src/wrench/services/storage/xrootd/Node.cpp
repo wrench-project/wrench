@@ -980,8 +980,7 @@ namespace wrench {
         /**
          * @brief Determines whether the storage service has the file. This doesn't simulate anything and is merely a zero-simulated-time data structure lookup.
          * If you want to simulate the overhead of querying the StorageService, instead use lookupFile().
-         * @param file a file
-         * @param path the path
+         * @param location: a location
          * @return true if the file is present, false otherwise
          */
         bool Node::hasFile(const shared_ptr<FileLocation> &location) {
@@ -992,6 +991,10 @@ namespace wrench {
             return !constructFileSearchTree(metavisor->getFileNodes(location->getFile())).empty();//meta search the subtree for the file.  If its in the subtree we can find a route to it, so we have it
         }
 
+	/**
+         * @brief Get the storage service's total space (in zero simulated time)
+         * @return a capacity in bytes
+         */
         double Node::getTotalSpace() {
             if (internalStorage) {
                 return internalStorage->getTotalSpace();
@@ -1000,6 +1003,10 @@ namespace wrench {
             }
         }
 
+	/**
+         * @brief Determine whether the storage service is bufferized
+         * @return true if bufferized, false otherwise
+         */
         bool Node::isBufferized() const {
             if (internalStorage) {
                 return internalStorage->isBufferized();
@@ -1009,6 +1016,10 @@ namespace wrench {
             }
         }
 
+	/**
+         * @brief Determine the storage service's buffer size
+         * @return a size in bytes
+         */
         double Node::getBufferSize() const {
             if (internalStorage) {
                 return internalStorage->getBufferSize();
@@ -1017,6 +1028,11 @@ namespace wrench {
             }
         }
 
+	/**
+         * @brief Reserve space at the storage service
+         * @param location: a location
+         * @return true if success, false otherwise
+         */
         bool Node::reserveSpace(std::shared_ptr<FileLocation> &location) {
             if (internalStorage) {
                 return internalStorage->reserveSpace(location);
@@ -1025,6 +1041,10 @@ namespace wrench {
             }
         }
 
+	/**
+         * @brief Unreserve space at the storage service
+         * @param location: a location
+         */
         void Node::unreserveSpace(std::shared_ptr<FileLocation> &location){
             if (internalStorage) {
                 internalStorage->unreserveSpace(location);

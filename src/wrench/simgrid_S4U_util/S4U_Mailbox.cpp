@@ -39,10 +39,12 @@ namespace wrench {
 
     class WorkflowTask;
     /**
-     * @brief Since im not sure how to call WRENCH_DEBUG from an h file, I just made this function to do the logging for the template getMessage functions.  It also has the added bonus of checking for inheritance
+     * @brief Helper method that avoids calling WRENCH_DEBUG from a .h file and do the logging for the templated getMessage() method.  
+     * It also has the added bonus of checking for inheritance
      *
      * @param mailbox: the mailbox so we can get its name
      * @param type: a pointer to the message so we have its type
+     * @param id: an integer id
      *
      */
    void S4U_Mailbox::templateWaitingLog(const simgrid::s4u::Mailbox* mailbox ,std::string type,unsigned long long id) {
@@ -50,10 +52,20 @@ namespace wrench {
        WRENCH_DEBUG("Waiting for message of type <%s> from mailbox_name '%s'.  Request ID: %llu",type.c_str() , mailbox->get_cname(),id);
    }
 
+    /**
+     * @brief Helper method that avoids calling WRENCH_DEBUG from a .h file and do the logging for the templated getMessage() method.  
+     * It also has the added bonus of checking for inheritance.
+     *
+     * @param mailbox: the mailbox so we can get its name
+     * @param type: a pointer to the message so we have its type
+     * @param id: an integer id
+     *
+     */
    void S4U_Mailbox::templateWaitingLogUpdate(const simgrid::s4u::Mailbox* mailbox ,std::string type,unsigned long long id) {
 
        WRENCH_DEBUG("Received a message of type <%s> from mailbox_name '%s'.  Request ID: %llu",type.c_str() , mailbox->get_cname(),id);
    }
+
     /**
      * @brief Synchronously receive a message from a mailbox
      *
