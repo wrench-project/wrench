@@ -86,7 +86,7 @@ private:
     BandwidthMeterServiceTest *test;
     //    std::shared_ptr<wrench::DataFile> file;
 
-    int main() {
+    int main() override {
         // Linknames
         const std::vector<std::string> linknames = wrench::Simulation::getLinknameList();
         const double TWO_SECOND_PERIOD = 2.0;
@@ -96,9 +96,13 @@ private:
         // Testing bad constructor invocations
         try {
             this->createBandwidthMeter({}, TWO_SECOND_PERIOD);
-            auto bogus_linknames = linknames;
-            this->createBandwidthMeter(linknames, 0.0001);
-            bogus_linknames.push_back("bogus_link");
+            throw std::runtime_error("Bad invocation of simple constructor should have thrown");
+        } catch (std::invalid_argument &e) {
+            // expected
+        }
+        try {
+            std::vector<std::string> bogus_linknames;
+            bogus_linknames.emplace_back("bogus_link");
             this->createBandwidthMeter(bogus_linknames, 5.0);
             throw std::runtime_error("Bad invocation of simple constructor should have thrown");
         } catch (std::invalid_argument &e) {
@@ -106,7 +110,6 @@ private:
         }
 
         auto bm1 = this->createBandwidthMeter(linknames, TWO_SECOND_PERIOD);
-
 
         // Create a bandwidth meter service using the complex constructor
         // Testing bad constructor invocations

@@ -1625,6 +1625,7 @@ private:
                 throw std::runtime_error(
                         "Got the correct failure even, a correct cause type, but the cause points to the wrong storage service");
             }
+            cause->toString(); // coverage
 
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
