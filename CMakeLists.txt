@@ -122,8 +122,8 @@ set(HEADER_FILES
         include/wrench/services/storage/compound/CompoundStorageServiceProperty.h
         include/wrench/services/storage/compound/CompoundStorageServiceMessagePayload.h
         include/wrench/services/storage/storage_helpers/FileLocation.h
-        include/wrench/services/memory/Block.h
-        include/wrench/services/memory/MemoryManager.h
+#        include/wrench/services/memory/Block.h
+#        include/wrench/services/memory/MemoryManager.h
         include/wrench/simgrid_S4U_util/S4U_Daemon.h
         include/wrench/simgrid_S4U_util/S4U_Mailbox.h
         include/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
