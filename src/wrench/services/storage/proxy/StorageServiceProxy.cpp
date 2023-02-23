@@ -553,7 +553,7 @@ namespace wrench {
      * @param message the raw unique_ptr for the message.  Assumed to be the same as msg, passed to avoid second cast.
      * @return True if the file is cached, false otherwise
      */
-    bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage * msg, unique_ptr<SimulationMessage> & message) {
+    bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage * msg, unique_ptr<ServiceMessage> & message) {
         if (cache->hasFile(msg->location->getFile(), msg->location->getPath())) {//check cache
             WRENCH_INFO("Forwarding to cache reply mailbox %s", msg->answer_mailbox->get_name().c_str());
             S4U_Mailbox::putMessage(
