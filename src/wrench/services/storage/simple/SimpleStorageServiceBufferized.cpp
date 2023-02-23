@@ -229,7 +229,7 @@ namespace wrench {
                             location,
                             true,
                             nullptr,
-                            file_reception_mailbox,
+                            {{file_reception_mailbox, location->getFile()->getSize()}},
                             this->buffer_size,
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
@@ -259,7 +259,7 @@ namespace wrench {
                             location,
                             false,
                             failure_cause,
-                            nullptr,
+                            {},
                             0,
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
@@ -313,6 +313,7 @@ namespace wrench {
                         failure_cause,
                         mailbox_to_receive_the_file_content,
                         buffer_size,
+                        1,
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
 
