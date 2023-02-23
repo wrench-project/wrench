@@ -191,7 +191,7 @@ namespace wrench {
         StorageServiceFileWriteAnswerMessage(std::shared_ptr<FileLocation> &location,
                                              bool success,
                                              std::shared_ptr<FailureCause> failure_cause,
-                                             simgrid::s4u::Mailbox *data_write_mailbox_name,
+                                             std::map<simgrid::s4u::Mailbox *, double> data_write_mailboxes_and_bytes,
                                              double buffer_size,
                                              double payload);
 
@@ -199,10 +199,10 @@ namespace wrench {
         std::shared_ptr<FileLocation> location;
         /** @brief Whether the write operation request was accepted or not */
         bool success;
-        /** @brief The mailbox on which to send the file */
-        simgrid::s4u::Mailbox *data_write_mailbox;
         /** @brief The cause of the failure, if any, or nullptr */
         std::shared_ptr<FailureCause> failure_cause;
+        /** @brief The set of destination mailboxes and the number of bytes to send to each */
+        std::map<simgrid::s4u::Mailbox *, double> data_write_mailboxes_and_bytes;
         /** @brief The buffer size to use */
         double buffer_size;
     };
@@ -239,6 +239,7 @@ namespace wrench {
                                             std::shared_ptr<FailureCause> failure_cause,
                                             simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
                                             double buffer_size,
+                                            unsigned long number_of_sources,
                                             double payload);
 
         /** @brief The location of the file */
@@ -251,6 +252,8 @@ namespace wrench {
         simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content;
         /** @brief The requested buffer size */
         double buffer_size;
+        /** @brief The number of sources that will send data */
+        unsigned long number_of_sources;
     };
 
     /**

@@ -261,6 +261,7 @@ namespace wrench {
                                                                  new FileNotFound(FileLocation::LOCATION(getSharedPtr<Node>(), msg->file))),
                                                          nullptr,
                                                          0,
+                                                         1,
                                                          getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
 
                     } else {
@@ -455,6 +456,7 @@ namespace wrench {
                                                                              FileLocation::LOCATION(internalStorage, file))),
                                                              nullptr,
                                                              0,
+                                                             1,
                                                              getMessagePayloadValue(
                                                                      MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
                         }
@@ -630,7 +632,7 @@ namespace wrench {
                                                      false,
                                                      std::shared_ptr<FailureCause>(
                                                              new NotAllowed(getSharedPtr<Node>(), error_message)),
-                                                     nullptr,
+                                                     {},
                                                      0,
                                                      getMessagePayloadValue(MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
 

@@ -148,22 +148,24 @@ namespace wrench {
 
             } else {
                 auto file = location->getFile();
-                // Bufferized
-                double remaining = file->getSize();
-                while (remaining - buffer_size > DBL_EPSILON) {
-                    S4U_Mailbox::putMessage(msg->data_write_mailbox,
-                                            new StorageServiceFileContentChunkMessage(
-                                                    file, buffer_size, false));
-                    remaining -= buffer_size;
-                }
-                S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
-                        file, remaining, true));
+                for (auto const &dwmb : msg->data_write_mailboxes_and_bytes) {
+                    // Bufferized
+                    double remaining = dwmb.second;
+                    while (remaining - buffer_size > DBL_EPSILON) {
+                        S4U_Mailbox::putMessage(dwmb.first,
+                                                new StorageServiceFileContentChunkMessage(
+                                                        file, buffer_size, false));
+                        remaining -= buffer_size;
+                    }
+                    S4U_Mailbox::putMessage(dwmb.first, new StorageServiceFileContentChunkMessage(
+                            file, remaining, true));
 
-                //Waiting for the final ack
-                message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-                if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
-                    throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
-                                             message->getName() + "] message instead of final ack!");
+                    //Waiting for the final ack
+                    message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+                    if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
+                        throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
+                                                 message->getName() + "] message instead of final ack!");
+                    }
                 }
             }
 
@@ -206,10 +208,10 @@ namespace wrench {
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         S4U_Mailbox::putMessage(this->mailbox, new StorageServiceFreeSpaceRequestMessage(
-                                                       answer_mailbox,
-                                                       path,
-                                                       this->getMessagePayloadValue(
-                                                               StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+                answer_mailbox,
+                path,
+                this->getMessagePayloadValue(
+                        StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -247,14 +249,14 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
-            // Wait for a reply
-            auto message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        // Wait for a reply
+        auto message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
 
-            if (auto msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {
-                return msg->file_is_available;
-            } else {
-                throw std::runtime_error("StorageService::lookupFile(): Unexpected [" + message->getName() + "] message (was expecting StorageServiceFileLookupAnswerMessage)");
-            }
+        if (auto msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {
+            return msg->file_is_available;
+        } else {
+            throw std::runtime_error("StorageService::lookupFile(): Unexpected [" + message->getName() + "] message (was expecting StorageServiceFileLookupAnswerMessage)");
+        }
     }
 
 
@@ -318,6 +320,8 @@ namespace wrench {
                     }
                 } else {
                     // Otherwise, retrieve the file chunks until the last one is received
+                    // Noting that we have multiple sources
+                    unsigned long num_final_chunks_received = 0;
                     while (true) {
                         std::shared_ptr<SimulationMessage> file_content_message = nullptr;
                         try {
@@ -330,8 +334,10 @@ namespace wrench {
                         if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage *>(
                                 file_content_message.get())) {
                             if (file_content_chunk_msg->last_chunk) {
-                                S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
-                                break;
+                                num_final_chunks_received++;
+                                if (num_final_chunks_received == msg->number_of_sources) {
+                                    break;
+                                }
                             }
                         } else {
                             S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
@@ -342,11 +348,13 @@ namespace wrench {
 
                     S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
 
-                    //Waiting for the final ack
-                    message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-                    if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
-                        throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                                 message->getName() + "] message! (was expecting a StorageServiceAckMessage)");
+                    //Waiting for the final acks
+                    for (unsigned long source = 0; source < msg->number_of_sources; source++) {
+                        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+                        if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
+                            throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                                     message->getName() + "] message! (was expecting a StorageServiceAckMessage)");
+                        }
                     }
                 }
             }
