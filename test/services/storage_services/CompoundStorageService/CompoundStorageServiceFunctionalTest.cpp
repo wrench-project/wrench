@@ -139,7 +139,7 @@ private:
 
 
         // Verify synchronous request for current free space (currently same as capacity, as no file has been placed on internal services)
-        auto expected_capacity =  100.0 +  510.0;
+        auto expected_capacity = 100.0 + 510.0;
         auto free_space = test->compound_storage_service->getTotalFreeSpace();
         if (free_space != expected_capacity) {
             throw std::runtime_error("'Free Space' available to CompoundStorageService is incorrect");
@@ -152,10 +152,10 @@ private:
         }
 
         // Verify that compound storage service unique mount point is DEV_NULL
-//        auto mount_point = test->compound_storage_service->getMountPoint();
-//        if (mount_point != wrench::LogicalFileSystem::DEV_NULL + "/") {
-//            throw std::runtime_error("CompoundStorageService should have only one 'LogicalFileSystem::DEV_NULL' filesystem");
-//        }
+        //        auto mount_point = test->compound_storage_service->getMountPoint();
+        //        if (mount_point != wrench::LogicalFileSystem::DEV_NULL + "/") {
+        //            throw std::runtime_error("CompoundStorageService should have only one 'LogicalFileSystem::DEV_NULL' filesystem");
+        //        }
 
         // We don't support getLoad or getFileLastWriteDate on CompoundStorageService yet (and won't ?)
         try {
@@ -291,31 +291,31 @@ void CompoundStorageServiceFunctionalTest::do_BasicFunctionality_test() {
     // Create some simple storage services
     // Unbufferized
     ASSERT_NO_THROW(simple_storage_service_100 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(simple_storage0, {"/disk100"},
-                                                                     {}, {})));
+                            wrench::SimpleStorageService::createSimpleStorageService(simple_storage0, {"/disk100"},
+                                                                                     {}, {})));
     // Bufferized
     ASSERT_NO_THROW(simple_storage_service_510 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk510"},
-                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "1000000"}}, {})));
+                            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk510"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "1000000"}}, {})));
 
     // Fail to create a Compound Storage Service (no storage services provided)
     ASSERT_THROW(compound_storage_service = simulation->add(
-            new wrench::CompoundStorageService(compound_storage, {})),
+                         new wrench::CompoundStorageService(compound_storage, {})),
                  std::invalid_argument);
 
     // Fail to create a Compound Storage Service (one of the storage service is just a nullptr)
     ASSERT_THROW(compound_storage_service = simulation->add(
-            new wrench::CompoundStorageService(compound_storage, {simple_storage_service_1000, simple_storage_service_100})),
+                         new wrench::CompoundStorageService(compound_storage, {simple_storage_service_1000, simple_storage_service_100})),
                  std::invalid_argument);
 
     // Create a valid Compound Storage Service, without user provided callback (no intercept capabilities)
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
-            new wrench::CompoundStorageService(compound_storage, {simple_storage_service_100, simple_storage_service_510})));
+                            new wrench::CompoundStorageService(compound_storage, {simple_storage_service_100, simple_storage_service_510})));
 
     // Create a Controler
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new CompoundStorageServiceBasicFunctionalityTestCtrl(this, compound_storage)));
+                            new CompoundStorageServiceBasicFunctionalityTestCtrl(this, compound_storage)));
 
     // A bogus staging (can't use CompoundStorageService for staging)
     ASSERT_THROW(simulation->stageFile(file_10, compound_storage_service), std::invalid_argument);
@@ -402,10 +402,10 @@ private:
 
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
 
-//        for (auto const &action : job1->getActions()) {
-//            std::cerr << " - " << action->getName() << ": " << action->getStateAsString() << "\n";
-//            std::cerr << "     " << (action->getFailureCause() ? action->getFailureCause()->toString() : "") << "\n";
-//        }
+        //        for (auto const &action : job1->getActions()) {
+        //            std::cerr << " - " << action->getName() << ": " << action->getStateAsString() << "\n";
+        //            std::cerr << "     " << (action->getFailureCause() ? action->getFailureCause()->toString() : "") << "\n";
+        //        }
 
         if (not std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
@@ -431,7 +431,7 @@ private:
         auto file_500_designated_loc = test->compound_storage_service->lookupFileLocation(test->file_500);
         if (!file_500_designated_loc) {
             throw std::runtime_error("Should have been able to lookup file_500 through CSS");
-        } else if (file_500_designated_loc->getPath() != "/") { // TODO: HENRI CHANGED THIS TO "/" which is the logical path (used to say "/diskXXX/" which is physical)
+        } else if (file_500_designated_loc->getPath() != "/") {// TODO: HENRI CHANGED THIS TO "/" which is the logical path (used to say "/diskXXX/" which is physical)
             throw std::runtime_error("file_500 copy through CSS is not where it should be (got path: " + file_500_designated_loc->getPath());
         }
 
@@ -457,15 +457,15 @@ std::shared_ptr<wrench::FileLocation> defaultStorageServiceSelection(
 
         auto free_space = storage_service->getTotalFreeSpace();
         if (free_space >= capacity_req) {
-            designated_location = wrench::FileLocation::LOCATION(storage_service, file); // TODO: MAJOR CHANGE
+            designated_location = wrench::FileLocation::LOCATION(storage_service, file);// TODO: MAJOR CHANGE
             break;
         }
-//        for (const auto &free_space_entry : free_space) {
-//            if (free_space_entry.second >= capacity_req) {
-//                designated_location = wrench::FileLocation::LOCATION(storage_service, free_space_entry.first, file);
-//                break;
-//            }
-//        }
+        //        for (const auto &free_space_entry : free_space) {
+        //            if (free_space_entry.second >= capacity_req) {
+        //                designated_location = wrench::FileLocation::LOCATION(storage_service, free_space_entry.first, file);
+        //                break;
+        //            }
+        //        }
     }
 
     return designated_location;
@@ -484,8 +484,8 @@ void CompoundStorageServiceFunctionalTest::do_BasicInterceptFunctionality_test()
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
-//    argv[2] = strdup("--log=wrench_core_mailbox.t=debug");
+    //    argv[1] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--log=wrench_core_mailbox.t=debug");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -509,30 +509,30 @@ void CompoundStorageServiceFunctionalTest::do_BasicInterceptFunctionality_test()
     // Create some simple storage services
     // Bufferized
     ASSERT_NO_THROW(simple_storage_service_1000 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(simple_storage0, {"/disk1000"},
-                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "1000000"}}, {})));
+                            wrench::SimpleStorageService::createSimpleStorageService(simple_storage0, {"/disk1000"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "1000000"}}, {})));
 
     // Non-bufferized
     ASSERT_NO_THROW(simple_storage_service_100 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(simple_storage0, {"/disk100"},
-                                                                     {}, {})));
+                            wrench::SimpleStorageService::createSimpleStorageService(simple_storage0, {"/disk100"},
+                                                                                     {}, {})));
 
     // Non-bufferized
-//    ASSERT_NO_THROW(simple_storage_service_510 = simulation->add(
-//            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk100", "/disk510"},
-//                                                                     {}, {})));
+    //    ASSERT_NO_THROW(simple_storage_service_510 = simulation->add(
+    //            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk100", "/disk510"},
+    //                                                                     {}, {})));
     ASSERT_NO_THROW(simple_storage_service_510 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk510"},
                                                                                      {}, {})));
 
     // Create a valid Compound Storage Service (using a non-bufferized storage service in this case) with a user-provided callback
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
-            new wrench::CompoundStorageService(compound_storage, {simple_storage_service_510}, defaultStorageServiceSelection)));
+                            new wrench::CompoundStorageService(compound_storage, {simple_storage_service_510}, defaultStorageServiceSelection)));
 
     // Create a Controller
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new CompoundStorageServiceInterceptFunctionalityTestCtrl(this, compute)));
+                            new CompoundStorageServiceInterceptFunctionalityTestCtrl(this, compute)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -686,28 +686,28 @@ void CompoundStorageServiceFunctionalTest::do_BasicError_test() {
     // Create some simple storage services
     // Bufferized
     ASSERT_NO_THROW(simple_storage_service_1000 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(simple_storage0, {"/disk1000"},
-                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "1000000"}}, {})));
+                            wrench::SimpleStorageService::createSimpleStorageService(simple_storage0, {"/disk1000"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "1000000"}}, {})));
 
     // Non-bufferized
     ASSERT_NO_THROW(simple_storage_service_100 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(simple_storage0, {"/disk100"},
-                                                                     {}, {})));
+                            wrench::SimpleStorageService::createSimpleStorageService(simple_storage0, {"/disk100"},
+                                                                                     {}, {})));
 
     // Non-bufferized
     ASSERT_NO_THROW(simple_storage_service_510 = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk510"},
-                                                                     {}, {})));
+                            wrench::SimpleStorageService::createSimpleStorageService(simple_storage1, {"/disk510"},
+                                                                                     {}, {})));
 
     // Create a valid Compound Storage Service (using a non-bufferized storage service in this case) with a user-provided callback
     // CAREFUL -> REUSING CALLBACK FROM PREVIOUS TEST
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
-            new wrench::CompoundStorageService(compound_storage, {simple_storage_service_510}, defaultStorageServiceSelection)));
+                            new wrench::CompoundStorageService(compound_storage, {simple_storage_service_510}, defaultStorageServiceSelection)));
 
     // Create a Controller
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new CompoundStorageServiceErrorTestCtrl(this, compute)));
+                            new CompoundStorageServiceErrorTestCtrl(this, compute)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

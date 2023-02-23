@@ -261,7 +261,7 @@ namespace wrench {
      * @param absolute_path: the path where it would have been written
      * @throw std::invalid_argument
      */
-    void LogicalFileSystem::unreserveSpace(const std::shared_ptr<DataFile> &file, const std::string& absolute_path) {
+    void LogicalFileSystem::unreserveSpace(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return;
         }

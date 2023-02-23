@@ -271,8 +271,8 @@ namespace wrench {
             message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
             auto msg = S4U_Mailbox::getMessage<BatchQueryAnswerMessage>(batchsched_query_mailbox,
                                                                         "[This error likely means that the scheduling algorithm that Batsched was configured to use (\"" +
-                                                                        this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
-                                                                        "\") does not support queue waiting time predictions!]. Received an");
+                                                                                this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
+                                                                                "\") does not support queue waiting time predictions!]. Received an");
 
             job_estimated_start_times[std::get<0>(job)] = msg->estimated_start_time;
         }

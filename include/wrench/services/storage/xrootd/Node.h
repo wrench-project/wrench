@@ -42,12 +42,12 @@ namespace wrench {
             /** \cond DEVELOPER    */
             /***********************/
 
+            using StorageService::createFile;
+            using StorageService::deleteFile;
+            using StorageService::hasFile;
+            using StorageService::lookupFile;
             using StorageService::readFile;
             using StorageService::writeFile;
-            using StorageService::deleteFile;
-            using StorageService::lookupFile;
-            using StorageService::createFile;
-            using StorageService::hasFile;
 
             void createFile(const std::shared_ptr<FileLocation> &location) override;
 
@@ -62,9 +62,6 @@ namespace wrench {
             virtual double getBufferSize() const override;
             virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) override;
             virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) override;
-
-
-
 
 
             /***********************/
