@@ -528,15 +528,15 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
-        if (dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
+        if (std::dynamic_pointer_cast<HostHasTurnedOnMessage>(message)) {
             // Do nothing, just wake up
             return true;
 
-        } else if (dynamic_cast<HostHasChangedSpeedMessage *>(message.get())) {
+        } else if (std::dynamic_pointer_cast<HostHasChangedSpeedMessage>(message)) {
             // Do nothing, just wake up
             return true;
 
-        } else if (dynamic_cast<HostHasTurnedOffMessage *>(message.get())) {
+        } else if (std::dynamic_pointer_cast<HostHasTurnedOffMessage>(message)) {
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
                     ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
@@ -558,7 +558,7 @@ namespace wrench {
                 }
             }
 
-        } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
 
             // This is Synchronous
@@ -570,15 +570,15 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<ActionExecutionServiceSubmitActionRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ActionExecutionServiceSubmitActionRequestMessage>(message)) {
             processSubmitAction(msg->reply_mailbox, msg->action);
             return true;
 
-        } else if (auto msg = dynamic_cast<ActionExecutionServiceTerminateActionRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ActionExecutionServiceTerminateActionRequestMessage>(message)) {
             processActionTerminationRequest(msg->action, msg->reply_mailbox, msg->termination_cause);
             return true;
 
-        } else if (auto msg = dynamic_cast<ActionExecutorDoneMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ActionExecutorDoneMessage>(message)) {
             if (msg->action_executor->getAction()->getState() == Action::State::COMPLETED) {
                 processActionExecutorCompletion(msg->action_executor);
             } else {
@@ -586,7 +586,7 @@ namespace wrench {
             }
             return true;
 
-        } else if (auto msg = dynamic_cast<ServiceHasCrashedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ServiceHasCrashedMessage>(message)) {
             auto service = msg->service;
             auto action_executor = std::dynamic_pointer_cast<ActionExecutor>(service);
             if (not action_executor) {

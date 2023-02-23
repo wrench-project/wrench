@@ -156,6 +156,9 @@ namespace wrench {
 
     }
 
+    /**
+     * @brief Start the compute service's scratch space service
+     */
     void ComputeService::startScratchStorageService() {
         if (this->scratch_space_storage_service) return; // Already started by somebody else
         if (this->scratch_space_mount_point.empty()) return; // No mount point provided

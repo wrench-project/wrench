@@ -92,7 +92,7 @@ namespace wrench {
 
         bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
-        std::string getMountPoint();
+        //std::string getMountPoint();
         std::set<std::string> getMountPoints();
         bool hasMultipleMountPoints();
         bool hasMountPoint(const std::string &mp);
