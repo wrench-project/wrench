@@ -210,18 +210,10 @@ namespace wrench {
                                                 ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobAnswerMessage *>(message.get())) {
-            // If no success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "ComputeService::submitCompoundJob(): Received an unexpected [" + message->getName() +
-                    "] message!");
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(answer_mailbox, this->network_timeout,
+                                                                                         "ComputeService::submitCompoundJob(): Received an");
+        if (not msg->success) {
+            throw ExecutionException(msg->failure_cause);
         }
     }
 
@@ -440,7 +432,7 @@ namespace wrench {
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
         //        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
 
             // This is Synchronous
@@ -453,27 +445,27 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitCompoundJobRequestMessage>(message)) {
             processSubmitCompoundJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationRequestMessage>(message)) {
             processGetResourceInformation(msg->answer_mailbox, msg->key);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage>(message)) {
             processIsThereAtLeastOneHostWithAvailableResources(msg->answer_mailbox, msg->num_cores, msg->ram);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceTerminateCompoundJobRequestMessage>(message)) {
             processCompoundJobTerminationRequest(msg->job, msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = dynamic_cast<ActionExecutionServiceActionDoneMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ActionExecutionServiceActionDoneMessage>(message)) {
             processActionDone(msg->action);
             return true;
 
-        } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ServiceHasTerminatedMessage>(message)) {
             if (std::dynamic_pointer_cast<ActionExecutionService>(msg->service)) {
                 if (this->getPropertyValueAsBoolean(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)) {
                     return false;
@@ -511,18 +503,10 @@ namespace wrench {
                                         answer_mailbox, job, this->getMessagePayloadValue(BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        if (auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobAnswerMessage *>(message.get())) {
-            // If no success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "BareMetalComputeService::terminateCompoundJob(): Received an unexpected [" +
-                    message->getName() + "] message!");
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceTerminateCompoundJobAnswerMessage>(answer_mailbox,
+                                                                                            "BareMetalComputeService::terminateCompoundJob(): Received an");
+        if (not msg->success) {
+            throw ExecutionException(msg->failure_cause);
         }
     }
 
@@ -671,9 +655,9 @@ namespace wrench {
         bool answer = this->action_execution_service->IsThereAtLeastOneHostWithAvailableResources(num_cores, ram);
         S4U_Mailbox::dputMessage(
                 answer_mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
-                                        answer,
-                                        this->getMessagePayloadValue(
-                                                BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
+                        answer,
+                        this->getMessagePayloadValue(
+                                BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
     }
 
     /**
@@ -706,8 +690,8 @@ namespace wrench {
                     this->getScratch()->deleteFile(
                             f,
                             this->getScratch()->getBaseRootPath() +
-                                    j.first->getName()
-                            );
+                            j.first->getName()
+                    );
                 } catch (ExecutionException &e) {
                     throw;
                 }
@@ -750,35 +734,35 @@ namespace wrench {
         // TODO: This may be a performance bottleneck... may have to remedy
         std::sort(this->ready_actions.begin(), this->ready_actions.end(),
                   [](const std::shared_ptr<Action> &a, const std::shared_ptr<Action> &b) -> bool {
-                      if (a->getJob() != b->getJob()) {
-                          if (a->getJob()->getPriority() > b->getJob()->getPriority()) {
-                              return true;
-                          } else if (a->getJob()->getPriority() < b->getJob()->getPriority()) {
-                              return false;
-                          } else if (a->getPriority() > b->getPriority()) {
-                              return true;
-                          } else if (a->getPriority() < b->getPriority()) {
-                              return false;
-                          } else if (a->getName() < b->getName()) {
-                              return true;
-                          } else if (a->getName() < b->getName()) {
-                              return false;
-                          } else {
-                              return (unsigned long) (a->getJob().get()) > (unsigned long) (b->getJob().get());
-                          }
-                      } else {
-                          if (a->getPriority() > b->getPriority()) {
-                              return true;
-                          } else if (a->getPriority() < b->getPriority()) {
-                              return false;
-                          } else if (a->getName() < b->getName()) {
-                              return true;
-                          } else if (a->getName() > b->getName()) {
-                              return false;
-                          } else {
-                              return (unsigned long) (a.get()) > (unsigned long) (b.get());
-                          }
-                      }
+                    if (a->getJob() != b->getJob()) {
+                        if (a->getJob()->getPriority() > b->getJob()->getPriority()) {
+                            return true;
+                        } else if (a->getJob()->getPriority() < b->getJob()->getPriority()) {
+                            return false;
+                        } else if (a->getPriority() > b->getPriority()) {
+                            return true;
+                        } else if (a->getPriority() < b->getPriority()) {
+                            return false;
+                        } else if (a->getName() < b->getName()) {
+                            return true;
+                        } else if (a->getName() < b->getName()) {
+                            return false;
+                        } else {
+                            return (unsigned long) (a->getJob().get()) > (unsigned long) (b->getJob().get());
+                        }
+                    } else {
+                        if (a->getPriority() > b->getPriority()) {
+                            return true;
+                        } else if (a->getPriority() < b->getPriority()) {
+                            return false;
+                        } else if (a->getName() < b->getName()) {
+                            return true;
+                        } else if (a->getName() > b->getName()) {
+                            return false;
+                        } else {
+                            return (unsigned long) (a.get()) > (unsigned long) (b.get());
+                        }
+                    }
                   });
 
         for (auto const &action: this->ready_actions) {

@@ -164,18 +164,13 @@ namespace wrench {
                                         0.0));
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        if (auto msg = dynamic_cast<ActionExecutionServiceSubmitActionAnswerMessage *>(message.get())) {
-            // If not a success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "ActionExecutionService::submitActions(): Received an unexpected [" + message->getName() +
-                    "] message!");
+        auto msg = S4U_Mailbox::getMessage<ActionExecutionServiceSubmitActionAnswerMessage >(
+                answer_mailbox,
+                this->network_timeout,
+                "ActionExecutionService::submitActions(): Received an");
+        // If not a success, throw an exception
+        if (not msg->success) {
+            throw ExecutionException(msg->cause);
         }
     }
 
@@ -544,7 +539,7 @@ namespace wrench {
         } else if (dynamic_cast<HostHasTurnedOffMessage *>(message.get())) {
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
-                        ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+                    ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
 
             } else {
@@ -602,7 +597,7 @@ namespace wrench {
             processActionExecutorCrash(action_executor);
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
-                        ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+                    ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
 
             } else {
@@ -724,18 +719,13 @@ namespace wrench {
                                         answer_mailbox, std::move(action), termination_cause, 0.0));
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        if (auto msg = dynamic_cast<ActionExecutionServiceTerminateActionAnswerMessage *>(message.get())) {
-            // If no success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "ActionExecutionService::terminateAction(): Received an unexpected [" +
-                    message->getName() + "] message!");
+        auto msg = S4U_Mailbox::getMessage<ActionExecutionServiceTerminateActionAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "ActionExecutionService::terminateAction(): Received an");
+        // If no success, throw an exception
+        if (not msg->success) {
+            throw ExecutionException(msg->cause);
         }
     }
 
@@ -757,7 +747,7 @@ namespace wrench {
         // Send the notification to the originator
         S4U_Mailbox::dputMessage(
                 this->parent_service->mailbox, new ActionExecutionServiceActionDoneMessage(
-                                                       executor->getAction(), 0.0));
+                        executor->getAction(), 0.0));
     }
 
     /**

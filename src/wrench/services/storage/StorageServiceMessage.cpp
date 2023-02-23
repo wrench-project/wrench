@@ -114,8 +114,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which to send the answer
-     * @param file: the file
-     * @param path: the file path
+     * @param location: the location
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -222,9 +221,7 @@ namespace wrench {
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param requesting_host: the requesting host
-    * @param file: the file
-    * @param path: the file path
-    * @param buffer_size: the buffer size
+    * @param location: the location
     * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
@@ -252,7 +249,6 @@ namespace wrench {
      * @param failure_cause: the cause of the failure (nullptr if success)
      * @param data_write_mailbox: the mailbox to which file content should be sent
      * @param buffer_size: the buffer size to use
-     * @param destination_mailboxes_and_bytes: the set of destination mailboxes and the number of bytes to send to each
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -283,8 +279,7 @@ namespace wrench {
    * @brief Constructor
    * @param answer_mailbox: the mailbox to which to send the answer
    * @param requesting_host: the requesting host
-   * @param file: the file to read
-   * @param path: the file path
+   * @param location: the location to read
    * @param num_bytes_to_read: the number of bytes to read
    * @param payload: the message size in bytes
    *

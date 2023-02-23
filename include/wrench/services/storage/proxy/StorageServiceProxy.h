@@ -60,19 +60,28 @@ namespace wrench {
 
         std::shared_ptr<StorageService> getCache();
 
-
         double getLoad() override;//cache
 
-        virtual bool isBufferized() const override; //cache
+        bool isBufferized() const override; //cache
 
-        virtual double getBufferSize() const override; //cache
+        double getBufferSize() const override; //cache
 
-        virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
-                throw std::runtime_error("StorageServiceProxy::reserveSpace(): should be be called");
+        /**
+         * @brief Reserve space at the storage service
+         * @param location a location
+         * @return true if success, false otherwise
+         */
+        bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
+                throw std::runtime_error("StorageServiceProxy::reserveSpace(): should not be called");
         };
 
-        virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
-            throw std::runtime_error("StorageServiceProxy::unreserveSpace(): should be be called");
+
+        /**
+         * @brief Unreserve space at the storage service
+         * @param location a location
+         */
+        void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
+            throw std::runtime_error("StorageServiceProxy::unreserveSpace(): should not be called");
         };
 
         /**
@@ -100,7 +109,8 @@ namespace wrench {
         int main() override;
         bool processNextMessage();
         bool rejectDuplicateRead(const std::shared_ptr<DataFile>&  file);
-        StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService> &cache = nullptr, const std::shared_ptr<StorageService> &default_remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads = {});
+
+        explicit StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService> &cache = nullptr, const std::shared_ptr<StorageService> &default_remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads = {});
 
 
         /**
