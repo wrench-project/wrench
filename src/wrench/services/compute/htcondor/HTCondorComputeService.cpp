@@ -203,6 +203,8 @@ namespace wrench {
         this->central_manager->setSimulation(this->simulation);
         this->central_manager->start(this->central_manager, true, false);// Daemonized, no auto-restart
 
+        // Start the Scratch Storage Service
+        this->startScratchStorageService();
 
         // main loop
         while (this->processNextMessage()) {

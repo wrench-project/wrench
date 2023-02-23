@@ -1416,7 +1416,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BareMetalComputeServiceCompletedJobTerminationTestWMS(
                                     this, hostname)));
@@ -1546,7 +1546,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
                                     this, hostname)));
@@ -1621,11 +1621,10 @@ private:
                 throw std::runtime_error("Got the expected job failure but unexpected failure cause: " +
                                          real_event->failure_cause->toString() + " (expected: InvalidDirectoryPath)");
             }
-            if (cause->getStorageService() != this->test->compute_service->getScratch()) {
+            if (cause->getLocation()->getStorageService() != this->test->compute_service->getScratch()) {
                 throw std::runtime_error(
                         "Got the correct failure even, a correct cause type, but the cause points to the wrong storage service");
             }
-            cause->getInvalidPath();// coverage
 
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
@@ -1671,7 +1670,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
                                     this, hostname)));

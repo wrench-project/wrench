@@ -404,6 +404,9 @@ namespace wrench {
             termination_detector->start(termination_detector, true, false);// Daemonized, no auto-restart
         }
 
+        // Start the Scratch Storage Service
+        this->startScratchStorageService();
+
         /** Main loop **/
         while (this->processNextMessage()) {
             dispatchReadyActions();
@@ -700,11 +703,11 @@ namespace wrench {
         for (auto const &j: this->files_in_scratch) {
             for (auto const &f: j.second) {
                 try {
-                    StorageService::deleteFile(FileLocation::LOCATION(
-                            this->getScratch(),
-                            this->getScratch()->getMountPoint() +
-                                    j.first->getName(),
-                            f));
+                    this->getScratch()->deleteFile(
+                            f,
+                            this->getScratch()->getBaseRootPath() +
+                                    j.first->getName()
+                            );
                 } catch (ExecutionException &e) {
                     throw;
                 }

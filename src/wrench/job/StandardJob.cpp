@@ -323,17 +323,17 @@ namespace wrench {
             if (scratch) {
                 for (auto const &task: this->tasks) {
                     for (auto const &f: task->getInputFiles()) {
-                        if (scratch->hasFile(f, scratch->getMountPoint() + "/" + cjob->getName())) {
+                        if (scratch->hasFile(f, scratch->getBaseRootPath()  + cjob->getName())) {
                             try {
-                                scratch->deleteFile(FileLocation::LOCATION(scratch, scratch->getMountPoint() + "/" + cjob->getName(), f));
+                                scratch->deleteFile(FileLocation::LOCATION(scratch, scratch->getBaseRootPath()  + cjob->getName(), f));
                             } catch (ExecutionException &ignore) {}
                         }
                     }
 
                     for (auto const &f: task->getOutputFiles()) {
-                        if (scratch->hasFile(f, scratch->getMountPoint() + "/" + cjob->getName())) {
+                        if (scratch->hasFile(f, scratch->getBaseRootPath()  + cjob->getName())) {
                             try {
-                                scratch->deleteFile(FileLocation::LOCATION(scratch, scratch->getMountPoint() + "/" + cjob->getName(), f));
+                                scratch->deleteFile(FileLocation::LOCATION(scratch, scratch->getBaseRootPath()  + cjob->getName(), f));
                             } catch (ExecutionException &ignore) {}
                         }
                     }

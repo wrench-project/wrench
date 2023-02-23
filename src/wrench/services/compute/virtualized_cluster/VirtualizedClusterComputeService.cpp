@@ -154,6 +154,9 @@ namespace wrench {
                 this->hostname.c_str(),
                 this->mailbox->get_cname());
 
+        // Start the Scratch Storage Service
+        this->startScratchStorageService();
+
         /** Main loop **/
         while (this->processNextMessage()) {
             // no specific action

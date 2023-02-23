@@ -61,11 +61,10 @@ namespace wrench {
         // Fix location if scratch
         if (this->file_location->isScratch()) {
             auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
-            this->file_location = FileLocation::LOCATION(cs->getScratch(), cs->getScratch()->getMountPoint() + "/" + this->getJob()->getName(), this->file_location->getFile());
+            this->file_location = FileLocation::LOCATION(cs->getScratch(), cs->getScratch()->getBaseRootPath()  + this->getJob()->getName(), this->file_location->getFile());
         }
         // File write
-        StorageService::writeFile(
-                this->file_location);
+        StorageService::writeFileAtLocation(this->file_location);
     }
 
     /**
