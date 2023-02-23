@@ -80,8 +80,8 @@ namespace wrench {
         assertServiceIsUp();
 
         if (boost::iequals(
-                    this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                    "alltoall")) {
+                this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                "alltoall")) {
             throw std::runtime_error(
                     "NetworkProximityService::getCoordinate() cannot be called with NETWORK_PROXIMITY_SERVICE_TYPE of ALLTOALL");
         }
@@ -99,14 +99,11 @@ namespace wrench {
 
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        if (auto msg = dynamic_cast<CoordinateLookupAnswerMessage *>(message.get())) {
-            return std::make_pair(msg->xy_coordinate, msg->timestamp);
-        } else {
-            throw std::runtime_error(
-                    "NetworkProximityService::getCoordinate(): Unexpected [" + message->getName() + "] message");
-        }
+        auto msg = S4U_Mailbox::getMessage<CoordinateLookupAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "NetworkProximityService::getCoordinate(): Received an");
+        return std::make_pair(msg->xy_coordinate, msg->timestamp);
     }
 
     /**
@@ -142,16 +139,11 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
-        std::unique_ptr<SimulationMessage> message = nullptr;
-
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        if (auto msg = dynamic_cast<NetworkProximityLookupAnswerMessage *>(message.get())) {
-            return std::make_pair(msg->proximity_value, msg->timestamp);
-        } else {
-            throw std::runtime_error(
-                    "NetworkProximityService::query(): Unexpected [" + message->getName() + "] message");
-        }
+        auto msg = S4U_Mailbox::getMessage<NetworkProximityLookupAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "NetworkProximityService::query(): Received an");
+        return std::make_pair(msg->proximity_value, msg->timestamp);
     }
 
     /**
@@ -201,8 +193,8 @@ namespace wrench {
 
             // if this network service type is 'vivaldi', set up the coordinate lookup table
             if (boost::iequals(
-                        this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                        "vivaldi")) {
+                    this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                    "vivaldi")) {
                 this->coordinate_lookup_table.insert(
                         std::make_pair(h, std::make_pair((0.0), Simulation::getCurrentSimulatedDate())));
             }
@@ -232,7 +224,7 @@ namespace wrench {
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
@@ -247,7 +239,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // This is Synchronous
             try {
                 //Stop the network daemons
@@ -267,7 +259,7 @@ namespace wrench {
                 return false;
             }
 
-        } else if (auto msg = dynamic_cast<NetworkProximityLookupRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<NetworkProximityLookupRequestMessage>(message)) {
             double proximity_value = NetworkProximityService::NOT_AVAILABLE;
             double timestamp = NetworkProximityService::NOT_AVAILABLE;
 
@@ -304,17 +296,17 @@ namespace wrench {
                                     NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
             return true;
 
-        } else if (auto msg = dynamic_cast<NetworkProximityComputeAnswerMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<NetworkProximityComputeAnswerMessage>(message)) {
             this->addEntryToDatabase(msg->hosts, msg->proximity_value);
 
             if (boost::iequals(
-                        this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                        "vivaldi")) {
+                    this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                    "vivaldi")) {
                 vivaldiUpdate(msg->proximity_value, msg->hosts.first, msg->hosts.second);
             }
             return true;
 
-        } else if (auto msg = dynamic_cast<NextContactDaemonRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<NextContactDaemonRequestMessage>(message)) {
             std::shared_ptr<NetworkProximityDaemon> chosen_peer = NetworkProximityService::getCommunicationPeer(
                     msg->daemon);
 
@@ -328,7 +320,7 @@ namespace wrench {
                                     NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
             return true;
 
-        } else if (auto msg = dynamic_cast<CoordinateLookupRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CoordinateLookupRequestMessage>(message)) {
             std::string requested_host = msg->requested_host;
             auto const coordinate_itr = this->coordinate_lookup_table.find(requested_host);
             CoordinateLookupAnswerMessage *msg_to_send_back;
@@ -530,7 +522,7 @@ namespace wrench {
         }
 
         if (this->getPropertyValueAsDouble(
-                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE) < 0) {
+                NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE) < 0) {
             throw std::invalid_argument(error_prefix + "Invalid NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE value " +
                                         this->getPropertyValueAsString(
                                                 NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE));

@@ -131,28 +131,28 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             return processStopDaemonRequest(msg->ack_mailbox);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFreeSpaceRequestMessage>(message)) {
             return processFreeSpaceRequest(msg->answer_mailbox, msg->path);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileDeleteRequestMessage>(message)) {
             return processFileDeleteRequest(msg->location, msg->answer_mailbox);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileLookupRequestMessage>(message)) {
             return processFileLookupRequest(msg->location, msg->answer_mailbox);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileWriteRequestMessage>(message)) {
             return processFileWriteRequest(msg->location, msg->answer_mailbox);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadRequestMessage>(message)) {
             return processFileReadRequest(msg->location, msg->num_bytes_to_read, msg->answer_mailbox);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileCopyRequestMessage>(message)) {
             return processFileCopyRequest(msg->src, msg->dst, msg->answer_mailbox);
 
-        } else if (auto msg = dynamic_cast<FileTransferThreadNotificationMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<FileTransferThreadNotificationMessage>(message)) {
             return processFileTransferThreadNotification(
                     msg->file_transfer_thread,
                     msg->src_mailbox,
@@ -175,7 +175,6 @@ namespace wrench {
      *
      * @param location: the location to write the file to
      * @param answer_mailbox: the mailbox to which the reply should be sent
-     * @param buffer_size: the buffer size to use
      * @return true if this process should keep running
      */
     bool SimpleStorageServiceBufferized::processFileWriteRequest(std::shared_ptr<FileLocation> &location,

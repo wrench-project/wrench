@@ -319,25 +319,25 @@ namespace wrench {
 
 
     /**
- * @brief Synchronously and sequentially read a set of files from storage services
- *
- * @param locations: a map of files to locations
- *
- * @throw std::runtime_error
- * @throw ExecutionException
- */
+     * @brief Synchronously and sequentially read a set of files from storage services
+     *
+     * @param locations: a map of files to locations
+     *
+     * @throw std::runtime_error
+     * @throw ExecutionException
+     */
     void StorageService::readFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
         StorageService::writeOrReadFiles(READ, std::move(locations));
     }
 
     /**
- * @brief Synchronously and sequentially upload a set of files from storage services
- *
- * @param locations: a map of files to locations
- *
- * @throw std::runtime_error
- * @throw ExecutionException
- */
+     * @brief Synchronously and sequentially upload a set of files from storage services
+     *
+     * @param locations: a map of files to locations
+     *
+     * @throw std::runtime_error
+     * @throw ExecutionException
+     */
     void StorageService::writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
         StorageService::writeOrReadFiles(WRITE, std::move(locations));
     }
