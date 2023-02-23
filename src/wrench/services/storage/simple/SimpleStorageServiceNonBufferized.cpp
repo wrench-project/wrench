@@ -284,7 +284,6 @@ namespace wrench {
      * @param location: the location to write the file to
      * @param answer_mailbox: the mailbox to which the reply should be sent
      * @param requesting_host: the requesting host
-     * @param buffer_size: the buffer size to use
      * @return true if this process should keep running
      */
     bool SimpleStorageServiceNonBufferized::processFileWriteRequest(std::shared_ptr<FileLocation> &location,

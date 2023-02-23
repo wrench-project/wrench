@@ -313,45 +313,6 @@ namespace wrench {
                         true, nullptr, this->getMessagePayloadValue(HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
     }
 
-    ///**
-    // * @brief Process a submit pilot job request
-    // *
-    // * @param answer_mailbox: the mailbox to which the answer message should be sent
-    // * @param job: the job
-    // * @param service_specific_args: service specific arguments
-    // *
-    // * @throw std::runtime_error
-    // */
-    //    void HTCondorComputeService::processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
-    //                                                       const std::map<std::string, std::string> &service_specific_args) {
-    //
-    //        WRENCH_INFO("Asked to run a pilot job");
-    //
-    //        // Check that the job can run on some child service
-    //        if (not this->central_manager->jobCanRunSomewhere(job, service_specific_args)) {
-    //            S4U_Mailbox::dputMessage(
-    //                    answer_mailbox,
-    //                    new ComputeServiceSubmitPilotJobAnswerMessage(
-    //                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
-    //                                    new NotEnoughResources(job, this->getSharedPtr<HTCondorComputeService>())),
-    //                            this->getMessagePayloadValue(
-    //                                    HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-    //            return;
-    //        }
-    //
-    //        // Submit the job to the central manager
-    //        this->central_manager->submitPilotJob(job, service_specific_args);
-    //
-    //        // send positive answer
-    //        S4U_Mailbox::dputMessage(
-    //                answer_mailbox,
-    //                new ComputeServiceSubmitPilotJobAnswerMessage(
-    //                        job, this->getSharedPtr<HTCondorComputeService>(), true, nullptr, this->getMessagePayloadValue(
-    //                                HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-    //        return;
-    //    }
-
-
     /**
       * @brief Process a host available resource request
       * @param answer_mailbox: the answer mailbox
