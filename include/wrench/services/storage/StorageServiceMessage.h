@@ -73,7 +73,6 @@ namespace wrench {
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The location to lookup */
         std::shared_ptr<FileLocation> location;
-
     };
 
     /**

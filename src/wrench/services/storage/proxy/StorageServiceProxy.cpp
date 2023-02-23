@@ -48,15 +48,15 @@ namespace wrench {
         std::string message =
                 "Proxy Server " + this->getName() + "  starting on host " + this->getHostname();
         WRENCH_DEBUG("%s",
-                    message.c_str());
+                     message.c_str());
 
         /** Main loop **/
         while (this->processNextMessage()) {
         }
 
         WRENCH_DEBUG("Proxy Server Node %s on host %s cleanly terminating!",
-                    this->getName().c_str(),
-                    S4U_Simulation::getHostName().c_str());
+                     this->getName().c_str(),
+                     S4U_Simulation::getHostName().c_str());
 
         return 0;
     }
@@ -111,7 +111,7 @@ namespace wrench {
                 target = location->target;
             }
             //cerr<<"FILE LOOKUP!!!! "<<remote<<" "<<target<<endl;
-            if (cache->hasFile(msg->location)) { //forward request to cache
+            if (cache->hasFile(msg->location)) {//forward request to cache
                 //cerr<<"File cached"<<endl;
                 S4U_Mailbox::dputMessage(msg->answer_mailbox, new StorageServiceFileLookupAnswerMessage(msg->location->getFile(), true, StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
 
@@ -284,25 +284,25 @@ namespace wrench {
     }
 
 
-//    /**
-//     * @brief Get the mount point of the remote server (will throw is more than one).  If there isnt a default, returns DEV_NUL
-//     * @return the (sole) mount point of the service
-//     */
-//    std::string StorageServiceProxy::getMountPoint() {
-//        if (remote) {
-//            return remote->getMountPoint();
-//        }
-//        if (cache) {
-//            return cache->getMountPoint();
-//        }
-//        return LogicalFileSystem::DEV_NULL;
-//    }
+    //    /**
+    //     * @brief Get the mount point of the remote server (will throw is more than one).  If there isnt a default, returns DEV_NUL
+    //     * @return the (sole) mount point of the service
+    //     */
+    //    std::string StorageServiceProxy::getMountPoint() {
+    //        if (remote) {
+    //            return remote->getMountPoint();
+    //        }
+    //        if (cache) {
+    //            return cache->getMountPoint();
+    //        }
+    //        return LogicalFileSystem::DEV_NULL;
+    //    }
 
     bool StorageServiceProxy::isBufferized() const {
         if (cache) {
             return cache->isBufferized();
         } else {
-            return false;   // Not sure that makes sense
+            return false;// Not sure that makes sense
         }
     }
 
@@ -311,50 +311,50 @@ namespace wrench {
         if (cache) {
             return cache->getBufferSize();
         } else {
-            return 0;   // Not sure that makes sense
+            return 0;// Not sure that makes sense
         }
     }
 
 
-//    /**
-//     * @brief Get the set of mount points of the remote server, if not returns {}
-//     * @return the set of mount points
-//     */
-//    std::set<std::string> StorageServiceProxy::getMountPoints() {
-//        if (remote) {
-//            return remote->getMountPoints();
-//        }
-//        if (cache) {
-//            return cache->getMountPoints();
-//        }
-//        return {};
-//    }
-//    /**
-//     * @brief Checked whether the remote storage service has multiple mount points
-//     * @return true whether the service has multiple mount points
-//     */
-//    bool StorageServiceProxy::hasMultipleMountPoints() {
-//        if (remote) {
-//            return remote->hasMultipleMountPoints();
-//        }
-//
-//        return false;
-//    }
-//    /**
-//    * @brief Checked whether the remote storage service has a particular mount point
-//    * @param mp: a mount point
-//    *
-//    * @return true whether the service has that mount point
-//    */
-//    bool StorageServiceProxy::hasMountPoint(const std::string &mp) {
-//        if (remote) {
-//            return remote->hasMountPoint(mp);
-//        }
-//        if (cache) {
-//            return cache->hasMountPoint(mp);
-//        }
-//        return false;
-//    }
+    //    /**
+    //     * @brief Get the set of mount points of the remote server, if not returns {}
+    //     * @return the set of mount points
+    //     */
+    //    std::set<std::string> StorageServiceProxy::getMountPoints() {
+    //        if (remote) {
+    //            return remote->getMountPoints();
+    //        }
+    //        if (cache) {
+    //            return cache->getMountPoints();
+    //        }
+    //        return {};
+    //    }
+    //    /**
+    //     * @brief Checked whether the remote storage service has multiple mount points
+    //     * @return true whether the service has multiple mount points
+    //     */
+    //    bool StorageServiceProxy::hasMultipleMountPoints() {
+    //        if (remote) {
+    //            return remote->hasMultipleMountPoints();
+    //        }
+    //
+    //        return false;
+    //    }
+    //    /**
+    //    * @brief Checked whether the remote storage service has a particular mount point
+    //    * @param mp: a mount point
+    //    *
+    //    * @return true whether the service has that mount point
+    //    */
+    //    bool StorageServiceProxy::hasMountPoint(const std::string &mp) {
+    //        if (remote) {
+    //            return remote->hasMountPoint(mp);
+    //        }
+    //        if (cache) {
+    //            return cache->hasMountPoint(mp);
+    //        }
+    //        return false;
+    //    }
 
 
     /**
@@ -424,12 +424,12 @@ namespace wrench {
         this->setMessagePayloads(this->default_messagepayload_values, std::move(message_payloads));
         this->setProperty(StorageServiceProperty::BUFFER_SIZE, cache->getPropertyValueAsString(StorageServiceProperty::BUFFER_SIZE));//the internal cache has the same buffer properties as this service.
 
-//        if (cache and cache->hasMultipleMountPoints()) {
-//            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's cache can not have multiple mountpoints");
-//        }
-//        if (remote and remote->hasMultipleMountPoints()) {
-//            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's default remote can not have multiple mountpoints");
-//        }
+        //        if (cache and cache->hasMultipleMountPoints()) {
+        //            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's cache can not have multiple mountpoints");
+        //        }
+        //        if (remote and remote->hasMultipleMountPoints()) {
+        //            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's default remote can not have multiple mountpoints");
+        //        }
         //        if (cache and default_remote) {
         //            if ((cache->isBufferized() and not default_remote->isBufferized()) or
         //                (not cache->isBufferized() and default_remote->isBufferized())) {
@@ -553,7 +553,7 @@ namespace wrench {
      * @param message the raw unique_ptr for the message.  Assumed to be the same as msg, passed to avoid second cast.
      * @return True if the file is cached, false otherwise
      */
-    bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage * msg, unique_ptr<ServiceMessage> & message) {
+    bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<ServiceMessage> &message) {
         if (cache->hasFile(msg->location->getFile(), msg->location->getPath())) {//check cache
             WRENCH_INFO("Forwarding to cache reply mailbox %s", msg->answer_mailbox->get_name().c_str());
             S4U_Mailbox::putMessage(
@@ -568,7 +568,7 @@ namespace wrench {
         } else {
             //im not really sure what this was suppose to be for.  Preventing read from a file being written I think, but Im not 100% sure
             //std::vector<unique_ptr<ServiceMessage>> &messages = pending[msg->location->getFile()];
-           // for (unsigned int i = 0; i < messages.size(); i++) {
+            // for (unsigned int i = 0; i < messages.size(); i++) {
             //    if (auto tmpMsg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(messages[i].get())) {
             //        //there is A writeRequest for this file in progress, ignore
             //        pending[msg->location->getFile()].push_back(std::move(message));
@@ -584,19 +584,18 @@ namespace wrench {
      * @param file the file to find
      * @return True if the message was processed.  False otherwise
      */
-    bool StorageServiceProxy::rejectDuplicateRead(const std::shared_ptr<DataFile>& file){
+    bool StorageServiceProxy::rejectDuplicateRead(const std::shared_ptr<DataFile> &file) {
         WRENCH_DEBUG("Looking for Duplicate Read");
-        bool second=false;
+        bool second = false;
         std::vector<unique_ptr<ServiceMessage>> &messages = pending[file];
 
         for (unsigned int i = 0; i < messages.size(); i++) {
             if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
-                if(second){
+                if (second) {
                     WRENCH_DEBUG("Duplicate remote read detected, Queuing");
                     return true;
                 }
-                second=true;
-
+                second = true;
             }
         }
         return false;
@@ -620,9 +619,8 @@ namespace wrench {
 
                 pending[msg->location->getFile()].push_back(std::move(message));
                 //handle duplicate requests
-                if(rejectDuplicateRead(msg->location->getFile())){
+                if (rejectDuplicateRead(msg->location->getFile())) {
                     return true;
-
                 }
 
                 StorageService::initiateFileCopy(mailbox, FileLocation::LOCATION(target, msg->location->getFile()), FileLocation::LOCATION(cache, msg->location->getFile()));
@@ -638,7 +636,7 @@ namespace wrench {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
 
                     if (msg->success) {
-                        tmpMsg->payload = 0;                     //this message has already been sent, this is a fake resend
+                        tmpMsg->payload = 0;                      //this message has already been sent, this is a fake resend
                         S4U_Mailbox::dputMessage(mailbox, tmpMsg);//now that the data is cached, resend the message
                         std::swap(messages[i], messages.back());
                         messages.back().release();
@@ -652,8 +650,6 @@ namespace wrench {
                         i--;
                     }
                 }
-
-
             }
             return true;
         }
@@ -679,9 +675,8 @@ namespace wrench {
 
                 pending[msg->location->getFile()].push_back(std::move(message));
                 //handle duplicate requests
-                if(rejectDuplicateRead(msg->location->getFile())){
+                if (rejectDuplicateRead(msg->location->getFile())) {
                     return true;
-
                 }
                 StorageService::initiateFileCopy(mailbox, FileLocation::LOCATION(target, msg->location->getFile()), FileLocation::LOCATION(cache, msg->location->getFile()));
             } else {
@@ -694,7 +689,7 @@ namespace wrench {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
                     if (msg->success) {
                         S4U_Mailbox::putMessage(tmpMsg->answer_mailbox, new StorageServiceFileReadAnswerMessage(tmpMsg->location, true, nullptr, nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));//magic read, send buffersize 0 and we are assumed to be nonbufferized
-                        S4U_Mailbox::putMessage(tmpMsg->answer_mailbox, new StorageServiceAckMessage(tmpMsg->location));                                                                                                      //emediatly send the expected ack
+                        S4U_Mailbox::putMessage(tmpMsg->answer_mailbox, new StorageServiceAckMessage(tmpMsg->location));                                                                                                         //emediatly send the expected ack
                         std::swap(messages[i], messages.back());
                         messages.pop_back();
                         i--;
@@ -730,18 +725,17 @@ namespace wrench {
 
                 pending[msg->location->getFile()].push_back(std::move(message));
                 //handle duplicate requests
-                if(rejectDuplicateRead(msg->location->getFile())){
+                if (rejectDuplicateRead(msg->location->getFile())) {
                     return true;
-
                 }
                 //pending[msg->location->getFile()].push_back(std::move(message));
                 //Readthrough: read from target to client emediatly, then instantly create on cache.  REQUIRES EXTANT NETWORK PATH
                 //readthrough:  all block until first read is finished, then all others read
                 //do not spend excessive time on readThrough
                 auto forward = new StorageServiceFileReadRequestMessage(msg);
-                forward->answer_mailbox = mailbox;                                                                                 //setup intercept mailbox
+                forward->answer_mailbox = mailbox;                                                                     //setup intercept mailbox
                 forward->location = FileLocation::LOCATION(target, msg->location->getPath(), msg->location->getFile());//hyjack locaiton to be on target
-                S4U_Mailbox::dputMessage(target->mailbox, forward);                                                                 //send to target
+                S4U_Mailbox::dputMessage(target->mailbox, forward);                                                    //send to target
             } else {
                 S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
             }
@@ -753,7 +747,7 @@ namespace wrench {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
                     if (msg->success) {
 
-                        msg->location = tmpMsg->location;                                  //fix up the location
+                        msg->location = tmpMsg->location;                                   //fix up the location
                         S4U_Mailbox::dputMessage(tmpMsg->answer_mailbox, message.release());//forward success message to first waiting read host
                         return true;
                     } else {
@@ -764,7 +758,6 @@ namespace wrench {
                         i--;
                     }
                 }
-
             }
             return true;
         } else if (auto msg = dynamic_cast<StorageServiceAckMessage *>(message.get())) {//Our readthrough has finished
@@ -785,8 +778,8 @@ namespace wrench {
                         messages.pop_back();
                         i--;
                         first = false;
-                    } else {                                     //these are the pending reads
-                        tmpMsg->payload = 0;                     //this message has already been sent, this is a fake resend
+                    } else {                                      //these are the pending reads
+                        tmpMsg->payload = 0;                      //this message has already been sent, this is a fake resend
                         S4U_Mailbox::dputMessage(mailbox, tmpMsg);//these should now be cached, and should just drop down to the cache automatically
                         std::swap(messages[i], messages.back());
                         messages.back().release();

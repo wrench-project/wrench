@@ -477,7 +477,7 @@ namespace wrench {
             auto dst_mount_point = dst_ss->getPathMountPoint(dst_loc->getPath());
 
             // Read the first chunk
-            simulation->readFromDisk(to_send, src_ss->hostname,src_mount_point);
+            simulation->readFromDisk(to_send, src_ss->hostname, src_mount_point);
             // start the pipeline
             while (remaining - this->buffer_size > DBL_EPSILON) {
                 simulation->readFromDiskAndWriteToDiskConcurrently(

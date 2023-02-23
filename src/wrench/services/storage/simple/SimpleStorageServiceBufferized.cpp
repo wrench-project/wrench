@@ -54,7 +54,7 @@ namespace wrench {
     SimpleStorageServiceBufferized::SimpleStorageServiceBufferized(const std::string &hostname,
                                                                    std::set<std::string> mount_points,
                                                                    WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),"_" + std::to_string(getNewUniqueNumber())) {
+                                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list), "_" + std::to_string(getNewUniqueNumber())) {
         this->buffer_size = this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
         this->is_bufferized = true;
     }
