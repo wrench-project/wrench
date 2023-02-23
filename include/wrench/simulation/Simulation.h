@@ -112,12 +112,24 @@ namespace wrench {
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
 
+	/**
+	 * @brief Creates a file copy on a storage service before the simulation begins
+	 * @param file: a file
+	 * @param storage_service: a storage service
+	 */
         void stageFile(const std::shared_ptr<DataFile> file, const std::shared_ptr<StorageService> &storage_service) {
             this->stageFile(wrench::FileLocation::LOCATION(storage_service, file));
         }
+	/**
+         * @brief Creates a file copy on a storage service before the simulation begins
+         * @param file: a file
+         * @param storage_service: a storage service
+	 * @param path: a path
+         */
         void stageFile(const std::shared_ptr<DataFile> file, const std::shared_ptr<StorageService> &storage_service, const std::string &path) {
             this->stageFile(wrench::FileLocation::LOCATION(storage_service, path, file));
         }
+
         void stageFile(const std::shared_ptr<FileLocation> &location);
 
         /***********************/

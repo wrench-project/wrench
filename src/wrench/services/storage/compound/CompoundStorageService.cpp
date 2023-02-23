@@ -631,8 +631,6 @@ namespace wrench {
      *
      * @throw ExecutionException
      *
-     * @throw std::runtime_error
-     *
      */
     double CompoundStorageService::getTotalFreeSpaceAtPath(const std::string &path) {
         WRENCH_DEBUG("CompoundStorageService::getFreeSpace Forwarding request to internal services");
@@ -646,7 +644,7 @@ namespace wrench {
 
     /** 
      *  @brief setIsScratch can't be used on a CompoundStorageService because it doesn't have any actual storage resources.
-     *  
+     *  @param is_scratch true or false
      *  @throw std::logic_error
      */
     void CompoundStorageService::setIsScratch(bool is_scratch) {
@@ -667,7 +665,7 @@ namespace wrench {
     /**
      * @brief Get a file's last write date at a location (in zero simulated time)
      *
-     * @param file: the location
+     * @param location: the location
      *
      * @return a date in seconds, or -1 if the file is not found
      */

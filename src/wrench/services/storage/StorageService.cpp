@@ -42,8 +42,6 @@ namespace wrench {
         this->is_scratch = false;
     }
 
-
-
     /**
      * @brief Indicate whether this storage service is a scratch service of a ComputeService
      * @param is_scratch: true if scratch, false otherwise
@@ -94,7 +92,6 @@ namespace wrench {
     /******     TO SPECIFIC STORAGE SERVERS NOT LOCATIONS     ******/
     /******    CONSTRUCTS LOCATION AND FORWARDS TO DAEMON    ******/
     /***************************************************************/
-
 
 
     /**

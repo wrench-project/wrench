@@ -918,7 +918,9 @@ namespace wrench {
 
         /**
         * @brief write a file on this node.
-        * @param file: A shared pointer to a file
+	* @param answer_mailbox: a mailbox on which to send the answer messagej
+        * @param location: a location
+	* @param wait_for_answer: true if this method should wait for the answer, false otherwise
         *
         * @throw std::invalid_argument
         */

@@ -223,7 +223,7 @@ namespace wrench {
 
         /**
          * @brief Determines whether a file is present at a location (in zero simulated time)
-         * @param location a location
+         * @param location: a location
          * @return true if the file is present, false otherwise
          */
         static bool hasFileAtLocation(const std::shared_ptr<FileLocation> &location) {
@@ -234,7 +234,7 @@ namespace wrench {
         }
         /**
          * @brief Determines whether a file is present at the storage service (in zero simulated time)
-         * @param file a file
+         * @param file: a file
          * @return true if the file is present, false otherwise
          */
         bool hasFile(const std::shared_ptr<DataFile> &file) {
@@ -242,8 +242,8 @@ namespace wrench {
         }
         /**
          * @brief Determines whether a file is present at the storage service (in zero simulated time)
-         * @param file a file
-         * @param path a path
+         * @param file: a file
+         * @param path: a path
          * @return true if the file is present, false otherwise
          */
         virtual bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
@@ -251,7 +251,7 @@ namespace wrench {
         }
         /**
          * @brief Determines whether a file is present at the storage service (in zero simulated time)
-         * @param location a location
+         * @param location: a location
          * @return true if the file is present, false otherwise
          */
         virtual bool hasFile(const std::shared_ptr<FileLocation> &location) = 0;
@@ -259,7 +259,7 @@ namespace wrench {
         /** File creation methods */
         /**
          * @brief Create a file at a location (in zero simulated time)
-         * @param location a location
+         * @param location: a location
          */
         static void createFileAtLocation(const std::shared_ptr<FileLocation> &location) {
             if (location == nullptr) {
@@ -269,30 +269,30 @@ namespace wrench {
         }
         /**
          * @brief Create a file at the storage service (in zero simulated time)
-         * @param file a file
+         * @param file: a file
          */
         void createFile(const std::shared_ptr<DataFile> &file) {
             this->createFile(file, "/");
         }
         /**
          * @brief Create a file at the storage service (in zero simulated time)
-         * @param location a location
-         * @param path a path
+         * @param file: a file
+         * @param path: a path
          */
         virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
             this->createFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
         /**
          * @brief Create a file at the storage service (in zero simulated time)
-         * @param location a location
+         * @param location: a location
          */
         virtual void createFile(const std::shared_ptr<FileLocation> &location) = 0;
 
         /** File write date methods */
         /**
          * @brief Get a file's last write date at a location (in zero simulated time)
-         * @param location  a location
-         * @param a date in seconds, or -1 if the file is not found
+         * @param location:  a location
+         * @return a date in seconds, or -1 if the file is not found
          */
         double getFileLocationLastWriteDate(const std::shared_ptr<FileLocation> &location) {
             if (location == nullptr) {
@@ -302,25 +302,25 @@ namespace wrench {
         }
         /**
          * @brief Get a file's last write date at the storage service (in zero simulated time)
-         * @param file  a file
-         * @param a date in seconds
+         * @param file: a file
+         * @return a date in seconds
          */
         double getFileLastWriteDate(const std::shared_ptr<DataFile> &file) {
             return this->getFileLastWriteDate(file, "/");
         }
         /**
          * @brief Get a file's last write date at the storage service (in zero simulated time)
-         * @param file  a file
-         * @param path a path
-         * @param a date in seconds
+         * @param file: a file
+         * @param path: a path
+         * @return a date in seconds
          */
         virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
             return this->getFileLastWriteDate(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
         /**
          * @brief Get a file's last write date at the storage service (in zero simulated time)
-         * @param file  a location
-         * @param a date in seconds
+         * @param location: a location
+         * @return a date in seconds
          */
         virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) = 0;
 
@@ -363,8 +363,8 @@ namespace wrench {
 
         /**
          * @brief Copy a file from one location to another
-         * @param src_location a source location
-         * @param dst_location a destination location
+         * @param src_location: a source location
+         * @param dst_location: a destination location
          */
         static void copyFile(const std::shared_ptr<FileLocation> &src_location,
                              const std::shared_ptr<FileLocation> &dst_location);
@@ -372,14 +372,14 @@ namespace wrench {
         /**
          * @brief Helper method to read multiple files
          *
-         * @param locations a map of files to locations
+         * @param locations: a map of files to locations
          */
         static void readFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
         /**
          * @brief Helper method to write multiple files
          *
-         * @param locations a map of files to locations
+         * @param locations: a map of files to locations
          */
         static void writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
@@ -408,9 +408,9 @@ namespace wrench {
 
         /**
          * @brief Initiate a file copy from one location to another
-         * @param answer_mailbox a mailbox on which to receive completion/failure notification
-         * @param src_location a source location
-         * @param dst_location a destination location
+         * @param answer_mailbox: a mailbox on which to receive completion/failure notification
+         * @param src_location: a source location
+         * @param dst_location: a destination location
          */
         static void initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox,
                                      const std::shared_ptr<FileLocation> &src_location,
@@ -418,14 +418,14 @@ namespace wrench {
 
         /**
          * @brief Reserve space at the storage service
-         * @param location a location
+         * @param location: a location
          * @return true if success, false otherwise
          */
         virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) = 0;
 
         /**
          * @brief Unreserve space at the storage service
-         * @param location a location
+         * @param location: a location
          */
         virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) = 0;
 
@@ -445,10 +445,16 @@ namespace wrench {
                                const std::shared_ptr<FileLocation> &location,
                                bool wait_for_answer);
 
+        /**
+	 * @brief Decrement the number of operations for a location
+	 **/
         virtual void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
             // do nothing
         }
 
+        /**
+	 * @brief Increment the number of operations for a location
+	 **/
         virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
             // no nothing
         }
