@@ -285,11 +285,11 @@ namespace wrench {
         std::sort(queue_state.begin(), queue_state.end(),
                   [](const std::tuple<std::string, std::string, int, int, int, double, double> &j1,
                      const std::tuple<std::string, std::string, int, int, int, double, double> &j2) -> bool {
-                      if (std::get<6>(j1) == std::get<6>(j2)) {
-                          return (std::get<1>(j1) > std::get<1>(j2));
-                      } else {
-                          return (std::get<6>(j1) > std::get<6>(j2));
-                      }
+                    if (std::get<6>(j1) == std::get<6>(j2)) {
+                        return (std::get<1>(j1) > std::get<1>(j2));
+                    } else {
+                        return (std::get<6>(j1) > std::get<6>(j2));
+                    }
                   });
 
         return queue_state;
@@ -372,15 +372,10 @@ namespace wrench {
                                 BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        std::shared_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitCompoundJobAnswerMessage>(message);
-        if (!msg) {
-            throw std::runtime_error(
-                    "BatchComputeService::submitCompoundJob(): Received an unexpected [" + message->getName() +
-                    "] message!");
-        }
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "BatchComputeService::submitCompoundJob(): Received an");
         if (!msg->success) {
             throw ExecutionException(msg->failure_cause);
         }
@@ -405,17 +400,10 @@ namespace wrench {
                                 BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobAnswerMessage *>(message.get());
-
-        if (not msg) {
-            throw std::runtime_error("BatchComputeService::terminateCompoundJob(): Received an unexpected [" +
-                                     message->getName() +
-                                     "] message!");
-        }
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceTerminateCompoundJobAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "BatchComputeService::terminateCompoundJob(): Received an");
 
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
@@ -1289,7 +1277,7 @@ namespace wrench {
                     this->host_id_to_names[node]);// Use the whole RAM
             this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
             resources.insert(std::make_pair(this->host_id_to_names[node], std::make_tuple(
-                                                                                  cores_per_node_asked_for, ram_capacity)));
+                    cores_per_node_asked_for, ram_capacity)));
         }
 
         startJob(resources, compound_job, batch_job, num_nodes_allocated, time_in_seconds,

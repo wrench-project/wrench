@@ -452,8 +452,8 @@ namespace wrench {
 
     /**
      * @brief Delete a file
-     * @param targetServer
-     * @param file
+     * @param targetServer: the target server
+     * @param file: the file 
      */
     void StorageServiceProxy::deleteFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
         this->deleteFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
@@ -473,7 +473,7 @@ namespace wrench {
     /**
      * @brief Read a file
      * @param location: a location
-     * @param num_bytes: a nuimber of bytes to read
+     * @param num_bytes: a number of bytes to read
      */
     void StorageServiceProxy::readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
         this->readFile(ProxyLocation::LOCATION(remote, this->getSharedPtr<StorageService>(), location->getFile()));
@@ -489,11 +489,11 @@ namespace wrench {
     }
 
     /**
- * @brief Read a file
- * @param targetServer: the target server
- * @param file: the file
- * @param num_bytes: the number of bytes to read
- */
+     * @brief Read a file
+     * @param targetServer: the target server
+     * @param file: the file
+     * @param num_bytes: the number of bytes to read
+     */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, double num_bytes) {
         this->readFile(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), file), num_bytes);
     }

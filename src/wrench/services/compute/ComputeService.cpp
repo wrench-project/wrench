@@ -388,17 +388,13 @@ namespace wrench {
                         ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "BareMetalComputeService::isThereAtLeastOneHostWithIdleResources(): received an");
 
-        if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage *>(message.get())) {
-            return msg->answer;
+        return msg->answer;
 
-        } else {
-            throw std::runtime_error(
-                    "BareMetalComputeService::isThereAtLeastOneHostWithIdleResources(): unexpected [" + message->getName() +
-                    "] message");
-        }
     }
 
     /**
@@ -467,17 +463,11 @@ namespace wrench {
                         ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        if (auto msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage *>(message.get())) {
-            return msg->info;
-
-        } else {
-            throw std::runtime_error(
-                    "BareMetalComputeService::getServiceResourceInformation(): unexpected [" + message->getName() +
-                    "] message");
-        }
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceResourceInformationAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "BareMetalComputeService::getServiceResourceInformation(): received an");
+        return msg->info;
     }
 
     /**
