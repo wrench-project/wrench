@@ -78,16 +78,16 @@ private:
         auto data_movement_manager = this->createDataMovementManager();
 
         if (mode == "reading") {
-            wrench::StorageService::readFile(
+            wrench::StorageService::readFileAtLocation(
 
                     wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_size_0));
-            wrench::StorageService::readFile(
+            wrench::StorageService::readFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_size_100));
 
         } else if (mode == "writing") {
-            wrench::StorageService::writeFile(
+            wrench::StorageService::writeFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_size_0));
-            wrench::StorageService::writeFile(
+            wrench::StorageService::writeFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_size_100));
 
         } else if (mode == "copying") {

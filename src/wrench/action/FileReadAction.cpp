@@ -79,14 +79,14 @@ namespace wrench {
         for (unsigned long i = 0; i < this->file_locations.size(); i++) {
             if (this->file_locations[i]->isScratch()) {
                 auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
-                this->file_locations[i] = FileLocation::LOCATION(cs->getScratch(), cs->getScratch()->getMountPoint() + "/" + this->getJob()->getName(), this->file_locations[i]->getFile());
+                this->file_locations[i] = FileLocation::LOCATION(cs->getScratch(), cs->getScratch()->getBaseRootPath()  + this->getJob()->getName(), this->file_locations[i]->getFile());
             }
         }
         // File read
         for (unsigned long i = 0; i < this->file_locations.size(); i++) {
             try {
                 this->used_location = this->file_locations[i];
-                StorageService::readFile(this->file_locations[i], this->num_bytes_to_read);
+                StorageService::readFileAtLocation(this->file_locations[i], this->num_bytes_to_read);
                 continue;
             } catch (ExecutionException &e) {
                 if (i == this->file_locations.size() - 1) {

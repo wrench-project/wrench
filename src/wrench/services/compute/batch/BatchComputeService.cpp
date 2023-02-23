@@ -439,6 +439,9 @@ namespace wrench {
             startBackgroundWorkloadProcess();
         }
 
+        // Start the Scratch Storage Service
+        this->startScratchStorageService();
+
         /** Main loop **/
         while (processNextMessage()) {
             this->scheduler->processQueuedJobs();

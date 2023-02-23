@@ -152,22 +152,33 @@ namespace wrench {
                                    const std::string &service_name,
                                    const std::string &scratch_space_mount_point) : Service(hostname, service_name) {
         this->state = ComputeService::UP;
+        // Check that mount point makes sense
+        if ((not scratch_space_mount_point.empty()) and (not Simulation::hostHasMountPoint(hostname, scratch_space_mount_point))) {
+            throw std::invalid_argument("ComputeService::ComputeService(): Host " + hostname + " does not have a disk mounted at " + scratch_space_mount_point);
+        }
+        this->scratch_space_mount_point = scratch_space_mount_point;
 
-        if (not scratch_space_mount_point.empty()) {
-            double buffer_size = 10000000;// TODO: Make this configurable?
-            try {
-                this->scratch_space_storage_service =
-                        std::shared_ptr<StorageService>(
-                                SimpleStorageService::createSimpleStorageService(hostname, {scratch_space_mount_point},
-                                                                                 {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {}));
-                this->scratch_space_storage_service->setScratch();
-                this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(
-                        this->scratch_space_storage_service);
-            } catch (std::runtime_error &e) {
-                throw;
-            }
-        } else {
-            this->scratch_space_storage_service = nullptr;
+
+    }
+
+    void ComputeService::startScratchStorageService() {
+        if (this->scratch_space_storage_service) return; // Already started by somebody else
+        if (this->scratch_space_mount_point.empty()) return; // No mount point provided
+
+        double buffer_size = 1000000000;// TODO: Make this configurable?
+        try {
+
+            auto ss = SimpleStorageService::createSimpleStorageService(
+                    hostname,
+                    {scratch_space_mount_point},
+                    {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {});
+
+            ss->setIsScratch(true);
+            this->scratch_space_storage_service =
+                    this->simulation->startNewService(ss);
+
+        } catch (std::runtime_error &e) {
+            throw;
         }
     }
 
@@ -370,11 +381,11 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
-                                                       answer_mailbox,
-                                                       num_cores,
-                                                       ram,
-                                                       this->getMessagePayloadValue(
-                                                               ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
+                answer_mailbox,
+                num_cores,
+                ram,
+                this->getMessagePayloadValue(
+                        ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -450,10 +461,10 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
-                                                       answer_mailbox,
-                                                       key,
-                                                       this->getMessagePayloadValue(
-                                                               ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
+                answer_mailbox,
+                key,
+                this->getMessagePayloadValue(
+                        ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -475,7 +486,7 @@ namespace wrench {
      */
     double ComputeService::getTotalScratchSpaceSize() {
         // A scratch space SS is always created with a single mount point
-        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace().begin()->second : 0.0;
+        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
     }
 
     /**
@@ -483,8 +494,7 @@ namespace wrench {
      * @return a size (in bytes)
      */
     double ComputeService::getFreeScratchSpaceSize() {
-        // A scratch space SS is always created with a single mount point
-        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace().begin()->second : 0.0;
+        return this->scratch_space_storage_service->getTotalFreeSpace();
     }
 
     /**
@@ -495,20 +505,20 @@ namespace wrench {
         return this->scratch_space_storage_service;
     }
 
-    /**
-    * @brief Get a shared pointer to the compute service's scratch storage space
-    * @return a shared pointer to the shared scratch space
-    */
-    std::shared_ptr<StorageService> ComputeService::getScratchSharedPtr() {
-        return this->scratch_space_storage_service_shared_ptr;
-    }
+//    /**
+//    * @brief Get a shared pointer to the compute service's scratch storage space
+//    * @return a shared pointer to the shared scratch space
+//    */
+//    std::shared_ptr<StorageService> ComputeService::getScratchSharedPtr() {
+//        return this->scratch_space_storage_service_shared_ptr;
+//    }
 
     /**
     * @brief Checks if the compute service has a scratch space
     * @return true if the compute service has some scratch storage space, false otherwise
     */
     bool ComputeService::hasScratch() const {
-        return (this->scratch_space_storage_service != nullptr);
+        return (not this->scratch_space_mount_point.empty()) or (this->scratch_space_storage_service != nullptr);
     }
 
     /**
@@ -528,7 +538,7 @@ namespace wrench {
      */
     void ComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
         if (not this->hasScratch()) {
-            throw std::invalid_argument("Compute service does not have scratch space");
+            throw std::invalid_argument("Compute service (" + this->getName() + ") does not have scratch space");
         }
     }
 

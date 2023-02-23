@@ -68,7 +68,6 @@ namespace wrench {
         std::cerr << "---------------\n";
 #endif
 
-
         this->daemon_lock = simgrid::s4u::Mutex::create();
         this->hostname = hostname;
         this->simulation = nullptr;

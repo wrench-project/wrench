@@ -246,7 +246,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new MemoryManagerChainOfTasksTestWMS(this, workflow, hostname)));
     // Create a File Registry Service

@@ -29,28 +29,25 @@ namespace wrench {
         using StorageService::lookupFile;
         using StorageService::readFile;
         using StorageService::writeFile;
+        using StorageService::createFile;
+        using StorageService::hasFile;
 
 
-        std::map<std::string, double> getTotalSpace();
-        std::map<std::string, double> getFreeSpace();
-
-        std::string getMountPoint();              //simple forward
-        std::set<std::string> getMountPoints();   //simple forward
-        bool hasMultipleMountPoints();            //simple forward
-        bool hasMountPoint(const std::string &mp);//simple forward
+        double getTotalSpace() override;
+        double getTotalFreeSpaceAtPath(const std::string &path) override;
 
         /**
 	 * @brief Get the last write date of a file
 	 * @param location: the file location
 	 * @return a (simulated) date in seconds
 	 */
-        double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location);//forward
+        double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override; //forward
 
-        virtual void deleteFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
+        virtual void deleteFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
 
         virtual bool lookupFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
 
-        void readFile(const std::shared_ptr<DataFile> &file);
+        void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) override;
         virtual void readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
         virtual void readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, double num_bytes);
         virtual void readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path);
@@ -59,14 +56,24 @@ namespace wrench {
         virtual void writeFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path);
         virtual void writeFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
 
-        void createFile(const std::shared_ptr<FileLocation> &location);                 //forward
-        void createFile(const std::shared_ptr<DataFile> &file, const std::string &path);//forward
-        void createFile(const std::shared_ptr<DataFile> &file);                         //forward
+        void createFile(const std::shared_ptr<FileLocation> &location) override;
 
-        const std::shared_ptr<StorageService> getCache();
+        std::shared_ptr<StorageService> getCache();
 
 
-        double getLoad();//cache
+        double getLoad() override;//cache
+
+        virtual bool isBufferized() const override; //cache
+
+        virtual double getBufferSize() const override; //cache
+
+        virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
+                throw std::runtime_error("StorageServiceProxy::reserveSpace(): should be be called");
+        };
+
+        virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
+            throw std::runtime_error("StorageServiceProxy::unreserveSpace(): should be be called");
+        };
 
         /**
          * @brief Factory to create a StorageServiceProxy that can a default destination to forward requests too, and will cache requests as they are made
@@ -84,16 +91,17 @@ namespace wrench {
             return std::make_shared<StorageServiceProxy>(hostname, cache, remote, properties, message_payloads);
         }
 
-        bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path);
+        bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        int main();
+        int main() override;
         bool processNextMessage();
         bool rejectDuplicateRead(const std::shared_ptr<DataFile>&  file);
         StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService> &cache = nullptr, const std::shared_ptr<StorageService> &default_remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads = {});
+
 
         /**
          * @brief Factory to create a StorageServiceProxy that does not cache reads, and does not have a default destination to forward too
@@ -141,7 +149,7 @@ namespace wrench {
     private:
         /** @brief Default property values */
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {StorageServiceProperty::BUFFER_SIZE, "10000000"},// 10 MEGA BYTE
+//                {StorageServiceProperty::BUFFER_SIZE, "10000000"},// 10 MEGA BYTE
                 {StorageServiceProperty::CACHING_BEHAVIOR, "NONE"},
                 {StorageServiceProxyProperty::UNCACHED_READ_METHOD, "CopyThenRead"},
                 {StorageServiceProxyProperty::MESSAGE_OVERHEAD, "0"}};
@@ -205,6 +213,7 @@ namespace wrench {
             return std::shared_ptr<ProxyLocation>(new ProxyLocation(target, FileLocation::LOCATION(ss, file)));
         }
 
+#ifdef PAGE_CACHE_SIMULATION
         /**
 	     * @brief Location specifier for a proxy
 	     * @param target: a (remote) storage service to access, which overrides the default remote
@@ -222,13 +231,14 @@ namespace wrench {
                 const std::shared_ptr<DataFile> &file) {
             return std::shared_ptr<ProxyLocation>(new ProxyLocation(target, FileLocation::LOCATION(ss, server_ss, file)));
         }
+#endif
 
         /**
 	     * @brief Location specifier for a proxy
 	     * @param target: a (remote) storage service to access, which overrides the default remote
          *                service (if any) of the proxy
 	     * @param ss: The proxy
-	     * @param absolute_path: The absolute path
+	     * @param path: The path
 	     * @param file: The file
          *
          * @return a proxy location
@@ -236,9 +246,9 @@ namespace wrench {
         static std::shared_ptr<ProxyLocation> LOCATION(
                 const std::shared_ptr<StorageService> &target,
                 const std::shared_ptr<StorageService> &ss,
-                const std::string &absolute_path,
+                const std::string &path,
                 const std::shared_ptr<DataFile> &file) {
-            return std::shared_ptr<ProxyLocation>(new ProxyLocation(target, FileLocation::LOCATION(ss, ss->getMountPoint() + "/" + absolute_path, file)));
+            return std::shared_ptr<ProxyLocation>(new ProxyLocation(target, FileLocation::LOCATION(ss, path, file)));
         }
 
     private:

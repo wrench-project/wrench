@@ -25,38 +25,28 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param storage_service: the storage service at which the mount point was unknown
-     * @param invalid_path: the invalid path
+     * @param location: the location with the invalid path
      */
-    InvalidDirectoryPath::InvalidDirectoryPath(std::shared_ptr<StorageService> storage_service,
-                                               std::string invalid_path) {
-        this->storage_service = std::move(storage_service);
-        this->invalid_path = std::move(invalid_path);
+    InvalidDirectoryPath::InvalidDirectoryPath(const std::shared_ptr<FileLocation> &location) {
+        this->location = location;
     }
 
     /**
-     * @brief Get the storage service at which the path was invalid
+     * @brief Get the location with the invalid path
      * @return a storage service
      */
-    std::shared_ptr<StorageService> InvalidDirectoryPath::getStorageService() {
-        return this->storage_service;
+    std::shared_ptr<FileLocation> InvalidDirectoryPath::getLocation() {
+        return this->location;
     }
 
-    /**
-     * @brief Get the invalid path
-     * @return a path
-     */
-    std::string InvalidDirectoryPath::getInvalidPath() {
-        return this->invalid_path;
-    }
 
     /**
      * @brief Get the human-readable failure message
      * @return the message
      */
     std::string InvalidDirectoryPath::toString() {
-        return "Storage service " + this->storage_service->getName() + " doesn't have a " +
-               this->getInvalidPath() + " path";
+        return "Storage service " + this->location->getStorageService()->getName() + " doesn't have a " +
+               this->getLocation()->getPath() + " path";
     }
 
 }// namespace wrench

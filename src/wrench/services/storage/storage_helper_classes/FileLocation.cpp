@@ -10,6 +10,7 @@
 #include <memory>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
+#include <wrench/services/storage/simple/SimpleStorageService.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
 #include <wrench/services/storage/compound/CompoundStorageService.h>
 #include <boost/algorithm/string/split.hpp>
@@ -29,29 +30,26 @@ namespace wrench {
     std::unordered_map<std::string, std::shared_ptr<FileLocation>> FileLocation::file_location_map;
     size_t FileLocation::file_location_map_previous_size = 0;
 
-    FileLocation::~FileLocation() {
-    }
+    FileLocation::~FileLocation() = default;
 
     /**
      * @brief Factory to create a new file location
      * @param ss: a storage service
-     * @param mp: a mount point
-     * @param apamp: an path at the mount point
      * @param file: a file
+     * @param path: a path
      * @param is_scratch: whether scratch or not
      * @return a shared pointer to a file location
      */
     std::shared_ptr<FileLocation> FileLocation::createFileLocation(const std::shared_ptr<StorageService> &ss,
-                                                                   const std::string &mp,
-                                                                   const std::string &apamp,
                                                                    const std::shared_ptr<DataFile> &file,
+                                                                   const std::string &path,
                                                                    bool is_scratch) {
         // TODO: Find a more efficiency key?
-        std::string key = (ss ? ss->getName() : "") + "|" + mp + "|" + apamp + "|" + file->getID() + "|" + (is_scratch ? "1" : "0");
+        std::string key = (ss ? ss->getName() : "") + "|" + path + "|" + file->getID() + "|" + (is_scratch ? "1" : "0");
         if (FileLocation::file_location_map.find(key) != FileLocation::file_location_map.end()) {
             return FileLocation::file_location_map[key];
         }
-        auto new_location = std::shared_ptr<FileLocation>(new FileLocation(ss, mp, apamp, file, is_scratch));
+        auto new_location = std::shared_ptr<FileLocation>(new FileLocation(ss, file, path, is_scratch));
 
         if (FileLocation::file_location_map.size() - FileLocation::file_location_map_previous_size > RECLAIM_TRIGGER) {
             FileLocation::reclaimFileLocations();
@@ -88,7 +86,7 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::SCRATCH(): Cannot pass nullptr file");
         }
 
-        return FileLocation::createFileLocation(nullptr, "", "", file, true);
+        return FileLocation::createFileLocation(nullptr, file, "", true);
     }
 
     /**
@@ -101,20 +99,13 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss, const std::shared_ptr<DataFile> &file) {
-        if (ss == nullptr) {
-            throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr storage service");
+        if (!ss or !file) {
+            throw std::invalid_argument("FileLocation::LOCATION(): invalid nullptr arguments");
         }
-        if (file == nullptr) {
-            throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr file");
-        }
-
-        if (ss->hasMultipleMountPoints()) {
-            throw std::invalid_argument("FileLocation::LOCATION(): Storage Service has multiple mount points. "
-                                        "Call the version of this method that takes a mount point argument");
-        }
-        return LOCATION(ss, ss->getMountPoint(), file);
+        return LOCATION(ss, "/", file);
     }
 
+#ifdef PAGE_CACHE_SIMULATION
     /**
      * @brief File location specifier for a storage service's (single) mount point root
      * Used in case of NFS with page cache.
@@ -126,33 +117,30 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss,
-                                                         std::shared_ptr<StorageService> server_ss,
+                                                         const std::shared_ptr<StorageService> &server_ss,
                                                          const std::shared_ptr<DataFile> &file) {
         if (ss == nullptr) {
             throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr storage service");
         }
 
-        if (ss->hasMultipleMountPoints()) {
-            throw std::invalid_argument("FileLocation::LOCATION(): Storage Service has multiple mount points. "
-                                        "Call the version of this method that takes a mount point argument");
-        }
-        std::shared_ptr<FileLocation> location = LOCATION(ss, *(ss->getMountPoints().begin()), file);
+        std::shared_ptr<FileLocation> location = LOCATION(ss, file, "/");
         location->server_storage_service = server_ss;
         return location;
     }
+#endif
 
     /**
      * @brief File location specifier given an absolute path at a storage service
      *
      * @param ss: a storage service
-     * @param absolute_path: an absolute path at the storage service to a directory (that may contain files)
      * @param file: a file
+     * @param path: a path
      * @return a file location specification
      *
      * @throw std::invalid_argument
      */
     std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss,
-                                                         std::string absolute_path,
+                                                         const std::string &path,
                                                          const std::shared_ptr<DataFile> &file) {
         if (ss == nullptr) {
             throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr storage service");
@@ -160,32 +148,11 @@ namespace wrench {
         if (file == nullptr) {
             throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr file");
         }
-        if (absolute_path.empty()) {
+        if (path.empty()) {
             throw std::invalid_argument("FileLocation::LOCATION(): must specify a non-empty path");
         }
-        absolute_path = FileLocation::sanitizePath(absolute_path + "/");
 
-        std::string mount_point = "";
-        for (auto const &mp: ss->getMountPoints()) {
-            // This works because we disallowed two mounts from being proper prefixes of each other
-            if ((mp != "/") and (absolute_path.find(mp) == 0)) {
-                mount_point = mp;
-                break;
-            }
-        }
-        if (mount_point.empty()) {
-            if (ss->hasMountPoint("/")) {
-                mount_point = "/";
-            } else {
-                throw std::invalid_argument("FileLocation::LOCATION(): Invalid path '" +
-                                            absolute_path + "' at storage service '" + ss->getName() + "'");
-            }
-        }
-
-        absolute_path.replace(0, mount_point.length(), "/");
-        absolute_path = sanitizePath(absolute_path);
-
-        return FileLocation::createFileLocation(ss, mount_point, absolute_path, file, false);
+        return FileLocation::createFileLocation(ss, file, FileLocation::sanitizePath(path + "/"),  false);
     }
 
     /**
@@ -198,7 +165,7 @@ namespace wrench {
             return "SCRATCH:" + this->file->getID();
         } else {
             return this->storage_service->getName() + ":" +
-                   sanitizePath(this->mount_point + this->absolute_path_at_mount_point) + ":" + this->file->getID();
+                   sanitizePath(this->path) + ":" + this->file->getID();
         }
     }
 
@@ -220,7 +187,7 @@ namespace wrench {
      *
      * @return The updated storage service
      */
-    std::shared_ptr<StorageService> FileLocation::setStorageService(std::shared_ptr<StorageService> storage_service) {
+    std::shared_ptr<StorageService> FileLocation::setStorageService(std::shared_ptr<StorageService> &storage_service) {
         this->storage_service = std::move(storage_service);
         return this->storage_service;
     }
@@ -233,6 +200,7 @@ namespace wrench {
         return this->file;
     }
 
+#ifdef PAGE_CACHE_SIMULATION
     /**
      * @brief Get the location's server storage service
      * @return a storage service
@@ -243,53 +211,17 @@ namespace wrench {
         }
         return this->server_storage_service;
     }
+#endif
 
     /**
-     * @brief Get the location's mount point
-     * @return a mount point
-     */
-    std::string FileLocation::getMountPoint() {
-        if (this->is_scratch) {
-            throw std::invalid_argument("FileLocation::getMountPoint(): No mount point for a SCRATCH location");
-        }
-        return this->mount_point;
-    }
-
-    /**
-     * @brief Sets the location's mountpoint
-     * @param mount_point: the mount point
-     * 
-     * @return the mount point
-     */
-    std::string FileLocation::setMountPoint(std::string mount_point) {
-        if (this->is_scratch) {
-            throw std::invalid_argument("FileLocation::getMountPoint(): No mount point for a SCRATCH location");
-        }
-        this->mount_point = std::move(mount_point);
-        return this->mount_point;
-    }
-
-
-    /**
-     * @brief Get the location's path at mount point
+     * @brief Get the location's path
      * @return a path
      */
-    std::string FileLocation::getAbsolutePathAtMountPoint() {
+    std::string FileLocation::getPath() {
         if (this->is_scratch) {
-            throw std::invalid_argument("FileLocation::getAbsolutePathAtMountPoint(): No path at mount point for a SCRATCH location");
+            throw std::invalid_argument("FileLocation::getPath(): No path for a SCRATCH location");
         }
-        return this->absolute_path_at_mount_point;
-    }
-
-    /**
-     * @brief Get the location's full absolute path
-     * @return a path
-     */
-    std::string FileLocation::getFullAbsolutePath() {
-        if (this->is_scratch) {
-            throw std::invalid_argument("FileLocation::getFullAbsolutePath(): No full absolute path for a SCRATCH location");
-        }
-        return FileLocation::sanitizePath(this->mount_point + "/" + this->absolute_path_at_mount_point);
+        return this->path;
     }
 
     /**
@@ -305,7 +237,7 @@ namespace wrench {
      * @param path: an absolute path
      * @return a sanitized path
      */
-    std::string FileLocation::sanitizePath(std::string path) {
+    std::string FileLocation::sanitizePath(const std::string &path) {
         if (path == "/") return "/";// make the common case fast
 
         if (path.empty()) {
@@ -331,19 +263,20 @@ namespace wrench {
             }
         }
 
+        std::string sanitized = path;
         // Make it /-started and /-terminated
-        if (path.at(path.length() - 1) != '/') {
-            path = "/" + path + "/";
+        if (sanitized.at(sanitized.length() - 1) != '/') {
+            sanitized = "/" + sanitized + "/";
         }
 
         // Deal with "", "." and ".."
         std::vector<std::string> tokens;
-        boost::split(tokens, path, boost::is_any_of("/"));
+        boost::split(tokens, sanitized, boost::is_any_of("/"));
         tokens.erase(tokens.begin());
         tokens.pop_back();
         std::vector<std::string> new_tokens;
 
-        for (auto t: tokens) {
+        for (auto const &t: tokens) {
             if ((t == ".") or t.empty()) {
                 // do nothing
             } else if (t == "..") {
@@ -358,7 +291,7 @@ namespace wrench {
         }
 
         // Reconstruct sanitized path
-        std::string sanitized = "";
+        sanitized = "";
         for (auto const &t: new_tokens) {
             sanitized += "/" + t;
         }
@@ -400,6 +333,17 @@ namespace wrench {
         }
 
         return true;
+    }
+
+    simgrid::s4u::Disk *FileLocation::getDiskOrNull() {
+        if (this->is_scratch) {
+            return nullptr;
+        }
+        auto sss = std::dynamic_pointer_cast<SimpleStorageService>(this->storage_service);
+        if (not sss) {
+            return nullptr;
+        }
+        return sss->getDiskForPathOrNull(this->path);
     }
 
 

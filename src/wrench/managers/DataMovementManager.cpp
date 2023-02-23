@@ -138,9 +138,9 @@ namespace wrench {
 
 
     /**
- * @brief Main method of the daemon that implements the DataMovementManager
- * @return 0 on success
- */
+     * @brief Main method of the data movement manager
+     * @return 0 on successful termination, non-zero otherwise
+     */
     int DataMovementManager::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
@@ -154,11 +154,11 @@ namespace wrench {
     }
 
     /**
- * @brief Process the next message
- * @return true if the daemon should continue, false otherwise
- *
- * @throw std::runtime_error
- */
+     * @brief Process the next message
+     * @return true if the daemon should continue, false otherwise
+     *
+     * @throw std::runtime_error
+     */
     bool DataMovementManager::processNextMessage() {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
@@ -196,12 +196,10 @@ namespace wrench {
                 }
             }
 
-            bool file_registry_service_updated = false;
             if (request.file_registry_service) {
                 WRENCH_INFO("Trying to do a register");
                 try {
                     request.file_registry_service->addEntry(request.dst);
-                    file_registry_service_updated = true;
                 } catch (ExecutionException &e) {
                     WRENCH_INFO("Oops, couldn't do it");
                     // don't throw, just keep file_registry_service_update to false
@@ -212,8 +210,6 @@ namespace wrench {
             S4U_Mailbox::dputMessage(this->creator_mailbox,
                                      new StorageServiceFileCopyAnswerMessage(msg->src,
                                                                              msg->dst,
-                                                                             request.file_registry_service,
-                                                                             file_registry_service_updated,
                                                                              msg->success,
                                                                              std::move(msg->failure_cause),
                                                                              0));

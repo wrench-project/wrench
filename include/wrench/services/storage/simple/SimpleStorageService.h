@@ -74,6 +74,13 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
+        using StorageService::readFile;
+        using StorageService::writeFile;
+        using StorageService::deleteFile;
+        using StorageService::lookupFile;
+        using StorageService::createFile;
+        using StorageService::hasFile;
+
         ~SimpleStorageService() override;
 
         static SimpleStorageService *createSimpleStorageService(const std::string &hostname,
@@ -81,9 +88,60 @@ namespace wrench {
                                                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
+        virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path = "/") override;
+
+        bool hasFile(const std::shared_ptr<FileLocation> &location) override;
+
+        std::string getMountPoint();
+        std::set<std::string> getMountPoints();
+        bool hasMultipleMountPoints();
+        bool hasMountPoint(const std::string &mp);
+
+        double getTotalSpace() override;
+
+        virtual std::string getBaseRootPath() override;
+
+
+        virtual void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
+
+        virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
+
+        virtual bool isBufferized() const override {
+                return this->is_bufferized;
+        }
+
+        virtual double getBufferSize() const override {
+            return this->buffer_size;
+
+        }
+
+        virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
+            std::string mount_point;
+            std::string path_at_mount_point;
+            this->splitPath(location->getPath(), mount_point, path_at_mount_point);
+            return this->file_systems[mount_point]->reserveSpace(location->getFile(), path_at_mount_point);
+        }
+
+        virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
+            std::string mount_point;
+            std::string path_at_mount_point;
+            this->splitPath(location->getPath(), mount_point, path_at_mount_point);
+            this->file_systems[mount_point]->unreserveSpace(location->getFile(), path_at_mount_point);
+        }
+
+
+        std::string getPathMountPoint(const std::string &path) {
+            std::string mount_point, path_at_mount_point;
+            this->splitPath(path, mount_point, path_at_mount_point);
+            return mount_point;
+        }
+
+        void createFile(const std::shared_ptr<FileLocation> &location) override;
+
         double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
-        using StorageService::hasFile;
-        bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) override;
+
+        simgrid::s4u::Disk *getDiskForPathOrNull(const std::string &path);
+
 
         /***********************/
         /** \endcond          **/
@@ -91,7 +149,7 @@ namespace wrench {
 
     protected:
         SimpleStorageService(const std::string &hostname,
-                             std::set<std::string> mount_points,
+                             const std::set<std::string>& mount_points,
                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                              const std::string &suffix);
@@ -107,11 +165,25 @@ namespace wrench {
                                       simgrid::s4u::Mailbox *answer_mailbox);
         bool processFileLookupRequest(const std::shared_ptr<FileLocation> &location,
                                       simgrid::s4u::Mailbox *answer_mailbox);
-        bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox);
+        bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox,
+                                     const std::string &path);
 
+    protected:
+        /** @brief The service's buffer size */
+        double buffer_size = 10000000;
+
+        /** @brief Whether the service is bufferized */
+        bool is_bufferized;
+
+        /** @brief File systems */
+        std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
+
+        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
 
     private:
         friend class Simulation;
+
+
 
         void validateProperties();
 

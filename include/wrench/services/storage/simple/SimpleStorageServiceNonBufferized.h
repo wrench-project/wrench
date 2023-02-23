@@ -118,23 +118,28 @@ namespace wrench {
 
         bool processNextMessage(SimulationMessage *message);
 
-        bool processFileWriteRequest(const std::shared_ptr<FileLocation> &location,
-                                     simgrid::s4u::Mailbox *answer_mailbox, simgrid::s4u::Host *requesting_host,
-                                     double buffer_size);
+        bool processFileWriteRequest(std::shared_ptr<FileLocation> &location,
+                                     simgrid::s4u::Mailbox *answer_mailbox, simgrid::s4u::Host *requesting_host);
 
         bool
         processFileReadRequest(const std::shared_ptr<FileLocation> &location,
                                double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox,
                                simgrid::s4u::Host *requesting_host);
 
+
+        bool processFileCopyRequest(
+                std::shared_ptr<FileLocation> &src,
+                std::shared_ptr<FileLocation> &dst,
+                simgrid::s4u::Mailbox *answer_mailbox);
+
         bool processFileCopyRequestIAmTheSource(
-                const std::shared_ptr<FileLocation> &src,
-                const std::shared_ptr<FileLocation> &dst,
+                std::shared_ptr<FileLocation> &src,
+                std::shared_ptr<FileLocation> &dst,
                 simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processFileCopyRequestIAmNotTheSource(
-                const std::shared_ptr<FileLocation> &src,
-                const std::shared_ptr<FileLocation> &dst,
+                std::shared_ptr<FileLocation> &src,
+                std::shared_ptr<FileLocation> &dst,
                 simgrid::s4u::Mailbox *answer_mailbox);
 
 

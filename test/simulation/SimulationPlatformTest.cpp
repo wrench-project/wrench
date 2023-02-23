@@ -215,11 +215,11 @@ private:
         // Create a file on it
         auto too_big = wrench::Simulation::addFile("too_big", 200.0);
         try {
-            wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, too_big));
+            wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, too_big));
             throw std::runtime_error("Should not be able to create a file that big on the newly created storage service");
-        } catch (std::invalid_argument &ignore) {}
+        } catch (wrench::ExecutionException &ignore) {}
         auto not_too_big = wrench::Simulation::addFile("not_too_big", 20.0);
-        wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, not_too_big));
+        wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
 
         return 0;
     }

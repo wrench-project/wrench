@@ -345,7 +345,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new HTCondorStandardJobTestWMS(this, hostname)));
 
@@ -481,7 +481,7 @@ void HTCondorServiceTest::do_StandardJobTaskFailureTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new HTCondorStandardJobFailureTestWMS(this, hostname)));
 
@@ -607,7 +607,7 @@ void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new HTCondorStandardJobAddComputeServiceTestWMS(this, hostname)));
 
@@ -750,7 +750,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new HTCondorPilotJobTestWMS(this, hostname)));
 
@@ -992,7 +992,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new HTCondorGridUniverseTestWMS(this, hostname)));
 
@@ -1114,7 +1114,7 @@ void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new HTCondorNoGridUniverseJobTestWMS(this, hostname)));
 
@@ -1363,7 +1363,7 @@ void HTCondorServiceTest::do_NoGridJobSupportTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new HTCondorNoGridJobTestWMS(this, hostname)));
 
@@ -1526,7 +1526,7 @@ void HTCondorServiceTest::do_NotEnoughResourcesTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new HTCondorNotEnoughResourcesTestWMS(this, hostname)));
 
@@ -1626,7 +1626,7 @@ void HTCondorServiceTest::do_ScratchTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
