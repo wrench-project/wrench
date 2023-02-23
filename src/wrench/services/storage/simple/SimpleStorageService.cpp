@@ -351,8 +351,7 @@ namespace wrench {
     /**
      * @brief Determines whether the storage service has the file. This doesn't simulate anything and is merely a zero-simulated-time data structure lookup.
      * If you want to simulate the overhead of querying the StorageService, instead use lookupFile().
-     * @param file a file
-     * @param path the path
+     * @param location: a location
      * @return true if the file is present, false otherwise
      */
     bool SimpleStorageService::hasFile(const std::shared_ptr<FileLocation> &location) {
@@ -366,6 +365,13 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Helper method to split a path into mountpoint:path_at_mount_point
+     * @param path: a path string
+     * @param mount_point: the mountpoint
+     * @param path_at_mount_point: the path at the mount point
+     * @return true on success, false on failure (i.e., mount point not found)
+     */
     bool SimpleStorageService::splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point) {
         auto sanitized_path = FileLocation::sanitizePath(path);
         for (auto const &fs : this->file_systems) {
@@ -377,10 +383,12 @@ namespace wrench {
             }
         }
         return false;
-
-
     }
 
+    /**
+     * @brief Decrement the number of operations for a location
+     * @param location: a location
+     */
     void SimpleStorageService::decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
         std::string mount_point;
         std::string path_at_mount_point;
@@ -389,6 +397,10 @@ namespace wrench {
         this->file_systems[mount_point]->decrementNumRunningTransactionsForFileInDirectory(location->getFile(), path_at_mount_point);
     }
 
+    /**
+     * @brief increment the number of operations for a location
+     * @param location: a location
+     */
     void SimpleStorageService::incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
         std::string mount_point;
         std::string path_at_mount_point;

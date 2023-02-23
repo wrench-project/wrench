@@ -64,19 +64,14 @@ namespace wrench {
         }
 
         // Wait for the ack
-        std::unique_ptr<SimulationMessage> message = nullptr;
-
         try {
-            message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
-        } catch (ExecutionException &e) {
+            S4U_Mailbox::getMessage<ServiceDaemonStoppedMessage>(
+                    ack_mailbox,
+                    this->network_timeout,
+                    "ComputeService::stop(): Received an");
+        } catch (...) {
             this->shutting_down = false;
             throw;
-        }
-
-        if (dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
-            this->state = Service::DOWN;
-        } else {
-            throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
         }
 
         // Set the service state to down
