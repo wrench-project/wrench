@@ -34,7 +34,6 @@ namespace wrench {
      *
      * @param file: the file to store
      * @param absolute_path: the directory's absolute path (at the mount point)
-     * @param must_be_initialized: whether the file system is initialized
      *
      * @throw std::invalid_argument
      */

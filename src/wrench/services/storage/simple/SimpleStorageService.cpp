@@ -409,6 +409,10 @@ namespace wrench {
         this->file_systems[mount_point]->incrementNumRunningTransactionsForFileInDirectory(location->getFile(), path_at_mount_point);
     }
 
+    /**
+     * @brief Create a file at the storage service (in zero simulated time)
+     * @param location: a location
+     */
     void SimpleStorageService::createFile(const std::shared_ptr<FileLocation> &location)  {
         // If the file's already there, nothing to do
         if (StorageService::hasFileAtLocation(location)) return;
@@ -425,6 +429,11 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Get a file's last write date at a the storage service (in zero simulated time)
+     * @param location:  a location
+     * @return a date in seconds, or -1 if the file is not found
+     */
     double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
         if (location == nullptr) {
             throw std::invalid_argument("SimpleStorageService::getFileLastWriteDate(): Invalid nullptr argument");
@@ -436,6 +445,11 @@ namespace wrench {
         return this->file_systems[mount_point]->getFileLastWriteDate(location->getFile(), path_at_mount_point);
     }
 
+    /**
+     * @brief Gets the disk that stores a path
+     * @param path: a path
+     * @return a disk, or nullptr if path is invalid
+     */
     simgrid::s4u::Disk *SimpleStorageService::getDiskForPathOrNull(const string &path) {
         std::string mount_point, path_at_mount_point;
         bool success = this->splitPath(path, mount_point, path_at_mount_point);
