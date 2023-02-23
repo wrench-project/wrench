@@ -262,9 +262,9 @@ void LogicalFileSystemTest::do_LRUTests() {
     ASSERT_DOUBLE_EQ(fs1->getFreeSpace(), 40);
 
 
-    fs1->removeFileFromDirectory(file_10, "/foo");   // coverage
-    fs1->storeFileInDirectory(file_10, "/foo");// coverage
-    fs1->removeAllFilesInDirectory("/foo");          // coverage
+    fs1->removeFileFromDirectory(file_10, "/foo");// coverage
+    fs1->storeFileInDirectory(file_10, "/foo");   // coverage
+    fs1->removeAllFilesInDirectory("/foo");       // coverage
 
     fs1->storeFileInDirectory(file_10, "/faa");// coverage
 

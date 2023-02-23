@@ -97,7 +97,6 @@ namespace wrench {
 #ifdef PAGE_CACHE_SIMULATION
                     }
 #endif
-
                 }
 
 

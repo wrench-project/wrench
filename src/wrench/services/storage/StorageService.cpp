@@ -51,33 +51,33 @@ namespace wrench {
     }
 
 
-//    /**
-//     * @brief Store a file at a particular location BEFORE the simulation is launched
-//     *
-//     * @param location: a file location
-//     *
-//     */
-//    void StorageService::stageFile(const std::shared_ptr<FileLocation> &location) {
-//        location->getStorageService()->stageFile(location->getFile(), location->getMountPoint(),
-//                                                 location->getAbsolutePathAtMountPoint());
-//    }
-//
-//    /**
-//     * @brief Store a file at a particular mount point and directory BEFORE the simulation is launched
-//     *
-//     * @param file: a file
-//     * @param mountpoint: a mount point
-//     * @param path: a path at the mount point
-//     */
-//    void StorageService::stageFile(const std::shared_ptr<DataFile> &file, const std::string &mountpoint, std::string path) {
-//        auto fs = this->file_systems[mountpoint].get();
-//
-//        try {
-//            fs->stageFile(file, std::move(path));
-//        } catch (std::exception &e) {
-//            throw;
-//        }
-//    }
+    //    /**
+    //     * @brief Store a file at a particular location BEFORE the simulation is launched
+    //     *
+    //     * @param location: a file location
+    //     *
+    //     */
+    //    void StorageService::stageFile(const std::shared_ptr<FileLocation> &location) {
+    //        location->getStorageService()->stageFile(location->getFile(), location->getMountPoint(),
+    //                                                 location->getAbsolutePathAtMountPoint());
+    //    }
+    //
+    //    /**
+    //     * @brief Store a file at a particular mount point and directory BEFORE the simulation is launched
+    //     *
+    //     * @param file: a file
+    //     * @param mountpoint: a mount point
+    //     * @param path: a path at the mount point
+    //     */
+    //    void StorageService::stageFile(const std::shared_ptr<DataFile> &file, const std::string &mountpoint, std::string path) {
+    //        auto fs = this->file_systems[mountpoint].get();
+    //
+    //        try {
+    //            fs->stageFile(file, std::move(path));
+    //        } catch (std::exception &e) {
+    //            throw;
+    //        }
+    //    }
 
     /**
      * @brief Stop the service
@@ -124,7 +124,7 @@ namespace wrench {
         // Wait for a reply
 
         {
-            auto msg = S4U_Mailbox::getMessage<StorageServiceFileWriteAnswerMessage>(answer_mailbox, this->network_timeout,"StorageService::writeFile(): Received a totally");
+            auto msg = S4U_Mailbox::getMessage<StorageServiceFileWriteAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::writeFile(): Received a totally");
 
             if (not msg->success) {
                 throw ExecutionException(msg->failure_cause);
@@ -135,12 +135,12 @@ namespace wrench {
 
             if (buffer_size < 1) {
                 // just wait for the final ack (no timeout!)
-                S4U_Mailbox::getMessage<StorageServiceAckMessage>(answer_mailbox,"StorageService::writeFile(): Received an");
+                S4U_Mailbox::getMessage<StorageServiceAckMessage>(answer_mailbox, "StorageService::writeFile(): Received an");
 
 
             } else {
                 auto file = location->getFile();
-                for (auto const &dwmb : msg->data_write_mailboxes_and_bytes) {
+                for (auto const &dwmb: msg->data_write_mailboxes_and_bytes) {
                     // Bufferized
                     double remaining = dwmb.second;
                     while (remaining - buffer_size > DBL_EPSILON) {
@@ -150,14 +150,12 @@ namespace wrench {
                         remaining -= buffer_size;
                     }
                     S4U_Mailbox::putMessage(dwmb.first, new StorageServiceFileContentChunkMessage(
-                            file, remaining, true));
+                                                                file, remaining, true));
 
                     //Waiting for the final ack
-                    S4U_Mailbox::getMessage<StorageServiceAckMessage>(answer_mailbox,"StorageService::writeFile(): Received an");
-
+                    S4U_Mailbox::getMessage<StorageServiceAckMessage>(answer_mailbox, "StorageService::writeFile(): Received an");
                 }
             }
-
         }
     }
 
@@ -194,16 +192,15 @@ namespace wrench {
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         S4U_Mailbox::putMessage(this->mailbox, new StorageServiceFreeSpaceRequestMessage(
-                answer_mailbox,
-                path,
-                this->getMessagePayloadValue(
-                        StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+                                                       answer_mailbox,
+                                                       path,
+                                                       this->getMessagePayloadValue(
+                                                               StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
-        auto msg = S4U_Mailbox::getMessage<StorageServiceFreeSpaceAnswerMessage>(answer_mailbox, this->network_timeout,"StorageService::getTotalFreeSpaceAtPath() Received an");
+        auto msg = S4U_Mailbox::getMessage<StorageServiceFreeSpaceAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::getTotalFreeSpaceAtPath() Received an");
 
         return msg->free_space;
-
     }
 
     /**
@@ -232,10 +229,9 @@ namespace wrench {
                                 StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
-        auto msg = S4U_Mailbox::getMessage<StorageServiceFileLookupAnswerMessage>(answer_mailbox, this->network_timeout,"StorageService::lookupFile():");
+        auto msg = S4U_Mailbox::getMessage<StorageServiceFileLookupAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::lookupFile():");
 
         return msg->file_is_available;
-
     }
 
 
@@ -270,7 +266,7 @@ namespace wrench {
 
         if (wait_for_answer) {
             // Wait for a reply
-            auto msg = S4U_Mailbox::getMessage<StorageServiceFileReadAnswerMessage>(answer_mailbox ,this->network_timeout,"StorageService::readFile(): Received an");
+            auto msg = S4U_Mailbox::getMessage<StorageServiceFileReadAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::readFile(): Received an");
 
             // If it's not a success, throw an exception
             if (not msg->success) {
@@ -291,7 +287,7 @@ namespace wrench {
                 while (true) {
                     std::shared_ptr<StorageServiceFileContentChunkMessage> file_content_chunk_msg = nullptr;
                     try {
-                        file_content_chunk_msg = S4U_Mailbox::getMessage<StorageServiceFileContentChunkMessage>(msg->mailbox_to_receive_the_file_content,"StorageService::readFile(): Received an");
+                        file_content_chunk_msg = S4U_Mailbox::getMessage<StorageServiceFileContentChunkMessage>(msg->mailbox_to_receive_the_file_content, "StorageService::readFile(): Received an");
                     } catch (...) {
                         S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
                         throw;
@@ -312,7 +308,6 @@ namespace wrench {
                 }
 
                 S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
-
             }
         }
     }
@@ -420,13 +415,12 @@ namespace wrench {
             // Wait for a reply
             std::unique_ptr<SimulationMessage> message = nullptr;
 
-            auto msg = S4U_Mailbox::getMessage<StorageServiceFileDeleteAnswerMessage>(answer_mailbox, this->network_timeout,"StorageService::deleteFile():");
+            auto msg = S4U_Mailbox::getMessage<StorageServiceFileDeleteAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::deleteFile():");
             // On failure, throw an exception
             if (!msg->success) {
                 throw ExecutionException(std::move(msg->failure_cause));
             }
             WRENCH_INFO("Deleted file at %s", location->toString().c_str());
-
         }
     }
 
@@ -495,7 +489,6 @@ namespace wrench {
         if (msg->failure_cause) {
             throw ExecutionException(std::move(msg->failure_cause));
         }
-
     }
 
     /**
@@ -557,66 +550,65 @@ namespace wrench {
     }
 
 
+    //    /**
+    //     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+    //     * at that location.
+    //     *
+    //     * @param location: a file location, must be the same object as the function is invoked on
+    //     *
+    //     * @throw std::invalid_argument
+    //     */
+    //    void StorageService::createFile(const std::shared_ptr<FileLocation> &location) {
+    //        if (location->getStorageService() != this->getSharedPtr<StorageService>()) {
+    //            throw std::invalid_argument("StorageService::createFile(file,location) must be called on the same StorageService that the location uses");
+    //        }
+    //        stageFile(location->getFile(), location->getPath());
+    //    }
 
-//    /**
-//     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-//     * at that location.
-//     *
-//     * @param location: a file location, must be the same object as the function is invoked on
-//     *
-//     * @throw std::invalid_argument
-//     */
-//    void StorageService::createFile(const std::shared_ptr<FileLocation> &location) {
-//        if (location->getStorageService() != this->getSharedPtr<StorageService>()) {
-//            throw std::invalid_argument("StorageService::createFile(file,location) must be called on the same StorageService that the location uses");
-//        }
-//        stageFile(location->getFile(), location->getPath());
-//    }
+    //    /**
+    // * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+    // * at that location.
+    //
+    //*
+    //* @param file: a file
+    //* @param path: path to file
+    //*
+    //*/
+    //    void StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+    //
+    //        createFile(FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
+    //    }
 
-//    /**
-// * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-// * at that location.
-//
-//*
-//* @param file: a file
-//* @param path: path to file
-//*
-//*/
-//    void StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-//
-//        createFile(FileLocation::LOCATION(this->getSharedPtr<StorageService>(), path, file));
-//    }
+    //    /**
+    // * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+    // * at that location.
+    // * @param file: a file
+    // *
+    // */
+    //    void StorageService::createFile(const std::shared_ptr<DataFile> &file) {
+    //
+    //        createFile(FileLocation::LOCATION(this->getSharedPtr<StorageService>(), getMountPoint(), file));
+    //    }
 
-//    /**
-// * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-// * at that location.
-// * @param file: a file
-// *
-// */
-//    void StorageService::createFile(const std::shared_ptr<DataFile> &file) {
-//
-//        createFile(FileLocation::LOCATION(this->getSharedPtr<StorageService>(), getMountPoint(), file));
-//    }
+    //    /**
+    //     * @brief Determines whether the storage service is bufferized
+    //     * @return true if bufferized, false otherwise
+    //     */
+    //    bool StorageService::isBufferized() const {
+    //        return this->buffer_size > 1;
+    //    }
 
-//    /**
-//     * @brief Determines whether the storage service is bufferized
-//     * @return true if bufferized, false otherwise
-//     */
-//    bool StorageService::isBufferized() const {
-//        return this->buffer_size > 1;
-//    }
-
-//    /**
-//     * @brief Determines whether the storage service has the file. This doesn't simulate anything and is merely a zero-simulated-time data structure lookup.
-//     * If you want to simulate the overhead of querying the StorageService, instead use lookupFile().
-//     *
-//     * @param file a file
-//     *
-//     * @return true if the file is present, false otherwise
-//     */
-//    bool StorageService::hasFile(const shared_ptr<DataFile> &file) {
-//        return this->hasFile(file, this->getMountPoint());
-//    }
+    //    /**
+    //     * @brief Determines whether the storage service has the file. This doesn't simulate anything and is merely a zero-simulated-time data structure lookup.
+    //     * If you want to simulate the overhead of querying the StorageService, instead use lookupFile().
+    //     *
+    //     * @param file a file
+    //     *
+    //     * @return true if the file is present, false otherwise
+    //     */
+    //    bool StorageService::hasFile(const shared_ptr<DataFile> &file) {
+    //        return this->hasFile(file, this->getMountPoint());
+    //    }
 
 
 }// namespace wrench

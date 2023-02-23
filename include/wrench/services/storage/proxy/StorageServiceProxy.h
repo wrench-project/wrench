@@ -25,12 +25,12 @@ namespace wrench {
     class StorageServiceProxy : public StorageService {
 
     public:
+        using StorageService::createFile;
         using StorageService::deleteFile;
+        using StorageService::hasFile;
         using StorageService::lookupFile;
         using StorageService::readFile;
         using StorageService::writeFile;
-        using StorageService::createFile;
-        using StorageService::hasFile;
 
 
         double getTotalSpace() override;
@@ -41,7 +41,7 @@ namespace wrench {
 	 * @param location: the file location
 	 * @return a (simulated) date in seconds
 	 */
-        double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override; //forward
+        double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;//forward
 
         virtual void deleteFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
 
@@ -62,9 +62,9 @@ namespace wrench {
 
         double getLoad() override;//cache
 
-        bool isBufferized() const override; //cache
+        bool isBufferized() const override;//cache
 
-        double getBufferSize() const override; //cache
+        double getBufferSize() const override;//cache
 
         bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
@@ -91,7 +91,7 @@ namespace wrench {
 
         int main() override;
         bool processNextMessage();
-        bool rejectDuplicateRead(const std::shared_ptr<DataFile>&  file);
+        bool rejectDuplicateRead(const std::shared_ptr<DataFile> &file);
 
         explicit StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService> &cache = nullptr, const std::shared_ptr<StorageService> &default_remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads = {});
 
@@ -101,7 +101,7 @@ namespace wrench {
          * @return true if success, false otherwise
          */
         bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
-                throw std::runtime_error("StorageServiceProxy::reserveSpace(): should not be called");
+            throw std::runtime_error("StorageServiceProxy::reserveSpace(): should not be called");
         };
 
 
@@ -160,7 +160,7 @@ namespace wrench {
     private:
         /** @brief Default property values */
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-//                {StorageServiceProperty::BUFFER_SIZE, "10000000"},// 10 MEGA BYTE
+                //                {StorageServiceProperty::BUFFER_SIZE, "10000000"},// 10 MEGA BYTE
                 {StorageServiceProperty::CACHING_BEHAVIOR, "NONE"},
                 {StorageServiceProxyProperty::UNCACHED_READ_METHOD, "CopyThenRead"},
                 {StorageServiceProxyProperty::MESSAGE_OVERHEAD, "0"}};

@@ -270,7 +270,7 @@ private:
         }
 
 
-//
+        //
         if (!double_copy_failed) {
             throw std::runtime_error("Synchronous file copy should have failed.");
         }
@@ -306,7 +306,7 @@ private:
             throw std::runtime_error("Asynchronous file copy should have completed");
         }
 
-//
+        //
 
         if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src2_file_2))) {
@@ -331,7 +331,7 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

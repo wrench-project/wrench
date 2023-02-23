@@ -77,7 +77,6 @@ namespace wrench {
 
         // Create the S4U simulation wrapper
         this->s4u_simulation = std::make_unique<S4U_Simulation>();
-
     }
 
     /**
@@ -578,14 +577,14 @@ namespace wrench {
                 storage_service->start(storage_service, true, true);// Daemonized, AUTO-RESTART
             }
 
-//            // Start the scratch services
-//            for (const auto &compute_service: this->compute_services) {
-//                if (compute_service->hasScratch()) {
-//                    compute_service->getScratch()->simulation = this;
-//                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
-//                                                         false);// Daemonized, no auto-restart
-//                }
-//            }
+            //            // Start the scratch services
+            //            for (const auto &compute_service: this->compute_services) {
+            //                if (compute_service->hasScratch()) {
+            //                    compute_service->getScratch()->simulation = this;
+            //                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
+            //                                                         false);// Daemonized, no auto-restart
+            //                }
+            //            }
 
             // Start the network proximity services
             for (const auto &network_proximity_service: this->network_proximity_services) {
@@ -957,7 +956,7 @@ namespace wrench {
         // Write to disk
         auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
         if (!ss) {
-            throw ...
+            throw...
         }
         this->writeToDisk(n_bytes, hostname, location->getMountPoint());
 
@@ -1296,10 +1295,10 @@ namespace wrench {
         std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
         this->compute_services.insert(shared_ptr);
         shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
-//        if (service->hasScratch()) {
-//            service->getScratch()->simulation = this;
-//            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
-//        }
+                                                   //        if (service->hasScratch()) {
+                                                   //            service->getScratch()->simulation = this;
+                                                   //            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
+                                                   //        }
 
         return shared_ptr;
     }

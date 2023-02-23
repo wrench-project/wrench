@@ -381,7 +381,7 @@ namespace wrench {
         return true;
     }
 
-/**
+    /**
  * @brief Handle a file read request
  * @param location: the file's location
  * @param num_bytes_to_read: the number of bytes to read
@@ -464,7 +464,7 @@ namespace wrench {
         return true;
     }
 
-/**
+    /**
  * @brief Handle a file copy request
  * @param src_location: the source location
  * @param dst_location: the destination location
@@ -556,7 +556,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
  * @brief Handle a file copy request
  * @param src_location: the source location
  * @param dst_location: the destination location
@@ -635,8 +635,8 @@ namespace wrench {
         // At this point, I have the file
 
         // Can file fit at the destination?
-//        auto dst_file_system = dst_location->getStorageService()->file_systems[dst_location->getMountPoint()].get();
-//        bool file_already_at_destination = dst_file_system->isFileInDirectory(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint());
+        //        auto dst_file_system = dst_location->getStorageService()->file_systems[dst_location->getMountPoint()].get();
+        //        bool file_already_at_destination = dst_file_system->isFileInDirectory(dst_location->getFile(), dst_location->getAbsolutePathAtMountPoint());
         bool file_already_at_destination = StorageService::hasFileAtLocation(dst_location);
 
         // If not already at destination make space for it, and if not possible, then return an error
@@ -685,7 +685,7 @@ namespace wrench {
         return true;
     }
 
-/**
+    /**
 * @brief Start pending file transfer threads if any and if possible
 */
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
@@ -701,7 +701,7 @@ namespace wrench {
                                                                transaction->src_disk,
                                                                transaction->dst_host,
                                                                transaction->dst_disk)
-                    ->set_size((uint64_t) (transaction->transfer_size));
+                                       ->set_size((uint64_t) (transaction->transfer_size));
 
             transaction->stream = sg_iostream;
 
@@ -711,7 +711,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
 * @brief Get the load (number of concurrent reads) on the storage service
 * @return the load on the service
 */

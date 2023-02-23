@@ -75,7 +75,7 @@ namespace wrench {
 
         bool reserveSpace(const std::shared_ptr<DataFile> &file,
                           const std::string &absolute_path);
-        void unreserveSpace(const std::shared_ptr<DataFile> &file, const std::string& absolute_path);
+        void unreserveSpace(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
 
         void createDirectory(const std::string &absolute_path);
         bool doesDirectoryExist(const std::string &absolute_path);

@@ -70,13 +70,12 @@ namespace wrench {
 
 
     public:
-
+        using StorageService::createFile;
+        using StorageService::deleteFile;
+        using StorageService::hasFile;
+        using StorageService::lookupFile;
         using StorageService::readFile;
         using StorageService::writeFile;
-        using StorageService::deleteFile;
-        using StorageService::lookupFile;
-        using StorageService::createFile;
-        using StorageService::hasFile;
 
         ~SimpleStorageService() override;
 
@@ -103,7 +102,7 @@ namespace wrench {
         virtual std::string getBaseRootPath() override;
 
 
-	/**
+        /**
          * @brief Reserve space at the storage service
          * @param location: a location
          * @return true if success, false otherwise
@@ -115,7 +114,7 @@ namespace wrench {
             return this->file_systems[mount_point]->reserveSpace(location->getFile(), path_at_mount_point);
         }
 
-	/**
+        /**
          * @brief Unreserve space at the storage service
          * @param location: a location
          */
@@ -127,7 +126,7 @@ namespace wrench {
         }
 
 
-	/**
+        /**
 	 * @brief Get the mount point that stores a path
 	 * @param path: path
 	 *
@@ -153,21 +152,20 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
-	/**
+        /**
          * @brief Determine whether the storage service is bufferized
          * @return true if bufferized, false otherwise
          */
         virtual bool isBufferized() const override {
-                return this->is_bufferized;
+            return this->is_bufferized;
         }
 
-	/**
+        /**
          * @brief Determine the storage service's buffer size
          * @return a size in bytes
          */
         virtual double getBufferSize() const override {
             return this->buffer_size;
-
         }
 
 
@@ -179,13 +177,12 @@ namespace wrench {
         /***********************/
 
 
-
     protected:
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
         SimpleStorageService(const std::string &hostname,
-                             const std::set<std::string>& mount_points,
+                             const std::set<std::string> &mount_points,
                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                              const std::string &suffix);

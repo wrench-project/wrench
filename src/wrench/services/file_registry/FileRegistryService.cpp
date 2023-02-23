@@ -57,7 +57,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    std::set<std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(const std::shared_ptr<DataFile>& file) {
+    std::set<std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(const std::shared_ptr<DataFile> &file) {
         if (file == nullptr) {
             throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
         }
@@ -67,9 +67,9 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new FileRegistryFileLookupRequestMessage(
-                answer_mailbox, file,
-                this->getMessagePayloadValue(
-                        FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+                                                       answer_mailbox, file,
+                                                       this->getMessagePayloadValue(
+                                                               FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         auto msg = S4U_Mailbox::getMessage<FileRegistryFileLookupAnswerMessage>(
                 answer_mailbox,
@@ -88,9 +88,9 @@ namespace wrench {
      * @return a map of <distance , file location> pairs
      */
     std::map<double, std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(
-            const std::shared_ptr<DataFile>& file,
-            const std::string& reference_host,
-            const std::shared_ptr<NetworkProximityService>& network_proximity_service) {
+            const std::shared_ptr<DataFile> &file,
+            const std::string &reference_host,
+            const std::shared_ptr<NetworkProximityService> &network_proximity_service) {
         if (file == nullptr) {
             throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, no file");
         }
@@ -132,7 +132,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::addEntry(const std::shared_ptr<FileLocation>& location) {
+    void FileRegistryService::addEntry(const std::shared_ptr<FileLocation> &location) {
         if (location == nullptr) {
             throw std::invalid_argument("FileRegistryService::addEntry(): Invalid nullptr argument");
         }
@@ -152,7 +152,6 @@ namespace wrench {
                 answer_mailbox,
                 this->network_timeout,
                 "FileRegistryService::addEntry(): Received an");
-
     }
 
     /**

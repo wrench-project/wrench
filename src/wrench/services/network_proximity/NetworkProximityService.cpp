@@ -80,8 +80,8 @@ namespace wrench {
         assertServiceIsUp();
 
         if (boost::iequals(
-                this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                "alltoall")) {
+                    this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                    "alltoall")) {
             throw std::runtime_error(
                     "NetworkProximityService::getCoordinate() cannot be called with NETWORK_PROXIMITY_SERVICE_TYPE of ALLTOALL");
         }
@@ -193,8 +193,8 @@ namespace wrench {
 
             // if this network service type is 'vivaldi', set up the coordinate lookup table
             if (boost::iequals(
-                    this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                    "vivaldi")) {
+                        this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                        "vivaldi")) {
                 this->coordinate_lookup_table.insert(
                         std::make_pair(h, std::make_pair((0.0), Simulation::getCurrentSimulatedDate())));
             }
@@ -300,8 +300,8 @@ namespace wrench {
             this->addEntryToDatabase(msg->hosts, msg->proximity_value);
 
             if (boost::iequals(
-                    this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                    "vivaldi")) {
+                        this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                        "vivaldi")) {
                 vivaldiUpdate(msg->proximity_value, msg->hosts.first, msg->hosts.second);
             }
             return true;
@@ -522,7 +522,7 @@ namespace wrench {
         }
 
         if (this->getPropertyValueAsDouble(
-                NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE) < 0) {
+                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE) < 0) {
             throw std::invalid_argument(error_prefix + "Invalid NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE value " +
                                         this->getPropertyValueAsString(
                                                 NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE));

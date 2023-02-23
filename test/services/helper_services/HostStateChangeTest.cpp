@@ -87,7 +87,7 @@ private:
         simgrid::s4u::Host::by_name("Host2")->turn_on();
 
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox, (double)10);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox, (double) 10);
         } catch (wrench::ExecutionException &) {
             throw std::runtime_error("Did not get a message before the timeout");
         }
@@ -102,7 +102,7 @@ private:
         if (this->notify_when_speed_change) {
 
             try {
-                message = wrench::S4U_Mailbox::getMessage(this->mailbox, (double)10);
+                message = wrench::S4U_Mailbox::getMessage(this->mailbox, (double) 10);
             } catch (wrench::ExecutionException &) {
                 throw std::runtime_error("Did not get a message before the timeout");
             }
