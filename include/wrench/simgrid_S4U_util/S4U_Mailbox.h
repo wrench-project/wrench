@@ -45,21 +45,26 @@ namespace wrench {
      */
         template<class TMessageType>
         static std::unique_ptr<TMessageType> getMessage(simgrid::s4u::Mailbox *mailbox,const std::string& error_prefix=""){
+            auto id=++messageCounter;
             #ifndef NDEBUG
                 char const *name = typeid(TMessageType).name();
                 std::string tn= boost::core::demangle(name);
-                templateWaitingLog(mailbox,tn);
+                templateWaitingLog(mailbox,tn,id);
             #endif
 
 
             auto message=S4U_Mailbox::getMessage(mailbox,false);
+
             if(auto msg=dynamic_cast<TMessageType*>(message.get())){
+#ifndef NDEBUG
+                templateWaitingLogUpdate(mailbox,tn,id);
+#endif
                 message.release();
                 return std::unique_ptr<TMessageType>(msg);
             }else{
                 char const *name = typeid(TMessageType).name();
                 std::string tn= boost::core::demangle(name);
-                throw std::runtime_error(error_prefix+" Unexpected [" + message->getName() + "] message while waiting for "+ tn.c_str());
+                throw std::runtime_error(error_prefix+" Unexpected [" + message->getName() + "] message while waiting for "+ tn.c_str()+". Request ID: "+std::to_string(id));
             }
         }
         /**
@@ -75,21 +80,26 @@ namespace wrench {
      */
         template<class TMessageType>
         static std::unique_ptr<TMessageType> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout,const std::string& error_prefix=""){
+            auto id=++messageCounter;
 #ifndef NDEBUG
             char const *name = typeid(TMessageType).name();
             std::string tn= boost::core::demangle(name);
-            templateWaitingLog(mailbox,tn);
+            templateWaitingLog(mailbox,tn,id);
 #endif
 
 
             auto message=S4U_Mailbox::getMessage(mailbox,timeout,false);
+
             if(auto msg=dynamic_cast<TMessageType*>(message.get())){
                 message.release();
+#ifndef NDEBUG
+                templateWaitingLogUpdate(mailbox,tn,id);
+#endif
                 return std::unique_ptr<TMessageType>(msg);
             }else{
                 char const *name = typeid(TMessageType).name();
                 std::string tn= boost::core::demangle(name);
-                throw std::runtime_error(error_prefix+" Unexpected [" + message->getName() + "] message while waiting for "+ tn.c_str());
+                throw std::runtime_error(error_prefix+" Unexpected [" + message->getName() + "] message while waiting for "+ tn.c_str()+". Request ID: "+std::to_string(id));
             }
         }
         /**
@@ -147,7 +157,9 @@ namespace wrench {
         static std::deque<simgrid::s4u::Mailbox *> free_mailboxes;
         static std::set<simgrid::s4u::Mailbox *> used_mailboxes;
         static std::deque<simgrid::s4u::Mailbox *> mailboxes_to_drain;
-        static void templateWaitingLog(const simgrid::s4u::Mailbox* mailbox ,std::string type);
+        static void templateWaitingLog(const simgrid::s4u::Mailbox* mailbox ,std::string type,unsigned long long id);
+        static void templateWaitingLogUpdate(const simgrid::s4u::Mailbox* mailbox ,std::string type,unsigned long long id);
+        static unsigned long long messageCounter;
     };
 
     /***********************/
