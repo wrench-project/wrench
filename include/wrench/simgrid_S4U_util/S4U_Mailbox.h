@@ -75,15 +75,21 @@ namespace wrench {
      */
         template<class TMessageType>
         static std::unique_ptr<TMessageType> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout,const std::string& error_prefix=""){
+#ifndef NDEBUG
+            char const *name = typeid(TMessageType).name();
+            std::string tn= boost::core::demangle(name);
+            templateWaitingLog(mailbox,tn);
+#endif
 
-            templateWaitingLog(mailbox,(TMessageType*)nullptr);
 
             auto message=S4U_Mailbox::getMessage(mailbox,timeout,false);
-            if(auto msg=dynamic_cast<TMessageType>(message.get())){
+            if(auto msg=dynamic_cast<TMessageType*>(message.get())){
                 message.release();
                 return std::unique_ptr<TMessageType>(msg);
             }else{
-                throw std::runtime_error(error_prefix+"Unexpected [" + message->getName() + "] message while waiting for "+ WRENCH_BOOST_DEMANGLE_TYPE((TMessageType)nullptr));
+                char const *name = typeid(TMessageType).name();
+                std::string tn= boost::core::demangle(name);
+                throw std::runtime_error(error_prefix+"Unexpected [" + message->getName() + "] message while waiting for "+ tn.c_str());
             }
         }
         /**
