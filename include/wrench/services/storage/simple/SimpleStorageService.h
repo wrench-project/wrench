@@ -106,15 +106,28 @@ namespace wrench {
 
         virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
 
+	/**
+         * @brief Determine whether the storage service is bufferized
+         * @return true if bufferized, false otherwise
+         */
         virtual bool isBufferized() const override {
                 return this->is_bufferized;
         }
 
+	/**
+         * @brief Determine the storage service's buffer size
+         * @return a size in bytes
+         */
         virtual double getBufferSize() const override {
             return this->buffer_size;
 
         }
 
+	/**
+         * @brief Reserve space at the storage service
+         * @param location: a location
+         * @return true if success, false otherwise
+         */
         virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
             std::string mount_point;
             std::string path_at_mount_point;
@@ -122,6 +135,10 @@ namespace wrench {
             return this->file_systems[mount_point]->reserveSpace(location->getFile(), path_at_mount_point);
         }
 
+	/**
+         * @brief Unreserve space at the storage service
+         * @param location: a location
+         */
         virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
             std::string mount_point;
             std::string path_at_mount_point;
@@ -130,6 +147,12 @@ namespace wrench {
         }
 
 
+	/**
+	 * @brief Get the mount point that stores a path
+	 * @param path: path
+	 *
+	 * @return a mount point
+	 */
         std::string getPathMountPoint(const std::string &path) {
             std::string mount_point, path_at_mount_point;
             this->splitPath(path, mount_point, path_at_mount_point);
