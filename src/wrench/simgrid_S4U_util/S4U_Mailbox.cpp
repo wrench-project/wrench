@@ -45,9 +45,14 @@ namespace wrench {
      * @param type: a pointer to the message so we have its type
      *
      */
-   void S4U_Mailbox::templateWaitingLog(const simgrid::s4u::Mailbox* mailbox ,std::string type) {
+   void S4U_Mailbox::templateWaitingLog(const simgrid::s4u::Mailbox* mailbox ,std::string type,unsigned long long id) {
 
-       WRENCH_DEBUG("Getting a message of type <%s> from mailbox_name '%s'",type.c_str() , mailbox->get_cname());
+       WRENCH_DEBUG("Waiting for message of type <%s> from mailbox_name '%s'.  Request ID: %llu",type.c_str() , mailbox->get_cname(),id);
+   }
+
+   void S4U_Mailbox::templateWaitingLogUpdate(const simgrid::s4u::Mailbox* mailbox ,std::string type,unsigned long long id) {
+
+       WRENCH_DEBUG("Received a message of type <%s> from mailbox_name '%s'.  Request ID: %llu",type.c_str() , mailbox->get_cname(),id);
    }
     /**
      * @brief Synchronously receive a message from a mailbox
@@ -356,6 +361,5 @@ namespace wrench {
     simgrid::s4u::Mailbox *S4U_Mailbox::generateUniqueMailbox(const std::string &prefix) {
         return simgrid::s4u::Mailbox::by_name(prefix + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber()));
     }
-
-
+    unsigned long long S4U_Mailbox::messageCounter=0;
 }// namespace wrench

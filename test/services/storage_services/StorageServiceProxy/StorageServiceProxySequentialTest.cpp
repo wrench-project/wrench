@@ -118,12 +118,12 @@ void StorageServiceProxySimultaneousTest::do_Simultaneous_test(std::string mode)
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 4;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[3] = strdup("--wrench-full-log");
-    argv[1] = strdup("--log=wrench_core_mailbox.threshold=debug");
-    argv[2] = strdup("--log=wrench_core_proxy_file_server.threshold=debug");
+    //argv[3] = strdup("--wrench-full-log");
+    //argv[1] = strdup("--log=wrench_core_mailbox.threshold=debug");
+    //argv[2] = strdup("--log=wrench_core_proxy_file_server.threshold=debug");
     simulation->init(&argc, argv);
 
     simulation->instantiatePlatform(platform_file_path);
@@ -152,7 +152,7 @@ void StorageServiceProxySimultaneousTest::do_Simultaneous_test(std::string mode)
             wrench::StorageServiceProxy::createRedirectProxy(
                     "Proxy", cache, remote, {{wrench::StorageServiceProxyProperty::UNCACHED_READ_METHOD, mode}}));
 
-    auto file1 = wrench::Simulation::addFile("file1", 1E13);//100MB
+    auto file1 = wrench::Simulation::addFile("file1", 1E13);
 
     // Create a copy file1 on remote
     remote->createFile(file1);
