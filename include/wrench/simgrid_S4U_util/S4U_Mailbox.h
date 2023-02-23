@@ -59,7 +59,7 @@ namespace wrench {
             }else{
                 char const *name = typeid(TMessageType).name();
                 std::string tn= boost::core::demangle(name);
-                throw std::runtime_error(error_prefix+"Unexpected [" + message->getName() + "] message while waiting for "+ tn.c_str());
+                throw std::runtime_error(error_prefix+" Unexpected [" + message->getName() + "] message while waiting for "+ tn.c_str());
             }
         }
         /**
@@ -89,7 +89,7 @@ namespace wrench {
             }else{
                 char const *name = typeid(TMessageType).name();
                 std::string tn= boost::core::demangle(name);
-                throw std::runtime_error(error_prefix+"Unexpected [" + message->getName() + "] message while waiting for "+ tn.c_str());
+                throw std::runtime_error(error_prefix+" Unexpected [" + message->getName() + "] message while waiting for "+ tn.c_str());
             }
         }
         /**
