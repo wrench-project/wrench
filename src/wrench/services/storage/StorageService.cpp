@@ -148,7 +148,11 @@ namespace wrench {
 
             } else {
                 auto file = location->getFile();
-                std::cerr << "ASDASDASDASD " << msg->data_write_mailboxes_and_bytes.size() << "\n";
+                std::cerr << "BEFORE THE LOOP " << msg->data_write_mailboxes_and_bytes.size() << "\n";
+                for (auto const &dwmb : msg->data_write_mailboxes_and_bytes) {
+                    std::cerr << dwmb.first->get_cname() << "  " << dwmb.second << "\n";
+                }
+                std::cerr << "DOING THE LOOP " << msg->data_write_mailboxes_and_bytes.size() << "\n";
                 for (auto const &dwmb : msg->data_write_mailboxes_and_bytes) {
                     std::cerr << dwmb.first->get_cname() << "  " << dwmb.second << "\n";
                     // Bufferized
@@ -159,16 +163,20 @@ namespace wrench {
                                                         file, buffer_size, false));
                         remaining -= buffer_size;
                     }
+                    std::cerr << "remaining for last message= " << remaining << "\n";
                     S4U_Mailbox::putMessage(dwmb.first, new StorageServiceFileContentChunkMessage(
                             file, remaining, true));
 
+                    std::cerr << "WAITING FOR ACK\n";
                     //Waiting for the final ack
                     message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
                     if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
                         throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
                                                  message->getName() + "] message instead of final ack!");
                     }
+                    std::cerr << "LOOPING AGAIN\n";
                 }
+                std::cerr << "DONE WITH LOOP\n";
             }
 
         } else {
