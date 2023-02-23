@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#ifdef PAGE_CACHE_SIMULATION
 
 #include <wrench/services/memory/Block.h>
 
@@ -151,3 +152,5 @@ namespace wrench {
     }
 
 }// namespace wrench
+
+#endif

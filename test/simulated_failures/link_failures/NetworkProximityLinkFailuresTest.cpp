@@ -166,7 +166,7 @@ void NetworkProximityLinkFailuresTest::do_NetworkProximityLinkFailures_Test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new NetworkProxLinkFailuresTestWMS(this,
                                                                stable_hostname)));

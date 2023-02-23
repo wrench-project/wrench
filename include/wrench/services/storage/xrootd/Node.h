@@ -42,12 +42,30 @@ namespace wrench {
             /** \cond DEVELOPER    */
             /***********************/
 
-            void createFile(const std::shared_ptr<DataFile> &file) override;
-            void createFile(const std::shared_ptr<DataFile> &file, const string &path) override;
+            using StorageService::readFile;
+            using StorageService::writeFile;
+            using StorageService::deleteFile;
+            using StorageService::lookupFile;
+            using StorageService::createFile;
+            using StorageService::hasFile;
 
-            void writeFile(const std::shared_ptr<DataFile> &file) override;
+            void createFile(const std::shared_ptr<FileLocation> &location) override;
 
-            double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
+            virtual void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+                                   const std::shared_ptr<FileLocation> &location,
+                                   bool wait_for_answer) override;
+
+            virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
+
+            virtual double getTotalSpace() override;
+            virtual bool isBufferized() const override;
+            virtual double getBufferSize() const override;
+            virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) override;
+            virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) override;
+
+
+
+
 
             /***********************/
             /** \endcond           */
@@ -100,16 +118,12 @@ namespace wrench {
             //bool hasMultipleMountPoints() override;
             //bool hasMountPoint(const std::string &mp) override;
 
-            bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) override;
+            bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
             bool cached(shared_ptr<DataFile> file);
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
 
-
-            void createFile(const std::shared_ptr<FileLocation> &location) override;
-
             double getLoad() override;
-
 
             int main() override;
             bool processNextMessage();
@@ -119,6 +133,9 @@ namespace wrench {
             Deployment *deployment;
 
             std::shared_ptr<Node> addChild(std::shared_ptr<Node> child);
+
+            /** @brief File systems */
+            std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
 
 
             map<Node *, vector<stack<Node *>>> splitStack(vector<stack<Node *>> search_stack);

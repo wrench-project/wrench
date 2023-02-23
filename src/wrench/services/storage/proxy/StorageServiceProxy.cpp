@@ -60,25 +60,18 @@ namespace wrench {
 
         return 0;
     }
-    /**
-     * @brief Get the total static capacity of the remote storage service (in zero simulation time) if there is no remote, this function is invalid
-     * @return capacity of the storage service (double) for each mount point, in a map
-     */
-    std::map<std::string, double> StorageServiceProxy::getTotalSpace() {
-        if (remote) {
-            return remote->getTotalSpace();
-        }
-        throw runtime_error("Proxy with no default location does not support getTotalSpace()");
-    }
-    bool StorageServiceProxy::hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+
+
+    bool StorageServiceProxy::hasFile(const std::shared_ptr<FileLocation> &location) {
         if (cache) {
-            return cache->hasFile(file, path);
+            return cache->hasFile(location);
         }
         if (remote) {
-            return remote->hasFile(file, path);
+            return remote->hasFile(location);
         }
         return false;
     }
+
     /**
      * @brief Process a received control message
      *
@@ -118,7 +111,7 @@ namespace wrench {
                 target = location->target;
             }
             //cerr<<"FILE LOOKUP!!!! "<<remote<<" "<<target<<endl;
-            if (cache->hasFile(msg->location->getFile(), msg->location->getFullAbsolutePath())) {//forward request to cache
+            if (cache->hasFile(msg->location)) { //forward request to cache
                 //cerr<<"File cached"<<endl;
                 S4U_Mailbox::dputMessage(msg->answer_mailbox, new StorageServiceFileLookupAnswerMessage(msg->location->getFile(), true, StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
 
@@ -129,7 +122,7 @@ namespace wrench {
                         target->mailbox,
                         new StorageServiceFileLookupRequestMessage(
                                 mailbox,
-                                FileLocation::LOCATION(target, msg->location->getMountPoint(), msg->location->getFile()),
+                                FileLocation::LOCATION(target, msg->location->getPath(), msg->location->getFile()),
                                 target->getMessagePayloadValue(
                                         StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
             } else {
@@ -176,9 +169,9 @@ namespace wrench {
                     pending[msg->location->getFile()].push_back(std::move(message));
                     WRENCH_DEBUG("Adding pending write");
                 }
-                S4U_Mailbox::dputMessage(cache->mailbox, new StorageServiceFileWriteRequestMessage(mailbox, msg->requesting_host, FileLocation::LOCATION(cache, msg->location->getFile()), msg->buffer_size, 0));
+                S4U_Mailbox::putMessage(cache->mailbox, new StorageServiceFileWriteRequestMessage(mailbox, msg->requesting_host, FileLocation::LOCATION(cache, msg->location->getFile()), 0));
             } else {
-                S4U_Mailbox::dputMessage(msg->answer_mailbox, new StorageServiceFileWriteAnswerMessage(msg->location, false, std::make_shared<HostError>(hostname), 0, StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD));
+                S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileWriteAnswerMessage(msg->location, false, std::make_shared<HostError>(hostname), nullptr, 0, StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD));
             }
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
@@ -263,77 +256,116 @@ namespace wrench {
         return true;
     }
     /**
-     * @brief Synchronously asks the remote storage service for its capacity at all its
-     *        mount points.  invalid if there is no default location
+     * @brief Synchronously asks the proxy service for its capacity (which returns
+     *        the remote)
+     *
+     * @param path: the path
      * @return The free space in bytes of each mount point, as a map
      *
      */
-    std::map<std::string, double> StorageServiceProxy::getFreeSpace() {
+    double StorageServiceProxy::getTotalFreeSpaceAtPath(const std::string &path) {
         if (remote) {
-            return remote->getFreeSpace();
+            return remote->getTotalFreeSpaceAtPath(path);
         }
         throw runtime_error("Proxy with no default location does not support getFreeSpace()");
     }
-    /**
-     * @brief Get the mount point of the remote server (will throw is more than one).  If there isnt a default, returns DEV_NUL
-     * @return the (sole) mount point of the service
-     */
-    std::string StorageServiceProxy::getMountPoint() {
-        if (remote) {
-            return remote->getMountPoint();
-        }
-        if (cache) {
-            return cache->getMountPoint();
-        }
-        return LogicalFileSystem::DEV_NULL;
-    }
-    /**
-     * @brief Get the set of mount points of the remote server, if not returns {}
-     * @return the set of mount points
-     */
-    std::set<std::string> StorageServiceProxy::getMountPoints() {
-        if (remote) {
-            return remote->getMountPoints();
-        }
-        if (cache) {
-            return cache->getMountPoints();
-        }
-        return {};
-    }
-    /**
-     * @brief Checked whether the remote storage service has multiple mount points
-     * @return true whether the service has multiple mount points
-     */
-    bool StorageServiceProxy::hasMultipleMountPoints() {
-        if (remote) {
-            return remote->hasMultipleMountPoints();
-        }
 
-        return false;
-    }
     /**
-    * @brief Checked whether the remote storage service has a particular mount point
-    * @param mp: a mount point
-    *
-    * @return true whether the service has that mount point
-    */
-    bool StorageServiceProxy::hasMountPoint(const std::string &mp) {
+     * @brief Synchronously asks the proxy service for its total capacity (which returns
+     *        the remote)
+     * @return The free space in bytes of each mount point, as a map
+     *
+     */
+    double StorageServiceProxy::getTotalSpace() {
         if (remote) {
-            return remote->hasMountPoint(mp);
+            return remote->getTotalSpace();
         }
-        if (cache) {
-            return cache->hasMountPoint(mp);
-        }
-        return false;
+        throw runtime_error("Proxy with no default location does not support getTotalSpace()");
     }
 
 
+//    /**
+//     * @brief Get the mount point of the remote server (will throw is more than one).  If there isnt a default, returns DEV_NUL
+//     * @return the (sole) mount point of the service
+//     */
+//    std::string StorageServiceProxy::getMountPoint() {
+//        if (remote) {
+//            return remote->getMountPoint();
+//        }
+//        if (cache) {
+//            return cache->getMountPoint();
+//        }
+//        return LogicalFileSystem::DEV_NULL;
+//    }
+
+    bool StorageServiceProxy::isBufferized() const {
+        if (cache) {
+            return cache->isBufferized();
+        } else {
+            return false;   // Not sure that makes sense
+        }
+    }
+
+
+    double StorageServiceProxy::getBufferSize() const {
+        if (cache) {
+            return cache->getBufferSize();
+        } else {
+            return 0;   // Not sure that makes sense
+        }
+    }
+
+
+//    /**
+//     * @brief Get the set of mount points of the remote server, if not returns {}
+//     * @return the set of mount points
+//     */
+//    std::set<std::string> StorageServiceProxy::getMountPoints() {
+//        if (remote) {
+//            return remote->getMountPoints();
+//        }
+//        if (cache) {
+//            return cache->getMountPoints();
+//        }
+//        return {};
+//    }
+//    /**
+//     * @brief Checked whether the remote storage service has multiple mount points
+//     * @return true whether the service has multiple mount points
+//     */
+//    bool StorageServiceProxy::hasMultipleMountPoints() {
+//        if (remote) {
+//            return remote->hasMultipleMountPoints();
+//        }
+//
+//        return false;
+//    }
+//    /**
+//    * @brief Checked whether the remote storage service has a particular mount point
+//    * @param mp: a mount point
+//    *
+//    * @return true whether the service has that mount point
+//    */
+//    bool StorageServiceProxy::hasMountPoint(const std::string &mp) {
+//        if (remote) {
+//            return remote->hasMountPoint(mp);
+//        }
+//        if (cache) {
+//            return cache->hasMountPoint(mp);
+//        }
+//        return false;
+//    }
+
+
     /**
-         * @brief Forward to remote server
-         * @param location: the file location
-         * @return a (simulated) date in seconds
-         */
+     * @brief Forward to remote server
+     * @param location: the file location
+     * @return a (simulated) date in seconds
+     */
     double StorageServiceProxy::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+        if (location == nullptr) {
+            throw std::invalid_argument("StorageServiceProxy::getFileLastWriteDate(): Invalid nullptr argument");
+        }
         if (remote) {
             return remote->getFileLastWriteDate(location);
         }
@@ -345,33 +377,16 @@ namespace wrench {
 
 
     /**
-     * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.
-If you want it to start cached, you should also call StorageServiceProxy.getCache().createFile
+     * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile
+     * on the remote service where you wish to create the file. If you want it to start cached, you should also call
+     * StorageServiceProxy.getCache().createFile
      * @param location: the file location
      *
      **/
     void StorageServiceProxy::createFile(const std::shared_ptr<FileLocation> &location) {
-        throw std::runtime_error("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
+        throw std::runtime_error("StorageServiceProxy.createFile(): is ambiguous where the file should go. You should call createFile() on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile()");
     }
-    /**
-     * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.
-If you want it to start cached, you should also call StorageServiceProxy.getCache().createFile
-     * @param file: the file to create
-     * @param path: the file path
-     *
-     **/
-    void StorageServiceProxy::createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-        throw std::runtime_error("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
-    }
-    /**
-     * @brief StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.
-If you want it to start cached, you should also call StorageServiceProxy.getCache().createFile
-     * @param file: the file to create
-     *
-     **/
-    void StorageServiceProxy::createFile(const std::shared_ptr<DataFile> &file) {
-        throw std::runtime_error("StorageServiceProxy.createFile() is ambiguous where the file should go.  You should call createFile on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile");
-    }
+
     /**
      * Get the load of the cache
      * @return the load of the cache
@@ -402,20 +417,23 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                                                                                                                                                    remote(default_remote) {
 
 
+        if (properties.find(StorageServiceProperty::BUFFER_SIZE) != properties.end()) {
+            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): You cannot pass a buffer size property to a StorageServiceProxy");
+        }
         this->setProperties(this->default_property_values, std::move(properties));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(message_payloads));
         this->setProperty(StorageServiceProperty::BUFFER_SIZE, cache->getPropertyValueAsString(StorageServiceProperty::BUFFER_SIZE));//the internal cache has the same buffer properties as this service.
-        this->buffer_size = this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
-        if (cache and cache->hasMultipleMountPoints()) {
-            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's cache can not have multiple mountpoints");
-        }
-        if (remote and remote->hasMultipleMountPoints()) {
-            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's default remote can not have multiple mountpoints");
-        }
+
+//        if (cache and cache->hasMultipleMountPoints()) {
+//            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's cache can not have multiple mountpoints");
+//        }
+//        if (remote and remote->hasMultipleMountPoints()) {
+//            throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): A storage service proxy's default remote can not have multiple mountpoints");
+//        }
         //        if (cache and default_remote) {
         //            if ((cache->isBufferized() and not default_remote->isBufferized()) or
         //                (not cache->isBufferized() and default_remote->isBufferized())) {
-        //                throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): The cache and the default_remote storage services much has the same bufferization mode");
+        //                throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): The cache and the default_remote storage services must has the same bufferization mode");
         //        }
 
         string readProperty = getPropertyValueAsString(StorageServiceProxyProperty::UNCACHED_READ_METHOD);
@@ -431,14 +449,14 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
         }
         this->network_timeout = -1.0;//turn off network time out.  A proxy will wait to respond to a second file request until it has downloaded the file completely.  For large files this can easily excede any reasonable timeout.  So we dissable it completely
     }
+
     /**
      * @brief Delete a file
      * @param targetServer
      * @param file
-     * @param file_registry_service
      */
-    void StorageServiceProxy::deleteFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service) {
-        StorageService::deleteFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file), file_registry_service);
+    void StorageServiceProxy::deleteFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
+        this->deleteFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
 
     /**
@@ -449,15 +467,16 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
      * @return true if the file is present, false otherwise
      */
     bool StorageServiceProxy::lookupFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
-        return StorageService::lookupFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
+        return this->lookupFile(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), file));
     }
 
     /**
      * @brief Read a file
-     * @param file: the file
+     * @param location: a location
+     * @param num_bytes: a nuimber of bytes to read
      */
-    void StorageServiceProxy::readFile(const std::shared_ptr<DataFile> &file) {
-        StorageService::readFile(ProxyLocation::LOCATION(remote, std::static_pointer_cast<StorageService>(shared_from_this()), file));
+    void StorageServiceProxy::readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+        this->readFile(ProxyLocation::LOCATION(remote, this->getSharedPtr<StorageService>(), location->getFile()));
     }
 
     /**
@@ -466,65 +485,65 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
      * @param file: the file
      */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
-        StorageService::readFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
+        this->readFile(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), file));
     }
 
     /**
-     * @brief Read a file
-     * @param targetServer: the target server
-     * @param file: the file
-     * @param num_bytes: the number of bytes to read
-     */
+ * @brief Read a file
+ * @param targetServer: the target server
+ * @param file: the file
+ * @param num_bytes: the number of bytes to read
+ */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, double num_bytes) {
-        StorageService::readFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file), num_bytes);
+        this->readFile(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), file), num_bytes);
     }
 
     /**
-     * @brief Read a file
-     * @param targetServer: the target server
-     * @param file: the file
-     * @param path: the file path
-     */
+ * @brief Read a file
+ * @param targetServer: the target server
+ * @param file: the file
+ * @param path: the file path
+ */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path) {
-        StorageService::readFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file));
+        this->readFile(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), path, file));
     }
 
     /**
-     * @brief Read a file
-     * @param targetServer: the target server
-     * @param file: the file
-     * @param path: the file path
-     * @param num_bytes: the number of bytes to read
-     */
+ * @brief Read a file
+ * @param targetServer: the target server
+ * @param file: the file
+ * @param path: the file path
+ * @param num_bytes: the number of bytes to read
+ */
     void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes) {
-        StorageService::readFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file), num_bytes);
+        this->readFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file), num_bytes);
     }
 
     /**
-     * @brief Write a file
-     * @param targetServer: the target server
-     * @param file: the file
-     * @param path: the file path
-     */
+ * @brief Write a file
+ * @param targetServer: the target server
+ * @param file: the file
+ * @param path: the file path
+ */
     void StorageServiceProxy::writeFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path) {
-        StorageService::writeFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file));
+        this->writeFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file));
     }
 
     /**
-     * @brief Write a file
-     * @param targetServer: the target server
-     * @param file: the file
-     */
+ * @brief Write a file
+ * @param targetServer: the target server
+ * @param file: the file
+ */
     void StorageServiceProxy::writeFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
-        StorageService::writeFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
+        this->writeFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), file));
     }
 
     /**
-     * @brief Get the proxy's associated cache
-     *
-     * @return the cache storage service
-     */
-    const std::shared_ptr<StorageService> StorageServiceProxy::getCache() {
+ * @brief Get the proxy's associated cache
+ *
+ * @return the cache storage service
+ */
+    std::shared_ptr<StorageService> StorageServiceProxy::getCache() {
         return this->cache;
     }
 
@@ -534,16 +553,15 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
      * @param message the raw unique_ptr for the message.  Assumed to be the same as msg, passed to avoid second cast.
      * @return True if the file is cached, false otherwise
      */
-    bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<ServiceMessage> &message) {
-        if (cache->hasFile(msg->location->getFile(), msg->location->getFullAbsolutePath())) {//check cache
-            WRENCH_DEBUG("Forwarding to cache mailbox, reply to %s", msg->answer_mailbox->get_name().c_str());
-            S4U_Mailbox::dputMessage(
+    bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage * msg, unique_ptr<SimulationMessage> & message) {
+        if (cache->hasFile(msg->location->getFile(), msg->location->getPath())) {//check cache
+            WRENCH_INFO("Forwarding to cache reply mailbox %s", msg->answer_mailbox->get_name().c_str());
+            S4U_Mailbox::putMessage(
                     cache->mailbox,
                     new StorageServiceFileReadRequestMessage(
                             msg->answer_mailbox,
                             msg->requesting_host,//msg->mailbox_to_receive_the_file_content,
-                            FileLocation::LOCATION(cache, msg->location->getMountPoint(),
-                                                   msg->location->getFile()),
+                            FileLocation::LOCATION(cache, msg->location->getPath(), msg->location->getFile()),
                             msg->num_bytes_to_read, 0));
             return true;
 
@@ -716,7 +734,7 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
                 //do not speed excessive time on readThrough
                 auto forward = new StorageServiceFileReadRequestMessage(msg);
                 forward->answer_mailbox = mailbox;                                                                                 //setup intercept mailbox
-                forward->location = FileLocation::LOCATION(target, msg->location->getFullAbsolutePath(), msg->location->getFile());//hyjack locaiton to be on target
+                forward->location = FileLocation::LOCATION(target, msg->location->getPath(), msg->location->getFile());//hyjack locaiton to be on target
                 S4U_Mailbox::dputMessage(target->mailbox, forward);                                                                 //send to target
             } else {
                 S4U_Mailbox::dputMessage(msg->answer_mailbox, new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
@@ -773,4 +791,5 @@ If you want it to start cached, you should also call StorageServiceProxy.getCach
         }
         return false;
     }
+
 }// namespace wrench

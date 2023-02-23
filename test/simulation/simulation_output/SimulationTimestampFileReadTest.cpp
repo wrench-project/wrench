@@ -168,7 +168,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileReadBasicTestWMS(
                             this, host1)));
 
@@ -231,10 +231,10 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
 
         // source should be set
         ASSERT_EQ(this->storage_service, fc.first->getSource()->getStorageService());
-        ASSERT_EQ("/", fc.first->getSource()->getAbsolutePathAtMountPoint());
+        ASSERT_EQ("/", fc.first->getSource()->getPath());
 
         ASSERT_EQ(this->storage_service, fc.second->getSource()->getStorageService());
-        ASSERT_EQ("/", fc.second->getSource()->getAbsolutePathAtMountPoint());
+        ASSERT_EQ("/", fc.second->getSource()->getPath());
 
         //service should be set
         ASSERT_EQ(fc.first->getService(), fc.second->getService());

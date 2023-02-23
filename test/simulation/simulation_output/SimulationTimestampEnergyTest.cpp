@@ -110,7 +110,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     std::string host = wrench::Simulation::getHostnameList()[0];
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new SimulationTimestampPstateSetTestWMS(
                                     this, host)));
@@ -203,7 +203,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
     std::string host = wrench::Simulation::getHostnameList()[0];
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new SimulationTimestampEnergyConsumptionTestWMS(
                                     this, host)));
@@ -333,7 +333,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
     std::string host = wrench::Simulation::getHostnameList()[0];
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyMeterTestWMS(
                                     this, workflow, host)));
@@ -469,7 +469,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
     std::string host = wrench::Simulation::getHostnameList()[0];
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyMeterMultipleMeasurementPeriodTestWMS(
                                     this, host)));
