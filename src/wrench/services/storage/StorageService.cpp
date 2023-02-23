@@ -304,6 +304,8 @@ namespace wrench {
 
             if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
 
+            unsigned long number_of_sources = msg->number_of_sources;
+
                 // If it's not a success, throw an exception
                 if (not msg->success) {
                     std::shared_ptr<FailureCause> cause = msg->failure_cause;
@@ -349,13 +351,15 @@ namespace wrench {
                     S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
 
                     //Waiting for the final acks
-                    for (unsigned long source = 0; source < msg->number_of_sources; source++) {
+                    std::cerr << "HERE\n";
+                    for (unsigned long source = 0; source < number_of_sources; source++) {
                         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
                         if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
                             throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                                      message->getName() + "] message! (was expecting a StorageServiceAckMessage)");
                         }
                     }
+                    std::cerr << "MSG: DONE!\n";
                 }
             }
         }
