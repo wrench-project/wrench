@@ -148,7 +148,9 @@ namespace wrench {
 
             } else {
                 auto file = location->getFile();
+                std::cerr << "ASDASDASDASD " << msg->data_write_mailboxes_and_bytes.size() << "\n";
                 for (auto const &dwmb : msg->data_write_mailboxes_and_bytes) {
+                    std::cerr << dwmb.first->get_cname() << "  " << dwmb.second << "\n";
                     // Bufferized
                     double remaining = dwmb.second;
                     while (remaining - buffer_size > DBL_EPSILON) {
