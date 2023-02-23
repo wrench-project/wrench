@@ -102,32 +102,35 @@ namespace wrench {
 
         public:
             /***********************/
-            /** \cond INTERNAL     */
+            /** \cond DEVELOPER    */
             /***********************/
-            //XRootD* getMetavisor();
-
-            std::shared_ptr<SimpleStorageService> getStorageServer();
-
-            //bool lookupFile(std::shared_ptr<DataFile>file);
-            //void deleteFile(std::shared_ptr<DataFile>file);//meta delete from sub tree
-            //void readFile(std::shared_ptr<DataFile>file);
-            //void readFile(std::shared_ptr<DataFile>file, double num_bytes);
-
-            // std::string getMountPoint() override;
-            //std::set<std::string> getMountPoints() override;
-            //bool hasMultipleMountPoints() override;
-            //bool hasMountPoint(const std::string &mp) override;
 
             bool hasFile(const std::shared_ptr<FileLocation> &location) override;
+
+            double getLoad() override;
+
+            /***********************/
+            /** \endcond           */
+            /***********************/
+
+
+            /***********************/
+            /** \cond INTERNAL     */
+            /***********************/
+
+            std::shared_ptr<SimpleStorageService> getStorageServer();
 
             bool cached(shared_ptr<DataFile> file);
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
 
-            double getLoad() override;
 
             int main() override;
             bool processNextMessage();
             Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
+
+            /***********************/
+            /** \endcond           */
+            /***********************/
 
         private:
             Deployment *deployment;

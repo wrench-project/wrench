@@ -100,19 +100,11 @@ namespace wrench {
                                           WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
-    private:
         friend class Simulation;
 
-        /***********************/
-        /** \cond INTERNAL    **/
-        /***********************/
 
         void cleanup(bool has_returned_from_main, int return_value) override;
         double getLoad() override;
-
-        /***********************/
-        /** \endcond          **/
-        /***********************/
 
         int main() override;
 

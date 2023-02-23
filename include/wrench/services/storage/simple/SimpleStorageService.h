@@ -70,9 +70,6 @@ namespace wrench {
 
 
     public:
-        /***********************/
-        /** \cond INTERNAL    **/
-        /***********************/
 
         using StorageService::readFile;
         using StorageService::writeFile;
@@ -88,6 +85,10 @@ namespace wrench {
                                                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
+        /***********************/
+        /** \cond DEVELOPER   **/
+        /***********************/
+
         virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path = "/") override;
 
         bool hasFile(const std::shared_ptr<FileLocation> &location) override;
@@ -101,27 +102,6 @@ namespace wrench {
 
         virtual std::string getBaseRootPath() override;
 
-
-        virtual void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
-
-        virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
-
-	/**
-         * @brief Determine whether the storage service is bufferized
-         * @return true if bufferized, false otherwise
-         */
-        virtual bool isBufferized() const override {
-                return this->is_bufferized;
-        }
-
-	/**
-         * @brief Determine the storage service's buffer size
-         * @return a size in bytes
-         */
-        virtual double getBufferSize() const override {
-            return this->buffer_size;
-
-        }
 
 	/**
          * @brief Reserve space at the storage service
@@ -165,19 +145,52 @@ namespace wrench {
 
         simgrid::s4u::Disk *getDiskForPathOrNull(const std::string &path);
 
-
         /***********************/
         /** \endcond          **/
         /***********************/
 
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
+
+	/**
+         * @brief Determine whether the storage service is bufferized
+         * @return true if bufferized, false otherwise
+         */
+        virtual bool isBufferized() const override {
+                return this->is_bufferized;
+        }
+
+	/**
+         * @brief Determine the storage service's buffer size
+         * @return a size in bytes
+         */
+        virtual double getBufferSize() const override {
+            return this->buffer_size;
+
+        }
+
+
+        virtual void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
+
+        virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
+        /***********************/
+        /** \endcond          **/
+        /***********************/
+
+
+
     protected:
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
         SimpleStorageService(const std::string &hostname,
                              const std::set<std::string>& mount_points,
                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                              const std::string &suffix);
 
-    protected:
+
         static unsigned long getNewUniqueNumber();
 
         /** @brief Maximum number of concurrent connections */
@@ -191,7 +204,7 @@ namespace wrench {
         bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox,
                                      const std::string &path);
 
-    protected:
+
         /** @brief The service's buffer size */
         double buffer_size = 10000000;
 
@@ -203,10 +216,12 @@ namespace wrench {
 
         bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
 
+        /***********************/
+        /** \endcond          **/
+        /***********************/
+
     private:
         friend class Simulation;
-
-
 
         void validateProperties();
 

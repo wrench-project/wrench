@@ -50,6 +50,8 @@ namespace wrench {
         using StorageService::createFile;
         using StorageService::hasFile;
 
+
+
         CompoundStorageService(const std::string &hostname,
                                std::set<std::shared_ptr<StorageService>> storage_services,
                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
@@ -60,6 +62,10 @@ namespace wrench {
                                StorageSelectionStrategyCallback storage_selection,
                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
 
         double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
 
@@ -124,7 +130,17 @@ namespace wrench {
 
         std::shared_ptr<FileLocation> lookupFileLocation(const std::shared_ptr<FileLocation> &location);
 
-    protected:
+
+        bool hasFile(const std::shared_ptr<FileLocation> &location) override;
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+    private:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         CompoundStorageService(const std::string &hostname,
                                std::set<std::shared_ptr<StorageService>> storage_services,
                                StorageSelectionStrategyCallback storage_selection,
@@ -164,7 +180,10 @@ namespace wrench {
 
         bool processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox);
 
-        bool hasFile(const std::shared_ptr<FileLocation> &location) override;
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
     private:
         friend class Simulation;
