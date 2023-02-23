@@ -247,7 +247,7 @@ namespace wrench {
      * @param location: the file's location
      * @param success: whether the write operation succeeded
      * @param failure_cause: the cause of the failure (nullptr if success)
-     * @param data_write_mailbox: the mailbox to which file content should be sent
+     * @param data_write_mailboxes_and_bytes: mailboxes to which bytes need to be sent
      * @param buffer_size: the buffer size to use
      * @param payload: the message size in bytes
      *
