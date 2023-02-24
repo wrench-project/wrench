@@ -37,7 +37,7 @@ namespace wrench {
      * @param hostname: the name of the host on which the daemon will run
      * @param process_name_prefix: the prefix of the name of the simulated process/actor
      */
-    S4U_Daemon::S4U_Daemon(const std::string& hostname, const std::string& process_name_prefix) {
+    S4U_Daemon::S4U_Daemon(const std::string &hostname, const std::string &process_name_prefix) {
         if (not simgrid::s4u::Engine::is_initialized()) {
             throw std::runtime_error("Simulation must be initialized before services can be created");
         }
