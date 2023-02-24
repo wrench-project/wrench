@@ -152,16 +152,14 @@ namespace wrench {
             throw std::invalid_argument("ComputeService::ComputeService(): Host " + hostname + " does not have a disk mounted at " + scratch_space_mount_point);
         }
         this->scratch_space_mount_point = scratch_space_mount_point;
-
-
     }
 
     /**
      * @brief Start the compute service's scratch space service
      */
     void ComputeService::startScratchStorageService() {
-        if (this->scratch_space_storage_service) return; // Already started by somebody else
-        if (this->scratch_space_mount_point.empty()) return; // No mount point provided
+        if (this->scratch_space_storage_service) return;    // Already started by somebody else
+        if (this->scratch_space_mount_point.empty()) return;// No mount point provided
 
         double buffer_size = 1000000000;// TODO: Make this configurable?
         try {
@@ -379,11 +377,11 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
-                answer_mailbox,
-                num_cores,
-                ram,
-                this->getMessagePayloadValue(
-                        ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
+                                                       answer_mailbox,
+                                                       num_cores,
+                                                       ram,
+                                                       this->getMessagePayloadValue(
+                                                               ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         auto msg = S4U_Mailbox::getMessage<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage>(
@@ -392,7 +390,6 @@ namespace wrench {
                 "BareMetalComputeService::isThereAtLeastOneHostWithIdleResources(): received an");
 
         return msg->answer;
-
     }
 
     /**
@@ -455,10 +452,10 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
-                answer_mailbox,
-                key,
-                this->getMessagePayloadValue(
-                        ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
+                                                       answer_mailbox,
+                                                       key,
+                                                       this->getMessagePayloadValue(
+                                                               ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         auto msg = S4U_Mailbox::getMessage<ComputeServiceResourceInformationAnswerMessage>(
@@ -493,13 +490,13 @@ namespace wrench {
         return this->scratch_space_storage_service;
     }
 
-//    /**
-//    * @brief Get a shared pointer to the compute service's scratch storage space
-//    * @return a shared pointer to the shared scratch space
-//    */
-//    std::shared_ptr<StorageService> ComputeService::getScratchSharedPtr() {
-//        return this->scratch_space_storage_service_shared_ptr;
-//    }
+    //    /**
+    //    * @brief Get a shared pointer to the compute service's scratch storage space
+    //    * @return a shared pointer to the shared scratch space
+    //    */
+    //    std::shared_ptr<StorageService> ComputeService::getScratchSharedPtr() {
+    //        return this->scratch_space_storage_service_shared_ptr;
+    //    }
 
     /**
     * @brief Checks if the compute service has a scratch space

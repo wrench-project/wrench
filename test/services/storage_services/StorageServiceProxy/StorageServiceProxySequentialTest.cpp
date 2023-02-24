@@ -75,7 +75,7 @@ class StorageServiceProxySimultaneousTestExecutionController : public wrench::Ex
 
 public:
     StorageServiceProxySimultaneousTestExecutionController(StorageServiceProxySimultaneousTest *test,
-                                                    std::string hostname, const std::shared_ptr<wrench::DataFile>& file1, bool testWithDefault) : wrench::ExecutionController(hostname, "test"),file1(file1),  test(test), order(testWithDefault){
+                                                           std::string hostname, const std::shared_ptr<wrench::DataFile> &file1, bool testWithDefault) : wrench::ExecutionController(hostname, "test"), file1(file1), test(test), order(testWithDefault) {
     }
 
 private:
@@ -89,7 +89,7 @@ private:
         WRENCH_INFO("Adding a file files to the simulation");
 
 
-        if(order){
+        if (order) {
             simulation->sleep(1);
         }
         WRENCH_INFO("Initiating Read %d", order);
@@ -135,7 +135,6 @@ void StorageServiceProxySimultaneousTest::do_Simultaneous_test(std::string mode)
                                                                                             nullptr,
                                                                                             {simgrid::s4u::LinkInRoute(simgrid::s4u::Link::by_name("link12")), simgrid::s4u::LinkInRoute(simgrid::s4u::Link::by_name("link13"))});
         }
-
     }
 
     // Create a XRootD Manager object
@@ -156,8 +155,8 @@ void StorageServiceProxySimultaneousTest::do_Simultaneous_test(std::string mode)
     remote->createFile(file1);
     //cache->createFile(file1);
     // Create an execution controller
-    auto controller1 = simulation->add(new StorageServiceProxySimultaneousTestExecutionController(this, "Client",file1, true));
-    auto controller2 = simulation->add(new StorageServiceProxySimultaneousTestExecutionController(this, "Client",file1, false));
+    auto controller1 = simulation->add(new StorageServiceProxySimultaneousTestExecutionController(this, "Client", file1, true));
+    auto controller2 = simulation->add(new StorageServiceProxySimultaneousTestExecutionController(this, "Client", file1, false));
     // Running a "run a single task1" simulation
 
     ASSERT_NO_THROW(simulation->launch());

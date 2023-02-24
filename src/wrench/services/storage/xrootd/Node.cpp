@@ -152,8 +152,8 @@ namespace wrench {
                                                          msg->file,
                                                          cached,
                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
-                                                         cached.size(),
+                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                                                         cached.size(),
                                                          msg->answered));
                     } else {
                         if (!children.empty()) {
@@ -165,7 +165,7 @@ namespace wrench {
 
                             for (auto const &entry: splitStacks) {
                                 if (entry.first == this) {//this node was the target
-                                    if (internalStorage && //check the storage, it SHOULD be there, but we should check still
+                                    if (internalStorage &&//check the storage, it SHOULD be there, but we should check still
                                         internalStorage->hasFile(msg->file)) {
                                         //File in internal storage
                                         cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
@@ -177,7 +177,7 @@ namespace wrench {
                                                                          msg->file,
                                                                          set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
                                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                                          msg->answered));
                                     }
                                 } else {
@@ -201,7 +201,7 @@ namespace wrench {
                                                              msg->file,
                                                              set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
                                                              getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                             getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                                     getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                              msg->answered));
                         }
                     }
@@ -478,8 +478,8 @@ namespace wrench {
                                                      msg->file,
                                                      cached,
                                                      getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                     getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
-                                                     cached.size(),
+                                                             getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                                                     cached.size(),
                                                      msg->answered));
                 } else {//File Not Cached
                     if (internalStorage &&
@@ -495,7 +495,7 @@ namespace wrench {
                                                          msg->file,
                                                          set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
                                                          getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                         getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                          msg->answered));
                     } else {//File not in internal storage or cache
                         if (children.size() > 0 &&
@@ -639,8 +639,8 @@ namespace wrench {
                 } else {
                     // Forward the message
                     msg->location = FileLocation::LOCATION(internalStorage, file);
-//                    msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
-//                            SimpleStorageServiceProperty::BUFFER_SIZE);
+                    //                    msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
+                    //                            SimpleStorageServiceProperty::BUFFER_SIZE);
                     S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
                 }
 
@@ -779,8 +779,8 @@ namespace wrench {
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
             cache.maxCacheTime = getPropertyValueAsTimeInSecond(Property::CACHE_MAX_LIFETIME);
             this->deployment = deployment;
-//            this->buffer_size = DBL_MAX;// Not used, but letting it be zero will raise unwanted exception since
-//            // clients "think" that they're talking to a real storage service
+            //            this->buffer_size = DBL_MAX;// Not used, but letting it be zero will raise unwanted exception since
+            //            // clients "think" that they're talking to a real storage service
         }
 
         /**
@@ -939,7 +939,7 @@ namespace wrench {
             // TODO: WILL SAY "THIS IS NOT ME, MY PARENT IS THE INTERNALSTORAGE, NOT THE NODE"
             auto new_location = FileLocation::LOCATION(internalStorage, location->getPath(), location->getFile());
             internalStorage->writeFile(answer_mailbox, new_location, wait_for_answer);
-//            internalStorage->writeFile(answer_mailbox, location, wait_for_answer);
+            //            internalStorage->writeFile(answer_mailbox, location, wait_for_answer);
             metavisor->files[location->getFile()].push_back(this->getSharedPtr<Node>());
         }
 
@@ -991,7 +991,7 @@ namespace wrench {
             return !constructFileSearchTree(metavisor->getFileNodes(location->getFile())).empty();//meta search the subtree for the file.  If its in the subtree we can find a route to it, so we have it
         }
 
-	/**
+        /**
          * @brief Get the storage service's total space (in zero simulated time)
          * @return a capacity in bytes
          */
@@ -1003,7 +1003,7 @@ namespace wrench {
             }
         }
 
-	/**
+        /**
          * @brief Determine whether the storage service is bufferized
          * @return true if bufferized, false otherwise
          */
@@ -1011,12 +1011,12 @@ namespace wrench {
             if (internalStorage) {
                 return internalStorage->isBufferized();
             } else {
-                return 0; // TODO: IS THIS A GOOD IDEA? MAY MESS UP COPYING???
+                return 0;// TODO: IS THIS A GOOD IDEA? MAY MESS UP COPYING???
                 throw std::runtime_error("Node::isBufferized() called on non storage Node " + hostname);
             }
         }
 
-	/**
+        /**
          * @brief Determine the storage service's buffer size
          * @return a size in bytes
          */
@@ -1028,7 +1028,7 @@ namespace wrench {
             }
         }
 
-	/**
+        /**
          * @brief Reserve space at the storage service
          * @param location: a location
          * @return true if success, false otherwise
@@ -1041,11 +1041,11 @@ namespace wrench {
             }
         }
 
-	/**
+        /**
          * @brief Unreserve space at the storage service
          * @param location: a location
          */
-        void Node::unreserveSpace(std::shared_ptr<FileLocation> &location){
+        void Node::unreserveSpace(std::shared_ptr<FileLocation> &location) {
             if (internalStorage) {
                 internalStorage->unreserveSpace(location);
             } else {

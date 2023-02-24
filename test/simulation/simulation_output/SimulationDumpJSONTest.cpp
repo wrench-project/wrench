@@ -1234,7 +1234,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1268,7 +1268,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     nlohmann::json result_json;
     json_file >> result_json;
 
-//    std::cerr << result_json << "\n";
+    //    std::cerr << result_json << "\n";
 
     for (auto const &operation: (std::vector<std::string>){"reads"}) {
         ASSERT_EQ(result_json["host1"]["/"][operation].size(), 3);

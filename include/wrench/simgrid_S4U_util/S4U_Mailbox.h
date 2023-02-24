@@ -44,27 +44,27 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      */
         template<class TMessageType>
-        static std::unique_ptr<TMessageType> getMessage(simgrid::s4u::Mailbox *mailbox,const std::string& error_prefix=""){
-            auto id=++messageCounter;
-            #ifndef NDEBUG
-                char const *name = typeid(TMessageType).name();
-                std::string tn= boost::core::demangle(name);
-                templateWaitingLog(mailbox,tn,id);
-            #endif
-
-
-            auto message=S4U_Mailbox::getMessage(mailbox,false);
-
-            if(auto msg=dynamic_cast<TMessageType*>(message.get())){
+        static std::unique_ptr<TMessageType> getMessage(simgrid::s4u::Mailbox *mailbox, const std::string &error_prefix = "") {
+            auto id = ++messageCounter;
 #ifndef NDEBUG
-                templateWaitingLogUpdate(mailbox,tn,id);
+            char const *name = typeid(TMessageType).name();
+            std::string tn = boost::core::demangle(name);
+            templateWaitingLog(mailbox, tn, id);
+#endif
+
+
+            auto message = S4U_Mailbox::getMessage(mailbox, false);
+
+            if (auto msg = dynamic_cast<TMessageType *>(message.get())) {
+#ifndef NDEBUG
+                templateWaitingLogUpdate(mailbox, tn, id);
 #endif
                 message.release();
                 return std::unique_ptr<TMessageType>(msg);
-            }else{
+            } else {
                 char const *name = typeid(TMessageType).name();
-                std::string tn= boost::core::demangle(name);
-                throw std::runtime_error(error_prefix+" Unexpected [" + message->getName() + "] message while waiting for "+ tn.c_str()+". Request ID: "+std::to_string(id));
+                std::string tn = boost::core::demangle(name);
+                throw std::runtime_error(error_prefix + " Unexpected [" + message->getName() + "] message while waiting for " + tn.c_str() + ". Request ID: " + std::to_string(id));
             }
         }
         /**
@@ -79,27 +79,27 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      */
         template<class TMessageType>
-        static std::unique_ptr<TMessageType> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout,const std::string& error_prefix=""){
-            auto id=++messageCounter;
+        static std::unique_ptr<TMessageType> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout, const std::string &error_prefix = "") {
+            auto id = ++messageCounter;
 #ifndef NDEBUG
             char const *name = typeid(TMessageType).name();
-            std::string tn= boost::core::demangle(name);
-            templateWaitingLog(mailbox,tn,id);
+            std::string tn = boost::core::demangle(name);
+            templateWaitingLog(mailbox, tn, id);
 #endif
 
 
-            auto message=S4U_Mailbox::getMessage(mailbox,timeout,false);
+            auto message = S4U_Mailbox::getMessage(mailbox, timeout, false);
 
-            if(auto msg=dynamic_cast<TMessageType*>(message.get())){
+            if (auto msg = dynamic_cast<TMessageType *>(message.get())) {
                 message.release();
 #ifndef NDEBUG
-                templateWaitingLogUpdate(mailbox,tn,id);
+                templateWaitingLogUpdate(mailbox, tn, id);
 #endif
                 return std::unique_ptr<TMessageType>(msg);
-            }else{
+            } else {
                 char const *name = typeid(TMessageType).name();
-                std::string tn= boost::core::demangle(name);
-                throw std::runtime_error(error_prefix+" Unexpected [" + message->getName() + "] message while waiting for "+ tn.c_str()+". Request ID: "+std::to_string(id));
+                std::string tn = boost::core::demangle(name);
+                throw std::runtime_error(error_prefix + " Unexpected [" + message->getName() + "] message while waiting for " + tn.c_str() + ". Request ID: " + std::to_string(id));
             }
         }
         /**
@@ -110,8 +110,8 @@ namespace wrench {
      *
      * @throw std::shared_ptr<NetworkError>
      */
-        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox){
-                return getMessage(mailbox,true);
+        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox) {
+            return getMessage(mailbox, true);
         }
         /**
      * @brief Synchronously receive a message from a mailbox, with a timeout
@@ -122,8 +122,8 @@ namespace wrench {
      *
      * @throw std::shared_ptr<NetworkError>
      */
-        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout){
-                return getMessage(mailbox, timeout,true);
+        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout) {
+            return getMessage(mailbox, timeout, true);
         }
         static void putMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *m);
         static void dputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg);
@@ -152,13 +152,13 @@ namespace wrench {
 
 
     private:
-        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox,bool log);
-        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout,bool log);
+        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox, bool log);
+        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout, bool log);
         static std::deque<simgrid::s4u::Mailbox *> free_mailboxes;
         static std::set<simgrid::s4u::Mailbox *> used_mailboxes;
         static std::deque<simgrid::s4u::Mailbox *> mailboxes_to_drain;
-        static void templateWaitingLog(const simgrid::s4u::Mailbox* mailbox ,std::string type,unsigned long long id);
-        static void templateWaitingLogUpdate(const simgrid::s4u::Mailbox* mailbox ,std::string type,unsigned long long id);
+        static void templateWaitingLog(const simgrid::s4u::Mailbox *mailbox, std::string type, unsigned long long id);
+        static void templateWaitingLogUpdate(const simgrid::s4u::Mailbox *mailbox, std::string type, unsigned long long id);
         static unsigned long long messageCounter;
     };
 
