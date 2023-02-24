@@ -64,6 +64,7 @@ namespace wrench {
      * @brief Reclaim file locations that are no longer used
      */
     void FileLocation::reclaimFileLocations() {
+        std::cerr << "IN RECLAIM FL\n";
         for (auto it = FileLocation::file_location_map.cbegin(); it != FileLocation::file_location_map.cend();) {
             if ((*it).second.use_count() == 1) {
                 it = FileLocation::file_location_map.erase(it);
