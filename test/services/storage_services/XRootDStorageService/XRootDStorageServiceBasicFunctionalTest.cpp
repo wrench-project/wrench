@@ -195,7 +195,7 @@ private:
         // Copy a file from Supervisor to stand-alone storage service (which is not alloweD)
         auto file7 = wrench::Simulation::addFile("file7", 10000);
         this->test->root_supervisor->getChild(0)->writeFile(file7);
-        this->test->root_supervisor->getChild(0)->createFile(file7);  // works too
+        this->test->root_supervisor->getChild(0)->createFile(file7);// works too
         try {
             wrench::StorageService::copyFile(
                     wrench::FileLocation::LOCATION(this->test->root_supervisor, file7),
@@ -246,8 +246,8 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
-//    argv[2] = strdup("--log=wrench_core_mailbox.t=debug");
+    //    argv[1] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--log=wrench_core_mailbox.t=debug");
 
     simulation->init(&argc, argv);
 

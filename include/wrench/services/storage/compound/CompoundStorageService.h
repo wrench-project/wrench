@@ -42,14 +42,12 @@ namespace wrench {
      */
     class CompoundStorageService : public StorageService {
     public:
-
+        using StorageService::createFile;
+        using StorageService::deleteFile;
+        using StorageService::hasFile;
+        using StorageService::lookupFile;
         using StorageService::readFile;
         using StorageService::writeFile;
-        using StorageService::deleteFile;
-        using StorageService::lookupFile;
-        using StorageService::createFile;
-        using StorageService::hasFile;
-
 
 
         CompoundStorageService(const std::string &hostname,
@@ -88,7 +86,7 @@ namespace wrench {
             return false;
         }
 
-	/**
+        /**
          * @brief Determine the storage service's buffer size
          * @return a size in bytes
          */
@@ -96,7 +94,7 @@ namespace wrench {
             return 0;
         }
 
-	/**
+        /**
          * @brief Reserve space at the storage service
          * @param location a location
          * @return true if success, false otherwise
@@ -105,7 +103,7 @@ namespace wrench {
             throw std::runtime_error("CompoundStorageService::reserveSpace(): not implemented");
         }
 
-	/**
+        /**
         * @brief Unreserve space at the storage service
         * @param location a location
         */
@@ -113,7 +111,7 @@ namespace wrench {
             throw std::runtime_error("CompoundStorageService::unreserveSpace(): not implemented");
         }
 
-	/**
+        /**
          * @brief Create a file at the storage service (in zero simulated time)
          * @param location a location
          */
@@ -214,9 +212,8 @@ namespace wrench {
 
         bool isStorageSelectionUserProvided;
 
-        /** @brief File systems */ // TODO: Is this really needed now that file_systems are no longer in StorageService.h?
+        /** @brief File systems */// TODO: Is this really needed now that file_systems are no longer in StorageService.h?
         std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
-
     };
 
 };// namespace wrench

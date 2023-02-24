@@ -311,8 +311,8 @@ private:
         CUSTOM_THROW(new wrench::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), nullptr, location, 10, 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), (simgrid::s4u::Host *) 666, nullptr, 10, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, true, nullptr, {{simgrid::s4u::Mailbox::by_name("mailbox"),0.0}}, 10, 666));
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, false, failure_cause, {{nullptr,0.0}}, 10, 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, true, nullptr, {{simgrid::s4u::Mailbox::by_name("mailbox"), 0.0}}, 10, 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, false, failure_cause, {{nullptr, 0.0}}, 10, 666));
         CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(nullptr, true, nullptr, simgrid::s4u::Mailbox::by_name("mailbox"), 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, true, nullptr, nullptr, 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, true, failure_cause, simgrid::s4u::Mailbox::by_name("mailbox"), 666), std::invalid_argument);
