@@ -239,6 +239,7 @@ namespace wrench {
             cleanup_actions.push_back(cjob->addFileDeleteAction("", fc));
         }
 
+
         // Create the task actions
         for (auto const &task: this->tasks) {
             // Create the Compute Action
@@ -317,9 +318,11 @@ namespace wrench {
         // Create the scratch clean up actions
         //        std::cerr << "NEED SCRATCH CLEAN = " << need_scratch_clean << "\n";
         // Does the lambda capture of cjob_file_locations work?
-        auto lambda_execute = [this, cjob](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
+        std::weak_ptr<CompoundJob> weak_cjob = cjob;
+        auto lambda_execute = [this, weak_cjob](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
             auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
             auto scratch = cs->getScratch();
+            auto cjob = weak_cjob.lock();
             if (scratch) {
                 for (auto const &task: this->tasks) {
                     for (auto const &f: task->getInputFiles()) {
@@ -343,6 +346,7 @@ namespace wrench {
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
         scratch_cleanup = cjob->addCustomAction("", 0, 0, lambda_execute, lambda_terminate);
+
 
         // Add all inter-task dependencies
         for (auto const &parent_task: this->tasks) {
@@ -447,7 +451,7 @@ namespace wrench {
         }
 
         //            cjob->printActionDependencies();
-        this->compound_job = cjob;
+        this->compound_job = std::move(cjob);
     }
 
     void StandardJob::analyzeActions(const std::vector<std::shared_ptr<Action>> &actions,
