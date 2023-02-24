@@ -1,7 +1,8 @@
 ﻿
 set(CMAKE_CXX_STANDARD 14)
 
-add_custom_command(
+# ToDo: change it to my script generate html form swagger gen maybe?
+#[[add_custom_command(
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/REST_API_generated_code.h
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/doc/
@@ -9,7 +10,7 @@ add_custom_command(
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         COMMENT "Generating REST API code and documentation"
         VERBATIM
-)
+)]]
 
 
 # Add needed packages

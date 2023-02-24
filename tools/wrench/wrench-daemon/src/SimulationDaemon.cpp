@@ -25,27 +25,34 @@ using json = nlohmann::json;
  */
 void SimulationDaemon::run() {
     // Set up GET request handler for the (likely useless) "alive" path
-    this->server.Get("/api/alive", [this](const Request &req, Response &res) { alive(req, res); });
+    CROW_ROUTE(app, "/api/alive").methods("Get"_method)
+            ([this](const crow::request& req){
+                crow::response res;
+                this->alive(req, res);
+                return res;
+            });
 
     // Set up POST request handler for terminating simulation
-    this->server.Post("/api/terminateSimulation",
-                      [this](const Request &req, Response &res) { terminateSimulation(req, res); });
+    CROW_ROUTE(app, "/api/terminateSimulation").methods("POST"_method)
+            ([this](const crow::request& req){
+                crow::response res;
+                this->terminateSimulation(req, res);
+                return res;
+            });
 
     // Set up ALL POST request handlers for API calls
     REST_API rest_api(
-            this->server,
-            [this](const Request &req) { this->displayRequest(req); },
+            this->app,
+            [this](const crow::request &req) { this->displayRequest(req); },
             this->simulation_controller);
 
     if (daemon_logging) {
         std::cerr << " PID " << getpid() << " listening on port " << simulation_port_number << "\n";
     }
 
-    while (true) {
-        // This is in a while loop because, on Linux, it seems that sometimes the
-        // server returns from the listen() call below, not sure why...
-        server.listen("0.0.0.0", simulation_port_number);
-    }
+    // Test ToDo: Investigate multi-threads later
+    app.port(simulation_port_number).run();
+
     //    exit(0);
 }
 
@@ -71,15 +78,15 @@ SimulationDaemon::SimulationDaemon(
  * @brief Helper method for logging
  * @param req HTTP request
  */
-void SimulationDaemon::displayRequest(const Request &req) const {
+void SimulationDaemon::displayRequest(const crow::request &req) const {
     unsigned long max_line_length = 120;
     if (daemon_logging) {
-        std::cerr << req.path << " " << req.body.substr(0, max_line_length)
+        std::cerr << req.url << " " << req.body.substr(0, max_line_length)
                   << (req.body.length() > max_line_length ? "..." : "") << std::endl;
     }
 }
 
-void SimulationDaemon::alive(const Request &req, Response &res) {
+void SimulationDaemon::alive(const crow::request &req, crow::response &res) {
     SimulationDaemon::displayRequest(req);
 
     // Create json answer
@@ -88,7 +95,7 @@ void SimulationDaemon::alive(const Request &req, Response &res) {
     answer["alive"] = true;
 
     res.set_header("access-control-allow-origin", "*");
-    res.set_content(answer.dump(), "application/json");
+    res.body = to_string(answer);
 }
 
 /***********************
@@ -114,7 +121,7 @@ void SimulationDaemon::alive(const Request &req, Response &res) {
  * }
  * END_REST_API_DOCUMENTATION
  */
-void SimulationDaemon::terminateSimulation(const Request &req, Response &res) {
+void SimulationDaemon::terminateSimulation(const crow::request &req, crow::response &res) {
     displayRequest(req);
 
     // Stop the simulation thread and wait for it to have stopped
@@ -126,9 +133,9 @@ void SimulationDaemon::terminateSimulation(const Request &req, Response &res) {
     answer["wrench_api_request_success"] = true;
 
     res.set_header("access-control-allow-origin", "*");
-    res.set_content(answer.dump(), "application/json");
+    res.body = to_string(answer);
 
-    server.stop();
+    app.stop();
     if (daemon_logging) {
         std::cerr << " PID " << getpid() << " terminated.\n";
     }
