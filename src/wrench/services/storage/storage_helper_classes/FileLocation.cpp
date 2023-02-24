@@ -152,7 +152,7 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::LOCATION(): must specify a non-empty path");
         }
 
-        return FileLocation::createFileLocation(ss, file, FileLocation::sanitizePath(path + "/"),  false);
+        return FileLocation::createFileLocation(ss, file, FileLocation::sanitizePath(path + "/"), false);
     }
 
     /**

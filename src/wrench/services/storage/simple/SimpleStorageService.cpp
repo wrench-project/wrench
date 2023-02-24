@@ -68,8 +68,6 @@ namespace wrench {
     }
 
 
-
-
     /**
     * @brief Generate a unique number
     *
@@ -100,7 +98,7 @@ namespace wrench {
      */
     SimpleStorageService::SimpleStorageService(
             const std::string &hostname,
-            const std::set<std::string>& mount_points,
+            const std::set<std::string> &mount_points,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             const std::string &suffix) : StorageService(hostname, "simple_storage" + suffix) {
@@ -232,25 +230,25 @@ namespace wrench {
      * @return
      */
     std::string SimpleStorageService::getBaseRootPath() {
-            if (this->file_systems.size() > 1) {
-                throw std::runtime_error("SimpleStorageService::getBaseRootPath(): storage service has mutiple mount points, and thus no single getRootPath");
-            } else {
-                return this->file_systems.begin()->first + "/";
-            }
+        if (this->file_systems.size() > 1) {
+            throw std::runtime_error("SimpleStorageService::getBaseRootPath(): storage service has mutiple mount points, and thus no single getRootPath");
+        } else {
+            return this->file_systems.begin()->first + "/";
+        }
     }
 
 
-//    /**
-//     * @brief Get the mount point (will throw is more than one)
-//     * @return the (sole) mount point of the service
-//     */
-//    std::string SimpleStorageService::getMountPoint() {
-//        if (this->hasMultipleMountPoints()) {
-//            throw std::invalid_argument(
-//                    "StorageService::getMountPoint(): The storage service has more than one mount point");
-//        }
-//        return wrench::FileLocation::sanitizePath(this->file_systems.begin()->first);
-//    }
+    //    /**
+    //     * @brief Get the mount point (will throw is more than one)
+    //     * @return the (sole) mount point of the service
+    //     */
+    //    std::string SimpleStorageService::getMountPoint() {
+    //        if (this->hasMultipleMountPoints()) {
+    //            throw std::invalid_argument(
+    //                    "StorageService::getMountPoint(): The storage service has more than one mount point");
+    //        }
+    //        return wrench::FileLocation::sanitizePath(this->file_systems.begin()->first);
+    //    }
 
     /**
      * @brief Get the set of mount points
@@ -374,7 +372,7 @@ namespace wrench {
      */
     bool SimpleStorageService::splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point) {
         auto sanitized_path = FileLocation::sanitizePath(path);
-        for (auto const &fs : this->file_systems) {
+        for (auto const &fs: this->file_systems) {
             auto mp = fs.first;
             if (FileLocation::properPathPrefix(mp, sanitized_path)) {
                 mount_point = mp;
@@ -413,7 +411,7 @@ namespace wrench {
      * @brief Create a file at the storage service (in zero simulated time)
      * @param location: a location
      */
-    void SimpleStorageService::createFile(const std::shared_ptr<FileLocation> &location)  {
+    void SimpleStorageService::createFile(const std::shared_ptr<FileLocation> &location) {
         // If the file's already there, nothing to do
         if (StorageService::hasFileAtLocation(location)) return;
 

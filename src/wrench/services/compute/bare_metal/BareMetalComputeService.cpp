@@ -655,9 +655,9 @@ namespace wrench {
         bool answer = this->action_execution_service->IsThereAtLeastOneHostWithAvailableResources(num_cores, ram);
         S4U_Mailbox::dputMessage(
                 answer_mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
-                        answer,
-                        this->getMessagePayloadValue(
-                                BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
+                                        answer,
+                                        this->getMessagePayloadValue(
+                                                BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
     }
 
     /**
@@ -690,8 +690,7 @@ namespace wrench {
                     this->getScratch()->deleteFile(
                             f,
                             this->getScratch()->getBaseRootPath() +
-                            j.first->getName()
-                    );
+                                    j.first->getName());
                 } catch (ExecutionException &e) {
                     throw;
                 }
@@ -734,35 +733,35 @@ namespace wrench {
         // TODO: This may be a performance bottleneck... may have to remedy
         std::sort(this->ready_actions.begin(), this->ready_actions.end(),
                   [](const std::shared_ptr<Action> &a, const std::shared_ptr<Action> &b) -> bool {
-                    if (a->getJob() != b->getJob()) {
-                        if (a->getJob()->getPriority() > b->getJob()->getPriority()) {
-                            return true;
-                        } else if (a->getJob()->getPriority() < b->getJob()->getPriority()) {
-                            return false;
-                        } else if (a->getPriority() > b->getPriority()) {
-                            return true;
-                        } else if (a->getPriority() < b->getPriority()) {
-                            return false;
-                        } else if (a->getName() < b->getName()) {
-                            return true;
-                        } else if (a->getName() < b->getName()) {
-                            return false;
-                        } else {
-                            return (unsigned long) (a->getJob().get()) > (unsigned long) (b->getJob().get());
-                        }
-                    } else {
-                        if (a->getPriority() > b->getPriority()) {
-                            return true;
-                        } else if (a->getPriority() < b->getPriority()) {
-                            return false;
-                        } else if (a->getName() < b->getName()) {
-                            return true;
-                        } else if (a->getName() > b->getName()) {
-                            return false;
-                        } else {
-                            return (unsigned long) (a.get()) > (unsigned long) (b.get());
-                        }
-                    }
+                      if (a->getJob() != b->getJob()) {
+                          if (a->getJob()->getPriority() > b->getJob()->getPriority()) {
+                              return true;
+                          } else if (a->getJob()->getPriority() < b->getJob()->getPriority()) {
+                              return false;
+                          } else if (a->getPriority() > b->getPriority()) {
+                              return true;
+                          } else if (a->getPriority() < b->getPriority()) {
+                              return false;
+                          } else if (a->getName() < b->getName()) {
+                              return true;
+                          } else if (a->getName() < b->getName()) {
+                              return false;
+                          } else {
+                              return (unsigned long) (a->getJob().get()) > (unsigned long) (b->getJob().get());
+                          }
+                      } else {
+                          if (a->getPriority() > b->getPriority()) {
+                              return true;
+                          } else if (a->getPriority() < b->getPriority()) {
+                              return false;
+                          } else if (a->getName() < b->getName()) {
+                              return true;
+                          } else if (a->getName() > b->getName()) {
+                              return false;
+                          } else {
+                              return (unsigned long) (a.get()) > (unsigned long) (b.get());
+                          }
+                      }
                   });
 
         for (auto const &action: this->ready_actions) {

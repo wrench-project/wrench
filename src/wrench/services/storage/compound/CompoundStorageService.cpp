@@ -150,9 +150,9 @@ namespace wrench {
         for (const auto &ss: this->storage_services) {
             message = " - " + ss->process_name + " on " + ss->getHostname();
             WRENCH_INFO("%s", message.c_str());
-//            for (const auto &mnt: ss->getMountPoints()) {
-//                WRENCH_INFO("  - %s", mnt.c_str());
-//            }
+            //            for (const auto &mnt: ss->getMountPoints()) {
+            //                WRENCH_INFO("  - %s", mnt.c_str());
+            //            }
         }
 
         /** Main loop **/
@@ -421,7 +421,7 @@ namespace wrench {
             final_dst = this->lookupOrDesignateStorageService(msg->dst);
         }
 
-//        std::cerr << "FINAL DST = " << (final_dst == nullptr) << "\n";
+        //        std::cerr << "FINAL DST = " << (final_dst == nullptr) << "\n";
 
         // Error case - src
         if (!final_src) {
@@ -612,7 +612,7 @@ namespace wrench {
      * @return A number of bytes
      */
     double CompoundStorageService::getTotalSpace() {
-//        WRENCH_INFO("CompoundStorageService::getTotalSpace");
+        //        WRENCH_INFO("CompoundStorageService::getTotalSpace");
         double free_space = 0.0;
         for (const auto &service: this->storage_services) {
             auto service_name = service->getName();
