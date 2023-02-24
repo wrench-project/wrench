@@ -106,7 +106,7 @@ namespace wrench {
                     this->time_to_next_measurement.end(),
                     [](decltype(this->time_to_next_measurement)::value_type &lhs,
                        decltype(this->time_to_next_measurement)::value_type &rhs) {
-                      return lhs.second < rhs.second;
+                        return lhs.second < rhs.second;
                     });
 
             double time_to_next_measure = min_el->second;
