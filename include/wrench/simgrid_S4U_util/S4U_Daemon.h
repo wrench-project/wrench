@@ -58,7 +58,7 @@ namespace wrench {
 
         static simgrid::s4u::Mailbox *getRunningActorRecvMailbox();
 
-        S4U_Daemon(const std::string& hostname, const std::string& process_name_prefix);
+        S4U_Daemon(const std::string &hostname, const std::string &process_name_prefix);
 
         // Daemon without a mailbox (not needed?)
         //        S4U_Daemon(std::string hostname, std::string process_name_prefix);
@@ -145,8 +145,8 @@ namespace wrench {
 
         bool has_returned_from_main = false;// Set to true after main returns
         int return_value = 0;               // Set to the value returned by main
-        bool daemonized{};                    // Set to true if daemon is daemonized
-        bool auto_restart{};                  // Set to true if daemon is supposed to auto-restart
+        bool daemonized{};                  // Set to true if daemon is daemonized
+        bool auto_restart{};                // Set to true if daemon is supposed to auto-restart
 
 
 #ifdef ACTOR_TRACKING_OUTPUT
