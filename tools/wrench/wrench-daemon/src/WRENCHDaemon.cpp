@@ -75,12 +75,12 @@ bool WRENCHDaemon::isPortTaken(int port) {
  * @param res the response object to update
  * @param port_number the port_number on which simulation client will need to connect
  */
-void setSuccessAnswer(Response &res, int port_number) {
+void setSuccessAnswer(crow::response &res, int port_number) {
     json answer;
     answer["wrench_api_request_success"] = true;
     answer["port_number"] = port_number;
     res.set_header("access-control-allow-origin", "*");
-    res.set_content(answer.dump(), "application/json");
+    res.body = to_string(answer);
 }
 
 /**
@@ -88,12 +88,12 @@ void setSuccessAnswer(Response &res, int port_number) {
  * @param res res the response object to update
  * @param failure_cause a human-readable error message
  */
-void setFailureAnswer(Response &res, const std::string &failure_cause) {
+void setFailureAnswer(crow::response &res, const std::string &failure_cause) {
     json answer;
     answer["wrench_api_request_success"] = false;
     answer["failure_cause"] = failure_cause;
     res.set_header("access-control-allow-origin", "*");
-    res.set_content(answer.dump(), "application/json");
+    res.body = to_string(answer);
 }
 
 /**
@@ -154,11 +154,11 @@ std::string readStringFromSharedMemorySegment(int shm_segment_id) {
  * }
  * END_REST_API_DOCUMENTATION
  */
-void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
+void WRENCHDaemon::startSimulation(const crow::request &req, crow::response &res) {
     // Print some logging
     unsigned long max_line_length = 120;
     if (daemon_logging) {
-        std::cerr << req.path << " " << req.body.substr(0, max_line_length)
+        std::cerr << req.url << " " << req.body.substr(0, max_line_length)
                   << (req.body.length() > max_line_length ? "..." : "") << std::endl;
     }
 
@@ -200,7 +200,7 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
 
     if (!child_pid) {// The child process
         // Stop the server that was listening on the main WRENCH daemon port
-        server.stop();
+        app.stop();
 
         // Create a pipe for communication with my child (aka the grand-child)
         int fd[2];
@@ -236,6 +236,7 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
             std::mutex guard;
             std::condition_variable signal;
 
+            std::cout<<"before parsing body data"<<std::endl;
             // Create AND launch the simulation in a separate thread (it is tempting to
             // do the creation here and the launch in a thread, but it seems that SimGrid
             // does not like that - likely due to the maestro business)
@@ -352,9 +353,10 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
  * @param req the HTTP request
  * @param res the HTTP response
  */
+/*
 void WRENCHDaemon::error_handling(const Request &req, Response &res) {
     std::cerr << "[" << res.status << "]: " << req.path << " " << req.body << "\n";
-}
+}*/
 
 /**
  * @brief The WRENCH daemon's "main" method
@@ -362,10 +364,15 @@ void WRENCHDaemon::error_handling(const Request &req, Response &res) {
 void WRENCHDaemon::run() {
     // Only set up POST request handler for "/api/startSimulation" since
     // all other API paths will be handled by a simulation daemon instead
-    server.Post("/api/startSimulation", [this](const Request &req, Response &res) { this->startSimulation(req, res); });
-
-    // Set some generic error handler
-    server.set_error_handler([](const Request &req, Response &res) { WRENCHDaemon::error_handling(req, res); });
+    // now we use crow in this outer loop
+    // Set some generic error handler ToDo: do we still need that when replacing httplib with crow
+    //server.set_error_handler([](const Request &req, Response &res) { WRENCHDaemon::error_handling(req, res); });
+    CROW_ROUTE(app, "/api/startSimulation").methods("POST"_method)
+            ([this](const crow::request& req){
+                crow::response res;
+                this->startSimulation(req, res);
+                return res;
+            });
 
     // Start the web server
     if (daemon_logging) {
@@ -375,6 +382,7 @@ void WRENCHDaemon::run() {
         // This is in a while loop because, on Linux, the main process seems to return
         // from the listen() call below, not sure why... perhaps this while loop
         // could be removed, but it likely doesn't hurt
-        server.listen("0.0.0.0", port_number);
+        //set the port, set the app to run on multiple threads, and run the app ToDo: do we need multithreads
+        app.port(port_number).run();
     }
 }

@@ -11,6 +11,7 @@
 #define SIMULATION_DAEMON_H
 
 #include "httplib.h"
+#include "crow.h"
 
 using httplib::Request;
 using httplib::Response;
@@ -39,18 +40,18 @@ public:
     void run();
 
 private:
-    httplib::Server server;
+    crow::SimpleApp app;
 
     bool daemon_logging;
     int simulation_port_number;
     std::shared_ptr<wrench::SimulationController> simulation_controller;
     std::thread &simulation_thread;
 
-    void displayRequest(const Request &req) const;
+    void displayRequest(const crow::request &req) const;
 
-    void terminateSimulation(const Request &req, Response &res);
+    void terminateSimulation(const crow::request &req, crow::response &res);
 
-    void alive(const Request &req, Response &res);
+    void alive(const crow::request &req, crow::response &res);
 };
 
 
