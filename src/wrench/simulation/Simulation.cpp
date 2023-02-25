@@ -1452,7 +1452,7 @@ namespace wrench {
                                                     " has two disks with the same mount point '" + disks[i] + "'");
                     }
                     if ((disks[j] != "/") and (disks[i] != "/") and
-                        (FileLocation::properPathPrefix(disks[i], disks[j]))) {
+                        (FileLocation::properPathPrefix(FileLocation::sanitizePath(disks[i]), FileLocation::sanitizePath(disks[j])))) {
                         throw std::invalid_argument("Simulation::platformSanityCheck(): Host " + h +
                                                     " has two disks, with one of them having a mount point that "
                                                     "is a prefix of the other (" +
