@@ -309,17 +309,22 @@ namespace wrench {
      * @return true if one of the two paths is a proper prefix of the other
      */
     bool FileLocation::properPathPrefix(std::string path1, std::string path2) {
-        if (path1.size() > path2.size()) return false;
-
-        std::cerr << "PATH1: " << path1 << "\n";
-        std::cerr << "PATH2: " << path2 << "\n";
-        bool foo = !path2.compare(0, path1.size(), path1);
-        std::cerr << "FOO = " << foo << "\n";
-        return foo;
+//        if (path1.size() > path2.size()) return false;
+//
+//        path1 = sanitizePath(path1);
+//        path2 = sanitizePath(path2);
+//        std::cerr << "PATH1: " << path1 << "\n";
+//        std::cerr << "PATH2: " << path2 << "\n";
+//        bool foo = (path2.compare(0, path1.size(), path1) >= 0);
+//        std::cerr << "FOO = " << foo << "\n";
+//        return foo;
 
         // Sanitize paths
         path1 = sanitizePath(path1);
         path2 = sanitizePath(path2);
+
+        return path2.size() >= path1.size() && path2.compare(0, path1.size(), path1) == 0;
+
 
 
         // Split into tokens
