@@ -107,7 +107,6 @@ protected:
 
 TEST_F(WorkflowTaskTest, TaskStructure) {
 
-
     // WorkflowTask structure sanity check
     ASSERT_EQ(t1->getWorkflow(), workflow.get());
 
