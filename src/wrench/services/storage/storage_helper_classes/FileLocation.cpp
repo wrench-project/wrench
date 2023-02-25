@@ -304,52 +304,20 @@ namespace wrench {
 
     /**
      * @brief Helper method to find if a path is a proper prefix of another path
-     * @param path1: prefix
-     * @param path2: another path (already sanitized)
+     * @param path1: a path (ALREADY SANITIZED)
+     * @param path2: another path (ALREADY SANITIZED)
      * @return true if one of the two paths is a proper prefix of the other
      */
-    bool FileLocation::properPathPrefix(std::string path1, std::string path2) {
-//        if (path1.size() > path2.size()) return false;
-//
-//        path1 = sanitizePath(path1);
-//        path2 = sanitizePath(path2);
-//        std::cerr << "PATH1: " << path1 << "\n";
-//        std::cerr << "PATH2: " << path2 << "\n";
-//        bool foo = (path2.compare(0, path1.size(), path1) >= 0);
-//        std::cerr << "FOO = " << foo << "\n";
-//        return foo;
+    bool FileLocation::properPathPrefix(const std::string &path1, const std::string &path2) {
 
-        // Sanitize paths
-        path1 = sanitizePath(path1);
-        path2 = sanitizePath(path2);
-
-        return path2.size() >= path1.size() && path2.compare(0, path1.size(), path1) == 0;
-
-
-
-        // Split into tokens
-        std::vector<std::string> tokens1, tokens2, shorter, longer;
-        boost::split(tokens1, path1, boost::is_any_of("/"));
-        boost::split(tokens2, path2, boost::is_any_of("/"));
-
-
-        if (tokens1.size() < tokens2.size()) {
-            shorter = tokens1;
-            longer = tokens2;
-        } else {
-            shorter = tokens2;
-            longer = tokens1;
-        }
-
-        for (unsigned int i = 1; i < shorter.size() - 1; i++) {
-            if (shorter.at(i) != longer.at(i)) {
-                return false;
-            }
-        }
-
-        return true;
+        return ((path2.size() >= path1.size() && path2.compare(0, path1.size(), path1) == 0) or
+               (path2.size() < path1.size() && path1.compare(0, path2.size(), path2) == 0));
     }
 
+    /**
+     * @brief Gets the simgrid disk associated to a location
+     * @return a simgrid disk or nullpts if none
+     */
     simgrid::s4u::Disk *FileLocation::getDiskOrNull() {
         if (this->is_scratch) {
             return nullptr;

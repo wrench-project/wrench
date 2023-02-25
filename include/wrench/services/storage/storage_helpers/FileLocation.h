@@ -97,7 +97,7 @@ namespace wrench {
         }
 
         static std::string sanitizePath(const std::string &path);
-        static bool properPathPrefix(std::string path1, std::string path2);
+        static bool properPathPrefix(const std::string &path1, const std::string &path2);
 
     private:
         friend class LogicalFileSystem;
