@@ -113,7 +113,8 @@ namespace wrench {
         try {
             for (const auto &mp: mount_points) {
                 this->file_systems[mp] = LogicalFileSystem::createLogicalFileSystem(
-                        this->getHostname(), this, mp, this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR));
+                        this->getHostname(), this,
+                        FileLocation::sanitizePath(mp), this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR));
             }
         } catch (std::invalid_argument &e) {
             throw;

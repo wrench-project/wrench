@@ -262,7 +262,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void LogicalFileSystem::unreserveSpace(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
-        if (devnull) {
+
+        if (this->devnull) {
             return;
         }
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
