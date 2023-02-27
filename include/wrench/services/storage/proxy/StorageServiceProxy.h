@@ -62,6 +62,8 @@ namespace wrench {
 
         double getLoad() override;//cache
 
+        void removeDirectory(const std::string &path) override;
+
         bool isBufferized() const override;//cache
 
         double getBufferSize() const override;//cache
