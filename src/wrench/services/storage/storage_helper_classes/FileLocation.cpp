@@ -263,7 +263,7 @@ namespace wrench {
         char disallowed_characters[] = {'\\', ' ', '~', '`', '\'', '"', '&', '*', '?', '.'};
         for (auto const &c: disallowed_characters) {
             if (path.find(c) != std::string::npos) {
-                throw std::invalid_argument("FileLocation::sanitizePath(): Disallowed character '" + std::to_string(c) + "' in path (" + path + ")");
+                throw std::invalid_argument("FileLocation::sanitizePath(): Disallowed character '" + std::string(1, c) + "' in path (" + path + ")");
             }
         }
 
