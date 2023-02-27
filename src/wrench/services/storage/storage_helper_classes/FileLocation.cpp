@@ -239,7 +239,6 @@ namespace wrench {
      * @param path: an absolute path
      * @return a sanitized path
      */
-#define __cpluplus 201703L
     std::string FileLocation::sanitizePath(const std::string &path) {
         if (path == "/") return "/";// make the common case fast
 
@@ -247,7 +246,9 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::sanitizePath(): path cannot be empty");
         }
 
-#if (__cpluplus >= 201703L)
+#if 0
+        // THIS DOES NOT MAKE MUCH OF A DIFFERENT IT SEEMS (IN TERMS OF PERFORMANCE)
+        // ONLY WORKS WITH C++17
         // Adding a leading space because, weirdly, lexically_normal() doesn't behave
         // correctly on Linux without it (it doesn't reduce "////" to "/", but does
         // reduce " ////" to " /"
@@ -256,52 +257,61 @@ namespace wrench {
         // Remove the extra space
         to_return.erase(0, 1);
         return to_return;
-#else
+#endif
+
         // Cannot have certain substring (why not)
-        //        std::string disallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
-        char disallowed_characters[] = {'\\', ' ', '~', '`', '\'', '&', '*', '?'};
+        char disallowed_characters[] = {'\\', ' ', '~', '`', '\'', '"', '&', '*', '?', '.'};
         for (auto const &c: disallowed_characters) {
             if (path.find(c) != std::string::npos) {
                 throw std::invalid_argument("FileLocation::sanitizePath(): Disallowed character '" + std::to_string(c) + "' in path (" + path + ")");
             }
         }
 
-        std::string sanitized = path;
+        std::string sanitized = "/";
+        sanitized += path;
+        sanitized += "/";
         // Make it /-started and /-terminated
-        if (sanitized.at(sanitized.length() - 1) != '/') {
-            sanitized = "/" + sanitized + "/";
-        }
+//        if (sanitized.at(sanitized.length() - 1) != '/') {
+//            sanitized += "/";
+//            sanitized += path;
+//            sanitized += "/";
+//        } else {
+//            sanitized = path;
+//        }
+
 
         // Deal with "", "." and ".."
         std::vector<std::string> tokens;
         boost::split(tokens, sanitized, boost::is_any_of("/"));
         tokens.erase(tokens.begin());
         tokens.pop_back();
-        std::vector<std::string> new_tokens;
+//        std::vector<std::string> new_tokens;
 
-        for (auto const &t: tokens) {
-            if ((t == ".") or t.empty()) {
-                // do nothing
-            } else if (t == "..") {
-                if (new_tokens.empty()) {
-                    throw std::invalid_argument("FileLocation::sanitizePath(): Invalid path (" + path + ")");
-                } else {
-                    new_tokens.pop_back();
-                }
-            } else {
-                new_tokens.push_back(t);
-            }
-        }
+//        for (auto const &t: tokens) {
+//            if ((t == ".") or t.empty()) {
+//                // do nothing
+//            } else if (t == "..") {
+//                if (new_tokens.empty()) {
+//                    throw std::invalid_argument("FileLocation::sanitizePath(): Invalid path (" + path + ")");
+//                } else {
+//                    new_tokens.pop_back();
+//                }
+//            } else {
+//                new_tokens.push_back(t);
+//            }
+//        }
 
         // Reconstruct sanitized path
         sanitized = "";
-        for (auto const &t: new_tokens) {
-            sanitized += "/" + t;
+        for (auto const &t: tokens) {
+            if (not t.empty()) {
+                sanitized += "/";
+                sanitized += t;
+            }
         }
         sanitized += "/";
 
         return sanitized;
-#endif
     }
 
     /**
