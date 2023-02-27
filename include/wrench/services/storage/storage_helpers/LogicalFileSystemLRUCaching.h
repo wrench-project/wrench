@@ -70,7 +70,7 @@ namespace wrench {
          */
         unsigned int next_lru_sequence_number = 0;
 
-        void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path, bool must_be_initialized) override;
+        void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) override;
         void removeFileFromDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) override;
         void removeAllFilesInDirectory(const std::string &absolute_path) override;
         void updateReadDate(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) override;

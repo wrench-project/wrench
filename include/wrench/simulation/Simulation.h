@@ -62,6 +62,7 @@ namespace wrench {
         static double getHostMemoryCapacity(const std::string &hostname);
         static unsigned long getHostNumCores(const std::string &hostname);
         static double getHostFlopRate(const std::string &hostname);
+        static bool hostHasMountPoint(const std::string &hostname, const std::string &scratch_space_mount_point);
 
         static std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
         static void removeFile(const std::shared_ptr<DataFile> &file);
@@ -110,11 +111,25 @@ namespace wrench {
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
 
-        void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &ss);
-        void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &ss, std::string directory_absolute_path);
+        /**
+	 * @brief Creates a file copy on a storage service before the simulation begins
+	 * @param file: a file
+	 * @param storage_service: a storage service
+	 */
+        void stageFile(const std::shared_ptr<DataFile> file, const std::shared_ptr<StorageService> &storage_service) {
+            this->stageFile(wrench::FileLocation::LOCATION(storage_service, file));
+        }
+        /**
+         * @brief Creates a file copy on a storage service before the simulation begins
+         * @param file: a file
+         * @param storage_service: a storage service
+	 * @param path: a path
+         */
+        void stageFile(const std::shared_ptr<DataFile> file, const std::shared_ptr<StorageService> &storage_service, const std::string &path) {
+            this->stageFile(wrench::FileLocation::LOCATION(storage_service, path, file));
+        }
 
-        static void createFile(const std::shared_ptr<FileLocation> &location);
-        static void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &server);
+        void stageFile(const std::shared_ptr<FileLocation> &location);
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -182,7 +197,6 @@ namespace wrench {
         static bool isEnergySimulationEnabled();
         static bool isSurfPrecisionSetByUser();
 
-
         /***********************/
         /** \endcond           */
         /***********************/
@@ -212,7 +226,6 @@ namespace wrench {
 
         static int unique_disk_sequence_number;
 
-        void stageFile(const std::shared_ptr<FileLocation> &location);
 
         void platformSanityCheck();
         void checkSimulationSetup();

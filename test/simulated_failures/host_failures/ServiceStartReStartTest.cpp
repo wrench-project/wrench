@@ -136,7 +136,7 @@ void ServiceReStartHostFailuresTest::do_StartServiceOnDownHostTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new StartServiceOnDownHostTestWMS(this, hostname)));
 
@@ -224,7 +224,7 @@ void ServiceReStartHostFailuresTest::do_ServiceRestartTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ServiceRestartTestWMS(this, hostname)));
 

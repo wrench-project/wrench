@@ -14,6 +14,7 @@
 #include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
+#include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
 #include <wrench/exceptions/ExecutionException.h>
 
 #include <utility>
@@ -73,11 +74,19 @@ namespace wrench {
     void FileReadAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
+
+        // Fix locations that are scratch
+        for (unsigned long i = 0; i < this->file_locations.size(); i++) {
+            if (this->file_locations[i]->isScratch()) {
+                auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
+                this->file_locations[i] = FileLocation::LOCATION(cs->getScratch(), cs->getScratch()->getBaseRootPath() + this->getJob()->getName(), this->file_locations[i]->getFile());
+            }
+        }
         // File read
         for (unsigned long i = 0; i < this->file_locations.size(); i++) {
             try {
                 this->used_location = this->file_locations[i];
-                StorageService::readFile(this->file_locations[i], this->num_bytes_to_read);
+                StorageService::readFileAtLocation(this->file_locations[i], this->num_bytes_to_read);
                 continue;
             } catch (ExecutionException &e) {
                 if (i == this->file_locations.size() - 1) {

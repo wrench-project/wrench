@@ -40,6 +40,7 @@ namespace wrench {
             simgrid::s4u::Engine::set_config("surf/precision:1e-9");
         }
         S4U_Mailbox::createMailboxPool(S4U_Mailbox::mailbox_pool_size);
+        S4U_Mailbox::NULL_MAILBOX = simgrid::s4u::Mailbox::by_name("NULL_MAILBOX");
         this->initialized = true;
         sg_storage_file_system_init();
     }
@@ -186,7 +187,20 @@ namespace wrench {
         }
         return links.at(0)->get_bandwidth();
     }
-
+    /**
+     * @brief Set a link's new bandwidth
+     * @param name: the link's name
+     * @param bandwidth: the new bandwidth
+     *
+     */
+    void S4U_Simulation::setLinkBandwidth(const std::string &name, double bandwidth) {
+        auto links = simgrid::s4u::Engine::get_instance()->get_filtered_links(
+                [name](simgrid::s4u::Link *l) { return (l->get_name() == name); });
+        if (links.empty()) {
+            throw std::invalid_argument("S4U_Simulation::setLinkBandwidth(): unknown link " + name);
+        }
+        links.at(0)->set_bandwidth(bandwidth);
+    }
     /**
      * @brief Get a link's bandwidth usage
      * @param name: the link's name
@@ -1091,10 +1105,6 @@ namespace wrench {
                                        double write_bandwidth_in_bytes_per_sec,
                                        double capacity_in_bytes,
                                        const std::string &mount_point) {
-        if (read_bandwidth_in_bytes_per_sec != write_bandwidth_in_bytes_per_sec) {
-            throw std::invalid_argument("Simulation::createNewDisk(): For now, disks must have equal "
-                                        "read and write bandwidth");
-        }
 
         // Get the host
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -1117,6 +1127,7 @@ namespace wrench {
         // Add the required disk properties
         disk->set_property("size", std::to_string(capacity_in_bytes) + "B");
         disk->set_property("mount", mount_point);
+        disk->seal();
     }
 
     /**

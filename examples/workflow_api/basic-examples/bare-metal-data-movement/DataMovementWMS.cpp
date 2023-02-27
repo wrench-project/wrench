@@ -125,7 +125,7 @@ namespace wrench {
 
         /* Delete outfile_2 on storage_service2 */
         WRENCH_INFO("Deleting file outfile_2 from storage_service2");
-        StorageService::deleteFile(FileLocation::LOCATION(storage_service2, outfile_2));
+        StorageService::deleteFileAtLocation(FileLocation::LOCATION(storage_service2, outfile_2));
         WRENCH_INFO("File deleted");
 
         WRENCH_INFO("Workflow execution complete");

@@ -219,7 +219,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new SimpleCONSERVATIVE_BFTestWMS(
                                     this, hostname)));
@@ -389,7 +389,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_test(int seed) {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new LargeCONSERVATIVE_BFTestWMS(
                                     this, workflow, {compute_service}, hostname)));
@@ -551,7 +551,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BFQueueWaitTimePredi
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new SimpleCONSERVATIVE_BFQueueWaitTimePredictionWMS(
                                     this, hostname)));
@@ -720,7 +720,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_BatschedBroken_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BatschedBrokenTestWMS(
                                     this, hostname)));
@@ -887,7 +887,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_CORE_LEVEL_test()
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new SimpleCONSERVATIVE_BF_CORE_LEVELTestWMS(
                                     this, hostname)));
@@ -1055,7 +1055,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_CORE_LEVEL_test(in
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new LargeCONSERVATIVE_BF_CORE_LEVELTestWMS(
                                     this, hostname)));

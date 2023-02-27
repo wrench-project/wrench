@@ -77,18 +77,26 @@ namespace wrench {
                 std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
 
                 for (const auto &input_file: ready_task->getInputFiles()) {
+#ifdef PAGE_CACHE_SIMULATION
                     if (Simulation::isPageCachingEnabled()) {
                         file_locations[input_file] = FileLocation::LOCATION(this->client_storage_service, this->server_storage_service, input_file);
                     } else {
+#endif
                         file_locations[input_file] = FileLocation::LOCATION(this->server_storage_service, input_file);
+#ifdef PAGE_CACHE_SIMULATION
                     }
+#endif
                 }
                 for (const auto &output_file: ready_task->getOutputFiles()) {
+#ifdef PAGE_CACHE_SIMULATION
                     if (Simulation::isPageCachingEnabled()) {
                         file_locations[output_file] = FileLocation::LOCATION(this->server_storage_service, this->server_storage_service, output_file);
                     } else {
+#endif
                         file_locations[output_file] = FileLocation::LOCATION(this->server_storage_service, output_file);
+#ifdef PAGE_CACHE_SIMULATION
                     }
+#endif
                 }
 
 

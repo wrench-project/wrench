@@ -64,7 +64,7 @@ namespace wrench {
                                                                    memory_requirement));
         this->ready_tasks.insert(task);
         // Associate the workflow to the task
-        task->workflow = this->getSharedPtr();
+        task->workflow = this;
 
         task->toplevel = 0;// upon creation, a task is an exit task
 

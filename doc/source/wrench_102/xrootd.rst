@@ -11,10 +11,8 @@ The following operations are supported by a supervisor node
 (and are accomplished by the supervisor
 interacting with the nodes that are in the subtree of which it is the root):
 
-  -  Synchronously reading a file (rarely used by an execution controller but
-     included for completeness); and 
-  -  Semi-Synchronously deleting a file (execution waits for supervisor to acknowledge delete request, 
-  but does not wait for the full XRootD subtree to be purged)
+  -  Synchronously reading a file (rarely used by an execution controller but included for completeness); and 
+  -  Semi-Synchronously deleting a file (execution waits for supervisor to acknowledge delete request, but does not wait for the full XRootD subtree to be purged)
 
 In addition, all storage nodes in an XRootD tree support all operations that an instance of :ref:`Simple Storage Service <guide-102-simplestorage>` does (which must be invoked directory on that node). 
 
@@ -36,21 +34,21 @@ subtree rooted at the supervisor should storage the newly created data.
 
 Several interactions with an XRootD Deployment are done simply by calling **virtual** methods of the :cpp:class:`wrench::StorageService` class, but it is also 
 possible to call directly methods of these :ref:`Simple Storage Service <guide-102-simplestorage>` class for XRootD storage nodes. This is because, in the XRootD distributed
-file systems, so notions (such as the location of a file) are different than in a non-distributed file system. For instance: 
+file systems, some notions (such as the location of a file) are different than in a non-distributed file system. For instance: 
 
 .. code:: cpp
 
-   std::shared_ptr<wrench::xrootd::Deployment> deployment;
-   std::shared_ptr<wrench::DataFile> some_file;
+  std::shared_ptr<wrench::XRootD::Deployment> deployment;
+  std::shared_ptr<wrench::DataFile> some_file;
 
-   [...]
+  [...]
 
-   // Read a file from one specific storage node 
-   deployment->getRootSupervisor()->getChild(0)->readFile(some_file);
+  // Read a file from one specific storage node
+  deployment->getRootSupervisor()->getChild(0)->readFile(some_file);
 
-   // Delete a file from the whole subtree, which may
-   // delete the file at multiple storage nodes
-   deployment->getRootSupervisor()->deleteFile(some_file);
+  // Delete a file from the whole subtree, which may
+  // delete the file at multiple storage nodes
+  deployment->getRootSupervisor()->deleteFile(some_file);
    
 
 Note that file deletion from an XRootD (sub)tree  will not return an error

@@ -285,7 +285,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new DynamicServiceCreationReadyTasksTestWMS(this, hostname)));
 

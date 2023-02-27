@@ -1,0 +1,38 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
+<platform version="4.1">
+   <zone id="AS0" routing="Full">
+       <host id="Client" speed="1f">
+          <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
+             <prop id="size" value="100GB"/>
+             <prop id="mount" value="/"/>
+          </disk>
+       </host>
+       <host id="Proxy" speed="1f">
+          <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
+             <prop id="size" value="100GB"/>
+             <prop id="mount" value="/"/>
+          </disk>
+       </host>
+       <host id="Remote" speed="1f">
+          <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
+             <prop id="size" value="100GB"/>
+             <prop id="mount" value="/"/>
+          </disk>
+       </host>
+       <host id="Target" speed="1f">
+          <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
+             <prop id="size" value="100GB"/>
+             <prop id="mount" value="/"/>
+          </disk>
+       </host>
+       <link id="link12" bandwidth="5GBps" latency="10us"/>
+       <link id="link13" bandwidth="100MBps" latency="100us"/>
+       <link id="link23" bandwidth="100MBps" latency="100us"/>
+       <route src="Client" dst="Proxy"> <link_ctn id="link12"/> </route>
+       <route src="Proxy" dst="Remote"> <link_ctn id="link13"/> </route>
+       <route src="Proxy" dst="Target"> <link_ctn id="link23"/> </route>
+       <!-- <route src="Client" dst="Remote"> <link_ctn id="link12"/> <link_ctn id="link13"/> </route> These routes are only required for readThrough mode-->
+       <!-- <route src="Client" dst="Target"> <link_ctn id="link12"/> <link_ctn id="link13"/> </route> These routes are only required for readThrough mode-->
+   </zone> 
+</platform>

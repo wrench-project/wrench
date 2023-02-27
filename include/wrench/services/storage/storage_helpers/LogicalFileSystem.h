@@ -67,18 +67,15 @@ namespace wrench {
                                                                           const std::string &mount_point = DEV_NULL,
                                                                           const std::string &eviction_policy = "NONE");
 
-        void init();
-        bool isInitialized();
-
-        double getTotalCapacity();
-        double getFreeSpace();
+        double getTotalCapacity() const;
+        double getFreeSpace() const;
         //        bool hasEnoughFreeSpace(double bytes);
 
         void stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path);
 
         bool reserveSpace(const std::shared_ptr<DataFile> &file,
                           const std::string &absolute_path);
-        void unreserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path);
+        void unreserveSpace(const std::shared_ptr<DataFile> &file, const std::string &absolute_path);
 
         void createDirectory(const std::string &absolute_path);
         bool doesDirectoryExist(const std::string &absolute_path);
@@ -96,11 +93,10 @@ namespace wrench {
          *
          * @param file: the file to store
          * @param absolute_path: the directory's absolute path (at the mount point)
-         * @param must_be_initialized: whether the file system is initialized
          *
          * @throw std::invalid_argument
          */
-        virtual void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path, bool must_be_initialized) = 0;
+        virtual void storeFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) = 0;
         /**
          * @brief Remove a file in a directory
          * @param file: the file to remove
@@ -145,7 +141,7 @@ namespace wrench {
         /**
          * @brief Static "list" of mountpoints in the simulation
          */
-        static std::map<std::string, StorageService *> mount_points;
+        static std::set<std::string> mount_points;
 
         /**
          * @brief Whether this file system is /dev/null
@@ -179,7 +175,7 @@ namespace wrench {
          */
         double total_capacity;
         /**
-         * @brief current amout of free space
+         * @brief current amount of free space
          */
         double free_space = 0;
         /**
@@ -188,22 +184,9 @@ namespace wrench {
         std::map<std::string, double> reserved_space;
 
         /**
-         * @brief whether the file system is initialized
-         */
-        bool initialized;
-        /**
          * @brief file system content
          */
         std::unordered_map<std::string, std::map<std::shared_ptr<DataFile>, std::shared_ptr<LogicalFileSystem::FileOnDisk>>> content;
-
-        /**
-         * @brief Assert that file system has been initialized
-         */
-        void assertInitHasBeenCalled() const {
-            if (not this->initialized) {
-                throw std::runtime_error("LogicalFileSystem::assertInitHasBeenCalled(): A logical file system needs to be initialized before it's called");
-            }
-        }
 
         /**
          * @brief Assert that a directory exists

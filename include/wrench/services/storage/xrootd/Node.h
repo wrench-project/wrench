@@ -42,12 +42,27 @@ namespace wrench {
             /** \cond DEVELOPER    */
             /***********************/
 
-            void createFile(const std::shared_ptr<DataFile> &file) override;
-            void createFile(const std::shared_ptr<DataFile> &file, const string &path) override;
+            using StorageService::createFile;
+            using StorageService::deleteFile;
+            using StorageService::hasFile;
+            using StorageService::lookupFile;
+            using StorageService::readFile;
+            using StorageService::writeFile;
 
-            void writeFile(const std::shared_ptr<DataFile> &file) override;
+            void createFile(const std::shared_ptr<FileLocation> &location) override;
 
-            double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
+            virtual void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+                                   const std::shared_ptr<FileLocation> &location,
+                                   bool wait_for_answer) override;
+
+            virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
+
+            virtual double getTotalSpace() override;
+            virtual bool isBufferized() const override;
+            virtual double getBufferSize() const override;
+            virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) override;
+            virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) override;
+
 
             /***********************/
             /** \endcond           */
@@ -84,46 +99,50 @@ namespace wrench {
 
         public:
             /***********************/
+            /** \cond DEVELOPER    */
+            /***********************/
+
+            bool hasFile(const std::shared_ptr<FileLocation> &location) override;
+
+            double getLoad() override;
+
+            void removeDirectory(const std::string &path) override;
+
+            /***********************/
+            /** \endcond           */
+            /***********************/
+
+
+            /***********************/
             /** \cond INTERNAL     */
             /***********************/
-            //XRootD* getMetavisor();
 
             std::shared_ptr<SimpleStorageService> getStorageServer();
 
-            //bool lookupFile(std::shared_ptr<DataFile>file);
-            //void deleteFile(std::shared_ptr<DataFile>file);//meta delete from sub tree
-            //void readFile(std::shared_ptr<DataFile>file);
-            //void readFile(std::shared_ptr<DataFile>file, double num_bytes);
-
-            // std::string getMountPoint() override;
-            //std::set<std::string> getMountPoints() override;
-            //bool hasMultipleMountPoints() override;
-            //bool hasMountPoint(const std::string &mp) override;
-
-            bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) override;
-
             bool cached(shared_ptr<DataFile> file);
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
-
-
-            void createFile(const std::shared_ptr<FileLocation> &location) override;
-
-            double getLoad() override;
 
 
             int main() override;
             bool processNextMessage();
             Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
 
+            /***********************/
+            /** \endcond           */
+            /***********************/
+
         private:
             Deployment *deployment;
 
             std::shared_ptr<Node> addChild(std::shared_ptr<Node> child);
 
+            /** @brief File systems */
+            std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
+
 
             map<Node *, vector<stack<Node *>>> splitStack(vector<stack<Node *>> search_stack);
             virtual std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
-            vector<stack<Node *>> constructFileSearchTree(vector<shared_ptr<Node>> &targets);
+            vector<stack<Node *>> constructFileSearchTree(const vector<shared_ptr<Node>> &targets);
             stack<Node *> constructSearchStack(Node *target);
             //std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
 

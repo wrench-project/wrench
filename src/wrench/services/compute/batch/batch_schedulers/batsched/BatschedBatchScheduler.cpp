@@ -270,16 +270,12 @@ namespace wrench {
             // Get the answer
             std::unique_ptr<SimulationMessage> message = nullptr;
             message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
+            auto msg = S4U_Mailbox::getMessage<BatchQueryAnswerMessage>(batchsched_query_mailbox,
+                                                                        "[This error likely means that the scheduling algorithm that Batsched was configured to use (\"" +
+                                                                                this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
+                                                                                "\") does not support queue waiting time predictions!]. Received an");
 
-            if (auto msg = dynamic_cast<BatchQueryAnswerMessage *>(message.get())) {
-                job_estimated_start_times[std::get<0>(job)] = msg->estimated_start_time;
-            } else {
-                throw std::runtime_error(
-                        "BatschedBatchScheduler::getStartTimeEstimates: Received an unexpected [" + message->getName() +
-                        "] message.\nThis likely means that the scheduling algorithm that Batsched was configured to use (" +
-                        this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
-                        ") does not support queue waiting time predictions!");
-            }
+            job_estimated_start_times[std::get<0>(job)] = msg->estimated_start_time;
         }
         return job_estimated_start_times;
 #else

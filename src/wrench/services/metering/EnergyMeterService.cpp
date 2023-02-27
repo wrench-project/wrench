@@ -143,22 +143,21 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool EnergyMeterService::processNextMessage(double timeout) {
-        std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox, timeout);
+            try {
+                auto msg = S4U_Mailbox::getMessage<ServiceStopDaemonMessage>(
+                        this->mailbox,
+                        timeout,
+                        "EnergyMeter::waitForNextMessage(): Received an");
+                WRENCH_INFO("Energy Meter got a %s message", msg->getName().c_str());
+            } catch (std::runtime_error &e) {
+                throw;
+            }
+            return true;
         } catch (ExecutionException &e) {
             return true;
         }
-
-        WRENCH_INFO("Energy Meter got a %s message", message->getName().c_str());
-
-        if (dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-            // There shouldn't be any need to clean any state up
-            return false;
-        }
-
-        throw std::runtime_error("EnergyMeter::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
     }
 
 }// namespace wrench

@@ -8,10 +8,13 @@
  *
  */
 
+#ifdef PAGE_CACHE_SIMULATION
+
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/failure_causes/HostError.h>
 #include <wrench/services/memory/MemoryManager.h>
+
 
 WRENCH_LOG_CATEGORY(wrench_periodic_flush, "Log category for Periodic Flush");
 
@@ -219,10 +222,10 @@ namespace wrench {
                     // flush whole block
                     blk->setDirty(false);
                     flushed += blk->getSize();
-                    flushing_map[blk->getLocation()->getMountPoint()] += blk->getSize();
+                    flushing_map[blk->getLocation()->getPath()] += blk->getSize();
                 } else if (flushed < amount && amount < flushed + blk->getSize()) {
                     double blk_flushed = amount - flushed;
-                    flushing_map[blk->getLocation()->getMountPoint()] += blk_flushed;
+                    flushing_map[blk->getLocation()->getPath()] += blk_flushed;
 
                     flushed = amount;
                     // split
@@ -305,7 +308,7 @@ namespace wrench {
             block_to_deal_with->setDirty(false);
             flushed += block_to_deal_with->getSize();
 
-            simgrid::s4u::Disk *disk = getDisk(block_to_deal_with->getLocation()->getMountPoint(), this->hostname);
+            simgrid::s4u::Disk *disk = getDisk(block_to_deal_with->getLocation()->getPath(), this->hostname);
             disk->write(block_to_deal_with->getSize());
 
             this->dirty -= block_to_deal_with->getSize();
@@ -407,7 +410,7 @@ namespace wrench {
         inactive_list.push_back(new Block(filename, location, amount, S4U_Simulation::getClock(), false, 0));
         balanceLruLists();
 
-        simgrid::s4u::Disk *disk = getDisk(location->getMountPoint(), this->hostname);
+        simgrid::s4u::Disk *disk = getDisk(location->getPath(), this->hostname);
         if (async) {
             return disk->read_async(amount);
         } else {
@@ -716,3 +719,5 @@ namespace wrench {
     }
 
 }// namespace wrench
+
+#endif

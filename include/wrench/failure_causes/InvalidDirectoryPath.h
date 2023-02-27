@@ -35,19 +35,16 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
         InvalidDirectoryPath(
-                std::shared_ptr<StorageService> storage_service,
-                std::string invalid_path);
+                const std::shared_ptr<FileLocation> &location);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<StorageService> getStorageService();
-        std::string getInvalidPath();
+        std::shared_ptr<FileLocation> getLocation();
         std::string toString() override;
 
     private:
-        std::shared_ptr<StorageService> storage_service;
-        std::string invalid_path;
+        std::shared_ptr<FileLocation> location;
     };
 
 

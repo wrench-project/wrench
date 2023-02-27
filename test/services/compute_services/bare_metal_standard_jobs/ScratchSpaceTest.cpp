@@ -115,7 +115,7 @@ void ScratchSpaceTest::do_BogusScratchSpace_test() {
 
 
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -157,7 +157,7 @@ public:
 private:
     ScratchSpaceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -213,7 +213,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
 
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -247,7 +247,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new SimpleScratchSpaceTestWMS(
                                     this, hostname)));
@@ -285,7 +285,7 @@ public:
 private:
     ScratchSpaceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -468,7 +468,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new SimpleScratchSpaceFailureTestWMS(
                                     this, hostname)));
@@ -716,7 +716,7 @@ public:
 private:
     ScratchSpaceTest *test;
 
-    int main() {
+    int main() override {
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
@@ -785,7 +785,7 @@ TEST_F(ScratchSpaceTest, RaceConditionTest) {
 void ScratchSpaceTest::do_RaceConditionTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -810,7 +810,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ScratchSpaceRaceConditionTestWMS(this, hostname)));
 
@@ -864,13 +864,13 @@ private:
         std::shared_ptr<wrench::DataFile> file2 = this->test->workflow->getFileByID("input2");
 
         //check if this file is staged at mount point of non-scratch
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(test->storage_service1, file1))) {
             throw std::runtime_error(
                     "The file1 was supposed to be staged at the mount point but is not");
         }
         //check if this file is staged at mount point of non-scratch
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(test->storage_service2, file2))) {
             throw std::runtime_error(
                     "The file2 was supposed to be staged in / partition but is not");
@@ -906,9 +906,10 @@ private:
             }
         }
 
+
         //the file1 should still be non-scratch space, the job should only delete file from it's scratch job's partition
         //check if this file is staged in mount point of non-scratch
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(test->storage_service1, file1))) {
             throw std::runtime_error(
                     "The file1 again was supposed to be staged in / partition but is not");
@@ -918,7 +919,7 @@ private:
         try {
             wrench::StorageService::copyFile(
                     wrench::FileLocation::LOCATION(this->test->storage_service1,
-                                                   this->test->storage_service1->getMountPoint() + job1->getName(), file1),
+                                                   this->test->storage_service1->getBaseRootPath() + job1->getName(), file1),
                     wrench::FileLocation::LOCATION(this->test->storage_service2, file1));
             throw std::runtime_error(
                     "Non-scratch space have / partition unless created by copying something into a new partition name");
@@ -930,7 +931,7 @@ private:
             wrench::StorageService::copyFile(
                     wrench::FileLocation::LOCATION(this->test->storage_service1, file1),
                     wrench::FileLocation::LOCATION(this->test->storage_service2,
-                                                   this->test->storage_service2->getMountPoint() + job1->getName(), file1));
+                                                   this->test->storage_service2->getBaseRootPath() + job1->getName(), file1));
 
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
@@ -953,7 +954,7 @@ private:
             wrench::StorageService::copyFile(
                     wrench::FileLocation::LOCATION(this->test->storage_service2, file2),
                     wrench::FileLocation::LOCATION(this->test->storage_service2,
-                                                   this->test->storage_service2->getMountPoint() + "/test", file2));
+                                                   this->test->storage_service2->getBaseRootPath() + "/test", file2));
 
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
@@ -961,8 +962,8 @@ private:
         }
 
         //we just copied file to /test partition of storage service2, so it must be there
-        if (not wrench::StorageService::lookupFile(
-                    wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->storage_service2->getMountPoint() + "/test", file2))) {
+        if (not wrench::StorageService::lookupFileAtLocation(
+                    wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->storage_service2->getBaseRootPath() + "/test", file2))) {
 
             throw std::runtime_error(
                     "The file2 was supposed to be stored in /test partition but is not");
@@ -980,11 +981,11 @@ TEST_F(ScratchSpaceTest, ScratchNonScratchPartitionsTest) {
 void ScratchSpaceTest::do_PartitionsTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

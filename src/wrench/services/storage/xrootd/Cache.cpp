@@ -19,7 +19,7 @@ namespace wrench {
             double earliestAllowedTime = wrench::S4U_Simulation::getClock() - maxCacheTime;
             auto entries = cache[file];
             //after getting all possible cache entries, loop through them "all" and check the timestamps, removing any that fail.  If you find even 1 success, return true and stop cleaning.
-            for (auto ittr = entries.begin(); ittr != entries.end();) {// intentionally blank 3rd term
+            for (auto ittr = entries.begin(); ittr != entries.end(); /*intentionaly blank*/) {
                 auto entry = *ittr;
                 if (entry.second < earliestAllowedTime) {
                     ittr = entries.erase(ittr);

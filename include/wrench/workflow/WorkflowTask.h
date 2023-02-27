@@ -91,7 +91,7 @@ namespace wrench {
 
         Job *getJob() const;
 
-        std::shared_ptr<Workflow> getWorkflow() const;
+        Workflow *getWorkflow() const;
 
         std::string getClusterID() const;
 
@@ -277,8 +277,8 @@ namespace wrench {
         std::string color;               // A RGB color formatted as "#rrggbb"
         double flops;                    // Number of flops
         double average_cpu = -1;         // Average CPU utilization
-        unsigned long bytes_read = -1;   // Total bytes read in KB
-        unsigned long bytes_written = -1;// Total bytes written in KB
+        unsigned long bytes_read = -1;   // Total bytes read
+        unsigned long bytes_written = -1;// Total bytes written
         unsigned long min_num_cores;
         unsigned long max_num_cores;
         std::shared_ptr<ParallelModel> parallel_model;
@@ -292,7 +292,7 @@ namespace wrench {
         State upcoming_visible_state;  // A visible state that will become active once a WMS has process a previously sent workflow execution event
         InternalState internal_state;  // Not to be exposed to developer level
 
-        std::shared_ptr<Workflow> workflow;// Containing workflow
+        Workflow *workflow;// Containing workflow
 
         std::map<std::string, std::shared_ptr<DataFile>> output_files;// List of output files
         std::map<std::string, std::shared_ptr<DataFile>> input_files; // List of input files

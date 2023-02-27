@@ -172,7 +172,7 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
 
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileWriteBasicTestWMS(
                             this, host1)));
 
@@ -234,10 +234,10 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
 
         // destination should be set
         ASSERT_EQ(this->storage_service, fc.first->getDestination()->getStorageService());
-        ASSERT_EQ("/", fc.first->getDestination()->getAbsolutePathAtMountPoint());
+        ASSERT_EQ("/", fc.first->getDestination()->getPath());
 
         ASSERT_EQ(this->storage_service, fc.second->getDestination()->getStorageService());
-        ASSERT_EQ("/", fc.second->getDestination()->getAbsolutePathAtMountPoint());
+        ASSERT_EQ("/", fc.second->getDestination()->getPath());
 
         //service should be set
         ASSERT_EQ(fc.first->getService(), fc.second->getService());

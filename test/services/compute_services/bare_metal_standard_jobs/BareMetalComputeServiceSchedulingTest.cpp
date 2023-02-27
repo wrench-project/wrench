@@ -102,7 +102,7 @@ public:
 private:
     BareMetalComputeServiceTestScheduling *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -240,7 +240,7 @@ public:
 private:
     BareMetalComputeServiceTestScheduling *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -366,7 +366,7 @@ public:
 private:
     BareMetalComputeServiceTestScheduling *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -461,7 +461,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing2_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new LoadBalancing2TestWMS(
                                     this, "Host1")));

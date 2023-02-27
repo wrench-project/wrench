@@ -325,7 +325,7 @@ private:
 
         double before_read = wrench::Simulation::getCurrentSimulatedDate();
         try {
-            wrench::StorageService::readFile(wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_1));
+            wrench::StorageService::readFileAtLocation(wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_1));
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }

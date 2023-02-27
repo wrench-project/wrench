@@ -245,7 +245,7 @@ void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlg
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     wms = simulation->add(new VMResourceAllocationTestWMS(this, hostname));
 
     ASSERT_NO_THROW(simulation->launch());

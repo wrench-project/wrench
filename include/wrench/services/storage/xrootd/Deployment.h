@@ -31,8 +31,8 @@ namespace wrench {
 
 
         /**
-       * @brief A class that implements the notion of an XRootD deployment. This tracks all nodes and files within the system.
-       */
+         * @brief A class that implements the notion of an XRootD deployment. This tracks all nodes and files within the system.
+         */
         class Deployment {
         public:
             /**

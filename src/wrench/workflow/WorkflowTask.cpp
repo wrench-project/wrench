@@ -299,7 +299,7 @@ namespace wrench {
      * @brief Get the workflow that contains the task
      * @return a workflow
      */
-    std::shared_ptr<Workflow> WorkflowTask::getWorkflow() const {
+    Workflow *WorkflowTask::getWorkflow() const {
         return this->workflow;
     }
 
@@ -405,7 +405,7 @@ namespace wrench {
 
     /**
      * @brief Get the number of bytes read by the task
-     * @return number of bytes read by the task in KB
+     * @return number of bytes read by the task
      */
     unsigned long WorkflowTask::getBytesRead() const {
         return this->bytes_read;
@@ -413,7 +413,7 @@ namespace wrench {
 
     /**
      * @brief Set the number of bytes read by the task
-     * @param b_read: number of bytes read by the task in KB
+     * @param b_read: number of bytes read by the task
      */
     void WorkflowTask::setBytesRead(unsigned long b_read) {
         this->bytes_read = b_read;
@@ -421,7 +421,7 @@ namespace wrench {
 
     /**
      * @brief Get the number of bytes written by the task
-     * @return number of bytes written by the task in KB
+     * @return number of bytes written by the task
      */
     unsigned long WorkflowTask::getBytesWritten() const {
         return this->bytes_written;
@@ -429,7 +429,7 @@ namespace wrench {
 
     /**
      * @brief Set the number of bytes written by the task
-     * @param b_written: number of bytes written by the task in KB
+     * @param b_written: number of bytes written by the task
      */
     void WorkflowTask::setBytesWritten(unsigned long b_written) {
         this->bytes_written = b_written;

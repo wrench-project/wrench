@@ -225,7 +225,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
+    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -337,7 +337,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
+    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -571,7 +571,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
+    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

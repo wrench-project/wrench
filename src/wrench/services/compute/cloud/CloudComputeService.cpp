@@ -448,6 +448,9 @@ namespace wrench {
                     this->hostname.c_str(),
                     this->mailbox->get_cname());
 
+        // Start the Scratch Storage Service
+        this->startScratchStorageService();
+
         /** Main loop **/
         while (this->processNextMessage()) {
             // no specific action
@@ -892,7 +895,7 @@ namespace wrench {
                                                 compute_resources,
                                                 plist,
                                                 vm->getMessagePayloadList(),
-                                                getScratch()));
+                                                this->getScratch()));
             cs->simulation = this->simulation;
             std::get<2>(this->vm_list[vm_name]) = cs;
         }

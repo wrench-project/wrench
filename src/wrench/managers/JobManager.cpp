@@ -416,7 +416,7 @@ namespace wrench {
         // Tweak the service_specific_arguments
         std::map<std::string, std::string> new_args;
 
-        std::shared_ptr<Workflow> workflow = nullptr;
+        Workflow *workflow = nullptr;
         if (not job->getTasks().empty()) {
             workflow = (*(job->getTasks().begin()))->getWorkflow();
         }
@@ -899,7 +899,7 @@ namespace wrench {
      * @return
      */
     bool JobManager::processNextMessage() {
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (ExecutionException &e) {
@@ -915,13 +915,13 @@ namespace wrench {
         WRENCH_DEBUG("Job Manager got a %s message", message->getName().c_str());
         WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
 
-        if (dynamic_cast<JobManagerWakeupMessage *>(message.get())) {
+        if (std::dynamic_pointer_cast<JobManagerWakeupMessage>(message)) {
             // Just wakeup
             return true;
-        } else if (dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        } else if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // There shouldn't be any need to clean up any state
             return false;
-        } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobDoneMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobDoneMessage>(message)) {
             // Is this in fact a standard job???
             if (this->cjob_to_sjob_map.find(msg->job) != this->cjob_to_sjob_map.end()) {
                 auto sjob = this->cjob_to_sjob_map[msg->job];
@@ -931,7 +931,7 @@ namespace wrench {
                 processCompoundJobCompletion(msg->job, msg->compute_service);
             }
             return true;
-        } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobFailedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobFailedMessage>(message)) {
             if (this->cjob_to_sjob_map.find(msg->job) != this->cjob_to_sjob_map.end()) {
                 auto sjob = this->cjob_to_sjob_map[msg->job];
                 this->cjob_to_sjob_map.erase(msg->job);
@@ -949,10 +949,10 @@ namespace wrench {
                 processCompoundJobFailure(msg->job, msg->compute_service);
             }
             return true;
-        } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
             processPilotJobStart(msg->job, msg->compute_service);
             return true;
-        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
             processPilotJobExpiration(msg->job, msg->compute_service);
             return true;
         } else {

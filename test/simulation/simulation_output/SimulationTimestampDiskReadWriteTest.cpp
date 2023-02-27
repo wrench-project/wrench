@@ -93,10 +93,10 @@ private:
     int main() {
 
 
-        wrench::StorageService::readFile(
+        wrench::StorageService::readFileAtLocation(
                 wrench::FileLocation::LOCATION(this->test->storage_service_1, this->test->file_1));
 
-        wrench::StorageService::writeFile(
+        wrench::StorageService::writeFileAtLocation(
                 wrench::FileLocation::LOCATION(this->test->storage_service_2, this->test->file_1));
 
 
@@ -132,7 +132,7 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
 
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampDiskReadWriteBasicTestWMS(
                             this, host1)));
 

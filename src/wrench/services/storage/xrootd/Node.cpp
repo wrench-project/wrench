@@ -12,7 +12,6 @@
 #include <wrench/services/storage/xrootd/Deployment.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/failure_causes/NetworkError.h>
 #include <wrench/failure_causes/FileNotFound.h>
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/storage/xrootd/XRootDMessage.h"
@@ -157,17 +156,17 @@ namespace wrench {
                                                                          cached.size(),
                                                          msg->answered));
                     } else {
-                        if (children.size() > 0) {
+                        if (!children.empty()) {
 
                             map<Node *, vector<stack<Node *>>> splitStacks = splitStack(msg->search_stack);
                             S4U_Simulation::compute(
                                     this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                             WRENCH_DEBUG("Advanced Broadcast to %zu hosts", splitStacks.size());
 
-                            for (auto entry: splitStacks) {
+                            for (auto const &entry: splitStacks) {
                                 if (entry.first == this) {//this node was the target
                                     if (internalStorage &&//check the storage, it SHOULD be there, but we should check still
-                                        StorageService::lookupFile(FileLocation::LOCATION(internalStorage, msg->file))) {
+                                        internalStorage->hasFile(msg->file)) {
                                         //File in internal storage
                                         cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
                                         S4U_Mailbox::dputMessage(supervisor->mailbox,
@@ -191,7 +190,7 @@ namespace wrench {
                         }
 
                         if (internalStorage &&//check the storage, it SHOULD be there, but we should check still
-                            StorageService::lookupFile(FileLocation::LOCATION(internalStorage, msg->file))) {
+                            internalStorage->hasFile(msg->file)) {
                             //File in internal storage
                             cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
                             S4U_Mailbox::dputMessage(supervisor->mailbox,
@@ -214,7 +213,7 @@ namespace wrench {
                     }
                     if (internalStorage) {
                         //File in internal storage
-                        StorageService::deleteFile(FileLocation::LOCATION(internalStorage, msg->file));
+                        internalStorage->deleteFile(msg->file);
                     }
 
                     S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
@@ -240,7 +239,7 @@ namespace wrench {
                 try {
                     S4U_Mailbox::dputMessage(msg->ack_mailbox,
                                              new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                     SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                                     ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
                 } catch (ExecutionException &e) {
                     return false;
                 }
@@ -260,7 +259,9 @@ namespace wrench {
                                                          false,
                                                          std::shared_ptr<FailureCause>(
                                                                  new FileNotFound(FileLocation::LOCATION(getSharedPtr<Node>(), msg->file))),
+                                                         nullptr,
                                                          0,
+                                                         1,
                                                          getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
 
                     } else {
@@ -287,7 +288,7 @@ namespace wrench {
                                                      getMessagePayloadValue(
                                                              MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
                 } else {//File Not Cached
-                    if (internalStorage && StorageService::lookupFile(FileLocation::LOCATION(internalStorage, file))) {
+                    if (internalStorage && internalStorage->hasFile(file)) {
 
                         S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                                  new StorageServiceFileLookupAnswerMessage(
@@ -373,14 +374,13 @@ namespace wrench {
                                              new StorageServiceFileReadRequestMessage(
                                                      msg->answer_mailbox,
                                                      simgrid::s4u::this_actor::get_host(),
-                                                     msg->mailbox_to_receive_the_file_content,
                                                      best,
                                                      msg->num_bytes_to_read,
                                                      getMessagePayloadValue(
                                                              MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
                 } else {//File Not Cached
                     if (internalStorage &&
-                        StorageService::lookupFile(FileLocation::LOCATION(internalStorage, file))) {
+                        internalStorage->hasFile(file)) {
 
                         WRENCH_DEBUG("File %s found in internal Storage", file->getID().c_str());
                         //File in internal storage
@@ -389,7 +389,6 @@ namespace wrench {
                                                  new StorageServiceFileReadRequestMessage(
                                                          msg->answer_mailbox,
                                                          simgrid::s4u::this_actor::get_host(),
-                                                         msg->mailbox_to_receive_the_file_content,
                                                          FileLocation::LOCATION(internalStorage, file),
                                                          msg->num_bytes_to_read,
                                                          getMessagePayloadValue(
@@ -401,7 +400,7 @@ namespace wrench {
                         //        this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                         //extra compute call
 
-                        if (children.size() > 0) {//recursive search
+                        if (!children.empty()) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
                             Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->mailbox,
                                                        new FileNotFoundAlarm(msg->answer_mailbox, file, true, answered), "XROOTD_FileNotFoundAlarm");
@@ -413,7 +412,7 @@ namespace wrench {
                                 map<Node *, vector<stack<Node *>>> splitStacks = splitStack(search_stack);
                                 WRENCH_DEBUG("Searching %zu subtrees for %s", search_stack.size(), file->getID().c_str());
                                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
-                                for (auto entry: splitStacks) {
+                                for (auto const &entry: splitStacks) {
                                     if (entry.first == this) {//this node was the target
                                         //we shouldn't have to worry about this, it should have been handled earlier.
                                         // But just in case, I don't want a rogue search going who knows where
@@ -455,7 +454,9 @@ namespace wrench {
                                                              std::shared_ptr<FailureCause>(
                                                                      new FileNotFound(
                                                                              FileLocation::LOCATION(internalStorage, file))),
+                                                             nullptr,
                                                              0,
+                                                             1,
                                                              getMessagePayloadValue(
                                                                      MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
                         }
@@ -482,7 +483,7 @@ namespace wrench {
                                                      msg->answered));
                 } else {//File Not Cached
                     if (internalStorage &&
-                        StorageService::lookupFile(FileLocation::LOCATION(internalStorage, msg->file))) {
+                        internalStorage->hasFile(msg->file)) {
                         WRENCH_DEBUG("Found %s in internal storage", msg->file->getID().c_str());
                         //File in internal storage
                         cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
@@ -535,7 +536,6 @@ namespace wrench {
                                                      new StorageServiceFileReadRequestMessage(
                                                              msg->answer_mailbox,
                                                              simgrid::s4u::this_actor::get_host(),
-                                                             msg->original->mailbox_to_receive_the_file_content,
                                                              best,
                                                              msg->original->num_bytes_to_read,
                                                              getMessagePayloadValue(
@@ -606,7 +606,7 @@ namespace wrench {
                 if (internalStorage) {
                     //File in internal storage
                     try {
-                        StorageService::deleteFile(FileLocation::LOCATION(internalStorage, msg->file));
+                        internalStorage->deleteFile(msg->file);
                     } catch (ExecutionException &e) {
                         //we don't actually care if this fails, that just means the file
                         // we tried to delete wasn't there already.  Big whoop.
@@ -625,20 +625,22 @@ namespace wrench {
                 if (not internalStorage) {
                     // Reply this is not allowed
                     std::string error_message = "Cannot write file at non-storage XRootD node";
+                    auto location = FileLocation::LOCATION(this->getSharedPtr<Node>(), file);
                     S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                              new StorageServiceFileWriteAnswerMessage(
-                                                     FileLocation::LOCATION(getSharedPtr<Node>(), file),
+                                                     location,
                                                      false,
                                                      std::shared_ptr<FailureCause>(
                                                              new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                                     {},
                                                      0,
                                                      getMessagePayloadValue(MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
 
                 } else {
                     // Forward the message
                     msg->location = FileLocation::LOCATION(internalStorage, file);
-                    msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
-                            SimpleStorageServiceProperty::BUFFER_SIZE);
+                    //                    msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
+                    //                            SimpleStorageServiceProperty::BUFFER_SIZE);
                     S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
                 }
 
@@ -646,15 +648,18 @@ namespace wrench {
                 auto file = msg->src->getFile();
                 if (not internalStorage) {
                     // Reply this is not allowed
-                    std::string error_message = "Cannot copy file to/from non-storage XRooD node";
-                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                             new StorageServiceFileWriteAnswerMessage(
-                                                     FileLocation::LOCATION(getSharedPtr<Node>(), file),
-                                                     false,
-                                                     std::shared_ptr<FailureCause>(
-                                                             new NotAllowed(getSharedPtr<Node>(), error_message)),
-                                                     0,
-                                                     getMessagePayloadValue(MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+                    if (msg->answer_mailbox) {
+                        std::string error_message = "Cannot copy file to/from non-storage XRooD node";
+                        auto location = FileLocation::LOCATION(getSharedPtr<Node>(), file);
+                        S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                                 new StorageServiceFileCopyAnswerMessage(
+                                                         msg->src,
+                                                         msg->dst,
+                                                         false,
+                                                         std::shared_ptr<FailureCause>(
+                                                                 new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                                         getMessagePayloadValue(MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+                    }
 
                 } else {
                     // Forward the message
@@ -764,7 +769,7 @@ namespace wrench {
         *
         */
         Node::Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootD") {
+                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootDNode") {
 
             // Create /dev/null mountpoint so that Locations can be created
             this->file_systems[LogicalFileSystem::DEV_NULL] =
@@ -774,8 +779,8 @@ namespace wrench {
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
             cache.maxCacheTime = getPropertyValueAsTimeInSecond(Property::CACHE_MAX_LIFETIME);
             this->deployment = deployment;
-            this->buffer_size = DBL_MAX;// Not used, but letting it be zero will raise unwanted exception since
-            // clients "think" that they're talking to a real storage service
+            //            this->buffer_size = DBL_MAX;// Not used, but letting it be zero will raise unwanted exception since
+            //            // clients "think" that they're talking to a real storage service
         }
 
         /**
@@ -844,9 +849,9 @@ namespace wrench {
         }
 
         /**
-     * @brief Get the load of the underlying storage service
-     * @return the load on the service
-     */
+         * @brief Get the load of the underlying storage service
+         * @return the load on the service
+         */
         double Node::getLoad() {
             if (internalStorage) {
                 return internalStorage->getLoad();
@@ -855,12 +860,21 @@ namespace wrench {
         }
 
         /**
+         * @brief Remove a directory and all its content at the Node (in zero simulated time)
+         * @param path: a path
+         */
+        void Node::removeDirectory(const std::string &path) {
+            throw std::runtime_error("Node::removeDirectory(): Not implemented yet (ever?)");
+        }
+
+
+        /**
         * @brief construct the path to all targets IF they are in the subtree
         * @param targets: All the nodes to search for
         *
         * @returns the path to each target in the subtree.
         */
-        vector<stack<Node *>> Node::constructFileSearchTree(vector<shared_ptr<Node>> &targets) {
+        vector<stack<Node *>> Node::constructFileSearchTree(const vector<shared_ptr<Node>> &targets) {
             vector<stack<Node *>> ret;
             for (auto target: targets) {
                 if (target.get() == this) {
@@ -894,20 +908,7 @@ namespace wrench {
             }
             return ret;
         }
-        /**
-        * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
-        * @param file: A shared pointer to a file
-        *
-        * @throw std::invalid_argument
-        */
-        void Node::createFile(const std::shared_ptr<DataFile> &file) {
-            if (internalStorage == nullptr) {
-                throw std::runtime_error("Node::createFile() called on non storage Node " + hostname);
-            }
 
-            metavisor->files[file].push_back(this->getSharedPtr<Node>());
-            internalStorage->createFile(file);
-        }
         /**
         * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
         * @param location: a file location, must be the same object as the function is invoked on
@@ -920,41 +921,36 @@ namespace wrench {
             }
 
             internalStorage->createFile(location);
-
             metavisor->files[location->getFile()].push_back(this->getSharedPtr<Node>());
         }
-        /**
-        * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
-        * @param file: A shared pointer to a file
-        * @param path: a path at the node's mount point
-        *
-        * @throw std::invalid_argument
-        */
-        void Node::createFile(const std::shared_ptr<DataFile> &file, const string &path) {
-            if (internalStorage == nullptr) {
-                throw std::runtime_error("Node::createFile() called on non storage Node " + hostname);
-            }
-            internalStorage->createFile(file, path);
-            metavisor->files[file].push_back(this->getSharedPtr<Node>());
-        }
+
 
         /**
         * @brief write a file on this node.
-        * @param file: A shared pointer to a file
+	* @param answer_mailbox: a mailbox on which to send the answer messagej
+        * @param location: a location
+	* @param wait_for_answer: true if this method should wait for the answer, false otherwise
         *
         * @throw std::invalid_argument
         */
-        void Node::writeFile(const std::shared_ptr<DataFile> &file) {
+        void Node::writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+                             const std::shared_ptr<FileLocation> &location,
+                             bool wait_for_answer) {
             if (internalStorage == nullptr) {
                 std::string error_message = "Cannot write file at non-storage XRootD node";
                 throw ExecutionException(
                         std::shared_ptr<FailureCause>(
                                 new NotAllowed(getSharedPtr<Node>(), error_message)));
             }
-            internalStorage->writeFile(file);
-            metavisor->files[file].push_back(this->getSharedPtr<Node>());
+            // Replace the location with
+            // TODO: THIS LOCATION REWRITE WAS DONE TO FIX SOMETHING BUT HENRI HAS NO
+            // TODO: IDEA HOW COME IT EVERY WORKED BEFORE SINCE THE FTT INSINCE INTERNALSTORAGE
+            // TODO: WILL SAY "THIS IS NOT ME, MY PARENT IS THE INTERNALSTORAGE, NOT THE NODE"
+            auto new_location = FileLocation::LOCATION(internalStorage, location->getPath(), location->getFile());
+            internalStorage->writeFile(answer_mailbox, new_location, wait_for_answer);
+            //            internalStorage->writeFile(answer_mailbox, location, wait_for_answer);
+            metavisor->files[location->getFile()].push_back(this->getSharedPtr<Node>());
         }
-
 
         /**
          * @brief Adds a child, which will be a supervisor, to a node
@@ -993,12 +989,77 @@ namespace wrench {
         /**
          * @brief Determines whether the storage service has the file. This doesn't simulate anything and is merely a zero-simulated-time data structure lookup.
          * If you want to simulate the overhead of querying the StorageService, instead use lookupFile().
-         * @param file a file
-         * @param path the path
+         * @param location: a location
          * @return true if the file is present, false otherwise
          */
-        bool Node::hasFile(const shared_ptr<DataFile> &file, const string &path) {
-            throw std::runtime_error("XRootD::Node::hasFile(): Not supported/implemented yet");
+        bool Node::hasFile(const shared_ptr<FileLocation> &location) {
+            if (internalStorage)
+                return internalStorage->hasFile(location);
+            //return false;//no internal storage here, so I dont have any files.  But I am pretending to have some, so its reasonable to ask.
+            //alternativly
+            return !constructFileSearchTree(metavisor->getFileNodes(location->getFile())).empty();//meta search the subtree for the file.  If its in the subtree we can find a route to it, so we have it
+        }
+
+        /**
+         * @brief Get the storage service's total space (in zero simulated time)
+         * @return a capacity in bytes
+         */
+        double Node::getTotalSpace() {
+            if (internalStorage) {
+                return internalStorage->getTotalSpace();
+            } else {
+                return 0;
+            }
+        }
+
+        /**
+         * @brief Determine whether the storage service is bufferized
+         * @return true if bufferized, false otherwise
+         */
+        bool Node::isBufferized() const {
+            if (internalStorage) {
+                return internalStorage->isBufferized();
+            } else {
+                return 0;// TODO: IS THIS A GOOD IDEA? MAY MESS UP COPYING???
+                throw std::runtime_error("Node::isBufferized() called on non storage Node " + hostname);
+            }
+        }
+
+        /**
+         * @brief Determine the storage service's buffer size
+         * @return a size in bytes
+         */
+        double Node::getBufferSize() const {
+            if (internalStorage) {
+                return internalStorage->getBufferSize();
+            } else {
+                throw std::runtime_error("Node::getBufferSize() called on non storage Node " + hostname);
+            }
+        }
+
+        /**
+         * @brief Reserve space at the storage service
+         * @param location: a location
+         * @return true if success, false otherwise
+         */
+        bool Node::reserveSpace(std::shared_ptr<FileLocation> &location) {
+            if (internalStorage) {
+                return internalStorage->reserveSpace(location);
+            } else {
+                throw std::runtime_error("Node::reserveSpace() called on non storage Node " + hostname);
+            }
+        }
+
+        /**
+         * @brief Unreserve space at the storage service
+         * @param location: a location
+         */
+        void Node::unreserveSpace(std::shared_ptr<FileLocation> &location) {
+            if (internalStorage) {
+                internalStorage->unreserveSpace(location);
+            } else {
+                throw std::runtime_error("Node::unreserveSpace() called on non storage Node " + hostname);
+            }
         }
 
 

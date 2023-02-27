@@ -142,6 +142,7 @@ private:
         }
 
         // attempt to write file directly to leaf
+        WRENCH_INFO("Writing files directly to a leaf");
         this->test->root_supervisor->getChild(0)->writeFile(file3);
 
         // attempt to write file directly to supervisor.
@@ -154,9 +155,10 @@ private:
             }
         }
 
-        // Copy a file child 0 to child 1
+        // Copy a file from child 0 to child 1
         auto file4 = wrench::Simulation::addFile("file4", 10000);
 
+        WRENCH_INFO("Copy a file from child 0 to to child 1");
         this->test->root_supervisor->getChild(0)->writeFile(file4);
         wrench::StorageService::copyFile(
                 wrench::FileLocation::LOCATION(this->test->root_supervisor->getChild(0), file4),
@@ -167,6 +169,7 @@ private:
         }
 
         // Copy a file from child 0 to a stand-alone SimpleStorageService
+        WRENCH_INFO("Copy a file child 0 to a stand-alone SimpleStorageService");
         auto file5 = wrench::Simulation::addFile("file5", 10000);
         this->test->root_supervisor->getChild(0)->writeFile(file5);
         wrench::StorageService::copyFile(
@@ -189,18 +192,21 @@ private:
             throw std::runtime_error("It seems that file6 was never copied from standalone ss to child 1");
         }
 
-        // Copy a file from Supervisor to stand-alone storage service
+        // Copy a file from Supervisor to stand-alone storage service (which is not alloweD)
         auto file7 = wrench::Simulation::addFile("file7", 10000);
-        //        this->test->root_supervisor->getChild(0)->createFile(file7);  // works too
         this->test->root_supervisor->getChild(0)->writeFile(file7);
-        wrench::StorageService::copyFile(
-                wrench::FileLocation::LOCATION(this->test->root_supervisor, file7),
-                wrench::FileLocation::LOCATION(this->test->standalone_ss, file7));
-
-        // Check that the copy has worked
-        if (!this->test->standalone_ss->lookupFile(file7)) {
-            throw std::runtime_error("It seems that file7 was never copied from supervisor to standalone ss");
+        this->test->root_supervisor->getChild(0)->createFile(file7);// works too
+        try {
+            wrench::StorageService::copyFile(
+                    wrench::FileLocation::LOCATION(this->test->root_supervisor, file7),
+                    wrench::FileLocation::LOCATION(this->test->standalone_ss, file7));
+            throw std::runtime_error("Should not be allowed to copy from supervisor to storage service");
+        } catch (wrench::ExecutionException &e) {
+            if (not std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause())) {
+                throw std::runtime_error("Got expected exception, but wrong failure cause");
+            }
         }
+
 
         //mark
         if (this->test->root_supervisor->getChild(3) != nullptr) {
@@ -241,6 +247,7 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--log=wrench_core_mailbox.t=debug");
 
     simulation->init(&argc, argv);
 

@@ -435,7 +435,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new CompareProxTestWMS(this, hostname)));
 
@@ -602,7 +602,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
                                                                  {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"}})));
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new VivaldiConvergeWMS(
                                     this, {alltoall_network_service, vivaldi_network_service}, hostname)));
@@ -767,7 +767,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
 
     //Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ValidatePropertiesWMS(
                                     this, hostname)));

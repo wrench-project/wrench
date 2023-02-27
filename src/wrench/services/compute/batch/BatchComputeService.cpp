@@ -372,15 +372,10 @@ namespace wrench {
                                 BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        std::shared_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitCompoundJobAnswerMessage>(message);
-        if (!msg) {
-            throw std::runtime_error(
-                    "BatchComputeService::submitCompoundJob(): Received an unexpected [" + message->getName() +
-                    "] message!");
-        }
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "BatchComputeService::submitCompoundJob(): Received an");
         if (!msg->success) {
             throw ExecutionException(msg->failure_cause);
         }
@@ -405,17 +400,10 @@ namespace wrench {
                                 BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobAnswerMessage *>(message.get());
-
-        if (not msg) {
-            throw std::runtime_error("BatchComputeService::terminateCompoundJob(): Received an unexpected [" +
-                                     message->getName() +
-                                     "] message!");
-        }
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceTerminateCompoundJobAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "BatchComputeService::terminateCompoundJob(): Received an");
 
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
@@ -438,6 +426,9 @@ namespace wrench {
         if (not this->workload_trace.empty()) {
             startBackgroundWorkloadProcess();
         }
+
+        // Start the Scratch Storage Service
+        this->startScratchStorageService();
 
         /** Main loop **/
         while (processNextMessage()) {
@@ -718,7 +709,7 @@ namespace wrench {
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
@@ -733,7 +724,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->setStateToDown();
             this->terminate(msg->send_failure_notifications, msg->termination_cause);
             //            this->terminateRunningPilotJobs();
@@ -748,42 +739,41 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationRequestMessage>(message)) {
             processGetResourceInformation(msg->answer_mailbox, msg->key);
             return true;
 
-        } else if (auto msg = dynamic_cast<BatchComputeServiceJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<BatchComputeServiceJobRequestMessage>(message)) {
             processJobSubmission(msg->job, msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobDoneMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobDoneMessage>(message)) {
             processCompoundJobCompletion(std::dynamic_pointer_cast<BareMetalComputeServiceOneShot>(msg->compute_service), msg->job);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobFailedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobFailedMessage>(message)) {
             processCompoundJobFailure(std::dynamic_pointer_cast<BareMetalComputeServiceOneShot>(msg->compute_service), msg->job, nullptr);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceTerminateCompoundJobRequestMessage>(message)) {
             processCompoundJobTerminationRequest(msg->job, msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = dynamic_cast<AlarmJobTimeOutMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<AlarmJobTimeOutMessage>(message)) {
             processAlarmJobTimeout(msg->job);
             return true;
 
-        } else if (auto msg = dynamic_cast<BatchExecuteJobFromBatSchedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<BatchExecuteJobFromBatSchedMessage>(message)) {
             processExecuteJobFromBatSched(msg->batsched_decision_reply);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage>(message)) {
             processIsThereAtLeastOneHostWithAvailableResources(msg->answer_mailbox, msg->num_cores, msg->ram);
             return true;
 
         } else {
             throw std::runtime_error(
                     "BatchComputeService::processNextMessage(): Unexpected [" + message->getName() + "] message");
-            return false;
         }
     }
 

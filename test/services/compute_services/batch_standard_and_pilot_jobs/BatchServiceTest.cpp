@@ -465,7 +465,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new TerminateOneStandardJobSubmissionTestWMS(
                                     this, hostname)));
@@ -588,7 +588,7 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new TerminateOneStandardJobSubmissionTestWMS(
                                     this, hostname)));
@@ -736,7 +736,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new OneStandardJobSubmissionTestWMS(
                                     this, hostname)));
@@ -868,7 +868,7 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new StandardJobFailureTestWMS(
                                     this, hostname)));
@@ -1037,7 +1037,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new TwoStandardJobSubmissionTestWMS(this, hostname)));
 
@@ -1195,7 +1195,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new OnePilotJobSubmissionTestWMS(
                                     this, hostname)));
@@ -1362,7 +1362,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new StandardPlusPilotJobSubmissionTestWMS(
                                     this, hostname)));
@@ -1494,7 +1494,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new InsufficientCoresJobSubmissionTestWMS(
                                     this, hostname)));
@@ -1607,7 +1607,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new NoArgumentsJobSubmissionTestWMS(
                                     this, hostname)));
@@ -1750,7 +1750,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new StandardJobTimeoutSubmissionTestWMS(
                                     this, hostname)));
@@ -1874,7 +1874,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new PilotJobTimeoutSubmissionTestWMS(
                                     this, hostname)));
@@ -2075,7 +2075,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BestFitStandardJobSubmissionTestWMS(
                                     this, hostname)));
@@ -2225,7 +2225,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new FirstFitStandardJobSubmissionTestWMS(
                                     this, hostname)));
@@ -2474,7 +2474,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new RoundRobinStandardJobSubmissionTestWMS(
                                     this, hostname)));
@@ -2649,7 +2649,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new StandardJobInsidePilotJobTimeoutSubmissionTestWMS(
                                     this, hostname)));
@@ -2801,7 +2801,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new StandardJobInsidePilotJobSucessSubmissionTestWMS(
                                     this, hostname)));
@@ -2942,7 +2942,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new InsufficientCoresInsidePilotJobSubmissionTestWMS(
                                     this, hostname)));
@@ -3069,7 +3069,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new MultipleStandardJobSubmissionTestWMS(
                                     this, hostname)));
@@ -3201,7 +3201,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new DifferentBatchAlgorithmsSubmissionTestWMS(
                                     this, hostname)));
@@ -3334,7 +3334,7 @@ void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ShutdownWithPendingRunningJobsTestWMS(
                                     this, hostname)));

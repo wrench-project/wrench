@@ -42,7 +42,12 @@ protected:
     </cluster>
 
     <zone id="host_zone" routing="Full">
-        <host id="subzonehost" speed="1f" core="2"/>
+        <host id="subzonehost" speed="1f" core="2">
+           <disk id="scratch" read_bw="100MBps" write_bw="100MBps">
+               <prop id="size" value="100B"/>
+               <prop id="mount" value="/scratch"/>
+           </disk>
+        </host>
     </zone>
 
     <zone id="subzone" routing="Full">
@@ -200,10 +205,6 @@ private:
 
     int main() override {
 
-        try {
-            wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 20.0, 100.0, "/foo");
-            throw std::runtime_error("Should not be able to create a disk with different read and write bandwidths");
-        } catch (std::invalid_argument &ignore) {}
 
         // Create a new disk on subzonehost
         wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 10.0, 100.0, "/foo");
@@ -214,11 +215,11 @@ private:
         // Create a file on it
         auto too_big = wrench::Simulation::addFile("too_big", 200.0);
         try {
-            wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, too_big));
+            wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, too_big));
             throw std::runtime_error("Should not be able to create a file that big on the newly created storage service");
-        } catch (std::invalid_argument &ignore) {}
+        } catch (wrench::ExecutionException &ignore) {}
         auto not_too_big = wrench::Simulation::addFile("not_too_big", 20.0);
-        wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, not_too_big));
+        wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
 
         wrench::Simulation::sleep(1);
         std::cerr << "WMS RETURNING: " << ss.use_count() << "\n";
@@ -282,7 +283,7 @@ public:
 private:
     double link_bw;
 
-    void create_platform(double link_bw) const {
+    static void create_platform(double link_bw) {
         // Create the top-level zone
         auto zone = simgrid::s4u::create_full_zone("AS0");
         // Create the WMSHost host with its disk

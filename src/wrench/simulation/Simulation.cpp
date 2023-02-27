@@ -12,10 +12,12 @@
 #include <csignal>
 #include <simgrid/plugins/live_migration.h>
 
+#include <wrench/exceptions//ExecutionException.h>
 #include <wrench/execution_controller/ExecutionController.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
 #include <wrench/services/storage/StorageService.h>
+#include <wrench/services/storage/compound/CompoundStorageService.h>
 #include <wrench/simulation/Simulation.h>
 #include "simgrid/plugins/energy.h"
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
@@ -512,8 +514,10 @@ namespace wrench {
         try {
             this->is_running = true;
             this->s4u_simulation->runSimulation();
+            wrench::FileLocation::file_location_map.clear();
             this->is_running = false;
         } catch (std::runtime_error &e) {
+            wrench::FileLocation::file_location_map.clear();
             this->is_running = false;
             throw;
         }
@@ -573,14 +577,14 @@ namespace wrench {
                 storage_service->start(storage_service, true, true);// Daemonized, AUTO-RESTART
             }
 
-            // Start the scratch services
-            for (const auto &compute_service: this->compute_services) {
-                if (compute_service->hasScratch()) {
-                    compute_service->getScratch()->simulation = this;
-                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
-                                                         false);// Daemonized, no auto-restart
-                }
-            }
+            //            // Start the scratch services
+            //            for (const auto &compute_service: this->compute_services) {
+            //                if (compute_service->hasScratch()) {
+            //                    compute_service->getScratch()->simulation = this;
+            //                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
+            //                                                         false);// Daemonized, no auto-restart
+            //                }
+            //            }
 
             // Start the network proximity services
             for (const auto &network_proximity_service: this->network_proximity_services) {
@@ -722,35 +726,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
-     *
-     * @param file: a file to stage on a storage service
-     * @param storage_service: a storage service
-     *
-     * @throw std::runtime_error
-     * @throw std::invalid_argument
-     */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &storage_service) {
-        Simulation::stageFile(FileLocation::LOCATION(storage_service, file));
-    }
-
-    /**
-     * @brief Stage a copy of a file at a storage service in a particular directory
-     *
-     * @param file: a file to stage on a storage service
-     * @param storage_service: a storage service
-     * @param directory_absolute_path: the absolute path of the directory where the file should be stored
-     *
-     * @throw std::runtime_error
-     * @throw std::invalid_argument
-     */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &storage_service,
-                               std::string directory_absolute_path) {
-        Simulation::stageFile(FileLocation::LOCATION(storage_service, directory_absolute_path, file));
-    }
-
-    /**
-     * @brief State a copy of a file at a location, and update the file registry service
+     * @brief Stage a copy of a file at a location (and add entries to all file registry services, if any)
      * @param location: the file location
      */
     void Simulation::stageFile(const std::shared_ptr<FileLocation> &location) {
@@ -758,50 +734,25 @@ namespace wrench {
             throw std::invalid_argument("Simulation::stageFile(): Invalid nullptr arguments");
         }
 
+        if (std::dynamic_pointer_cast<CompoundStorageService>(location->getStorageService())) {
+            throw std::invalid_argument("Simulation::stageFile(): Can't stage on CompoundStorageService (it is only an abstraction layer)");
+        }
+
         if (this->is_running) {
             throw std::runtime_error(" Simulation::stageFile(): Cannot stage a file once the simulation has started");
         }
 
-        // Check that a FileRegistryService has been set
-        if (this->file_registry_services.empty()) {
-            throw std::runtime_error(
-                    "Simulation::stageFile(): At least one FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
-        }
-
         // Put the file on the storage service (not via the service daemon)
         try {
-            StorageService::stageFile(location);
-        } catch (std::invalid_argument &e) {
-            throw;
+            location->getStorageService()->createFile(location);
+        } catch (ExecutionException &e) {
+            throw std::invalid_argument("Simulation::stageFile(): Not enough space on disk");
         }
 
-        // Update all file registry services
+        // Update all file registry services (perhaps none)
         for (const auto &frs: this->file_registry_services) {
             frs->addEntryToDatabase(location);
         }
-    }
-    /**
-     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-     * at that location.
-     *
-     * @param location: a file location
-     *
-     * @throw std::invalid_argument
-     */
-
-    void Simulation::createFile(const std::shared_ptr<FileLocation> &location) {
-        location->getStorageService()->createFile(location);
-    }
-    /**
-     * @brief Store a file on a particular file server ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-     * at that location.
-     * @param file: a file
-     * @param service: a storage service
-     *
-     * @throw std::invalid_argument
-     */
-    [[deprecated("Replaced by StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location), do not use if using XRootD or other distributed file system")]] void Simulation::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &service) {
-        service->createFile(file);
     }
 
     /**
@@ -888,6 +839,7 @@ namespace wrench {
                                                           temp_unique_sequence_number);
     }
 
+#ifdef PAGE_CACHE_SIMULATION
     /**
      * @brief Read file locally, only available if writeback is activated.
      *
@@ -900,7 +852,7 @@ namespace wrench {
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, location->getPath(), n_bytes,
                                                     temp_unique_sequence_number);
 
         auto mem_mng = getMemoryManagerByHost(hostname);
@@ -927,7 +879,7 @@ namespace wrench {
         //        Anonymous used by application
         mem_mng->useAnonymousMemory(n_bytes);
 
-        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getPath(), n_bytes,
                                                          temp_unique_sequence_number);
     }
 
@@ -979,7 +931,7 @@ namespace wrench {
             remaining -= to_cache;
         }
 
-        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getPath(), n_bytes,
                                                           temp_unique_sequence_number);
     }
 
@@ -996,12 +948,16 @@ namespace wrench {
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, location->getPath(), n_bytes,
                                                      temp_unique_sequence_number);
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
 
         // Write to disk
+        auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
+        if (!ss) {
+            throw...
+        }
         this->writeToDisk(n_bytes, hostname, location->getMountPoint());
 
         mem_mng->evict(n_bytes - mem_mng->getFreeMemory(), file->getID());
@@ -1010,6 +966,7 @@ namespace wrench {
         this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
                                                           temp_unique_sequence_number);
     }
+#endif
 
     /**
      * @brief Find MemoryManager running on a host based on hostname
@@ -1079,6 +1036,16 @@ namespace wrench {
      */
     double Simulation::getHostFlopRate(const std::string &hostname) {
         return S4U_Simulation::getHostFlopRate(hostname);
+    }
+
+    /**
+     * @brief Determine if a host has a disk mounted at some mount point
+     * @param hostname: the hostname
+     * @param mount_point: the mount point
+     * @return true or false
+     */
+    bool Simulation::hostHasMountPoint(const std::string &hostname, const std::string &mount_point) {
+        return S4U_Simulation::hostHasMountPoint(hostname, mount_point);
     }
 
     /**
@@ -1328,10 +1295,10 @@ namespace wrench {
         std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
         this->compute_services.insert(shared_ptr);
         shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
-        if (service->hasScratch()) {
-            service->getScratch()->simulation = this;
-            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
-        }
+                                                   //        if (service->hasScratch()) {
+                                                   //            service->getScratch()->simulation = this;
+                                                   //            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
+                                                   //        }
 
         return shared_ptr;
     }
@@ -1353,6 +1320,7 @@ namespace wrench {
         if (not this->is_running) {
             throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
         }
+
 
         service->simulation = this;
         std::shared_ptr<StorageService> shared_ptr = std::shared_ptr<StorageService>(service);
@@ -1484,7 +1452,7 @@ namespace wrench {
                                                     " has two disks with the same mount point '" + disks[i] + "'");
                     }
                     if ((disks[j] != "/") and (disks[i] != "/") and
-                        (FileLocation::properPathPrefix(disks[i], disks[j]))) {
+                        (FileLocation::properPathPrefix(FileLocation::sanitizePath(disks[i]), FileLocation::sanitizePath(disks[j])))) {
                         throw std::invalid_argument("Simulation::platformSanityCheck(): Host " + h +
                                                     " has two disks, with one of them having a mount point that "
                                                     "is a prefix of the other (" +

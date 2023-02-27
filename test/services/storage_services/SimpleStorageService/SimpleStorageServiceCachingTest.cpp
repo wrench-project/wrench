@@ -86,7 +86,6 @@ private:
 
         // The LRU list:  file_50, file_30, file_10
 
-
         // Add a file of size 70, which should kick out file_50 and file_30
         auto file_70 = wrench::Simulation::addFile("file_70", 70);
 
@@ -153,10 +152,12 @@ void SimpleStorageServiceCachingTest::do_SimpleLRUCaching_test(double buffer_siz
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
+    //    std::cerr << "\nBUFFER SIZE = " << buffer_size << "\n";
+
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

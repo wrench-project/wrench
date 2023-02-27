@@ -790,7 +790,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     std::string host = wrench::Simulation::getHostnameList()[0];
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
             new SimulationOutputDumpEnergyConsumptionTestWMS(
                     this, host)));
@@ -1149,14 +1149,13 @@ public:
 private:
     SimulationDumpJSONTest *test;
 
-    int main() {
-
+    int main() override {
 
         auto file_1 = this->test->workflow->addFile("file_1", 1.00 * 1000 * 1000);
 
-        wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
-        wrench::StorageService::writeFile(wrench::FileLocation::LOCATION(this->test->ss2, file_1));
-        wrench::StorageService::readFile(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
+        wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
+        wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss2, file_1));
+        wrench::StorageService::readFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
         return 0;
     }
 };
@@ -1170,6 +1169,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1185,7 +1185,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
                                                                                                    {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new SimulationDumpDiskOperationsTestWMS(
             this, host1)));
 
@@ -1201,6 +1201,8 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
 
     // Performing programmatic checks of the JSON output
     auto result_json = readJSONFromFile(disk_operations_json_file_path);
+
+    //    std::cerr << result_json << "\n";
 
     for (auto const &operation: (std::vector<std::string>){"reads"}) {
         ASSERT_EQ(result_json["host1"].as_object()["/"].as_object()[operation].as_array().size(), 3);

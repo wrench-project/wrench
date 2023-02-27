@@ -333,17 +333,14 @@ namespace wrench {
                                                     ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
 
             // Wait for the ack
-            message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
+            message = S4U_Mailbox::getMessage<ServiceDaemonStoppedMessage>(
+                    ack_mailbox,
+                    this->network_timeout,
+                    "Service::stop(): Received an");
 
-        } catch (ExecutionException &e) {// network error
+        } catch (...) {// network error
             this->shutting_down = false;
             throw;
-        }
-
-        if (dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
-            this->state = Service::DOWN;
-        } else {
-            throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
         }
 
         // Set the service state to down

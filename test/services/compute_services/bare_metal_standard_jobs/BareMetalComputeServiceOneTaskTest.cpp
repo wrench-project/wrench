@@ -374,8 +374,6 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
     ASSERT_NO_THROW(wms = simulation->add(
                             new NoopTestWMS(this, hostname)));
 
-    ASSERT_THROW(simulation->stageFile(input_file, storage_service1), std::runtime_error);
-
     simulation->add(new wrench::FileRegistryService(hostname));
 
     ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
@@ -764,7 +762,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -775,7 +773,8 @@ private:
                                                    {test->output_file, wrench::FileLocation::LOCATION(
                                                                                test->storage_service1, "/disk1", test->output_file)}});
 
-
+        //        std::cerr << "TOTAL SPACE = " << this->test->storage_service1->getTotalSpace() << "\n";
+        //        std::cerr << "FREE SPACE = " << this->test->storage_service1->getFreeSpace() << "\n";
         // Submit the job
         test->task->getStateAsString();
         job_manager->submitJob(job, test->compute_service);
@@ -788,7 +787,8 @@ private:
         } catch (std::invalid_argument &ignore) {}
 
         test->task->getStateAsString();
-        // Wait for the workflow execution event
+
+        // Wait for the  execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
@@ -797,24 +797,23 @@ private:
 
         // bogus lookup #1
         try {
-            wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service1, nullptr));
+            wrench::StorageService::lookupFileAtLocation(wrench::FileLocation::LOCATION(this->test->storage_service1, nullptr));
             throw std::runtime_error("Should not have been able to lookup a nullptr file");
         } catch (std::invalid_argument &e) {
         }
 
         // bogus lookup #2
         try {
-            wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(nullptr, this->test->output_file));
+            wrench::StorageService::lookupFileAtLocation(wrench::FileLocation::LOCATION(nullptr, this->test->output_file));
             throw std::runtime_error("Should not have been able to lookup a nullptr storage service");
         } catch (std::invalid_argument &e) {
         }
 
 
-        if (!wrench::StorageService::lookupFile(
+        if (!wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->output_file))) {
             throw std::runtime_error("Output file not written to storage service");
         }
-
 
         return 0;
     }
@@ -830,7 +829,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -857,10 +856,9 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
-                            new ExecutionWithLocationMapTestWMS(
-                                    this, hostname)));
+                            new ExecutionWithLocationMapTestWMS(this, hostname)));
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -938,20 +936,20 @@ private:
 
         // bogus lookup #1
         try {
-            wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(this->test->storage_service1, nullptr));
+            wrench::StorageService::lookupFileAtLocation(wrench::FileLocation::LOCATION(this->test->storage_service1, nullptr));
             throw std::runtime_error("Should not have been able to lookup a nullptr file");
         } catch (std::invalid_argument &e) {
         }
 
         // bogus lookup #2
         try {
-            wrench::StorageService::lookupFile((std::shared_ptr<wrench::FileLocation>) nullptr);
+            wrench::StorageService::lookupFileAtLocation((std::shared_ptr<wrench::FileLocation>) nullptr);
             throw std::runtime_error("Should not have been able to lookup a nullptr location");
         } catch (std::invalid_argument &e) {
         }
 
 
-        if (!wrench::StorageService::lookupFile(
+        if (!wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->output_file))) {
             throw std::runtime_error("Output file not written to storage service");
         }
@@ -1001,7 +999,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMapMultiple_tes
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ExecutionWithLocationMapMultipleTestWMS(
                                     this, hostname)));
@@ -1066,7 +1064,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service1,
                                                    "/scratch/" + job->getName(), this->test->output_file))) {
             throw std::runtime_error("Output file not written to storage service");
@@ -1113,7 +1111,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_t
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ExecutionWithDefaultStorageServiceTestWMS(this, hostname)));
 
@@ -1193,19 +1191,19 @@ private:
         }
 
         // Test file locations
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->input_file))) {
             throw std::runtime_error("Input file should be on Storage Service #1");
         }
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->output_file))) {
             throw std::runtime_error("Output file should be on Storage Service #1");
         }
-        if (wrench::StorageService::lookupFile(
+        if (wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->input_file))) {
             throw std::runtime_error("Input file should not be on Storage Service #2");
         }
-        if (wrench::StorageService::lookupFile(
+        if (wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->output_file))) {
             throw std::runtime_error("Output file should not be on Storage Service #2");
         }
@@ -1257,7 +1255,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ExecutionWithPrePostCopiesAndCleanupTestWMS(this, hostname)));
 
@@ -1343,11 +1341,11 @@ private:
         }
 
         // Test file locations
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->input_file))) {
             throw std::runtime_error("Input file should be on Storage Service #2");
         }
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service3, this->test->input_file))) {
             throw std::runtime_error("Input file should be on Storage Service #3");
         }
@@ -1403,7 +1401,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ExecutionWithPrePostCopiesNoTaskNoCleanupTestWMS(this, hostname)));
 
@@ -1466,7 +1464,7 @@ private:
         }
 
         // Test file locations
-        if (wrench::StorageService::lookupFile(
+        if (wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->input_file))) {
             throw std::runtime_error("Input file should not be on Storage Service #2");
         }
@@ -1518,7 +1516,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ExecutionWithPreNoPostCopiesNoTaskCleanupTestWMS(this, hostname)));
 
@@ -1556,7 +1554,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Remove the staged file!
-        wrench::StorageService::deleteFile(
+        wrench::StorageService::deleteFileAtLocation(
                 wrench::FileLocation::LOCATION(test->storage_service1, test->input_file));
 
         // Create a job ubmit the job
@@ -1633,7 +1631,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ExecutionWithMissingFileTestWMS(this, hostname)));
 
@@ -1747,7 +1745,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ExecutionWithNotEnoughCoresTestWMS(this, hostname)));
 
@@ -1855,7 +1853,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ExecutionWithNotEnoughRAMTestWMS(this, hostname)));
 
@@ -1963,7 +1961,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ExecutionWithDownServiceTestWMS(
                                     this, hostname)));
@@ -2082,7 +2080,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ExecutionWithSuspendedServiceTestWMS(
                                     this, hostname)));
