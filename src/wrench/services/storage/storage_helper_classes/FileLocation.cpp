@@ -44,7 +44,9 @@ namespace wrench {
                                                                    const std::shared_ptr<DataFile> &file,
                                                                    const std::string &path,
                                                                    bool is_scratch) {
-        // TODO: Find a more efficiency key?
+        // This looks inefficient (compare to using std::hash<void*> for instance), but it has
+        // no collisions and benchmarking showed that (with compiler optimizations), it makes
+        // very little difference
         std::string key = (ss ? ss->getName() : "") + "|" + path + "|" + file->getID() + "|" + (is_scratch ? "1" : "0");
         if (FileLocation::file_location_map.find(key) != FileLocation::file_location_map.end()) {
             return FileLocation::file_location_map[key];
@@ -237,6 +239,7 @@ namespace wrench {
      * @param path: an absolute path
      * @return a sanitized path
      */
+#define __cpluplus 201703L
     std::string FileLocation::sanitizePath(const std::string &path) {
         if (path == "/") return "/";// make the common case fast
 
