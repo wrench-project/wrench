@@ -106,6 +106,8 @@ namespace wrench {
 
             double getLoad() override;
 
+            void removeDirectory(const std::string &path) override;
+
             /***********************/
             /** \endcond           */
             /***********************/

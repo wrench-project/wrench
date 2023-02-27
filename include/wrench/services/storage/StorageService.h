@@ -288,6 +288,12 @@ namespace wrench {
          */
         virtual void createFile(const std::shared_ptr<FileLocation> &location) = 0;
 
+        /**
+         * @brief Remove a directory and all files at the storage service (in zero simulated time)
+         * @param path a path
+         */
+        virtual void removeDirectory(const std::string &path) = 0;
+
         /** File write date methods */
         /**
          * @brief Get a file's last write date at a location (in zero simulated time)

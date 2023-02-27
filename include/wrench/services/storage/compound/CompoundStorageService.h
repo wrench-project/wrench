@@ -104,6 +104,15 @@ namespace wrench {
         }
 
         /**
+         * @brief Remove a directory and all its content at the storage service (in zero simulated time)
+         * @param path: a path
+         */
+        void removeDirectory(const std::string &path) override {
+            throw std::runtime_error("CompoundStorageService::removeDirectory(): not implemented");
+        }
+
+
+        /**
         * @brief Unreserve space at the storage service
         * @param location a location
         */

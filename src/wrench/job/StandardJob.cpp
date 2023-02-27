@@ -319,29 +319,12 @@ namespace wrench {
         //        std::cerr << "NEED SCRATCH CLEAN = " << need_scratch_clean << "\n";
         // Does the lambda capture of cjob_file_locations work?
         std::weak_ptr<CompoundJob> weak_cjob = cjob;
-        auto lambda_execute = [this, weak_cjob](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
+        auto lambda_execute = [weak_cjob](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
             auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
             auto scratch = cs->getScratch();
             auto cjob = weak_cjob.lock();
             if (scratch) {
-                for (auto const &task: this->tasks) {
-                    for (auto const &f: task->getInputFiles()) {
-                        if (scratch->hasFile(f, scratch->getBaseRootPath() + cjob->getName())) {
-                            try {
-                                scratch->deleteFile(FileLocation::LOCATION(scratch, scratch->getBaseRootPath() + cjob->getName(), f));
-                            } catch (ExecutionException &ignore) {}
-                        }
-                    }
-
-                    for (auto const &f: task->getOutputFiles()) {
-                        if (scratch->hasFile(f, scratch->getBaseRootPath() + cjob->getName())) {
-                            try {
-                                scratch->deleteFile(FileLocation::LOCATION(scratch, scratch->getBaseRootPath() + cjob->getName(), f));
-                            } catch (ExecutionException &ignore) {}
-                        }
-                    }
-                }
-                // TODO: REMOVE DIRECTORY
+                scratch->removeDirectory(scratch->getBaseRootPath() + cjob->getName());
             }
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
