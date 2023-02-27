@@ -310,7 +310,7 @@ namespace wrench {
     bool FileLocation::properPathPrefix(const std::string &path1, const std::string &path2) {
 
         return ((path2.size() >= path1.size() && path2.compare(0, path1.size(), path1) == 0) or
-               (path2.size() < path1.size() && path1.compare(0, path2.size(), path2) == 0));
+                (path2.size() < path1.size() && path1.compare(0, path2.size(), path2) == 0));
     }
 
     /**
