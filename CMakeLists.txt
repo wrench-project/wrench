@@ -31,7 +31,7 @@ find_package(SimGrid REQUIRED)
 
 find_package(nlohmann_json)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "2")
