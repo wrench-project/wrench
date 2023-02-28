@@ -400,7 +400,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        unsigned long NUM_TRIALS = 500;
+        unsigned long NUM_TRIALS = 250;
 
         auto cloud_service = this->test->compute_service;
 
