@@ -46,7 +46,6 @@ namespace wrench {
 
         if (desired_rank >= this->size) {
             throw std::invalid_argument("Communicator::join(): invalid arguments");
-
         }
         if (this->rank_to_mailbox.find(desired_rank) != this->rank_to_mailbox.end()) {
             if (this->actor_to_rank.find(my_pid) != this->actor_to_rank.end()) {
@@ -62,7 +61,7 @@ namespace wrench {
         if (this->size > this->rank_to_mailbox.size()) {
             simgrid::s4u::this_actor::suspend();
         } else {
-            for (auto const &item : this->actor_to_rank) {
+            for (auto const &item: this->actor_to_rank) {
                 if (item.first != my_pid) {
                     simgrid::s4u::Actor::by_pid(item.first)->resume();
                 }
@@ -96,7 +95,7 @@ namespace wrench {
         }
         // Post all the sends
         std::vector<std::shared_ptr<S4U_PendingCommunication>> posted_sends;
-        for (auto const &send_operation : sends) {
+        for (auto const &send_operation: sends) {
             auto dst_mailbox = this->rank_to_mailbox[send_operation.first];
             posted_sends.push_back(S4U_Mailbox::iputMessage(dst_mailbox, new wrench::SimulationMessage(send_operation.second)));
         }
@@ -107,11 +106,11 @@ namespace wrench {
         }
 
         // Do all the synchronous receives
-        for (int i=0; i < num_receives; i++) {
+        for (int i = 0; i < num_receives; i++) {
             S4U_Mailbox::getMessage(this->rank_to_mailbox[this->actor_to_rank[my_pid]]);
         }
         // Wait for all the sends
-        for (auto const &posted_send : posted_sends) {
+        for (auto const &posted_send: posted_sends) {
             posted_send->wait();
         }
         // Wait for the computation
@@ -135,7 +134,7 @@ namespace wrench {
             simgrid::s4u::this_actor::suspend();
         } else {
             count = 0;
-            for (auto const &item : this->actor_to_rank) {
+            for (auto const &item: this->actor_to_rank) {
                 if (item.first != my_pid) {
                     simgrid::s4u::Actor::by_pid(item.first)->resume();
                 }
@@ -147,10 +146,10 @@ namespace wrench {
      * @brief Destructor
      */
     Communicator::~Communicator() {
-        for (auto const &item : this->rank_to_mailbox) {
+        for (auto const &item: this->rank_to_mailbox) {
             S4U_Mailbox::retireTemporaryMailbox(item.second);
         }
     }
 
 
-}
+}// namespace wrench
