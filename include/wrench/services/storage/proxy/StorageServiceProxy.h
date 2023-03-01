@@ -47,7 +47,7 @@ namespace wrench {
 
         virtual bool lookupFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
 
-        void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) override;
+        //void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) override;
         virtual void readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
         virtual void readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, double num_bytes);
         virtual void readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path);

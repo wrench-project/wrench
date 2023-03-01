@@ -485,14 +485,14 @@ namespace wrench {
         return this->lookupFile(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), file));
     }
 
-    /**
-     * @brief Read a file
-     * @param location: a location
-     * @param num_bytes: a number of bytes to read
-     */
-    void StorageServiceProxy::readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
-        this->readFile(ProxyLocation::LOCATION(remote, this->getSharedPtr<StorageService>(), location->getFile()));
-    }
+    //    /**
+    //     * @brief Read a file
+    //     * @param location: a location
+    //     * @param num_bytes: a number of bytes to read
+    //     */
+    //    void StorageServiceProxy::readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+    //        this->readFile(ProxyLocation::LOCATION(remote, this->getSharedPtr<StorageService>(), location->getFile()));
+    //    }
 
     /**
      * @brief Read a file
