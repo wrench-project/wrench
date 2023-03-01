@@ -17,7 +17,9 @@ namespace wrench {
         unsigned long join();
         unsigned long join(unsigned long desired_rank);
         unsigned long getNumRanks();
-        void communicate(const std::map<unsigned long, double>& sends, int num_receives);
+        void barrier();
+        void sendAndReceive(const std::map<unsigned long, double>& sends, int num_receives);
+        void sendReceiveAndCompute(const std::map<unsigned long, double>& sends, int num_receives, double flops);
 
         ~Communicator();
 
