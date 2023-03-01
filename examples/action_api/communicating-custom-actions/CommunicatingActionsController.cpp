@@ -63,7 +63,7 @@ namespace wrench {
         /* Create actions that will participate in a parallel computation that mimics what could
          * happen in a parallel (MPI) matrix multiplication using the SUMMA algorithm */
 
-        /* First, let's create a communicator object */
+        /* First, let's create a communicator through which actions will communicate */
         auto communicator = wrench::Communicator::createCommunicator(COMMUNICATOR_SIZE);
 
         /* Now let's create all actions */
@@ -71,7 +71,6 @@ namespace wrench {
         for (int i=0; i < COMMUNICATOR_SIZE; i++) {
             auto lambda_execute = [communicator](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
                 auto my_rank = communicator->join();
-                auto num_procs = communicator->getNumRanks();
                 auto my_col = my_rank %  SQRT_COMMUNICATOR_SIZE;
                 auto my_row = my_rank / SQRT_COMMUNICATOR_SIZE;
                 communicator->barrier();
@@ -93,10 +92,10 @@ namespace wrench {
                     double message_size = std::pow<double>(BLOCK_SIZE, 2);
                     for (int j=0; j < SQRT_COMMUNICATOR_SIZE; j++) {
                         if (j != my_col) {
-                            sends[my_row * SQRT_COMMUNICATOR_SIZE + j] = message_size; // 100 MB
+                            sends[my_row * SQRT_COMMUNICATOR_SIZE + j] = message_size;
                         }
                         if (j != my_row) {
-                            sends[j * SQRT_COMMUNICATOR_SIZE + my_col] = message_size; // 100 MB
+                            sends[j * SQRT_COMMUNICATOR_SIZE + my_col] = message_size;
                         }
                     }
                     communicator->sendAndReceive(sends, (SQRT_COMMUNICATOR_SIZE-1) + (SQRT_COMMUNICATOR_SIZE-1));
@@ -106,7 +105,7 @@ namespace wrench {
 
                 }
                 communicator->barrier();
-                WRENCH_INFO("Action with rank %lu (row %lu / col %lu 2-D coordinates) completes!", my_rank, my_row, my_col);
+                WRENCH_INFO("Action with rank %lu (row %lu / col %lu 2-D coordinates) completed!", my_rank, my_row, my_col);
                 communicator->barrier();
             };
             auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
