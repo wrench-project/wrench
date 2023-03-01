@@ -44,7 +44,9 @@ namespace wrench {
                                                                    const std::shared_ptr<DataFile> &file,
                                                                    const std::string &path,
                                                                    bool is_scratch) {
-        // TODO: Find a more efficiency key?
+        // This looks inefficient (compare to using std::hash<void*> for instance), but it has
+        // no collisions and benchmarking showed that (with compiler optimizations), it makes
+        // very little difference
         std::string key = (ss ? ss->getName() : "") + "|" + path + "|" + file->getID() + "|" + (is_scratch ? "1" : "0");
         if (FileLocation::file_location_map.find(key) != FileLocation::file_location_map.end()) {
             return FileLocation::file_location_map[key];
@@ -244,7 +246,9 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::sanitizePath(): path cannot be empty");
         }
 
-#if (__cpluplus >= 201703L)
+#if 0
+        // THIS DOES NOT MAKE MUCH OF A DIFFERENT IT SEEMS (IN TERMS OF PERFORMANCE)
+        // ONLY WORKS WITH C++17
         // Adding a leading space because, weirdly, lexically_normal() doesn't behave
         // correctly on Linux without it (it doesn't reduce "////" to "/", but does
         // reduce " ////" to " /"
@@ -253,88 +257,79 @@ namespace wrench {
         // Remove the extra space
         to_return.erase(0, 1);
         return to_return;
-#else
+#endif
+
         // Cannot have certain substring (why not)
-        //        std::string disallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
-        char disallowed_characters[] = {'\\', ' ', '~', '`', '\'', '&', '*', '?'};
+        char disallowed_characters[] = {'\\', ' ', '~', '`', '\'', '"', '&', '*', '?', '.'};
         for (auto const &c: disallowed_characters) {
             if (path.find(c) != std::string::npos) {
-                throw std::invalid_argument("FileLocation::sanitizePath(): Disallowed character '" + std::to_string(c) + "' in path (" + path + ")");
+                throw std::invalid_argument("FileLocation::sanitizePath(): Disallowed character '" + std::string(1, c) + "' in path (" + path + ")");
             }
         }
 
-        std::string sanitized = path;
+        std::string sanitized = "/";
+        sanitized += path;
+        sanitized += "/";
         // Make it /-started and /-terminated
-        if (sanitized.at(sanitized.length() - 1) != '/') {
-            sanitized = "/" + sanitized + "/";
-        }
+        //        if (sanitized.at(sanitized.length() - 1) != '/') {
+        //            sanitized += "/";
+        //            sanitized += path;
+        //            sanitized += "/";
+        //        } else {
+        //            sanitized = path;
+        //        }
+
 
         // Deal with "", "." and ".."
         std::vector<std::string> tokens;
         boost::split(tokens, sanitized, boost::is_any_of("/"));
         tokens.erase(tokens.begin());
         tokens.pop_back();
-        std::vector<std::string> new_tokens;
+        //        std::vector<std::string> new_tokens;
 
-        for (auto const &t: tokens) {
-            if ((t == ".") or t.empty()) {
-                // do nothing
-            } else if (t == "..") {
-                if (new_tokens.empty()) {
-                    throw std::invalid_argument("FileLocation::sanitizePath(): Invalid path (" + path + ")");
-                } else {
-                    new_tokens.pop_back();
-                }
-            } else {
-                new_tokens.push_back(t);
-            }
-        }
+        //        for (auto const &t: tokens) {
+        //            if ((t == ".") or t.empty()) {
+        //                // do nothing
+        //            } else if (t == "..") {
+        //                if (new_tokens.empty()) {
+        //                    throw std::invalid_argument("FileLocation::sanitizePath(): Invalid path (" + path + ")");
+        //                } else {
+        //                    new_tokens.pop_back();
+        //                }
+        //            } else {
+        //                new_tokens.push_back(t);
+        //            }
+        //        }
 
         // Reconstruct sanitized path
         sanitized = "";
-        for (auto const &t: new_tokens) {
-            sanitized += "/" + t;
+        for (auto const &t: tokens) {
+            if (not t.empty()) {
+                sanitized += "/";
+                sanitized += t;
+            }
         }
         sanitized += "/";
 
         return sanitized;
-#endif
     }
 
     /**
      * @brief Helper method to find if a path is a proper prefix of another path
-     * @param path1: a path
-     * @param path2: another path
+     * @param path1: a path (ALREADY SANITIZED)
+     * @param path2: another path (ALREADY SANITIZED)
      * @return true if one of the two paths is a proper prefix of the other
      */
-    bool FileLocation::properPathPrefix(std::string path1, std::string path2) {
-        // Sanitize paths
-        path1 = sanitizePath(path1);
-        path2 = sanitizePath(path2);
+    bool FileLocation::properPathPrefix(const std::string &path1, const std::string &path2) {
 
-        // Split into tokens
-        std::vector<std::string> tokens1, tokens2, shorter, longer;
-        boost::split(tokens1, path1, boost::is_any_of("/"));
-        boost::split(tokens2, path2, boost::is_any_of("/"));
-
-
-        if (tokens1.size() < tokens2.size()) {
-            shorter = tokens1;
-            longer = tokens2;
-        } else {
-            shorter = tokens2;
-            longer = tokens1;
-        }
-
-        for (unsigned int i = 1; i < shorter.size() - 1; i++) {
-            if (shorter.at(i) != longer.at(i)) {
-                return false;
-            }
-        }
-
-        return true;
+        return ((path2.size() >= path1.size() && path2.compare(0, path1.size(), path1) == 0) or
+                (path2.size() < path1.size() && path1.compare(0, path2.size(), path2) == 0));
     }
 
+    /**
+     * @brief Gets the simgrid disk associated to a location
+     * @return a simgrid disk or nullpts if none
+     */
     simgrid::s4u::Disk *FileLocation::getDiskOrNull() {
         if (this->is_scratch) {
             return nullptr;

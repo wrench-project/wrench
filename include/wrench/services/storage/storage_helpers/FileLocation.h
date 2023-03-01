@@ -97,7 +97,7 @@ namespace wrench {
         }
 
         static std::string sanitizePath(const std::string &path);
-        static bool properPathPrefix(std::string path1, std::string path2);
+        static bool properPathPrefix(const std::string &path1, const std::string &path2);
 
     private:
         friend class LogicalFileSystem;
@@ -114,7 +114,9 @@ namespace wrench {
         FileLocation(std::shared_ptr<StorageService> ss, std::shared_ptr<DataFile> file, std::string path, bool is_scratch) : storage_service(std::move(ss)),
                                                                                                                               path(std::move(path)),
                                                                                                                               file(std::move(file)),
-                                                                                                                              is_scratch(is_scratch) {}
+                                                                                                                              is_scratch(is_scratch) {
+        }
+
         static std::shared_ptr<FileLocation> createFileLocation(const std::shared_ptr<StorageService> &ss,
                                                                 const std::shared_ptr<DataFile> &file,
                                                                 const std::string &path,

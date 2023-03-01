@@ -113,7 +113,8 @@ namespace wrench {
         try {
             for (const auto &mp: mount_points) {
                 this->file_systems[mp] = LogicalFileSystem::createLogicalFileSystem(
-                        this->getHostname(), this, mp, this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR));
+                        this->getHostname(), this,
+                        FileLocation::sanitizePath(mp), this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR));
             }
         } catch (std::invalid_argument &e) {
             throw;
@@ -360,6 +361,23 @@ namespace wrench {
         }
         auto fs = this->file_systems[mount_point].get();
         return fs->isFileInDirectory(location->getFile(), path_at_mount_point);
+    }
+
+    /**
+     * @brief Remove a directory and all files at the storage service (in zero simulated time)
+     * @param path a path
+     */
+    void SimpleStorageService::removeDirectory(const std::string &path) {
+        std::string mount_point;
+        std::string path_at_mount_point;
+        if (not this->splitPath(FileLocation::sanitizePath(path), mount_point, path_at_mount_point)) {
+            return;
+        }
+        auto fs = this->file_systems[mount_point].get();
+        if (fs->doesDirectoryExist(path_at_mount_point)) {
+            fs->removeAllFilesInDirectory(path_at_mount_point);
+            fs->removeEmptyDirectory(path_at_mount_point);
+        }
     }
 
 

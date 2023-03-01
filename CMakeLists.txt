@@ -3,12 +3,17 @@ message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CM
 
 project(wrench CXX)
 
+# Disable annoying warnings
+add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
+#add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
+
 # Make Release the default build type
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
+add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field -Wno-unused-local-typedefs" )
+
 if (ENABLE_BATSCHED)
     add_definitions(-DENABLE_BATSCHED)
 endif ()
@@ -26,7 +31,7 @@ find_package(SimGrid REQUIRED)
 
 find_package(nlohmann_json)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "2")
