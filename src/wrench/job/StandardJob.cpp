@@ -322,8 +322,8 @@ namespace wrench {
         auto lambda_execute = [weak_cjob](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
             auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
             auto scratch = cs->getScratch();
-            auto cjob = weak_cjob.lock();
             if (scratch) {
+                auto cjob = weak_cjob.lock();
                 scratch->removeDirectory(scratch->getBaseRootPath() + cjob->getName());
             }
         };
