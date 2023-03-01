@@ -849,15 +849,24 @@ namespace wrench {
         }
 
         /**
-     * @brief Get the load of the underlying storage service
-     * @return the load on the service
-     */
+         * @brief Get the load of the underlying storage service
+         * @return the load on the service
+         */
         double Node::getLoad() {
             if (internalStorage) {
                 return internalStorage->getLoad();
             }
             return 0;
         }
+
+        /**
+         * @brief Remove a directory and all its content at the Node (in zero simulated time)
+         * @param path: a path
+         */
+        void Node::removeDirectory(const std::string &path) {
+            throw std::runtime_error("Node::removeDirectory(): Not implemented yet (ever?)");
+        }
+
 
         /**
         * @brief construct the path to all targets IF they are in the subtree

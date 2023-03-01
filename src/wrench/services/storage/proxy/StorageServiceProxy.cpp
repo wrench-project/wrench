@@ -298,6 +298,10 @@ namespace wrench {
     //        return LogicalFileSystem::DEV_NULL;
     //    }
 
+    /**
+     * @brief Returns true if the cache is bufferized, false otherwise
+     * @return true or false
+     */
     bool StorageServiceProxy::isBufferized() const {
         if (cache) {
             return cache->isBufferized();
@@ -306,7 +310,18 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Remove a directory and all its content at the storage service (in zero simulated time)
+     * @param path: a path
+     */
+    void StorageServiceProxy::removeDirectory(const std::string &path) {
+        throw std::runtime_error("StorageServiceProxy::removeDirectory(): not implemented yet");
+    }
 
+    /**
+     * @brief Get the buffer size of the cache (which could be 0 or >0), or 0 if there is no cache
+     * @return a size in bytes
+     */
     double StorageServiceProxy::getBufferSize() const {
         if (cache) {
             return cache->getBufferSize();
