@@ -38,10 +38,18 @@ namespace wrench {
          */
         virtual std::string toString() { return "Generic ExecutionEvent"; }
 
-        virtual ~ExecutionEvent() = default;
+        //        virtual ~ExecutionEvent() = default;
+        virtual ~ExecutionEvent(){
+                //                std::cerr << "DES"
+                //                         "STRUCTOR EVENT\n";
+        };
+
 
     protected:
-        ExecutionEvent() = default;
+        //        ExecutionEvent() = default;
+        ExecutionEvent() {
+            //            std::cerr << "CONSTRUCTOR EVENT\n";
+        }
 
         /***********************/
         /** \endcond           */

@@ -107,9 +107,8 @@ protected:
 
 TEST_F(WorkflowTaskTest, TaskStructure) {
 
-
     // WorkflowTask structure sanity check
-    ASSERT_EQ(t1->getWorkflow(), workflow);
+    ASSERT_EQ(t1->getWorkflow(), workflow.get());
 
     ASSERT_NE(t1->getID(), t2->getID());
     ASSERT_EQ(t1->getID(), "task1-01");
