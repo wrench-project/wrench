@@ -18,23 +18,22 @@ namespace wrench {
         unsigned long join(unsigned long desired_rank);
         unsigned long getNumRanks();
         void barrier();
-        void sendAndReceive(const std::map<unsigned long, double>& sends, int num_receives);
-        void sendReceiveAndCompute(const std::map<unsigned long, double>& sends, int num_receives, double flops);
+        void sendAndReceive(const std::map<unsigned long, double> &sends, int num_receives);
+        void sendReceiveAndCompute(const std::map<unsigned long, double> &sends, int num_receives, double flops);
 
         ~Communicator();
 
 
     protected:
-        explicit Communicator(unsigned long size) : size(size) {};
+        explicit Communicator(unsigned long size) : size(size){};
 
     private:
         unsigned long size;
         std::map<aid_t, unsigned long> actor_to_rank;
         std::map<unsigned long, simgrid::s4u::Mailbox *> rank_to_mailbox;
-
     };
 
-}
+}// namespace wrench
 
 
 #endif//WRENCH_COMMUNICATOR_H
