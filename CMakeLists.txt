@@ -206,6 +206,7 @@ set(HEADER_FILES
         include/wrench/services/storage/xrootd/XRootDProperty.h
         include/wrench/services/storage/proxy/StorageServiceProxy.h
         include/wrench/services/storage/proxy/StorageServiceProxyProperty.h
+        include/wrench/communicator/Communicator.h
         )
 
 # source files
@@ -382,6 +383,7 @@ set(SOURCE_FILES
         src/wrench/services/storage/xrootd/XRootDProperty.cpp
         src/wrench/services/storage/proxy/StorageServiceProxy.cpp
         src/wrench/services/storage/proxy/StorageServiceProxyProperty.cpp
+        src/wrench/communicator/Communicator.cpp
         )
 
 # test files
@@ -500,6 +502,7 @@ set(TEST_FILES
         test/misc/UnitParserTest.cpp
         test/services/storage_services/StorageServiceProxy/StorageServiceProxyBasicTest.cpp
         test/services/storage_services/StorageServiceProxy/StorageServiceProxySequentialTest.cpp
+        test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceActionsThatCommunicateTests.cpp
         )
 
 
