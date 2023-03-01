@@ -271,13 +271,13 @@ namespace wrench {
         sanitized += path;
         sanitized += "/";
         // Make it /-started and /-terminated
-//        if (sanitized.at(sanitized.length() - 1) != '/') {
-//            sanitized += "/";
-//            sanitized += path;
-//            sanitized += "/";
-//        } else {
-//            sanitized = path;
-//        }
+        //        if (sanitized.at(sanitized.length() - 1) != '/') {
+        //            sanitized += "/";
+        //            sanitized += path;
+        //            sanitized += "/";
+        //        } else {
+        //            sanitized = path;
+        //        }
 
 
         // Deal with "", "." and ".."
@@ -285,21 +285,21 @@ namespace wrench {
         boost::split(tokens, sanitized, boost::is_any_of("/"));
         tokens.erase(tokens.begin());
         tokens.pop_back();
-//        std::vector<std::string> new_tokens;
+        //        std::vector<std::string> new_tokens;
 
-//        for (auto const &t: tokens) {
-//            if ((t == ".") or t.empty()) {
-//                // do nothing
-//            } else if (t == "..") {
-//                if (new_tokens.empty()) {
-//                    throw std::invalid_argument("FileLocation::sanitizePath(): Invalid path (" + path + ")");
-//                } else {
-//                    new_tokens.pop_back();
-//                }
-//            } else {
-//                new_tokens.push_back(t);
-//            }
-//        }
+        //        for (auto const &t: tokens) {
+        //            if ((t == ".") or t.empty()) {
+        //                // do nothing
+        //            } else if (t == "..") {
+        //                if (new_tokens.empty()) {
+        //                    throw std::invalid_argument("FileLocation::sanitizePath(): Invalid path (" + path + ")");
+        //                } else {
+        //                    new_tokens.pop_back();
+        //                }
+        //            } else {
+        //                new_tokens.push_back(t);
+        //            }
+        //        }
 
         // Reconstruct sanitized path
         sanitized = "";
