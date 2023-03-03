@@ -42,7 +42,8 @@ namespace wrench {
             simgrid::s4u::Engine::set_config("surf/precision:1e-9");
         }
         // Set the SMPI host speed to something very small to ignore all C++ code timing
-        simgrid::s4u::Engine::set_config("smpi/host-speed:0.00001f");
+        simgrid::s4u::Engine::set_config("smpi/simulate-computation:no");
+        // Create the mailbox pool
         S4U_Mailbox::createMailboxPool(S4U_Mailbox::mailbox_pool_size);
         S4U_Mailbox::NULL_MAILBOX = simgrid::s4u::Mailbox::by_name("NULL_MAILBOX");
         this->initialized = true;

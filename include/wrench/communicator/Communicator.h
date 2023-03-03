@@ -35,7 +35,10 @@ namespace wrench {
         std::map<aid_t, unsigned long> actor_to_rank;
         std::map<unsigned long, simgrid::s4u::Mailbox *> rank_to_mailbox;
 
-        static void performAllToAll(const std::vector<simgrid::s4u::Host *> &hosts, int bytes) ;
+        void performSMPIOperation(std::string op_name,
+                                         std::vector<simgrid::s4u::Host *> &hosts,
+                                         simgrid::s4u::Host * root_hosts,
+                                         int bytes) ;
 
     };
 
