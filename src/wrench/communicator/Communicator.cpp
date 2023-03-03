@@ -206,7 +206,7 @@ namespace wrench {
     public:
         AllToAllParticipant(int bytes, simgrid::s4u::Mailbox *notify_mailbox) : bytes(bytes), notify_mailbox(notify_mailbox) {}
 
-        void operator ()() {
+        void operator()() {
 
             MPI_Init();
 
@@ -217,14 +217,15 @@ namespace wrench {
 
             std::vector<char> out(bytes * size);
             std::vector<char> in(bytes * size);
-//            WRENCH_INFO("I am an MPI Process with Rank %d Calling MPI_Alltoall", rank);
+            //            WRENCH_INFO("I am an MPI Process with Rank %d Calling MPI_Alltoall", rank);
             MPI_Alltoall(out.data(), bytes, MPI_CHAR, in.data(), bytes, MPI_CHAR, MPI_COMM_WORLD);
 
-//            WRENCH_INFO("I am done with the call to MPI_AllToAll");
+            //            WRENCH_INFO("I am done with the call to MPI_AllToAll");
             MPI_Finalize();
 
             S4U_Mailbox::putMessage(notify_mailbox, new SimulationMessage(0));
         }
+
     private:
         int bytes;
         simgrid::s4u::Mailbox *notify_mailbox;
@@ -237,7 +238,7 @@ namespace wrench {
         // Start actors to do an MPI_AllToAll
         SMPI_app_instance_start("MPI_alltoall", AllToAllParticipant(bytes, mailbox), hosts);
         // Wait for all of those actors to be done
-        for (int i=0; i < hosts.size(); i++) {
+        for (int i = 0; i < hosts.size(); i++) {
             S4U_Mailbox::getMessage(mailbox);
         }
     }
