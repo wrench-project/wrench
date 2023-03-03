@@ -25,7 +25,7 @@ namespace wrench {
     public:
         // Constructor
         CommunicatingActionsController(std::shared_ptr<BatchComputeService> batch_cs,
-                                    const std::string &hostname);
+                                       const std::string &hostname);
 
     private:
         // main() method of the Controller

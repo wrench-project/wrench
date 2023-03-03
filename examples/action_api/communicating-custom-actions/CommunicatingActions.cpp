@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
 
     /* Instantiate an execution execution_controller to be stated on UserHost */
     auto wms = simulation->add(
-            new wrench::CommunicatingActionsController(batch_service,  host_list.at(0)));
+            new wrench::CommunicatingActionsController(batch_service, host_list.at(0)));
 
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;

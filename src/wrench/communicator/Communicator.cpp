@@ -153,7 +153,6 @@ namespace wrench {
      * @brief Destructor
      */
     Communicator::~Communicator() {
-
         for (auto const &item: this->rank_to_mailbox) {
             S4U_Mailbox::retireTemporaryMailbox(item.second);
         }
@@ -243,4 +242,4 @@ namespace wrench {
         }
     }
 
-}
+}// namespace wrench
