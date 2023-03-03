@@ -2,6 +2,7 @@
 
 #include <wrench/logging/TerminalOutput.h>
 #include "wrench/communicator/Communicator.h"
+#include "wrench/communicator/SMPIExecutor.h"
 #include "wrench/simulation//Simulation.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
@@ -168,6 +169,25 @@ namespace wrench {
         if (bytes < 1.0) {
             throw std::runtime_error("Communicator::MPI_AllToAll(): invalid argument (should be >= 1.0)");
         }
+        // Gather the list of hosts TODO: This should be stored in the communicator
+        std::vector<simgrid::s4u::Host *> hosts;
+        for (auto const &item: this->actor_to_rank) {
+            hosts.push_back(simgrid::s4u::Actor::by_pid(item.first)->get_host());
+        }
+
+        this->performSMPIOperation("AllToAll", hosts, nullptr, (int)bytes);
+    }
+
+    /**
+     * @brief Helper method to perform SMPI Operations
+     * @param op_name: operation name
+     * @param hosts: hosts involved
+     * @param root_host: root hosts (nullptr if none)
+     * @param data_size: data size in bytes
+     */
+    void Communicator::performSMPIOperation(std::string op_name,
+                                            std::vector<simgrid::s4u::Host *> &hosts,
+                                            simgrid::s4u::Host *root_host, int data_size) {
 
         // Global synchronization
         this->barrier();
@@ -182,14 +202,12 @@ namespace wrench {
         } else {
             // I am the last arrived process and will be doing the entire operation with temp actors
 
-            // Gather the list of hosts
-            std::vector<simgrid::s4u::Host *> hosts;
-            for (auto const &item: this->actor_to_rank) {
-                hosts.push_back(simgrid::s4u::Actor::by_pid(item.first)->get_host());
+            if (op_name == "AllToAll") {
+                // Create all tmp actors that will do the AllToAll
+                SMPIExecutor::performAllToAll(hosts, data_size);
+            } else {
+                throw std::runtime_error("Communicator::performSMPIOperation(): Internal error - unknown oprations");
             }
-
-            // Create all tmp actors that will do the AllToAll
-            Communicator::performAllToAll(hosts, (int) bytes);
 
             // Resume everyone
             for (auto const &item: this->actor_to_rank) {
@@ -197,53 +215,6 @@ namespace wrench {
                     simgrid::s4u::Actor::by_pid(item.first)->resume();
                 }
             }
-        }
-    }
-
-    /**
-     * @brief A Functor class for an MPI-All-to-All participant
-     */
-    class AllToAllParticipant {
-    public:
-        AllToAllParticipant(int bytes, simgrid::s4u::Mailbox *notify_mailbox) : bytes(bytes), notify_mailbox(notify_mailbox) {}
-
-        void operator ()() {
-
-            MPI_Init();
-
-            int rank;
-            int size;
-            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-            MPI_Comm_size(MPI_COMM_WORLD, &size);
-
-//            std::vector<char> out(bytes * size);
-//            std::vector<char> in(bytes * size);
-//            MPI_Alltoall(out.data(), bytes, MPI_CHAR, in.data(), bytes, MPI_CHAR, MPI_COMM_WORLD);
-
-            void *data = SMPI_SHARED_MALLOC(bytes * size);
-            MPI_Alltoall(data, bytes, MPI_CHAR, data, bytes, MPI_CHAR, MPI_COMM_WORLD);
-            SMPI_SHARED_FREE(data);
-
-            MPI_Finalize();
-
-            // Notify my creator of completion
-            S4U_Mailbox::putMessage(notify_mailbox, new SimulationMessage(0));
-        }
-
-    private:
-        int bytes;
-        simgrid::s4u::Mailbox *notify_mailbox;
-    };
-
-
-    void Communicator::performAllToAll(const std::vector<simgrid::s4u::Host *> &hosts, int bytes) {
-        // Create a mailbox to receive notifications of completion
-        auto mailbox = S4U_Mailbox::getTemporaryMailbox();
-        // Start actors to do an MPI_AllToAll
-        SMPI_app_instance_start("MPI_alltoall", AllToAllParticipant(bytes, mailbox), hosts);
-        // Wait for all of those actors to be done
-        for (int i=0; i < hosts.size(); i++) {
-            S4U_Mailbox::getMessage(mailbox);
         }
     }
 

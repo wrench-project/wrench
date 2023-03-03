@@ -207,6 +207,7 @@ set(HEADER_FILES
         include/wrench/services/storage/proxy/StorageServiceProxy.h
         include/wrench/services/storage/proxy/StorageServiceProxyProperty.h
         include/wrench/communicator/Communicator.h
+        include/wrench/communicator/SMPIExecutor.h
         )
 
 # source files
@@ -384,6 +385,7 @@ set(SOURCE_FILES
         src/wrench/services/storage/proxy/StorageServiceProxy.cpp
         src/wrench/services/storage/proxy/StorageServiceProxyProperty.cpp
         src/wrench/communicator/Communicator.cpp
+        src/wrench/communicator/SMPIExecutor.cpp
         )
 
 # test files
