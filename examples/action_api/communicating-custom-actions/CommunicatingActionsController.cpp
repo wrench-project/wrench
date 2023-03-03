@@ -93,10 +93,10 @@ namespace wrench {
                     double message_size = std::pow<double>(BLOCK_SIZE, 2);
                     for (int j=0; j < SQRT_COMMUNICATOR_SIZE; j++) {
                         if (j != my_col) {
-                            sends[my_row * SQRT_COMMUNICATOR_SIZE + j] = message_size; // 100 MB
+                            sends[my_row * SQRT_COMMUNICATOR_SIZE + j] = message_size;
                         }
                         if (j != my_row) {
-                            sends[j * SQRT_COMMUNICATOR_SIZE + my_col] = message_size; // 100 MB
+                            sends[j * SQRT_COMMUNICATOR_SIZE + my_col] = message_size;
                         }
                     }
                     communicator->sendAndReceive(sends, (SQRT_COMMUNICATOR_SIZE-1) + (SQRT_COMMUNICATOR_SIZE-1));
