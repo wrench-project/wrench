@@ -20,7 +20,7 @@ class BareMetalComputeServiceActionsThatCommunicateTest : public ::testing::Test
 public:
 
     void do_TwoCommunicatingActions_test();
-    void do_MPIAllToAll_test();
+    void do_MPICollectives_test();
 
 protected:
     ~BareMetalComputeServiceActionsThatCommunicateTest() override {
@@ -216,7 +216,7 @@ void BareMetalComputeServiceActionsThatCommunicateTest::do_TwoCommunicatingActio
 
 
 /**********************************************************************/
-/**  MPI ALL-TO-ALL TEST                                            **/
+/**  MPI TEST                                                        **/
 /**********************************************************************/
 
 class BareMetalMPIAllToAllTestExecutionController : public wrench::ExecutionController {
@@ -248,8 +248,14 @@ private:
           auto num_procs = communicator->getNumRanks();
           auto my_rank = communicator->join();
           WRENCH_INFO("I am in a communicator with rank %lu/%lu", my_rank, num_procs);
-          communicator->MPI_AllToAll(10000000);
-          WRENCH_INFO("Done with the AllToAll");
+
+          WRENCH_INFO("Doing an Alltoall");
+          communicator->MPI_Alltoall(10000000);
+          WRENCH_INFO("Done with the Alltoall");
+
+          WRENCH_INFO("Doing a Barrier");
+          communicator->MPI_Barrier();
+          WRENCH_INFO("Done with the Barrier");
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
 
@@ -278,11 +284,11 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceActionsThatCommunicateTest, MPIAllToAll) {
-    DO_TEST_WITH_FORK(do_MPIAllToAll_test);
+TEST_F(BareMetalComputeServiceActionsThatCommunicateTest, MPICollectives) {
+    DO_TEST_WITH_FORK(do_MPICollectives_test);
 }
 
-void BareMetalComputeServiceActionsThatCommunicateTest::do_MPIAllToAll_test() {
+void BareMetalComputeServiceActionsThatCommunicateTest::do_MPICollectives_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
