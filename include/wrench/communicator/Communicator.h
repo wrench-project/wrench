@@ -38,10 +38,9 @@ namespace wrench {
         std::vector<simgrid::s4u::Host *> participating_hosts;
 
         void performSMPIOperation(std::string op_name,
-                                         std::vector<simgrid::s4u::Host *> &hosts,
-                                         simgrid::s4u::Host * root_hosts,
-                                         int bytes) ;
-
+                                  std::vector<simgrid::s4u::Host *> &hosts,
+                                  simgrid::s4u::Host *root_hosts,
+                                  int bytes);
     };
 
 }// namespace wrench

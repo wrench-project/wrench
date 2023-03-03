@@ -137,10 +137,10 @@ private:
 
         // Create two actions
         auto lambda_execute = [communicator](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
-          auto num_procs = communicator->getNumRanks();
-          auto my_rank = communicator->join();
-          WRENCH_INFO("I am in a communicator with rank %lu/%lu", my_rank, num_procs);
-          communicator->sendAndReceive({{1 - my_rank, 1000.0}}, 1);
+            auto num_procs = communicator->getNumRanks();
+            auto my_rank = communicator->join();
+            WRENCH_INFO("I am in a communicator with rank %lu/%lu", my_rank, num_procs);
+            communicator->sendAndReceive({{1 - my_rank, 1000.0}}, 1);
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
 
@@ -219,7 +219,7 @@ class BareMetalMPIAllToAllTestExecutionController : public wrench::ExecutionCont
 public:
     BareMetalMPIAllToAllTestExecutionController(BareMetalComputeServiceActionsThatCommunicateTest *test,
                                                 std::string hostname,
-                                                const std::shared_ptr<wrench::BareMetalComputeService>& compute_service) : wrench::ExecutionController(hostname, "test") {
+                                                const std::shared_ptr<wrench::BareMetalComputeService> &compute_service) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
     }
@@ -241,21 +241,21 @@ private:
 
         // Create two actions
         auto lambda_execute = [communicator](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
-          auto num_procs = communicator->getNumRanks();
-          auto my_rank = communicator->join();
-          WRENCH_INFO("I am in a communicator with rank %lu/%lu", my_rank, num_procs);
+            auto num_procs = communicator->getNumRanks();
+            auto my_rank = communicator->join();
+            WRENCH_INFO("I am in a communicator with rank %lu/%lu", my_rank, num_procs);
 
-          WRENCH_INFO("Doing an Alltoall");
-          communicator->MPI_Alltoall(10000000);
-          WRENCH_INFO("Done with the Alltoall");
+            WRENCH_INFO("Doing an Alltoall");
+            communicator->MPI_Alltoall(10000000);
+            WRENCH_INFO("Done with the Alltoall");
 
-          WRENCH_INFO("Doing a Bcast");
-          communicator->MPI_Bcast(0, 10000000);
-          WRENCH_INFO("Done with the Bcast");
+            WRENCH_INFO("Doing a Bcast");
+            communicator->MPI_Bcast(0, 10000000);
+            WRENCH_INFO("Done with the Bcast");
 
-          WRENCH_INFO("Doing a Barrier");
-          communicator->MPI_Barrier();
-          WRENCH_INFO("Done with the Barrier");
+            WRENCH_INFO("Doing a Barrier");
+            communicator->MPI_Barrier();
+            WRENCH_INFO("Done with the Barrier");
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
 
@@ -295,9 +295,9 @@ void BareMetalComputeServiceActionsThatCommunicateTest::do_MPICollectives_test()
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
-//        argv[2] = strdup("--cfg=smpi/host-speed:0.001");
-//        argv[2] = strdup("--log=wrench_core_mailbox.threshold:debug");
+    //    argv[1] = strdup("--wrench-full-log");
+    //        argv[2] = strdup("--cfg=smpi/host-speed:0.001");
+    //        argv[2] = strdup("--log=wrench_core_mailbox.threshold:debug");
 
     simulation->init(&argc, argv);
 
