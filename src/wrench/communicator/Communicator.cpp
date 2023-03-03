@@ -74,6 +74,7 @@ namespace wrench {
         }
 
         this->rank_to_mailbox[desired_rank] = S4U_Mailbox::getTemporaryMailbox();
+        this->rank_to_host[desired_rank] = simgrid::s4u::this_actor::get_host();
         this->actor_to_rank[my_pid] = desired_rank;
         this->participating_hosts.push_back(simgrid::s4u::this_actor::get_host());
 
@@ -177,6 +178,18 @@ namespace wrench {
     }
 
     /**
+     * @brief Perform an MPI cast collective, using SimGrid's SMPI implementation
+     *
+     * @param bytes: the number of bytes in each message sent/received
+     */
+    void Communicator::MPI_Bcast(int root_rank, double bytes) {
+        if ((bytes < 1.0) or (root_rank < 0) or (root_rank >= this->size)) {
+            throw std::runtime_error("Communicator::MPI_Bcast(): invalid argument");
+        }
+        this->performSMPIOperation("Bcast", this->participating_hosts, this->rank_to_host[root_rank], (int)bytes);
+    }
+
+    /**
      * @brief Perform an MPI Barrier, using SimGrid's SMPI implementation
      *
      */
@@ -212,6 +225,8 @@ namespace wrench {
 
             if (op_name == "Alltoall") {
                 SMPIExecutor::performAlltoall(hosts, data_size);
+            } else if (op_name == "Bcast") {
+                SMPIExecutor::performBcast(hosts, root_host, data_size);
             } else if (op_name == "Barrier") {
                 SMPIExecutor::performBarrier(hosts);
             } else {
