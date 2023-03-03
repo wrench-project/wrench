@@ -20,9 +20,10 @@ class BareMetalComputeServiceActionsThatCommunicateTest : public ::testing::Test
 public:
 
     void do_TwoCommunicatingActions_test();
+    void do_MPIAllToAll_test();
 
 protected:
-    ~BareMetalComputeServiceActionsThatCommunicateTest() {
+    ~BareMetalComputeServiceActionsThatCommunicateTest() override {
     }
 
     BareMetalComputeServiceActionsThatCommunicateTest() {
@@ -99,7 +100,7 @@ protected:
 };
 
 /**********************************************************************/
-/**  BAD TWO COMMUNICATING ACTIONS TEST                              **/
+/**  TWO COMMUNICATING ACTIONS TEST                                  **/
 /**********************************************************************/
 
 class BareMetalTwoCommunicatingActionsTestExecutionController : public wrench::ExecutionController {
@@ -142,7 +143,7 @@ private:
             auto num_procs = communicator->getNumRanks();
             auto my_rank = communicator->join();
             WRENCH_INFO("I am in a communicator with rank %lu/%lu", my_rank, num_procs);
-            communicator->communicate({{1-my_rank,1000.0}}, 1);
+            communicator->sendAndReceive({{1-my_rank,1000.0}}, 1);
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
 
@@ -202,6 +203,113 @@ void BareMetalComputeServiceActionsThatCommunicateTest::do_TwoCommunicatingActio
 
     // Create an Execution Controller
     auto controller = simulation->add(new BareMetalTwoCommunicatingActionsTestExecutionController(this, "Host1", compute_service));
+
+    // Run a do nothing simulation, because why not
+    ASSERT_NO_THROW(simulation->launch());
+
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  MPI ALL-TO-ALL TEST                                            **/
+/**********************************************************************/
+
+class BareMetalMPIAllToAllTestExecutionController : public wrench::ExecutionController {
+public:
+    BareMetalMPIAllToAllTestExecutionController(BareMetalComputeServiceActionsThatCommunicateTest *test,
+                                                            std::string hostname,
+                                                            const std::shared_ptr<wrench::BareMetalComputeService>& compute_service) : wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+    }
+
+private:
+    BareMetalComputeServiceActionsThatCommunicateTest *test;
+    std::shared_ptr<wrench::BareMetalComputeService> compute_service;
+
+
+    int main() override {
+
+        auto job_manager = this->createJobManager();
+
+        // Create a compound job
+        auto job = job_manager->createCompoundJob("job");
+
+        // Create a communicator of size 2
+        auto communicator = wrench::Communicator::createCommunicator(2);
+
+        // Create two actions
+        auto lambda_execute = [communicator](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
+            auto num_procs = communicator->getNumRanks();
+            auto my_rank = communicator->join();
+            WRENCH_INFO("I am in a communicator with rank %lu/%lu", my_rank, num_procs);
+            communicator->MPI_AllToAll(1000);
+            WRENCH_INFO("Done with the AllToAll");
+        };
+        auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
+
+        auto action1 = job->addCustomAction("action1", 0, 0, lambda_execute, lambda_terminate);
+        auto action2 = job->addCustomAction("action2", 0, 0, lambda_execute, lambda_terminate);
+
+        // Submit the job
+        job_manager->submitJob(job, this->compute_service);
+
+        // Wait for the job completion
+        auto event = this->waitForNextEvent();
+
+        if (not std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event)) {
+            throw std::runtime_error("Did not receive the expected CompoundJobCompletedEvent (instead got " + event->toString() + ")");
+        }
+
+        // Inspect actions
+        if (action1->getState() != wrench::Action::COMPLETED or action1->getFailureCause() != nullptr) {
+            throw std::runtime_error("Action 1 should have completed");
+        }
+        if (action2->getState() != wrench::Action::COMPLETED or action1->getFailureCause() != nullptr) {
+            throw std::runtime_error("Action 2 should have completed");
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceActionsThatCommunicateTest, MPIAllToAll) {
+    DO_TEST_WITH_FORK(do_MPIAllToAll_test);
+}
+
+void BareMetalComputeServiceActionsThatCommunicateTest::do_MPIAllToAll_test() {
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+//        argv[1] = strdup("--wrench-full-log");
+//        argv[2] = strdup("--cfg=smpi/host-speed:0.001");
+//        argv[2] = strdup("--log=wrench_core_mailbox.threshold:debug");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    auto compute_service = simulation->add(
+            new wrench::BareMetalComputeService("Host1",
+                                                {std::make_pair("Host2",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM)),
+                                                 std::make_pair("Host3",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                "", {}, {}));
+
+    // Create an Execution Controller
+    auto controller = simulation->add(new BareMetalMPIAllToAllTestExecutionController(this, "Host1", compute_service));
 
     // Run a do nothing simulation, because why not
     ASSERT_NO_THROW(simulation->launch());

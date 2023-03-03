@@ -21,6 +21,9 @@ namespace wrench {
         void sendAndReceive(const std::map<unsigned long, double>& sends, int num_receives);
         void sendReceiveAndCompute(const std::map<unsigned long, double>& sends, int num_receives, double flops);
 
+        void MPI_AllToAll(double bytes);
+
+
         ~Communicator();
 
 
@@ -31,6 +34,8 @@ namespace wrench {
         unsigned long size;
         std::map<aid_t, unsigned long> actor_to_rank;
         std::map<unsigned long, simgrid::s4u::Mailbox *> rank_to_mailbox;
+
+        static void performAllToAll(const std::vector<simgrid::s4u::Host *> &hosts, int bytes) ;
 
     };
 
