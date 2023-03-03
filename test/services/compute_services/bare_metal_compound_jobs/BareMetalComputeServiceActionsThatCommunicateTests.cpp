@@ -140,7 +140,7 @@ private:
           auto num_procs = communicator->getNumRanks();
           auto my_rank = communicator->join();
           WRENCH_INFO("I am in a communicator with rank %lu/%lu", my_rank, num_procs);
-          communicator->sendAndReceive({{1-my_rank,1000.0}}, 1);
+          communicator->sendAndReceive({{1 - my_rank, 1000.0}}, 1);
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
 
@@ -209,7 +209,6 @@ void BareMetalComputeServiceActionsThatCommunicateTest::do_TwoCommunicatingActio
         free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
