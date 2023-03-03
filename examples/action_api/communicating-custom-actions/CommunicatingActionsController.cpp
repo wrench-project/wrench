@@ -71,7 +71,7 @@ namespace wrench {
         for (int i = 0; i < COMMUNICATOR_SIZE; i++) {
             auto lambda_execute = [communicator](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
                 auto my_rank = communicator->join();
-                auto my_col = my_rank %  SQRT_COMMUNICATOR_SIZE;
+                auto my_col = my_rank % SQRT_COMMUNICATOR_SIZE;
                 auto num_procs = communicator->getNumRanks();
                 auto my_row = my_rank / SQRT_COMMUNICATOR_SIZE;
                 communicator->barrier();

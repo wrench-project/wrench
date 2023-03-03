@@ -34,8 +34,7 @@ namespace wrench {
         unsigned long size;
         std::map<aid_t, unsigned long> actor_to_rank;
         std::map<unsigned long, simgrid::s4u::Mailbox *> rank_to_mailbox;
-        static void performAllToAll(const std::vector<simgrid::s4u::Host *> &hosts, int bytes) ;
-
+        static void performAllToAll(const std::vector<simgrid::s4u::Host *> &hosts, int bytes);
     };
 
 }// namespace wrench
