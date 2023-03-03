@@ -24,6 +24,7 @@ using json = nlohmann::json;
  * @brief The Simulation Daemon's "main" method
  */
 void SimulationDaemon::run() {
+    std::cout<<"about to  crash down"<<std::endl;
     // Set up GET request handler for the (likely useless) "alive" path
     CROW_ROUTE(app, "/api/alive").methods("Get"_method)
             ([this](const crow::request& req){
@@ -31,7 +32,7 @@ void SimulationDaemon::run() {
                 this->alive(req, res);
                 return res;
             });
-
+    std::cout<<"register one functions"<<std::endl;
     // Set up POST request handler for terminating simulation
     CROW_ROUTE(app, "/api/terminateSimulation").methods("POST"_method)
             ([this](const crow::request& req){
@@ -39,8 +40,9 @@ void SimulationDaemon::run() {
                 this->terminateSimulation(req, res);
                 return res;
             });
-
+    std::cout<<"register two functions"<<std::endl;
     // Set up ALL POST request handlers for API calls
+
     REST_API rest_api(
             this->app,
             [this](const crow::request &req) { this->displayRequest(req); },
@@ -51,6 +53,7 @@ void SimulationDaemon::run() {
     }
 
     // Test ToDo: Investigate multi-threads later
+    std::cout<<"testing before running"<<std::endl;
     app.port(simulation_port_number).run();
 
     //    exit(0);
