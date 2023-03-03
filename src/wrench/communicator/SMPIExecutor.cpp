@@ -10,7 +10,6 @@
 #include "simgrid/s4u.hpp"
 
 
-
 WRENCH_LOG_CATEGORY(wrench_core_smpi_executor, "Log category for SMPIExecutor");
 
 namespace wrench {
@@ -27,7 +26,7 @@ namespace wrench {
          */
         MPI_Alltoall_partipant(int data_size, simgrid::s4u::Mailbox *notify_mailbox) : data_size(data_size), notify_mailbox(notify_mailbox) {}
 
-        void operator ()() {
+        void operator()() {
 
             MPI_Init();
             void *data = SMPI_SHARED_MALLOC(data_size * data_size);
@@ -59,7 +58,7 @@ namespace wrench {
                                 MPI_Alltoall_partipant(data_size, mailbox),
                                 hosts);
         // Wait for all of those actors to be done
-        for (int i=0; i < hosts.size(); i++) {
+        for (int i = 0; i < hosts.size(); i++) {
             S4U_Mailbox::getMessage(mailbox);
         }
     }
@@ -76,7 +75,7 @@ namespace wrench {
          */
         explicit MPI_Barrier_partipant(simgrid::s4u::Mailbox *notify_mailbox) : notify_mailbox(notify_mailbox) {}
 
-        void operator ()() {
+        void operator()() {
 
             MPI_Init();
             MPI_Barrier(MPI_COMM_WORLD);
@@ -103,7 +102,7 @@ namespace wrench {
                                 MPI_Barrier_partipant(mailbox),
                                 hosts);
         // Wait for all of those actors to be done
-        for (int i=0; i < hosts.size(); i++) {
+        for (int i = 0; i < hosts.size(); i++) {
             S4U_Mailbox::getMessage(mailbox);
         }
     }
@@ -121,7 +120,7 @@ namespace wrench {
          */
         MPI_Bcast_partipant(int data_size, simgrid::s4u::Mailbox *notify_mailbox) : data_size(data_size), notify_mailbox(notify_mailbox) {}
 
-        void operator ()() {
+        void operator()() {
 
             MPI_Init();
             void *data = SMPI_SHARED_MALLOC(data_size);
@@ -159,9 +158,9 @@ namespace wrench {
                                 MPI_Bcast_partipant(data_size, mailbox),
                                 hosts);
         // Wait for all of those actors to be done
-        for (int i=0; i < hosts.size(); i++) {
+        for (int i = 0; i < hosts.size(); i++) {
             S4U_Mailbox::getMessage(mailbox);
         }
     }
 
-}
+}// namespace wrench
