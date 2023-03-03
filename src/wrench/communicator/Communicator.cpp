@@ -15,6 +15,16 @@ WRENCH_LOG_CATEGORY(wrench_core_communicator, "Log category for Communicator");
 namespace wrench {
 
     /**
+     * @brief Destructor
+     */
+    Communicator::~Communicator() {
+        for (auto const &item: this->rank_to_mailbox) {
+            S4U_Mailbox::retireTemporaryMailbox(item.second);
+        }
+    }
+
+
+    /**
      * @brief Factory method to construct a communicator
      * @param size the size of the communicator (# of processes)
      * @return a shared pointer to a communicator
@@ -65,6 +75,7 @@ namespace wrench {
 
         this->rank_to_mailbox[desired_rank] = S4U_Mailbox::getTemporaryMailbox();
         this->actor_to_rank[my_pid] = desired_rank;
+        this->participating_hosts.push_back(simgrid::s4u::this_actor::get_host());
 
         if (this->size > this->rank_to_mailbox.size()) {
             simgrid::s4u::this_actor::suspend();
@@ -80,7 +91,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Perform asynchronous sends and receives
+     * @brief Perform asynchronous sends and receives operations, using standard WRENCH/SimGrid point to
+     *        point communications.
      * @param sends: the specification of all outgoing communications as <rank, volume in bytes> pairs
      * @param num_receives: the number of expected received (from any source)
      */
@@ -90,7 +102,8 @@ namespace wrench {
 
 
     /**
-     * @brief Perform concurrent asynchronous sends, receives, and a computation
+     * @brief Perform concurrent asynchronous sends, receives, and a computation, using standard WRENCH/SimGrid point to
+     *        point communications
      * @param sends: the specification of all outgoing communications as <rank, volume in bytes> pairs
      * @param num_receives: the number of expected received (from any source)
      * @param flops: the number of floating point operations to compute
@@ -128,7 +141,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Barrier method (all participants wait for each other)
+     * @brief Barrier method (all participants wait for each other), using standard WRENCH/SimGrid mechanisms
      */
     void Communicator::barrier() {
         auto my_pid = simgrid::s4u::this_actor::get_pid();
@@ -150,40 +163,35 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Destructor
-     */
-    Communicator::~Communicator() {
-
-        for (auto const &item: this->rank_to_mailbox) {
-            S4U_Mailbox::retireTemporaryMailbox(item.second);
-        }
-    }
 
     /**
-     * An MPI AllToAll method, which uses SimGrid' SMPI underneath
+     * @brief Perform an MPI AllToAll collective, using SimGrid's SMPI implementation
      *
-     * @param bytes: the number of bytes in each exchanged message
+     * @param bytes: the number of bytes in each message sent/received
      */
-    void Communicator::MPI_AllToAll(double bytes) {
+    void Communicator::MPI_Alltoall(double bytes) {
         if (bytes < 1.0) {
-            throw std::runtime_error("Communicator::MPI_AllToAll(): invalid argument (should be >= 1.0)");
+            throw std::runtime_error("Communicator::MPI_Alltoall(): invalid argument (should be >= 1.0)");
         }
-        // Gather the list of hosts TODO: This should be stored in the communicator
-        std::vector<simgrid::s4u::Host *> hosts;
-        for (auto const &item: this->actor_to_rank) {
-            hosts.push_back(simgrid::s4u::Actor::by_pid(item.first)->get_host());
-        }
-
-        this->performSMPIOperation("AllToAll", hosts, nullptr, (int)bytes);
+        this->performSMPIOperation("Alltoall", this->participating_hosts, nullptr, (int)bytes);
     }
+
+    /**
+     * @brief Perform an MPI Barrier, using SimGrid's SMPI implementation
+     *
+     */
+    void Communicator::MPI_Barrier() {
+        this->performSMPIOperation("Barrier", this->participating_hosts, nullptr, 0);
+    }
+
+
 
     /**
      * @brief Helper method to perform SMPI Operations
      * @param op_name: operation name
      * @param hosts: hosts involved
      * @param root_host: root hosts (nullptr if none)
-     * @param data_size: data size in bytes
+     * @param data_size: data size in bytes (0 if none)
      */
     void Communicator::performSMPIOperation(std::string op_name,
                                             std::vector<simgrid::s4u::Host *> &hosts,
@@ -202,9 +210,10 @@ namespace wrench {
         } else {
             // I am the last arrived process and will be doing the entire operation with temp actors
 
-            if (op_name == "AllToAll") {
-                // Create all tmp actors that will do the AllToAll
-                SMPIExecutor::performAllToAll(hosts, data_size);
+            if (op_name == "Alltoall") {
+                SMPIExecutor::performAlltoall(hosts, data_size);
+            } else if (op_name == "Barrier") {
+                SMPIExecutor::performBarrier(hosts);
             } else {
                 throw std::runtime_error("Communicator::performSMPIOperation(): Internal error - unknown oprations");
             }
