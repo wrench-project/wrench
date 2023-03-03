@@ -262,7 +262,7 @@ void WRENCHDaemon::startSimulation(const crow::request &req, crow::response &res
                 std::unique_lock<std::mutex> lock(guard);
                 signal.wait(lock);
             }
-
+            std::cout<<"after launching"<<std::endl;
             // If there was a simulation launch error, then put the error message in the
             // shared memory segment, communicate the failure to the parent process
             // via a pipe,  and exit
@@ -298,7 +298,7 @@ void WRENCHDaemon::startSimulation(const crow::request &req, crow::response &res
                 auto simulation_daemon = new SimulationDaemon(
                         daemon_logging, simulation_port_number,
                         simulation_launcher->getController(), simulation_thread);
-
+                std::cout<<"creating the simulation thread"<<std::endl;
                 // Start the HTTP server for this particular simulation
                 simulation_daemon->run();// never returns
                 exit(0);                 // never executed
