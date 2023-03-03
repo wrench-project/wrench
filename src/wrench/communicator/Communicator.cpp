@@ -216,16 +216,20 @@ namespace wrench {
             MPI_Comm_rank(MPI_COMM_WORLD, &rank);
             MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-            std::vector<char> out(bytes * size);
-            std::vector<char> in(bytes * size);
-//            WRENCH_INFO("I am an MPI Process with Rank %d Calling MPI_Alltoall", rank);
-            MPI_Alltoall(out.data(), bytes, MPI_CHAR, in.data(), bytes, MPI_CHAR, MPI_COMM_WORLD);
+//            std::vector<char> out(bytes * size);
+//            std::vector<char> in(bytes * size);
+//            MPI_Alltoall(out.data(), bytes, MPI_CHAR, in.data(), bytes, MPI_CHAR, MPI_COMM_WORLD);
 
-//            WRENCH_INFO("I am done with the call to MPI_AllToAll");
+            void *data = SMPI_SHARED_MALLOC(bytes * size);
+            MPI_Alltoall(data, bytes, MPI_CHAR, data, bytes, MPI_CHAR, MPI_COMM_WORLD);
+            SMPI_SHARED_FREE(data);
+
             MPI_Finalize();
 
+            // Notify my creator of completion
             S4U_Mailbox::putMessage(notify_mailbox, new SimulationMessage(0));
         }
+
     private:
         int bytes;
         simgrid::s4u::Mailbox *notify_mailbox;
