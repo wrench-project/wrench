@@ -23,7 +23,7 @@
 #define SQRT_COMMUNICATOR_SIZE 4
 
 #define MATRIX_SIZE 10000
-#define BLOCK_SIZE ((double)MATRIX_SIZE / SQRT_COMMUNICATOR_SIZE)
+#define BLOCK_SIZE ((double) MATRIX_SIZE / SQRT_COMMUNICATOR_SIZE)
 
 WRENCH_LOG_CATEGORY(custom_controller, "Log category for CommunicatingActionsController");
 
@@ -68,14 +68,15 @@ namespace wrench {
 
         /* Now let's create all actions */
         WRENCH_INFO("Adding %d actions (that will communicate with each other) to the job", COMMUNICATOR_SIZE);
-        for (int i=0; i < COMMUNICATOR_SIZE; i++) {
+        for (int i = 0; i < COMMUNICATOR_SIZE; i++) {
             auto lambda_execute = [communicator](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
                 auto my_rank = communicator->join();
                 auto my_col = my_rank %  SQRT_COMMUNICATOR_SIZE;
+                auto num_procs = communicator->getNumRanks();
                 auto my_row = my_rank / SQRT_COMMUNICATOR_SIZE;
                 communicator->barrier();
                 WRENCH_INFO("I am an action with rank %lu in a communicator (row %lu / col %lu 2-D coordinates)", my_rank, my_row, my_col);
-                for (int i=0; i < SQRT_COMMUNICATOR_SIZE; i++) {
+                for (int i = 0; i < SQRT_COMMUNICATOR_SIZE; i++) {
                     communicator->barrier();
                     if (my_rank == 0) {
                         WRENCH_INFO("Iteration %d's computation phase begins...", i);
@@ -90,7 +91,7 @@ namespace wrench {
                     // Send messages to processes in my row and my column
                     std::map<unsigned long, double> sends;
                     double message_size = std::pow<double>(BLOCK_SIZE, 2);
-                    for (int j=0; j < SQRT_COMMUNICATOR_SIZE; j++) {
+                    for (int j = 0; j < SQRT_COMMUNICATOR_SIZE; j++) {
                         if (j != my_col) {
                             sends[my_row * SQRT_COMMUNICATOR_SIZE + j] = message_size;
                         }
@@ -98,11 +99,10 @@ namespace wrench {
                             sends[j * SQRT_COMMUNICATOR_SIZE + my_col] = message_size;
                         }
                     }
-                    communicator->sendAndReceive(sends, (SQRT_COMMUNICATOR_SIZE-1) + (SQRT_COMMUNICATOR_SIZE-1));
+                    communicator->sendAndReceive(sends, (SQRT_COMMUNICATOR_SIZE - 1) + (SQRT_COMMUNICATOR_SIZE - 1));
                     if (my_rank == 0) {
                         WRENCH_INFO("Iteration %d's communication phase ended", i);
                     }
-
                 }
                 communicator->barrier();
                 WRENCH_INFO("Action with rank %lu (row %lu / col %lu 2-D coordinates) completed!", my_rank, my_row, my_col);
