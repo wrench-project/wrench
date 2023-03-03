@@ -2,6 +2,7 @@
 
 #include <wrench/logging/TerminalOutput.h>
 #include "wrench/communicator/Communicator.h"
+#include "wrench/simulation//Simulation.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "smpi/smpi.h"
@@ -160,8 +161,14 @@ namespace wrench {
 
     /**
      * An MPI AllToAll method, which uses SimGrid' SMPI underneath
+     *
+     * @param bytes: the number of bytes in each exchanged message
      */
     void Communicator::MPI_AllToAll(double bytes) {
+        if (bytes < 1.0) {
+            throw std::runtime_error("Communicator::MPI_AllToAll(): invalid argument (should be >= 1.0)");
+        }
+
         // Global synchronization
         this->barrier();
         auto my_pid = simgrid::s4u::this_actor::get_pid();
@@ -182,7 +189,7 @@ namespace wrench {
             }
 
             // Create all tmp actors that will do the AllToAll
-            Communicator::performAllToAll(hosts, bytes);
+            Communicator::performAllToAll(hosts, (int) bytes);
 
             // Resume everyone
             for (auto const &item: this->actor_to_rank) {
@@ -193,59 +200,52 @@ namespace wrench {
         }
     }
 
-//    /**
-//     * @brief A Functor class for an MPI-All-to-All participant
-//     */
-//    class AllToAllParticipant {
-//    public:
-//        explicit AllToAllParticipant(double bytes) : bytes(bytes) {}
-//
-//        void operator ()() {
-//            WRENCH_INFO("IM CALLING MPI_Init()");
-//            MPI_Init();
-//            WRENCH_INFO("I HAVE CALLED MPI_Init()");
-//
-//            int rank;
-//            int size;
-//            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-//            MPI_Comm_size(MPI_COMM_WORLD, &size);
-//            WRENCH_INFO("alltoall for rank %d", rank);
-//            std::vector<int> out(1000 * size);
-//            std::vector<int> in(1000 * size);
-//            MPI_Alltoall(out.data(), bytes, MPI_CHAR, in.data(), bytes, MPI_CHAR, MPI_COMM_WORLD);
-//
-//            WRENCH_INFO("after alltoall %d", rank);
-//            MPI_Finalize();
-//
-//        }
-//    private:
-//        double bytes;
-//    };
+    /**
+     * @brief A Functor class for an MPI-All-to-All participant
+     */
+    class AllToAllParticipant {
+    public:
+        AllToAllParticipant(int bytes, simgrid::s4u::Mailbox *notify_mailbox) : bytes(bytes), notify_mailbox(notify_mailbox) {}
 
-    static void alltoall_mpi()
-    {
-        std::cerr << "CALLING MPI INIT\n";
-        MPI_Init();
-        std::cerr << "CALLED MPI INIT\n";
+        void operator ()() {
 
-        int rank;
-        int size;
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-        MPI_Comm_size(MPI_COMM_WORLD, &size);
-        XBT_INFO("alltoall for rank %d", rank);
-        std::vector<int> out(1000 * size);
-        std::vector<int> in(1000 * size);
-        MPI_Alltoall(out.data(), 1000, MPI_INT, in.data(), 1000, MPI_INT, MPI_COMM_WORLD);
+            WRENCH_INFO("Calling MPI_init");
+            MPI_Init();
+            WRENCH_INFO("Called MPI_init");
 
-        XBT_INFO("after alltoall %d", rank);
-        MPI_Finalize();
-    }
+            int rank;
+            int size;
+            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+            MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+            std::vector<char> out(bytes * size);
+            std::vector<char> in(bytes * size);
+            WRENCH_INFO("I am an MPI Process with Rank %d Calling MPI_Alltoall", rank);
+            MPI_Alltoall(out.data(), bytes, MPI_CHAR, in.data(), bytes, MPI_CHAR, MPI_COMM_WORLD);
+
+            WRENCH_INFO("I am done with the call to MPI_AllToAll");
+            MPI_Finalize();
+
+            S4U_Mailbox::putMessage(notify_mailbox, new SimulationMessage(0));
+        }
+    private:
+        int bytes;
+        simgrid::s4u::Mailbox *notify_mailbox;
+    };
 
 
-    void Communicator::performAllToAll(const std::vector<simgrid::s4u::Host *> &hosts, double bytes) {
-//            SMPI_app_instance_start("alltoall", AllToAllParticipant(bytes), hosts);
-        SMPI_app_instance_start("alltoall", alltoall_mpi, hosts);
-
+    void Communicator::performAllToAll(const std::vector<simgrid::s4u::Host *> &hosts, int bytes) {
+        // Create a mailbox to receive notifications of completion
+        auto mailbox = S4U_Mailbox::getTemporaryMailbox();
+        // Start actors to do an MPI_AllToAll
+        for (auto const &h : hosts) {
+            std::cerr << "MPIALL: " << h->get_name() << "\n";
+        }
+        SMPI_app_instance_start("MPI_alltoall", AllToAllParticipant(bytes, mailbox), hosts);
+        // Wait for all of those actors to be done
+        for (int i=0; i < hosts.size(); i++) {
+            S4U_Mailbox::getMessage(mailbox);
+        }
     }
 
 }
