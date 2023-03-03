@@ -20,6 +20,6 @@ namespace wrench {
     /** @endcond          */
     /**********************/
 
-}
+}// namespace wrench
 
 #endif//WRENCH_SMPI_EXECUTOR_H

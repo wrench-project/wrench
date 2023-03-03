@@ -174,7 +174,7 @@ namespace wrench {
         if (bytes < 1.0) {
             throw std::runtime_error("Communicator::MPI_Alltoall(): invalid argument (should be >= 1.0)");
         }
-        this->performSMPIOperation("Alltoall", this->participating_hosts, nullptr, (int)bytes);
+        this->performSMPIOperation("Alltoall", this->participating_hosts, nullptr, (int) bytes);
     }
 
     /**
@@ -186,7 +186,7 @@ namespace wrench {
         if ((bytes < 1.0) or (root_rank < 0) or (root_rank >= this->size)) {
             throw std::runtime_error("Communicator::MPI_Bcast(): invalid argument");
         }
-        this->performSMPIOperation("Bcast", this->participating_hosts, this->rank_to_host[root_rank], (int)bytes);
+        this->performSMPIOperation("Bcast", this->participating_hosts, this->rank_to_host[root_rank], (int) bytes);
     }
 
     /**
@@ -196,7 +196,6 @@ namespace wrench {
     void Communicator::MPI_Barrier() {
         this->performSMPIOperation("Barrier", this->participating_hosts, nullptr, 0);
     }
-
 
 
     /**
