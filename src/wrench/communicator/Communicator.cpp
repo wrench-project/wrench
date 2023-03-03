@@ -209,9 +209,7 @@ namespace wrench {
 
         void operator ()() {
 
-            WRENCH_INFO("Calling MPI_init");
             MPI_Init();
-            WRENCH_INFO("Called MPI_init");
 
             int rank;
             int size;
@@ -220,10 +218,10 @@ namespace wrench {
 
             std::vector<char> out(bytes * size);
             std::vector<char> in(bytes * size);
-            WRENCH_INFO("I am an MPI Process with Rank %d Calling MPI_Alltoall", rank);
+//            WRENCH_INFO("I am an MPI Process with Rank %d Calling MPI_Alltoall", rank);
             MPI_Alltoall(out.data(), bytes, MPI_CHAR, in.data(), bytes, MPI_CHAR, MPI_COMM_WORLD);
 
-            WRENCH_INFO("I am done with the call to MPI_AllToAll");
+//            WRENCH_INFO("I am done with the call to MPI_AllToAll");
             MPI_Finalize();
 
             S4U_Mailbox::putMessage(notify_mailbox, new SimulationMessage(0));
@@ -238,9 +236,6 @@ namespace wrench {
         // Create a mailbox to receive notifications of completion
         auto mailbox = S4U_Mailbox::getTemporaryMailbox();
         // Start actors to do an MPI_AllToAll
-        for (auto const &h : hosts) {
-            std::cerr << "MPIALL: " << h->get_name() << "\n";
-        }
         SMPI_app_instance_start("MPI_alltoall", AllToAllParticipant(bytes, mailbox), hosts);
         // Wait for all of those actors to be done
         for (int i=0; i < hosts.size(); i++) {
