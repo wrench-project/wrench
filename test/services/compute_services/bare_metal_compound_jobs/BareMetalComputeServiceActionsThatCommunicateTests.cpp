@@ -18,7 +18,6 @@ WRENCH_LOG_CATEGORY(bare_metal_compute_service_actions_that_communicate_test, "L
 
 class BareMetalComputeServiceActionsThatCommunicateTest : public ::testing::Test {
 public:
-
     void do_TwoCommunicatingActions_test();
     void do_MPIAllToAll_test();
 
@@ -95,8 +94,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
-
 };
 
 /**********************************************************************/
@@ -107,7 +104,7 @@ class BareMetalTwoCommunicatingActionsTestExecutionController : public wrench::E
 public:
     BareMetalTwoCommunicatingActionsTestExecutionController(BareMetalComputeServiceActionsThatCommunicateTest *test,
                                                             std::string hostname,
-                                                            const std::shared_ptr<wrench::BareMetalComputeService>& compute_service) : wrench::ExecutionController(hostname, "test") {
+                                                            const std::shared_ptr<wrench::BareMetalComputeService> &compute_service) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
     }
@@ -183,8 +180,8 @@ void BareMetalComputeServiceActionsThatCommunicateTest::do_TwoCommunicatingActio
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
-//    argv[2] = strdup("--log=wrench_core_mailbox.threshold:debug");
+    //    argv[1] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--log=wrench_core_mailbox.threshold:debug");
 
     simulation->init(&argc, argv);
 
