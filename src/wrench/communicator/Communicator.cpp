@@ -170,11 +170,11 @@ namespace wrench {
      *
      * @param bytes: the number of bytes in each message sent/received
      */
-    void Communicator::MPI_Alltoall(double bytes) {
+    void Communicator::MPI_Alltoall(double bytes, std::string config) {
         if (bytes < 1.0) {
             throw std::runtime_error("Communicator::MPI_Alltoall(): invalid argument (should be >= 1.0)");
         }
-        this->performSMPIOperation("Alltoall", this->participating_hosts, nullptr, (int)bytes);
+        this->performSMPIOperation("Alltoall", this->participating_hosts, nullptr, (int)bytes, "smpi/alltoall:" + std::move(config));
     }
 
     /**
@@ -182,19 +182,19 @@ namespace wrench {
      *
      * @param bytes: the number of bytes in each message sent/received
      */
-    void Communicator::MPI_Bcast(int root_rank, double bytes) {
+    void Communicator::MPI_Bcast(int root_rank, double bytes, std::string config) {
         if ((bytes < 1.0) or (root_rank < 0) or (root_rank >= this->size)) {
             throw std::runtime_error("Communicator::MPI_Bcast(): invalid argument");
         }
-        this->performSMPIOperation("Bcast", this->participating_hosts, this->rank_to_host[root_rank], (int)bytes);
+        this->performSMPIOperation("Bcast", this->participating_hosts, this->rank_to_host[root_rank], (int)bytes, "smpi/bcast:" + std::move(config));
     }
 
     /**
      * @brief Perform an MPI Barrier, using SimGrid's SMPI implementation
      *
      */
-    void Communicator::MPI_Barrier() {
-        this->performSMPIOperation("Barrier", this->participating_hosts, nullptr, 0);
+    void Communicator::MPI_Barrier(std::string config) {
+        this->performSMPIOperation("Barrier", this->participating_hosts, nullptr, 0, "smpi/barrier:" + std::move(config));
     }
 
 
@@ -205,10 +205,15 @@ namespace wrench {
      * @param hosts: hosts involved
      * @param root_host: root hosts (nullptr if none)
      * @param data_size: data size in bytes (0 if none)
+     * @param config: the config string
      */
-    void Communicator::performSMPIOperation(std::string op_name,
+    void Communicator::performSMPIOperation(const std::string& op_name,
                                             std::vector<simgrid::s4u::Host *> &hosts,
-                                            simgrid::s4u::Host *root_host, int data_size) {
+                                            simgrid::s4u::Host *root_host,
+                                            int data_size,
+                                            const std::string& config) {
+
+
 
         // Global synchronization
         this->barrier();
@@ -222,6 +227,8 @@ namespace wrench {
             simgrid::s4u::this_actor::suspend();
         } else {
             // I am the last arrived process and will be doing the entire operation with temp actors
+            // Set the configuration
+            simgrid::s4u::Engine::set_config(config);
 
             if (op_name == "Alltoall") {
                 SMPIExecutor::performAlltoall(hosts, data_size);
