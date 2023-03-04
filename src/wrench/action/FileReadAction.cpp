@@ -27,20 +27,20 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
+    * @param file_locations: the locations to from (will be tried in order until one succeeds)
     * @param num_bytes_to_read: the number of bytes to read (if < 0: read the whole file)
     */
     FileReadAction::FileReadAction(const std::string &name,
                                    std::vector<std::shared_ptr<FileLocation>> file_locations,
                                    double num_bytes_to_read) : Action(name, "file_read_"),
-                                                               file_locations(file_locations) {
+                                                               file_locations(std::move(file_locations)) {
 
-        this->file = file_locations.at(0)->getFile();
-        for (auto const &l: file_locations) {
-            if (l->getFile() != this->file) {
-                throw std::invalid_argument("FileReadAction::FileReadAction(): All file locations should be for the same file");
-            }
-        }
+//        this->file = file_locations.at(0)->getFile();
+//        for (auto const &l: file_locations) {
+//            if (l->getFile() != this->file) {
+//                throw std::invalid_argument("FileReadAction::FileReadAction(): All file locations should be for the same file");
+//            }
+//        }
 
         if (num_bytes_to_read < 0.0) {
             this->num_bytes_to_read = this->file->getSize();
