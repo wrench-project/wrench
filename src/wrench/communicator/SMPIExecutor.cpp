@@ -138,7 +138,6 @@ namespace wrench {
         simgrid::s4u::Mailbox *notify_mailbox;
     };
 
-
     /**
      * @brief Method to perform an SMPI Bcast
      * @param hosts: list of hosts
