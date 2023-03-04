@@ -44,6 +44,7 @@ namespace wrench {
         // Set the SMPI options
         simgrid::s4u::Engine::set_config("smpi/simulate-computation:no");
         simgrid::s4u::Engine::set_config("smpi/init:0");
+        simgrid::s4u::Engine::set_config("smpi/shared-malloc:global");
 
         // Create the mailbox pool
         S4U_Mailbox::createMailboxPool(S4U_Mailbox::mailbox_pool_size);
