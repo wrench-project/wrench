@@ -198,7 +198,6 @@ namespace wrench {
     }
 
 
-
     /**
      * @brief Helper method to perform SMPI Operations
      * @param op_name: operation name

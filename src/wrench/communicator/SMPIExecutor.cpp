@@ -9,7 +9,6 @@
 #include "simgrid/s4u.hpp"
 
 
-
 WRENCH_LOG_CATEGORY(wrench_core_smpi_executor, "Log category for SMPIExecutor");
 
 namespace wrench {
@@ -26,7 +25,7 @@ namespace wrench {
          */
         MPI_Alltoall_partipant(int data_size, simgrid::s4u::BarrierPtr barrier) : data_size(data_size), barrier(std::move(barrier)) {}
 
-        void operator ()() {
+        void operator()() {
 
             MPI_Init();
             void *data = SMPI_SHARED_MALLOC(data_size * data_size);
@@ -70,7 +69,7 @@ namespace wrench {
          */
         explicit MPI_Barrier_partipant(simgrid::s4u::BarrierPtr barrier) : barrier(std::move(barrier)) {}
 
-        void operator ()() {
+        void operator()() {
 
             MPI_Init();
             MPI_Barrier(MPI_COMM_WORLD);
@@ -110,7 +109,7 @@ namespace wrench {
          */
         MPI_Bcast_partipant(int data_size, simgrid::s4u::BarrierPtr barrier) : data_size(data_size), barrier(std::move(barrier)) {}
 
-        void operator ()() {
+        void operator()() {
 
             MPI_Init();
             void *data = SMPI_SHARED_MALLOC(data_size);
@@ -149,4 +148,4 @@ namespace wrench {
         barrier->wait();
     }
 
-}
+}// namespace wrench
