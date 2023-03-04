@@ -183,7 +183,7 @@ namespace wrench {
      * @param bytes: the number of bytes in each message sent/received
      */
     void Communicator::MPI_Bcast(int root_rank, double bytes, std::string config) {
-        if ((bytes < 1.0) or (root_rank < 0) or (root_rank >= this->size)) {
+        if ((bytes < 1.0) or (root_rank < 0) or (root_rank >= (int)this->size)) {
             throw std::runtime_error("Communicator::MPI_Bcast(): invalid argument");
         }
         this->performSMPIOperation("Bcast", this->participating_hosts, this->rank_to_host[root_rank], (int) bytes, "smpi/bcast:" + std::move(config));
