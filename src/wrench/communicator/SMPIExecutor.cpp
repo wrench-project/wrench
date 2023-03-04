@@ -50,7 +50,7 @@ namespace wrench {
      */
     void SMPIExecutor::performAlltoall(std::vector<simgrid::s4u::Host *> &hosts,
                                        int data_size) {
-        auto barrier = simgrid::s4u::Barrier::create(hosts.size());
+        auto barrier = simgrid::s4u::Barrier::create(1 + hosts.size());
         // Start actors to do an MPI_AllToAll
         SMPI_app_instance_start(("MPI_AllToAll_" + std::to_string(simgrid::s4u::this_actor::get_pid())).c_str(),
                                 MPI_Alltoall_partipant(data_size, barrier),
@@ -89,7 +89,7 @@ namespace wrench {
      * @param hosts: list of hosts
      */
     void SMPIExecutor::performBarrier(std::vector<simgrid::s4u::Host *> &hosts) {
-        auto barrier = simgrid::s4u::Barrier::create(hosts.size() + 1);
+        auto barrier = simgrid::s4u::Barrier::create(1 + hosts.size());
         // Start actors to do an MPI_AllToAll
         SMPI_app_instance_start(("MPI_Barrier_" + std::to_string(simgrid::s4u::this_actor::get_pid())).c_str(),
                                 MPI_Barrier_partipant(barrier),
@@ -137,7 +137,7 @@ namespace wrench {
                                     simgrid::s4u::Host *root_host,
                                     int data_size) {
 
-        auto barrier = simgrid::s4u::Barrier::create(hosts.size() + 1);
+        auto barrier = simgrid::s4u::Barrier::create(1 + hosts.size());
         // Make sure that the root_host is the first host in the list of hosts, so that it's always rank 0
         auto it = std::find(hosts.begin(), hosts.end(), root_host);
         std::iter_swap(hosts.begin(), it);
