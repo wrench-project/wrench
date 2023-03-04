@@ -51,7 +51,7 @@ namespace wrench {
         S4U_Mailbox::NULL_MAILBOX = simgrid::s4u::Mailbox::by_name("NULL_MAILBOX");
         this->initialized = true;
 
-//        sg_storage_file_system_init();
+        //        sg_storage_file_system_init();
     }
 
     /**
