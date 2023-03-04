@@ -249,23 +249,23 @@ private:
             communicator->MPI_Alltoall(10000000);
             WRENCH_INFO("Done with the Alltoall");
 
-          communicator->barrier();
+            communicator->barrier();
 
-          WRENCH_INFO("Doing an Alltoall");
-          communicator->MPI_Alltoall(10000000, "mpich");
-          WRENCH_INFO("Done with the Alltoall");
+            WRENCH_INFO("Doing an Alltoall");
+            communicator->MPI_Alltoall(10000000, "mpich");
+            WRENCH_INFO("Done with the Alltoall");
 
-          communicator->barrier();
+            communicator->barrier();
 
-          WRENCH_INFO("Doing a Bcast");
-          communicator->MPI_Bcast(0, 10000000);
-          WRENCH_INFO("Done with the Bcast");
+            WRENCH_INFO("Doing a Bcast");
+            communicator->MPI_Bcast(0, 10000000);
+            WRENCH_INFO("Done with the Bcast");
 
-          communicator->barrier();
+            communicator->barrier();
 
-          WRENCH_INFO("Doing a Barrier");
-          communicator->MPI_Barrier();
-          WRENCH_INFO("Done with the Barrier");
+            WRENCH_INFO("Doing a Barrier");
+            communicator->MPI_Barrier();
+            WRENCH_INFO("Done with the Barrier");
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
 
