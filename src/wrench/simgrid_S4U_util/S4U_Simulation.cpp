@@ -41,13 +41,16 @@ namespace wrench {
         if (not Simulation::isSurfPrecisionSetByUser()) {
             simgrid::s4u::Engine::set_config("surf/precision:1e-9");
         }
-        // Set the SMPI host speed to something very small to ignore all C++ code timing
+        // Set the SMPI options
         simgrid::s4u::Engine::set_config("smpi/simulate-computation:no");
+        simgrid::s4u::Engine::set_config("smpi/init:0");
+
         // Create the mailbox pool
         S4U_Mailbox::createMailboxPool(S4U_Mailbox::mailbox_pool_size);
         S4U_Mailbox::NULL_MAILBOX = simgrid::s4u::Mailbox::by_name("NULL_MAILBOX");
         this->initialized = true;
-        sg_storage_file_system_init();
+
+//        sg_storage_file_system_init();
     }
 
     /**
