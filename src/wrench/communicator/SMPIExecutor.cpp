@@ -79,7 +79,7 @@ namespace wrench {
         }
 
     private:
-        simgrid::s4u::BarrierPtr  barrier;
+        simgrid::s4u::BarrierPtr barrier;
     };
 
 
