@@ -267,6 +267,7 @@ private:
           communicator->MPI_Barrier();
           WRENCH_INFO("Done with the Barrier");
         };
+
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
 
         auto action1 = job->addCustomAction("action1", 0, 1, lambda_execute, lambda_terminate);
@@ -329,7 +330,6 @@ void BareMetalComputeServiceActionsThatCommunicateTest::do_MPICollectives_test()
 
     // Run a do nothing simulation, because why not
     ASSERT_NO_THROW(simulation->launch());
-
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
