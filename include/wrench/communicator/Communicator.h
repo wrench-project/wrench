@@ -21,9 +21,9 @@ namespace wrench {
         void sendAndReceive(const std::map<unsigned long, double> &sends, int num_receives);
         void sendReceiveAndCompute(const std::map<unsigned long, double> &sends, int num_receives, double flops);
 
-        void MPI_Alltoall(double bytes);
-        void MPI_Bcast(int root_rank, double bytes);
-        void MPI_Barrier();
+        void MPI_Alltoall(double bytes, std::string config="ompi");
+        void MPI_Bcast(int root_rank, double bytes, std::string config="ompi");
+        void MPI_Barrier(std::string config="ompi");
 
         ~Communicator();
 
@@ -37,10 +37,11 @@ namespace wrench {
         std::map<unsigned long, simgrid::s4u::Host *> rank_to_host;
         std::vector<simgrid::s4u::Host *> participating_hosts;
 
-        void performSMPIOperation(std::string op_name,
-                                         std::vector<simgrid::s4u::Host *> &hosts,
-                                         simgrid::s4u::Host * root_hosts,
-                                         int bytes) ;
+        void performSMPIOperation(const std::string& op_name,
+                                  std::vector<simgrid::s4u::Host *> &hosts,
+                                  simgrid::s4u::Host * root_hosts,
+                                  int bytes,
+                                  const std::string& config);
 
     };
 
