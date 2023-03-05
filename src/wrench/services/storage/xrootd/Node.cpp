@@ -924,6 +924,24 @@ namespace wrench {
             metavisor->files[location->getFile()].push_back(this->getSharedPtr<Node>());
         }
 
+        /**
+        * @brief remove a new file in the federation on this node.
+        * @param location: a file location, must be the same object as the function is invoked on
+        *
+        * @throw std::invalid_argument
+        */
+        void Node::removeFile(const std::shared_ptr<FileLocation> &location) {
+            if (internalStorage == nullptr) {
+                throw std::runtime_error("Node::removeFile() called on non storage Node " + hostname);
+            }
+
+            internalStorage->removeFile(location);
+            auto it = std::find(metavisor->files[location->getFile()].begin(), metavisor->files[location->getFile()].end(), this->getSharedPtr<Node>());
+            if (it != metavisor->files[location->getFile()].end()) {
+                metavisor->files[location->getFile()].erase(it);
+            }
+        }
+
 
         /**
         * @brief write a file on this node.

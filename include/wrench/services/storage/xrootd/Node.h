@@ -50,6 +50,7 @@ namespace wrench {
             using StorageService::writeFile;
 
             void createFile(const std::shared_ptr<FileLocation> &location) override;
+            void removeFile(const std::shared_ptr<FileLocation> &location) override;
 
             virtual void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
                                    const std::shared_ptr<FileLocation> &location,
