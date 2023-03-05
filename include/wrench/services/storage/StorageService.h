@@ -288,7 +288,7 @@ namespace wrench {
          */
         virtual void createFile(const std::shared_ptr<FileLocation> &location) = 0;
 
-        
+
         /** File removal methods */
         /**
          * @brief Remove a file at a location (in zero simulated time)
@@ -320,8 +320,8 @@ namespace wrench {
          * @param location: a location
          */
         virtual void removeFile(const std::shared_ptr<FileLocation> &location) = 0;
-        
-        
+
+
         /**
          * @brief Remove a directory and all files at the storage service (in zero simulated time)
          * @param path a path
