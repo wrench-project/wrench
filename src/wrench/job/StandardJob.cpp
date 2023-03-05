@@ -252,10 +252,10 @@ namespace wrench {
             for (auto const &f: task->getInputFiles()) {
                 std::shared_ptr<Action> fread_action;
                 if (this->file_locations.find(f) != this->file_locations.end()) {
-//                    std::vector<std::shared_ptr<FileLocation>> fixed_locations = this->file_locations[f];
-//                    for (auto const &loc: this->file_locations[f]) {
-//                        fixed_locations.push_back(loc);
-//                    }
+                    //                    std::vector<std::shared_ptr<FileLocation>> fixed_locations = this->file_locations[f];
+                    //                    for (auto const &loc: this->file_locations[f]) {
+                    //                        fixed_locations.push_back(loc);
+                    //                    }
                     fread_action = cjob->addFileReadAction("", this->file_locations[f]);
                 } else {
                     fread_action = cjob->addFileReadAction("", FileLocation::SCRATCH(f));
@@ -268,9 +268,9 @@ namespace wrench {
                 std::shared_ptr<Action> fwrite_action;
                 if (this->file_locations.find(f) != this->file_locations.end()) {
                     std::vector<std::shared_ptr<FileLocation>> fixed_locations = this->file_locations[f];
-//                    for (auto const &loc: this->file_locations[f]) {
-//                        fixed_locations.push_back(loc);
-//                    }
+                    //                    for (auto const &loc: this->file_locations[f]) {
+                    //                        fixed_locations.push_back(loc);
+                    //                    }
                     if (fixed_locations.size() > 1) {
                         throw std::runtime_error("StandardJob::createUnderlyingCompoundJob(): Internal WRENCH error - "
                                                  "there should be a single location for a file write action");
