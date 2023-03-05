@@ -57,6 +57,7 @@ namespace wrench {
         virtual void writeFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
 
         void createFile(const std::shared_ptr<FileLocation> &location) override;
+        void removeFile(const std::shared_ptr<FileLocation> &location) override;
 
         std::shared_ptr<StorageService> getCache();
 

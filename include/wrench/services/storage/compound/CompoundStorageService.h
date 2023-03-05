@@ -129,6 +129,14 @@ namespace wrench {
         }
 
         /**
+         * @brief Remove a file at the storage service (in zero simulated time)
+         * @param location a location
+         */
+        void removeFile(const std::shared_ptr<FileLocation> &location) override {
+            throw std::runtime_error("CompoundStorageService::removeFile(): not implemented");
+        }
+
+        /**
          * @brief Method to return the collection of known StorageServices
          */
         std::set<std::shared_ptr<StorageService>> &getAllServices();
