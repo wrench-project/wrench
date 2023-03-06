@@ -31,6 +31,9 @@ namespace std {
 
 namespace wrench {
 
+    std::set<std::shared_ptr<Service>> Service::servicesSetToAutoRestart;
+
+
     /**
      * @brief Destructor
      */
@@ -280,7 +283,7 @@ namespace wrench {
             // Setting the state to UP
             this->state = Service::UP;
 
-            // Creating the life saver so that the the actor will never see the
+            // Creating the life saver so that the actor will never see the
             // Service object deleted from under its feet
             this->createLifeSaver(this_service);
 
@@ -289,6 +292,10 @@ namespace wrench {
 
             // Start the daemon for the service
             this->startDaemon(daemonize, auto_restart);
+
+            if (auto_restart) {
+                Service::servicesSetToAutoRestart.insert(this_service);
+            }
 
             //            // Print some information a out the currently tracked daemons
             //            WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
@@ -488,4 +495,15 @@ namespace wrench {
                     std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr<Service>())));
         }
     }
+
+    /**
+     * @brief Delete life savers of all services that were set to auto-restart,
+     * which should be performed after the simulation is over to avoid memory leaks
+     */
+    void Service::deleteLifeSaversOfAutorestartServices() {
+        for (auto const &s : Service::servicesSetToAutoRestart) {
+            s->deleteLifeSaver();
+        }
+    }
+
 }// namespace wrench
