@@ -68,6 +68,7 @@ namespace wrench {
         void startDaemon(bool _daemonized, bool _auto_restart);
 
         void createLifeSaver(std::shared_ptr<S4U_Daemon> reference);
+        void deleteLifeSaver();
 
         virtual void cleanup(bool has_returned_from_main, int return_value);
 
