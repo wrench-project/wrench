@@ -80,6 +80,8 @@ namespace wrench {
         if (this->initialized) {
             SMPI_init();
             this->engine->run();
+            std::cerr << "AFTER THIS ENFINE RUN\n";
+            Service::deleteLifeSaversOfAutorestartServices();
             SMPI_finalize();
         } else {
             throw std::runtime_error("S4U_Simulation::runSimulation(): Simulation has not been initialized");
