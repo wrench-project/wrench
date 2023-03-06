@@ -18,7 +18,7 @@ void setupSimulationPlatform(const shared_ptr<Simulation> &simulation, unsigned 
     xml += "   <zone id=\"AS0\" routing=\"Full\">\n";
 
     // CS hosts
-    for (int i = 0; i < num_cs; i++) {
+    for (unsigned long i = 0; i < num_cs; i++) {
         xml += "    <host id=\"CS_host_" + std::to_string(i) + "\" speed=\"1f\" core=\"16\">\n";
         xml += "      <disk id=\"hard_drive_CS_" + std::to_string(i) + "\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n";
         xml += "        <prop id=\"size\" value=\"5000GiB\"/>\n";
@@ -28,7 +28,7 @@ void setupSimulationPlatform(const shared_ptr<Simulation> &simulation, unsigned 
     }
 
     // CS hosts
-    for (int i = 0; i < num_ss; i++) {
+    for (unsigned long i = 0; i < num_ss; i++) {
         xml += "    <host id=\"SS_host_" + std::to_string(i) + "\" speed=\"1f\" core=\"16\">\n";
         xml += "      <disk id=\"hard_drive_SS_" + std::to_string(i) + "\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n";
         xml += "        <prop id=\"size\" value=\"5000GiB\"/>\n";
@@ -40,20 +40,20 @@ void setupSimulationPlatform(const shared_ptr<Simulation> &simulation, unsigned 
     // Network link
     xml += "    <link id=\"wide_area_link\" bandwidth=\"10GBps\" latency=\"100ns\"/>\n";
 
-    for (int i = 0; i < num_cs; i++) {
-        for (int j = i; j < num_cs; j++) {
+    for (unsigned long i = 0; i < num_cs; i++) {
+        for (unsigned long j = i; j < num_cs; j++) {
             xml += "    <route src=\"CS_host_" + std::to_string(i) + "\" dst=\"CS_host_" + std::to_string(j) + "\"> <link_ctn id=\"wide_area_link\"/> </route>\n";
         }
     }
 
-    for (int i = 0; i < num_ss; i++) {
-        for (int j = i; j < num_ss; j++) {
+    for (unsigned long i = 0; i < num_ss; i++) {
+        for (unsigned long j = i; j < num_ss; j++) {
             xml += "    <route src=\"SS_host_" + std::to_string(i) + "\" dst=\"SS_host_" + std::to_string(j) + "\"> <link_ctn id=\"wide_area_link\"/> </route>\n";
         }
     }
 
-    for (int i = 0; i < num_cs; i++) {
-        for (int j = 0; j < num_ss; j++) {
+    for (unsigned long i = 0; i < num_cs; i++) {
+        for (unsigned long j = 0; j < num_ss; j++) {
             xml += "    <route src=\"CS_host_" + std::to_string(i) + "\" dst=\"SS_host_" + std::to_string(j) + "\"> <link_ctn id=\"wide_area_link\"/> </route>\n";
         }
     }
