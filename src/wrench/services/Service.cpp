@@ -501,7 +501,7 @@ namespace wrench {
      * which should be performed after the simulation is over to avoid memory leaks
      */
     void Service::deleteLifeSaversOfAutorestartServices() {
-        for (auto const &s : Service::servicesSetToAutoRestart) {
+        for (auto const &s: Service::servicesSetToAutoRestart) {
             s->deleteLifeSaver();
         }
     }
