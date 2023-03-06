@@ -121,7 +121,9 @@ namespace wrench {
      */
     void S4U_Daemon::deleteLifeSaver() {
         if (this->life_saver) {
-            delete this->life_saver;
+            auto life_saver_ref = this->life_saver;
+            this->life_saver = nullptr;
+            delete life_saver_ref;
         }
     }
 
