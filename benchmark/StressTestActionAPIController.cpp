@@ -52,7 +52,7 @@ namespace wrench {
                 num_pending_jobs++;
             }
 
-            std::shared_ptr <wrench::ExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             event = this->waitForNextEvent();
             if (auto real_event = dynamic_cast<wrench::CompoundJobCompletedEvent *>(event.get())) {
                 auto job = real_event->job;
@@ -60,7 +60,7 @@ namespace wrench {
                 num_completed_jobs++;
                 num_pending_jobs--;
                 // Erase the files
-                for (auto const &action : job->getActions()) {
+                for (auto const &action: job->getActions()) {
                     if (std::dynamic_pointer_cast<FileReadAction>(action)) {
                         StorageService::removeFileAtLocation(std::dynamic_pointer_cast<FileReadAction>(action)->getFileLocations().at(0));
                     } else if (std::dynamic_pointer_cast<FileWriteAction>(action)) {
@@ -77,4 +77,4 @@ namespace wrench {
         return 0;
     }
 
-};
+};// namespace wrench
