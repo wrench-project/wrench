@@ -9,7 +9,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(stress_test_simulator, "Log category for Stress Tes
 
 using namespace wrench;
 
-void setupSimulationPlatform(const shared_ptr<Simulation>& simulation, unsigned long num_cs, unsigned long num_ss) {
+void setupSimulationPlatform(const shared_ptr<Simulation> &simulation, unsigned long num_cs, unsigned long num_ss) {
 
     // Create the platform file
     std::string xml = "<?xml version='1.0'?>\n";
@@ -18,7 +18,7 @@ void setupSimulationPlatform(const shared_ptr<Simulation>& simulation, unsigned 
     xml += "   <zone id=\"AS0\" routing=\"Full\">\n";
 
     // CS hosts
-    for (int i=0; i < num_cs; i++) {
+    for (int i = 0; i < num_cs; i++) {
         xml += "    <host id=\"CS_host_" + std::to_string(i) + "\" speed=\"1f\" core=\"16\">\n";
         xml += "      <disk id=\"hard_drive_CS_" + std::to_string(i) + "\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n";
         xml += "        <prop id=\"size\" value=\"5000GiB\"/>\n";
@@ -28,7 +28,7 @@ void setupSimulationPlatform(const shared_ptr<Simulation>& simulation, unsigned 
     }
 
     // CS hosts
-    for (int i=0; i < num_ss; i++) {
+    for (int i = 0; i < num_ss; i++) {
         xml += "    <host id=\"SS_host_" + std::to_string(i) + "\" speed=\"1f\" core=\"16\">\n";
         xml += "      <disk id=\"hard_drive_SS_" + std::to_string(i) + "\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n";
         xml += "        <prop id=\"size\" value=\"5000GiB\"/>\n";
@@ -40,20 +40,20 @@ void setupSimulationPlatform(const shared_ptr<Simulation>& simulation, unsigned 
     // Network link
     xml += "    <link id=\"wide_area_link\" bandwidth=\"10GBps\" latency=\"100ns\"/>\n";
 
-    for (int i=0; i < num_cs; i++) {
-        for (int j=i; j < num_cs; j++) {
+    for (int i = 0; i < num_cs; i++) {
+        for (int j = i; j < num_cs; j++) {
             xml += "    <route src=\"CS_host_" + std::to_string(i) + "\" dst=\"CS_host_" + std::to_string(j) + "\"> <link_ctn id=\"wide_area_link\"/> </route>\n";
         }
     }
 
-    for (int i=0; i < num_ss; i++) {
-        for (int j=i; j < num_ss; j++) {
+    for (int i = 0; i < num_ss; i++) {
+        for (int j = i; j < num_ss; j++) {
             xml += "    <route src=\"SS_host_" + std::to_string(i) + "\" dst=\"SS_host_" + std::to_string(j) + "\"> <link_ctn id=\"wide_area_link\"/> </route>\n";
         }
     }
 
-    for (int i=0; i < num_cs; i++) {
-        for (int j=0; j < num_ss; j++) {
+    for (int i = 0; i < num_cs; i++) {
+        for (int j = 0; j < num_ss; j++) {
             xml += "    <route src=\"CS_host_" + std::to_string(i) + "\" dst=\"SS_host_" + std::to_string(j) + "\"> <link_ctn id=\"wide_area_link\"/> </route>\n";
         }
     }
@@ -67,8 +67,8 @@ void setupSimulationPlatform(const shared_ptr<Simulation>& simulation, unsigned 
 
     try {
         simulation->instantiatePlatform("/tmp/platform.xml");
-    } catch (std::invalid_argument &e) {  // Unfortunately S4U doesn't throw for this...
-        throw std::runtime_error("Invalid generated XML platform file: "  + std::string(e.what()));
+    } catch (std::invalid_argument &e) {// Unfortunately S4U doesn't throw for this...
+        throw std::runtime_error("Invalid generated XML platform file: " + std::string(e.what()));
     }
 }
 
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
     unsigned long buffer_size;
 
     if (argc == 7) {
-        if ((strcmp(argv[1], "WORKFLOW") and strcmp(argv[1],"ACTION")) or
+        if ((strcmp(argv[1], "WORKFLOW") and strcmp(argv[1], "ACTION")) or
             ((sscanf(argv[2], "%lu", &num_jobs) != 1) or (num_jobs < 1)) or
             ((sscanf(argv[3], "%lu", &num_cs) != 1) or (num_cs < 1)) or
             ((sscanf(argv[4], "%lu", &num_ss) != 1) or (num_ss < 1)) or
@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
             exit(1);
         }
     } else if (argc == 5) {
-        if ((strcmp(argv[1], "WORKFLOW") and strcmp(argv[1],"ACTION")) or
+        if ((strcmp(argv[1], "WORKFLOW") and strcmp(argv[1], "ACTION")) or
             ((sscanf(argv[2], "%lu", &num_jobs) != 1) or (num_jobs < 1)) or
             ((sscanf(argv[3], "%lu", &num_cs) != 1) or (num_cs < 1)) or
             ((sscanf(argv[4], "%lu", &num_ss) != 1) or (num_ss < 1)) or
@@ -121,27 +121,27 @@ int main(int argc, char **argv) {
 
     // Create the Compute Services
     std::set<std::shared_ptr<ComputeService>> compute_services;
-    for (unsigned int i=0; i < num_cs; i++) {
+    for (unsigned int i = 0; i < num_cs; i++) {
         std::string hostname = "CS_host_" + std::to_string(i);
         compute_services.insert(simulation->add<ComputeService>(new BareMetalComputeService(hostname, {hostname}, "", {}, {})));
     }
 
     // Create the Storage Services
     std::set<std::shared_ptr<StorageService>> storage_services;
-    for (unsigned int i=0; i < num_ss; i++) {
+    for (unsigned int i = 0; i < num_ss; i++) {
         std::string hostname = "SS_host_" + std::to_string(i);
         storage_services.insert(simulation->add<StorageService>(SimpleStorageService::createSimpleStorageService(hostname, {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
     }
     // Create the Network Proximity Services
     std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services;
-    for (unsigned int i=0; i < num_nps; i++) {
+    for (unsigned int i = 0; i < num_nps; i++) {
         std::string hostname = "CS_host_0";
         std::vector<std::string> participating_hosts;
         participating_hosts.reserve(compute_services.size());
-        for (const auto& cs : compute_services) {
+        for (const auto &cs: compute_services) {
             participating_hosts.push_back(cs->getHostname());
         }
-        for (const auto& ss : storage_services) {
+        for (const auto &ss: storage_services) {
             participating_hosts.push_back(ss->getHostname());
         }
 
@@ -176,6 +176,3 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-
-
-
