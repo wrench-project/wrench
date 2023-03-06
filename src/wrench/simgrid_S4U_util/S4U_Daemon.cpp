@@ -204,7 +204,6 @@ namespace wrench {
             this->state = S4U_Daemon::State::DOWN;
             // Call cleanup
             this->cleanup(this->hasReturnedFromMain(), this->getReturnValue());
-
             // Free memory_manager_service for the object unless the service is set to auto-restart
             if (not this->isSetToAutoRestart()) {
                 auto life_saver_ref = this->life_saver;
