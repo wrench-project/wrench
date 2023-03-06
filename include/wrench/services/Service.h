@@ -90,6 +90,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+        friend class S4U_Simulation;
 
         /**
          * @brief Assert for the service being up
