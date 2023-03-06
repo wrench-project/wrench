@@ -3,6 +3,7 @@
 #include <wrench-dev.h>
 
 #include "StressTestWorkflowAPIController.h"
+#include "StressTestActionAPIController.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(stress_test_simulator, "Log category for Stress Test Simulator");
 
@@ -84,36 +85,38 @@ int main(int argc, char **argv) {
     unsigned long num_nps;
     unsigned long buffer_size;
 
-    if (argc == 6) {
-        if (((sscanf(argv[1], "%lu", &num_jobs) != 1) or (num_jobs < 1)) or
-        ((sscanf(argv[2], "%lu", &num_cs) != 1) or (num_cs < 1)) or
-        ((sscanf(argv[3], "%lu", &num_ss) != 1) or (num_ss < 1)) or
-        ((sscanf(argv[4], "%lu", &num_nps) != 1)) or
-        ((sscanf(argv[5], "%lu", &buffer_size) != 1))) {
+    if (argc == 7) {
+        if ((strcmp(argv[1], "WORKFLOW") and strcmp(argv[1],"ACTION")) or
+            ((sscanf(argv[2], "%lu", &num_jobs) != 1) or (num_jobs < 1)) or
+            ((sscanf(argv[3], "%lu", &num_cs) != 1) or (num_cs < 1)) or
+            ((sscanf(argv[4], "%lu", &num_ss) != 1) or (num_ss < 1)) or
+            ((sscanf(argv[5], "%lu", &num_nps) != 1)) or
+            ((sscanf(argv[6], "%lu", &buffer_size) != 1))) {
             std::cerr << "Usage: " << argv[0]
-                      << " <num jobs> <num compute services> <num storage services> <num network proximity services> [buffer size]"
+                      << " <WORKFLOW|ACTION> <num jobs> <num compute services> <num storage services> <num network proximity services> [buffer size]"
                       << "\n";
             exit(1);
         }
     } else if (argc == 5) {
-        if (((sscanf(argv[1], "%lu", &num_jobs) != 1) or (num_jobs < 1)) or
-        ((sscanf(argv[2], "%lu", &num_cs) != 1) or (num_cs < 1)) or
-        ((sscanf(argv[3], "%lu", &num_ss) != 1) or (num_ss < 1)) or
-        ((sscanf(argv[4], "%lu", &num_nps) != 1))) {
+        if ((strcmp(argv[1], "WORKFLOW") and strcmp(argv[1],"ACTION")) or
+            ((sscanf(argv[2], "%lu", &num_jobs) != 1) or (num_jobs < 1)) or
+            ((sscanf(argv[3], "%lu", &num_cs) != 1) or (num_cs < 1)) or
+            ((sscanf(argv[4], "%lu", &num_ss) != 1) or (num_ss < 1)) or
+            ((sscanf(argv[5], "%lu", &num_nps) != 1))) {
             std::cerr << "Usage: " << argv[0]
-                      << " <num jobs> <num compute services> <num storage services> <num network proximity services> [buffer size]"
+                      << " <WORKFLOW|ACTION> <num jobs> <num compute services> <num storage services> <num network proximity services> [buffer size]"
                       << "\n";
             exit(1);
         }
         buffer_size = 10485760;
     } else {
         std::cerr << "Usage: " << argv[0]
-                  << " <num jobs> <num compute services> <num storage services> <num network proximity services> [buffer size]"
+                  << " <WORKFLOW|ACTION> <num jobs> <num compute services> <num storage services> <num network proximity services> [buffer size]"
                   << "\n";
         exit(1);
     }
 
-    // Setup the simulation platform
+    // Set up the simulation platform
     setupSimulationPlatform(simulation, num_cs, num_ss);
 
     // Create the Compute Services
@@ -134,10 +137,11 @@ int main(int argc, char **argv) {
     for (unsigned int i=0; i < num_nps; i++) {
         std::string hostname = "CS_host_0";
         std::vector<std::string> participating_hosts;
-        for (auto cs : compute_services) {
+        participating_hosts.reserve(compute_services.size());
+        for (const auto& cs : compute_services) {
             participating_hosts.push_back(cs->getHostname());
         }
-        for (auto ss : storage_services) {
+        for (const auto& ss : storage_services) {
             participating_hosts.push_back(ss->getHostname());
         }
 
@@ -147,8 +151,14 @@ int main(int argc, char **argv) {
     // Create a File Registry Service
     std::shared_ptr<FileRegistryService> file_registry_service = simulation->add(new FileRegistryService("CS_host_0"));
 
-    // Create the WMS
-    std::shared_ptr<ExecutionController> wms = simulation->add(new StressTestWorkflowAPIController(compute_services, storage_services, network_proximity_services, file_registry_service, num_jobs, "CS_host_0"));
+    // Create the Controller
+    if (not strcmp(argv[1], "WORKFLOW")) {
+        std::shared_ptr<ExecutionController> wms = simulation->add(
+                new StressTestWorkflowAPIController(compute_services, storage_services, network_proximity_services, file_registry_service, num_jobs, "CS_host_0"));
+    } else {
+        std::shared_ptr<ExecutionController> wms = simulation->add(
+                new StressTestActionAPIController(compute_services, storage_services, network_proximity_services, file_registry_service, num_jobs, "CS_host_0"));
+    }
 
     simulation->getOutput().enableWorkflowTaskTimestamps(false);
     simulation->getOutput().enableFileReadWriteCopyTimestamps(false);
