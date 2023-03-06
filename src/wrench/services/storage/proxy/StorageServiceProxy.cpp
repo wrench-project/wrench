@@ -399,7 +399,18 @@ namespace wrench {
      *
      **/
     void StorageServiceProxy::createFile(const std::shared_ptr<FileLocation> &location) {
-        throw std::runtime_error("StorageServiceProxy.createFile(): is ambiguous where the file should go. You should call createFile() on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile()");
+        throw std::runtime_error("StorageServiceProxy.createFile(): is ambiguous where the file should be removed. You should call createFile() on the remote service where you wish to create the file.  \nIf you want it to start cached, you should also call StorageServiceProxy.getCache().createFile()");
+    }
+
+    /**
+     * @brief StorageServiceProxy.removeFile() is ambiguous where the file should go.  You should call removeFile
+     * on the remote service where you wish to remove the file. If you want it to start cached, you should also call
+     * StorageServiceProxy.getCache().removeFile
+     * @param location: the file location
+     *
+     **/
+    void StorageServiceProxy::removeFile(const std::shared_ptr<FileLocation> &location) {
+        throw std::runtime_error("StorageServiceProxy.removeFile(): is ambiguous where the file should be removed. You should call removeFile() on the remote service where you wish to remove the file.");
     }
 
     /**
@@ -485,14 +496,14 @@ namespace wrench {
         return this->lookupFile(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), file));
     }
 
-    /**
-     * @brief Read a file
-     * @param location: a location
-     * @param num_bytes: a number of bytes to read
-     */
-    void StorageServiceProxy::readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
-        this->readFile(ProxyLocation::LOCATION(remote, this->getSharedPtr<StorageService>(), location->getFile()));
-    }
+    //    /**
+    //     * @brief Read a file
+    //     * @param location: a location
+    //     * @param num_bytes: a number of bytes to read
+    //     */
+    //    void StorageServiceProxy::readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+    //        this->readFile(ProxyLocation::LOCATION(remote, this->getSharedPtr<StorageService>(), location->getFile()));
+    //    }
 
     /**
      * @brief Read a file

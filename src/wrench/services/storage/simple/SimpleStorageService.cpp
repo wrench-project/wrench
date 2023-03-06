@@ -381,6 +381,22 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Remove a file at the storage service (in zero simulated time)
+     * @param path a path
+     */
+    void SimpleStorageService::removeFile(const std::shared_ptr<FileLocation> &location) {
+        std::string mount_point;
+        std::string path_at_mount_point;
+        if (not this->splitPath(FileLocation::sanitizePath(location->getPath()), mount_point, path_at_mount_point)) {
+            return;
+        }
+        auto fs = this->file_systems[mount_point].get();
+        if (fs->doesDirectoryExist(path_at_mount_point)) {
+            fs->removeFileFromDirectory(location->getFile(), path_at_mount_point);
+        }
+    }
+
 
     /**
      * @brief Helper method to split a path into mountpoint:path_at_mount_point

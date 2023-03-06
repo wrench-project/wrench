@@ -23,13 +23,13 @@
  ** the completion time of each workflow task is printed.
  **
  ** Example invocation of the simulator for a 10-task workflow, with no logging:
- **    ./wrench-example-cloud-bag-of-tasks 10 ./four_hosts.xml
+ **    ./wrench-example-cloud-bag-of-tasks 10 ./dragonfly_cluster.xml
  **
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
- **    ./wrench-example-cloud-bag-of-tasks 10 ./four_hosts.xml --log=custom_wms.threshold=info
+ **    ./wrench-example-cloud-bag-of-tasks 10 ./dragonfly_cluster.xml --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator for a 6-task workflow with full logging:
- **    ./wrench-example-cloud-bag-of-tasks 6 ./four_hosts.xml --wrench-full-log
+ **    ./wrench-example-cloud-bag-of-tasks 6 ./dragonfly_cluster.xml --wrench-full-log
  **/
 
 

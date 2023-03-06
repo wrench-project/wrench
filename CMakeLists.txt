@@ -207,6 +207,8 @@ set(HEADER_FILES
         include/wrench/services/storage/xrootd/XRootDProperty.h
         include/wrench/services/storage/proxy/StorageServiceProxy.h
         include/wrench/services/storage/proxy/StorageServiceProxyProperty.h
+        include/wrench/communicator/Communicator.h
+        include/wrench/communicator/SMPIExecutor.h
         )
 
 # source files
@@ -383,6 +385,8 @@ set(SOURCE_FILES
         src/wrench/services/storage/xrootd/XRootDProperty.cpp
         src/wrench/services/storage/proxy/StorageServiceProxy.cpp
         src/wrench/services/storage/proxy/StorageServiceProxyProperty.cpp
+        src/wrench/communicator/Communicator.cpp
+        src/wrench/communicator/SMPIExecutor.cpp
         )
 
 # test files
@@ -502,6 +506,7 @@ set(TEST_FILES
         test/include/JSONFromFileUtil.h
         test/services/storage_services/StorageServiceProxy/StorageServiceProxyBasicTest.cpp
         test/services/storage_services/StorageServiceProxy/StorageServiceProxySequentialTest.cpp
+        test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceActionsThatCommunicateTests.cpp
         )
 
 
@@ -535,9 +540,6 @@ else()
 endif()
 
 
-
-
-
 # additional packages
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/DefinePackages.cmake)
 
@@ -546,6 +548,9 @@ include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Tools.cmake)
 
 # build examples
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Examples.cmake)
+
+# build benchmark
+include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Benchmark.cmake)
 
 # build documentation
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Documentation.cmake)

@@ -43,8 +43,7 @@ And, one of the following:
 ### Required Dependencies 
 
 - [Boost](https://www.boost.org) - version 1.75 or higher
-- [SimGrid](https://framagit.org/simgrid/simgrid/) - **master branch, commit tag 17ac6c61bd407825851b824adbfa28d64fb69587**
-- [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
+- [SimGrid](https://framagit.org/simgrid/simgrid/) - **master branch, commit tag dbb4b9d8b72ec01fe1748a7eb6b32222ffe3ece5**
 
 ### Optional Dependencies
 

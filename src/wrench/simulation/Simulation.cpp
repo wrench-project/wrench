@@ -127,8 +127,6 @@ namespace wrench {
         }
 
         std::vector<std::string> cleanedup_args;
-
-
         for (i = 0; i < *argc; i++) {
             if (not strcmp(argv[i], "--help")) {
                 simulator_help_requested = true;

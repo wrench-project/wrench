@@ -21,6 +21,7 @@ add_subdirectory(examples/action_api/cloud-bag-of-actions EXCLUDE_FROM_ALL)
 add_subdirectory(examples/action_api/multi-action-multi-job EXCLUDE_FROM_ALL)
 add_subdirectory(examples/action_api/job-action-failure EXCLUDE_FROM_ALL)
 add_subdirectory(examples/action_api/super-custom-action EXCLUDE_FROM_ALL)
+add_subdirectory(examples/action_api/communicating-custom-actions EXCLUDE_FROM_ALL)
 
 add_subdirectory(examples/action_api/XRootD EXCLUDE_FROM_ALL)
 add_subdirectory(examples/action_api/storage-service-proxy EXCLUDE_FROM_ALL)

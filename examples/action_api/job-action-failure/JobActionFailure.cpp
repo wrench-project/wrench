@@ -21,13 +21,13 @@
  **
  **
  ** Example invocation of the simulator with no logging:
- **    ./wrench-example-job-action-failure ./four_hosts.xml
+ **    ./wrench-example-job-action-failure ./dragonfly_cluster.xml
  **
  ** Example invocation of the simulator with only WMS logging:
- **    ./wrench-example-job-action-failure ./four_hosts.xml --log=custom_controller.threshold=info
+ **    ./wrench-example-job-action-failure ./dragonfly_cluster.xml --log=custom_controller.threshold=info
  **
  ** Example invocation of the simulator with full logging:
- **    ./wrench-example-job-action-failure ./four_hosts.xml --wrench-full-log
+ **    ./wrench-example-job-action-failure ./dragonfly_cluster.xml --wrench-full-log
  **/
 
 #include <iostream>

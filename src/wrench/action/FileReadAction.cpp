@@ -27,7 +27,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
+    * @param file_locations: the locations to read from (will be tried in order until one succeeds)
     * @param num_bytes_to_read: the number of bytes to read (if < 0: read the whole file)
     */
     FileReadAction::FileReadAction(const std::string &name,

@@ -23,6 +23,8 @@
 #include <simgrid/version.h>
 
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
+#include "smpi/smpi.h"
+
 
 WRENCH_LOG_CATEGORY(wrench_core_s4u_simulation, "Log category for S4U_Simulation");
 
@@ -39,10 +41,17 @@ namespace wrench {
         if (not Simulation::isSurfPrecisionSetByUser()) {
             simgrid::s4u::Engine::set_config("surf/precision:1e-9");
         }
+        // Set the SMPI options
+        simgrid::s4u::Engine::set_config("smpi/simulate-computation:no");
+        simgrid::s4u::Engine::set_config("smpi/init:0");
+        simgrid::s4u::Engine::set_config("smpi/shared-malloc:global");
+
+        // Create the mailbox pool
         S4U_Mailbox::createMailboxPool(S4U_Mailbox::mailbox_pool_size);
         S4U_Mailbox::NULL_MAILBOX = simgrid::s4u::Mailbox::by_name("NULL_MAILBOX");
         this->initialized = true;
-        sg_storage_file_system_init();
+
+        //        sg_storage_file_system_init();
     }
 
     /**
@@ -69,7 +78,9 @@ namespace wrench {
      */
     void S4U_Simulation::runSimulation() {
         if (this->initialized) {
+            SMPI_init();
             this->engine->run();
+            SMPI_finalize();
         } else {
             throw std::runtime_error("S4U_Simulation::runSimulation(): Simulation has not been initialized");
         }
