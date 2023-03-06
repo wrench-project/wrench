@@ -85,6 +85,13 @@ namespace wrench {
     Simulation::~Simulation() {
         this->s4u_simulation->shutdown();
         this->compute_services.clear();
+        this->storage_services.clear();
+        this->file_registry_services.clear();
+        this->execution_controllers.clear();
+        this->network_proximity_services.clear();
+        this->energy_meter_services.clear();
+        this->bandwidth_meter_services.clear();
+
     }
 
     /**
@@ -231,7 +238,8 @@ namespace wrench {
 
         *argc = 0;
         for (const auto &a: cleanedup_args) {
-            //free(argv[(*argc)]);//you cant free the base args, so no one is going to try to free ours.  This is just going to have to stay a memory leak
+            //free(argv[(*argc)]);//you cant free the base args, so no one is going to try to free ours.
+            //This is just going to have to stay a memory leak
             argv[(*argc)] = strdup(a.c_str());
             (*argc)++;
         }
