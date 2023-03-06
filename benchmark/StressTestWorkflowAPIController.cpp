@@ -10,7 +10,7 @@
 #include <set>
 #include "StressTestWorkflowAPIController.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(stress_test_wms, "Log category for Stress Test WMS");
+XBT_LOG_NEW_DEFAULT_CATEGORY(stress_test_workflow_controller, "Log category for Stress Test Workflow Controller");
 
 namespace wrench {
 
@@ -21,15 +21,16 @@ namespace wrench {
         shared_ptr<Workflow> workflow = Workflow::createWorkflow();
         // One task per job, all independent
         for (unsigned int i=0; i < this->num_jobs; i++) {
-            shared_ptr<WorkflowTask> task = workflow->addTask("task_" + std::to_string(i), 10.0, 1, 1, 1.0);
-            task->addOutputFile(workflow->addFile("file_" + std::to_string(i), 100000000));
+            shared_ptr<WorkflowTask> task = workflow->addTask("task_" + std::to_string(i), 1000.0, 1, 1, 1.0);
+            task->addOutputFile(workflow->addFile("outfile_" + std::to_string(i), 100000000));
+            task->addInputFile(workflow->addFile("infile_" + std::to_string(i), 100000000));
         }
 
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
 
         std::set<shared_ptr<WorkflowTask> > tasks_to_do;
-        for (auto t : workflow->getTasks()) {
+        for (const auto& t : workflow->getTasks()) {
             tasks_to_do.insert(t);
         }
         std::set<shared_ptr<WorkflowTask> > tasks_pending;
@@ -43,13 +44,14 @@ namespace wrench {
 
         while ((not tasks_to_do.empty()) or (not tasks_pending.empty())) {
 
-            while ((tasks_to_do.size() > 0) and (tasks_pending.size() < max_num_pending_tasks)) {
+            while ((!tasks_to_do.empty()) and (tasks_pending.size() < max_num_pending_tasks)) {
 
                 WRENCH_INFO("Looking at scheduling another task");
                 shared_ptr<WorkflowTask> to_submit = *(tasks_to_do.begin());
                 tasks_to_do.erase(to_submit);
                 tasks_pending.insert(to_submit);
 
+                auto input_file = *(to_submit->getInputFiles().begin());
                 auto output_file = *(to_submit->getOutputFiles().begin());
                 // Pick a random compute
                 auto cs_it(compute_services.begin());
@@ -60,7 +62,11 @@ namespace wrench {
                 advance(ss_it, rand() % storage_services.size());
                 auto target_ss = *ss_it;
 
-                auto job = job_manager->createStandardJob(to_submit, {std::make_pair(output_file, wrench::FileLocation::LOCATION(target_ss, output_file))});
+                StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(target_ss, input_file));
+                auto job = job_manager->createStandardJob(to_submit,
+                                                          {{input_file, wrench::FileLocation::LOCATION(target_ss, input_file)},
+                                                           {output_file, wrench::FileLocation::LOCATION(target_ss, output_file)}
+                                                          });
                 job_manager->submitJob(job, target_cs);
 
             }
@@ -73,9 +79,10 @@ namespace wrench {
                 if (tasks_to_do.size() % 10 == 0) {
                     //std::cerr << ".";
                 }
-                // Erase the task's output file
-                auto file_to_delete = *(completed_task->getOutputFiles().begin());
-                StorageService::removeFileAtLocation(real_event->standard_job->getFileLocations()[file_to_delete].at(0));
+                // Erase the task's input and output file
+                for (auto const &location : real_event->standard_job->getFileLocations()) {
+                    StorageService::removeFileAtLocation(location.second.at(0));
+                }
 
                 // Erase the pending task
                 tasks_pending.erase(completed_task);
