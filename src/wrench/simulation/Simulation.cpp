@@ -84,14 +84,6 @@ namespace wrench {
      */
     Simulation::~Simulation() {
         this->s4u_simulation->shutdown();
-        this->compute_services.clear();
-        this->storage_services.clear();
-        this->file_registry_services.clear();
-        this->execution_controllers.clear();
-        this->network_proximity_services.clear();
-        this->energy_meter_services.clear();
-        this->bandwidth_meter_services.clear();
-
     }
 
     /**
@@ -521,9 +513,11 @@ namespace wrench {
             this->is_running = true;
             this->s4u_simulation->runSimulation();
             wrench::FileLocation::file_location_map.clear();
+            Service::deleteLifeSaversOfAutorestartServices();
             this->is_running = false;
         } catch (std::runtime_error &e) {
             wrench::FileLocation::file_location_map.clear();
+            Service::deleteLifeSaversOfAutorestartServices();
             this->is_running = false;
             throw;
         }
@@ -582,6 +576,7 @@ namespace wrench {
             for (const auto &storage_service: this->storage_services) {
                 storage_service->start(storage_service, true, true);// Daemonized, AUTO-RESTART
             }
+
 
             //            // Start the scratch services
             //            for (const auto &compute_service: this->compute_services) {

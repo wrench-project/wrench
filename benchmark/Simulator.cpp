@@ -153,10 +153,10 @@ int main(int argc, char **argv) {
 
     // Create the Controller
     if (not strcmp(argv[1], "WORKFLOW")) {
-        std::shared_ptr<ExecutionController> wms = simulation->add(
+        simulation->add(
                 new StressTestWorkflowAPIController(compute_services, storage_services, network_proximity_services, file_registry_service, num_jobs, "CS_host_0"));
     } else {
-        std::shared_ptr<ExecutionController> wms = simulation->add(
+        simulation->add(
                 new StressTestActionAPIController(compute_services, storage_services, network_proximity_services, file_registry_service, num_jobs, "CS_host_0"));
     }
 
@@ -173,6 +173,8 @@ int main(int argc, char **argv) {
     }
     WRENCH_INFO("Simulation done: %.2lf\n", wrench::Simulation::getCurrentSimulatedDate());
     std::cerr << wrench::Simulation::getCurrentSimulatedDate() << "\n";
+
+    simulation = nullptr;
 
     return 0;
 }

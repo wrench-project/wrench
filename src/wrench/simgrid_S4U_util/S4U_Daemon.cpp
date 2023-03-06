@@ -117,6 +117,15 @@ namespace wrench {
     }
 
     /**
+     * @brief Delete the daemon's life-saver (use at your own risks, if your not the Simulation class)
+     */
+    void S4U_Daemon::deleteLifeSaver() {
+        if (this->life_saver) {
+            delete this->life_saver;
+        }
+    }
+
+    /**
      * @brief Start the daemon
      *
      * @param daemonized: whether the S4U actor should be daemonized

@@ -115,8 +115,10 @@ namespace wrench {
         void setMessagePayloads(WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values,
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE overriden_messagepayload_values);
 
-
         void serviceSanityCheck();
+
+        static void deleteLifeSaversOfAutorestartServices();
+
 
         /** @brief The service's property list */
         WRENCH_PROPERTY_COLLECTION_TYPE property_list;
@@ -150,6 +152,8 @@ namespace wrench {
         double getPropertyValueWithUnitsAsValue(
                 WRENCH_PROPERTY_TYPE property,
                 const std::function<double(std::string &s)> &unit_parsing_function);
+
+        static std::set<std::shared_ptr<Service>> servicesSetToAutoRestart;
 
         /***********************/
         /** \endcond           */

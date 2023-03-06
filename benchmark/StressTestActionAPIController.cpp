@@ -22,11 +22,13 @@ namespace wrench {
         unsigned long num_pending_jobs = 0;
         unsigned long num_completed_jobs = 0;
 
+
         while (num_completed_jobs < num_jobs) {
 
-            while (num_pending_jobs < max_num_pending_jobs) {
+            while ((num_pending_jobs < max_num_pending_jobs) and (num_pending_jobs + num_completed_jobs < num_jobs)) {
 
                 WRENCH_INFO("Creating a new job");
+
                 auto job = job_manager->createCompoundJob("job_" + std::to_string(num_completed_jobs));
 
                 // Pick a random compute
@@ -67,6 +69,7 @@ namespace wrench {
                         StorageService::removeFileAtLocation(std::dynamic_pointer_cast<FileWriteAction>(action)->getFileLocation());
                     }
                 }
+
             } else if (auto real_event = dynamic_cast<wrench::CompoundJobFailedEvent *>(event.get())) {
                 throw std::runtime_error(real_event->failure_cause->toString());
             } else {

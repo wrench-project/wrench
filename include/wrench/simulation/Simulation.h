@@ -210,19 +210,12 @@ namespace wrench {
         std::unique_ptr<S4U_Simulation> s4u_simulation;
 
         std::set<std::shared_ptr<ExecutionController>> execution_controllers;
-
         std::set<std::shared_ptr<FileRegistryService>> file_registry_services;
-
         std::set<std::shared_ptr<EnergyMeterService>> energy_meter_services;
-
         std::set<std::shared_ptr<BandwidthMeterService>> bandwidth_meter_services;
-
         std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services;
-
         std::set<std::shared_ptr<ComputeService>> compute_services;
-
         std::set<std::shared_ptr<StorageService>> storage_services;
-
         std::set<std::shared_ptr<MemoryManager>> memory_managers;
 
         static int unique_disk_sequence_number;
