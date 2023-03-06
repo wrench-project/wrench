@@ -19,11 +19,9 @@
         if (pid) {                                           \
             int exit_code;                                   \
             waitpid(pid, &exit_code, 0);                     \
-            std::cerr << "GOT THE CHILD'S WAITPID\n";                                                 \
             ASSERT_EQ(exit_code, 0);                         \
         } else {                                             \
             this->function();                                \
-            std::cerr << "CALLING EXIT HERE INNERE\n";                                                 \
             exit((::testing::Test::HasFailure() ? 255 : 0)); \
         }                                                    \
     }

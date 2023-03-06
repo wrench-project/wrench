@@ -85,7 +85,7 @@ namespace wrench {
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
 #endif
-        std::cerr << "IN DESTRUCTOR OF S4U DAEMON: " << this->process_name << "\n";
+//        std::cerr << "IN DESTRUCTOR OF S4U DAEMON: " << this->process_name << "\n";
     }
 
     /**

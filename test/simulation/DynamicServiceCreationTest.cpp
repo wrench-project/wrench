@@ -178,7 +178,6 @@ private:
                 new wrench::NetworkProximityService(hostname, {"DualCoreHost", "QuadCoreHost"}));
 
         // Dynamically create a Storage Service on this host
-        std::cerr << "CREATING STORAGE SERVICE\n";
         auto dynamically_created_storage_service = simulation->startNewService(
                 wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
                                                                          {},

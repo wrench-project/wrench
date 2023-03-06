@@ -222,7 +222,6 @@ private:
         wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
 
         wrench::Simulation::sleep(1);
-        std::cerr << "WMS RETURNING: " << ss.use_count() << "\n";
 
         return 0;
     }
@@ -255,15 +254,12 @@ void SimulationPlatformTest::do_CreateNewDiskTest_test() {
     ASSERT_NO_THROW(wms = simulation->add(new CreateNewDiskTestWMS(this, hostname)));
 
     // Running the simulation
-    std::cerr << "CALLING LAUNCH\n";
     ASSERT_NO_THROW(simulation->launch());
-    std::cerr << "CALLED LAUNCH\n";
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 
-    std::cerr << "END OF MAIN\n";
 }
 
 

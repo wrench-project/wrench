@@ -195,7 +195,7 @@ namespace wrench {
 
                     // task bytes written
                     if (task_spec_object.find("bytesWritten") != task_spec_object.end()) {
-                        task->setBytesWritten(task_spec_object.at("bytesWritten").to_number<unsigned long>()) * 1000;
+                        task->setBytesWritten(task_spec_object.at("bytesWritten").to_number<unsigned long>() * 1000);
                     }
 
                     // task files
@@ -203,7 +203,7 @@ namespace wrench {
 
                     for (auto &f: files) {
                         auto f_spec = f.as_object();
-                        double size = f_spec.at("size").to_number<double>() * 1000;
+                        double size_in_bytes = f_spec.at("size").to_number<double>() * 1000;
                         std::string link = std::string(f_spec.at("link").as_string().c_str());
                         std::string id = std::string(f_spec.at("name").as_string().c_str());
                         std::shared_ptr<wrench::DataFile> workflow_file = nullptr;
