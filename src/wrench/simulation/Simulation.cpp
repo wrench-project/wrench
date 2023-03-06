@@ -91,7 +91,6 @@ namespace wrench {
         this->network_proximity_services.clear();
         this->energy_meter_services.clear();
         this->bandwidth_meter_services.clear();
-
     }
 
     /**
