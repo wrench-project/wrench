@@ -5,7 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(wrench-stress-test
         ./Simulator.cpp
         StressTestWorkflowAPIController.cpp
-        StressTestWorkflowAPIController.h)
+        StressTestWorkflowAPIController.h
+        StressTestActionAPIController.cpp
+        StressTestActionAPIController.h
+        )
 
 add_dependencies(wrench-stress-test wrench)
 
