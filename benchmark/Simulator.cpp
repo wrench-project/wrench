@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
                       << "\n";
             exit(1);
         }
-    } else if (argc == 5) {
+    } else if (argc == 6) {
         if ((strcmp(argv[1], "WORKFLOW") and strcmp(argv[1], "ACTION")) or
             ((sscanf(argv[2], "%lu", &num_jobs) != 1) or (num_jobs < 1)) or
             ((sscanf(argv[3], "%lu", &num_cs) != 1) or (num_cs < 1)) or
