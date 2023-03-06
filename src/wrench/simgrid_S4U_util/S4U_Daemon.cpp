@@ -205,14 +205,13 @@ namespace wrench {
             // Call cleanup
             this->cleanup(this->hasReturnedFromMain(), this->getReturnValue());
             // Free memory_manager_service for the object unless the service is set to auto-restart
+            std::cerr << "IN S4UDAMONE EXIT " << "\n";
             if (not this->isSetToAutoRestart()) {
-                auto life_saver_ref = this->life_saver;
-                this->life_saver = nullptr;
 //                Service::increaseNumCompletedServicesCount();
 #ifdef MESSAGE_MANAGER
                 MessageManager::cleanUpMessages(this->mailbox_name);
 #endif
-                delete life_saver_ref;
+                this->deleteLifeSaver();
             }
             return 0;
         });
