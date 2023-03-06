@@ -550,5 +550,8 @@ include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Tools.cmake)
 # build examples
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Examples.cmake)
 
+# build benchmark
+include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Benchmark.cmake)
+
 # build documentation
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Documentation.cmake)
