@@ -20,7 +20,7 @@ namespace wrench {
         // Creating workflow
         shared_ptr<Workflow> workflow = Workflow::createWorkflow();
         // One task per job, all independent
-        for (unsigned int i=0; i < this->num_jobs; i++) {
+        for (unsigned int i = 0; i < this->num_jobs; i++) {
             shared_ptr<WorkflowTask> task = workflow->addTask("task_" + std::to_string(i), 1000.0, 1, 1, 1.0);
             task->addOutputFile(workflow->addFile("outfile_" + std::to_string(i), 100000000));
             task->addInputFile(workflow->addFile("infile_" + std::to_string(i), 100000000));
@@ -29,11 +29,11 @@ namespace wrench {
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
 
-        std::set<shared_ptr<WorkflowTask> > tasks_to_do;
-        for (const auto& t : workflow->getTasks()) {
+        std::set<shared_ptr<WorkflowTask>> tasks_to_do;
+        for (const auto &t: workflow->getTasks()) {
             tasks_to_do.insert(t);
         }
-        std::set<shared_ptr<WorkflowTask> > tasks_pending;
+        std::set<shared_ptr<WorkflowTask>> tasks_pending;
 
         //REMOVE//std::set<std::shared_ptr<ComputeService>> compute_services = this->getAvailableComputeServices<ComputeService>();
         //REMOVE//std::set<std::shared_ptr<StorageService>> storage_services = this->getAvailableStorageServices();
@@ -65,13 +65,11 @@ namespace wrench {
                 StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(target_ss, input_file));
                 auto job = job_manager->createStandardJob(to_submit,
                                                           {{input_file, wrench::FileLocation::LOCATION(target_ss, input_file)},
-                                                           {output_file, wrench::FileLocation::LOCATION(target_ss, output_file)}
-                                                          });
+                                                           {output_file, wrench::FileLocation::LOCATION(target_ss, output_file)}});
                 job_manager->submitJob(job, target_cs);
-
             }
 
-            std::shared_ptr <wrench::ExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             event = this->waitForNextEvent();
             if (auto real_event = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get())) {
                 shared_ptr<WorkflowTask> completed_task = *(real_event->standard_job->getTasks().begin());
@@ -80,7 +78,7 @@ namespace wrench {
                     //std::cerr << ".";
                 }
                 // Erase the task's input and output file
-                for (auto const &location : real_event->standard_job->getFileLocations()) {
+                for (auto const &location: real_event->standard_job->getFileLocations()) {
                     StorageService::removeFileAtLocation(location.second.at(0));
                 }
 
@@ -96,4 +94,4 @@ namespace wrench {
         return 0;
     }
 
-};
+};// namespace wrench
