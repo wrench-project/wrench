@@ -521,7 +521,6 @@ namespace wrench {
             this->is_running = false;
             throw;
         }
-
     }
 
     /**
@@ -606,7 +605,6 @@ namespace wrench {
         } catch (std::runtime_error &e) {
             throw;
         }
-
     }
 
     /**
