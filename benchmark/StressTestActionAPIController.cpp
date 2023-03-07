@@ -16,6 +16,8 @@ namespace wrench {
 
     int StressTestActionAPIController::main() {
 
+        std::cerr << "IN CONTRLLER: CS REFCOUNT = " << (*compute_services.begin()).use_count() << "\n";
+#if 0
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
         unsigned long max_num_pending_jobs = 10;
@@ -76,7 +78,7 @@ namespace wrench {
                 throw std::runtime_error("Got an unexpected event!");
             }
         }
-
+#endif
         return 0;
     }
 

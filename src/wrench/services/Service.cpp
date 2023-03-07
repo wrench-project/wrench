@@ -33,11 +33,11 @@ namespace wrench {
 
     std::set<std::shared_ptr<Service>> Service::servicesSetToAutoRestart;
 
-
     /**
      * @brief Destructor
      */
     Service::~Service() {
+        std::cerr << "IN SERVICE DESTRUCTOR: " << this->getName() << "\n";
         //        WRENCH_INFO("IN SERVICE DESTRUCTOR: %s", this->getName().c_str());
     }
 
@@ -47,6 +47,7 @@ namespace wrench {
      * @param process_name_prefix: the prefix for the process name
      */
     Service::Service(std::string hostname, std::string process_name_prefix) : S4U_Daemon(hostname, process_name_prefix) {
+        std::cerr << "IN SERVICECONSTRUCTOR: " << process_name_prefix << "\n";
         this->name = process_name_prefix;
     }
 
