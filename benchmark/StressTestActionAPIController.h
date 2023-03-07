@@ -19,11 +19,10 @@ namespace wrench {
     class StressTestActionAPIController : public ExecutionController {
 
     public:
-
-//        ~StressTestActionAPIController() {
-//            this->compute_services.clear();
-//            this->storage_services.clear();
-//        }
+        //        ~StressTestActionAPIController() {
+        //            this->compute_services.clear();
+        //            this->storage_services.clear();
+        //        }
 
         StressTestActionAPIController(std::set<std::shared_ptr<ComputeService>> compute_services,
                                       std::set<std::shared_ptr<StorageService>> storage_services,
