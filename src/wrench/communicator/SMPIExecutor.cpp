@@ -25,7 +25,7 @@ namespace wrench {
          */
         MPI_Alltoall_partipant(int data_size, simgrid::s4u::BarrierPtr barrier) : data_size(data_size), barrier(std::move(barrier)) {}
 
-	/**
+        /**
 	 * @brief The actor's main method
 	 */
         void operator()() {
@@ -72,7 +72,7 @@ namespace wrench {
          */
         explicit MPI_Barrier_partipant(simgrid::s4u::BarrierPtr barrier) : barrier(std::move(barrier)) {}
 
-	/**
+        /**
 	 * @brief The actor's main method
 	 */
         void operator()() {
@@ -115,7 +115,7 @@ namespace wrench {
          */
         MPI_Bcast_partipant(int data_size, simgrid::s4u::BarrierPtr barrier) : data_size(data_size), barrier(std::move(barrier)) {}
 
-	/**
+        /**
 	 * @brief The actor's main method
 	 */
         void operator()() {
