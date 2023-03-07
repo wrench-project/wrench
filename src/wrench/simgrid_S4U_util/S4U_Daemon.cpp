@@ -30,6 +30,7 @@ std::unordered_map<std::string, unsigned long> num_actors;
 namespace wrench {
 
     std::unordered_map<aid_t, simgrid::s4u::Mailbox *> S4U_Daemon::map_actor_to_recv_mailbox;
+    int S4U_Daemon::num_non_daemonized_actors_running = 0;
 
     /**
      * @brief Constructor (daemon with a mailbox)
@@ -179,9 +180,10 @@ namespace wrench {
         // terminate immediately. This is a weird simgrid::s4u behavior/bug, that may be
         // fixed at some point, but this test saves us for now.
         if (not this->has_returned_from_main) {
-            this->setupOnExitFunction();
 
             if (this->daemonized) {
+                S4U_Daemon::num_non_daemonized_actors_running++;
+                this->setupOnExitFunction();
                 this->s4u_actor->daemonize();
             }
 
@@ -201,19 +203,22 @@ namespace wrench {
      */
     void S4U_Daemon::setupOnExitFunction() {
         this->s4u_actor->on_exit([this](bool failed) {
-            // Set state to down
-            this->state = S4U_Daemon::State::DOWN;
-            // Call cleanup
-            this->cleanup(this->hasReturnedFromMain(), this->getReturnValue());
-            // Free memory_manager_service for the object unless the service is set to auto-restart
-            if (not this->isSetToAutoRestart()) {
+          if (this->daemonized) {
+              S4U_Daemon::num_non_daemonized_actors_running--;
+          }
+          // Set state to down
+          this->state = S4U_Daemon::State::DOWN;
+          // Call cleanup
+          this->cleanup(this->hasReturnedFromMain(), this->getReturnValue());
+          // Free memory_manager_service for the object unless the service is set to auto-restart
+          if ((S4U_Daemon::num_non_daemonized_actors_running == 0) or (not this->isSetToAutoRestart())) {
 //                Service::increaseNumCompletedServicesCount();
 #ifdef MESSAGE_MANAGER
-                MessageManager::cleanUpMessages(this->mailbox_name);
+              MessageManager::cleanUpMessages(this->mailbox_name);
 #endif
-                this->deleteLifeSaver();
-            }
-            return 0;
+              this->deleteLifeSaver();
+          }
+          return 0;
         });
     }
 
