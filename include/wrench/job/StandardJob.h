@@ -33,12 +33,18 @@ namespace wrench {
     class WorkflowTask;
     class Action;
 
+
     /**
      * @brief A standard (i.e., non-pilot) workflow job that can be submitted to a ComputeService
      * by a WMS (via a JobManager)
      */
     class StandardJob : public Job, public std::enable_shared_from_this<StandardJob> {
+
     public:
+        //        ~StandardJob() {
+        //            std::cerr << "IN STANDARD JOB DESTRUCTOR: CJOB.REF# = " << this->compound_job.use_count() << "\n";
+        //        }
+
         /** @brief Standard job states */
         enum State {
             /** @brief Not submitted yet */
@@ -122,13 +128,13 @@ namespace wrench {
         void applyTaskUpdates(std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
                               std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments);
 
-        void analyzeActions(const std::vector<std::shared_ptr<Action>> &actions,
-                            bool *at_least_one_failed,
-                            bool *at_least_one_killed,
-                            std::shared_ptr<FailureCause> *failure_cause,
-                            double *earliest_start_date,
-                            double *latest_end_date,
-                            double *earliest_failure_date);
+        static void analyzeActions(const std::vector<std::shared_ptr<Action>> &actions,
+                                   bool *at_least_one_failed,
+                                   bool *at_least_one_killed,
+                                   std::shared_ptr<FailureCause> *failure_cause,
+                                   double *earliest_start_date,
+                                   double *latest_end_date,
+                                   double *earliest_failure_date);
 
 
         State state;

@@ -412,7 +412,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new CloudStandardJobTestWMS(this, hostname)));
 
@@ -543,7 +543,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -681,7 +681,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new CloudNumCoresTestWMS(this, hostname)));
 
@@ -782,7 +782,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new StopAllVMsTestWMS(this, hostname)));
 
@@ -1021,7 +1021,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ShutdownVMTestWMS(this, hostname)));
 
@@ -1138,7 +1138,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ShutdownVMAndThenShutdownServiceTestWMS(this, hostname)));
 
@@ -1291,7 +1291,7 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new SubmitToVMTestWMS(this, hostname)));
 
@@ -1391,7 +1391,7 @@ void VirtualizedClusterServiceTest::do_VMStartShutdownStartShutdown_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     wms = simulation->add(
             new CloudServiceVMStartShutdownStartShutdownTestWMS(this, hostname));
 
@@ -1515,7 +1515,7 @@ void VirtualizedClusterServiceTest::do_VMShutdownWhileJobIsRunning_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     wms = simulation->add(
             new CloudServiceVMShutdownWhileJobIsRunningTestWMS(this, hostname));
 
@@ -1642,7 +1642,7 @@ void VirtualizedClusterServiceTest::do_VMComputeServiceStopWhileJobIsRunning_tes
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     wms = simulation->add(new CloudServiceVMComputeServiceStopWhileJobIsRunningTestWMS(
             this, hostname));
 

@@ -14,6 +14,7 @@
 #include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
+#include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
 
 
 #include <utility>
@@ -57,9 +58,13 @@ namespace wrench {
     void FileWriteAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
+        // Fix location if scratch
+        if (this->file_location->isScratch()) {
+            auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
+            this->file_location = FileLocation::LOCATION(cs->getScratch(), cs->getScratch()->getBaseRootPath() + this->getJob()->getName(), this->file_location->getFile());
+        }
         // File write
-        StorageService::writeFile(
-                this->file_location);
+        StorageService::writeFileAtLocation(this->file_location);
     }
 
     /**

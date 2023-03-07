@@ -72,6 +72,9 @@
 #include "wrench/action/SleepAction.h"
 #include "wrench/services/helper_services/action_executor/ActionExecutor.h"
 
+// Communicator
+#include "wrench/communicator/Communicator.h"
+
 
 // Job
 #include "wrench/job/Job.h"

@@ -47,6 +47,17 @@ namespace wrench {
      */
     class Simulation {
     public:
+        //        void printRefCounts(std::string message) {
+        //            std::cerr << message << " SIMUALTION: CS\n";
+        //            for (auto const &cs : this->compute_services) {
+        //                std::cerr  << "    CS REFCOUNT: " << cs.use_count() - 1 << "\n";
+        //            }
+        //            std::cerr << message << " SIMUALTION: SS\n";
+        //            for (auto const &cs : this->storage_services) {
+        //                std::cerr << "    SS REFCOUNT: " << cs.use_count() - 1 << "\n";
+        //            }
+        //        }
+
         static std::shared_ptr<Simulation> createSimulation();
 
         ~Simulation();
@@ -63,6 +74,7 @@ namespace wrench {
         static double getHostMemoryCapacity(const std::string &hostname);
         static unsigned long getHostNumCores(const std::string &hostname);
         static double getHostFlopRate(const std::string &hostname);
+        static bool hostHasMountPoint(const std::string &hostname, const std::string &scratch_space_mount_point);
 
         static std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
         static void removeFile(const std::shared_ptr<DataFile> &file);
@@ -111,11 +123,25 @@ namespace wrench {
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
 
-        void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &ss);
-        void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &ss, std::string directory_absolute_path);
+        /**
+	 * @brief Creates a file copy on a storage service before the simulation begins
+	 * @param file: a file
+	 * @param storage_service: a storage service
+	 */
+        void stageFile(const std::shared_ptr<DataFile> file, const std::shared_ptr<StorageService> &storage_service) {
+            this->stageFile(wrench::FileLocation::LOCATION(storage_service, file));
+        }
+        /**
+         * @brief Creates a file copy on a storage service before the simulation begins
+         * @param file: a file
+         * @param storage_service: a storage service
+	 * @param path: a path
+         */
+        void stageFile(const std::shared_ptr<DataFile> file, const std::shared_ptr<StorageService> &storage_service, const std::string &path) {
+            this->stageFile(wrench::FileLocation::LOCATION(storage_service, path, file));
+        }
 
-        static void createFile(const std::shared_ptr<FileLocation> &location);
-        static void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &server);
+        void stageFile(const std::shared_ptr<FileLocation> &location);
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -183,7 +209,6 @@ namespace wrench {
         static bool isEnergySimulationEnabled();
         static bool isSurfPrecisionSetByUser();
 
-
         /***********************/
         /** \endcond           */
         /***********************/
@@ -196,24 +221,16 @@ namespace wrench {
         std::unique_ptr<S4U_Simulation> s4u_simulation;
 
         std::set<std::shared_ptr<ExecutionController>> execution_controllers;
-
         std::set<std::shared_ptr<FileRegistryService>> file_registry_services;
-
         std::set<std::shared_ptr<EnergyMeterService>> energy_meter_services;
-
         std::set<std::shared_ptr<BandwidthMeterService>> bandwidth_meter_services;
-
         std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services;
-
         std::set<std::shared_ptr<ComputeService>> compute_services;
-
         std::set<std::shared_ptr<StorageService>> storage_services;
-
         std::set<std::shared_ptr<MemoryManager>> memory_managers;
 
         static int unique_disk_sequence_number;
 
-        void stageFile(const std::shared_ptr<FileLocation> &location);
 
         void platformSanityCheck();
         void checkSimulationSetup();

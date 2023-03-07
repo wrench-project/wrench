@@ -3,12 +3,17 @@ message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CM
 
 project(wrench CXX)
 
+# Disable annoying warnings
+add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
+#add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
+
 # Make Release the default build type
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
+add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field -Wno-unused-local-typedefs" )
+
 if (ENABLE_BATSCHED)
     add_definitions(-DENABLE_BATSCHED)
 endif ()
@@ -26,7 +31,7 @@ find_package(SimGrid REQUIRED)
 
 find_package(nlohmann_json)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "2")
@@ -118,9 +123,12 @@ set(HEADER_FILES
         include/wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h
         include/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.h
         include/wrench/services/storage/simple/SimpleStorageServiceProperty.h
+        include/wrench/services/storage/compound/CompoundStorageService.h
+        include/wrench/services/storage/compound/CompoundStorageServiceProperty.h
+        include/wrench/services/storage/compound/CompoundStorageServiceMessagePayload.h
         include/wrench/services/storage/storage_helpers/FileLocation.h
-        include/wrench/services/memory/Block.h
-        include/wrench/services/memory/MemoryManager.h
+#        include/wrench/services/memory/Block.h
+#        include/wrench/services/memory/MemoryManager.h
         include/wrench/simgrid_S4U_util/S4U_Daemon.h
         include/wrench/simgrid_S4U_util/S4U_Mailbox.h
         include/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
@@ -196,6 +204,10 @@ set(HEADER_FILES
         include/wrench/services/storage/xrootd/SearchStack.h
         include/wrench/services/storage/xrootd/Cache.h
         include/wrench/services/storage/xrootd/XRootDProperty.h
+        include/wrench/services/storage/proxy/StorageServiceProxy.h
+        include/wrench/services/storage/proxy/StorageServiceProxyProperty.h
+        include/wrench/communicator/Communicator.h
+        include/wrench/communicator/SMPIExecutor.h
         )
 
 # source files
@@ -298,14 +310,15 @@ set(SOURCE_FILES
         src/wrench/services/storage/simple/SimpleStorageServiceNonBufferized.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
+        src/wrench/services/storage/compound/CompoundStorageService.cpp
+        src/wrench/services/storage/compound/CompoundStorageServiceProperty.cpp
+        src/wrench/services/storage/compound/CompoundStorageServiceMessagePayload.cpp
         src/wrench/services/storage/storage_helper_classes/FileLocation.cpp
         src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
         include/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystem.cpp
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystemNoCaching.cpp
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystemLRUCaching.cpp
-        src/wrench/services/memory/Block.cpp
-        src/wrench/services/memory/MemoryManager.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
         include/wrench/simgrid_S4U_util/S4U_DaemonActor.h
@@ -369,6 +382,10 @@ set(SOURCE_FILES
         src/wrench/services/storage/xrootd/XRootDMessagePayload.cpp
         src/wrench/services/storage/xrootd/XRootDMessage.cpp
         src/wrench/services/storage/xrootd/XRootDProperty.cpp
+        src/wrench/services/storage/proxy/StorageServiceProxy.cpp
+        src/wrench/services/storage/proxy/StorageServiceProxyProperty.cpp
+        src/wrench/communicator/Communicator.cpp
+        src/wrench/communicator/SMPIExecutor.cpp
         )
 
 # test files
@@ -383,7 +400,7 @@ set(TEST_FILES
         test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowParallelModelTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
-        test/services/memory_manager_service/MemoryManagerTest.cpp
+#        test/services/memory_manager_service/MemoryManagerTest.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceOneActionTests.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiActionTests.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiJobTests.cpp
@@ -425,6 +442,7 @@ set(TEST_FILES
         test/services/helper_services/AlarmTest.cpp
         test/services/storage_services/XRootDStorageService/XRootDStorageServiceBasicFunctionalTest.cpp
         test/services/storage_services/XRootDStorageService/XRootDStorageServiceFullFunctionalTest.cpp
+        test/services/storage_services/CompoundStorageService/CompoundStorageServiceFunctionalTest.cpp
         test/wms/WMSTest.cpp
         test/wms/MultipleWMSTest.cpp
         test/services/compute_services/virtualized_cluster/VirtualizedClusterServiceTest.cpp
@@ -484,6 +502,9 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
         test/simulation/S4U_MailboxTest.cpp
         test/misc/UnitParserTest.cpp
+        test/services/storage_services/StorageServiceProxy/StorageServiceProxyBasicTest.cpp
+        test/services/storage_services/StorageServiceProxy/StorageServiceProxySequentialTest.cpp
+        test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceActionsThatCommunicateTests.cpp
         )
 
 
@@ -517,9 +538,6 @@ else()
 endif()
 
 
-
-
-
 # additional packages
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/DefinePackages.cmake)
 
@@ -528,6 +546,9 @@ include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Tools.cmake)
 
 # build examples
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Examples.cmake)
+
+# build benchmark
+include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Benchmark.cmake)
 
 # build documentation
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Documentation.cmake)

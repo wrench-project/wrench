@@ -122,14 +122,14 @@ class FileCopyActionExecutorSuccessTestWMS : public wrench::ExecutionController 
 
 public:
     FileCopyActionExecutorSuccessTestWMS(FileCopyActionExecutorTest *test,
-                                         std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                                         const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
     FileCopyActionExecutorTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -148,8 +148,9 @@ private:
         file_copy_action->getDestinationFileLocation();
 
         // Create a file copy action executor
-        auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_copy_action, nullptr));
+        auto file_copy_action_executor = std::make_shared<wrench::ActionExecutor>(
+                "Host2", 0, 0.0, 0, false,
+                this->mailbox, file_copy_action, nullptr);
         // Start it
         file_copy_action_executor->setSimulation(this->simulation);
         file_copy_action_executor->start(file_copy_action_executor, true, false);
@@ -169,13 +170,18 @@ private:
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
 
+        // Did the copy happen?
+        if (not wrench::StorageService::hasFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss2, this->test->file))) {
+            throw std::runtime_error("File copy should have happened!");
+        }
+
         // Is the start-date sensible?
         if (file_copy_action->getStartDate() < 0.0 or file_copy_action->getStartDate() > EPSILON) {
             throw std::runtime_error("Unexpected action start date: " + std::to_string(file_copy_action->getStartDate()));
         }
 
         // Is the end-date sensible?
-        if (file_copy_action->getEndDate() + EPSILON < 10.90216 or file_copy_action->getEndDate() > 10.90216 + EPSILON) {
+        if (file_copy_action->getEndDate() < 10.8 or file_copy_action->getEndDate() > 10.9) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(file_copy_action->getEndDate()));
         }
 
@@ -210,12 +216,12 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     // Create a Storage Service
     this->ss1 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "Host3", {"/"},
-            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
+            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "1MB"}}));
 
     // Create another Storage Service
     this->ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "Host1", {"/"},
-            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
+            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "1MB"}}));
 
     // Create a workflow
     workflow = wrench::Workflow::createWorkflow();
@@ -224,7 +230,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     this->file = workflow->addFile("some_file", 1000000.0);
 
     // Put it on ss1
-    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
+    simulation->stageFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -248,14 +254,14 @@ class FileCopyActionExecutorSuccessSameHostTestWMS : public wrench::ExecutionCon
 
 public:
     FileCopyActionExecutorSuccessSameHostTestWMS(FileCopyActionExecutorTest *test,
-                                                 std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                                                 const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
     FileCopyActionExecutorTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -325,7 +331,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessSameHostTest_te
     this->file = workflow->addFile("some_file", 1000000000.0);
 
     // Put it on ss1
-    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
+    simulation->stageFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

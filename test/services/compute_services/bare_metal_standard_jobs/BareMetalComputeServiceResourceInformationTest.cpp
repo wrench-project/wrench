@@ -146,6 +146,7 @@ private:
 
         ram_capacities = this->test->compute_service1->getMemoryCapacity();
         std::vector<double> sorted_ram_capacities;
+        sorted_ram_capacities.reserve(ram_capacities.size());
         for (auto const &r: ram_capacities) {
             sorted_ram_capacities.push_back(r.second);
         }
@@ -159,6 +160,7 @@ private:
         // Get Core flop rates
         std::map<std::string, double> core_flop_rates = this->test->compute_service1->getCoreFlopRate();
         std::vector<double> sorted_core_flop_rates;
+        sorted_core_flop_rates.reserve(core_flop_rates.size());
         for (auto const &f: core_flop_rates) {
             sorted_core_flop_rates.push_back(f.second);
         }
@@ -185,6 +187,7 @@ private:
         // Get number of idle cores
         std::map<std::string, unsigned long> num_idle_cores = this->test->compute_service1->getPerHostNumIdleCores();
         std::vector<unsigned long> idle_core_counts;
+        idle_core_counts.reserve(num_idle_cores.size());
         for (auto const &c: num_idle_cores) {
             idle_core_counts.push_back(c.second);
         }
@@ -260,7 +263,7 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
 
     // Create the WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ResourceInformationTestWMS(
                                     this, "Host1")));

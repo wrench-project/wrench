@@ -107,9 +107,8 @@ protected:
 
 TEST_F(WorkflowTaskTest, TaskStructure) {
 
-
     // WorkflowTask structure sanity check
-    ASSERT_EQ(t1->getWorkflow(), workflow);
+    ASSERT_EQ(t1->getWorkflow(), workflow.get());
 
     ASSERT_NE(t1->getID(), t2->getID());
     ASSERT_EQ(t1->getID(), "task1-01");
@@ -298,9 +297,8 @@ private:
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
         // while large_input_file is being read, we delete small_input_file so that the one task job will fail
-        wrench::StorageService::deleteFile(
-                wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("zz_small_input_file")),
-                this->test->file_registry_service);
+        wrench::StorageService::deleteFileAtLocation(
+                wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("zz_small_input_file")));
 
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
