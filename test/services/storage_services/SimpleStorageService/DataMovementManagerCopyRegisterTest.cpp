@@ -112,7 +112,7 @@ private:
     DataMovementManagerCopyRegisterTest *test;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;
 
-    int main() {
+    int main() override {
 
 
         auto data_movement_manager = this->createDataMovementManager();
@@ -143,9 +143,8 @@ private:
 
         // Do the same thing but kill the FileRegistryService first
 
-        wrench::StorageService::deleteFile(
-                wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src_file_1),
-                file_registry_service);
+        wrench::StorageService::deleteFileAtLocation(
+                wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src_file_1));
         file_registry_service->stop();
         try {
             data_movement_manager->doSynchronousFileCopy(
@@ -162,7 +161,6 @@ private:
                 new wrench::FileRegistryService(this->hostname, {}, {}));
         file_registry_service->setSimulation(this->simulation);
         file_registry_service->start(file_registry_service, true, false);
-
 
         // try asynchronous copy and register
         std::shared_ptr<wrench::ExecutionEvent> async_copy_event;
@@ -198,6 +196,7 @@ private:
         if (not found) {
             throw std::runtime_error("Asynchronous file copy succeeded but file was not registered at DstHost.");
         }
+
 
         // try 2 asynchronous copies of the same file
         bool double_copy_failed = false;
@@ -271,10 +270,7 @@ private:
         }
 
 
-        if (!async_dual_copy_event2_real->file_registry_service_updated) {
-            throw std::runtime_error("Asynchronous file copy should have set the event's file_registry_service_updated variable to true");
-        }
-
+        //
         if (!double_copy_failed) {
             throw std::runtime_error("Synchronous file copy should have failed.");
         }
@@ -310,11 +306,9 @@ private:
             throw std::runtime_error("Asynchronous file copy should have completed");
         }
 
-        if (async_copy_event2_real->file_registry_service_updated) {
-            throw std::runtime_error("File registry service should not have been updated");
-        }
+        //
 
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src2_file_2))) {
             throw std::runtime_error("Asynchronous file copy should have completed even though the FileRegistryService was down.");
         }
@@ -337,6 +331,7 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

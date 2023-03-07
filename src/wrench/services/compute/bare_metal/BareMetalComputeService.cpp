@@ -49,6 +49,7 @@ namespace wrench {
         // Do the default behavior (which will throw as this is not a fault-tolerant service)
         Service::cleanup(has_returned_from_main, return_value);
 
+        this->action_execution_service = nullptr; // to avoid leak due to circular refs
         this->current_jobs.clear();
         this->not_ready_actions.clear();
         this->ready_actions.clear();
@@ -210,18 +211,10 @@ namespace wrench {
                                                 ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobAnswerMessage *>(message.get())) {
-            // If no success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "ComputeService::submitCompoundJob(): Received an unexpected [" + message->getName() +
-                    "] message!");
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(answer_mailbox, this->network_timeout,
+                                                                                         "ComputeService::submitCompoundJob(): Received an");
+        if (not msg->success) {
+            throw ExecutionException(msg->failure_cause);
         }
     }
 
@@ -404,6 +397,9 @@ namespace wrench {
             termination_detector->start(termination_detector, true, false);// Daemonized, no auto-restart
         }
 
+        // Start the Scratch Storage Service
+        this->startScratchStorageService();
+
         /** Main loop **/
         while (this->processNextMessage()) {
             dispatchReadyActions();
@@ -437,7 +433,7 @@ namespace wrench {
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
         //        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
 
             // This is Synchronous
@@ -450,27 +446,27 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitCompoundJobRequestMessage>(message)) {
             processSubmitCompoundJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationRequestMessage>(message)) {
             processGetResourceInformation(msg->answer_mailbox, msg->key);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage>(message)) {
             processIsThereAtLeastOneHostWithAvailableResources(msg->answer_mailbox, msg->num_cores, msg->ram);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceTerminateCompoundJobRequestMessage>(message)) {
             processCompoundJobTerminationRequest(msg->job, msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = dynamic_cast<ActionExecutionServiceActionDoneMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ActionExecutionServiceActionDoneMessage>(message)) {
             processActionDone(msg->action);
             return true;
 
-        } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ServiceHasTerminatedMessage>(message)) {
             if (std::dynamic_pointer_cast<ActionExecutionService>(msg->service)) {
                 if (this->getPropertyValueAsBoolean(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)) {
                     return false;
@@ -508,18 +504,10 @@ namespace wrench {
                                         answer_mailbox, job, this->getMessagePayloadValue(BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        if (auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobAnswerMessage *>(message.get())) {
-            // If no success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "BareMetalComputeService::terminateCompoundJob(): Received an unexpected [" +
-                    message->getName() + "] message!");
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceTerminateCompoundJobAnswerMessage>(answer_mailbox,
+                                                                                            "BareMetalComputeService::terminateCompoundJob(): Received an");
+        if (not msg->success) {
+            throw ExecutionException(msg->failure_cause);
         }
     }
 
@@ -700,11 +688,10 @@ namespace wrench {
         for (auto const &j: this->files_in_scratch) {
             for (auto const &f: j.second) {
                 try {
-                    StorageService::deleteFile(FileLocation::LOCATION(
-                            this->getScratch(),
-                            this->getScratch()->getMountPoint() +
-                                    j.first->getName(),
-                            f));
+                    this->getScratch()->deleteFile(
+                            f,
+                            this->getScratch()->getBaseRootPath() +
+                                    j.first->getName());
                 } catch (ExecutionException &e) {
                     throw;
                 }

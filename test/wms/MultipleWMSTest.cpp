@@ -201,7 +201,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
     // Create a WMS
     auto workflow = this->createWorkflow("wf_");
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new DeferredWMSStartTestWMS(this, workflow, 100, hostname)));
 

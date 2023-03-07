@@ -138,7 +138,7 @@ public:
 private:
     SimpleSimulationTest *test;
 
-    int main() {
+    int main() override {
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
@@ -471,8 +471,8 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     ASSERT_THROW(simulation->add((wrench::NetworkProximityService *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::FileRegistryService *) nullptr), std::invalid_argument);
 
-    // Try to stage a file without a file registry
-    ASSERT_THROW(simulation->stageFile(input_file, storage_service), std::runtime_error);
+    //    // Try to stage a file without a file registry
+    //    ASSERT_THROW(simulation->stageFile(input_file, storage_service), std::runtime_error);
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;

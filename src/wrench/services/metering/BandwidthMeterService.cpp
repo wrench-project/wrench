@@ -144,20 +144,13 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool BandwidthMeterService::processNextMessage(double timeout) {
-        std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox, timeout);
+            auto msg = S4U_Mailbox::getMessage<ServiceStopDaemonMessage>(this->mailbox, timeout, "BandwidthMeter::waitForNextMessage(): Received an");
+            return false;
         } catch (ExecutionException &e) {
             return true;
         }
-
-        if (dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-            // There shouldn't be any need to clean any state up
-            return false;
-        }
-
-        throw std::runtime_error("BandwidthMeter::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
     }
 
 

@@ -14,6 +14,7 @@
 #include <iostream>
 #include <utility>
 #include <unordered_map>
+#include <simgrid/s4u.hpp>
 
 
 namespace wrench {
@@ -22,8 +23,8 @@ namespace wrench {
     /** \cond DEVELOPER    */
     /***********************/
 
-
     class StorageService;
+    class SimpleStorageService;
     class DataFile;
 
     /**
@@ -32,29 +33,32 @@ namespace wrench {
     class FileLocation {
 
     public:
-        ~FileLocation();
+        virtual ~FileLocation();
 
         /**
          * @brief Static location that denotes a compute service's scratch space
          */
         static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService> &ss, const std::shared_ptr<DataFile> &file);
 
+#ifdef PAGE_CACHE_SIMuLATION
         static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService> &ss,
-                                                      std::shared_ptr<StorageService> server_ss,
+                                                      const std::shared_ptr<StorageService> server_ss,
                                                       const std::shared_ptr<DataFile> &file);
+#endif
 
         static std::shared_ptr<FileLocation> LOCATION(const std::shared_ptr<StorageService> &ss,
-                                                      std::string absolute_path,
+                                                      const std::string &path,
                                                       const std::shared_ptr<DataFile> &file);
 
         static std::shared_ptr<FileLocation> SCRATCH(const std::shared_ptr<DataFile> &file);
 
         std::shared_ptr<DataFile> getFile();
         std::shared_ptr<StorageService> getStorageService();
+        std::shared_ptr<StorageService> setStorageService(std::shared_ptr<StorageService> &storage_service);
+#ifdef PAGE_CACHE_SIMULATION
         std::shared_ptr<StorageService> getServerStorageService();
-        std::string getMountPoint();
-        std::string getAbsolutePathAtMountPoint();
-        std::string getFullAbsolutePath();
+#endif
+        std::string getPath();
         bool isScratch() const;
         std::string toString();
 
@@ -72,8 +76,8 @@ namespace wrench {
                           const std::shared_ptr<FileLocation> &rhs) {
             return ((not lhs->is_scratch) and
                     (not rhs->is_scratch) and
-                    (lhs->storage_service == rhs->storage_service) and
-                    (lhs->getFullAbsolutePath() == rhs->getFullAbsolutePath()) and
+                    (lhs->getStorageService() == rhs->getStorageService()) and
+                    (lhs->getPath() == rhs->getPath()) and
                     (lhs->file == rhs->file));
         }
         /**
@@ -88,47 +92,50 @@ namespace wrench {
             return ((not this->is_scratch) and
                     (not other->is_scratch) and
                     (this->getStorageService() == other->getStorageService()) and
-                    (this->getFullAbsolutePath() == other->getFullAbsolutePath()) and
+                    (this->getPath() == other->getPath()) and
                     (this->getFile() == other->getFile()));
         }
 
-
-        static std::string sanitizePath(std::string path);
-        static bool properPathPrefix(std::string path1, std::string path2);
+        static std::string sanitizePath(const std::string &path);
+        static bool properPathPrefix(const std::string &path1, const std::string &path2);
 
     private:
         friend class LogicalFileSystem;
-
+        friend class Simulation;
+        friend class SimpleStorageServiceNonBufferized;
 
         /**
          * @brief Constructor
          * @param ss: the storage service
-         * @param mp: the mount point path
-         * @param apamp: the absolute path
          * @param file: the file
-	 * @param is_scratch: whether the location is a SCRATCH location
+         * @param path: the file path
+	     * @param is_scratch: whether the location is a SCRATCH location
          */
-        FileLocation(std::shared_ptr<StorageService> ss, std::string mp, std::string apamp, std::shared_ptr<DataFile> file, bool is_scratch) : storage_service(std::move(ss)),
-                                                                                                                                               mount_point(std::move(mp)),
-                                                                                                                                               absolute_path_at_mount_point(std::move(apamp)),
-                                                                                                                                               file(std::move(std::move(file))),
-                                                                                                                                               is_scratch(is_scratch) {}
-
-        std::shared_ptr<StorageService> storage_service;
-        std::shared_ptr<StorageService> server_storage_service;
-        std::string mount_point;
-        std::string absolute_path_at_mount_point;
-        std::shared_ptr<DataFile> file;
-        bool is_scratch;
+        FileLocation(std::shared_ptr<StorageService> ss, std::shared_ptr<DataFile> file, std::string path, bool is_scratch) : storage_service(std::move(ss)),
+                                                                                                                              path(std::move(path)),
+                                                                                                                              file(std::move(file)),
+                                                                                                                              is_scratch(is_scratch) {
+        }
 
         static std::shared_ptr<FileLocation> createFileLocation(const std::shared_ptr<StorageService> &ss,
-                                                                const std::string &mp,
-                                                                const std::string &apamp,
                                                                 const std::shared_ptr<DataFile> &file,
+                                                                const std::string &path,
                                                                 bool is_scratch);
+
+        simgrid::s4u::Disk *getDiskOrNull();
 
         static void reclaimFileLocations();
 
+#ifdef PAGE_CACHE_SIMULATION
+        std::shared_ptr<StorageService> server_storage_service;
+#endif
+
+        std::shared_ptr<StorageService> storage_service;
+        std::string path;
+        std::shared_ptr<DataFile> file;
+        bool is_scratch;
+
+    public:// TODO MAKE PRIVATE AGAIN
         static std::unordered_map<std::string, std::shared_ptr<FileLocation>> file_location_map;
         static size_t file_location_map_previous_size;
     };

@@ -50,17 +50,11 @@ namespace wrench {
          * @param file: a workflow file
          * @param src: the source location
          * @param dst: the destination location
-         * @param file_registry_service: a file registry service
-         * @param file_registry_service_updated: whether the file registry service has been updated
          */
         FileCopyCompletedEvent(std::shared_ptr<DataFile> file,
                                std::shared_ptr<FileLocation> src,
-                               std::shared_ptr<FileLocation> dst,
-                               std::shared_ptr<FileRegistryService> file_registry_service,
-                               bool file_registry_service_updated)
-            : file(std::move(file)), src(std::move(src)), dst(std::move(dst)),
-              file_registry_service(std::move(file_registry_service)),
-              file_registry_service_updated(file_registry_service_updated) {}
+                               std::shared_ptr<FileLocation> dst)
+            : file(std::move(file)), src(std::move(src)), dst(std::move(dst)) {}
 
     public:
         /** @brief The workflow file that has successfully been copied */
@@ -69,10 +63,6 @@ namespace wrench {
         std::shared_ptr<FileLocation> src;
         /** @brief The destination location */
         std::shared_ptr<FileLocation> dst;
-        /** @brief The file registry service that was supposed to be updated (or nullptr if none) */
-        std::shared_ptr<FileRegistryService> file_registry_service;
-        /** @brief Whether the file registry service (if any) has been successfully updated */
-        bool file_registry_service_updated;
 
         /**
          * @brief Get a textual description of the event

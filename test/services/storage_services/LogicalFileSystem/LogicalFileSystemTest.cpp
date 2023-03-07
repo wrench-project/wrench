@@ -78,12 +78,10 @@ void LogicalFileSystemTest::do_BasicTests() {
     } catch (std::invalid_argument &ignore) {}
 
     auto fs1 = wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service1.get(), "/tmp", "NONE");
-    fs1->init();
 
     // Attempt to create a redundant Logical File System
-    auto fs1_bogus = wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service1.get(), "/tmp");
     try {
-        fs1_bogus->init();
+        wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service1.get(), "/tmp");
         throw std::runtime_error("Initializing a redundant file system should have thrown");
     } catch (std::invalid_argument &ignore) {
     }
@@ -99,7 +97,7 @@ void LogicalFileSystemTest::do_BasicTests() {
     fs1->unreserveSpace(file_80, "/files/");
     ASSERT_DOUBLE_EQ(100, fs1->getFreeSpace());
     ASSERT_TRUE(fs1->reserveSpace(file_80, "/files/"));
-    fs1->storeFileInDirectory(file_80, "/files/", true);
+    fs1->storeFileInDirectory(file_80, "/files/");
     ASSERT_DOUBLE_EQ(20, fs1->getFreeSpace());
     fs1->incrementNumRunningTransactionsForFileInDirectory(file_80, "/files");// coverage
     fs1->decrementNumRunningTransactionsForFileInDirectory(file_80, "/files");// coverage
@@ -110,7 +108,7 @@ void LogicalFileSystemTest::do_BasicTests() {
     fs1->removeFileFromDirectory(file_80, "/files/");
     ASSERT_DOUBLE_EQ(100, fs1->getFreeSpace());
 
-    fs1->storeFileInDirectory(file_50, "/faa", true);
+    fs1->storeFileInDirectory(file_50, "/faa");
     fs1->removeAllFilesInDirectory("/faa/");// coverage
 
 
@@ -148,7 +146,6 @@ void LogicalFileSystemTest::do_DevNullTests() {
 
     // Create a Logical File System
     auto fs1 = wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service.get(), "/dev/null");
-    fs1->init();
 
     auto file = wrench::Simulation::addFile("file", 1.0);
 
@@ -158,7 +155,7 @@ void LogicalFileSystemTest::do_DevNullTests() {
     ASSERT_TRUE(fs1->isDirectoryEmpty(("/foo")));
     ASSERT_FALSE(fs1->isFileInDirectory(file, "/foo"));
     fs1->removeEmptyDirectory("/foo");
-    fs1->storeFileInDirectory(file, "/foo", true);
+    fs1->storeFileInDirectory(file, "/foo");
     fs1->removeFileFromDirectory(file, "/foo");
     fs1->removeAllFilesInDirectory("/foo");
     ASSERT_TRUE(fs1->listFilesInDirectory("/foo").empty());
@@ -168,14 +165,13 @@ void LogicalFileSystemTest::do_DevNullTests() {
 
     // Create a Logical File System
     auto fs2 = wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service.get(), "/dev/null", "LRU");
-    fs2->init();
 
     fs2->createDirectory(("/foo"));
     ASSERT_FALSE(fs2->doesDirectoryExist(("/foo")));
     ASSERT_TRUE(fs2->isDirectoryEmpty(("/foo")));
     ASSERT_FALSE(fs2->isFileInDirectory(file, "/foo"));
     fs2->removeEmptyDirectory("/foo");
-    fs2->storeFileInDirectory(file, "/foo", true);
+    fs2->storeFileInDirectory(file, "/foo");
     fs2->removeFileFromDirectory(file, "/foo");
     fs2->removeAllFilesInDirectory("/foo");
     ASSERT_TRUE(fs2->listFilesInDirectory("/foo").empty());
@@ -216,7 +212,6 @@ void LogicalFileSystemTest::do_LRUTests() {
 
     // Create a Logical File System with LRU eviction
     auto fs1 = wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service.get(), "/tmp", "LRU");
-    fs1->init();
 
     auto file_60 = wrench::Simulation::addFile("file_60", 60);
     auto file_50 = wrench::Simulation::addFile("file_50", 50);
@@ -228,9 +223,9 @@ void LogicalFileSystemTest::do_LRUTests() {
     fs1->createDirectory(("/foo"));
     ASSERT_TRUE(fs1->reserveSpace(file_60, "/foo"));
     ASSERT_FALSE(fs1->reserveSpace(file_50, "/foo"));
-    fs1->storeFileInDirectory(file_60, "/foo", true);
+    fs1->storeFileInDirectory(file_60, "/foo");
     ASSERT_DOUBLE_EQ(40, fs1->getFreeSpace());
-    fs1->storeFileInDirectory(file_10, "/foo", true);
+    fs1->storeFileInDirectory(file_10, "/foo");
     ASSERT_DOUBLE_EQ(30, fs1->getFreeSpace());
 
     ASSERT_TRUE(fs1->reserveSpace(file_50, "/foo"));
@@ -238,7 +233,7 @@ void LogicalFileSystemTest::do_LRUTests() {
     ASSERT_FALSE(fs1->isFileInDirectory(file_60, "/foo"));
     // Check that file_10 is still there evicted
     ASSERT_TRUE(fs1->isFileInDirectory(file_10, "/foo"));
-    fs1->storeFileInDirectory(file_50, "/foo", true);
+    fs1->storeFileInDirectory(file_50, "/foo");
     ASSERT_DOUBLE_EQ(40, fs1->getFreeSpace());
 
     // At this point the content is:
@@ -248,7 +243,7 @@ void LogicalFileSystemTest::do_LRUTests() {
     ASSERT_TRUE(fs1->reserveSpace(other_file_50, "/foo"));
     ASSERT_TRUE(fs1->isFileInDirectory(file_10, "/foo"));
     ASSERT_FALSE(fs1->isFileInDirectory(file_50, "/foo"));
-    fs1->storeFileInDirectory(other_file_50, "/foo", true);
+    fs1->storeFileInDirectory(other_file_50, "/foo");
     fs1->updateReadDate(other_file_50, "/foo");
     fs1->updateReadDate(other_file_50, "/faa");// coverage
 
@@ -267,12 +262,11 @@ void LogicalFileSystemTest::do_LRUTests() {
     ASSERT_DOUBLE_EQ(fs1->getFreeSpace(), 40);
 
 
-    fs1->removeFileFromDirectory(file_10, "/foo");   // coverage
-    fs1->storeFileInDirectory(file_10, "/foo", true);// coverage
-    fs1->removeAllFilesInDirectory("/foo");          // coverage
+    fs1->removeFileFromDirectory(file_10, "/foo");// coverage
+    fs1->storeFileInDirectory(file_10, "/foo");   // coverage
+    fs1->removeAllFilesInDirectory("/foo");       // coverage
 
-    fs1->storeFileInDirectory(file_10, "/faa", true);// coverage
-
+    fs1->storeFileInDirectory(file_10, "/faa");// coverage
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

@@ -72,8 +72,8 @@ namespace wrench {
             auto work = gflop_dist(rng);
             // Create input file
             auto input_file = wrench::Simulation::addFile("input_file_" + std::to_string(i), mb_dist(rng));
-            // Create a copy of the input file on the storage service
-            wrench::Simulation::createFile(wrench::FileLocation::LOCATION(this->storage_service, input_file));
+            // Create a copy of the input file on the storage service (takes zero simulation time)
+            wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(this->storage_service, input_file));
             auto output_file = wrench::Simulation::addFile("output_file_" + std::to_string(i), mb_dist(rng));
             action_specs.emplace_back(work, input_file, output_file);
         }

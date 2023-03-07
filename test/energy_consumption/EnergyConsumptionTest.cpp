@@ -275,7 +275,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyApiAccessExceptionsTestWMS(
                                     this, hostname)));
@@ -431,7 +431,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyApiAccessExceptionsPluginNotActiveTestWMS(
                                     this, hostname)));
@@ -548,7 +548,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyConsumptionTestWMS(
                                     this, hostname)));
@@ -689,7 +689,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyAPICheckTestWMS(
                                     this, hostname)));
@@ -857,7 +857,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyConsumptionPStateChangeTestWMS(
                                     this, hostname)));
@@ -952,7 +952,7 @@ void EnergyConsumptionTest::do_PluginNotActive_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new PluginNotActivatedTestWMS(this, hostname)));
 

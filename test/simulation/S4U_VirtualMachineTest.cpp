@@ -176,7 +176,7 @@ void S4U_VirtualMachineTest::do_basic_Test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new S4U_VirtualMachineTestWMS(
                                     this, hostname)));

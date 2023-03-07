@@ -23,7 +23,7 @@ echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/job-action-failure/wrench-exampl
 ${INSTALL_DIR}/action_api/job-action-failure/wrench-example-job-action-failure ${INSTALL_DIR}/action_api/job-action-failure/four_hosts.xml
 
 echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/super-custom-action/wrench-example-super-custom-action${normal}"
-${INSTALL_DIR}/action_api/super-custom-action/wrench-example-super-custom-action ${INSTALL_DIR}/action_api/super-custom-action/four_hosts.xml 
+${INSTALL_DIR}/action_api/super-custom-action/wrench-example-super-custom-action ${INSTALL_DIR}/action_api/super-custom-action/seven_hosts.xml
 
 echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-chain/wrench-example-bare-metal-chain${normal}"
 ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-chain/wrench-example-bare-metal-chain 10 ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-chain/two_hosts.xml
@@ -69,5 +69,11 @@ ${INSTALL_DIR}/workflow_api/condor-grid-example/wrench-example-condor-grid-unive
 
 echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/XRootD/wrench-example-xrootd-basic xrootd_platform.xml${normal}"
 ${INSTALL_DIR}/action_api/XRootD/wrench-example-xrootd-basic ${INSTALL_DIR}/action_api/XRootD/xrootd_platform.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/storage-service-proxy/wrench-example-storage-service-proxy-basic proxy_platform.xml${normal}"
+${INSTALL_DIR}/action_api/storage-service-proxy/wrench-example-storage-service-proxy-basic ${INSTALL_DIR}/action_api/storage-service-proxy/proxy_platform.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/communicating-custom-actions/wrench-example-communicating-actions dragonfly_cluster.xml${normal}"
+${INSTALL_DIR}/action_api/communicating-custom-actions/wrench-example-communicating-actions ${INSTALL_DIR}/action_api/communicating-custom-actions/dragonfly_cluster.xml
 
 

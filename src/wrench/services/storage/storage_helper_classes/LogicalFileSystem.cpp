@@ -21,7 +21,7 @@ WRENCH_LOG_CATEGORY(wrench_core_logical_file_system, "Log category for Logical F
 namespace wrench {
 
     const std::string LogicalFileSystem::DEV_NULL = "/dev/null";
-    std::map<std::string, StorageService *> LogicalFileSystem::mount_points;
+    std::set<std::string> LogicalFileSystem::mount_points;
 
     /**
      * @brief Method to create a LogicalFileSystem instance
@@ -40,6 +40,18 @@ namespace wrench {
             throw std::invalid_argument("LogicalFileSystem::createLogicalFileSystem(): nullptr storage_service argument");
         }
 
+        // Check for uniqueness
+        auto key = hostname + ":" + mount_point;
+        if (mount_point != DEV_NULL) {
+            auto lfs = LogicalFileSystem::mount_points.find(key);
+
+            if (lfs != LogicalFileSystem::mount_points.end()) {
+                throw std::invalid_argument("LogicalFileSystem::createLogicalFileSystem(): A logical file system, used by some storage service, "
+                                            "already exist on host " +
+                                            hostname + " at mount point " + mount_point);
+            }
+        }
+
         //        std::cerr << "CREATING LOGICAL FS " << hostname << ":" << mount_point << "\n";
         std::unique_ptr<LogicalFileSystem> to_return;
         if (eviction_policy == "NONE") {
@@ -49,6 +61,8 @@ namespace wrench {
         } else {
             throw std::invalid_argument("LogicalFileSystem::createLogicalFileSystem(): Unknown cache eviction policy " + eviction_policy);
         }
+        LogicalFileSystem::mount_points.insert(key);
+
         //        std::cerr << "CREATED LOGICAL FS " << hostname << ":" << mount_point << "\n";
         return to_return;
     }
@@ -67,7 +81,6 @@ namespace wrench {
         this->storage_service = storage_service;
         this->content["/"] = {};
 
-        this->initialized = false;
         if (mount_point == DEV_NULL) {
             devnull = true;
             this->total_capacity = std::numeric_limits<double>::infinity();
@@ -87,37 +100,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Initializes the Logical File System (must be called before any other operation on this file system)
-     */
-    void LogicalFileSystem::init() {
-
-        // Check uniqueness
-        auto key = this->hostname + ":" + this->mount_point;
-        //        std::cerr << "CALLING INIT ON " << key << "\n";
-
-        auto lfs = LogicalFileSystem::mount_points.find(key);
-
-        if (lfs != LogicalFileSystem::mount_points.end() && mount_point != DEV_NULL) {
-            if (lfs->second == this->storage_service) {
-                throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem " + key + " already exists");
-            } else {
-                return;
-            }
-        } else {
-            LogicalFileSystem::mount_points[key] = this->storage_service;
-            this->initialized = true;
-        }
-    }
-
-    /**
-     * @brief Determine whether the file system has been initialized
-     * @return true or false
-     */
-    bool LogicalFileSystem::isInitialized() {
-        return this->initialized;
-    }
-
-    /**
      * @brief Create a new directory
      *
      * @param absolute_path: the directory's absolute path
@@ -127,7 +109,6 @@ namespace wrench {
         if (devnull) {
             return;
         }
-        //        assertInitHasBeenCalled();
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
         assertDirectoryDoesNotExist(fixed_path);
         this->content[fixed_path] = {};
@@ -142,7 +123,6 @@ namespace wrench {
         if (devnull) {
             return false;
         }
-        //        assertInitHasBeenCalled();
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
         return (this->content.find(fixed_path) != this->content.end());
     }
@@ -158,24 +138,22 @@ namespace wrench {
         if (devnull) {
             return true;
         }
-        assertInitHasBeenCalled();
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
         assertDirectoryExist(fixed_path);
         return (this->content[fixed_path].empty());
     }
 
     /**
- * @brief Remove an empty directory
- * @param absolute_path: the directory's absolute path
- *
- * @throw std::invalid_argument
- */
+     * @brief Remove an empty directory
+     * @param absolute_path: the directory's absolute path
+     *
+     * @throw std::invalid_argument
+     */
     void LogicalFileSystem::removeEmptyDirectory(const std::string &absolute_path) {
         if (devnull) {
             return;
         }
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
-        assertInitHasBeenCalled();
         assertDirectoryExist(fixed_path);
         assertDirectoryIsEmpty(fixed_path);
         this->content.erase(fixed_path);
@@ -195,7 +173,6 @@ namespace wrench {
         if (devnull) {
             return false;
         }
-        assertInitHasBeenCalled();
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
         // If directory does not exist, say "no"
@@ -219,7 +196,6 @@ namespace wrench {
         if (devnull) {
             return {};
         }
-        assertInitHasBeenCalled();
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
         assertDirectoryExist(fixed_path);
@@ -233,27 +209,15 @@ namespace wrench {
  * @brief Get the total capacity
  * @return the total capacity
  */
-    double LogicalFileSystem::getTotalCapacity() {
-        assertInitHasBeenCalled();
+    double LogicalFileSystem::getTotalCapacity() const {
         return this->total_capacity;
     }
-
-    //    /**
-    // * @brief Checks whether there is enough space to store some number of bytes
-    // * @param bytes: a number of bytes
-    // * @return true if the number of bytes can fit
-    // */
-    //    bool LogicalFileSystem::hasEnoughFreeSpace(double bytes) {
-    //        assertInitHasBeenCalled();
-    //        return (this->free_space >= bytes);
-    //    }
 
     /**
      * @brief Get the file system's free space
      * @return the free space in bytes
      */
-    double LogicalFileSystem::getFreeSpace() {
-        assertInitHasBeenCalled();
+    double LogicalFileSystem::getFreeSpace() const {
         return this->free_space;
     }
 
@@ -270,7 +234,6 @@ namespace wrench {
             return true;
         }
 
-        assertInitHasBeenCalled();
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
 
@@ -298,14 +261,14 @@ namespace wrench {
      * @param absolute_path: the path where it would have been written
      * @throw std::invalid_argument
      */
-    void LogicalFileSystem::unreserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
-        if (devnull) {
+    void LogicalFileSystem::unreserveSpace(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
+
+        if (this->devnull) {
             return;
         }
-        assertInitHasBeenCalled();
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
-        std::string key = FileLocation::sanitizePath(std::move(fixed_path)) + file->getID();
+        std::string key = FileLocation::sanitizePath(fixed_path) + file->getID();
 
         if (this->reserved_space.find(key) == this->reserved_space.end()) {
             return;// oh well, the transfer was cancelled/terminated/whatever
@@ -327,7 +290,6 @@ namespace wrench {
         if (devnull) {
             return -1;
         }
-        assertInitHasBeenCalled();
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
         // If directory does not exist, say "no"
@@ -374,7 +336,7 @@ namespace wrench {
 
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
-        this->storeFileInDirectory(file, fixed_path, false);
+        this->storeFileInDirectory(file, fixed_path);
     }
 
 }// namespace wrench

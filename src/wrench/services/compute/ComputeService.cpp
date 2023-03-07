@@ -64,19 +64,14 @@ namespace wrench {
         }
 
         // Wait for the ack
-        std::unique_ptr<SimulationMessage> message = nullptr;
-
         try {
-            message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
-        } catch (ExecutionException &e) {
+            S4U_Mailbox::getMessage<ServiceDaemonStoppedMessage>(
+                    ack_mailbox,
+                    this->network_timeout,
+                    "ComputeService::stop(): Received an");
+        } catch (...) {
             this->shutting_down = false;
             throw;
-        }
-
-        if (dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
-            this->state = Service::DOWN;
-        } else {
-            throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
         }
 
         // Set the service state to down
@@ -152,22 +147,34 @@ namespace wrench {
                                    const std::string &service_name,
                                    const std::string &scratch_space_mount_point) : Service(hostname, service_name) {
         this->state = ComputeService::UP;
+        // Check that mount point makes sense
+        if ((not scratch_space_mount_point.empty()) and (not Simulation::hostHasMountPoint(hostname, scratch_space_mount_point))) {
+            throw std::invalid_argument("ComputeService::ComputeService(): Host " + hostname + " does not have a disk mounted at " + scratch_space_mount_point);
+        }
+        this->scratch_space_mount_point = scratch_space_mount_point;
+    }
 
-        if (not scratch_space_mount_point.empty()) {
-            double buffer_size = 10000000;// TODO: Make this configurable?
-            try {
-                this->scratch_space_storage_service =
-                        std::shared_ptr<StorageService>(
-                                SimpleStorageService::createSimpleStorageService(hostname, {scratch_space_mount_point},
-                                                                                 {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {}));
-                this->scratch_space_storage_service->setScratch();
-                this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(
-                        this->scratch_space_storage_service);
-            } catch (std::runtime_error &e) {
-                throw;
-            }
-        } else {
-            this->scratch_space_storage_service = nullptr;
+    /**
+     * @brief Start the compute service's scratch space service
+     */
+    void ComputeService::startScratchStorageService() {
+        if (this->scratch_space_storage_service) return;    // Already started by somebody else
+        if (this->scratch_space_mount_point.empty()) return;// No mount point provided
+
+        double buffer_size = 1000000000;// TODO: Make this configurable?
+        try {
+
+            auto ss = SimpleStorageService::createSimpleStorageService(
+                    hostname,
+                    {scratch_space_mount_point},
+                    {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {});
+
+            ss->setIsScratch(true);
+            this->scratch_space_storage_service =
+                    this->simulation->startNewService(ss);
+
+        } catch (std::runtime_error &e) {
+            throw;
         }
     }
 
@@ -377,17 +384,12 @@ namespace wrench {
                                                                ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "BareMetalComputeService::isThereAtLeastOneHostWithIdleResources(): received an");
 
-        if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage *>(message.get())) {
-            return msg->answer;
-
-        } else {
-            throw std::runtime_error(
-                    "BareMetalComputeService::isThereAtLeastOneHostWithIdleResources(): unexpected [" + message->getName() +
-                    "] message");
-        }
+        return msg->answer;
     }
 
     /**
@@ -456,17 +458,11 @@ namespace wrench {
                                                                ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        if (auto msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage *>(message.get())) {
-            return msg->info;
-
-        } else {
-            throw std::runtime_error(
-                    "BareMetalComputeService::getServiceResourceInformation(): unexpected [" + message->getName() +
-                    "] message");
-        }
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceResourceInformationAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "BareMetalComputeService::getServiceResourceInformation(): received an");
+        return msg->info;
     }
 
     /**
@@ -475,7 +471,7 @@ namespace wrench {
      */
     double ComputeService::getTotalScratchSpaceSize() {
         // A scratch space SS is always created with a single mount point
-        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace().begin()->second : 0.0;
+        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
     }
 
     /**
@@ -483,8 +479,7 @@ namespace wrench {
      * @return a size (in bytes)
      */
     double ComputeService::getFreeScratchSpaceSize() {
-        // A scratch space SS is always created with a single mount point
-        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace().begin()->second : 0.0;
+        return this->scratch_space_storage_service->getTotalFreeSpace();
     }
 
     /**
@@ -495,20 +490,20 @@ namespace wrench {
         return this->scratch_space_storage_service;
     }
 
-    /**
-    * @brief Get a shared pointer to the compute service's scratch storage space
-    * @return a shared pointer to the shared scratch space
-    */
-    std::shared_ptr<StorageService> ComputeService::getScratchSharedPtr() {
-        return this->scratch_space_storage_service_shared_ptr;
-    }
+    //    /**
+    //    * @brief Get a shared pointer to the compute service's scratch storage space
+    //    * @return a shared pointer to the shared scratch space
+    //    */
+    //    std::shared_ptr<StorageService> ComputeService::getScratchSharedPtr() {
+    //        return this->scratch_space_storage_service_shared_ptr;
+    //    }
 
     /**
     * @brief Checks if the compute service has a scratch space
     * @return true if the compute service has some scratch storage space, false otherwise
     */
     bool ComputeService::hasScratch() const {
-        return (this->scratch_space_storage_service != nullptr);
+        return (not this->scratch_space_mount_point.empty()) or (this->scratch_space_storage_service != nullptr);
     }
 
     /**
@@ -528,7 +523,7 @@ namespace wrench {
      */
     void ComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
         if (not this->hasScratch()) {
-            throw std::invalid_argument("Compute service does not have scratch space");
+            throw std::invalid_argument("Compute service (" + this->getName() + ") does not have scratch space");
         }
     }
 
