@@ -174,10 +174,6 @@ int main(int argc, char **argv) {
     WRENCH_INFO("Simulation done: %.2lf\n", wrench::Simulation::getCurrentSimulatedDate());
     std::cerr << wrench::Simulation::getCurrentSimulatedDate() << "\n";
 
-    std::cerr << "CLEARING STORAGE SERCVICES\n";
-    std::cerr << "REF COUNT = " << (*storage_services.begin())->getName() << " " << (*storage_services.begin()).use_count() << "\n";
-    storage_services.clear();
-    std::cerr << "CLEARED STORAGE SERCVICES\n";
 
     simulation = nullptr;
 
