@@ -83,9 +83,7 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
-        this->printRefCounts("IN SIM DEST");
         this->s4u_simulation->shutdown();
-        this->compute_services.clear();
     }
 
     /**
@@ -524,7 +522,6 @@ namespace wrench {
             throw;
         }
 
-        std::cerr << "INSIDE LANCH = " << (*this->compute_services.begin())->getName() << " " << (*this->compute_services.begin()).use_count() << "\n";
     }
 
     /**
@@ -565,8 +562,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Simulation::startAllProcesses() {
-
-        printRefCounts("BEFORE START ALL PROCESSES");
 
         try {
             // Start the execution controllers
@@ -611,7 +606,6 @@ namespace wrench {
         } catch (std::runtime_error &e) {
             throw;
         }
-        printRefCounts("AFTER START ALL PROCESSES");
 
     }
 

@@ -125,12 +125,10 @@ namespace wrench {
      * @brief Delete the daemon's life-saver (use at your own risks, if your not the Simulation class)
      */
     void S4U_Daemon::deleteLifeSaver() {
-        std::cerr << "IN DELETE LIFE SAVER " << this->getName() << "\n";
         if (this->life_saver) {
             // Necessary so that the Actor destructor
             // happens before the simulation engine shutdowns
             this->s4u_actor = nullptr;
-            std::cerr << "  DOING THE DELETE" << this->getName() << "\n";
             auto life_saver_ref = this->life_saver;
             this->life_saver = nullptr;
             delete life_saver_ref;
@@ -149,9 +147,6 @@ namespace wrench {
      * @throw std::shared_ptr<HostError>
      */
     void S4U_Daemon::startDaemon(bool daemonized, bool auto_restart) {
-
-        this->simulation->printRefCounts("BEFORE STARTING DAEMON " + this->getName());
-
 
         // Check that there is a lifesaver
         if (not this->life_saver) {
@@ -208,8 +203,6 @@ namespace wrench {
             }
         }
 
-        this->simulation->printRefCounts("AFTER STARTING DAEMON " + this->getName());
-
         // Set the mailbox receiver
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
         this->mailbox->set_receiver(this->s4u_actor);
@@ -236,7 +229,6 @@ namespace wrench {
 #ifdef MESSAGE_MANAGER
               MessageManager::cleanUpMessages(this->mailbox_name);
 #endif
-              std::cerr << "CALLING DELETE LIFE SAVER ON: " << this->getName() << "\n";
               this->deleteLifeSaver();
           }
           return 0;
