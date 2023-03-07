@@ -83,8 +83,6 @@ namespace wrench {
     }
 
     S4U_Daemon::~S4U_Daemon() {
-        //        std::cerr << "IN DAEMON DESTRUCTOR: " << this->process_name << "\n";
-
         WRENCH_DEBUG("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
 #ifdef ACTOR_TRACKING_OUTPUT
