@@ -20,14 +20,11 @@ namespace wrench {
 
     public:
 
-        ~StressTestActionAPIController() {
-            this->compute_services.clear();
-            this->storage_services.clear();
+//        ~StressTestActionAPIController() {
+//            this->compute_services.clear();
+//            this->storage_services.clear();
+//        }
 
-        }
-
-        //ExecutionController(hostname,"one-task-at-a-time"),
-        //                                         workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service)
         StressTestActionAPIController(std::set<std::shared_ptr<ComputeService>> compute_services,
                                       std::set<std::shared_ptr<StorageService>> storage_services,
                                       std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services,
