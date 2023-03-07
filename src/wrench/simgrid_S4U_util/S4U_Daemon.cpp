@@ -79,11 +79,11 @@ namespace wrench {
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
         this->has_returned_from_main = false;
 
-//        std::cerr << "IN DAEMON CONSTRUCTOR: " << this->process_name << "\n";
+        //        std::cerr << "IN DAEMON CONSTRUCTOR: " << this->process_name << "\n";
     }
 
     S4U_Daemon::~S4U_Daemon() {
-//        std::cerr << "IN DAEMON DESTRUCTOR: " << this->process_name << "\n";
+        //        std::cerr << "IN DAEMON DESTRUCTOR: " << this->process_name << "\n";
 
         WRENCH_DEBUG("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
@@ -214,24 +214,23 @@ namespace wrench {
      */
     void S4U_Daemon::setupOnExitFunction() {
         this->s4u_actor->on_exit([this](bool failed) {
-
-          if (not this->daemonized) {
-              S4U_Daemon::num_non_daemonized_actors_running--;
-          }
-//          std::cerr << "*** NUM_NON_DAEMIONIZED_ACTORS_RUNNING = " << S4U_Daemon::num_non_daemonized_actors_running << "\n";
-          // Set state to down
-          this->state = S4U_Daemon::State::DOWN;
-          // Call cleanup
-          this->cleanup(this->hasReturnedFromMain(), this->getReturnValue());
-          // Free memory_manager_service for the object unless the service is set to auto-restart
-          if ((S4U_Daemon::num_non_daemonized_actors_running == 0) or (not this->isSetToAutoRestart())) {
+            if (not this->daemonized) {
+                S4U_Daemon::num_non_daemonized_actors_running--;
+            }
+            //          std::cerr << "*** NUM_NON_DAEMIONIZED_ACTORS_RUNNING = " << S4U_Daemon::num_non_daemonized_actors_running << "\n";
+            // Set state to down
+            this->state = S4U_Daemon::State::DOWN;
+            // Call cleanup
+            this->cleanup(this->hasReturnedFromMain(), this->getReturnValue());
+            // Free memory_manager_service for the object unless the service is set to auto-restart
+            if ((S4U_Daemon::num_non_daemonized_actors_running == 0) or (not this->isSetToAutoRestart())) {
 //                Service::increaseNumCompletedServicesCount();
 #ifdef MESSAGE_MANAGER
-              MessageManager::cleanUpMessages(this->mailbox_name);
+                MessageManager::cleanUpMessages(this->mailbox_name);
 #endif
-              this->deleteLifeSaver();
-          }
-          return 0;
+                this->deleteLifeSaver();
+            }
+            return 0;
         });
     }
 

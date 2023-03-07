@@ -37,7 +37,7 @@ namespace wrench {
      * @brief Destructor
      */
     Service::~Service() {
-//        std::cerr << "IN SERVICE DESTRUCTOR: " << this->getName() << "\n";
+        //        std::cerr << "IN SERVICE DESTRUCTOR: " << this->getName() << "\n";
         //        WRENCH_INFO("IN SERVICE DESTRUCTOR: %s", this->getName().c_str());
     }
 
