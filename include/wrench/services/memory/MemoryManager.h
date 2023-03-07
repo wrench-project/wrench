@@ -125,6 +125,4 @@ namespace wrench {
 
 }// namespace wrench
 
-#endif //WRENCH_MEMORYMANAGER_H
-
-
+#endif//WRENCH_MEMORYMANAGER_H
