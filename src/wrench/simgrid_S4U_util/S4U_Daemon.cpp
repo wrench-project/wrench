@@ -30,6 +30,7 @@ std::unordered_map<std::string, unsigned long> num_actors;
 namespace wrench {
 
     std::unordered_map<aid_t, simgrid::s4u::Mailbox *> S4U_Daemon::map_actor_to_recv_mailbox;
+    int S4U_Daemon::num_non_daemonized_actors_running = 0;
 
     /**
      * @brief Constructor (daemon with a mailbox)
@@ -77,6 +78,8 @@ namespace wrench {
         this->recv_mailbox = S4U_Mailbox::generateUniqueMailbox("rmb");
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
         this->has_returned_from_main = false;
+
+        //        std::cerr << "IN DAEMON CONSTRUCTOR: " << this->process_name << "\n";
     }
 
     S4U_Daemon::~S4U_Daemon() {
@@ -118,6 +121,22 @@ namespace wrench {
     }
 
     /**
+     * @brief Delete the daemon's life-saver (use at your own risks, if your not the Simulation class)
+     */
+    void S4U_Daemon::deleteLifeSaver() {
+        if (this->life_saver) {
+            // Necessary so that the Actor destructor
+            // happens before the simulation engine shutdowns
+            this->s4u_actor = nullptr;
+            auto life_saver_ref = this->life_saver;
+            this->life_saver = nullptr;
+            delete life_saver_ref;
+            // At this point the destructor may have be called,
+            // so we can no longer access variables safely.
+        }
+    }
+
+    /**
      * @brief Start the daemon
      *
      * @param daemonized: whether the S4U actor should be daemonized
@@ -127,6 +146,7 @@ namespace wrench {
      * @throw std::shared_ptr<HostError>
      */
     void S4U_Daemon::startDaemon(bool daemonized, bool auto_restart) {
+
         // Check that there is a lifesaver
         if (not this->life_saver) {
             throw std::runtime_error(
@@ -168,10 +188,13 @@ namespace wrench {
         // terminate immediately. This is a weird simgrid::s4u behavior/bug, that may be
         // fixed at some point, but this test saves us for now.
         if (not this->has_returned_from_main) {
+
             this->setupOnExitFunction();
 
             if (this->daemonized) {
                 this->s4u_actor->daemonize();
+            } else {
+                S4U_Daemon::num_non_daemonized_actors_running++;
             }
 
             if (this->auto_restart) {
@@ -190,20 +213,21 @@ namespace wrench {
      */
     void S4U_Daemon::setupOnExitFunction() {
         this->s4u_actor->on_exit([this](bool failed) {
+            if (not this->daemonized) {
+                S4U_Daemon::num_non_daemonized_actors_running--;
+            }
+            //          std::cerr << "*** NUM_NON_DAEMIONIZED_ACTORS_RUNNING = " << S4U_Daemon::num_non_daemonized_actors_running << "\n";
             // Set state to down
             this->state = S4U_Daemon::State::DOWN;
             // Call cleanup
             this->cleanup(this->hasReturnedFromMain(), this->getReturnValue());
-
             // Free memory_manager_service for the object unless the service is set to auto-restart
-            if (not this->isSetToAutoRestart()) {
-                auto life_saver_ref = this->life_saver;
-                this->life_saver = nullptr;
+            if ((S4U_Daemon::num_non_daemonized_actors_running == 0) or (not this->isSetToAutoRestart())) {
 //                Service::increaseNumCompletedServicesCount();
 #ifdef MESSAGE_MANAGER
                 MessageManager::cleanUpMessages(this->mailbox_name);
 #endif
-                delete life_saver_ref;
+                this->deleteLifeSaver();
             }
             return 0;
         });

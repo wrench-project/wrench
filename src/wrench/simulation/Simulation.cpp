@@ -84,7 +84,6 @@ namespace wrench {
      */
     Simulation::~Simulation() {
         this->s4u_simulation->shutdown();
-        this->compute_services.clear();
     }
 
     /**
@@ -231,7 +230,8 @@ namespace wrench {
 
         *argc = 0;
         for (const auto &a: cleanedup_args) {
-            //free(argv[(*argc)]);//you cant free the base args, so no one is going to try to free ours.  This is just going to have to stay a memory leak
+            //free(argv[(*argc)]);//you cant free the base args, so no one is going to try to free ours.
+            //This is just going to have to stay a memory leak
             argv[(*argc)] = strdup(a.c_str());
             (*argc)++;
         }
@@ -513,9 +513,11 @@ namespace wrench {
             this->is_running = true;
             this->s4u_simulation->runSimulation();
             wrench::FileLocation::file_location_map.clear();
+            //            Service::deleteLifeSaversOfAutorestartServices();
             this->is_running = false;
         } catch (std::runtime_error &e) {
             wrench::FileLocation::file_location_map.clear();
+            //            Service::deleteLifeSaversOfAutorestartServices();
             this->is_running = false;
             throw;
         }
@@ -559,6 +561,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Simulation::startAllProcesses() {
+
         try {
             // Start the execution controllers
             for (const auto &execution_controller: this->execution_controllers) {
@@ -574,6 +577,7 @@ namespace wrench {
             for (const auto &storage_service: this->storage_services) {
                 storage_service->start(storage_service, true, true);// Daemonized, AUTO-RESTART
             }
+
 
             //            // Start the scratch services
             //            for (const auto &compute_service: this->compute_services) {

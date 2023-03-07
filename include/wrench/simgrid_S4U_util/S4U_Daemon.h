@@ -68,6 +68,7 @@ namespace wrench {
         void startDaemon(bool _daemonized, bool _auto_restart);
 
         void createLifeSaver(std::shared_ptr<S4U_Daemon> reference);
+        void deleteLifeSaver();
 
         virtual void cleanup(bool has_returned_from_main, int return_value);
 
@@ -147,6 +148,8 @@ namespace wrench {
         int return_value = 0;               // Set to the value returned by main
         bool daemonized{};                  // Set to true if daemon is daemonized
         bool auto_restart{};                // Set to true if daemon is supposed to auto-restart
+
+        static int num_non_daemonized_actors_running;
 
 
 #ifdef ACTOR_TRACKING_OUTPUT

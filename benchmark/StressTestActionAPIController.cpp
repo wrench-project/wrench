@@ -16,17 +16,20 @@ namespace wrench {
 
     int StressTestActionAPIController::main() {
 
+#if 0
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
         unsigned long max_num_pending_jobs = 10;
         unsigned long num_pending_jobs = 0;
         unsigned long num_completed_jobs = 0;
 
+
         while (num_completed_jobs < num_jobs) {
 
-            while (num_pending_jobs < max_num_pending_jobs) {
+            while ((num_pending_jobs < max_num_pending_jobs) and (num_pending_jobs + num_completed_jobs < num_jobs)) {
 
                 WRENCH_INFO("Creating a new job");
+
                 auto job = job_manager->createCompoundJob("job_" + std::to_string(num_completed_jobs));
 
                 // Pick a random compute
@@ -52,7 +55,7 @@ namespace wrench {
                 num_pending_jobs++;
             }
 
-            std::shared_ptr <wrench::ExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             event = this->waitForNextEvent();
             if (auto real_event = dynamic_cast<wrench::CompoundJobCompletedEvent *>(event.get())) {
                 auto job = real_event->job;
@@ -60,21 +63,22 @@ namespace wrench {
                 num_completed_jobs++;
                 num_pending_jobs--;
                 // Erase the files
-                for (auto const &action : job->getActions()) {
+                for (auto const &action: job->getActions()) {
                     if (std::dynamic_pointer_cast<FileReadAction>(action)) {
                         StorageService::removeFileAtLocation(std::dynamic_pointer_cast<FileReadAction>(action)->getFileLocations().at(0));
                     } else if (std::dynamic_pointer_cast<FileWriteAction>(action)) {
                         StorageService::removeFileAtLocation(std::dynamic_pointer_cast<FileWriteAction>(action)->getFileLocation());
                     }
                 }
+
             } else if (auto real_event = dynamic_cast<wrench::CompoundJobFailedEvent *>(event.get())) {
                 throw std::runtime_error(real_event->failure_cause->toString());
             } else {
                 throw std::runtime_error("Got an unexpected event!");
             }
         }
-
+#endif
         return 0;
     }
 
-};
+};// namespace wrench

@@ -19,32 +19,31 @@ namespace wrench {
     class StressTestActionAPIController : public ExecutionController {
 
     public:
-//ExecutionController(hostname,"one-task-at-a-time"),
-//                                         workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service)
-        StressTestActionAPIController(const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                        const std::set<std::shared_ptr<StorageService>> &storage_services,
-                                        const std::set<std::shared_ptr<NetworkProximityService>> &network_proximity_services,
-                                        std::shared_ptr<FileRegistryService> file_registry_service,
-                                        int num_jobs,
-                                        const std::string &hostname) :
-                ExecutionController(hostname,"stresstestwms"),
-                compute_services(compute_services),
-                storage_services(storage_services),
-                network_proximity_services(network_proximity_services),
-                file_registry_service(std::move(file_registry_service)),
-                num_jobs(num_jobs) {}
+        //        ~StressTestActionAPIController() {
+        //            this->compute_services.clear();
+        //            this->storage_services.clear();
+        //        }
+
+        StressTestActionAPIController(std::set<std::shared_ptr<ComputeService>> compute_services,
+                                      std::set<std::shared_ptr<StorageService>> storage_services,
+                                      std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services,
+                                      int num_jobs,
+                                      const std::string &hostname) : ExecutionController(hostname, "stresstestwms"),
+                                                                     compute_services(std::move(compute_services)),
+                                                                     storage_services(std::move(storage_services)),
+                                                                     network_proximity_services(std::move(network_proximity_services)),
+                                                                     num_jobs(num_jobs) {}
 
         int main() override;
 
     private:
-        const std::set<std::shared_ptr<ComputeService>> &compute_services;
-        const std::set<std::shared_ptr<StorageService>> &storage_services;
-        const std::set<std::shared_ptr<NetworkProximityService>> &network_proximity_services;
-        const std::shared_ptr<FileRegistryService> file_registry_service;
+        std::set<std::shared_ptr<ComputeService>> compute_services;
+        std::set<std::shared_ptr<StorageService>> storage_services;
+        std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services;
         unsigned long num_jobs;
     };
 
-};
+};// namespace wrench
 
 
-#endif //STRESS_TEST_ACTION_API_CONTROLLER_H
+#endif//STRESS_TEST_ACTION_API_CONTROLLER_H

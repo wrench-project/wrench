@@ -135,6 +135,7 @@ namespace wrench {
         std::shared_ptr<DataFile> file;
         bool is_scratch;
 
+    public:// TODO MAKE PRIVATE AGAIN
         static std::unordered_map<std::string, std::shared_ptr<FileLocation>> file_location_map;
         static size_t file_location_map_previous_size;
     };

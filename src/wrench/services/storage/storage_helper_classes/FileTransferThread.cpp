@@ -234,7 +234,7 @@ namespace wrench {
                                      (dst_location ? dst_location->toString() : "nullptr") + ")");
         }
 
-        // Call retire on all mailboxes passed, which is pretty brute force be should work
+        // Call retire on all mailboxes passed, which is pretty brute force but should work
         if (this->dst_mailbox) {
             S4U_Mailbox::retireTemporaryMailbox(this->dst_mailbox);
         }

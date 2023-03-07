@@ -49,6 +49,7 @@ namespace wrench {
         // Do the default behavior (which will throw as this is not a fault-tolerant service)
         Service::cleanup(has_returned_from_main, return_value);
 
+        this->action_execution_service = nullptr; // to avoid leak due to circular refs
         this->current_jobs.clear();
         this->not_ready_actions.clear();
         this->ready_actions.clear();
