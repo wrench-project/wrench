@@ -37,6 +37,10 @@ namespace wrench {
     CompoundJob::CompoundJob(std::string name, std::shared_ptr<JobManager> job_manager)
         : Job(std::move(name), std::move(job_manager)),
           state(CompoundJob::State::NOT_SUBMITTED), priority(0.0) {
+        this->state_task_map[Action::State::NOT_READY] = {};
+        this->state_task_map[Action::State::COMPLETED] = {};
+        this->state_task_map[Action::State::KILLED] = {};
+        this->state_task_map[Action::State::FAILED] = {};
     }
 
     /**
@@ -517,11 +521,12 @@ namespace wrench {
      * @return true or false
      */
     bool CompoundJob::hasFailed() {
-        return (this->actions.size() ==
-                this->state_task_map[Action::State::NOT_READY].size() +
-                        this->state_task_map[Action::State::COMPLETED].size() +
-                        this->state_task_map[Action::State::KILLED].size() +
-                        this->state_task_map[Action::State::FAILED].size());
+        auto not_ready = this->state_task_map[Action::State::NOT_READY].size();
+        auto completed = this->state_task_map[Action::State::COMPLETED].size();
+        auto killed = this->state_task_map[Action::State::KILLED].size();
+        auto failed = this->state_task_map[Action::State::FAILED].size();
+
+        return (this->actions.size() == not_ready + completed + killed + failed) && (this->actions.size() != completed);
     }
 
     /**
