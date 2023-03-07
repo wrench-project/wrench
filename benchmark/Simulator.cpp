@@ -161,6 +161,7 @@ int main(int argc, char **argv) {
     simulation->getOutput().enableWorkflowTaskTimestamps(false);
     simulation->getOutput().enableFileReadWriteCopyTimestamps(false);
 
+
     // Launch the simulation
     try {
         WRENCH_INFO("Launching simulation!");
@@ -171,7 +172,6 @@ int main(int argc, char **argv) {
     }
 
     std::cerr << wrench::Simulation::getCurrentSimulatedDate() << "\n";
-
 
     return 0;
 }
