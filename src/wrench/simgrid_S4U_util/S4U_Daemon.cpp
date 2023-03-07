@@ -80,6 +80,7 @@ namespace wrench {
     }
 
     S4U_Daemon::~S4U_Daemon() {
+
         WRENCH_DEBUG("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
 #ifdef ACTOR_TRACKING_OUTPUT
@@ -205,7 +206,6 @@ namespace wrench {
             // Call cleanup
             this->cleanup(this->hasReturnedFromMain(), this->getReturnValue());
             // Free memory_manager_service for the object unless the service is set to auto-restart
-            std::cerr << "IN S4UDAMONE EXIT " << "\n";
             if (not this->isSetToAutoRestart()) {
 //                Service::increaseNumCompletedServicesCount();
 #ifdef MESSAGE_MANAGER
