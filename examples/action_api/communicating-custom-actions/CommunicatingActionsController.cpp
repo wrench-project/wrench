@@ -67,7 +67,7 @@ namespace wrench {
         auto communicator = wrench::Communicator::createCommunicator(COMMUNICATOR_SIZE);
 
         /* Now let's create all actions */
-        WRENCH_INFO("Adding %d actions (that will communicate with each other) to the job", COMMUNICATOR_SIZE);
+        WRENCH_INFO("Adding %lu actions (that will communicate with each other) to the job", COMMUNICATOR_SIZE);
         for (int i = 0; i < COMMUNICATOR_SIZE; i++) {
             auto lambda_execute = [communicator](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
                 auto my_rank = communicator->join();
@@ -79,14 +79,14 @@ namespace wrench {
                 for (unsigned long i = 0; i < SQRT_COMMUNICATOR_SIZE; i++) {
                     communicator->barrier();
                     if (my_rank == 0) {
-                        WRENCH_INFO("Iteration %d's computation phase begins...", i);
+                        WRENCH_INFO("Iteration %lu's computation phase begins...", i);
                     }
                     communicator->barrier();
                     double flops = 2 * std::pow<double>(BLOCK_SIZE, 3);
                     Simulation::compute(flops);
                     if (my_rank == 0) {
-                        WRENCH_INFO("Iteration %d's computation phase ended", i);
-                        WRENCH_INFO("Iteration %d's communication phase begins...", i);
+                        WRENCH_INFO("Iteration %lu's computation phase ended", i);
+                        WRENCH_INFO("Iteration %lu's communication phase begins...", i);
                     }
                     // Send messages to processes in my row and my column
                     std::map<unsigned long, double> sends;
@@ -101,7 +101,7 @@ namespace wrench {
                     }
                     communicator->sendAndReceive(sends, (SQRT_COMMUNICATOR_SIZE - 1) + (SQRT_COMMUNICATOR_SIZE - 1));
                     if (my_rank == 0) {
-                        WRENCH_INFO("Iteration %d's communication phase ended", i);
+                        WRENCH_INFO("Iteration %lu's communication phase ended", i);
                     }
                 }
                 communicator->barrier();
