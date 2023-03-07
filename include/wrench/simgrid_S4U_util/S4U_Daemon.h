@@ -149,6 +149,8 @@ namespace wrench {
         bool daemonized{};                  // Set to true if daemon is daemonized
         bool auto_restart{};                // Set to true if daemon is supposed to auto-restart
 
+        static int num_non_daemonized_actors_running;
+
 
 #ifdef ACTOR_TRACKING_OUTPUT
         std::string process_name_prefix;
