@@ -47,6 +47,18 @@ namespace wrench {
      */
     class Simulation {
     public:
+
+        void printRefCounts(std::string message) {
+            std::cerr << message << " SIMUALTION: CS\n";
+            for (auto const &cs : this->compute_services) {
+                std::cerr  << "    CS REFCOUNT: " << cs.use_count() - 1 << "\n";
+            }
+            std::cerr << message << " SIMUALTION: SS\n";
+            for (auto const &cs : this->storage_services) {
+                std::cerr << "    SS REFCOUNT: " << cs.use_count() - 1 << "\n";
+            }
+        }
+
         static std::shared_ptr<Simulation> createSimulation();
 
         ~Simulation();
