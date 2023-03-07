@@ -76,7 +76,7 @@ namespace wrench {
                 auto my_row = my_rank / SQRT_COMMUNICATOR_SIZE;
                 communicator->barrier();
                 WRENCH_INFO("I am an action with rank %lu in a communicator (row %lu / col %lu 2-D coordinates)", my_rank, my_row, my_col);
-                for (int i = 0; i < SQRT_COMMUNICATOR_SIZE; i++) {
+                for (unsigned long i = 0; i < SQRT_COMMUNICATOR_SIZE; i++) {
                     communicator->barrier();
                     if (my_rank == 0) {
                         WRENCH_INFO("Iteration %d's computation phase begins...", i);
@@ -91,7 +91,7 @@ namespace wrench {
                     // Send messages to processes in my row and my column
                     std::map<unsigned long, double> sends;
                     double message_size = std::pow<double>(BLOCK_SIZE, 2);
-                    for (int j = 0; j < SQRT_COMMUNICATOR_SIZE; j++) {
+                    for (unsigned long j = 0; j < SQRT_COMMUNICATOR_SIZE; j++) {
                         if (j != my_col) {
                             sends[my_row * SQRT_COMMUNICATOR_SIZE + j] = message_size;
                         }
