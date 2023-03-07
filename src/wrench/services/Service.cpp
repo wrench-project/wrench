@@ -496,14 +496,4 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Delete life savers of all services that were set to auto-restart,
-     * which should be performed after the simulation is over to avoid memory leaks
-     */
-    void Service::deleteLifeSaversOfAutorestartServices() {
-        for (auto const &s: Service::servicesSetToAutoRestart) {
-            s->deleteLifeSaver();
-        }
-    }
-
 }// namespace wrench

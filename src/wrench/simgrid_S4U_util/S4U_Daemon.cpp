@@ -79,11 +79,11 @@ namespace wrench {
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
         this->has_returned_from_main = false;
 
-        std::cerr << "IN DAEMON CONSTRUCTOR: " << this->process_name << "\n";
+//        std::cerr << "IN DAEMON CONSTRUCTOR: " << this->process_name << "\n";
     }
 
     S4U_Daemon::~S4U_Daemon() {
-        std::cerr << "IN DAEMON DESTRUCTOR: " << this->process_name << "\n";
+//        std::cerr << "IN DAEMON DESTRUCTOR: " << this->process_name << "\n";
 
         WRENCH_DEBUG("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
@@ -125,12 +125,15 @@ namespace wrench {
      * @brief Delete the daemon's life-saver (use at your own risks, if your not the Simulation class)
      */
     void S4U_Daemon::deleteLifeSaver() {
-        std::cerr << "IN DELETE LIFE SAVER " << this->getName() << "\n";
+//        std::cerr << "IN DELETE LIFE SAVER " << this->getName() << "\n";
         if (this->life_saver) {
-            std::cerr << "  DOING THE DELETE" << this->getName() << "\n";
+            // Necessary so that the Actor destructor
+            // happens before the simulation engine shutdowns
+            this->s4u_actor = nullptr;
+//            std::cerr << "  DOING THE DELETE" << this->getName() << "\n";
             auto life_saver_ref = this->life_saver;
             this->life_saver = nullptr;
-            delete life_saver_ref;
+            delete life_saver_ref; // At this point the destructor is called!
         }
     }
 
@@ -210,11 +213,11 @@ namespace wrench {
      */
     void S4U_Daemon::setupOnExitFunction() {
         this->s4u_actor->on_exit([this](bool failed) {
-          std::cerr << "IN ON EXIT FOR " << this->getName() << "\n";
+//          std::cerr << "IN ON EXIT FOR " << this->getName() << "\n";
           if (not this->daemonized) {
               S4U_Daemon::num_non_daemonized_actors_running--;
           }
-          std::cerr << "*** NUM_NON_DAEMIONIZED_ACTORS_RUNNING = " << S4U_Daemon::num_non_daemonized_actors_running << "\n";
+//          std::cerr << "*** NUM_NON_DAEMIONIZED_ACTORS_RUNNING = " << S4U_Daemon::num_non_daemonized_actors_running << "\n";
           // Set state to down
           this->state = S4U_Daemon::State::DOWN;
           // Call cleanup
