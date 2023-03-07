@@ -128,10 +128,6 @@ namespace wrench {
             bool processNextMessage();
             Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
 
-            /***********************/
-            /** \endcond           */
-            /***********************/
-
         private:
             Deployment *deployment;
 

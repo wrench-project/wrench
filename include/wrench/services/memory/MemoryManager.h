@@ -8,6 +8,7 @@
  *
  */
 
+
 #ifndef WRENCH_MEMORYMANAGER_H
 #define WRENCH_MEMORYMANAGER_H
 
@@ -124,4 +125,6 @@ namespace wrench {
 
 }// namespace wrench
 
-#endif//WRENCH_MEMORYMANAGER_H
+#endif //WRENCH_MEMORYMANAGER_H
+
+

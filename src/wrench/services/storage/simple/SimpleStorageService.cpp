@@ -381,7 +381,7 @@ namespace wrench {
 
     /**
      * @brief Remove a file at the storage service (in zero simulated time)
-     * @param path a path
+     * @param location: a location
      */
     void SimpleStorageService::removeFile(const std::shared_ptr<FileLocation> &location) {
         std::string mount_point;

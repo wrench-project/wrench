@@ -712,6 +712,7 @@ namespace wrench {
         this->bandwidth_meter_services.insert(service);
     }
 
+#ifdef PAGE_CACHE_SIMULATION
     /**
       * @brief Add a MemoryManager to the simulation.
       *
@@ -726,6 +727,7 @@ namespace wrench {
         memory_manager->simulation = this;
         this->memory_managers.insert(memory_manager);
     }
+#endif
 
     /**
      * @brief Stage a copy of a file at a location (and add entries to all file registry services, if any)
@@ -968,7 +970,6 @@ namespace wrench {
         this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
                                                           temp_unique_sequence_number);
     }
-#endif
 
     /**
      * @brief Find MemoryManager running on a host based on hostname
@@ -984,6 +985,7 @@ namespace wrench {
         }
         return nullptr;
     }
+#endif
 
     /**
      * @brief Wrapper for S4U_Simulation hostExists()
@@ -1384,6 +1386,7 @@ namespace wrench {
         return shared_ptr;
     }
 
+#ifdef PAGE_CACHE_SIMULATION
     /**
      * @brief Starts a new memory_manager_service manager service during execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
@@ -1409,6 +1412,7 @@ namespace wrench {
 
         return shared_ptr;
     }
+#endif
 
     /**
      * @brief Checks that the platform is well defined
