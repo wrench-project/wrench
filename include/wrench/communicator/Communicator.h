@@ -31,7 +31,7 @@ namespace wrench {
         ~Communicator();
 
     protected:
-	/**
+        /**
 	 * @brief Constructor
 	 *
 	 * @param size: the communicator's size in number of processes
