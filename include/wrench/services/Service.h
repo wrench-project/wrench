@@ -118,9 +118,6 @@ namespace wrench {
 
         void serviceSanityCheck();
 
-        static void deleteLifeSaversOfAutorestartServices();
-
-
         /** @brief The service's property list */
         WRENCH_PROPERTY_COLLECTION_TYPE property_list;
 
