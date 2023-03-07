@@ -35,6 +35,10 @@ namespace wrench {
         public:
             explicit LifeSaver(std::shared_ptr<S4U_Daemon> &reference) : reference(reference) {}
 
+            ~LifeSaver() {
+                std::cerr << "IN LIFE SAVER DESTRUCTOR FOR " << reference->getName() << "  " << reference.use_count() << "\n";
+            }
+
             std::shared_ptr<S4U_Daemon> reference;
         };
 

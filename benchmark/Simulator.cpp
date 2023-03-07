@@ -148,20 +148,25 @@ int main(int argc, char **argv) {
         network_proximity_services.insert(simulation->add(new NetworkProximityService(hostname, participating_hosts, {}, {})));
     }
 
-    // Create a File Registry Service
-    std::shared_ptr<FileRegistryService> file_registry_service = simulation->add(new FileRegistryService("CS_host_0"));
+//    // Create a File Registry Service
+//    std::shared_ptr<FileRegistryService> file_registry_service = simulation->add(new FileRegistryService("CS_host_0"));
+
+    std::cerr << "B4 CREATING CONTROLE: " << (*compute_services.begin()).use_count() << "\n";
 
     // Create the Controller
     if (not strcmp(argv[1], "WORKFLOW")) {
         simulation->add(
-                new StressTestWorkflowAPIController(compute_services, storage_services, network_proximity_services, file_registry_service, num_jobs, "CS_host_0"));
+                new StressTestWorkflowAPIController(compute_services, storage_services, network_proximity_services, num_jobs, "CS_host_0"));
     } else {
         simulation->add(
-                new StressTestActionAPIController(compute_services, storage_services, network_proximity_services, file_registry_service, num_jobs, "CS_host_0"));
+                new StressTestActionAPIController(compute_services, storage_services, network_proximity_services, num_jobs, "CS_host_0"));
     }
+    std::cerr << "AFTER CREATING CONTROLE: " << (*compute_services.begin()).use_count() << "\n";
 
     simulation->getOutput().enableWorkflowTaskTimestamps(false);
     simulation->getOutput().enableFileReadWriteCopyTimestamps(false);
+
+    simulation->printRefCounts("BEFORE LAUNCH RETURNED");
 
     // Launch the simulation
     try {
@@ -171,11 +176,19 @@ int main(int argc, char **argv) {
         std::cerr << "Simulation failed: " << e.what() << "\n";
         exit(1);
     }
-    WRENCH_INFO("Simulation done: %.2lf\n", wrench::Simulation::getCurrentSimulatedDate());
+    simulation->printRefCounts("AFTER LAUNCH RETURNED");
+
     std::cerr << wrench::Simulation::getCurrentSimulatedDate() << "\n";
 
 
+    std::cerr << "BEFORE SIMULATIONG DEST SS: " << (*storage_services.begin()).use_count() << "\n";
+    std::cerr << "BEFORE SIMIUALTIONG DEST CS: " << (*compute_services.begin()).use_count() << "\n";
+
     simulation = nullptr;
+
+    std::cerr << "BEFORE RETURNING SS: " << (*storage_services.begin()).use_count() << "\n";
+    std::cerr << "BEFORE RETURNING CS: " << (*compute_services.begin()).use_count() << "\n";
+
 
     return 0;
 }
