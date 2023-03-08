@@ -337,7 +337,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
     ASSERT_NO_THROW(htcondor_service = simulation->add(
                             new wrench::HTCondorComputeService(
                                     hostname, std::move(compute_services),
-                                    {})));
+                                    {{wrench::HTCondorComputeServiceProperty::INSTANT_RESOURCE_AVAILABILITIES, "false"}})));
 
     // Coverage
     htcondor_service->supportsCompoundJobs();

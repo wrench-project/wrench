@@ -33,6 +33,7 @@ namespace wrench {
      * @param startup_overhead: a startup overhead, in seconds
      * @param grid_pre_overhead: a pre-job overhead for grid jobs, in seconds
      * @param non_grid_pre_overhead: a pre-job overhead for non-grid jobs, in seconds
+     * @param instant_resource_availabilities: true is instant resource availabilities to used
      * @param compute_services: a set of 'child' compute services available to and via the HTCondor pool
      * @param running_jobs: a list of currently running jobs
      * @param pending_jobs: a list of pending jobs
@@ -43,7 +44,7 @@ namespace wrench {
             double startup_overhead,
             double grid_pre_overhead,
             double non_grid_pre_overhead,
-            bool fast_bmcs_resource_availability,
+            bool instant_resource_availabilities,
             std::set<std::shared_ptr<ComputeService>> &compute_services,
             std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
             std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
@@ -53,7 +54,7 @@ namespace wrench {
         this->startup_overhead = startup_overhead;
         this->grid_pre_overhead = grid_pre_overhead;
         this->non_grid_pre_overhead = non_grid_pre_overhead;
-        this->fast_bmcs_resource_availability = fast_bmcs_resource_availability;
+        this->instant_resource_availabilities = instant_resource_availabilities;
 
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
@@ -249,7 +250,8 @@ namespace wrench {
             double min_required_memory = job->getMinimumRequiredMemory();
 
             bool enough_idle_resources = false;
-            if (this->getPropertyValueAsBoolean(HTCondorComputeServiceProperty::CONTACT_COMPUTE_SERVICES_FOR_AVAILABILITY)) {
+
+            if (not this->instant_resource_availabilities) {
                 enough_idle_resources = bmcs->isThereAtLeastOneHostWithIdleResources(min_required_num_cores,
                                                                                         min_required_memory);
             } else {

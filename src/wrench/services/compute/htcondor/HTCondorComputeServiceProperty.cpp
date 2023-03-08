@@ -16,6 +16,6 @@ namespace wrench {
     SET_PROPERTY_NAME(HTCondorComputeServiceProperty, GRID_POST_EXECUTION_DELAY);
     SET_PROPERTY_NAME(HTCondorComputeServiceProperty, NON_GRID_PRE_EXECUTION_DELAY);
     SET_PROPERTY_NAME(HTCondorComputeServiceProperty, NON_GRID_POST_EXECUTION_DELAY);
-    SET_PROPERTY_NAME(HTCondorComputeServiceProperty, CONTACT_COMPUTE_SERVICES_FOR_AVAILABILITY);
+    SET_PROPERTY_NAME(HTCondorComputeServiceProperty, INSTANT_RESOURCE_AVAILABILITIES);
 
 }// namespace wrench

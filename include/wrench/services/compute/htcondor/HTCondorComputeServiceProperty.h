@@ -53,17 +53,12 @@ namespace wrench {
 
         /**
          * @brief Whether the HTCondorComputeService should contact its subordinate BareMetalComputeServices (i.e.,
-         * when running non-grid jobs) to find out about their currently available resources, or instead keep its own record
-         * of their available resources. The two options are:
-         *   - "true": Messages are exchanged between the HTCondorComputeService (i.e., the negotiator) and subordinate
-         *     BareMetalComputeServices to find out their current available resources (with the caveat that by the time they respond
-         *     they could be used by some other job directly submitted to then via other means, in which case their response
-         *     is stale and their resources may become oversubscribed).
-         *   - "false" (default): This makes simulation faster since fewer messages are exchanged, but will lead to
-         *     possibly different executions than the "Yes" option if the subordinate BareMetalComputeServices are use to run
-         *     jobs that are not issued by the HTCondorComputeService, as resources will become oversubscribed).
+         * when running non-grid jobs) to find out about their currently available resources (value "false"), or instead or instead
+         * uses the "out of simulation time" method to query these services about their currently available resources (value "true");
+         * "true" is the default value since it reduces simulation time. The caveat that it no longer simulates the network load and overhead
+         * of all "tell me how many free resources you have right now?" and "this is what I got!" control messages.
          */
-        DECLARE_PROPERTY_NAME(CONTACT_COMPUTE_SERVICES_FOR_AVAILABILITY);
+        DECLARE_PROPERTY_NAME(INSTANT_RESOURCE_AVAILABILITIES);
 
     };
 }// namespace wrench

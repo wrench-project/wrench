@@ -36,7 +36,7 @@ namespace wrench {
                                   double startup_overhead,
                                   double grid_pre_overhead,
                                   double non_grid_pre_overhead,
-                                  bool fast_bmcs_resource_availability,
+                                  bool instant_resource_availabilities,
                                   std::set<std::shared_ptr<ComputeService>> &compute_services,
                                   std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
                                   std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
@@ -63,7 +63,7 @@ namespace wrench {
         /** non-grid, pre-overhead */
         double non_grid_pre_overhead;
 
-        bool fast_bmcs_resource_availability;
+        bool instant_resource_availabilities;
 
 
         /** mailbox to reply **/
