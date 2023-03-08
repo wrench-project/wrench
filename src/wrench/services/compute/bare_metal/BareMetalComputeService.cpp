@@ -907,4 +907,15 @@ namespace wrench {
         return false;
     }
 
+    /**
+     * @brief An "out of simulation time" (instant) method to check on resource availability
+     * @param num_cores: desired number of cores
+     * @param ram: desire RAM footprint
+     * @return true if there is at least one host with the available free resources, false otherwise
+     */
+    bool BareMetalComputeService::isThereAtLeastOneHostWithIdleResourcesInstant(unsigned long num_cores, double ram) {
+        return this->action_execution_service->IsThereAtLeastOneHostWithAvailableResources(num_cores, ram);
+    }
+
+
 }// namespace wrench
