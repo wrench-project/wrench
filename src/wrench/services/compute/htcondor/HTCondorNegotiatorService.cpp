@@ -57,7 +57,6 @@ namespace wrench {
         this->instant_resource_availabilities = instant_resource_availabilities;
 
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
-
     }
 
     /**
@@ -224,8 +223,8 @@ namespace wrench {
  * @return A target compute service
  */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceNonGridUniverse(
-            const std::shared_ptr<CompoundJob>& job,
-            std::map<std::string,std::string> service_specific_arguments) {
+            const std::shared_ptr<CompoundJob> &job,
+            std::map<std::string, std::string> service_specific_arguments) {
         std::shared_ptr<BareMetalComputeService> target_cs = nullptr;
 
         // Figure out which BatchComputeService compute services are available
@@ -253,10 +252,10 @@ namespace wrench {
 
             if (not this->instant_resource_availabilities) {
                 enough_idle_resources = bmcs->isThereAtLeastOneHostWithIdleResources(min_required_num_cores,
-                                                                                        min_required_memory);
+                                                                                     min_required_memory);
             } else {
                 enough_idle_resources = bmcs->isThereAtLeastOneHostWithIdleResourcesInstant(min_required_num_cores,
-                                                                                   min_required_memory);
+                                                                                            min_required_memory);
             }
 
             if (enough_idle_resources) {

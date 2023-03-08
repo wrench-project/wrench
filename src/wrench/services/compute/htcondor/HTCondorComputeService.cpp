@@ -40,7 +40,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     HTCondorComputeService::HTCondorComputeService(const std::string &hostname,
-                                                   const std::set<std::shared_ptr<ComputeService>>& compute_services,
+                                                   const std::set<std::shared_ptr<ComputeService>> &compute_services,
                                                    WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname, "htcondor_service", "") {
         // Set default and specified properties
