@@ -32,7 +32,7 @@ namespace wrench {
                 {HTCondorComputeServiceProperty::GRID_POST_EXECUTION_DELAY, "0.0"},
                 {HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY, "0.0"},
                 {HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY, "0.0"},
-                {HTCondorComputeServiceProperty::CONTACT_COMPUTE_SERVICES_FOR_AVAILABILITY, "0.0"},
+                {HTCondorComputeServiceProperty::INSTANT_RESOURCE_AVAILABILITIES, "true"},
         };
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
