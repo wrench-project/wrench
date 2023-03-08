@@ -246,7 +246,7 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::sanitizePath(): path cannot be empty");
         }
 
-#if 1
+#if 0
         // THIS MAKES ONLY A TINY BIT OF A PERFORMANCE BOOST
         // (ONLY WORKS WITH C++17)
         // Adding a leading space because, weirdly, lexically_normal() doesn't behave
