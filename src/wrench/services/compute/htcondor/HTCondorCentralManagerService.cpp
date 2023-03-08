@@ -54,6 +54,7 @@ namespace wrench {
             double grid_post_overhead,
             double non_grid_pre_overhead,
             double non_grid_post_overhead,
+            bool fast_bmcs_resource_availability,
             std::set<shared_ptr<ComputeService>> compute_services,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
@@ -64,6 +65,7 @@ namespace wrench {
         this->grid_post_overhead = grid_post_overhead;
         this->non_grid_pre_overhead = non_grid_pre_overhead;
         this->non_grid_post_overhead = non_grid_post_overhead;
+        this->fast_bmcs_resource_availability = fast_bmcs_resource_availability;
 
         this->compute_services = compute_services;
 
@@ -151,6 +153,7 @@ namespace wrench {
                             this->negotiator_startup_overhead,
                             this->grid_pre_overhead,
                             this->non_grid_pre_overhead,
+                            this->fast_bmcs_resource_availability,
                             this->compute_services,
                             this->running_jobs, this->pending_jobs, this->mailbox);
                     negotiator->setSimulation(this->simulation);
