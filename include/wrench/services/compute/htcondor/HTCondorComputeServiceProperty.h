@@ -59,7 +59,6 @@ namespace wrench {
          * of all "tell me how many free resources you have right now?" and "this is what I got!" control messages.
          */
         DECLARE_PROPERTY_NAME(INSTANT_RESOURCE_AVAILABILITIES);
-
     };
 }// namespace wrench
 
