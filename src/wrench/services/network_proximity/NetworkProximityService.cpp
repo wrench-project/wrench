@@ -192,7 +192,7 @@ namespace wrench {
 
         // Create  and start network daemons
         for (const auto &h: this->hosts_in_network) {
-            std::shared_ptr<NetworkProximityDaemon> np_daemon = std::make_shared<NetworkProximityDaemon>(
+            auto np_daemon = std::make_shared<NetworkProximityDaemon>(
 
                             this->simulation, h, this->mailbox,
                             this->getPropertyValueAsDouble(
