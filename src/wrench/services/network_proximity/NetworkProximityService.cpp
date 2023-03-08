@@ -194,16 +194,16 @@ namespace wrench {
         for (const auto &h: this->hosts_in_network) {
             auto np_daemon = std::make_shared<NetworkProximityDaemon>(
 
-                            this->simulation, h, this->mailbox,
-                            this->getPropertyValueAsDouble(
-                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
-                            this->getPropertyValueAsTimeInSecond(
-                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD),
-                            this->getPropertyValueAsDouble(
-                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE),
-                            this->getPropertyValueAsUnsignedLong(
-                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED),
-                            this->messagepayload_list);
+                    this->simulation, h, this->mailbox,
+                    this->getPropertyValueAsDouble(
+                            NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
+                    this->getPropertyValueAsTimeInSecond(
+                            NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD),
+                    this->getPropertyValueAsDouble(
+                            NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE),
+                    this->getPropertyValueAsUnsignedLong(
+                            NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED),
+                    this->messagepayload_list);
             this->network_daemons.push_back(np_daemon);
 
             // if this network service type is 'vivaldi', set up the coordinate lookup table
