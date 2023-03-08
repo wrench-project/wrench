@@ -136,7 +136,7 @@ namespace wrench {
                        (not strcmp(argv[i], "--wrench-log-full")) or
                        (not strcmp(argv[i], "--wrench-logs-full"))) {
                 xbt_log_control_set("root.thresh:info");
-            } else if (not strncmp(argv[i], "--wrench-mailbox-pool-size", strlen("--mailbox-pool-size"))) {
+            } else if (not strncmp(argv[i], "--wrench-mailbox-pool-size", strlen("--wrench-mailbox-pool-size"))) {
                 char *equal_sign = strchr(argv[i], '=');
                 if (!equal_sign) {
                     throw std::invalid_argument("Invalid --wrench-mailbox-pool-size argument value");
