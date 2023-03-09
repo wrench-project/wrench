@@ -40,7 +40,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     HTCondorComputeService::HTCondorComputeService(const std::string &hostname,
-                                                   std::set<std::shared_ptr<ComputeService>> compute_services,
+                                                   const std::set<std::shared_ptr<ComputeService>> &compute_services,
                                                    WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname, "htcondor_service", "") {
         // Set default and specified properties
@@ -100,6 +100,7 @@ namespace wrench {
                 this->getPropertyValueAsTimeInSecond(HTCondorComputeServiceProperty::GRID_POST_EXECUTION_DELAY),
                 this->getPropertyValueAsTimeInSecond(HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY),
                 this->getPropertyValueAsTimeInSecond(HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY),
+                this->getPropertyValueAsBoolean(HTCondorComputeServiceProperty::INSTANT_RESOURCE_AVAILABILITIES),
                 compute_services, property_list, messagepayload_list);
     }
 

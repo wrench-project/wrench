@@ -33,12 +33,10 @@ namespace wrench {
     Alarm::Alarm(double date, std::string hostname, simgrid::s4u::Mailbox *reply_mailbox,
                  SimulationMessage *msg, std::string suffix) : Service(hostname, "alarm_service_" + suffix) {
         this->date = date;
-        //      if (this->date <= S4U_Simulation::getClock()) {
-        //        WRENCH_INFO(
-        //                "Alarm is being started but notification date is in the past. Notification will be sent immediately.");
-        //      }
         this->reply_mailbox = reply_mailbox;
-        this->msg = msg;
+        // Make it unique so that there will be no memory leak in case the
+        // alarm never goes off
+        this->msg = std::unique_ptr<SimulationMessage>(msg);
     }
 
     /**
@@ -58,7 +56,8 @@ namespace wrench {
 
         WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_mailbox->get_cname());
         try {
-            S4U_Mailbox::putMessage(this->reply_mailbox, msg);
+            auto to_send = this->msg.release();
+            S4U_Mailbox::putMessage(this->reply_mailbox, to_send);
         } catch (ExecutionException &e) {
             WRENCH_WARN("AlarmService was not able to send its message");
         }

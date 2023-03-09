@@ -922,7 +922,7 @@ private:
                                          e.getCause()->toString() +
                                          " (expected: FileAlreadyBeingCopied)");
             }
-            if (cause->getFile() != this->test->file_500) {
+            if (cause->getSourceLocation()->getFile() != this->test->file_500) {
                 throw std::runtime_error("Got expected failure cause, but failure cause does not point to the right file");
             }
             if (not cause->getDestinationLocation()->equal(wrench::FileLocation::LOCATION(this->test->storage_service_510, this->test->file_500))) {

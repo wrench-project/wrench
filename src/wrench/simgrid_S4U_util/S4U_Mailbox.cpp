@@ -310,7 +310,7 @@ namespace wrench {
     simgrid::s4u::Mailbox *S4U_Mailbox::getTemporaryMailbox() {
         if (S4U_Mailbox::free_mailboxes.empty()) {
             throw std::runtime_error("S4U_Mailbox::getTemporaryMailbox(): Out of mailboxes! "
-                                     "(Increase the mailbox pool size with the --wrench-mailbox-pool-size command-line argument)");
+                                     "(Increase the mailbox pool size with the --wrench-mailbox-pool-size command-line argument (default is 5000))");
         }
 
         //        std::cerr << "FREE MAILBOX: " << S4U_Mailbox::free_mailboxes.size() << "\n";

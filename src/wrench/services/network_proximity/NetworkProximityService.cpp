@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iomanip>
 #include <limits>
+#include <memory>
 #include <random>
 
 #include <wrench/logging/TerminalOutput.h>
@@ -29,6 +30,20 @@ WRENCH_LOG_CATEGORY(wrench_core_network_proximity_service, "Log category for Net
 namespace wrench {
 
     constexpr double NetworkProximityService::NOT_AVAILABLE;
+
+    /**
+     * @brief Cleanup method
+     *
+     * @param has_returned_from_main: whether main() returned
+     * @param return_value: the return value (if main() returned)
+     */
+    void NetworkProximityService::cleanup(bool has_returned_from_main, int return_value) {
+        // Do the default behavior (which will throw as this is not a fault-tolerant service)
+        Service::cleanup(has_returned_from_main, return_value);
+
+        this->network_daemons.clear();
+    }
+
 
     /**
      * @brief Destructor
@@ -177,18 +192,18 @@ namespace wrench {
 
         // Create  and start network daemons
         for (const auto &h: this->hosts_in_network) {
-            std::shared_ptr<NetworkProximityDaemon> np_daemon = std::shared_ptr<NetworkProximityDaemon>(
-                    new NetworkProximityDaemon(
-                            this->simulation, h, this->mailbox,
-                            this->getPropertyValueAsDouble(
-                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
-                            this->getPropertyValueAsTimeInSecond(
-                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD),
-                            this->getPropertyValueAsDouble(
-                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE),
-                            this->getPropertyValueAsUnsignedLong(
-                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED),
-                            this->messagepayload_list));
+            auto np_daemon = std::make_shared<NetworkProximityDaemon>(
+
+                    this->simulation, h, this->mailbox,
+                    this->getPropertyValueAsDouble(
+                            NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
+                    this->getPropertyValueAsTimeInSecond(
+                            NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD),
+                    this->getPropertyValueAsDouble(
+                            NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE),
+                    this->getPropertyValueAsUnsignedLong(
+                            NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED),
+                    this->messagepayload_list);
             this->network_daemons.push_back(np_daemon);
 
             // if this network service type is 'vivaldi', set up the coordinate lookup table

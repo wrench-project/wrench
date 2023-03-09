@@ -10,12 +10,12 @@
 #include <wrench/execution_controller/ExecutionController.h>
 #include <wrench/execution_controller/ExecutionControllerMessage.h>
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/managers/DataMovementManager.h>
-#include <wrench/managers/JobManager.h>
+#include "wrench/managers/data_movement_manager/DataMovementManager.h"
+#include "wrench/managers/job_manager/JobManager.h"
 #include <wrench/services/helper_services/alarm/Alarm.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/Simulation.h>
-#include <wrench/managers/JobManager.h>
+#include "wrench/managers/job_manager/JobManager.h"
 #include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_execution_controller, "Log category for Execution Controller");

@@ -167,6 +167,7 @@ namespace wrench {
      * @brief Perform an MPI AllToAll collective, using SimGrid's SMPI implementation
      *
      * @param bytes: the number of bytes in each message sent/received
+     * @param config: the SMPI config option
      */
     void Communicator::MPI_Alltoall(double bytes, std::string config) {
         if (bytes < 1.0) {
@@ -178,7 +179,9 @@ namespace wrench {
     /**
      * @brief Perform an MPI cast collective, using SimGrid's SMPI implementation
      *
+     * @param root_rank: the rank of the root of the broadcast
      * @param bytes: the number of bytes in each message sent/received
+     * @param config: the SMPI config option
      */
     void Communicator::MPI_Bcast(int root_rank, double bytes, std::string config) {
         if ((bytes < 1.0) or (root_rank < 0) or (root_rank >= (int) this->size)) {
@@ -189,7 +192,8 @@ namespace wrench {
 
     /**
      * @brief Perform an MPI Barrier, using SimGrid's SMPI implementation
-     *
+     * 
+     * @param config: the SMPI config option
      */
     void Communicator::MPI_Barrier(std::string config) {
         this->performSMPIOperation("Barrier", this->participating_hosts, nullptr, 0, "smpi/barrier:" + std::move(config));
@@ -202,7 +206,7 @@ namespace wrench {
      * @param hosts: hosts involved
      * @param root_host: root hosts (nullptr if none)
      * @param data_size: data size in bytes (0 if none)
-     * @param config: the config string
+     * @param config: the SMPI config option
      */
     void Communicator::performSMPIOperation(const std::string &op_name,
                                             std::vector<simgrid::s4u::Host *> &hosts,

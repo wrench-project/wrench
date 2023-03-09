@@ -225,7 +225,9 @@ namespace wrench {
 
         void validateProperties();
 
+#ifdef PAGE_CACHE_SIMULATION
         std::shared_ptr<MemoryManager> memory_manager;
+#endif
     };
 
 }// namespace wrench

@@ -44,6 +44,7 @@ namespace wrench {
                                       double grid_post_overhead,
                                       double non_grid_pre_overhead,
                                       double non_grid_post_overhead,
+                                      bool fast_bmcs_resource_availability,
                                       std::set<std::shared_ptr<ComputeService>> compute_services,
                                       WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                       WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
@@ -96,6 +97,8 @@ namespace wrench {
         bool resources_unavailable = false;
         /** negotiator startup overhead in seconds **/
         double negotiator_startup_overhead = 0.0;
+
+        bool fast_bmcs_resource_availability;
 
         double grid_pre_overhead = 0.0;
         double grid_post_overhead = 0.0;

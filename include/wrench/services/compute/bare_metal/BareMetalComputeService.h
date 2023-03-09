@@ -116,6 +116,7 @@ namespace wrench {
 
         ~BareMetalComputeService() override;
 
+        bool isThereAtLeastOneHostWithIdleResourcesInstant(unsigned long num_cores, double ram);
 
     protected:
         friend class JobManager;

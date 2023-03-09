@@ -45,7 +45,7 @@ namespace wrench {
         double date;
         //        std::string reply_mailbox_name;
         simgrid::s4u::Mailbox *reply_mailbox;
-        SimulationMessage *msg;
+        std::unique_ptr<SimulationMessage> msg;
 
         int main() override;
     };

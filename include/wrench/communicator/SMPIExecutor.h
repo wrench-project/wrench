@@ -8,6 +8,9 @@ namespace wrench {
     /** @cond INTERNAL    */
     /**********************/
 
+    /** 
+     * @brief A wrapper class for all SMPI operations
+     */
     class SMPIExecutor {
 
     public:

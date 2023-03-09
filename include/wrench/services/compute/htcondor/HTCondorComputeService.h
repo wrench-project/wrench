@@ -32,6 +32,7 @@ namespace wrench {
                 {HTCondorComputeServiceProperty::GRID_POST_EXECUTION_DELAY, "0.0"},
                 {HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY, "0.0"},
                 {HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY, "0.0"},
+                {HTCondorComputeServiceProperty::INSTANT_RESOURCE_AVAILABILITIES, "true"},
         };
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
@@ -52,7 +53,7 @@ namespace wrench {
 
     public:
         HTCondorComputeService(const std::string &hostname,
-                               std::set<std::shared_ptr<ComputeService>> compute_services,
+                               const std::set<std::shared_ptr<ComputeService>> &compute_services,
                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 

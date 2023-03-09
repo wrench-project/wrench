@@ -489,15 +489,17 @@ namespace wrench {
                                const std::shared_ptr<FileLocation> &location,
                                bool wait_for_answer);
 
-        /**
+    /**
 	 * @brief Decrement the number of operations for a location
+     * @param location: a location
 	 **/
         virtual void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
             // do nothing
         }
 
-        /**
+    /**
 	 * @brief Increment the number of operations for a location
+     * @param location: a location
 	 **/
         virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
             // no nothing

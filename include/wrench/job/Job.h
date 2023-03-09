@@ -16,7 +16,7 @@
 #include <map>
 #include <memory>
 
-#include "wrench/managers/JobManager.h"
+#include "wrench/managers/job_manager/JobManager.h"
 
 namespace wrench {
 

@@ -40,7 +40,7 @@ namespace wrench {
 
         unsigned long max_num_pending_tasks = 10;
 
-        WRENCH_INFO("%lu tasks to run", tasks_to_do.size());
+        WRENCH_INFO("%zu tasks to run", tasks_to_do.size());
 
         while ((not tasks_to_do.empty()) or (not tasks_pending.empty())) {
 

@@ -247,8 +247,8 @@ namespace wrench {
         }
 
 #if 0
-        // THIS DOES NOT MAKE MUCH OF A DIFFERENT IT SEEMS (IN TERMS OF PERFORMANCE)
-        // ONLY WORKS WITH C++17
+        // THIS MAKES ONLY A TINY BIT OF A PERFORMANCE BOOST
+        // (ONLY WORKS WITH C++17)
         // Adding a leading space because, weirdly, lexically_normal() doesn't behave
         // correctly on Linux without it (it doesn't reduce "////" to "/", but does
         // reduce " ////" to " /"
@@ -257,7 +257,7 @@ namespace wrench {
         // Remove the extra space
         to_return.erase(0, 1);
         return to_return;
-#endif
+#else
 
         // Cannot have certain substring (why not)
         char disallowed_characters[] = {'\\', ' ', '~', '`', '\'', '"', '&', '*', '?', '.'};
@@ -312,6 +312,7 @@ namespace wrench {
         sanitized += "/";
 
         return sanitized;
+#endif
     }
 
     /**

@@ -47,18 +47,14 @@ namespace wrench {
         friend class ExecutionEvent;
         /**
          * @brief Constructor
-         * @param file: a workflow file
          * @param src: the source location
          * @param dst: the destination location
          */
-        FileCopyCompletedEvent(std::shared_ptr<DataFile> file,
-                               std::shared_ptr<FileLocation> src,
+        FileCopyCompletedEvent(std::shared_ptr<FileLocation> src,
                                std::shared_ptr<FileLocation> dst)
-            : file(std::move(file)), src(std::move(src)), dst(std::move(dst)) {}
+            : src(std::move(src)), dst(std::move(dst)) {}
 
     public:
-        /** @brief The workflow file that has successfully been copied */
-        std::shared_ptr<DataFile> file;
         /** @brief The source location */
         std::shared_ptr<FileLocation> src;
         /** @brief The destination location */
@@ -69,9 +65,9 @@ namespace wrench {
          * @return a text string
          */
         std::string toString() override {
-            return "FileCopyCompletedEvent (file: " + this->file->getID() +
+            return "FileCopyCompletedEvent (file: " + this->src->getFile()->getID() +
                    "; src = " + this->src->toString() +
-                   "; dst = " + this->dst->toString();
+                   "; dst = " + this->dst->toString() + ")";
         }
     };
 
