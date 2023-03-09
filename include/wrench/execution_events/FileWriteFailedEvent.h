@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_FILE_COPY_COMPLETED_EVENT_H
-#define WRENCH_FILE_COPY_COMPLETED_EVENT_H
+#ifndef WRENCH_FILE_WRITE_FAILED_EVENT_H
+#define WRENCH_FILE_WRITE_FAILED_EVENT_H
 
 #include <string>
 #include <utility>
@@ -39,35 +39,36 @@ namespace wrench {
 
 
     /**
-     * @brief A "file copy has completed" ExecutionEvent
+     * @brief A "file copy has failed" ExecutionEvent
      */
-    class FileCopyCompletedEvent : public ExecutionEvent {
+    class FileWriteFailedEvent : public ExecutionEvent {
 
     private:
         friend class ExecutionEvent;
         /**
          * @brief Constructor
-         * @param src: the source location
-         * @param dst: the destination location
+         * @param location: the location
+         * @param failure_cause: a failure cause
          */
-        FileCopyCompletedEvent(std::shared_ptr<FileLocation> src,
-                               std::shared_ptr<FileLocation> dst)
-            : src(std::move(src)), dst(std::move(dst)) {}
+        FileWriteFailedEvent(std::shared_ptr<FileLocation> location,
+                            std::shared_ptr<FailureCause> failure_cause)
+            : location(std::move(location)),
+              failure_cause(std::move(failure_cause)) {}
 
     public:
-        /** @brief The source location */
-        std::shared_ptr<FileLocation> src;
-        /** @brief The destination location */
-        std::shared_ptr<FileLocation> dst;
+        /** @brief The  location */
+        std::shared_ptr<FileLocation> location;
+        /** @brief The cause of the failure */
+        std::shared_ptr<FailureCause> failure_cause;
 
         /**
          * @brief Get a textual description of the event
          * @return a text string
          */
         std::string toString() override {
-            return "FileCopyCompletedEvent (file: " + this->src->getFile()->getID() +
-                   "; src = " + this->src->toString() +
-                   "; dst = " + this->dst->toString() + ")";
+            return "FileWriteFailedEvent (file: " + this->location->getFile()->getID() +
+                   "; location = " + this->location->toString() +
+                   "; cause: " + this->failure_cause->toString() + ")";
         }
     };
 
@@ -79,4 +80,4 @@ namespace wrench {
 /***********************/
 
 
-#endif//WRENCH_FILE_COPY_COMPLETED_EVENT_H
+#endif//WRENCH_FILE_WRITE_FAILED_EVENT_H
