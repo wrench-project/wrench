@@ -91,7 +91,7 @@ namespace wrench {
 
             bool operator==(const CopyRequestSpecs &rhs) const {
                 return (src->equal(rhs.src) &&
-                       dst->equal(rhs.dst));
+                        dst->equal(rhs.dst));
             }
         };
 
@@ -116,7 +116,7 @@ namespace wrench {
             ~WriteRequestSpecs() = default;
 
             WriteRequestSpecs(std::shared_ptr<FileLocation> location,
-                             std::shared_ptr<FileRegistryService> file_registry_service) : location(std::move(location)), file_registry_service(std::move(file_registry_service)) {}
+                              std::shared_ptr<FileRegistryService> file_registry_service) : location(std::move(location)), file_registry_service(std::move(file_registry_service)) {}
 
             bool operator==(const WriteRequestSpecs &rhs) const {
                 return (location->equal(rhs.location));
