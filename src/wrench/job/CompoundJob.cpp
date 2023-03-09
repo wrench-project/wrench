@@ -451,16 +451,16 @@ namespace wrench {
     bool CompoundJob::isReady() {
 
         return std::all_of(this->parents.begin(), this->parents.end(),
-                    [](const std::shared_ptr<CompoundJob> &e) {
-                        return e->getState() == CompoundJob::State::COMPLETED;
-                    });
+                           [](const std::shared_ptr<CompoundJob> &e) {
+                               return e->getState() == CompoundJob::State::COMPLETED;
+                           });
 
-//        for (auto const &p: this->parents) {
-//            if (p->getState() != CompoundJob::State::COMPLETED) {
-//                return false;
-//            }
-//        }
-//        return true;
+        //        for (auto const &p: this->parents) {
+        //            if (p->getState() != CompoundJob::State::COMPLETED) {
+        //                return false;
+        //            }
+        //        }
+        //        return true;
     }
 
     /**
