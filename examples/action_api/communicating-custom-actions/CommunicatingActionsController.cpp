@@ -103,7 +103,7 @@ namespace wrench {
                     data_manager->initiateAsynchronousFileRead(FileLocation::LOCATION(storage_service, file), num_io_bytes);
 
                     // Participate in an all to all communication
-                    unsigned long num_comm_bytes = 10 * MB;
+                    unsigned long num_comm_bytes = 1 * MB;
                     communicator->MPI_Alltoall(num_comm_bytes, "ompi");
 
                     // Wait for the asynchrous IO read to complete
