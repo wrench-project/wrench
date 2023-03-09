@@ -27,10 +27,10 @@
 #include "CommunicatingActionsController.h"// Controller implementation
 
 #define KB 1000.0
-#define MB (1000*KB)
-#define GB (1000*MB)
-#define GB (1000*MB)
-#define TB (1000*GB)
+#define MB (1000 * KB)
+#define GB (1000 * MB)
+#define GB (1000 * MB)
+#define TB (1000 * GB)
 #define MBps MB
 
 /**
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
             head_node, host_list, "", {}, {}));
 
     /* Create a new disk on the platform */
-    wrench::Simulation::createNewDisk(head_node, "disk0", 100*MBps, 50*MBps, 50*TB, "/");
+    wrench::Simulation::createNewDisk(head_node, "disk0", 100 * MBps, 50 * MBps, 50 * TB, "/");
 
     /* Instantiate a storage service on the head node, with a 50MB buffer size */
     std::cerr << "Instantiating a SimpleStorageService..." << std::endl;

@@ -523,33 +523,37 @@ namespace wrench {
     }
 
     /**
-* @brief Simulates a disk write
-*
-* @param num_bytes: number of bytes to write
-* @param hostname: name of host to which disk is attached
-* @param mount_point: mount point
-*/
-    void S4U_Simulation::writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point) {
+    * @brief Simulates a disk write
+    *
+    * @param num_bytes: number of bytes to write
+    * @param hostname: name of host to which disk is attached
+    * @param mount_point: mount point
+    * @param disk: a disk to write to, if known
+    */
+    void S4U_Simulation::writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk) {
         mount_point = FileLocation::sanitizePath(mount_point);
 
         WRENCH_DEBUG("Writing %lf bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
 
-        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
-        if (not host) {
-            throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown host " + hostname);
-        }
-
-        auto disk_list = host->get_disks();
-        for (auto disk: disk_list) {
-            std::string disk_mountpoint =
-                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
-            if (disk_mountpoint == mount_point) {
-                disk->write((sg_size_t) num_bytes);
-                return;
+        if (not disk) {
+            auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
+            if (not host) {
+                throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown host " + hostname);
             }
+
+            auto disk_list = host->get_disks();
+            for (auto d: disk_list) {
+                std::string disk_mountpoint =
+                        FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+                if (disk_mountpoint == mount_point) {
+                    disk = d;
+                    break;
+                }
+            }
+            throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown path " +
+                                        mount_point + " at host " + hostname);
         }
-        throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown path " +
-                                    mount_point + " at host " + hostname);
+        disk->write((sg_size_t) num_bytes);
     }
 
 
@@ -561,35 +565,39 @@ namespace wrench {
 * @param hostname: the host at which the disks are located
 * @param read_mount_point: the mountpoint to read from
 * @param write_mount_point: the mountpoint to write to
+* @param src_disk: source disk (nullptr if not known)
+* @param dst_disk: dst disk (nullptr if not known)
 */
     void S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                                 const std::string &hostname,
                                                                 const std::string &read_mount_point,
-                                                                const std::string &write_mount_point) {
+                                                                const std::string &write_mount_point,
+                                                                simgrid::s4u::Disk *src_disk,
+                                                                simgrid::s4u::Disk *dst_disk) {
         WRENCH_DEBUG("Reading %.2lf bytes from disk %s:%s and writing %lf bytes to disk %s:%s",
                      num_bytes_to_read, hostname.c_str(), read_mount_point.c_str(),
                      num_bytes_to_write, hostname.c_str(), write_mount_point.c_str());
 
-        simgrid::s4u::Disk *read_disk = nullptr;
-        simgrid::s4u::Disk *write_disk = nullptr;
+        if ((not src_disk) or (not dst_disk)) {
 
-        auto disk_list = S4U_Simulation::get_host_or_vm_by_name(hostname)->get_disks();
-        for (auto disk: disk_list) {
-            std::string disk_mountpoint =
-                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
-            if (disk_mountpoint == read_mount_point) {
-                read_disk = disk;
-            }
-            if (disk_mountpoint == write_mount_point) {
-                write_disk = disk;
+            auto disk_list = S4U_Simulation::get_host_or_vm_by_name(hostname)->get_disks();
+            for (auto disk: disk_list) {
+                std::string disk_mountpoint =
+                        FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+                if (disk_mountpoint == read_mount_point) {
+                    src_disk = disk;
+                }
+                if (disk_mountpoint == write_mount_point) {
+                    dst_disk = disk;
+                }
             }
         }
 
         // Start asynchronous read
-        auto read_activity = read_disk->io_init((sg_size_t) num_bytes_to_read, simgrid::s4u::Io::OpType::READ);
+        auto read_activity = src_disk->io_init((sg_size_t) num_bytes_to_read, simgrid::s4u::Io::OpType::READ);
         read_activity->start();
         // Do synchronous write
-        write_disk->write((sg_size_t) num_bytes_to_write);
+        dst_disk->write((sg_size_t) num_bytes_to_write);
         // Wait for asynchronous read to be done
         read_activity->wait();
     }
@@ -601,29 +609,33 @@ namespace wrench {
 * @param num_bytes: number of bytes to read
 * @param hostname: name of host to which disk is attached
 * @param mount_point: mount point
+ * @param disk: disk to read from (nullptr if not known)
 */
-    void S4U_Simulation::readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point) {
+    void S4U_Simulation::readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk) {
         mount_point = FileLocation::sanitizePath(mount_point);
 
         WRENCH_DEBUG("Reading %.2lf bytes from disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
 
-        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
-        if (not host) {
-            throw std::invalid_argument("S4U_Simulation::readFromDisk(): unknown host " + hostname);
-        }
-
-        auto disk_list = host->get_disks();
-        for (auto disk: disk_list) {
-            std::string disk_mountpoint =
-                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
-
-            if (disk_mountpoint == mount_point) {
-                disk->read((sg_size_t) num_bytes);
-                return;
+        if (not disk) {
+            auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
+            if (not host) {
+                throw std::invalid_argument("S4U_Simulation::readFromDisk(): unknown host " + hostname);
             }
+
+            auto disk_list = host->get_disks();
+            for (auto d: disk_list) {
+                std::string disk_mountpoint =
+                        FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+
+                if (disk_mountpoint == mount_point) {
+                    disk = d;
+                    break;
+                }
+            }
+            throw std::invalid_argument("S4U_Simulation::readFromDisk(): invalid mount point " +
+                                        mount_point + " at host " + hostname);
         }
-        throw std::invalid_argument("S4U_Simulation::readFromDisk(): invalid mount point " +
-                                    mount_point + " at host " + hostname);
+        disk->read((sg_size_t) num_bytes);
     }
 
 

@@ -103,6 +103,7 @@ namespace wrench {
         friend class LogicalFileSystem;
         friend class Simulation;
         friend class SimpleStorageServiceNonBufferized;
+        friend class FileTransferThread;
 
         /**
          * @brief Constructor

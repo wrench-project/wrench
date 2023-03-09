@@ -37,7 +37,7 @@ namespace wrench {
             std::shared_ptr<StorageService> ss,
             const std::string &hostname) : ExecutionController(hostname, "mamj"),
                                            batch_cs(std::move(batch_cs)),
-                                           ss(std::move(ss)){}
+                                           ss(std::move(ss)) {}
 
     /**
      * @brief main method of the CommunicatingActionsController daemon
@@ -56,7 +56,7 @@ namespace wrench {
 
         /* Create some file on the storage service */
         auto file = Simulation::addFile("big_file", 10000 * MB);
-        StorageService::createFileAtLocation(FileLocation::LOCATION(ss,file));
+        StorageService::createFileAtLocation(FileLocation::LOCATION(ss, file));
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
@@ -76,46 +76,45 @@ namespace wrench {
         for (int i = 0; i < COMMUNICATOR_SIZE; i++) {
 
             auto lambda_execute = [communicator, storage_service, file](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
-              auto my_rank = communicator->join();
+                auto my_rank = communicator->join();
 
-              // Create my own data movement manager
-              auto data_manager = action_executor->createDataMovementManager();
+                // Create my own data movement manager
+                auto data_manager = action_executor->createDataMovementManager();
 
 
-              communicator->barrier();
-              WRENCH_INFO("I am an action with rank %lu in my communicator", my_rank);
-              communicator->barrier();
+                communicator->barrier();
+                WRENCH_INFO("I am an action with rank %lu in my communicator", my_rank);
+                communicator->barrier();
 
-              // Do a bulk-synchronous loop of 10 iterations
-              for (unsigned long iter = 0; iter < 10; iter++) {
+                // Do a bulk-synchronous loop of 10 iterations
+                for (unsigned long iter = 0; iter < 10; iter++) {
 
-                  if (my_rank == 0) {
-                      WRENCH_INFO("Iteration %lu", iter);
-                  }
-                  communicator->barrier();
+                    if (my_rank == 0) {
+                        WRENCH_INFO("Iteration %lu", iter);
+                    }
+                    communicator->barrier();
 
-                  // Perform some computation
-                  double flops = 100 * GFLOP;
-                  Simulation::compute(flops);
+                    // Perform some computation
+                    double flops = 100 * GFLOP;
+                    Simulation::compute(flops);
 
-                  // Launch an asynchronous IO read to the storage service
-                  unsigned long num_io_bytes = 100*MB;
-                  data_manager->initiateAsynchronousFileRead(FileLocation::LOCATION(storage_service, file), num_io_bytes);
+                    // Launch an asynchronous IO read to the storage service
+                    unsigned long num_io_bytes = 100 * MB;
+                    data_manager->initiateAsynchronousFileRead(FileLocation::LOCATION(storage_service, file), num_io_bytes);
 
-                  // Participate in an all to all communication
-                  unsigned long num_comm_bytes = 10 * MB;
-                  communicator->MPI_Alltoall(num_comm_bytes, "ompi");
+                    // Participate in an all to all communication
+                    unsigned long num_comm_bytes = 1 * MB;
+                    communicator->MPI_Alltoall(num_comm_bytes, "ompi");
 
-                  // Wait for the asynchrous IO read to complete
-                  auto event = action_executor->waitForNextEvent();
-                  auto io_event = std::dynamic_pointer_cast<wrench::FileReadCompletedEvent>(event);
-                  if (not io_event) {
-                      throw std::runtime_error("Custom action: unexpected IO event: " + io_event->toString());
-                  }
-
-              }
-              communicator->barrier();
-              WRENCH_INFO("Action with rank %lu completed!", my_rank);
+                    // Wait for the asynchrous IO read to complete
+                    auto event = action_executor->waitForNextEvent();
+                    auto io_event = std::dynamic_pointer_cast<wrench::FileReadCompletedEvent>(event);
+                    if (not io_event) {
+                        throw std::runtime_error("Custom action: unexpected IO event: " + io_event->toString());
+                    }
+                }
+                communicator->barrier();
+                WRENCH_INFO("Action with rank %lu completed!", my_rank);
             };
 
             auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
@@ -128,7 +127,7 @@ namespace wrench {
         std::map<std::string, std::string> service_specific_args =
                 {{"-N", std::to_string(16)},
                  {"-c", std::to_string(1)},
-                 {"-t", std::to_string(3600*100)}};
+                 {"-t", std::to_string(3600 * 100)}};
         job_manager->submitJob(job, batch_cs, service_specific_args);
 
         /* Wait for an execution event */

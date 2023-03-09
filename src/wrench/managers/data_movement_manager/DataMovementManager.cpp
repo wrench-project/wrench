@@ -342,7 +342,7 @@ namespace wrench {
                                                                            std::move(msg->failure_cause)));
             return true;
 
-        }  else {
+        } else {
             throw std::runtime_error(
                     "DataMovementManager::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
         }

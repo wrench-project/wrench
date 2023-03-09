@@ -30,11 +30,9 @@ namespace wrench {
     DataManagerFileCopyAnswerMessage::DataManagerFileCopyAnswerMessage(std::shared_ptr<FileLocation> src_location,
                                                                        std::shared_ptr<FileLocation> dst_location,
                                                                        bool success,
-                                                                       std::shared_ptr<FailureCause> failure_cause) :
-            DataMovementManagerMessage(),
-            src_location(std::move(src_location)),
-            dst_location(std::move(dst_location)), success(success), failure_cause(std::move(failure_cause)) {
-
+                                                                       std::shared_ptr<FailureCause> failure_cause) : DataMovementManagerMessage(),
+                                                                                                                      src_location(std::move(src_location)),
+                                                                                                                      dst_location(std::move(dst_location)), success(success), failure_cause(std::move(failure_cause)) {
     }
 
     /**
@@ -47,10 +45,8 @@ namespace wrench {
     DataManagerFileReadAnswerMessage::DataManagerFileReadAnswerMessage(std::shared_ptr<FileLocation> location,
                                                                        double num_bytes,
                                                                        bool success,
-                                                                       std::shared_ptr<FailureCause> failure_cause) :
-            DataMovementManagerMessage(),
-            location(std::move(location)), num_bytes(num_bytes), success(success), failure_cause(std::move(failure_cause)){
-
+                                                                       std::shared_ptr<FailureCause> failure_cause) : DataMovementManagerMessage(),
+                                                                                                                      location(std::move(location)), num_bytes(num_bytes), success(success), failure_cause(std::move(failure_cause)) {
     }
 
     /**
@@ -61,12 +57,9 @@ namespace wrench {
      */
     DataManagerFileWriteAnswerMessage::DataManagerFileWriteAnswerMessage(std::shared_ptr<FileLocation> location,
                                                                          bool success,
-                                                                         std::shared_ptr<FailureCause> failure_cause) :
-            DataMovementManagerMessage(),
-            location(std::move(location)), success(success), failure_cause(std::move(failure_cause)){
-
+                                                                         std::shared_ptr<FailureCause> failure_cause) : DataMovementManagerMessage(),
+                                                                                                                        location(std::move(location)), success(success), failure_cause(std::move(failure_cause)) {
     }
-
 
 
     /**
@@ -80,7 +73,7 @@ namespace wrench {
                                                                                            double num_bytes,
                                                                                            bool success,
                                                                                            std::shared_ptr<FailureCause> failure_cause)
-            : DataMovementManagerMessage(), location(std::move(location)), num_bytes(num_bytes), success(success), failure_cause(std::move(failure_cause)) {
+        : DataMovementManagerMessage(), location(std::move(location)), num_bytes(num_bytes), success(success), failure_cause(std::move(failure_cause)) {
     }
 
     /**
@@ -92,7 +85,7 @@ namespace wrench {
     DataMovementManagerFileWriterThreadMessage::DataMovementManagerFileWriterThreadMessage(std::shared_ptr<FileLocation> location,
                                                                                            bool success,
                                                                                            std::shared_ptr<FailureCause> failure_cause)
-            : DataMovementManagerMessage(), location(std::move(location)), success(success), failure_cause(std::move(failure_cause)) {
+        : DataMovementManagerMessage(), location(std::move(location)), success(success), failure_cause(std::move(failure_cause)) {
     }
 
 
