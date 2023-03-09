@@ -736,8 +736,8 @@ namespace wrench {
     void ActionExecutionService::processActionExecutorCompletion(
             const std::shared_ptr<ActionExecutor> &executor) {
 
-//        auto hostname = executor->getHostname();
-//        auto action = executor->getAction();
+        //        auto hostname = executor->getHostname();
+        //        auto action = executor->getAction();
 
         // Update RAM availabilities and running thread counts
         this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
