@@ -1004,7 +1004,7 @@ namespace wrench {
         //remember the allocated resources for the job
         batch_job->setAllocatedResources(resources);
 
-        SimulationMessage *msg = new AlarmJobTimeOutMessage(batch_job, 0);
+        auto msg = new AlarmJobTimeOutMessage(batch_job, 0);
 
         std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
                                                                       batch_job->getEndingTimestamp(),

@@ -9,6 +9,9 @@
 
 namespace wrench {
 
+    /**
+     * @brief A class that implements a communicator (ala MPI) abstractions
+     */
     class Communicator {
 
     public:
@@ -28,6 +31,11 @@ namespace wrench {
         ~Communicator();
 
     protected:
+        /**
+	 * @brief Constructor
+	 *
+	 * @param size: the communicator's size in number of processes
+	 */
         explicit Communicator(unsigned long size) : size(size){};
 
     private:

@@ -7,17 +7,22 @@
  * (at your option) any later version.
  */
 
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/simulation/SimulationMessage.h>
-#include <wrench/services/ServiceMessage.h>
-#include <wrench/services/storage/StorageService.h>
-#include <wrench/services/file_registry/FileRegistryService.h>
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/services/storage/StorageServiceMessage.h>
-#include <wrench/data_file/DataFile.h>
-#include <wrench/managers/DataMovementManager.h>
-#include <wrench/failure_causes/FileAlreadyBeingCopied.h>
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simulation/SimulationMessage.h"
+#include "wrench/services/ServiceMessage.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/services/file_registry/FileRegistryService.h"
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/services/storage/StorageServiceMessage.h"
+#include "wrench/data_file/DataFile.h"
+#include "wrench/managers/data_movement_manager/DataMovementManager.h"
+#include "wrench/failure_causes/FileAlreadyBeingCopied.h"
+#include "wrench/failure_causes/FileAlreadyBeingRead.h"
+#include "wrench/failure_causes/FileAlreadyBeingWritten.h"
+#include "wrench/managers/data_movement_manager/FileReaderThread.h"
+#include "wrench/managers/data_movement_manager/FileWriterThread.h"
+#include "wrench/managers/data_movement_manager/DataMovementManagerMessage.h"
 
 #include <memory>
 
@@ -77,7 +82,7 @@ namespace wrench {
             for (auto const &p: this->pending_file_copies) {
                 if (*p == request) {
                     throw ExecutionException(
-                            std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src->getFile(), src, dst)));
+                            std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
                 }
             }
         } catch (ExecutionException &e) {
@@ -92,6 +97,77 @@ namespace wrench {
             throw;
         }
     }
+
+
+    /**
+     * @brief Ask the data manager to initiate an asynchronous file read
+     * @param location: the location to read from
+     * @param num_bytes: the number of bytes to read
+     *
+     * @throw std::invalid_argument
+     * @throw ExecutionException
+     */
+    void DataMovementManager::initiateAsynchronousFileRead(const std::shared_ptr<FileLocation> &location,
+                                                           const double num_bytes) {
+        if ((location == nullptr)) {
+            throw std::invalid_argument("DataMovementManager::initiateAsynchronousFileRead(): Invalid nullptr arguments");
+        }
+
+        DataMovementManager::ReadRequestSpecs request(location, num_bytes);
+
+        for (auto const &p: this->pending_file_reads) {
+            if (*p == request) {
+                throw ExecutionException(
+                        std::shared_ptr<FailureCause>(new FileAlreadyBeingRead(location)));
+            }
+        }
+
+        try {
+            this->pending_file_reads.push_front(std::make_unique<ReadRequestSpecs>(location, num_bytes));
+            // Initiate the read in a thread
+            auto frt = std::make_shared<FileReaderThread>(this->hostname, this->mailbox, location, num_bytes);
+            frt->setSimulation(this->simulation);
+            frt->start(frt, true, false);
+        } catch (ExecutionException &e) {
+            throw;
+        }
+    }
+
+    /**
+     * @brief Ask the data manager to initiate an asynchronous file write
+     * @param location: the location to read from
+     * @param file_registry_service: a file registry service to update once the file write has (successfully) completed
+     *
+     * @throw std::invalid_argument
+     * @throw ExecutionException
+     */
+    void DataMovementManager::initiateAsynchronousFileWrite(const std::shared_ptr<FileLocation> &location,
+                                                            const std::shared_ptr<FileRegistryService> &file_registry_service) {
+        if ((location == nullptr)) {
+            throw std::invalid_argument("DataMovementManager::initiateAsynchronousFileWrite(): Invalid nullptr arguments");
+        }
+
+        DataMovementManager::WriteRequestSpecs request(location, file_registry_service);
+
+        for (auto const &p: this->pending_file_writes) {
+            if (*p == request) {
+                throw ExecutionException(
+                        std::shared_ptr<FailureCause>(new FileAlreadyBeingRead(location)));
+            }
+        }
+
+        try {
+            this->pending_file_writes.push_front(std::make_unique<WriteRequestSpecs>(location, file_registry_service));
+
+            // Initiate the write in a thread
+            auto fwt = std::make_shared<FileWriterThread>(this->hostname, this->mailbox, location);
+            fwt->setSimulation(this->simulation);
+            fwt->start(fwt, true, false);
+        } catch (ExecutionException &e) {
+            throw;
+        }
+    }
+
 
     /**
      * @brief Ask the data manager to perform a synchronous file copy
@@ -118,7 +194,7 @@ namespace wrench {
             for (auto const &p: this->pending_file_copies) {
                 if (*p == request) {
                     throw ExecutionException(
-                            std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src->getFile(), src, dst)));
+                            std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
                 }
             }
 
@@ -206,28 +282,71 @@ namespace wrench {
                 }
             }
 
-            // Forward it back
+            // Replay
             S4U_Mailbox::dputMessage(this->creator_mailbox,
-                                     new StorageServiceFileCopyAnswerMessage(msg->src,
-                                                                             msg->dst,
-                                                                             msg->success,
-                                                                             std::move(msg->failure_cause),
-                                                                             0));
+                                     new DataManagerFileCopyAnswerMessage(msg->src,
+                                                                          msg->dst,
+                                                                          msg->success,
+                                                                          std::move(msg->failure_cause)));
             return true;
 
-        } else {
+        } else if (auto msg = std::dynamic_pointer_cast<DataMovementManagerFileReaderThreadMessage>(message)) {
+            // Remove the record and find the File Registry Service, if any
+            ReadRequestSpecs request(msg->location, msg->num_bytes);
+            for (auto it = this->pending_file_reads.begin();
+                 it != this->pending_file_reads.end();
+                 ++it) {
+                if (*(*it) == request) {
+                    this->pending_file_reads.erase(it);// remove the entry
+                    break;
+                }
+            }
+
+            // Forward it back
+            S4U_Mailbox::dputMessage(this->creator_mailbox,
+                                     new DataManagerFileReadAnswerMessage(msg->location,
+                                                                          msg->num_bytes,
+                                                                          msg->success,
+                                                                          std::move(msg->failure_cause)));
+            return true;
+
+        } else if (auto msg = std::dynamic_pointer_cast<DataMovementManagerFileWriterThreadMessage>(message)) {
+
+            // Remove the record and find the File Registry Service, if any
+            DataMovementManager::WriteRequestSpecs request(msg->location, 0);
+            for (auto it = this->pending_file_writes.begin();
+                 it != this->pending_file_writes.end();
+                 ++it) {
+                if (*(*it) == request) {
+                    // find out the file registry service if any
+                    request.file_registry_service = (*it)->file_registry_service;
+                    this->pending_file_writes.erase(it);// remove the entry
+                    break;
+                }
+            }
+
+            if (request.file_registry_service) {
+                WRENCH_INFO("Trying to do a register");
+                try {
+                    request.file_registry_service->addEntry(request.location);
+                } catch (ExecutionException &e) {
+                    WRENCH_INFO("Oops, couldn't do it");
+                    // don't throw, just keep file_registry_service_update to false
+                }
+            }
+
+            // Forward it back
+            S4U_Mailbox::dputMessage(this->creator_mailbox,
+                                     new DataManagerFileWriteAnswerMessage(msg->location,
+                                                                           msg->success,
+                                                                           std::move(msg->failure_cause)));
+            return true;
+
+        }  else {
             throw std::runtime_error(
                     "DataMovementManager::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
         }
     }
-
-    //    /** @brief Get the mailbox of the service that created this data movement manager
-    //     *
-    //     * @return a mailbox
-    //     */
-    //    simgrid::s4u::Mailbox *DataMovementManager::getCreatorMailbox() {
-    //        return this->creator_mailbox;
-    //    }
 
 
 }// namespace wrench

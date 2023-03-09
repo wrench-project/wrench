@@ -47,21 +47,17 @@ namespace wrench {
         friend class ExecutionEvent;
         /**
          * @brief Constructor
-         * @param file: a workflow file
          * @param src: source location
          * @param dst: destination location
          * @param failure_cause: a failure cause
          */
-        FileCopyFailedEvent(std::shared_ptr<DataFile> file,
-                            std::shared_ptr<FileLocation> src,
+        FileCopyFailedEvent(std::shared_ptr<FileLocation> src,
                             std::shared_ptr<FileLocation> dst,
                             std::shared_ptr<FailureCause> failure_cause)
-            : file(std::move(file)), src(std::move(src)), dst(std::move(dst)),
+            : src(std::move(src)), dst(std::move(dst)),
               failure_cause(std::move(failure_cause)) {}
 
     public:
-        /** @brief The workflow file that has failed to be copied */
-        std::shared_ptr<DataFile> file;
         /** @brief The source location */
         std::shared_ptr<FileLocation> src;
         /** @brief The destination location */
@@ -74,7 +70,7 @@ namespace wrench {
          * @return a text string
          */
         std::string toString() override {
-            return "FileCopyFailedEvent (file: " + this->file->getID() +
+            return "FileCopyFailedEvent (file: " + this->src->getFile()->getID() +
                    "; src = " + this->src->toString() +
                    "; dst = " + this->dst->toString() +
                    "; cause: " + this->failure_cause->toString() + ")";

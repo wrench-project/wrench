@@ -136,7 +136,7 @@ namespace wrench {
                        (not strcmp(argv[i], "--wrench-log-full")) or
                        (not strcmp(argv[i], "--wrench-logs-full"))) {
                 xbt_log_control_set("root.thresh:info");
-            } else if (not strncmp(argv[i], "--wrench-mailbox-pool-size", strlen("--mailbox-pool-size"))) {
+            } else if (not strncmp(argv[i], "--wrench-mailbox-pool-size", strlen("--wrench-mailbox-pool-size"))) {
                 char *equal_sign = strchr(argv[i], '=');
                 if (!equal_sign) {
                     throw std::invalid_argument("Invalid --wrench-mailbox-pool-size argument value");
@@ -712,6 +712,7 @@ namespace wrench {
         this->bandwidth_meter_services.insert(service);
     }
 
+#ifdef PAGE_CACHE_SIMULATION
     /**
       * @brief Add a MemoryManager to the simulation.
       *
@@ -726,6 +727,7 @@ namespace wrench {
         memory_manager->simulation = this;
         this->memory_managers.insert(memory_manager);
     }
+#endif
 
     /**
      * @brief Stage a copy of a file at a location (and add entries to all file registry services, if any)
@@ -755,6 +757,24 @@ namespace wrench {
         for (const auto &frs: this->file_registry_services) {
             frs->addEntryToDatabase(location);
         }
+    }
+
+
+    /**
+     * @brief Method to create a new disk in the platform, which can be handy
+     * @param hostname: the name of the host to which the disk should be attached
+     * @param disk_id: the nae of the disk
+     * @param read_bandwidth_in_bytes_per_sec: the disk's read bandwidth in byte/sec
+     * @param write_bandwidth_in_bytes_per_sec: the disk's write bandwidth in byte/sec
+     * @param capacity_in_bytes: the disk's capacity in bytes
+     * @param mount_point: the disk's mount point (most people use "/")
+     */
+    void Simulation::createNewDisk(const std::string &hostname, const std::string &disk_id,
+                                       double read_bandwidth_in_bytes_per_sec,
+                                       double write_bandwidth_in_bytes_per_sec,
+                                       double capacity_in_bytes,
+                                       const std::string &mount_point) {
+        S4U_Simulation::createNewDisk(hostname, disk_id, read_bandwidth_in_bytes_per_sec, write_bandwidth_in_bytes_per_sec, capacity_in_bytes, mount_point);
     }
 
     /**
@@ -968,7 +988,6 @@ namespace wrench {
         this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
                                                           temp_unique_sequence_number);
     }
-#endif
 
     /**
      * @brief Find MemoryManager running on a host based on hostname
@@ -984,6 +1003,7 @@ namespace wrench {
         }
         return nullptr;
     }
+#endif
 
     /**
      * @brief Wrapper for S4U_Simulation hostExists()
@@ -1384,6 +1404,7 @@ namespace wrench {
         return shared_ptr;
     }
 
+#ifdef PAGE_CACHE_SIMULATION
     /**
      * @brief Starts a new memory_manager_service manager service during execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
@@ -1409,6 +1430,7 @@ namespace wrench {
 
         return shared_ptr;
     }
+#endif
 
     /**
      * @brief Checks that the platform is well defined
