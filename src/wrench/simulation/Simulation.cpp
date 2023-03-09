@@ -780,18 +780,19 @@ namespace wrench {
     /**
      * @brief Wrapper enabling timestamps for disk reads
      *
-     * @param num_bytes - number of bytes read
-     * @param hostname - hostname to read from
-     * @param mount_point - mount point of disk to read from
+     * @param num_bytes: number of bytes read
+     * @param hostname: hostname to read from
+     * @param mount_point: mount point of disk to read from
+     * @param disk: disk to read from (nullptr if not known)
      *
      * @throw invalid_argument
      */
-    void Simulation::readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point) {
+    void Simulation::readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
-            S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point);
+            S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point, disk);
         } catch (const std::invalid_argument &ia) {
             this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
                                                           temp_unique_sequence_number);
@@ -808,13 +809,17 @@ namespace wrench {
      * @param hostname - hostname where disk is located
      * @param read_mount_point - mount point of disk to read from
      * @param write_mount_point - mount point of disk to write to
+     * @param src_disk: source disk (nullptr if not known)
+     * @param dst_disk: dst disk (nullptr if not known)
      *
      * @throw invalid_argument
      */
     void Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                             const std::string &hostname,
                                                             const std::string &read_mount_point,
-                                                            const std::string &write_mount_point) {
+                                                            const std::string &write_mount_point,
+                                                            simgrid::s4u::Disk *src_disk,
+                                                            simgrid::s4u::Disk *dst_disk) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
@@ -823,7 +828,7 @@ namespace wrench {
                                                      temp_unique_sequence_number);
         try {
             S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname,
-                                                                   read_mount_point, write_mount_point);
+                                                                   read_mount_point, write_mount_point, src_disk, dst_disk);
         } catch (const std::invalid_argument &ia) {
             this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
                                                            temp_unique_sequence_number);
