@@ -20,6 +20,13 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Constructor
+     * @param src_location: the source location
+     * @param dst_location: the destination location
+     * @param success: true if success, false otherwise
+     * @param failure_cause: a failure cause (nullptr is success if false)
+     */
     DataManagerFileCopyAnswerMessage::DataManagerFileCopyAnswerMessage(std::shared_ptr<FileLocation> src_location,
                                                                        std::shared_ptr<FileLocation> dst_location,
                                                                        bool success,
@@ -30,15 +37,28 @@ namespace wrench {
 
     }
 
+    /**
+     * @brief Constructor
+     * @param location: a location
+     * @param num_bytes: the number of bytes for the read
+     * @param success: true if success, false otherwise
+     * @param failure_cause: a failure cause (nullptr is success if false)
+     */
     DataManagerFileReadAnswerMessage::DataManagerFileReadAnswerMessage(std::shared_ptr<FileLocation> location,
-                                                                         double num_bytes,
-                                                                         bool success,
-                                                                         std::shared_ptr<FailureCause> failure_cause) :
+                                                                       double num_bytes,
+                                                                       bool success,
+                                                                       std::shared_ptr<FailureCause> failure_cause) :
             DataMovementManagerMessage(),
             location(std::move(location)), num_bytes(num_bytes), success(success), failure_cause(std::move(failure_cause)){
 
     }
 
+    /**
+     * @brief Constructor
+     * @param location: a location
+     * @param success: true if success, false otherwise
+     * @param failure_cause: a failure cause (nullptr is success if false)
+     */
     DataManagerFileWriteAnswerMessage::DataManagerFileWriteAnswerMessage(std::shared_ptr<FileLocation> location,
                                                                          bool success,
                                                                          std::shared_ptr<FailureCause> failure_cause) :
@@ -50,25 +70,30 @@ namespace wrench {
 
 
     /**
-     * @brief Constructor 
-     * @param necessary_state_changes: necessary task state changes
+     * @brief Constructor
+     * @param location: a location
+     * @param num_bytes: a number of bytes to read
+     * @param success: true if success, false otherwise
+     * @param failure_cause: a failure cause (nullptr is success if false)
      */
     DataMovementManagerFileReaderThreadMessage::DataMovementManagerFileReaderThreadMessage(std::shared_ptr<FileLocation> location,
                                                                                            double num_bytes,
                                                                                            bool success,
                                                                                            std::shared_ptr<FailureCause> failure_cause)
             : DataMovementManagerMessage(), location(std::move(location)), num_bytes(num_bytes), success(success), failure_cause(std::move(failure_cause)) {
-}
+    }
 
-/**
- * @brief Constructor
- * @param necessary_state_changes: necessary task state changes
- */
-DataMovementManagerFileWriterThreadMessage::DataMovementManagerFileWriterThreadMessage(std::shared_ptr<FileLocation> location,
-                                                                                       bool success,
-                                                                                       std::shared_ptr<FailureCause> failure_cause)
-        : DataMovementManagerMessage(), location(std::move(location)), success(success), failure_cause(std::move(failure_cause)) {
-}
+    /**
+     * @brief Constructor
+     * @param location: a location
+     * @param success: true if success, false otherwise
+     * @param failure_cause: a failure cause (nullptr is success if false)
+     */
+    DataMovementManagerFileWriterThreadMessage::DataMovementManagerFileWriterThreadMessage(std::shared_ptr<FileLocation> location,
+                                                                                           bool success,
+                                                                                           std::shared_ptr<FailureCause> failure_cause)
+            : DataMovementManagerMessage(), location(std::move(location)), success(success), failure_cause(std::move(failure_cause)) {
+    }
 
 
 }// namespace wrench

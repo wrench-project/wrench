@@ -47,8 +47,8 @@ namespace wrench {
         friend class ExecutionEvent;
         /**
          * @brief Constructor
-         * @param src: source location
-         * @param dst: destination location
+         * @param location: the location
+         * @param num_bytes: the number of bytes to read
          * @param failure_cause: a failure cause
          */
         FileReadFailedEvent(std::shared_ptr<FileLocation> location,

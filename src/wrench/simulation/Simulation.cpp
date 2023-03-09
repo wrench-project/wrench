@@ -759,6 +759,24 @@ namespace wrench {
         }
     }
 
+
+    /**
+     * @brief Method to create a new disk in the platform, which can be handy
+     * @param hostname: the name of the host to which the disk should be attached
+     * @param disk_id: the nae of the disk
+     * @param read_bandwidth_in_bytes_per_sec: the disk's read bandwidth in byte/sec
+     * @param write_bandwidth_in_bytes_per_sec: the disk's write bandwidth in byte/sec
+     * @param capacity_in_bytes: the disk's capacity in bytes
+     * @param mount_point: the disk's mount point (most people use "/")
+     */
+    void Simulation::createNewDisk(const std::string &hostname, const std::string &disk_id,
+                                       double read_bandwidth_in_bytes_per_sec,
+                                       double write_bandwidth_in_bytes_per_sec,
+                                       double capacity_in_bytes,
+                                       const std::string &mount_point) {
+        S4U_Simulation::createNewDisk(hostname, disk_id, read_bandwidth_in_bytes_per_sec, write_bandwidth_in_bytes_per_sec, capacity_in_bytes, mount_point);
+    }
+
     /**
      * @brief Wrapper enabling timestamps for disk reads
      *

@@ -47,8 +47,7 @@ namespace wrench {
         friend class ExecutionEvent;
         /**
          * @brief Constructor
-         * @param src: the source location
-         * @param dst: the destination location
+         * @param location: the write location
          */
         FileWriteCompletedEvent(std::shared_ptr<FileLocation> location)
             : location(std::move(location)) {}

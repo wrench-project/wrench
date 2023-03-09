@@ -39,9 +39,13 @@ namespace wrench {
                                          std::shared_ptr<FileLocation> dst_location,
                                          bool success,
                                          std::shared_ptr<FailureCause> failure_cause);
+	/** @brief The src location */
         std::shared_ptr<FileLocation> src_location;
+	/** @brief The dst location */
         std::shared_ptr<FileLocation> dst_location;
+	/** @brief Whether the operation succeeded */
         bool success;
+	/** @brief The failure cause, if any */
         std::shared_ptr<FailureCause> failure_cause;
     };
 
@@ -54,9 +58,13 @@ namespace wrench {
                                          double num_bytes,
                                          bool success,
                                          std::shared_ptr<FailureCause> failure_cause);
+	/** @brief The read location */
         std::shared_ptr<FileLocation> location;
+	/** @brief The number of bytes to read */
         double num_bytes;
+	/** @brief Whether the operation succeeded */
         bool success;
+	/** @brief The failure cause, if any */
         std::shared_ptr<FailureCause> failure_cause;
     };
 
@@ -68,8 +76,11 @@ namespace wrench {
         DataManagerFileWriteAnswerMessage(std::shared_ptr<FileLocation> location,
                                          bool success,
                                          std::shared_ptr<FailureCause> failure_cause);
+	/** @brief The write location */
         std::shared_ptr<FileLocation> location;
+	/** @brief Whether the operation succeeded */
         bool success;
+	/** @brief The failure cause, if any */
         std::shared_ptr<FailureCause> failure_cause;
     };
 
@@ -81,9 +92,13 @@ namespace wrench {
     public:
         DataMovementManagerFileReaderThreadMessage(std::shared_ptr<FileLocation> location, double num_bytes,
                                                    bool success, std::shared_ptr<FailureCause> failure_cause);
+	/** @brief The read location */
         std::shared_ptr<FileLocation> location;
+	/** @brief The number of bytes to read */
         double num_bytes;
+	/** @brief Whether the operation succeeded */
         bool success;
+	/** @brief The failure cause, if any */
         std::shared_ptr<FailureCause> failure_cause;
     };
 
@@ -93,8 +108,11 @@ namespace wrench {
     class DataMovementManagerFileWriterThreadMessage : public DataMovementManagerMessage {
     public:
         DataMovementManagerFileWriterThreadMessage(std::shared_ptr<FileLocation> location, bool success, std::shared_ptr<FailureCause> failure_cause);
+	/** @brief The write location */
         std::shared_ptr<FileLocation> location;
+	/** @brief Whether the operation succeeded */
         bool success;
+	/** @brief The failure cause, if any */
         std::shared_ptr<FailureCause> failure_cause;
     };
 
@@ -104,4 +122,4 @@ namespace wrench {
 
 }// namespace wrench
 
-#endif//WRENCH_JOBMANAGERMESSAGE_H
+#endif//WRENCH_DATAMOVEMENTMANAGERMESSAGE_H

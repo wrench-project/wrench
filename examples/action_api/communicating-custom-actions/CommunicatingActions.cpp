@@ -26,9 +26,12 @@
 
 #include "CommunicatingActionsController.h"// Controller implementation
 
-#define MB 1000000
-#define TB 1000000000000
-#define MBps 1000000g
+#define KB 1000.0
+#define MB (1000*KB)
+#define GB (1000*MB)
+#define GB (1000*MB)
+#define TB (1000*GB)
+#define MBps MB
 
 /**
  * @brief The Simulator's main function
@@ -72,14 +75,13 @@ int main(int argc, char **argv) {
     auto batch_service = simulation->add(new wrench::BatchComputeService(
             head_node, host_list, "", {}, {}));
 
-    /* Use a lower-level API to create a new Disk */
-    wrench::S4U_Simulation::createNewDisk(head_node, "disk0", 100*MBps, 50*MBps, 50*TB, "/");
+    /* Create a new disk on the platform */
+    wrench::Simulation::createNewDisk(head_node, "disk0", 100*MBps, 50*MBps, 50*TB, "/");
 
-    /* Instantiate a storage service on the head node */
+    /* Instantiate a storage service on the head node, with a 50MB buffer size */
     std::cerr << "Instantiating a SimpleStorageService..." << std::endl;
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             head_node, {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
-
 
     /* Instantiate an execution execution_controller to be stated on UserHost */
     auto wms = simulation->add(
