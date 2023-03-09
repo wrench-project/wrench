@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_FILE_COPY_COMPLETED_EVENT_H
-#define WRENCH_FILE_COPY_COMPLETED_EVENT_H
+#ifndef WRENCH_FILE_READ_COMPLETED_EVENT_H
+#define WRENCH_FILE_READ_COMPLETED_EVENT_H
 
 #include <string>
 #include <utility>
@@ -39,9 +39,9 @@ namespace wrench {
 
 
     /**
-     * @brief A "file copy has completed" ExecutionEvent
+     * @brief A "file read has completed" ExecutionEvent
      */
-    class FileCopyCompletedEvent : public ExecutionEvent {
+    class FileReadCompletedEvent : public ExecutionEvent {
 
     private:
         friend class ExecutionEvent;
@@ -50,24 +50,23 @@ namespace wrench {
          * @param src: the source location
          * @param dst: the destination location
          */
-        FileCopyCompletedEvent(std::shared_ptr<FileLocation> src,
-                               std::shared_ptr<FileLocation> dst)
-            : src(std::move(src)), dst(std::move(dst)) {}
+        FileReadCompletedEvent(std::shared_ptr<FileLocation> location,
+                               double num_bytes)
+            : location(std::move(location)), num_bytes(num_bytes) {}
 
     public:
-        /** @brief The source location */
-        std::shared_ptr<FileLocation> src;
-        /** @brief The destination location */
-        std::shared_ptr<FileLocation> dst;
+        /** @brief The  location */
+        std::shared_ptr<FileLocation> location;
+        /** @brief The number of bytes read */
+        double num_bytes;
 
         /**
          * @brief Get a textual description of the event
          * @return a text string
          */
         std::string toString() override {
-            return "FileCopyCompletedEvent (file: " + this->src->getFile()->getID() +
-                   "; src = " + this->src->toString() +
-                   "; dst = " + this->dst->toString() + ")";
+            return "FileReadCompletedEvent (file: " + this->location->getFile()->getID() +
+                   "; location = " + this->location->toString() + ")";
         }
     };
 
@@ -79,4 +78,4 @@ namespace wrench {
 /***********************/
 
 
-#endif//WRENCH_FILE_COPY_COMPLETED_EVENT_H
+#endif//WRENCH_FILE_READ_COMPLETED_EVENT_H

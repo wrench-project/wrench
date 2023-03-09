@@ -8,17 +8,8 @@
  */
 
 /**
- ** This simulator simulates the execution of a one-action job, where the
- ** action is a powerful custom action
- **
- ** The compute platform comprises 6 hosts hosts, UserHost, StorageHost1, StorageHost2, ComputeHost1,
- ** ComputeHost2, CloudHeadHost, and CloudComputeHost.
- ** On UserHost runs a controller (defined in class MultiActionMultiJobController). On StorageHost1 and
- ** StorageHost2 run two storage services.  On ComputeHost1 runs a bare-metal
- ** compute service, that has access to the 10 cores of that host on on ComputeHost2.  On CloudHeadHost runs
- ** a cloud service, that has access to the 10 cores of host CloudComputeHost. This cloud-service
- ** has a scratch space (i.e., a local storage service "mounted" at /scratch/)
- **
+ ** This simulator simulates the execution of a multi-action job where
+ ** the actions communicator using collective communications.
  **
  ** Example invocation of the simulator with no logging:
  **    ./wrench-example-communicating-actions ./dragonfly_cluster.xml
@@ -34,6 +25,10 @@
 #include <wrench.h>
 
 #include "CommunicatingActionsController.h"// Controller implementation
+
+#define MB 1000000
+#define TB 1000000000000
+#define MBps 1000000g
 
 /**
  * @brief The Simulator's main function
@@ -69,20 +64,26 @@ int main(int argc, char **argv) {
     /* Get the list of available host names */
     auto host_list = simulation->getHostnameList();
 
-    /* Instantiate a batch compute service, and add it to the simulation.
-     * A wrench::BatchComputeService is an abstraction of a compute service that corresponds
-     * to a batch-scheduled compute platform, i.e., managed by a batch scheduler that has jobs
-     * in a queue waiting for gaining access to compute resources.
-     * This particular service is started on BatchHeadNode and has no scratch storage space (mount point argument = "").
-     * This means that actions running on this service will access data files only from remote storage services. */
+    /* Pick one of those hosts as the head node */
+    auto head_node = host_list.at(0);
+
+    /* Instantiate a batch compute service */
     std::cerr << "Instantiating a batch compute service..." << std::endl;
     auto batch_service = simulation->add(new wrench::BatchComputeService(
-            host_list.at(0), host_list, "", {}, {}));
+            head_node, host_list, "", {}, {}));
+
+    /* Use a lower-level API to create a new Disk */
+    wrench::S4U_Simulation::createNewDisk(head_node, "disk0", 100*MBps, 50*MBps, 50*TB, "/");
+
+    /* Instantiate a storage service on the head node */
+    std::cerr << "Instantiating a SimpleStorageService..." << std::endl;
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+            head_node, {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
 
     /* Instantiate an execution execution_controller to be stated on UserHost */
     auto wms = simulation->add(
-            new wrench::CommunicatingActionsController(batch_service, host_list.at(0)));
+            new wrench::CommunicatingActionsController(batch_service, storage_service, host_list.at(0)));
 
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;

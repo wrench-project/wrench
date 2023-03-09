@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_FILE_COPY_FAILED_EVENT_H
-#define WRENCH_FILE_COPY_FAILED_EVENT_H
+#ifndef WRENCH_FILE_READ_FAILED_EVENT_H
+#define WRENCH_FILE_READ_FAILED_EVENT_H
 
 #include <string>
 #include <utility>
@@ -39,9 +39,9 @@ namespace wrench {
 
 
     /**
-     * @brief A "file copy has failed" ExecutionEvent
+     * @brief A "file read has failed" ExecutionEvent
      */
-    class FileCopyFailedEvent : public ExecutionEvent {
+    class FileReadFailedEvent : public ExecutionEvent {
 
     private:
         friend class ExecutionEvent;
@@ -51,17 +51,17 @@ namespace wrench {
          * @param dst: destination location
          * @param failure_cause: a failure cause
          */
-        FileCopyFailedEvent(std::shared_ptr<FileLocation> src,
-                            std::shared_ptr<FileLocation> dst,
+        FileReadFailedEvent(std::shared_ptr<FileLocation> location,
+                            double num_bytes,
                             std::shared_ptr<FailureCause> failure_cause)
-            : src(std::move(src)), dst(std::move(dst)),
+            : location(std::move(location)), num_bytes(num_bytes),
               failure_cause(std::move(failure_cause)) {}
 
     public:
-        /** @brief The source location */
-        std::shared_ptr<FileLocation> src;
-        /** @brief The destination location */
-        std::shared_ptr<FileLocation> dst;
+        /** @brief The location */
+        std::shared_ptr<FileLocation> location;
+        /** @brief The number of bytes that should have been read */
+        double num_bytes;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> failure_cause;
 
@@ -70,9 +70,9 @@ namespace wrench {
          * @return a text string
          */
         std::string toString() override {
-            return "FileCopyFailedEvent (file: " + this->src->getFile()->getID() +
-                   "; src = " + this->src->toString() +
-                   "; dst = " + this->dst->toString() +
+            return "FileReadFailedEvent (file: " + this->location->getFile()->getID() +
+                   "; location = " + this->location->toString() +
+                   "; num_bytes = " + std::to_string(this->num_bytes) +
                    "; cause: " + this->failure_cause->toString() + ")";
         }
     };
@@ -85,4 +85,4 @@ namespace wrench {
 /***********************/
 
 
-#endif//WRENCH_FILE_COPY_FAILED_EVENT_H
+#endif//WRENCH_FILE_READ_FAILED_EVENT_H
