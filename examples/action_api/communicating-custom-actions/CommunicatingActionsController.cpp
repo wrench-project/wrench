@@ -98,26 +98,26 @@ namespace wrench {
                   double flops = 100 * GFLOP;
                   Simulation::compute(flops);
 
-                  // Launch an asynchronous IO operation to the storage service
+                  // Launch an asynchronous IO read to the storage service
                   unsigned long num_io_bytes = 100*MB;
-                  data_manager->initiateAsynchronousFileRead(FileLocation::LOCATION(storage_service, file), file->getSize());
+                  data_manager->initiateAsynchronousFileRead(FileLocation::LOCATION(storage_service, file), num_io_bytes);
 
                   // Participate in an all to all communication
                   unsigned long num_comm_bytes = 10 * MB;
-                  communicator->MPI_Alltoall(10000, "ompi");
+                  communicator->MPI_Alltoall(num_comm_bytes, "ompi");
 
-                  // Wait for the asynchrous IO operation to complete
+                  // Wait for the asynchrous IO read to complete
                   auto event = action_executor->waitForNextEvent();
                   auto io_event = std::dynamic_pointer_cast<wrench::FileReadCompletedEvent>(event);
                   if (not io_event) {
-                      throw std::runtime_error("Custom action: unexpected event!");
+                      throw std::runtime_error("Custom action: unexpected IO event: " + io_event->toString());
                   }
 
               }
               communicator->barrier();
               WRENCH_INFO("Action with rank %lu completed!", my_rank);
-              communicator->barrier();
             };
+
             auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
 
             job->addCustomAction("action_" + std::to_string(i), 0, 1, lambda_execute, lambda_terminate);
