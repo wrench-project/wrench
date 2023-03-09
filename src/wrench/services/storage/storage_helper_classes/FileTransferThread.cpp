@@ -409,7 +409,7 @@ namespace wrench {
                             throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
                         }
                         simulation->readFromDisk(chunk_size, ss->hostname,
-                                                 ss->getPathMountPoint(location->getPath()));
+                                                 ss->getPathMountPoint(location->getPath()), location->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
                     }
 #endif
@@ -477,18 +477,12 @@ namespace wrench {
             auto dst_mount_point = dst_ss->getPathMountPoint(dst_loc->getPath());
 
             // Read the first chunk
-            simulation->readFromDisk(to_send, src_ss->hostname, src_mount_point);
+            simulation->readFromDisk(to_send, src_ss->hostname, src_mount_point, src_loc->getDiskOrNull());
             // start the pipeline
             while (remaining - this->buffer_size > DBL_EPSILON) {
                 simulation->readFromDiskAndWriteToDiskConcurrently(
                         this->buffer_size, this->buffer_size, src_loc->getStorageService()->hostname,
-                        src_mount_point, dst_mount_point);
-
-                //
-                //                simulation->writeToDisk(this->buffer_size, dst_loc->getStorageService()->hostname,
-                //                                            dst_loc->getMountPoint());
-                //                simulation->readFromDisk(this->buffer_size, src_loc->getStorageService()->hostname,
-                //                                             src_loc->getMountPoint());
+                        src_mount_point, dst_mount_point, src_loc->getDiskOrNull(), dst_loc->getDiskOrNull());
 
                 remaining -= this->buffer_size;
             }
