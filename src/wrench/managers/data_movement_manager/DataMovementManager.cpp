@@ -136,7 +136,7 @@ namespace wrench {
     /**
      * @brief Ask the data manager to initiate an asynchronous file write
      * @param location: the location to read from
-     * @param num_bytes: the number of bytes to read
+     * @param file_registry_service: a file registry service to update once the file write has (successfully) completed
      *
      * @throw std::invalid_argument
      * @throw ExecutionException

@@ -26,6 +26,7 @@ namespace wrench {
      *
      * @param hostname: the hostname on which the data movement manager is to run
      * @param creator_mailbox: the mailbox of the manager's creator
+     * @param location: the write location
      */
     FileWriterThread::FileWriterThread(std::string hostname,
                                        simgrid::s4u::Mailbox *creator_mailbox,

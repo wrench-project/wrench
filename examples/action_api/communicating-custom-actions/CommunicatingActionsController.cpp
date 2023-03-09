@@ -128,7 +128,7 @@ namespace wrench {
         std::map<std::string, std::string> service_specific_args =
                 {{"-N", std::to_string(16)},
                  {"-c", std::to_string(1)},
-                 {"-t", std::to_string(3600)}};
+                 {"-t", std::to_string(3600*100)}};
         job_manager->submitJob(job, batch_cs, service_specific_args);
 
         /* Wait for an execution event */

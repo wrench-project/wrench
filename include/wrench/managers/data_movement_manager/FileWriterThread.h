@@ -39,11 +39,6 @@ namespace wrench {
 
     protected:
 
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
     private:
         int main() override;
 
