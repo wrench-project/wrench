@@ -41,6 +41,7 @@ namespace wrench {
      * @param grid_post_overhead: grid job post-overhead
      * @param non_grid_pre_overhead: non-grid job pre-overhead
      * @param non_grid_post_overhead: non-grid job post-overhead
+     * @param fast_bmcs_resource_availability: whether to obtain direct availabily information from bare-metal services
      * @param compute_services: a set of 'child' compute resources available to and via the HTCondor pool
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")

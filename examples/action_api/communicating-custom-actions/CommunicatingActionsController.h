@@ -25,6 +25,7 @@ namespace wrench {
     public:
         // Constructor
         CommunicatingActionsController(std::shared_ptr<BatchComputeService> batch_cs,
+                                       std::shared_ptr<StorageService> ss,
                                        const std::string &hostname);
 
     private:
@@ -32,6 +33,7 @@ namespace wrench {
         int main() override;
 
         std::shared_ptr<BatchComputeService> batch_cs;
+        std::shared_ptr<StorageService> ss;
     };
 }// namespace wrench
 #endif//WRENCH_EXAMPLE_SUPER_CUSTOM_ACTION_CONTROLLER_H
