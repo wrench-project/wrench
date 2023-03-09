@@ -12,21 +12,21 @@
 #include <boost/algorithm/string/split.hpp>
 #include <utility>
 
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/managers/JobManager.h>
-#include <wrench/services/compute/ComputeService.h>
-#include <wrench/services/ServiceMessage.h>
-#include <wrench/services/compute/ComputeServiceMessage.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/simulation/SimulationMessage.h>
-#include <wrench/workflow/WorkflowTask.h>
-#include <wrench/job/StandardJob.h>
-#include <wrench/job/CompoundJob.h>
-#include <wrench/job/PilotJob.h>
-#include <wrench/services/helper_services/action_executor/ActionExecutor.h>
-#include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
-#include "wrench/managers/JobManagerMessage.h"
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/managers/job_manager/JobManager.h"
+#include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/ServiceMessage.h"
+#include "wrench/services/compute/ComputeServiceMessage.h"
+#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simulation/SimulationMessage.h"
+#include "wrench/workflow/WorkflowTask.h"
+#include "wrench/job/StandardJob.h"
+#include "wrench/job/CompoundJob.h"
+#include "wrench/job/PilotJob.h"
+#include "wrench/services/helper_services/action_executor/ActionExecutor.h"
+#include "wrench/services/helper_services/action_execution_service/ActionExecutionService.h"
+#include "wrench/managers/job_manager/JobManagerMessage.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_job_manager, "Log category for Job Manager");
 
