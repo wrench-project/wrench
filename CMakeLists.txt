@@ -64,8 +64,11 @@ set(HEADER_FILES
         include/wrench.h
         include/wrench/exceptions/ExecutionException.h
         include/wrench/logging/TerminalOutput.h
-        include/wrench/managers/DataMovementManager.h
-        include/wrench/managers/JobManager.h
+        include/wrench/managers/data_movement_manager/DataMovementManager.h
+        include/wrench/managers/data_movement_manager/DataMovementManagerMessage.h
+        include/wrench/managers/data_movement_manager/FileReaderThread.h
+        include/wrench/managers/data_movement_manager/FileWriterThread.h
+        include/wrench/managers/job_manager/JobManager.h
         include/wrench/services/Service.h
         include/wrench/services/ServiceMessage.h
         include/wrench/services/ServiceMessagePayload.h
@@ -156,12 +159,18 @@ set(HEADER_FILES
         include/wrench/execution_events/PilotJobExpiredEvent.h
         include/wrench/execution_events/FileCopyCompletedEvent.h
         include/wrench/execution_events/FileCopyFailedEvent.h
+        include/wrench/execution_events/FileReadCompletedEvent.h
+        include/wrench/execution_events/FileReadFailedEvent.h
+        include/wrench/execution_events/FileWriteCompletedEvent.h
+        include/wrench/execution_events/FileWriteFailedEvent.h
         include/wrench/execution_events/TimerEvent.h
         include/wrench/failure_causes/ComputationHasDied.h
         include/wrench/failure_causes/FailureCause.h
         include/wrench/failure_causes/SomeActionsHaveFailed.h
         include/wrench/failure_causes/FatalFailure.h
         include/wrench/failure_causes/FileAlreadyBeingCopied.h
+        include/wrench/failure_causes/FileAlreadyBeingRead.h
+        include/wrench/failure_causes/FileAlreadyBeingWritten.h
         include/wrench/failure_causes/FileNotFound.h
         include/wrench/failure_causes/FunctionalityNotAvailable.h
         include/wrench/failure_causes/HostError.h
@@ -219,10 +228,13 @@ set(SOURCE_FILES
         include/wrench/services/storage/storage_helpers/LogicalFileSystemNoCaching.h
         include/wrench/services/storage/storage_helpers/LogicalFileSystemLRUCaching.h
         src/wrench/logging/TerminalOutput.cpp
-        src/wrench/managers/DataMovementManager.cpp
-        src/wrench/managers/JobManager.cpp
-        src/wrench/managers/JobManagerMessage.cpp
-        include/wrench/managers/JobManagerMessage.h
+        src/wrench/managers/data_movement_manager/DataMovementManager.cpp
+        src/wrench/managers/data_movement_manager/DataMovementManagerMessage.cpp
+        src/wrench/managers/data_movement_manager/FileReaderThread.cpp
+        src/wrench/managers/data_movement_manager/FileWriterThread.cpp
+        src/wrench/managers/job_manager/JobManager.cpp
+        src/wrench/managers/job_manager/JobManagerMessage.cpp
+        include/wrench/managers/job_manager/JobManagerMessage.h
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessagePayload.cpp
@@ -347,6 +359,8 @@ set(SOURCE_FILES
         src/wrench/failure_causes/SomeActionsHaveFailed.cpp
         src/wrench/failure_causes/FatalFailure.cpp
         src/wrench/failure_causes/FileAlreadyBeingCopied.cpp
+        src/wrench/failure_causes/FileAlreadyBeingRead.cpp
+        src/wrench/failure_causes/FileAlreadyBeingWritten.cpp
         src/wrench/failure_causes/FileNotFound.cpp
         src/wrench/failure_causes/FunctionalityNotAvailable.cpp
         src/wrench/failure_causes/HostError.cpp
@@ -411,7 +425,7 @@ set(TEST_FILES
         test/services/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
         test/services/storage_services/SimpleStorageService/StorageServiceDeleteRegisterTest.cpp
-        test/services/storage_services/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
+        test/managers/DataMovementManagerTest.cpp
         test/services/storage_services/SimpleStorageService/ZeroSizeFileTest.cpp
         test/services/storage_services/SimpleStorageService/ChunkingTest.cpp
         test/services/storage_services/SimpleStorageService/CopyBufferizedNonBufferizedTest.cpp

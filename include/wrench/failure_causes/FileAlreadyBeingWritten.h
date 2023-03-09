@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_FILE_ALREADY_BEING_COPIED_H
-#define WRENCH_FILE_ALREADY_BEING_COPIED_H
+#ifndef WRENCH_FILE_ALREADY_BEING_WRITTEN_H
+#define WRENCH_FILE_ALREADY_BEING_WRITTEN_H
 
 #include <set>
 #include <string>
@@ -29,27 +29,24 @@ namespace wrench {
     /**
      * @brief A "file is already being copied" failure cause
      */
-    class FileAlreadyBeingCopied : public FailureCause {
+    class FileAlreadyBeingWritten : public FailureCause {
 
 
     public:
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FileAlreadyBeingCopied(std::shared_ptr<FileLocation> src,
-                               std::shared_ptr<FileLocation> dst);
+        explicit FileAlreadyBeingWritten(std::shared_ptr<FileLocation> location);
 
         /***********************/
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<FileLocation> getSourceLocation();
-        std::shared_ptr<FileLocation> getDestinationLocation();
+        std::shared_ptr<FileLocation> getLocation();
         std::string toString() override;
 
     private:
-        std::shared_ptr<FileLocation> src_location;
-        std::shared_ptr<FileLocation> dst_location;
+        std::shared_ptr<FileLocation> location;
     };
 
 
@@ -59,4 +56,4 @@ namespace wrench {
 }// namespace wrench
 
 
-#endif//WRENCH_FILE_ALREADY_BEING_COPIED_H
+#endif//WRENCH_FILE_ALREADY_BEING_WRITTEN_H

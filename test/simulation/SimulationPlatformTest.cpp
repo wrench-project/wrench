@@ -205,7 +205,6 @@ private:
 
     int main() override {
 
-
         // Create a new disk on subzonehost
         wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 10.0, 100.0, "/foo");
 
