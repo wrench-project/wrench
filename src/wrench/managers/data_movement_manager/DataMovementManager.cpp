@@ -158,7 +158,8 @@ namespace wrench {
 
         try {
             this->pending_file_writes.push_front(std::make_unique<WriteRequestSpecs>(location, file_registry_service));
-            // Initiate the read in a thread
+
+            // Initiate the write in a thread
             auto fwt = std::make_shared<FileWriterThread>(this->hostname, this->mailbox, location);
             fwt->setSimulation(this->simulation);
             fwt->start(fwt, true, false);
@@ -281,13 +282,12 @@ namespace wrench {
                 }
             }
 
-            // Forward it back
+            // Replay
             S4U_Mailbox::dputMessage(this->creator_mailbox,
-                                     new StorageServiceFileCopyAnswerMessage(msg->src,
-                                                                             msg->dst,
-                                                                             msg->success,
-                                                                             std::move(msg->failure_cause),
-                                                                             0));
+                                     new DataManagerFileCopyAnswerMessage(msg->src,
+                                                                          msg->dst,
+                                                                          msg->success,
+                                                                          std::move(msg->failure_cause)));
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<DataMovementManagerFileReaderThreadMessage>(message)) {
@@ -310,27 +310,39 @@ namespace wrench {
                                                                           std::move(msg->failure_cause)));
             return true;
 
-            } else if (auto msg = std::dynamic_pointer_cast<DataMovementManagerFileWriterThreadMessage>(message)) {
+        } else if (auto msg = std::dynamic_pointer_cast<DataMovementManagerFileWriterThreadMessage>(message)) {
 
             // Remove the record and find the File Registry Service, if any
             DataMovementManager::WriteRequestSpecs request(msg->location, 0);
-                for (auto it = this->pending_file_writes.begin();
-                     it != this->pending_file_writes.end();
-                     ++it) {
-                    if (*(*it) == request) {
-                        this->pending_file_writes.erase(it);// remove the entry
-                        break;
-                    }
+            for (auto it = this->pending_file_writes.begin();
+                 it != this->pending_file_writes.end();
+                 ++it) {
+                if (*(*it) == request) {
+                    // find out the file registry service if any
+                    request.file_registry_service = (*it)->file_registry_service;
+                    this->pending_file_writes.erase(it);// remove the entry
+                    break;
                 }
+            }
 
-                // Forward it back
-                S4U_Mailbox::dputMessage(this->creator_mailbox,
-                                         new DataManagerFileWriteAnswerMessage(msg->location,
-                                                                              msg->success,
-                                                                              std::move(msg->failure_cause)));
-                return true;
+            if (request.file_registry_service) {
+                WRENCH_INFO("Trying to do a register");
+                try {
+                    request.file_registry_service->addEntry(request.location);
+                } catch (ExecutionException &e) {
+                    WRENCH_INFO("Oops, couldn't do it");
+                    // don't throw, just keep file_registry_service_update to false
+                }
+            }
 
-            }  else {
+            // Forward it back
+            S4U_Mailbox::dputMessage(this->creator_mailbox,
+                                     new DataManagerFileWriteAnswerMessage(msg->location,
+                                                                           msg->success,
+                                                                           std::move(msg->failure_cause)));
+            return true;
+
+        }  else {
             throw std::runtime_error(
                     "DataMovementManager::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
         }
