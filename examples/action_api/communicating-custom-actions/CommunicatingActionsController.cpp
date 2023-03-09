@@ -8,7 +8,7 @@
  */
 
 /**
- ** A Controller that creates a job with a powerful custom action
+ ** A Controller that creates a job with custom actions that communicate
  **/
 
 #include <iostream>
@@ -19,11 +19,7 @@
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000.0 * 1000.0)
 
-#define COMMUNICATOR_SIZE 16
-#define SQRT_COMMUNICATOR_SIZE 4
-
-#define MATRIX_SIZE 10000
-#define BLOCK_SIZE ((double) MATRIX_SIZE / SQRT_COMMUNICATOR_SIZE)
+#define COMMUNICATOR_SIZE 16UL
 
 WRENCH_LOG_CATEGORY(custom_controller, "Log category for CommunicatingActionsController");
 
@@ -33,12 +29,15 @@ namespace wrench {
      * @brief Constructor, which calls the super constructor
      *
      * @param batch_cs: a batch compute service
+     * @param ss: a storage service
      * @param hostname: the name of the host on which to start the Controller
      */
     CommunicatingActionsController::CommunicatingActionsController(
             std::shared_ptr<BatchComputeService> batch_cs,
+            std::shared_ptr<StorageService> ss,
             const std::string &hostname) : ExecutionController(hostname, "mamj"),
-                                           batch_cs(std::move(batch_cs)) {}
+                                           batch_cs(std::move(batch_cs)),
+                                           ss(std::move(ss)){}
 
     /**
      * @brief main method of the CommunicatingActionsController daemon
@@ -52,6 +51,12 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
         WRENCH_INFO("Controller starting on host %s", Simulation::getHostName().c_str());
+
+        auto storage_service = this->ss;
+
+        /* Create some file on the storage service */
+        auto file = Simulation::addFile("big_file", 10000 * MB);
+        StorageService::createFileAtLocation(FileLocation::LOCATION(ss,file));
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
@@ -67,47 +72,52 @@ namespace wrench {
         auto communicator = wrench::Communicator::createCommunicator(COMMUNICATOR_SIZE);
 
         /* Now let's create all actions */
-        WRENCH_INFO("Adding %d actions (that will communicate with each other) to the job", COMMUNICATOR_SIZE);
+        WRENCH_INFO("Adding %lu actions (that will communicate with each other) to the job", COMMUNICATOR_SIZE);
         for (int i = 0; i < COMMUNICATOR_SIZE; i++) {
-            auto lambda_execute = [communicator](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
-                auto my_rank = communicator->join();
-                auto my_col = my_rank % SQRT_COMMUNICATOR_SIZE;
-                auto num_procs = communicator->getNumRanks();
-                auto my_row = my_rank / SQRT_COMMUNICATOR_SIZE;
-                communicator->barrier();
-                WRENCH_INFO("I am an action with rank %lu in a communicator (row %lu / col %lu 2-D coordinates)", my_rank, my_row, my_col);
-                for (int i = 0; i < SQRT_COMMUNICATOR_SIZE; i++) {
-                    communicator->barrier();
-                    if (my_rank == 0) {
-                        WRENCH_INFO("Iteration %d's computation phase begins...", i);
-                    }
-                    communicator->barrier();
-                    double flops = 2 * std::pow<double>(BLOCK_SIZE, 3);
-                    Simulation::compute(flops);
-                    if (my_rank == 0) {
-                        WRENCH_INFO("Iteration %d's computation phase ended", i);
-                        WRENCH_INFO("Iteration %d's communication phase begins...", i);
-                    }
-                    // Send messages to processes in my row and my column
-                    std::map<unsigned long, double> sends;
-                    double message_size = std::pow<double>(BLOCK_SIZE, 2);
-                    for (int j = 0; j < SQRT_COMMUNICATOR_SIZE; j++) {
-                        if (j != my_col) {
-                            sends[my_row * SQRT_COMMUNICATOR_SIZE + j] = message_size;
-                        }
-                        if (j != my_row) {
-                            sends[j * SQRT_COMMUNICATOR_SIZE + my_col] = message_size;
-                        }
-                    }
-                    communicator->sendAndReceive(sends, (SQRT_COMMUNICATOR_SIZE - 1) + (SQRT_COMMUNICATOR_SIZE - 1));
-                    if (my_rank == 0) {
-                        WRENCH_INFO("Iteration %d's communication phase ended", i);
-                    }
-                }
-                communicator->barrier();
-                WRENCH_INFO("Action with rank %lu (row %lu / col %lu 2-D coordinates) completed!", my_rank, my_row, my_col);
-                communicator->barrier();
+
+            auto lambda_execute = [communicator, storage_service, file](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
+              auto my_rank = communicator->join();
+
+              // Create my own data movement manager
+              auto data_manager = action_executor->createDataMovementManager();
+
+
+              communicator->barrier();
+              WRENCH_INFO("I am an action with rank %lu in my communicator", my_rank);
+              communicator->barrier();
+
+              // Do a bulk-synchronous loop of 10 iterations
+              for (unsigned long iter = 0; iter < 10; iter++) {
+
+                  if (my_rank == 0) {
+                      WRENCH_INFO("Iteration %lu", iter);
+                  }
+                  communicator->barrier();
+
+                  // Perform some computation
+                  double flops = 100 * GFLOP;
+                  Simulation::compute(flops);
+
+                  // Launch an asynchronous IO read to the storage service
+                  unsigned long num_io_bytes = 100*MB;
+                  data_manager->initiateAsynchronousFileRead(FileLocation::LOCATION(storage_service, file), num_io_bytes);
+
+                  // Participate in an all to all communication
+                  unsigned long num_comm_bytes = 10 * MB;
+                  communicator->MPI_Alltoall(num_comm_bytes, "ompi");
+
+                  // Wait for the asynchrous IO read to complete
+                  auto event = action_executor->waitForNextEvent();
+                  auto io_event = std::dynamic_pointer_cast<wrench::FileReadCompletedEvent>(event);
+                  if (not io_event) {
+                      throw std::runtime_error("Custom action: unexpected IO event: " + io_event->toString());
+                  }
+
+              }
+              communicator->barrier();
+              WRENCH_INFO("Action with rank %lu completed!", my_rank);
             };
+
             auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
 
             job->addCustomAction("action_" + std::to_string(i), 0, 1, lambda_execute, lambda_terminate);
@@ -118,7 +128,7 @@ namespace wrench {
         std::map<std::string, std::string> service_specific_args =
                 {{"-N", std::to_string(16)},
                  {"-c", std::to_string(1)},
-                 {"-t", std::to_string(3600)}};
+                 {"-t", std::to_string(3600*100)}};
         job_manager->submitJob(job, batch_cs, service_specific_args);
 
         /* Wait for an execution event */

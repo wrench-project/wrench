@@ -33,6 +33,7 @@ namespace wrench {
      * @param startup_overhead: a startup overhead, in seconds
      * @param grid_pre_overhead: a pre-job overhead for grid jobs, in seconds
      * @param non_grid_pre_overhead: a pre-job overhead for non-grid jobs, in seconds
+     * @param instant_resource_availabilities: true is instant resource availabilities to used
      * @param compute_services: a set of 'child' compute services available to and via the HTCondor pool
      * @param running_jobs: a list of currently running jobs
      * @param pending_jobs: a list of pending jobs
@@ -43,6 +44,7 @@ namespace wrench {
             double startup_overhead,
             double grid_pre_overhead,
             double non_grid_pre_overhead,
+            bool instant_resource_availabilities,
             std::set<std::shared_ptr<ComputeService>> &compute_services,
             std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
             std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
@@ -52,6 +54,8 @@ namespace wrench {
         this->startup_overhead = startup_overhead;
         this->grid_pre_overhead = grid_pre_overhead;
         this->non_grid_pre_overhead = non_grid_pre_overhead;
+        this->instant_resource_availabilities = instant_resource_availabilities;
+
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
 
@@ -89,7 +93,7 @@ namespace wrench {
 
         std::vector<std::shared_ptr<Job>> scheduled_jobs;
 
-        // Simulate some overhead
+        // Simulate startup overhead
         S4U_Simulation::sleep(this->startup_overhead);
 
         // sort jobs by priority
@@ -215,19 +219,19 @@ namespace wrench {
     /**
  * @brief Helper method to pick a target compute service for a job for a Non-Grid universe job
  * @param job: job to run
- * @param service_specific_arguments: service-specific arguments
- * @return
+ * @param service_specific_arguments: service-specific arguments (which may be augmented by this method!)
+ * @return A target compute service
  */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceNonGridUniverse(
-            std::shared_ptr<CompoundJob> job, std::map<std::string,
-                                                       std::string>
-                                                      service_specific_arguments) {
+            const std::shared_ptr<CompoundJob> &job,
+            std::map<std::string, std::string> service_specific_arguments) {
         std::shared_ptr<BareMetalComputeService> target_cs = nullptr;
 
         // Figure out which BatchComputeService compute services are available
         for (auto const &cs: this->compute_services) {
             // Only BareMetalComputeServices can be used
-            if (not std::dynamic_pointer_cast<BareMetalComputeService>(cs)) {
+            auto bmcs = std::dynamic_pointer_cast<BareMetalComputeService>(cs);
+            if (not bmcs) {
                 continue;
             }
             // If job type is not supported, nevermind (shouldn't happen really)
@@ -244,29 +248,16 @@ namespace wrench {
             unsigned long min_required_num_cores = job->getMinimumRequiredNumCores();
             double min_required_memory = job->getMinimumRequiredMemory();
 
-            bool enough_idle_resources = cs->isThereAtLeastOneHostWithIdleResources(min_required_num_cores,
-                                                                                    min_required_memory);
-#if 0
-            // Check on RAM constraints
-            auto ram_resources = cs->getPerHostAvailableMemoryCapacity();
-            unsigned long max_available_ram_capacity = 0;
-            for (auto const &entry: ram_resources) {
-                max_available_ram_capacity = std::max<unsigned long>(max_available_ram_capacity, entry.second);
-            }
-            if (max_available_ram_capacity < sjob->getMinimumRequiredMemory()) {
-                continue;
+            bool enough_idle_resources = false;
+
+            if (not this->instant_resource_availabilities) {
+                enough_idle_resources = bmcs->isThereAtLeastOneHostWithIdleResources(min_required_num_cores,
+                                                                                     min_required_memory);
+            } else {
+                enough_idle_resources = bmcs->isThereAtLeastOneHostWithIdleResourcesInstant(min_required_num_cores,
+                                                                                            min_required_memory);
             }
 
-            // Check on idle resources
-            auto idle_core_resources = cs->getPerHostNumIdleCores();
-            unsigned long max_num_idle_cores = 0;
-            for (auto const &entry : idle_core_resources) {
-                max_num_idle_cores = std::max<unsigned long>(max_num_idle_cores, entry.second);
-            }
-            if (max_num_idle_cores < sjob->getMinimumRequiredNumCores()) {
-                continue;
-            }
-#endif
             if (enough_idle_resources) {
                 // Return the first appropriate CS we found
                 return cs;

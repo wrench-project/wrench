@@ -10,7 +10,8 @@
 
 
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/managers/JobManagerMessage.h>
+#include "wrench/managers/job_manager/JobManagerMessage.h"
+#include "wrench/managers/data_movement_manager/DataMovementManagerMessage.h"
 
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
@@ -88,15 +89,34 @@ namespace wrench {
         } else if (auto m = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
             return std::shared_ptr<PilotJobExpiredEvent>(new PilotJobExpiredEvent(m->job, m->compute_service));
 
-        } else if (auto m = std::dynamic_pointer_cast<StorageServiceFileCopyAnswerMessage>(message)) {
+        } else if (auto m = std::dynamic_pointer_cast<DataManagerFileCopyAnswerMessage>(message)) {
             if (m->success) {
                 return std::shared_ptr<FileCopyCompletedEvent>(new FileCopyCompletedEvent(
-                        m->src->getFile(), m->src, m->dst));
+                        m->src_location, m->dst_location));
 
             } else {
                 return std::shared_ptr<FileCopyFailedEvent>(
-                        new FileCopyFailedEvent(m->src->getFile(), m->src, m->dst, m->failure_cause));
+                        new FileCopyFailedEvent(m->src_location, m->dst_location, m->failure_cause));
             }
+        } else if (auto m = std::dynamic_pointer_cast<DataManagerFileReadAnswerMessage>(message)) {
+            if (m->success) {
+                return std::shared_ptr<FileReadCompletedEvent>(new FileReadCompletedEvent(
+                        m->location, m->num_bytes));
+
+            } else {
+                return std::shared_ptr<FileReadFailedEvent>(
+                        new FileReadFailedEvent(m->location, m->num_bytes, m->failure_cause));
+            }
+        } else if (auto m = std::dynamic_pointer_cast<DataManagerFileWriteAnswerMessage>(message)) {
+            if (m->success) {
+                return std::shared_ptr<FileWriteCompletedEvent>(new FileWriteCompletedEvent(
+                        m->location));
+
+            } else {
+                return std::shared_ptr<FileWriteFailedEvent>(
+                        new FileWriteFailedEvent(m->location, m->failure_cause));
+            }
+
         } else if (auto m = std::dynamic_pointer_cast<ExecutionControllerAlarmTimerMessage>(message)) {
             return std::shared_ptr<TimerEvent>(new TimerEvent(m->message));
         } else {

@@ -21,10 +21,13 @@ namespace wrench {
         /**
          * @brief Constructor
          * @param data_size: number of data_size to send/recv
-         * @param notify_mailbox: mailbox to notify when done
+         * @param barrier: the synchronization barrier
          */
         MPI_Alltoall_partipant(int data_size, simgrid::s4u::BarrierPtr barrier) : data_size(data_size), barrier(std::move(barrier)) {}
 
+        /**
+	 * @brief The actor's main method
+	 */
         void operator()() {
 
             MPI_Init();
@@ -65,10 +68,13 @@ namespace wrench {
     public:
         /**
          * @brief Constructor
-         * @param notify_mailbox: mailbox to notify when done
+         * @param barrier: the synchronization barrier
          */
         explicit MPI_Barrier_partipant(simgrid::s4u::BarrierPtr barrier) : barrier(std::move(barrier)) {}
 
+        /**
+	 * @brief The actor's main method
+	 */
         void operator()() {
 
             MPI_Init();
@@ -105,10 +111,13 @@ namespace wrench {
         /**
          * @brief Constructor
          * @param data_size: number of data_size to send/recv
-         * @param notify_mailbox: mailbox to notify when done
+         * @param barrier: the synchronization barrier
          */
         MPI_Bcast_partipant(int data_size, simgrid::s4u::BarrierPtr barrier) : data_size(data_size), barrier(std::move(barrier)) {}
 
+        /**
+	 * @brief The actor's main method
+	 */
         void operator()() {
 
             MPI_Init();
@@ -129,6 +138,7 @@ namespace wrench {
     /**
      * @brief Method to perform an SMPI Bcast
      * @param hosts: list of hosts
+     * @param root_host: the host on which the root of the broadcast runs
      * @param data_size: size in data_size of each message sent/received
      */
     void SMPIExecutor::performBcast(std::vector<simgrid::s4u::Host *> &hosts,

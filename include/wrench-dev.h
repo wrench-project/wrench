@@ -48,8 +48,8 @@
 #include "wrench/services/file_registry/FileRegistryServiceProperty.h"
 
 // Managers
-#include "wrench/managers/JobManager.h"
-#include "wrench/managers/DataMovementManager.h"
+#include "wrench/managers/job_manager/JobManager.h"
+#include "wrench/managers/data_movement_manager/DataMovementManager.h"
 
 // Logging
 #include "wrench/logging/TerminalOutput.h"

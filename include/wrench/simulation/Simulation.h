@@ -38,7 +38,9 @@ namespace wrench {
     class SimulationOutput;
     class S4U_Simulation;
     class FileLocation;
+#ifdef PAGE_CACHE_SIMULATION
     class MemoryManager;
+#endif
 
     /**
      * @brief A class that provides basic simulation methods.  Once the simulation object has been
@@ -162,6 +164,12 @@ namespace wrench {
         static void turnOnLink(const std::string &link_name);
         static void turnOffLink(const std::string &link_name);
 
+        static void createNewDisk(const std::string &hostname, const std::string &disk_id,
+                           double read_bandwidth_in_bytes_per_sec,
+                           double write_bandwidth_in_bytes_per_sec,
+                           double capacity_in_bytes,
+                           const std::string &mount_point);
+
         // pstate related calls
         void setPstate(const std::string &hostname, int pstate);
         static int getCurrentPstate(const std::string &hostname);
@@ -170,7 +178,9 @@ namespace wrench {
         std::shared_ptr<StorageService> startNewService(StorageService *service);
         std::shared_ptr<NetworkProximityService> startNewService(NetworkProximityService *service);
         std::shared_ptr<FileRegistryService> startNewService(FileRegistryService *service);
+#ifdef PAGE_CACHE_SIMULATION
         std::shared_ptr<MemoryManager> startNewService(MemoryManager *service);
+#endif
 
         static double getCurrentSimulatedDate();
 
@@ -193,7 +203,9 @@ namespace wrench {
         void readWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location);
         void writebackWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location, bool is_dirty);
         void writeThroughWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location);
+#ifdef PAGE_CACHE_SIMULATION
         MemoryManager *getMemoryManagerByHost(const std::string &hostname);
+#endif
 
         static double getMemoryCapacity();
         static unsigned long getNumCores();
@@ -227,7 +239,10 @@ namespace wrench {
         std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services;
         std::set<std::shared_ptr<ComputeService>> compute_services;
         std::set<std::shared_ptr<StorageService>> storage_services;
+
+#ifdef PAGE_CACHE_SIMULATION
         std::set<std::shared_ptr<MemoryManager>> memory_managers;
+#endif
 
         static int unique_disk_sequence_number;
 
@@ -244,7 +259,10 @@ namespace wrench {
         void addService(const std::shared_ptr<FileRegistryService> &service);
         void addService(const std::shared_ptr<EnergyMeterService> &service);
         void addService(const std::shared_ptr<BandwidthMeterService> &service);
+
+#ifdef PAGE_CACHE_SIMULATION
         void addService(const std::shared_ptr<MemoryManager> &memory_manager);
+#endif
 
         static std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
 

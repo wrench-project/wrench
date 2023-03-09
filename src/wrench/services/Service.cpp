@@ -258,9 +258,9 @@ namespace wrench {
         } catch (std::invalid_argument &e) {
             throw;
         }
-        if (string_value == "true") {
+        if (string_value == "true" or string_value == "True") {
             return true;
-        } else if (string_value == "false") {
+        } else if (string_value == "false" or string_value == "False") {
             return false;
         } else {
             throw std::invalid_argument(

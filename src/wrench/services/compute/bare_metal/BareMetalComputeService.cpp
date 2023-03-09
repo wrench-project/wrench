@@ -49,7 +49,7 @@ namespace wrench {
         // Do the default behavior (which will throw as this is not a fault-tolerant service)
         Service::cleanup(has_returned_from_main, return_value);
 
-        this->action_execution_service = nullptr; // to avoid leak due to circular refs
+        this->action_execution_service = nullptr;// to avoid leak due to circular refs
         this->current_jobs.clear();
         this->not_ready_actions.clear();
         this->ready_actions.clear();
@@ -906,5 +906,16 @@ namespace wrench {
     bool BareMetalComputeService::supportsPilotJobs() {
         return false;
     }
+
+    /**
+     * @brief An "out of simulation time" (instant) method to check on resource availability
+     * @param num_cores: desired number of cores
+     * @param ram: desire RAM footprint
+     * @return true if there is at least one host with the available free resources, false otherwise
+     */
+    bool BareMetalComputeService::isThereAtLeastOneHostWithIdleResourcesInstant(unsigned long num_cores, double ram) {
+        return this->action_execution_service->IsThereAtLeastOneHostWithAvailableResources(num_cores, ram);
+    }
+
 
 }// namespace wrench

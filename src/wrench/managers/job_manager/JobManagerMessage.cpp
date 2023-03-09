@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/managers/JobManagerMessage.h"
+#include "wrench/managers/job_manager/JobManagerMessage.h"
 
 #include <utility>
 
