@@ -164,6 +164,12 @@ namespace wrench {
         static void turnOnLink(const std::string &link_name);
         static void turnOffLink(const std::string &link_name);
 
+        static void createNewDisk(const std::string &hostname, const std::string &disk_id,
+                           double read_bandwidth_in_bytes_per_sec,
+                           double write_bandwidth_in_bytes_per_sec,
+                           double capacity_in_bytes,
+                           const std::string &mount_point);
+
         // pstate related calls
         void setPstate(const std::string &hostname, int pstate);
         static int getCurrentPstate(const std::string &hostname);

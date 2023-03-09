@@ -44,6 +44,12 @@ namespace wrench {
                                           const std::shared_ptr<FileLocation> &dst,
                                           const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
 
+        void initiateAsynchronousFileRead(const std::shared_ptr<FileLocation> &location,
+                                          const double num_bytes);
+
+        void initiateAsynchronousFileWrite(const std::shared_ptr<FileLocation> &location,
+                                           const std::shared_ptr<FileRegistryService> &file_registry_service);
+
         void doSynchronousFileCopy(const std::shared_ptr<FileLocation> &src,
                                    const std::shared_ptr<FileLocation> &dst,
                                    const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
@@ -77,21 +83,50 @@ namespace wrench {
             std::shared_ptr<FileLocation> dst;
             std::shared_ptr<FileRegistryService> file_registry_service;
 
-            ~CopyRequestSpecs() {
-            }
+            ~CopyRequestSpecs() = default;
 
             CopyRequestSpecs(std::shared_ptr<FileLocation> src,
                              std::shared_ptr<FileLocation> dst,
                              std::shared_ptr<FileRegistryService> file_registry_service) : src(std::move(src)), dst(std::move(dst)), file_registry_service(std::move(file_registry_service)) {}
 
             bool operator==(const CopyRequestSpecs &rhs) const {
-                return (dst->getFile() == rhs.dst->getFile()) &&
-                       (dst->getStorageService() == rhs.dst->getStorageService()) &&
-                       (dst->getPath() == rhs.dst->getPath());
+                return (src->equal(rhs.src) &&
+                       dst->equal(rhs.dst));
             }
         };
 
+        struct ReadRequestSpecs {
+            std::shared_ptr<FileLocation> location;
+            double num_bytes;
+
+            ~ReadRequestSpecs() = default;
+
+            ReadRequestSpecs(std::shared_ptr<FileLocation> location,
+                             double num_bytes) : location(std::move(location)), num_bytes(num_bytes) {}
+
+            bool operator==(const ReadRequestSpecs &rhs) const {
+                return (location->equal(rhs.location));
+            }
+        };
+
+        struct WriteRequestSpecs {
+            std::shared_ptr<FileLocation> location;
+            std::shared_ptr<FileRegistryService> file_registry_service;
+
+            ~WriteRequestSpecs() = default;
+
+            WriteRequestSpecs(std::shared_ptr<FileLocation> location,
+                             std::shared_ptr<FileRegistryService> file_registry_service) : location(std::move(location)), file_registry_service(std::move(file_registry_service)) {}
+
+            bool operator==(const WriteRequestSpecs &rhs) const {
+                return (location->equal(rhs.location));
+            }
+        };
+
+
         std::list<std::unique_ptr<CopyRequestSpecs>> pending_file_copies;
+        std::list<std::unique_ptr<ReadRequestSpecs>> pending_file_reads;
+        std::list<std::unique_ptr<WriteRequestSpecs>> pending_file_writes;
     };
 
     /***********************/
