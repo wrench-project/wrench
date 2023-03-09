@@ -770,10 +770,10 @@ namespace wrench {
      * @param mount_point: the disk's mount point (most people use "/")
      */
     void Simulation::createNewDisk(const std::string &hostname, const std::string &disk_id,
-                                       double read_bandwidth_in_bytes_per_sec,
-                                       double write_bandwidth_in_bytes_per_sec,
-                                       double capacity_in_bytes,
-                                       const std::string &mount_point) {
+                                   double read_bandwidth_in_bytes_per_sec,
+                                   double write_bandwidth_in_bytes_per_sec,
+                                   double capacity_in_bytes,
+                                   const std::string &mount_point) {
         S4U_Simulation::createNewDisk(hostname, disk_id, read_bandwidth_in_bytes_per_sec, write_bandwidth_in_bytes_per_sec, capacity_in_bytes, mount_point);
     }
 
