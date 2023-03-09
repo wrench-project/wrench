@@ -736,22 +736,22 @@ namespace wrench {
     void ActionExecutionService::processActionExecutorCompletion(
             const std::shared_ptr<ActionExecutor> &executor) {
 
-        hostname = executor->getHostname();
-        auto action = executor->getAction();
+//        auto hostname = executor->getHostname();
+//        auto action = executor->getAction();
 
         // Update RAM availabilities and running thread counts
-        this->ram_availabilities[hostname] += executor->getMemoryAllocated();
-        this->running_thread_counts[hostname] -= executor->getNumCoresAllocated();
+        this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
+        this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
 
         // Forget the action executor
-        this->action_executors.erase(action);
-        this->all_actions.erase(action);
-        this->action_run_specs.erase(action);
+        this->action_executors.erase(executor->getAction());
+        this->all_actions.erase(executor->getAction());
+        this->action_run_specs.erase(executor->getAction());
 
         // Send the notification to the originator
         S4U_Mailbox::dputMessage(
                 this->parent_service->mailbox, new ActionExecutionServiceActionDoneMessage(
-                                                       action, 0.0));
+                                                       executor->getAction(), 0.0));
     }
 
     /**
