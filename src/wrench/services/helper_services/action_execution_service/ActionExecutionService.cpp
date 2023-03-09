@@ -539,7 +539,7 @@ namespace wrench {
         } else if (std::dynamic_pointer_cast<HostHasTurnedOffMessage>(message)) {
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
-                        ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+                    ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
 
             } else {
@@ -597,7 +597,7 @@ namespace wrench {
             processActionExecutorCrash(action_executor);
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
-                        ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+                    ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
 
             } else {
@@ -736,22 +736,22 @@ namespace wrench {
     void ActionExecutionService::processActionExecutorCompletion(
             const std::shared_ptr<ActionExecutor> &executor) {
 
-//        auto hostname = executor->getHostname();
-//        auto action = executor->getAction();
+        auto executor_hostname = executor->getHostname();
+        auto action = executor->getAction();
 
         // Update RAM availabilities and running thread counts
-        this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
-        this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
+        this->ram_availabilities[executor_hostname] += executor->getMemoryAllocated();
+        this->running_thread_counts[executor_hostname] -= executor->getNumCoresAllocated();
 
         // Forget the action executor
-        this->action_executors.erase(executor->getAction());
-        this->all_actions.erase(executor->getAction());
-        this->action_run_specs.erase(executor->getAction());
+        this->action_executors.erase(action);
+        this->all_actions.erase(action);
+        this->action_run_specs.erase(action);
 
         // Send the notification to the originator
         S4U_Mailbox::dputMessage(
                 this->parent_service->mailbox, new ActionExecutionServiceActionDoneMessage(
-                                                       executor->getAction(), 0.0));
+                        action, 0.0));
     }
 
     /**
