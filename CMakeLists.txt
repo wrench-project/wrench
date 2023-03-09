@@ -425,7 +425,7 @@ set(TEST_FILES
         test/services/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
         test/services/storage_services/SimpleStorageService/StorageServiceDeleteRegisterTest.cpp
-        test/services/storage_services/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
+        test/managers/DataMovementManagerTest.cpp
         test/services/storage_services/SimpleStorageService/ZeroSizeFileTest.cpp
         test/services/storage_services/SimpleStorageService/ChunkingTest.cpp
         test/services/storage_services/SimpleStorageService/CopyBufferizedNonBufferizedTest.cpp
