@@ -198,12 +198,12 @@ namespace wrench {
                                                     const std::string &hostname,
                                                     const std::string &read_mount_point,
                                                     const std::string &write_mount_point);
-        void writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point);
+        void writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk);
 
+#ifdef PAGE_CACHE_SIMULATION
         void readWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location);
         void writebackWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location, bool is_dirty);
         void writeThroughWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location);
-#ifdef PAGE_CACHE_SIMULATION
         MemoryManager *getMemoryManagerByHost(const std::string &hostname);
 #endif
 

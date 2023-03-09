@@ -59,7 +59,7 @@ namespace wrench {
                                            double parallel_per_thread_work);
         static void sleep(double);
         static void computeZeroFlop();
-        static void writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point);
+        static void writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk);
         static void readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point);
         static void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                            const std::string &hostname,

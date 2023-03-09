@@ -843,15 +843,16 @@ namespace wrench {
      * @param num_bytes: number of bytes written
      * @param hostname: name of the host to write to
      * @param mount_point: mount point of the disk to write to at the host
+     * @param disk: a simgrid disk to write to (nullptr if not known)
      *
      * @throw invalid_argument
      */
-    void Simulation::writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point) {
+    void Simulation::writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
-            S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point);
+            S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point, disk);
         } catch (const std::invalid_argument &ia) {
             this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
                                                            temp_unique_sequence_number);

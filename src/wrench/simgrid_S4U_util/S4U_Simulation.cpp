@@ -523,33 +523,37 @@ namespace wrench {
     }
 
     /**
-* @brief Simulates a disk write
-*
-* @param num_bytes: number of bytes to write
-* @param hostname: name of host to which disk is attached
-* @param mount_point: mount point
-*/
-    void S4U_Simulation::writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point) {
+    * @brief Simulates a disk write
+    *
+    * @param num_bytes: number of bytes to write
+    * @param hostname: name of host to which disk is attached
+    * @param mount_point: mount point
+    * @param disk: a disk to write to, if known
+    */
+    void S4U_Simulation::writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk) {
         mount_point = FileLocation::sanitizePath(mount_point);
 
         WRENCH_DEBUG("Writing %lf bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
 
-        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
-        if (not host) {
-            throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown host " + hostname);
-        }
-
-        auto disk_list = host->get_disks();
-        for (auto disk: disk_list) {
-            std::string disk_mountpoint =
-                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
-            if (disk_mountpoint == mount_point) {
-                disk->write((sg_size_t) num_bytes);
-                return;
+        if (not disk) {
+            auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
+            if (not host) {
+                throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown host " + hostname);
             }
+
+            auto disk_list = host->get_disks();
+            for (auto d: disk_list) {
+                std::string disk_mountpoint =
+                        FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+                if (disk_mountpoint == mount_point) {
+                    disk = d;
+                    break;
+                }
+            }
+            throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown path " +
+                                        mount_point + " at host " + hostname);
         }
-        throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown path " +
-                                    mount_point + " at host " + hostname);
+        disk->write((sg_size_t) num_bytes);
     }
 
 

@@ -313,7 +313,7 @@ namespace wrench {
                             throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Storage Service should be a SimpleStorageService for disk write");
                         }
                         simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
-                                                dst_ss->getPathMountPoint(location->getPath()));
+                                                dst_ss->getPathMountPoint(location->getPath()), dst_location->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
                     }
 #endif
@@ -342,13 +342,13 @@ namespace wrench {
                     }
                 } else {
 #endif
-                    //                     Write to disk
+                    // Write to disk
                     auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
                     if (!ss) {
                         throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
                     }
                     simulation->writeToDisk(msg->payload, ss->hostname,
-                                            ss->getPathMountPoint(location->getPath()));
+                                            ss->getPathMountPoint(location->getPath()), location->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
                 }
 #endif
@@ -494,7 +494,7 @@ namespace wrench {
             }
             // Write the last chunk
             simulation->writeToDisk(remaining, dst_loc->getStorageService()->hostname,
-                                    dst_mount_point);
+                                    dst_mount_point, dst_loc->getDiskOrNull());
         }
     }
 
@@ -606,7 +606,7 @@ namespace wrench {
                     // Write to disk
                     simulation->writeToDisk(msg->payload,
                                             dst_ss->getHostname(),
-                                            dst_ss->getPathMountPoint(dst_loc->getPath()));
+                                            dst_ss->getPathMountPoint(dst_loc->getPath()), dst_loc->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
                 }
 #endif
@@ -634,7 +634,7 @@ namespace wrench {
                 // Write to disk
                 simulation->writeToDisk(msg->payload,
                                         dst_ss->getHostname(),
-                                        dst_ss->getPathMountPoint(dst_loc->getPath()));
+                                        dst_ss->getPathMountPoint(dst_loc->getPath()), dst_loc->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
             }
 #endif
