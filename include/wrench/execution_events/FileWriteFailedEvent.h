@@ -51,7 +51,7 @@ namespace wrench {
          * @param failure_cause: a failure cause
          */
         FileWriteFailedEvent(std::shared_ptr<FileLocation> location,
-                            std::shared_ptr<FailureCause> failure_cause)
+                             std::shared_ptr<FailureCause> failure_cause)
             : location(std::move(location)),
               failure_cause(std::move(failure_cause)) {}
 
