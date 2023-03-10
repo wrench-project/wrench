@@ -129,7 +129,11 @@ private:
         };
 
         /* Add an action with 10 MPI processes, each of which has 2 cores */
-        job->addMPIAction("my_mpi_action", mpi_code, 10, 2);
+        auto action = job->addMPIAction("my_mpi_action", mpi_code, 10, 2);
+
+        action->getNumProcesses();
+        action->getNumCoresPerProcess();
+
 
         /* Submit the job to the batch compute service */
         WRENCH_INFO("Submitting job %s to the batch service", job->getName().c_str());
@@ -146,7 +150,6 @@ private:
         }
 
         return 0;
-
     }
 };
 

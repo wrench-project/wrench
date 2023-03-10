@@ -28,6 +28,9 @@ namespace wrench {
     class MPIAction : public Action {
 
     public:
+        unsigned long getNumProcesses() const;
+        unsigned long getNumCoresPerProcess() const;
+
     protected:
         friend class CompoundJob;
 
@@ -40,9 +43,6 @@ namespace wrench {
         unsigned long getMinNumCores() const override;
         unsigned long getMaxNumCores() const override;
         double getMinRAMFootprint() const override;
-
-        unsigned long getNumProcesses() const;
-        unsigned long getNumCoresPerProcesses() const;
 
         void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
         void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
