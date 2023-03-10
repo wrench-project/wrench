@@ -132,7 +132,7 @@ namespace wrench {
      * @brief Returns the number of cores required by each (MPI) process
      * @return a number of cores
      */
-    unsigned long MPIAction::getNumCoresPerProcesses() const {
+    unsigned long MPIAction::getNumCoresPerProcess() const {
         return this->num_cores_per_processes;
     }
 

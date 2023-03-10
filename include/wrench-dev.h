@@ -64,6 +64,7 @@
 #include "wrench/action/Action.h"
 #include "wrench/action/ComputeAction.h"
 #include "wrench/action/CustomAction.h"
+#include "wrench/action/MPIAction.h"
 #include "wrench/action/FileCopyAction.h"
 #include "wrench/action/FileDeleteAction.h"
 #include "wrench/action/FileReadAction.h"
