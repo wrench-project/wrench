@@ -21,6 +21,7 @@
 #include <wrench/action/FileRegistryAddEntryAction.h>
 #include <wrench/action/FileRegistryDeleteEntryAction.h>
 #include <wrench/action/CustomAction.h>
+#include <wrench/action/MPIAction.h>
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 WRENCH_LOG_CATEGORY(wrench_core_compound_job, "Log category for CompoundJob");
 
@@ -355,6 +356,25 @@ namespace wrench {
         this->addAction(custom_action);
         return custom_action;
     }
+
+    /**
+     * @brief Add an MPI action to the job
+     * @param name: the action's name (if empty, a unique name will be picked for you)
+     * @param mpi_code: a lambda/function that implements the MPI code that MPI processes should execute
+     * @param num_processes: the number of MPI processes
+     * @param num_cores_per_process: the number of core that each MPI process should use
+     * @return an MPI action
+     */
+    std::shared_ptr<MPIAction> CompoundJob::addMPIAction(const std::string &name,
+                                               const std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> &mpi_code,
+                                               unsigned long num_processes,
+                                               unsigned long num_cores_per_process) {
+        auto new_action = std::shared_ptr<MPIAction>(
+                new MPIAction(name, num_processes, num_cores_per_process, mpi_code));
+        this->addAction(new_action);
+        return new_action;
+    }
+
 
 
     /**
