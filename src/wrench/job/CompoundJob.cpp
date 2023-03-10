@@ -375,8 +375,6 @@ namespace wrench {
         return new_action;
     }
 
-
-
     /**
      * @brief Helper method to add an action to the job
      * @param action: an action
