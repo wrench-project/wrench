@@ -432,11 +432,11 @@ private:
                 data_movement_manager->initiateAsynchronousFileWrite(
                         write_location,
                         file_registry_service);
-                throw std::runtime_error("Should be able to concurrently write to the same location");
+                throw std::runtime_error("Should not be able to concurrently write to the same location");
             } catch (wrench::ExecutionException &e) {
                 auto real_cause = std::dynamic_pointer_cast<wrench::FileAlreadyBeingWritten>(e.getCause());
                 if (not real_cause) {
-                    throw std::runtime_error("Unexpected failurecause: " + real_cause->toString());
+                    throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString());
                 }
                 real_cause->toString(); // coverage
                 real_cause->getLocation(); // coverage
@@ -617,11 +617,11 @@ private:
             try {
                 data_movement_manager->initiateAsynchronousFileRead(
                         wrench::FileLocation::LOCATION(this->test->src_storage_service, this->test->src_file_1));
-                throw std::runtime_error("Should be able to concurrently read from the same location");
+                throw std::runtime_error("Should not be able to concurrently read from the same location");
             } catch (wrench::ExecutionException &e) {
                 auto real_cause = std::dynamic_pointer_cast<wrench::FileAlreadyBeingRead>(e.getCause());
                 if (not real_cause) {
-                    throw std::runtime_error("Unexpected failurecause: " + real_cause->toString());
+                    throw std::runtime_error("Unexpected failure cause: " + real_cause->toString());
                 }
                 real_cause->toString(); // coverage
                 real_cause->getLocation(); // coverage
