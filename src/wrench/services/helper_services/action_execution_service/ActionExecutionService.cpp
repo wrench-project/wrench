@@ -39,7 +39,6 @@ namespace wrench {
      * @brief Destructor
      */
     ActionExecutionService::~ActionExecutionService() {
-        this->default_property_values.clear();
     }
 
     /**

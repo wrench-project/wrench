@@ -81,9 +81,6 @@ namespace wrench {
      * @brief Destructor
      */
     HTCondorCentralManagerService::~HTCondorCentralManagerService() {
-        this->pending_jobs.clear();
-        this->compute_services.clear();
-        this->running_jobs.clear();
     }
 
     /**
