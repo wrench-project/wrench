@@ -438,8 +438,8 @@ private:
                 if (not real_cause) {
                     throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString());
                 }
-                real_cause->toString(); // coverage
-                real_cause->getLocation(); // coverage
+                real_cause->toString();   // coverage
+                real_cause->getLocation();// coverage
             }
 
 
@@ -623,8 +623,8 @@ private:
                 if (not real_cause) {
                     throw std::runtime_error("Unexpected failure cause: " + real_cause->toString());
                 }
-                real_cause->toString(); // coverage
-                real_cause->getLocation(); // coverage
+                real_cause->toString();   // coverage
+                real_cause->getLocation();// coverage
             }
 
 
