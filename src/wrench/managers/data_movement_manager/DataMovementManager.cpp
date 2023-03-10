@@ -162,7 +162,7 @@ namespace wrench {
         for (auto const &p: this->pending_file_writes) {
             if (*p == request) {
                 throw ExecutionException(
-                        std::shared_ptr<FailureCause>(new FileAlreadyBeingRead(location)));
+                        std::shared_ptr<FailureCause>(new FileAlreadyBeingWritten(location)));
             }
         }
 
