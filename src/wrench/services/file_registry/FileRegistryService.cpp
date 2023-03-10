@@ -45,7 +45,6 @@ namespace wrench {
     }
 
     FileRegistryService::~FileRegistryService() {
-        this->default_property_values.clear();
     }
 
     /**
