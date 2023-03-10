@@ -189,6 +189,7 @@ set(HEADER_FILES
         include/wrench/action/Action.h
         include/wrench/action/SleepAction.h
         include/wrench/action/CustomAction.h
+        include/wrench/action/MPIAction.h
         include/wrench/action/FileReadAction.h
         include/wrench/action/FileWriteAction.h
         include/wrench/action/FileCopyAction.h
@@ -379,6 +380,7 @@ set(SOURCE_FILES
         src/wrench/action/Action.cpp
         src/wrench/action/SleepAction.cpp
         src/wrench/action/CustomAction.cpp
+        src/wrench/action/MPIAction.cpp
         src/wrench/action/FileReadAction.cpp
         src/wrench/action/FileWriteAction.cpp
         src/wrench/action/FileCopyAction.cpp
