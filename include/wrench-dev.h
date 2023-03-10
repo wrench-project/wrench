@@ -19,6 +19,8 @@
 #include "wrench/failure_causes/FatalFailure.h"
 #include "wrench/failure_causes/SomeActionsHaveFailed.h"
 #include "wrench/failure_causes/FileAlreadyBeingCopied.h"
+#include "wrench/failure_causes/FileAlreadyBeingWritten.h"
+#include "wrench/failure_causes/FileAlreadyBeingRead.h"
 #include "wrench/failure_causes/FileNotFound.h"
 #include "wrench/failure_causes/FunctionalityNotAvailable.h"
 #include "wrench/failure_causes/InvalidDirectoryPath.h"

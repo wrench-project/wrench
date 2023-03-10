@@ -98,6 +98,16 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Ask the data manager to initiate an asynchronous file read
+     * @param location: the location to read from
+     *
+     * @throw std::invalid_argument
+     * @throw ExecutionException
+     */
+    void DataMovementManager::initiateAsynchronousFileRead(const std::shared_ptr<FileLocation> &location) {
+        this->initiateAsynchronousFileRead(location, location->getFile()->getSize());
+    }
 
     /**
      * @brief Ask the data manager to initiate an asynchronous file read

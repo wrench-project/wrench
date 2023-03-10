@@ -423,8 +423,25 @@ private:
                         write_location,
                         file_registry_service);
             } catch (wrench::ExecutionException &e) {
-                throw std::runtime_error("Got an exception while trying to instantiate a file write: " + std::string(e.what()));
+                throw std::runtime_error("Got an exception while trying to instantiate a file write: " + e.getCause()->toString());
             }
+
+            wrench::Simulation::sleep(0.01);
+
+            try {
+                data_movement_manager->initiateAsynchronousFileWrite(
+                        write_location,
+                        file_registry_service);
+                throw std::runtime_error("Should be able to concurrently write to the same location");
+            } catch (wrench::ExecutionException &e) {
+                auto real_cause = std::dynamic_pointer_cast<wrench::FileAlreadyBeingWritten>(e.getCause());
+                if (not real_cause) {
+                    throw std::runtime_error("Unexpected failurecause: " + real_cause->toString());
+                }
+                real_cause->toString(); // coverage
+                real_cause->getLocation(); // coverage
+            }
+
 
             try {
                 async_write_event = this->waitForNextEvent();
@@ -594,6 +611,22 @@ private:
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Got an exception while trying to instantiate a file read: " + std::string(e.what()));
             }
+
+            wrench::Simulation::sleep(0.01);
+
+            try {
+                data_movement_manager->initiateAsynchronousFileRead(
+                        wrench::FileLocation::LOCATION(this->test->src_storage_service, this->test->src_file_1));
+                throw std::runtime_error("Should be able to concurrently read from the same location");
+            } catch (wrench::ExecutionException &e) {
+                auto real_cause = std::dynamic_pointer_cast<wrench::FileAlreadyBeingRead>(e.getCause());
+                if (not real_cause) {
+                    throw std::runtime_error("Unexpected failurecause: " + real_cause->toString());
+                }
+                real_cause->toString(); // coverage
+                real_cause->getLocation(); // coverage
+            }
+
 
             try {
                 async_read_event = this->waitForNextEvent();
