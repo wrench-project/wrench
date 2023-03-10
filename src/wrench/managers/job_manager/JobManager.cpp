@@ -45,8 +45,6 @@ namespace wrench {
      * @brief Destructor, which kills the daemon (and clears all the jobs)
      */
     JobManager::~JobManager() {
-        this->jobs_to_dispatch.clear();
-        this->jobs_dispatched.clear();
     }
 
     /**

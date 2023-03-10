@@ -108,9 +108,6 @@ namespace wrench {
      * @brief Destructor
      */
     HTCondorComputeService::~HTCondorComputeService() {
-        this->central_manager = nullptr;
-        this->default_property_values.clear();
-        this->default_messagepayload_values.clear();
     }
 
     /**
