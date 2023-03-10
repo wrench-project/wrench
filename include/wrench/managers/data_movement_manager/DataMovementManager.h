@@ -47,6 +47,8 @@ namespace wrench {
         void initiateAsynchronousFileRead(const std::shared_ptr<FileLocation> &location,
                                           const double num_bytes);
 
+        void initiateAsynchronousFileRead(const std::shared_ptr<FileLocation> &location);
+
         void initiateAsynchronousFileWrite(const std::shared_ptr<FileLocation> &location,
                                            const std::shared_ptr<FileRegistryService> &file_registry_service);
 

@@ -81,7 +81,6 @@ namespace wrench {
                 // Create my own data movement manager
                 auto data_manager = action_executor->createDataMovementManager();
 
-
                 communicator->barrier();
                 WRENCH_INFO("I am an action with rank %lu in my communicator", my_rank);
                 communicator->barrier();
