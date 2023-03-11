@@ -66,7 +66,8 @@ namespace wrench {
         WRENCH_INFO("Creating a compound job");
         auto job = job_manager->createCompoundJob("my_mpi_job");
 
-        /* MPI code to execute */
+        /* MPI code to execute as part of the action. Note that there are extra barriers
+         * so that the log output is not weirdly interleaved */
         auto mpi_code = [storage_service, file](const std::shared_ptr<ActionExecutor> &action_executor) {
             int num_procs;
             int my_rank;
@@ -81,6 +82,7 @@ namespace wrench {
             // Create my own data movement manager
             auto data_manager = action_executor->createDataMovementManager();
 
+            // "Allocate" memory for the data that will be communicated
             int num_comm_bytes = 1000000;
             void *data = SMPI_SHARED_MALLOC(num_comm_bytes * num_procs);
 
@@ -122,14 +124,16 @@ namespace wrench {
         };
 
         /* Add an action with 16 MPI processes, each of which has 4 cores */
-        job->addMPIAction("my_mpi_action", mpi_code, 16, 4);
+        int num_mpi_processes = 16;
+        int num_cores_per_process = 4;
+        job->addMPIAction("my_mpi_action", mpi_code, num_mpi_processes, num_cores_per_process);
 
         /* Submit the job to the batch compute service */
         WRENCH_INFO("Submitting job %s to the batch service", job->getName().c_str());
         std::map<std::string, std::string> service_specific_args =
-                {{"-N", std::to_string(16)},
-                 {"-c", std::to_string(4)},
-                 {"-t", std::to_string(3600 * 100)}};
+                {{"-N", std::to_string(num_mpi_processes)}, // Number of compute nodes
+                 {"-c", std::to_string(num_cores_per_process)}, // Number of cores per compute node
+                 {"-t", std::to_string(3600 * 100)}}; // Requested time in seconds
         job_manager->submitJob(job, batch_cs, service_specific_args);
 
         /* Wait for an execution event */

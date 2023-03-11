@@ -560,7 +560,7 @@ you will find the typical pattern:
      [...]
 
      // Print an info-level message, using printf-like format
-     WRENCH_INFO("Submitting the job, asking for %s %s-core nodes for %s minutes",
+     WRENCH_INFO("Submitting the job, asking for %s %s-core nodes for %s seconds",
                  service_specific_arguments["-N"].c_str(),
                  service_specific_arguments["-c"].c_str(),
                  service_specific_arguments["-t"].c_str());

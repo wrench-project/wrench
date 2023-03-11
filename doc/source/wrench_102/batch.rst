@@ -10,7 +10,7 @@ to pass to it a service-specific argument. This argument is a
 ``std::map<std::string, std::string>`` of key-value pairs, and must have
 the following three elements:
 
--  key: ``-t``; value: a requested runtime in minutes that, if exceeded,
+-  key: ``-t``; value: a requested runtime in seconds that, if exceeded,
    causes forceful job termination (e.g., “60”);
 -  key: ``-N``; value: a requested number of compute nodes (e.g., “2”);
    and
@@ -36,7 +36,7 @@ Here is an example job submission to the batch service:
    std::map<std::string, std::string> service_specific_args;
 
    //   The job will run no longer than 1 hour
-   service_specific_args["-t"] = "60";
+   service_specific_args["-t"] = "3600";
 
    //   The job will run on 2 compute nodes
    service_specific_args["-N"] = "2";
@@ -67,9 +67,9 @@ expires) bare-metal compute service. Here is a simple code excerpt:
    // create a pilot job
    auto pilot_job = job_manager->createPilotJob();
 
-   // submit it to the batch compute service, asking for 2 10-core nodes for 20 minutes
+   // submit it to the batch compute service, asking for 2 10-core nodes for 1200 seconds
    std::map<std::string, std::string> service_specific_arguments = 
-               {{"-N","2"},{"-c","10"},{"-t","20"}};
+               {{"-N","2"},{"-c","10"},{"-t","1200"}};
    job_manager->submitJob(pilot_job, some_batch_service, service_specific_arguments);
 
    // Waiting for the next event (which will be a pilot job start event)
