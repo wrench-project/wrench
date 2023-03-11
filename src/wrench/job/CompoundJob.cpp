@@ -358,11 +358,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Add an MPI action to the job. This action will start processes on the whole
-     *        set of resources allocated to the job that contains this action. If other actions
-     *        in the job are running, they will shared resources with this MPI action. In general,
-     *        the use-case for an MPI action is that never runs concurrently with other actions
-     *        within its job, adn that that job is submitted to a BatchComputeService.
+     * @brief Add an MPI action to the job.  The intended
+     *         use-case for an MPI action is that never runs concurrently with other actions
+     *        within its job, and that that job is submitted to a BatchComputeService, so that it
+     *        has a set of resources dedicated to it. If the job
+     *        is submitted to a BareMetalComputeService, this action will use all of that service's
+     *        resources, regardless of other running actions/jobs on that service.
      * @param name: the action's name (if empty, a unique name will be picked for you)
      * @param mpi_code: a lambda/function that implements the MPI code that MPI processes should execute
      * @param num_processes: the number of MPI processes that will be started.
