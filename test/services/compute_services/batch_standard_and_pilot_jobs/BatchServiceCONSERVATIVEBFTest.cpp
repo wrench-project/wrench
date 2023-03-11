@@ -273,7 +273,7 @@ private:
                 random = random * 17 + 4123451;
                 job_specific_args["-N"] = std::to_string(1 + random % 4);
                 random = random * 17 + 4123451;
-                job_specific_args["-t"] = std::to_string(60 *(1 + random % 100));
+                job_specific_args["-t"] = std::to_string(60 * (1 + random % 100));
                 job_specific_args["-c"] = "10";
                 job_manager->submitJob(jobs[i], this->test->compute_service, job_specific_args);
             }
@@ -599,23 +599,23 @@ private:
                 job5;
 
         job1["-N"] = "4";
-        job1["-t"] = std::to_string(75*60);
+        job1["-t"] = std::to_string(75 * 60);
         job1["-c"] = "10";
 
         job2["-N"] = "2";
-        job2["-t"] = std::to_string(25*60);
+        job2["-t"] = std::to_string(25 * 60);
         job2["-c"] = "10";
 
         job3["-N"] = "4";
-        job3["-t"] = std::to_string(67*60);
+        job3["-t"] = std::to_string(67 * 60);
         job3["-c"] = "10";
 
         job4["-N"] = "2";
-        job4["-t"] = std::to_string(25*60);
+        job4["-t"] = std::to_string(25 * 60);
         job4["-c"] = "10";
 
         job5["-N"] = "4";
-        job5["-t"] = std::to_string(59*60);
+        job5["-t"] = std::to_string(59 * 60);
         job5["-c"] = "10";
 
         int num_jobs_submitted = 0;
