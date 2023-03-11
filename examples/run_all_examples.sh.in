@@ -167,3 +167,10 @@ echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/communicating-custom-actions/wre
 ${INSTALL_DIR}/action_api/communicating-custom-actions/wrench-example-communicating-actions ${INSTALL_DIR}/action_api/communicating-custom-actions/dragonfly_cluster.xml
 fi
 
+if [[ "${TO_EXCLUDE}" == *"wrench-example-batch-mpi-action"* ]]; then
+        echo "${bold}SKIPPING: wrench-example-batch-mpi-action${normal}"
+else
+echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/batch-mpi-action/wrench-example-batch-mpi-action dragonfly_cluster.xml${normal}"
+${INSTALL_DIR}/action_api/batch-mpi-action/wrench-example-batch-mpi-action ${INSTALL_DIR}/action_api/batch-mpi-action/dragonfly_cluster.xml
+fi
+
