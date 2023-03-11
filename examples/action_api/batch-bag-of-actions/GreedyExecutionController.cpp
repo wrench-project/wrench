@@ -85,7 +85,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
         std::uniform_int_distribution<int> node_dist(1, 2);
         std::uniform_int_distribution<int> core_dist(1, 10);
-        std::uniform_int_distribution<int> second_dist(5*60, 15*60);
+        std::uniform_int_distribution<int> second_dist(5 * 60, 15 * 60);
 
         std::vector<std::shared_ptr<ComputeAction>> compute_actions;
         for (int i = 0; i < this->num_actions; i += 2) {
