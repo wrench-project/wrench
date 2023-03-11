@@ -68,57 +68,57 @@ namespace wrench {
 
         /* MPI code to execute */
         auto mpi_code = [storage_service, file](const std::shared_ptr<ActionExecutor> &action_executor) {
-          int num_procs;
-          int my_rank;
+            int num_procs;
+            int my_rank;
 
-          MPI_Init();
-          MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
-          MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+            MPI_Init();
+            MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+            MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-          WRENCH_INFO("I am MPI process: %d/%d", my_rank, num_procs);
-          MPI_Barrier(MPI_COMM_WORLD);
+            WRENCH_INFO("I am MPI process: %d/%d", my_rank, num_procs);
+            MPI_Barrier(MPI_COMM_WORLD);
 
-          // Create my own data movement manager
-          auto data_manager = action_executor->createDataMovementManager();
+            // Create my own data movement manager
+            auto data_manager = action_executor->createDataMovementManager();
 
-          int num_comm_bytes = 1000000;
-          void *data = SMPI_SHARED_MALLOC(num_comm_bytes * num_procs);
+            int num_comm_bytes = 1000000;
+            void *data = SMPI_SHARED_MALLOC(num_comm_bytes * num_procs);
 
-          // Do a bulk-synchronous loop of 10 iterations
-          for (unsigned long iter = 0; iter < 10; iter++) {
+            // Do a bulk-synchronous loop of 10 iterations
+            for (unsigned long iter = 0; iter < 10; iter++) {
 
-              if (my_rank == 0) {
-                  WRENCH_INFO("Iteration %lu", iter);
-              }
-              MPI_Barrier(MPI_COMM_WORLD);
+                if (my_rank == 0) {
+                    WRENCH_INFO("Iteration %lu", iter);
+                }
+                MPI_Barrier(MPI_COMM_WORLD);
 
-              // Perform some computation on 4 cores
-              double flops = 100 * GFLOP;
-              int num_threads = 4;
-              double thread_creation_overhead = 0.01;
-              double sequential_work = 0.1 * flops; 
-              double parallel_per_thread_work = (0.9 * flops) / num_threads;
-              wrench::Simulation::computeMultiThreaded(num_threads, thread_creation_overhead, sequential_work, parallel_per_thread_work);
+                // Perform some computation on 4 cores
+                double flops = 100 * GFLOP;
+                int num_threads = 4;
+                double thread_creation_overhead = 0.01;
+                double sequential_work = 0.1 * flops;
+                double parallel_per_thread_work = (0.9 * flops) / num_threads;
+                wrench::Simulation::computeMultiThreaded(num_threads, thread_creation_overhead, sequential_work, parallel_per_thread_work);
 
-              // Launch an asynchronous IO read to the storage service
-              double num_io_bytes = 100 * MB;
-              data_manager->initiateAsynchronousFileRead(FileLocation::LOCATION(storage_service, file), num_io_bytes);
+                // Launch an asynchronous IO read to the storage service
+                double num_io_bytes = 100 * MB;
+                data_manager->initiateAsynchronousFileRead(FileLocation::LOCATION(storage_service, file), num_io_bytes);
 
-              // Participate in an all-to-all communication
-              MPI_Alltoall(data, num_comm_bytes, MPI_CHAR, data, num_comm_bytes, MPI_CHAR, MPI_COMM_WORLD);
+                // Participate in an all-to-all communication
+                MPI_Alltoall(data, num_comm_bytes, MPI_CHAR, data, num_comm_bytes, MPI_CHAR, MPI_COMM_WORLD);
 
-              // Wait for the asynchronous IO read to complete
-              auto event = action_executor->waitForNextEvent();
-              auto io_event = std::dynamic_pointer_cast<wrench::FileReadCompletedEvent>(event);
-              if (not io_event) {
-                  throw std::runtime_error("Custom action: unexpected IO event: " + io_event->toString());
-              }
-          }
-          SMPI_SHARED_FREE(data);
-          MPI_Barrier(MPI_COMM_WORLD);
-          WRENCH_INFO("Action with rank %d completed!", my_rank);
+                // Wait for the asynchronous IO read to complete
+                auto event = action_executor->waitForNextEvent();
+                auto io_event = std::dynamic_pointer_cast<wrench::FileReadCompletedEvent>(event);
+                if (not io_event) {
+                    throw std::runtime_error("Custom action: unexpected IO event: " + io_event->toString());
+                }
+            }
+            SMPI_SHARED_FREE(data);
+            MPI_Barrier(MPI_COMM_WORLD);
+            WRENCH_INFO("Action with rank %d completed!", my_rank);
 
-          MPI_Finalize();
+            MPI_Finalize();
         };
 
         /* Add an action with 16 MPI processes, each of which has 4 cores */

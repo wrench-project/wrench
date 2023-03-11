@@ -28,7 +28,6 @@ public:
     void do_MPIAction_test();
 
 protected:
-
     BatchComputeServiceMPIActionTest() {
 
         // Create a platform file
@@ -70,8 +69,8 @@ protected:
 class BatchMPIActionTestWMS : public wrench::ExecutionController {
 public:
     BatchMPIActionTestWMS(BatchComputeServiceMPIActionTest *test,
-                               std::shared_ptr<wrench::BatchComputeService> batch_compute_service,
-                               std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test), batch_compute_service(std::move(batch_compute_service)) {
+                          std::shared_ptr<wrench::BatchComputeService> batch_compute_service,
+                          std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test), batch_compute_service(std::move(batch_compute_service)) {
     }
 
 private:
@@ -119,7 +118,6 @@ private:
 
                 // Participate in an all-to-all communication
                 MPI_Alltoall(data, num_comm_bytes, MPI_CHAR, data, num_comm_bytes, MPI_CHAR, MPI_COMM_WORLD);
-
             }
             SMPI_SHARED_FREE(data);
             MPI_Barrier(MPI_COMM_WORLD);
@@ -174,15 +172,15 @@ void BatchComputeServiceMPIActionTest::do_MPIAction_test() {
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BatchComputeService("Host1",
-                                                            {"Host1","Host2","Host3","Host4"},
+                                                            {"Host1", "Host2", "Host3", "Host4"},
                                                             "",
                                                             {})));
 
     // Create a WMS
     std::string hostname = "Host1";
     ASSERT_NO_THROW(simulation->add(new BatchMPIActionTestWMS(
-                                    this, compute_service,
-                                    hostname)));
+            this, compute_service,
+            hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());

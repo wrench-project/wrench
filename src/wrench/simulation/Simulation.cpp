@@ -1182,9 +1182,9 @@ namespace wrench {
      * @param parallel_per_thread_work: the parallel per thread work (in flops)
      */
     void Simulation::computeMultiThreaded(unsigned long num_threads,
-                                                double thread_creation_overhead,
-                                                double sequential_work,
-                                                double parallel_per_thread_work) {
+                                          double thread_creation_overhead,
+                                          double sequential_work,
+                                          double parallel_per_thread_work) {
         S4U_Simulation::compute_multi_threaded(num_threads, thread_creation_overhead, sequential_work, parallel_per_thread_work);
     }
 
