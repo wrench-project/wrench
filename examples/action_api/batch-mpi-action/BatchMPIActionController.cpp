@@ -92,9 +92,13 @@ namespace wrench {
               }
               MPI_Barrier(MPI_COMM_WORLD);
 
-              // Perform some computation
+              // Perform some computation on 4 cores
               double flops = 100 * GFLOP;
-              wrench::Simulation::compute(flops);
+              int num_threads = 4;
+              double thread_creation_overhead = 0.01;
+              double sequential_work = 0.1 * flops; 
+              double parallel_per_thread_work = (0.9 * flops) / num_threads;
+              wrench::Simulation::computeMultiThreaded(num_threads, thread_creation_overhead, sequential_work, parallel_per_thread_work);
 
               // Launch an asynchronous IO read to the storage service
               double num_io_bytes = 100 * MB;
