@@ -431,7 +431,7 @@ private:
 
         // Create the BatchComputeService-specific argument
         batch_job_args["-N"] = std::to_string(2);   // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(1800);// Time in minutes (at least 1 minute)
+        batch_job_args["-t"] = std::to_string(1800);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
         // Submit this job to the BatchComputeService service
@@ -456,7 +456,7 @@ private:
         // Create the BatchComputeService-specific argument
         batch_job_args.clear();
         batch_job_args["-N"] = std::to_string(4);   // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(1800);// Time in minutes (at least 1 minute)
+        batch_job_args["-t"] = std::to_string(1800);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
         // Submit this job to the BatchComputeService service
@@ -793,7 +793,7 @@ private:
 
         // Create the BatchComputeService-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(10);// Time in minutes (at least 1 minute)
+        batch_job_args["-t"] = std::to_string(600);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);//number of cores per task1
 
         // Submit this job to the BatchComputeService service
@@ -944,7 +944,7 @@ private:
 
         // Create the BatchComputeService-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(10);// Time in minutes (at least 1 minute)
+        batch_job_args["-t"] = std::to_string(600);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);//number of cores per task1
 
         // Submit this job to the BatchComputeService service
@@ -1098,7 +1098,7 @@ private:
 
         // Create the BatchComputeService-specific argument
         batch_job_args["-N"] = std::to_string(2);   // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(1800);// Time in minutes (at least 1 minute)
+        batch_job_args["-t"] = std::to_string(1800);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
         // Submit this job to the BatchComputeService service
@@ -1124,7 +1124,7 @@ private:
         // Create the BatchComputeService-specific argument
         batch_job_args.clear();
         batch_job_args["-N"] = std::to_string(4);   // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(1800);// Time in minutes (at least 1 minute)
+        batch_job_args["-t"] = std::to_string(1800);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
         // Submit this job to the BatchComputeService service

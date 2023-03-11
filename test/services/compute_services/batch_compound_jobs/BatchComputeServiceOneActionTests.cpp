@@ -263,7 +263,7 @@ private:
         }
 
 
-        service_specific_args["-t"] = "60";
+        service_specific_args["-t"] = "3600";
         job_manager->submitJob(job, this->test->compute_service, service_specific_args);
 
 
@@ -405,7 +405,7 @@ private:
 
         // Submit it but ask for too many resources
         std::map<std::string, std::string> service_specific_arguments;
-        service_specific_arguments["-t"] = "60";
+        service_specific_arguments["-t"] = "3600";
         service_specific_arguments["-N"] = "2";
         service_specific_arguments["-c"] = "1";
         try {
@@ -419,7 +419,7 @@ private:
         }
 
         // Submit it but ask for too many resources
-        service_specific_arguments["-t"] = "60";
+        service_specific_arguments["-t"] = "3600";
         service_specific_arguments["-N"] = "1";
         service_specific_arguments["-c"] = "100";
         try {
@@ -438,7 +438,7 @@ private:
                                               wrench::ParallelModel::AMDAHL(1.0));
 
         // Submit it but ask for too many resources
-        service_specific_arguments["-t"] = "60";
+        service_specific_arguments["-t"] = "3600";
         service_specific_arguments["-N"] = "1";
         service_specific_arguments["-c"] = "1";
         try {
@@ -457,7 +457,7 @@ private:
                                               wrench::ParallelModel::AMDAHL(1.0));
 
         // Submit it but ask for too many resources
-        service_specific_arguments["-t"] = "60";
+        service_specific_arguments["-t"] = "3600";
         service_specific_arguments["-N"] = "1";
         service_specific_arguments["-c"] = "1";
         try {
@@ -689,7 +689,7 @@ private:
         auto action = job->addSleepAction("my_sleep", 10.0);
 
         std::map<std::string, std::string> service_specific_arguments;
-        service_specific_arguments["-t"] = "60";
+        service_specific_arguments["-t"] = "3600";
         service_specific_arguments["-N"] = "1";
         service_specific_arguments["-c"] = "3";
         job_manager->submitJob(job, this->test->compute_service, service_specific_arguments);
@@ -846,7 +846,7 @@ private:
         auto action = job->addSleepAction("my_sleep", 10.0);
 
         std::map<std::string, std::string> service_specific_arguments;
-        service_specific_arguments["-t"] = "60";
+        service_specific_arguments["-t"] = "3600";
         service_specific_arguments["-N"] = "1";
         service_specific_arguments["-c"] = "1";
 
@@ -1109,7 +1109,7 @@ private:
                                              wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->input_file));
 
         std::map<std::string, std::string> service_specific_args;
-        service_specific_args["-t"] = "60";
+        service_specific_args["-t"] = "3600";
         service_specific_args["-N"] = "1";
         service_specific_args["-c"] = "1";
 

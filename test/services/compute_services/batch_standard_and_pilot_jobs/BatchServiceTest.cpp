@@ -305,7 +305,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
-            batch_job_args["-t"] = "5"; //time in minutes
+            batch_job_args["-t"] = "300"; //time in seconds
             batch_job_args["-c"] = "10";//number of cores per node
             try {
                 job_manager->submitJob(job1, this->test->compute_service, batch_job_args);
@@ -338,7 +338,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
-            batch_job_args["-t"] = "5"; //time in minutes
+            batch_job_args["-t"] = "300"; //time in seconds
             batch_job_args["-c"] = "10";//number of cores per node
             try {
                 job_manager->submitJob(job2, this->test->compute_service, batch_job_args);
@@ -371,7 +371,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
-            batch_job_args["-t"] = "5"; //time in minutes
+            batch_job_args["-t"] = "300"; //time in seconds
             batch_job_args["-c"] = "10";//number of cores per node
             try {
                 job_manager->submitJob(job3, this->test->compute_service, batch_job_args);
@@ -511,7 +511,7 @@ private:
 
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = "4";
-        batch_job_args["-t"] = "5"; //time in minutes
+        batch_job_args["-t"] = "300"; //time in seconds
         batch_job_args["-c"] = "10";//number of cores per node
         try {
             job_manager->submitJob(pjob1, this->test->compute_service, batch_job_args);
@@ -656,7 +656,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "2";
-            batch_job_args["-t"] = "5";//time in minutes
+            batch_job_args["-t"] = "300";//time in seconds
             batch_job_args["-c"] = "4";//number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
@@ -800,7 +800,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "2";
-            batch_job_args["-t"] = "5";//time in minutes
+            batch_job_args["-t"] = "300";//time in seconds
             batch_job_args["-c"] = "4";//number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
@@ -927,7 +927,7 @@ private:
 
         // Create the BatchComputeService-specific argument
         batch_job_args["-N"] = std::to_string(2);         // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(18000 / 60);// Time in minutes (at least 1 minute)
+        batch_job_args["-t"] = std::to_string(18000);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);        //number of cores per task1
 
         // Submit this job to the BatchComputeService service
@@ -952,7 +952,7 @@ private:
         // Create the BatchComputeService-specific argument
         batch_job_args.clear();
         batch_job_args["-N"] = std::to_string(2);         // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(18000 / 60);// Time in minutes (at least 1 minute)
+        batch_job_args["-t"] = std::to_string(18000);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);        //number of cores per task1
 
         // Submit this job to the BatchComputeService service
@@ -1091,7 +1091,7 @@ private:
 
             std::map<std::string, std::string> bogus_batch_job_args;
             bogus_batch_job_args["-N"] = "x";
-            bogus_batch_job_args["-t"] = "1";//time in minutes
+            bogus_batch_job_args["-t"] = "60";//time in seconds
             bogus_batch_job_args["-c"] = "4";//number of cores per node
 
             // Coverage
@@ -1107,7 +1107,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
-            batch_job_args["-t"] = "1";//time in minutes
+            batch_job_args["-t"] = "60";//time in seconds
             batch_job_args["-c"] = "4";//number of cores per node
 
             pilot_job->getState();   // coverage
@@ -1260,7 +1260,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
-            batch_job_args["-t"] = "2";//time in minutes
+            batch_job_args["-t"] = "120";//time in seconds
             batch_job_args["-c"] = "4";//number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
@@ -1287,7 +1287,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
-            batch_job_args["-t"] = "1";//time in minutes
+            batch_job_args["-t"] = "60";//time in seconds
             batch_job_args["-c"] = "4";//number of cores per node
 
             // Submit a pilot job
@@ -1415,7 +1415,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
-            batch_job_args["-t"] = "2"; //time in minutes
+            batch_job_args["-t"] = "120"; //time in seconds
             batch_job_args["-c"] = "12";//number of cores per node, which is too many!
 
             try {
@@ -1440,7 +1440,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
-            batch_job_args["-t"] = "2"; //time in minutes
+            batch_job_args["-t"] = "120"; //time in seconds
             batch_job_args["-c"] = "12";//number of cores per node, which is too many!
 
             try {
@@ -1672,7 +1672,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
-            batch_job_args["-t"] = "1";//time in minutes
+            batch_job_args["-t"] = "60";//time in seconds
             batch_job_args["-c"] = "4";//number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
@@ -1798,7 +1798,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
-            batch_job_args["-t"] = "1";//time in minutes
+            batch_job_args["-t"] = "60";//time in seconds
             batch_job_args["-c"] = "4";//number of cores per node
 
             // Submit a pilot job
@@ -1948,7 +1948,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
-            batch_job_args["-t"] = "2";//time in minutes
+            batch_job_args["-t"] = "120";//time in seconds
             batch_job_args["-c"] = "8";//number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
@@ -1972,7 +1972,7 @@ private:
 
             std::map<std::string, std::string> task1_batch_job_args;
             task1_batch_job_args["-N"] = "1";
-            task1_batch_job_args["-t"] = "2";//time in minutes
+            task1_batch_job_args["-t"] = "120";//time in seconds
             task1_batch_job_args["-c"] = "9";//number of cores per node
             try {
                 job_manager->submitJob(job1, this->test->compute_service, task1_batch_job_args);
@@ -1996,7 +1996,7 @@ private:
 
             std::map<std::string, std::string> task2_batch_job_args;
             task2_batch_job_args["-N"] = "1";
-            task2_batch_job_args["-t"] = "2";//time in minutes
+            task2_batch_job_args["-t"] = "120";//time in seconds
             task2_batch_job_args["-c"] = "1";//number of cores per node
             try {
                 job_manager->submitJob(job2, this->test->compute_service, task2_batch_job_args);
@@ -2141,7 +2141,7 @@ private:
                 jobs.push_back(job_manager->createStandardJob(tasks[i]));
                 std::map<std::string, std::string> args;
                 args["-N"] = "1";
-                args["-t"] = "1";
+                args["-t"] = "60";
                 args["-c"] = std::to_string(num_cores_in_each_task);
                 try {
                     job_manager->submitJob(jobs[i], this->test->compute_service, args);
@@ -2296,7 +2296,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "2";
-            batch_job_args["-t"] = "1";//time in minutes
+            batch_job_args["-t"] = "60";//time in seconds
             batch_job_args["-c"] = "2";//number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
@@ -2307,7 +2307,7 @@ private:
 
             std::map<std::string, std::string> task2_batch_job_args;
             task2_batch_job_args["-N"] = "1";
-            task2_batch_job_args["-t"] = "1";//time in minutes
+            task2_batch_job_args["-t"] = "60";//time in seconds
             task2_batch_job_args["-c"] = "9";//number of cores per node
             try {
                 job_manager->submitJob(job2, this->test->compute_service, task2_batch_job_args);
@@ -2318,7 +2318,7 @@ private:
 
             std::map<std::string, std::string> task3_batch_job_args;
             task3_batch_job_args["-N"] = "1";
-            task3_batch_job_args["-t"] = "1";//time in minutes
+            task3_batch_job_args["-t"] = "60";//time in seconds
             task3_batch_job_args["-c"] = "1";//number of cores per node
             try {
                 job_manager->submitJob(job3, this->test->compute_service, task3_batch_job_args);
@@ -2329,7 +2329,7 @@ private:
 
             std::map<std::string, std::string> task4_batch_job_args;
             task4_batch_job_args["-N"] = "1";
-            task4_batch_job_args["-t"] = "2"; //time in minutes
+            task4_batch_job_args["-t"] = "120"; //time in seconds
             task4_batch_job_args["-c"] = "10";//number of cores per node
             try {
                 job_manager->submitJob(job4, this->test->compute_service, task4_batch_job_args);
@@ -2390,7 +2390,7 @@ private:
                 jobs.push_back(job_manager->createStandardJob(tasks[i]));
                 std::map<std::string, std::string> args;
                 args["-N"] = "1";
-                args["-t"] = "1";
+                args["-t"] = "60";
                 args["-c"] = "1";
                 try {
                     job_manager->submitJob(jobs[i], this->test->compute_service, args);
@@ -2537,7 +2537,7 @@ private:
 
             std::map<std::string, std::string> pilot_batch_job_args;
             pilot_batch_job_args["-N"] = "1";
-            pilot_batch_job_args["-t"] = "2";//time in minutes
+            pilot_batch_job_args["-t"] = "120";//time in seconds
             pilot_batch_job_args["-c"] = "4";//number of cores per node
 
             // Submit a pilot job
@@ -2703,7 +2703,7 @@ private:
 
             std::map<std::string, std::string> pilot_batch_job_args;
             pilot_batch_job_args["-N"] = "1";
-            pilot_batch_job_args["-t"] = "2";//time in minutes
+            pilot_batch_job_args["-t"] = "120";//time in seconds
             pilot_batch_job_args["-c"] = "4";//number of cores per node
 
             // Submit a pilot job
@@ -2855,7 +2855,7 @@ private:
 
             std::map<std::string, std::string> pilot_batch_job_args;
             pilot_batch_job_args["-N"] = "1";
-            pilot_batch_job_args["-t"] = "2";//time in minutes
+            pilot_batch_job_args["-t"] = "120";//time in seconds
             pilot_batch_job_args["-c"] = "4";//number of cores per node
 
             // Submit a pilot job
@@ -2980,7 +2980,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -2990,7 +2990,7 @@ private:
             std::vector<std::shared_ptr<wrench::StandardJob>> jobs;
             std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks;
             for (int i = 0; i < num_standard_jobs; i++) {
-                // Create a sequential task1 that lasts for random minutes and requires 2 cores
+                // Create a sequential task1 that lasts for random seconds and requires 2 cores
                 std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task1" + std::to_string(i), each_task_time, 2,
                                                                                            2, 0);
                 auto job = job_manager->createStandardJob(task);
@@ -3000,9 +3000,9 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
-            batch_job_args["-t"] = std::to_string((each_task_time / 60) * num_standard_jobs);//time in minutes
+            batch_job_args["-t"] = std::to_string((each_task_time) * num_standard_jobs);//time in seconds
             batch_job_args["-c"] = "2";                                                      //number of cores per node
-            for (auto standard_jobs: jobs) {
+            for (const auto& standard_jobs: jobs) {
                 try {
                     job_manager->submitJob(standard_jobs, this->test->compute_service, batch_job_args);
                 } catch (wrench::ExecutionException &e) {
@@ -3025,7 +3025,7 @@ private:
                 }
             }
 
-            for (auto each_task: tasks) {
+            for (const auto& each_task: tasks) {
                 this->test->workflow->removeTask(each_task);
             }
         }
@@ -3134,7 +3134,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
-            batch_job_args["-t"] = "5";//time in minutes
+            batch_job_args["-t"] = "300";//time in seconds
             batch_job_args["-c"] = "4";//number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
@@ -3258,7 +3258,7 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
-            batch_job_args["-t"] = "2"; //time in minutes
+            batch_job_args["-t"] = "120"; //time in seconds
             batch_job_args["-c"] = "10";//number of cores per node
             try {
                 job_manager->submitJob(jobs[i], this->test->compute_service, batch_job_args);
