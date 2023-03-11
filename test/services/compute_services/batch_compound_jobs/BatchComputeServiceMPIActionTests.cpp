@@ -88,42 +88,42 @@ private:
 
         /* MPI code to execute */
         auto mpi_code = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
-          int num_procs;
-          int my_rank;
+            int num_procs;
+            int my_rank;
 
-          MPI_Init();
-          MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
-          MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+            MPI_Init();
+            MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+            MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-          WRENCH_INFO("I am MPI process: %d/%d", my_rank, num_procs);
-          MPI_Barrier(MPI_COMM_WORLD);
+            WRENCH_INFO("I am MPI process: %d/%d", my_rank, num_procs);
+            MPI_Barrier(MPI_COMM_WORLD);
 
-          // Create my own data movement manager
-          auto data_manager = action_executor->createDataMovementManager();
+            // Create my own data movement manager
+            auto data_manager = action_executor->createDataMovementManager();
 
-          int num_comm_bytes = 1000000;
-          void *data = SMPI_SHARED_MALLOC(num_comm_bytes * num_procs);
+            int num_comm_bytes = 1000000;
+            void *data = SMPI_SHARED_MALLOC(num_comm_bytes * num_procs);
 
-          // Do a bulk-synchronous loop of 10 iterations
-          for (unsigned long iter = 0; iter < 10; iter++) {
+            // Do a bulk-synchronous loop of 10 iterations
+            for (unsigned long iter = 0; iter < 10; iter++) {
 
-              if (my_rank == 0) {
-                  WRENCH_INFO("Iteration %lu", iter);
-              }
-              MPI_Barrier(MPI_COMM_WORLD);
+                if (my_rank == 0) {
+                    WRENCH_INFO("Iteration %lu", iter);
+                }
+                MPI_Barrier(MPI_COMM_WORLD);
 
-              // Perform some computation
-              double flops = 100000;
-              wrench::Simulation::compute(flops);
+                // Perform some computation
+                double flops = 100000;
+                wrench::Simulation::compute(flops);
 
-              // Participate in an all-to-all communication
-              MPI_Alltoall(data, num_comm_bytes, MPI_CHAR, data, num_comm_bytes, MPI_CHAR, MPI_COMM_WORLD);
-          }
-          SMPI_SHARED_FREE(data);
-          MPI_Barrier(MPI_COMM_WORLD);
-          WRENCH_INFO("Action with rank %d completed!", my_rank);
+                // Participate in an all-to-all communication
+                MPI_Alltoall(data, num_comm_bytes, MPI_CHAR, data, num_comm_bytes, MPI_CHAR, MPI_COMM_WORLD);
+            }
+            SMPI_SHARED_FREE(data);
+            MPI_Barrier(MPI_COMM_WORLD);
+            WRENCH_INFO("Action with rank %d completed!", my_rank);
 
-          MPI_Finalize();
+            MPI_Finalize();
         };
 
         /* Add an action with 10 MPI processes, each of which has 2 cores */
@@ -162,7 +162,7 @@ void BatchComputeServiceMPIActionTest::do_MPIAction_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -171,10 +171,10 @@ void BatchComputeServiceMPIActionTest::do_MPIAction_test() {
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("Host1",
-                                            {"Host1", "Host2", "Host3", "Host4"},
-                                            "",
-                                            {})));
+                            new wrench::BatchComputeService("Host1",
+                                                            {"Host1", "Host2", "Host3", "Host4"},
+                                                            "",
+                                                            {})));
 
     // Create a WMS
     std::string hostname = "Host1";
