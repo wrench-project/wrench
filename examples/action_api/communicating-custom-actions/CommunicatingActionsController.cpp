@@ -105,7 +105,7 @@ namespace wrench {
                     // Participate in an all to all communication
                     unsigned long num_comm_bytes = 1 * MB;
                     std::map<unsigned long, double> sends;
-                    for (int i=0; i < num_ranks; i++) {
+                    for (int i = 0; i < num_ranks; i++) {
                         if (i != my_rank) {
                             sends[i] = num_comm_bytes;
                         }

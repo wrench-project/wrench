@@ -37,8 +37,7 @@ namespace wrench {
         MPIAction(const std::string &name,
                   unsigned long num_processes,
                   unsigned long num_cores_per_processes,
-                  std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> lambda_mpi
-        );
+                  std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> lambda_mpi);
 
         unsigned long getMinNumCores() const override;
         unsigned long getMaxNumCores() const override;
@@ -58,7 +57,7 @@ namespace wrench {
             MPIProcess(std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> lambda_mpi, simgrid::s4u::BarrierPtr barrier,
                        std::shared_ptr<ActionExecutor> action_executor) : lambda_mpi(std::move(lambda_mpi)), barrier(barrier), action_executor(std::move(action_executor)) {}
 
-            void operator ()() {
+            void operator()() {
                 this->lambda_mpi(action_executor);
                 barrier->wait();
             }
