@@ -55,7 +55,7 @@ namespace wrench {
             bool added_at_least_one_host = false;
             for (auto const &hostname: hostnames) {
                 auto num_cores = std::get<0>(resources[hostname]);
-                std::cerr << hostname << ": " << num_cores << "\n";
+//                std::cerr << hostname << ": " << num_cores << "\n";
                 if (num_cores >= this->num_cores_per_processes) {
                     hosts.push_back(hostname);
                     resources[hostname] = std::make_tuple(std::get<0>(resources[hostname]) - this->num_cores_per_processes, std::get<1>(resources[hostname]));
