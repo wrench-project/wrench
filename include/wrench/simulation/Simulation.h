@@ -187,9 +187,9 @@ namespace wrench {
         static void sleep(double duration);
         static void compute(double flops);
         static void computeMultiThreaded(unsigned long num_threads,
-                                    double thread_creation_overhead,
-                                    double sequential_work,
-                                    double parallel_per_thread_work);
+                                         double thread_creation_overhead,
+                                         double sequential_work,
+                                         double parallel_per_thread_work);
 
         /***********************/
         /** \endcond           */

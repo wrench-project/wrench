@@ -25,8 +25,8 @@ namespace wrench {
     public:
         // Constructor
         BatchMPIActionController(std::shared_ptr<BatchComputeService> batch_cs,
-                                       std::shared_ptr<StorageService> ss,
-                                       const std::string &hostname);
+                                 std::shared_ptr<StorageService> ss,
+                                 const std::string &hostname);
 
     private:
         // main() method of the Controller

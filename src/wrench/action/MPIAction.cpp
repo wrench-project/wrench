@@ -29,10 +29,9 @@ namespace wrench {
     * @param lambda_mpi: a lambda with MPI code
     */
     MPIAction::MPIAction(const std::string &name,
-              unsigned long num_processes,
-              unsigned long num_cores_per_processes,
-              std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> lambda_mpi) :
-    Action(name, "mpi_"), num_processes(num_processes), num_cores_per_processes(num_cores_per_processes), lambda_mpi(lambda_mpi) {
+                         unsigned long num_processes,
+                         unsigned long num_cores_per_processes,
+                         std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> lambda_mpi) : Action(name, "mpi_"), num_processes(num_processes), num_cores_per_processes(num_cores_per_processes), lambda_mpi(lambda_mpi) {
     }
 
     /**
@@ -46,7 +45,7 @@ namespace wrench {
         std::map<std::string, std::tuple<unsigned long, double>> resources(resources_ref.begin(), resources_ref.end());
         std::vector<std::string> hostnames;
         hostnames.reserve(resources.size());
-        for (auto const &h : resources) {
+        for (auto const &h: resources) {
             hostnames.push_back(h.first);
         }
 
@@ -54,9 +53,9 @@ namespace wrench {
         std::vector<std::string> hosts;
         while (hosts.size() != this->num_processes) {
             bool added_at_least_one_host = false;
-            for (auto const &hostname : hostnames) {
+            for (auto const &hostname: hostnames) {
                 auto num_cores = std::get<0>(resources[hostname]);
-//                std::cerr << hostname << ": " << num_cores << "\n";
+                //                std::cerr << hostname << ": " << num_cores << "\n";
                 if (num_cores >= this->num_cores_per_processes) {
                     hosts.push_back(hostname);
                     resources[hostname] = std::make_tuple(std::get<0>(resources[hostname]) - this->num_cores_per_processes, std::get<1>(resources[hostname]));
@@ -74,7 +73,7 @@ namespace wrench {
         // Transform the list of hosts into a list of simgrid hosts
         std::vector<simgrid::s4u::Host *> simgrid_hosts;
         simgrid_hosts.reserve(hosts.size());
-        for (auto const &host : hosts) {
+        for (auto const &host: hosts) {
             simgrid_hosts.push_back(S4U_Simulation::get_host_or_vm_by_name(host));
         }
 
@@ -85,7 +84,6 @@ namespace wrench {
                                 MPIProcess(this->lambda_mpi, barrier, action_executor),
                                 simgrid_hosts);
         barrier->wait();
-
     }
 
     /**
@@ -124,7 +122,7 @@ namespace wrench {
      * @return a number of processes
      */
     unsigned long MPIAction::getNumProcesses() const {
-            return this->num_processes;
+        return this->num_processes;
     }
 
 
@@ -135,7 +133,6 @@ namespace wrench {
     unsigned long MPIAction::getNumCoresPerProcess() const {
         return this->num_cores_per_processes;
     }
-
 
 
 }// namespace wrench
