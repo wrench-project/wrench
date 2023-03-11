@@ -131,9 +131,9 @@ namespace wrench {
         /* Submit the job to the batch compute service */
         WRENCH_INFO("Submitting job %s to the batch service", job->getName().c_str());
         std::map<std::string, std::string> service_specific_args =
-                {{"-N", std::to_string(num_mpi_processes)}, // Number of compute nodes
-                 {"-c", std::to_string(num_cores_per_process)}, // Number of cores per compute node
-                 {"-t", std::to_string(3600 * 100)}}; // Requested time in seconds
+                {{"-N", std::to_string(num_mpi_processes)},    // Number of compute nodes
+                 {"-c", std::to_string(num_cores_per_process)},// Number of cores per compute node
+                 {"-t", std::to_string(3600 * 100)}};          // Requested time in seconds
         job_manager->submitJob(job, batch_cs, service_specific_args);
 
         /* Wait for an execution event */
