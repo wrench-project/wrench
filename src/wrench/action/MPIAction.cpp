@@ -24,8 +24,8 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param ram: memory required
-    * @param num_cores: number of cores required
+    * @param num_processes: The number of MPI processes that will be started
+    * @param num_cores: number of cores that each process will use.
     * @param lambda_mpi: a lambda with MPI code
     */
     MPIAction::MPIAction(const std::string &name,
@@ -100,7 +100,7 @@ namespace wrench {
      * @return Always returns 0 for an MPIAction
      */
     unsigned long MPIAction::getMinNumCores() const {
-        return 0;
+        return this->num_processes * this->num_cores_per_processes;
     }
 
     /**
@@ -108,7 +108,7 @@ namespace wrench {
      * @return Always returns 0 for an MPIAction
      */
     unsigned long MPIAction::getMaxNumCores() const {
-        return 0;
+        return this->num_processes * this->num_cores_per_processes;
     }
 
     /**

@@ -358,11 +358,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Add an MPI action to the job
+     * @brief Add an MPI action to the job. This action will start processes on the whole
+     *        set of resources allocated to the job that contains this action. If other actions
+     *        in the job are running, they will shared resources with this MPI action. In general,
+     *        the use-case for an MPI action is that never runs concurrently with other actions
+     *        within its job, adn that that job is submitted to a BatchComputeService.
      * @param name: the action's name (if empty, a unique name will be picked for you)
      * @param mpi_code: a lambda/function that implements the MPI code that MPI processes should execute
-     * @param num_processes: the number of MPI processes
-     * @param num_cores_per_process: the number of core that each MPI process should use
+     * @param num_processes: the number of MPI processes that will be started.
+     * @param num_cores_per_process: the number of core that each MPI process should use. Note that this is not enforced by the runtime system.
+*                  If the processes compute with more cores, then they will cause time-sharing on cores.
      * @return an MPI action
      */
     std::shared_ptr<MPIAction> CompoundJob::addMPIAction(const std::string &name,
