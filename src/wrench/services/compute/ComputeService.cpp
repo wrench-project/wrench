@@ -89,7 +89,7 @@ namespace wrench {
      *          - If a hostname and a number of cores is provided (e.g., {"action1", "host1:12"}, the service will run the action on that host
      *            with the specified number of cores
      *      - to a BatchComputeService: {"-t":"<int>","-N":"<int>","-c":"<int>"[,{"-u":"<string>"}], [{actionID:[host[:num_cores]]}
-     *         - "-t": number of requested job duration in minutes
+     *         - "-t": number of requested job duration in seconds
      *         - "-N": number of requested compute hosts
      *         - "-c": number of requested cores per compute host
      *         - "-u": username (optional)

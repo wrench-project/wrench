@@ -138,7 +138,7 @@ private:
         std::map<std::string, std::string> service_specific_args =
                 {{"-N", std::to_string(4)},
                  {"-c", std::to_string(6)},
-                 {"-t", std::to_string(3600 * 100)}};
+                 {"-t", std::to_string(3600 * 1000)}};
         job_manager->submitJob(job, batch_compute_service, service_specific_args);
 
         /* Wait for an execution event */
