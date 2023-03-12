@@ -78,6 +78,15 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void S4U_Simulation::runSimulation() {
+
+        // Setup a handler for deadlocks
+        simgrid::s4u::Engine::on_deadlock_cb([]() {
+            throw std::runtime_error("The simulation has deadlocked."
+                                     " Run with logs enabled (e.g., --wrench-full-log) "
+                                     "to see the SimGrid-generated transcript that describes "
+                                     "the current state of all deadlocked actors.");
+        });
+
         if (this->initialized) {
             SMPI_init();
             this->engine->run();
