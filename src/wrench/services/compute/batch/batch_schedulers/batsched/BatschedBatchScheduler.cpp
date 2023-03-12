@@ -253,7 +253,7 @@ namespace wrench {
 
         std::string data = batch_submission_data.dump();
 
-        simgrid::s4u::Mailbox *batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailbox("batchsched_query_mailbox");
+        auto batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailbox("batchsched_query_mailbox");
 
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
@@ -268,7 +268,6 @@ namespace wrench {
         for (auto job: set_of_jobs) {
             // Get the answer
             std::unique_ptr<SimulationMessage> message = nullptr;
-            message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
             auto msg = S4U_Mailbox::getMessage<BatchQueryAnswerMessage>(batchsched_query_mailbox,
                                                                         "[This error likely means that the scheduling algorithm that Batsched was configured to use (\"" +
                                                                                 this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM) +

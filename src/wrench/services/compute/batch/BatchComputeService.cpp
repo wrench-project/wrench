@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include <memory>
 #include <nlohmann/json.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -222,9 +223,8 @@ namespace wrench {
         } catch (ExecutionException &e) {
             throw;
         } catch (std::exception &e) {
-            throw ExecutionException(std::shared_ptr<FunctionalityNotAvailable>(
-                    new FunctionalityNotAvailable(
-                            this->getSharedPtr<BatchComputeService>(), "start time estimates")));
+            throw ExecutionException(std::make_shared<FunctionalityNotAvailable>(
+                            this->getSharedPtr<BatchComputeService>(), "start time estimates"));
         }
     }
 
