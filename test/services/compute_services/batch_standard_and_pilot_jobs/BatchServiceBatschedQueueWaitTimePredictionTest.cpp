@@ -734,7 +734,7 @@ private:
             std::map<std::string, std::string> batch_job_args1;
             batch_job_args1["-N"] = "2";
             batch_job_args1["-t"] = "300";//time in seconds
-            batch_job_args1["-c"] = "4";//number of cores per node
+            batch_job_args1["-c"] = "4";  //number of cores per node
             try {
                 job_manager->submitJob(job1, this->test->compute_service, batch_job_args1);
             } catch (wrench::ExecutionException &e) {
@@ -762,7 +762,7 @@ private:
             std::map<std::string, std::string> batch_job_args2;
             batch_job_args2["-N"] = "4";
             batch_job_args2["-t"] = "300";//time in seconds
-            batch_job_args2["-c"] = "4";//number of cores per node
+            batch_job_args2["-c"] = "4";  //number of cores per node
             try {
                 job_manager->submitJob(job2, this->test->compute_service, batch_job_args2);
             } catch (wrench::ExecutionException &e) {
