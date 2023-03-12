@@ -224,7 +224,7 @@ namespace wrench {
             throw;
         } catch (std::exception &e) {
             throw ExecutionException(std::make_shared<FunctionalityNotAvailable>(
-                            this->getSharedPtr<BatchComputeService>(), "start time estimates"));
+                    this->getSharedPtr<BatchComputeService>(), "start time estimates"));
         }
     }
 
