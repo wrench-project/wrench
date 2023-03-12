@@ -981,7 +981,6 @@ namespace wrench {
         this->jobs_dispatched.erase(job->compound_job);
 
         // Forward the notification along the notification chain
-
         auto callback_mailbox = job->popCallbackMailbox();
         if (callback_mailbox) {
             auto augmented_msg = new JobManagerStandardJobCompletedMessage(
