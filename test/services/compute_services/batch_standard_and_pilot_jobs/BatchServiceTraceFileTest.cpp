@@ -792,9 +792,9 @@ private:
         auto standard_job_2_nodes = job_manager->createStandardJob(tasks);
 
         // Create the BatchComputeService-specific argument
-        batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
+        batch_job_args["-N"] = std::to_string(2);  // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(600);// Time in seconds (at least 1 minute)
-        batch_job_args["-c"] = std::to_string(10);//number of cores per task1
+        batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
         // Submit this job to the BatchComputeService service
         job_manager->submitJob(standard_job_2_nodes, this->test->compute_service, batch_job_args);
@@ -943,9 +943,9 @@ private:
         auto standard_job_2_nodes = job_manager->createStandardJob(tasks);
 
         // Create the BatchComputeService-specific argument
-        batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
+        batch_job_args["-N"] = std::to_string(2);  // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(600);// Time in seconds (at least 1 minute)
-        batch_job_args["-c"] = std::to_string(10);//number of cores per task1
+        batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
         // Submit this job to the BatchComputeService service
         job_manager->submitJob(standard_job_2_nodes, this->test->compute_service, batch_job_args);
