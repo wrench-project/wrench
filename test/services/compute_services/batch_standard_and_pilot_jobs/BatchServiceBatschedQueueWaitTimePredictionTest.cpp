@@ -614,8 +614,8 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
-//    argv[2] = strdup("--log=wrench_core_mailbox.t:debug");
+    //    argv[1] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--log=wrench_core_mailbox.t:debug");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
