@@ -7,6 +7,8 @@
  * (at your option) any later version.
  */
 
+#ifdef ENABLE_BATSCHED
+
 #ifndef WRENCH_BATSCHEDBATCHSCHEDULER_H
 #define WRENCH_BATSCHEDBATCHSCHEDULER_H
 
@@ -117,3 +119,5 @@ namespace wrench {
 
 
 #endif//WRENCH_BATSCHEDBATCHSCHEDULER_H
+
+#endif

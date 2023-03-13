@@ -7,6 +7,8 @@
  * (at your option) any later version.
  */
 
+#ifdef ENABLE_BATSCHED
+
 
 #ifdef ENABLE_BATSCHED
 
@@ -579,3 +581,5 @@ namespace wrench {
 #endif
 
 }// namespace wrench
+
+#endif
