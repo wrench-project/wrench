@@ -100,7 +100,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -237,7 +237,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
 
         this->simulation->sleep(10 * 3600);
 
@@ -315,7 +315,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -404,7 +404,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -768,7 +768,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -919,7 +919,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1071,7 +1071,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1612,7 +1612,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
 
         auto cs = this->test->compute_service;
 

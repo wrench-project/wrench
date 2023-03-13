@@ -73,7 +73,7 @@ private:
     SimpleStorageServiceChunkingTest *test;
     std::string mode;
 
-    int main() {
+    int main() override {
 
         auto data_movement_manager = this->createDataMovementManager();
 

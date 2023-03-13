@@ -29,7 +29,6 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        static std::shared_ptr<ExecutionEvent> waitForNextExecutionEvent(simgrid::s4u::Mailbox *mailbox);
         static std::shared_ptr<ExecutionEvent> waitForNextExecutionEvent(simgrid::s4u::Mailbox *mailbox, double timeout);
 
         /**
@@ -38,18 +37,8 @@ namespace wrench {
          */
         virtual std::string toString() { return "Generic ExecutionEvent"; }
 
-        //        virtual ~ExecutionEvent() = default;
-        virtual ~ExecutionEvent(){
-                //                std::cerr << "DES"
-                //                         "STRUCTOR EVENT\n";
-        };
-
 
     protected:
-        //        ExecutionEvent() = default;
-        ExecutionEvent() {
-            //            std::cerr << "CONSTRUCTOR EVENT\n";
-        }
 
         /***********************/
         /** \endcond           */

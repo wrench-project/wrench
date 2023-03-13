@@ -90,7 +90,7 @@ public:
 private:
     SimulationTimestampDiskReadWriteTest *test;
 
-    int main() {
+    int main() override {
 
 
         wrench::StorageService::readFileAtLocation(

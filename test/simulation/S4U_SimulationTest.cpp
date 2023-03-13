@@ -101,7 +101,7 @@ public:
 private:
     S4U_SimulationTest *test;
 
-    int main() {
+    int main() override {
 
         // Flop rate
         double f = wrench::S4U_Simulation::getFlopRate();
