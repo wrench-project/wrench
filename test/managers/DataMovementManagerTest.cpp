@@ -413,6 +413,14 @@ private:
         auto data_movement_manager = this->createDataMovementManager();
 
         {
+
+            try {
+                data_movement_manager->initiateAsynchronousFileWrite(nullptr, file_registry_service);
+                throw std::runtime_error("Should not be able to do a file write with a nullptr location");
+            } catch (std::invalid_argument &ignore) {
+            }
+
+
             // try asynchronous write and register that should work
             std::shared_ptr<wrench::ExecutionEvent> async_write_event;
 
@@ -602,6 +610,15 @@ private:
 
 
         {
+
+
+            try {
+                data_movement_manager->initiateAsynchronousFileRead(nullptr, 10);
+                throw std::runtime_error("Should not be able to do a file read with a nullptr location");
+            } catch (std::invalid_argument &ignore) {
+            }
+
+
             // try asynchronous read that should work
             std::shared_ptr<wrench::ExecutionEvent> async_read_event;
 
