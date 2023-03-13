@@ -132,15 +132,11 @@ namespace wrench {
             }
         }
 
-        try {
-            this->pending_file_reads.push_front(std::make_unique<ReadRequestSpecs>(location, num_bytes));
-            // Initiate the read in a thread
-            auto frt = std::make_shared<FileReaderThread>(this->hostname, this->mailbox, location, num_bytes);
-            frt->setSimulation(this->simulation);
-            frt->start(frt, true, false);
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        this->pending_file_reads.push_front(std::make_unique<ReadRequestSpecs>(location, num_bytes));
+        // Initiate the read in a thread
+        auto frt = std::make_shared<FileReaderThread>(this->hostname, this->mailbox, location, num_bytes);
+        frt->setSimulation(this->simulation);
+        frt->start(frt, true, false);
     }
 
     /**
@@ -166,16 +162,12 @@ namespace wrench {
             }
         }
 
-        try {
-            this->pending_file_writes.push_front(std::make_unique<WriteRequestSpecs>(location, file_registry_service));
+        this->pending_file_writes.push_front(std::make_unique<WriteRequestSpecs>(location, file_registry_service));
 
-            // Initiate the write in a thread
-            auto fwt = std::make_shared<FileWriterThread>(this->hostname, this->mailbox, location);
-            fwt->setSimulation(this->simulation);
-            fwt->start(fwt, true, false);
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        // Initiate the write in a thread
+        auto fwt = std::make_shared<FileWriterThread>(this->hostname, this->mailbox, location);
+        fwt->setSimulation(this->simulation);
+        fwt->start(fwt, true, false);
     }
 
 
