@@ -62,7 +62,7 @@ public:
 private:
     SimulationLoggingTest *test;
 
-    int main() {
+    int main() override {
 
         WRENCH_INFO("Testing WRENCH_INFO without color");
         wrench::TerminalOutput::setThisProcessLoggingColor(wrench::TerminalOutput::COLOR_BLUE);

@@ -283,7 +283,7 @@ public:
 private:
     WorkflowTaskTest *test;
 
-    int main() {
+    int main() override {
         auto job_manager = this->createJobManager();
 
         auto job_that_will_fail = job_manager->createStandardJob(this->test->t4,

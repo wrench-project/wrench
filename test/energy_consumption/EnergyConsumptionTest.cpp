@@ -149,7 +149,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -314,7 +314,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -470,7 +470,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -586,7 +586,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
         {
@@ -728,7 +728,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
 
         //The tests is just to switch pstate and check if energy consumed is +ve and we don't have any segfaults or something
         // Create a job manager
@@ -896,7 +896,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
 
         //The tests is just to switch pstate and check if energy consumed is +ve and we don't have any segfaults or something
         // Create a job manager

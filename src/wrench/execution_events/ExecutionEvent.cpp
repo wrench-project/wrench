@@ -26,20 +26,6 @@ namespace wrench {
 
     /**
      * @brief Block the calling process until a ExecutionEvent is generated
-     *        based on messages received on a mailbox
-     *
-     * @param mailbox: the name of the receiving mailbox
-     * @return a workflow execution event
-     *
-     * @throw ExecutionException
-     * @throw std::runtime_error
-     */
-    std::shared_ptr<ExecutionEvent> ExecutionEvent::waitForNextExecutionEvent(simgrid::s4u::Mailbox *mailbox) {
-        return ExecutionEvent::waitForNextExecutionEvent(mailbox, -1);
-    }
-
-    /**
-     * @brief Block the calling process until a ExecutionEvent is generated
      *        based on messages received on a mailbox, or until a timeout ooccurs
      *
      * @param mailbox: the name of the receiving mailbox

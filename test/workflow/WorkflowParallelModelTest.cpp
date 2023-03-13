@@ -61,7 +61,7 @@ private:
     ParallelModelTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
-    int main() {
+    int main() override {
         auto job_manager = this->createJobManager();
 
         auto job = job_manager->createStandardJob(this->workflow->getTaskByID("task1"));
