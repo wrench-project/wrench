@@ -219,6 +219,8 @@ private:
         } catch (wrench::ExecutionException &ignore) {}
         auto not_too_big = wrench::Simulation::addFile("not_too_big", 20.0);
         wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
+        wrench::StorageService::removeFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
+        wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
 
         return 0;
     }
