@@ -132,7 +132,7 @@ private:
     ComputeActionExecutorTest *test;
     bool simulation_computation_as_sleep;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -259,7 +259,7 @@ public:
 private:
     ComputeActionExecutorTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();

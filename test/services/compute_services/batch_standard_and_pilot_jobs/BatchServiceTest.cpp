@@ -193,7 +193,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Do nothing
         return 0;
     }
@@ -273,7 +273,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -502,7 +502,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -626,7 +626,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -773,7 +773,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -904,7 +904,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1072,7 +1072,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1233,7 +1233,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1400,7 +1400,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1532,7 +1532,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1645,7 +1645,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1788,7 +1788,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1912,7 +1912,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -2119,7 +2119,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -2270,7 +2270,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
         {
@@ -2520,7 +2520,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -2688,7 +2688,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -2840,7 +2840,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -3107,7 +3107,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -3240,7 +3240,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 

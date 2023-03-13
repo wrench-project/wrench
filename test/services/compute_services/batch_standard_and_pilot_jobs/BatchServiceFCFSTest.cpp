@@ -245,7 +245,7 @@ public:
 private:
     BatchServiceFCFSTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -420,7 +420,7 @@ public:
 private:
     BatchServiceFCFSTest *test;
 
-    int main() {
+    int main() override {
 
         // Sleep for 10 seconds
         wrench::Simulation::sleep(10);

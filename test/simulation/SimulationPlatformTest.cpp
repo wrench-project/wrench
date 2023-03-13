@@ -81,7 +81,7 @@ public:
 private:
     SimulationPlatformTest *test;
 
-    int main() {
+    int main() override {
 
         // Testing finding subzones
         auto subnetzones = wrench::S4U_Simulation::getAllSubZoneIDsByZone();

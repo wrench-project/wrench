@@ -123,7 +123,7 @@ private:
     FileRegistryActionExecutorTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();

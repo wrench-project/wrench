@@ -557,7 +557,7 @@ public:
 private:
     CompoundStorageServiceFunctionalTest *test;
 
-    int main() {
+    int main() override {
 
         auto job_manager = this->createJobManager();
 

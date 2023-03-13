@@ -73,7 +73,7 @@ public:
 private:
     SimulationTimestampEnergyTest *test;
 
-    int main() {
+    int main() override {
         // default ptstate = 0
         wrench::S4U_Simulation::sleep(10.000001);
 
@@ -169,7 +169,7 @@ public:
 private:
     SimulationTimestampEnergyTest *test;
 
-    int main() {
+    int main() override {
         const double MEGAFLOP = 1000.0 * 1000.0;
         wrench::S4U_Simulation::compute(100.0 * MEGAFLOP);                       // compute for 1 second
         auto c1 = this->simulation->getEnergyConsumed(this->getHostname(), true);// 200 joules
@@ -258,7 +258,7 @@ public:
 private:
     SimulationTimestampEnergyTest *test;
 
-    int main() {
+    int main() override {
         // EnergyMeter constructor tests
         try {
             auto fail_em1 = this->createEnergyMeter(std::vector<std::string>(), 1.0);
@@ -435,7 +435,7 @@ public:
 private:
     SimulationTimestampEnergyTest *test;
 
-    int main() {
+    int main() override {
 
         const std::map<std::string, double> measurement_periods = {
                 {"host1", 2.0},

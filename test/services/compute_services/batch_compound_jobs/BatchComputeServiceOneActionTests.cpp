@@ -11,6 +11,8 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
+#include <memory>
+
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
@@ -138,7 +140,7 @@ public:
 private:
     BatchComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         return 0;
     }
@@ -233,7 +235,7 @@ private:
     BatchComputeServiceOneActionTest *test;
     std::shared_ptr<wrench::BatchComputeService> batch_compute_service;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -390,7 +392,7 @@ public:
 private:
     BatchComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -550,7 +552,7 @@ public:
 private:
     BatchComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -676,7 +678,7 @@ public:
 private:
     BatchComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -830,10 +832,28 @@ public:
 private:
     BatchComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
+
+        {
+            // Coverage
+            std::shared_ptr<wrench::CompoundJob> wj1 = job_manager->createCompoundJob("wj1");
+            auto bj1 = std::make_shared<wrench::BatchJob>(wj1, 1, 10, 5, 1, "who", 0, 0);
+            bj1->setEndingTimestamp(100.0);
+            try {
+                bj1->setEndingTimestamp(200.0);
+                throw std::runtime_error("Should not be able to set batch job's ending time twice");
+            } catch (std::runtime_error &ignore) {
+            }
+
+            try {
+                bj1->setAllocatedResources({});
+                throw std::runtime_error("Should not be able to set batch job's resources to something empty");
+            } catch (std::invalid_argument &ignore) {
+            }
+        }
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -957,7 +977,7 @@ public:
 private:
     BatchComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -1095,7 +1115,7 @@ public:
 private:
     BatchComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -1239,7 +1259,7 @@ public:
 private:
     BatchComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -1344,7 +1364,7 @@ public:
 private:
     BatchComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -1449,7 +1469,7 @@ public:
 private:
     BatchComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
