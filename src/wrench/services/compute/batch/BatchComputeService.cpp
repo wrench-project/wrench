@@ -462,11 +462,6 @@ namespace wrench {
 
         std::shared_ptr<BatchJob> batch_job = this->all_jobs[job];
 
-        //        std::cerr << "IN sendCompoundJobFailureNotification \n";
-        // NO IDEA WHAT THIS WAS HERE - DEFINITELY A BUG!
-        //        this->scheduler->processJobFailure(batch_job);
-
-        //        job->printCallbackMailboxStack();
         try {
             S4U_Mailbox::putMessage(
                     job->popCallbackMailbox(),
