@@ -410,7 +410,6 @@ void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
 }
 
 
-
 /**********************************************************************/
 /**  ONE SLEEP ACTION TEST                                           **/
 /**********************************************************************/
@@ -418,8 +417,8 @@ void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
 class BatchBadServiceSpecificArgsTestWMS : public wrench::ExecutionController {
 public:
     BatchBadServiceSpecificArgsTestWMS(BatchComputeServiceOneActionTest *test,
-                               std::shared_ptr<wrench::BatchComputeService> batch_compute_service,
-                               std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test), batch_compute_service(batch_compute_service) {
+                                       std::shared_ptr<wrench::BatchComputeService> batch_compute_service,
+                                       std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test), batch_compute_service(batch_compute_service) {
     }
 
 private:
@@ -482,7 +481,7 @@ void BatchComputeServiceOneActionTest::do_BadServiceSpecificArgs_test() {
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-        argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
