@@ -110,12 +110,12 @@ private:
         root->getChild(0)->createFile(files[0]);
 
 
-        root->getChild(0)->removeFile(files[0]); // coverage
-        root->getChild(0)->getTotalSpace(); // coverage
-        auto location = wrench::FileLocation::LOCATION(root->getChild(0), files[0]); // coverage
-        root->getChild(0)->reserveSpace(location); // coverage
-        root->getChild(0)->unreserveSpace(location); // coverage
-        location = wrench::FileLocation::LOCATION(root, files[0]); // coverage
+        root->getChild(0)->removeFile(files[0]);                                    // coverage
+        root->getChild(0)->getTotalSpace();                                         // coverage
+        auto location = wrench::FileLocation::LOCATION(root->getChild(0), files[0]);// coverage
+        root->getChild(0)->reserveSpace(location);                                  // coverage
+        root->getChild(0)->unreserveSpace(location);                                // coverage
+        location = wrench::FileLocation::LOCATION(root, files[0]);                  // coverage
         try {
             root->reserveSpace(location);
             throw std::runtime_error("Shouldn't be able to reserve space on a non-storage node");
