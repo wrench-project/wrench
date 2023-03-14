@@ -43,7 +43,6 @@ namespace wrench {
         virtual ~ExecutionEvent() = default;
 
     protected:
-
         /**
          * @brief Constructor
          */
