@@ -37,8 +37,18 @@ namespace wrench {
          */
         virtual std::string toString() { return "Generic ExecutionEvent"; }
 
+        /**
+         * @brief Destructor
+         */
+        virtual ~ExecutionEvent() = default;
 
     protected:
+
+        /**
+         * @brief Constructor
+         */
+        ExecutionEvent() = default;
+
         /***********************/
         /** \endcond           */
         /***********************/
