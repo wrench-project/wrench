@@ -93,7 +93,6 @@ namespace wrench {
         std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
 
     private:
-#ifdef ENABLE_BATSCHED
 
         void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
                                        std::string kill_reason, std::string event_type);
@@ -108,7 +107,6 @@ namespace wrench {
         unsigned long batsched_port;
 
 
-#endif
     };
 
     /***********************/
@@ -120,4 +118,4 @@ namespace wrench {
 
 #endif//WRENCH_BATSCHEDBATCHSCHEDULER_H
 
-#endif
+#endif // ENABLE_BATSCHED
