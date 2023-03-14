@@ -700,9 +700,9 @@ namespace wrench {
      */
     bool CompoundJob::usesScratch() {
         return std::any_of(this->actions.begin(), this->actions.end(),
-                    [](const std::shared_ptr<Action> &action) {
-                      return (action->usesScratch());
-                    });
+                           [](const std::shared_ptr<Action> &action) {
+                               return (action->usesScratch());
+                           });
     }
 
 

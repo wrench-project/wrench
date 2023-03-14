@@ -1318,7 +1318,7 @@ namespace wrench {
             if (key == "-N") {
                 found_dash_N = true;
                 unsigned long num_nodes;
-                if ((sscanf(value.c_str(), "%lu", &num_nodes) != 1) or (num_nodes == 0))  {
+                if ((sscanf(value.c_str(), "%lu", &num_nodes) != 1) or (num_nodes == 0)) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value + "\"}");
                 }
                 if (this->compute_hosts.size() < num_nodes) {
