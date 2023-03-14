@@ -461,7 +461,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
 
     // Create a WMS
     ASSERT_NO_THROW(simulation->add(
-                            new SimpleSimulationReadyTasksTestWMS(this, hostname)));
+            new SimpleSimulationReadyTasksTestWMS(this, hostname)));
 
     // BOGUS ADDS
     ASSERT_THROW(simulation->add((wrench::ExecutionController *) nullptr), std::invalid_argument);
