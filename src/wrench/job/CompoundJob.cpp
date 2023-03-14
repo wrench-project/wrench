@@ -703,7 +703,6 @@ namespace wrench {
                     [](const std::shared_ptr<Action> &action) {
                       return (action->usesScratch());
                     });
-//        return false;
     }
 
 
