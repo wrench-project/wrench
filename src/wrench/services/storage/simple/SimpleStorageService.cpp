@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/InvalidDirectoryPath.h>
 #include <wrench/failure_causes/FileNotFound.h>
 #include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
 
