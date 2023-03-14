@@ -36,8 +36,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CompoundJob::CompoundJob(std::string name, std::shared_ptr<JobManager> job_manager)
-            : Job(std::move(name), std::move(job_manager)),
-              state(CompoundJob::State::NOT_SUBMITTED), priority(0.0) {
+        : Job(std::move(name), std::move(job_manager)),
+          state(CompoundJob::State::NOT_SUBMITTED), priority(0.0) {
         this->state_task_map[Action::State::NOT_READY] = {};
         this->state_task_map[Action::State::COMPLETED] = {};
         this->state_task_map[Action::State::KILLED] = {};
@@ -476,7 +476,7 @@ namespace wrench {
 
         return std::all_of(this->parents.begin(), this->parents.end(),
                            [](const std::shared_ptr<CompoundJob> &e) {
-                             return e->getState() == CompoundJob::State::COMPLETED;
+                               return e->getState() == CompoundJob::State::COMPLETED;
                            });
 
         //        for (auto const &p: this->parents) {
@@ -700,10 +700,10 @@ namespace wrench {
      */
     bool CompoundJob::usesScratch() {
         return std::any_of(this->actions.begin(), this->actions.end(),
-                    [](const std::shared_ptr<Action> &action) {
-                      return (action->usesScratch());
-                    });
-//        return false;
+                           [](const std::shared_ptr<Action> &action) {
+                               return (action->usesScratch());
+                           });
+        //        return false;
     }
 
 
