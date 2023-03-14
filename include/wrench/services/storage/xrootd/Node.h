@@ -43,11 +43,11 @@ namespace wrench {
             /***********************/
 
             using StorageService::createFile;
-            using StorageService::removeFile;
             using StorageService::deleteFile;
             using StorageService::hasFile;
             using StorageService::lookupFile;
             using StorageService::readFile;
+            using StorageService::removeFile;
             using StorageService::writeFile;
 
             void createFile(const std::shared_ptr<FileLocation> &location) override;
