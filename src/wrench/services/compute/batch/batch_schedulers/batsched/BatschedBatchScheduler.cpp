@@ -198,7 +198,6 @@ namespace wrench {
             throw std::runtime_error(
                     "Error while fork-exec of batsched");
         }
-
     }
 
     /**
@@ -305,7 +304,6 @@ namespace wrench {
             throw std::runtime_error(
                     "BatschedBatchScheduler::shutdown(): Upon termination batsched returned a non-empty event set, which is unexpected");
         }
-
     }
 
 
@@ -381,7 +379,7 @@ namespace wrench {
     void BatschedBatchScheduler::processUnknownJobTermination(std::string job_id) {
         // Fake it as a success
         this->notifyJobEventsToBatSched(job_id, "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
-//        this->appendJobInfoToCSVOutputFile(job_id, "TERMINATED");
+        //        this->appendJobInfoToCSVOutputFile(job_id, "TERMINATED");
     }
 
     void BatschedBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob> batch_job) {
@@ -540,4 +538,4 @@ namespace wrench {
 
 }// namespace wrench
 
-#endif // ENABLE_BATSCHED
+#endif// ENABLE_BATSCHED
