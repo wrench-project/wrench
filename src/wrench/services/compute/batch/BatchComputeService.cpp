@@ -255,6 +255,7 @@ namespace wrench {
             queue_state.emplace_back(tuple);
         }
 
+#ifdef ENABLE_BATSCHED
         //  Go through the waiting jobs (BATSCHED only)
         for (auto const &j: this->waiting_jobs) {
             auto tuple = std::make_tuple(
@@ -267,6 +268,7 @@ namespace wrench {
                     -1.0);
             queue_state.emplace_back(tuple);
         }
+#endif
 
         // Go through the pending jobs
         for (auto const &j: this->batch_queue) {
@@ -313,6 +315,7 @@ namespace wrench {
                         "BatchComputeService::parseUnsignedLongServiceSpecificArgument(): Invalid " + key + " value '" +
                         (*it).second + "'");
             }
+
         } else {
             throw std::invalid_argument(
                     "BatchComputeService::parseUnsignedLongServiceSpecificArgument(): Batch Service requires " + key +
@@ -758,9 +761,11 @@ namespace wrench {
             processAlarmJobTimeout(msg->job);
             return true;
 
+#ifdef ENABLE_BATSCHED
         } else if (auto msg = std::dynamic_pointer_cast<BatchExecuteJobFromBatSchedMessage>(message)) {
             processExecuteJobFromBatSched(msg->batsched_decision_reply);
             return true;
+#endif
 
         } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage>(message)) {
             processIsThereAtLeastOneHostWithAvailableResources(msg->answer_mailbox, msg->num_cores, msg->ram);
@@ -1205,6 +1210,7 @@ namespace wrench {
         this->processCompoundJobTimeout(compound_job);
     }
 
+#ifdef BATSCHED
     /**
      * @brief Method to hand incoming batsched message
      *
@@ -1277,6 +1283,7 @@ namespace wrench {
         startJob(resources, compound_job, batch_job, num_nodes_allocated, time_in_seconds,
                  cores_per_node_asked_for);
     }
+#endif
 
     /**
      * @brief Process a host available resource request
@@ -1311,7 +1318,7 @@ namespace wrench {
             if (key == "-N") {
                 found_dash_N = true;
                 unsigned long num_nodes;
-                if (sscanf(value.c_str(), "%lu", &num_nodes) != 1) {
+                if ((sscanf(value.c_str(), "%lu", &num_nodes) != 1) or (num_nodes == 0))  {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value + "\"}");
                 }
                 if (this->compute_hosts.size() < num_nodes) {
@@ -1320,13 +1327,13 @@ namespace wrench {
             } else if (key == "-t") {
                 found_dash_t = true;
                 unsigned long requested_time;
-                if (sscanf(value.c_str(), "%lu", &requested_time) != 1) {
+                if ((sscanf(value.c_str(), "%lu", &requested_time) != 1) or (requested_time == 0)) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value + "\"}");
                 }
             } else if (key == "-c") {
                 found_dash_c = true;
                 unsigned long num_cores;
-                if (sscanf(value.c_str(), "%lu", &num_cores) != 1) {
+                if ((sscanf(value.c_str(), "%lu", &num_cores) != 1) or (num_cores == 0)) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value + "\"}");
                 }
                 if (this->num_cores_per_node < num_cores) {
