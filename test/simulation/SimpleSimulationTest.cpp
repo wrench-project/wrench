@@ -292,9 +292,9 @@ private:
 
         {
             // Try to create and submit a job with tasks that are completed, which should fail
-            auto bogus_job = job_manager->createStandardJob(*(++tasks.begin()));
+            auto other_bogus_job = job_manager->createStandardJob(*(++tasks.begin()));
             try {
-                job_manager->submitJob(bogus_job, vm_cs);
+                job_manager->submitJob(other_bogus_job, vm_cs);
                 throw std::runtime_error("Should not be able to create a job with PENDING tasks");
             } catch (std::invalid_argument &e) {
             }
@@ -460,8 +460,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(
+    ASSERT_NO_THROW(simulation->add(
                             new SimpleSimulationReadyTasksTestWMS(this, hostname)));
 
     // BOGUS ADDS
