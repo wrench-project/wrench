@@ -39,14 +39,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Kill the service (brutally terminate the daemon)
-     */
-    void FileReaderThread::kill() {
-        this->killActor();
-    }
-
-
-    /**
      * @brief Main method of the file reader thread
      * @return 0 on successful termination, non-zero otherwise
      */

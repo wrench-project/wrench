@@ -17,14 +17,14 @@ namespace wrench {
      *
      * @param job: the compound job corresponding to the BatchComputeService job
      * @param job_id: the BatchComputeService job id
-     * @param time_in_minutes: the requested execution time in minutes
+     * @param time_in_seconds: the requested execution time in seconds
      * @param num_nodes: the requested number of compute nodes (hosts)
      * @param cores_per_node: the requested number of cores per node
      * @param username: the username of the user submitting the job
      * @param ending_time_stamp: the job's end date
      * @param arrival_time_stamp: the job's arrival date
      */
-    BatchJob::BatchJob(const std::shared_ptr<CompoundJob> &job, unsigned long job_id, unsigned long time_in_minutes, unsigned long num_nodes,
+    BatchJob::BatchJob(const std::shared_ptr<CompoundJob> &job, unsigned long job_id, unsigned long time_in_seconds, unsigned long num_nodes,
                        unsigned long cores_per_node, const std::string &username, double ending_time_stamp, double arrival_time_stamp) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (job == nullptr) {
@@ -42,7 +42,7 @@ namespace wrench {
 
         this->compound_job = job;
         this->job_id = job_id;
-        this->requested_time = time_in_minutes * 60;
+        this->requested_time = time_in_seconds;
         this->requested_num_nodes = num_nodes;
         this->requested_cores_per_node = cores_per_node;
         this->username = username;

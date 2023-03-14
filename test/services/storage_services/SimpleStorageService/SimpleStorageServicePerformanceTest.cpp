@@ -159,7 +159,7 @@ private:
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;
     double buffer_size;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -317,7 +317,7 @@ private:
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;
     double buffer_size;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();

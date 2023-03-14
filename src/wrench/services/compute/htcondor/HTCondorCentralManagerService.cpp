@@ -81,9 +81,6 @@ namespace wrench {
      * @brief Destructor
      */
     HTCondorCentralManagerService::~HTCondorCentralManagerService() {
-        this->pending_jobs.clear();
-        this->compute_services.clear();
-        this->running_jobs.clear();
     }
 
     /**
@@ -397,40 +394,40 @@ namespace wrench {
         this->running_jobs.clear();
     }
 
-    /**
-   * @brief Helper function to check whether a job kind is supported
-   * @param job: the job
-   * @param service_specific_arguments: the service-specific argument
-   * @return true or false
-   */
-    bool HTCondorCentralManagerService::jobKindIsSupported(
-            const std::shared_ptr<Job> &job,
-            std::map<std::string, std::string> service_specific_arguments) {
-        bool is_grid_universe =
-                (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
-                (service_specific_arguments["-universe"] == "grid");
-        bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
-
-        bool found_one = false;
-        for (auto const &cs: this->compute_services) {
-            if (is_grid_universe and (std::dynamic_pointer_cast<BatchComputeService>(cs) == nullptr)) {
-                continue;
-            }
-            if ((not is_grid_universe) and (std::dynamic_pointer_cast<BareMetalComputeService>(cs) == nullptr)) {
-                continue;
-            }
-            if (is_standard_job and (not cs->supportsStandardJobs())) {
-                continue;
-            }
-            if ((not is_standard_job) and (not cs->supportsPilotJobs())) {
-                continue;
-            }
-            found_one = true;
-            break;
-        }
-
-        return found_one;
-    }
+    //    /**
+    //   * @brief Helper function to check whether a job kind is supported
+    //   * @param job: the job
+    //   * @param service_specific_arguments: the service-specific argument
+    //   * @return true or false
+    //   */
+    //    bool HTCondorCentralManagerService::jobKindIsSupported(
+    //            const std::shared_ptr<Job> &job,
+    //            std::map<std::string, std::string> service_specific_arguments) {
+    //        bool is_grid_universe =
+    //                (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
+    //                (service_specific_arguments["-universe"] == "grid");
+    //        bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
+    //
+    //        bool found_one = false;
+    //        for (auto const &cs: this->compute_services) {
+    //            if (is_grid_universe and (std::dynamic_pointer_cast<BatchComputeService>(cs) == nullptr)) {
+    //                continue;
+    //            }
+    //            if ((not is_grid_universe) and (std::dynamic_pointer_cast<BareMetalComputeService>(cs) == nullptr)) {
+    //                continue;
+    //            }
+    //            if (is_standard_job and (not cs->supportsStandardJobs())) {
+    //                continue;
+    //            }
+    //            if ((not is_standard_job) and (not cs->supportsPilotJobs())) {
+    //                continue;
+    //            }
+    //            found_one = true;
+    //            break;
+    //        }
+    //
+    //        return found_one;
+    //    }
 
     /**
      * @brief Helper function to check whether a job can run on at least one child compute service

@@ -112,7 +112,7 @@ public:
 private:
     SimulationOutputTest *test;
 
-    int main() {
+    int main() override {
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         try {

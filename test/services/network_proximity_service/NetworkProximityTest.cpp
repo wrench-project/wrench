@@ -145,7 +145,7 @@ public:
 private:
     NetworkProximityTest *test;
 
-    int main() {
+    int main() override {
 
         std::pair<std::string, std::string> hosts_to_compute_proximity;
         hosts_to_compute_proximity = std::make_pair(wrench::Simulation::getHostnameList()[2],
@@ -318,7 +318,7 @@ public:
 private:
     NetworkProximityTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -463,7 +463,7 @@ private:
     NetworkProximityTest *test;
     std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -630,7 +630,7 @@ public:
 private:
     NetworkProximityTest *test;
 
-    int main() {
+    int main() override {
         //      wrench::S4U_Simulation::sleep(10);
         return 0;
     }

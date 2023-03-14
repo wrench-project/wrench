@@ -63,7 +63,6 @@ namespace wrench {
      * @brief Destructor
      */
     HTCondorNegotiatorService::~HTCondorNegotiatorService() {
-        this->pending_jobs.clear();
     }
 
     /**

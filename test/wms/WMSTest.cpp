@@ -85,7 +85,7 @@ private:
     WMSTest *test;
     double sleep_time;
 
-    int main() {
+    int main() override {
 
         wrench::Simulation::sleep(this->sleep_time);
 

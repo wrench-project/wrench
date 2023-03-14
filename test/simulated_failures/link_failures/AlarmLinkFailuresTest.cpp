@@ -73,7 +73,7 @@ public:
 private:
     AlarmLinkFailuresTest *test;
 
-    int main() {
+    int main() override {
 
         // Create an Alarm service that will go of in 10 seconds
         auto mailbox = this->mailbox;

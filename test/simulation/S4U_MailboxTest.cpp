@@ -62,7 +62,7 @@ private:
     S4U_MailboxTest *test;
     std::string mode;
 
-    int main() {
+    int main() override {
 
         unsigned long index;
         if (this == this->test->wms1.get()) {

@@ -413,6 +413,14 @@ private:
         auto data_movement_manager = this->createDataMovementManager();
 
         {
+
+            try {
+                data_movement_manager->initiateAsynchronousFileWrite(nullptr, file_registry_service);
+                throw std::runtime_error("Should not be able to do a file write with a nullptr location");
+            } catch (std::invalid_argument &ignore) {
+            }
+
+
             // try asynchronous write and register that should work
             std::shared_ptr<wrench::ExecutionEvent> async_write_event;
 
@@ -423,8 +431,25 @@ private:
                         write_location,
                         file_registry_service);
             } catch (wrench::ExecutionException &e) {
-                throw std::runtime_error("Got an exception while trying to instantiate a file write: " + std::string(e.what()));
+                throw std::runtime_error("Got an exception while trying to instantiate a file write: " + e.getCause()->toString());
             }
+
+            wrench::Simulation::sleep(0.01);
+
+            try {
+                data_movement_manager->initiateAsynchronousFileWrite(
+                        write_location,
+                        file_registry_service);
+                throw std::runtime_error("Should not be able to concurrently write to the same location");
+            } catch (wrench::ExecutionException &e) {
+                auto real_cause = std::dynamic_pointer_cast<wrench::FileAlreadyBeingWritten>(e.getCause());
+                if (not real_cause) {
+                    throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString());
+                }
+                real_cause->toString();   // coverage
+                real_cause->getLocation();// coverage
+            }
+
 
             try {
                 async_write_event = this->waitForNextEvent();
@@ -585,6 +610,15 @@ private:
 
 
         {
+
+
+            try {
+                data_movement_manager->initiateAsynchronousFileRead(nullptr, 10);
+                throw std::runtime_error("Should not be able to do a file read with a nullptr location");
+            } catch (std::invalid_argument &ignore) {
+            }
+
+
             // try asynchronous read that should work
             std::shared_ptr<wrench::ExecutionEvent> async_read_event;
 
@@ -594,6 +628,22 @@ private:
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Got an exception while trying to instantiate a file read: " + std::string(e.what()));
             }
+
+            wrench::Simulation::sleep(0.01);
+
+            try {
+                data_movement_manager->initiateAsynchronousFileRead(
+                        wrench::FileLocation::LOCATION(this->test->src_storage_service, this->test->src_file_1));
+                throw std::runtime_error("Should not be able to concurrently read from the same location");
+            } catch (wrench::ExecutionException &e) {
+                auto real_cause = std::dynamic_pointer_cast<wrench::FileAlreadyBeingRead>(e.getCause());
+                if (not real_cause) {
+                    throw std::runtime_error("Unexpected failure cause: " + real_cause->toString());
+                }
+                real_cause->toString();   // coverage
+                real_cause->getLocation();// coverage
+            }
+
 
             try {
                 async_read_event = this->waitForNextEvent();

@@ -130,7 +130,7 @@ public:
 private:
     SimpleStorageServiceLimitedConnectionsTest *test;
 
-    int main() {
+    int main() override {
 
 
         // Create a data movement manager

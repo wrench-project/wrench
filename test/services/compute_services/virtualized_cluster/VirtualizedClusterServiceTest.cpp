@@ -720,7 +720,7 @@ public:
 private:
     VirtualizedClusterServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
@@ -1177,7 +1177,7 @@ public:
 private:
     VirtualizedClusterServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 

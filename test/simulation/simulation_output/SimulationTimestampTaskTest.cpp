@@ -122,7 +122,7 @@ public:
 private:
     SimulationTimestampTaskTest *test;
 
-    int main() {
+    int main() override {
 
         auto job_manager = this->createJobManager();
 
@@ -311,7 +311,7 @@ public:
 private:
     SimulationTimestampTaskTest *test;
 
-    int main() {
+    int main() override {
 
         auto job_manager = this->createJobManager();
 
@@ -528,7 +528,7 @@ public:
 private:
     SimulationTimestampTaskTest *test;
 
-    int main() {
+    int main() override {
 
         auto job_manager = this->createJobManager();
 

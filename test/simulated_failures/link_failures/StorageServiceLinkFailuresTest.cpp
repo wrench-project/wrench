@@ -228,7 +228,7 @@ private:
     }
 
 
-    int main() {
+    int main() override {
 
         // Create a link switcher on/off for link1
         auto switcher1 = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(

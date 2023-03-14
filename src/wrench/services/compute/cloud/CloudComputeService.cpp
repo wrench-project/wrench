@@ -70,8 +70,6 @@ namespace wrench {
      * @brief Destructor
      */
     CloudComputeService::~CloudComputeService() {
-        this->default_property_values.clear();
-        this->vm_list.clear();
     }
 
     /**

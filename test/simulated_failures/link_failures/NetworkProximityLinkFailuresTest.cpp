@@ -100,7 +100,7 @@ public:
 private:
     NetworkProximityLinkFailuresTest *test;
 
-    int main() {
+    int main() override {
 
         for (int i = 1; i <= 6; i++) {
             // Starting a link murderer!!

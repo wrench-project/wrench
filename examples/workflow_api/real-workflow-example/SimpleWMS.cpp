@@ -70,7 +70,7 @@ namespace wrench {
                 WRENCH_INFO("Creating and submitting a pilot job");
                 pilot_job = job_manager->createPilotJob();
                 job_manager->submitJob(pilot_job, this->batch_compute_service,
-                                       {{"-N", "2"}, {"-c", "3"}, {"-t", "3000"}});
+                                       {{"-N", "2"}, {"-c", "3"}, {"-t", "180000"}});
             }
 
             // Construct the list of currently available bare-metal services (on VMs and perhaps within pilot job as well)

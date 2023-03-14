@@ -113,7 +113,7 @@ private:
     double sleep_time;
 
 
-    int main() {
+    int main() override {
         // check for deferred start
         wrench::Simulation::sleep(this->sleep_time);
 

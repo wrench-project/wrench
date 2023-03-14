@@ -60,6 +60,10 @@ TEST_F(FailureCauseConstructorTest, FatalFailure) {
     if (cause) {
         cause->toString();// Coverage
     }
+    ASSERT_NO_THROW(cause = new wrench::FatalFailure("Some message"));
+    if (cause) {
+        cause->toString();// Coverage
+    }
 }
 
 

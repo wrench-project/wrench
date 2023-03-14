@@ -190,6 +190,7 @@ set(HEADER_FILES
         include/wrench/action/Action.h
         include/wrench/action/SleepAction.h
         include/wrench/action/CustomAction.h
+        include/wrench/action/MPIAction.h
         include/wrench/action/FileReadAction.h
         include/wrench/action/FileWriteAction.h
         include/wrench/action/FileCopyAction.h
@@ -380,6 +381,7 @@ set(SOURCE_FILES
         src/wrench/action/Action.cpp
         src/wrench/action/SleepAction.cpp
         src/wrench/action/CustomAction.cpp
+        src/wrench/action/MPIAction.cpp
         src/wrench/action/FileReadAction.cpp
         src/wrench/action/FileWriteAction.cpp
         src/wrench/action/FileCopyAction.cpp
@@ -445,6 +447,7 @@ set(TEST_FILES
         test/services/helper_services/action_execution_service/ActionExecutionServiceTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceResourceInformationTest.cpp
         test/services/compute_services/batch_compound_jobs/BatchComputeServiceOneActionTests.cpp
+        test/services/compute_services/batch_compound_jobs/BatchComputeServiceMPIActionTests.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/HomeGrownTimeLineTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceFCFSTest.cpp

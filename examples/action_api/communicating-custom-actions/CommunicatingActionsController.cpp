@@ -77,10 +77,10 @@ namespace wrench {
 
             auto lambda_execute = [communicator, storage_service, file](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
                 auto my_rank = communicator->join();
+                auto num_ranks = communicator->getNumRanks();
 
                 // Create my own data movement manager
                 auto data_manager = action_executor->createDataMovementManager();
-
 
                 communicator->barrier();
                 WRENCH_INFO("I am an action with rank %lu in my communicator", my_rank);
@@ -104,9 +104,15 @@ namespace wrench {
 
                     // Participate in an all to all communication
                     unsigned long num_comm_bytes = 1 * MB;
-                    communicator->MPI_Alltoall(num_comm_bytes, "ompi");
+                    std::map<unsigned long, double> sends;
+                    for (int i = 0; i < num_ranks; i++) {
+                        if (i != my_rank) {
+                            sends[i] = num_comm_bytes;
+                        }
+                    }
+                    communicator->sendAndReceive(sends, num_ranks - 1);
 
-                    // Wait for the asynchrous IO read to complete
+                    // Wait for the asynchronous IO read to complete
                     auto event = action_executor->waitForNextEvent();
                     auto io_event = std::dynamic_pointer_cast<wrench::FileReadCompletedEvent>(event);
                     if (not io_event) {

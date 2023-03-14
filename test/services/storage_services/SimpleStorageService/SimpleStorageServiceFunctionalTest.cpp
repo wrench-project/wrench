@@ -29,6 +29,7 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service_100 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_510 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_1000 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service_multimp = nullptr;
 
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
@@ -74,6 +75,14 @@ protected:
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/disk100/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"somewhere1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/somewhere1/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"somewhere2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/somewhere2/\"/>"
                           "          </disk>"
                           "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"510B\"/>"
@@ -129,6 +138,20 @@ private:
                 throw std::runtime_error(
                         "File registry service should know that file " + f->getID() + " is (only) on storage service " +
                         this->test->storage_service_1000->getName());
+            }
+        }
+
+        // Call mount point methods for coverage
+        {
+            auto sss = std::dynamic_pointer_cast<wrench::SimpleStorageService>(this->test->storage_service_multimp);
+            sss->getMountPoints();
+            sss->hasMountPoint("/somewhere1");
+            sss->hasMountPoint("/somewhere1_not");
+            sss->hasMultipleMountPoints();
+            try {
+                sss->getBaseRootPath();
+                throw std::runtime_error("Shouldn't be able to get base root path from a multi-mount-point simple storage service");
+            } catch (std::runtime_error &ignore) {
             }
         }
 
@@ -674,7 +697,9 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1000"},
                                                                                      {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
-
+    ASSERT_NO_THROW(storage_service_multimp = simulation->add(
+                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/somewhere1", "/somewhere2"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a file registry
     file_registry_service =

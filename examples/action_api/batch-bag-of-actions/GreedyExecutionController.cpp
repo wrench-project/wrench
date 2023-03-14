@@ -85,7 +85,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
         std::uniform_int_distribution<int> node_dist(1, 2);
         std::uniform_int_distribution<int> core_dist(1, 10);
-        std::uniform_int_distribution<int> minute_dist(5, 15);
+        std::uniform_int_distribution<int> second_dist(5 * 60, 15 * 60);
 
         std::vector<std::shared_ptr<ComputeAction>> compute_actions;
         for (int i = 0; i < this->num_actions; i += 2) {
@@ -108,16 +108,16 @@ namespace wrench {
             // Pick job configuration parameters
             int num_nodes = node_dist(rng);
             int num_cores_per_nodes = core_dist(rng);
-            int num_minutes = minute_dist(rng);
+            int num_seconds = second_dist(rng);
             std::map<std::string, std::string> service_specific_args =
                     {{"-N", std::to_string(num_nodes)},
                      {"-c", std::to_string(num_cores_per_nodes)},
-                     {"-t", std::to_string(num_minutes)}};
+                     {"-t", std::to_string(num_seconds)}};
 
             // Submit the job!
-            WRENCH_INFO("Submitting job %s (%d nodes, %d cores per node, %d minutes) for executing actions %s and %s",
+            WRENCH_INFO("Submitting job %s (%d nodes, %d cores per node, %d seconds) for executing actions %s and %s",
                         job->getName().c_str(),
-                        num_nodes, num_cores_per_nodes, num_minutes,
+                        num_nodes, num_cores_per_nodes, num_seconds,
                         compute_1->getName().c_str(), compute_2->getName().c_str());
             job_manager->submitJob(job, this->compute_service, service_specific_args);
         }

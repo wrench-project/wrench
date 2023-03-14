@@ -62,7 +62,7 @@ namespace wrench {
 
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override{};
 
-        bool jobKindIsSupported(const std::shared_ptr<Job> &job, std::map<std::string, std::string> service_specific_arguments);
+        //        bool jobKindIsSupported(const std::shared_ptr<Job> &job, std::map<std::string, std::string> service_specific_arguments);
 
         std::shared_ptr<FailureCause> jobCanRunSomewhere(const std::shared_ptr<CompoundJob> &job, std::map<std::string, std::string> service_specific_arguments);
 

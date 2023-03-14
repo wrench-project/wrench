@@ -126,7 +126,7 @@ public:
 private:
     BareMetalComputeServiceActionMultiJobTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();

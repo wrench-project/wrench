@@ -164,7 +164,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
 
         return 0;
     }
@@ -306,7 +306,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
 
         wrench::TerminalOutput::disableColor();// just for increasing stupid coverage
 
@@ -405,7 +405,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -671,7 +671,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         double ram_capacity;
 
         ram_capacity = wrench::Simulation::getHostMemoryCapacity("TwoCoreHost");
@@ -905,7 +905,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1048,7 +1048,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1160,7 +1160,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1308,7 +1308,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1434,7 +1434,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1549,7 +1549,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1668,7 +1668,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1777,7 +1777,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1886,7 +1886,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1992,7 +1992,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 

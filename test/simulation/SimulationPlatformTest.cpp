@@ -81,7 +81,7 @@ public:
 private:
     SimulationPlatformTest *test;
 
-    int main() {
+    int main() override {
 
         // Testing finding subzones
         auto subnetzones = wrench::S4U_Simulation::getAllSubZoneIDsByZone();
@@ -218,6 +218,8 @@ private:
             throw std::runtime_error("Should not be able to create a file that big on the newly created storage service");
         } catch (wrench::ExecutionException &ignore) {}
         auto not_too_big = wrench::Simulation::addFile("not_too_big", 20.0);
+        wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
+        wrench::StorageService::removeFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
         wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
 
         wrench::Simulation::sleep(1);

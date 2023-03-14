@@ -101,7 +101,7 @@ public:
 private:
     FileRegistryLinkFailuresTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a bunch of files
         std::vector<std::shared_ptr<wrench::DataFile>> files;

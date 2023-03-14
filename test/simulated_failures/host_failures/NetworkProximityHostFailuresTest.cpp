@@ -94,7 +94,7 @@ public:
 private:
     NetworkProximityHostFailuresTest *test;
 
-    int main() {
+    int main() override {
 
         // Starting a FailedHost1 murderer!!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",

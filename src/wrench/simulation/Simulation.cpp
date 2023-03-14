@@ -1175,6 +1175,20 @@ namespace wrench {
     }
 
     /**
+     * @brief Simulates a multi-threaded computation
+     * @param num_threads: the number of threads
+     * @param thread_creation_overhead: the thread creation overhead in seconds
+     * @param sequential_work: the sequential work (in flops)
+     * @param parallel_per_thread_work: the parallel per thread work (in flops)
+     */
+    void Simulation::computeMultiThreaded(unsigned long num_threads,
+                                          double thread_creation_overhead,
+                                          double sequential_work,
+                                          double parallel_per_thread_work) {
+        S4U_Simulation::compute_multi_threaded(num_threads, thread_creation_overhead, sequential_work, parallel_per_thread_work);
+    }
+
+    /**
      * @brief Get the simulation output object
      * @return simulation output object
      */

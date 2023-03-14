@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-
 #ifdef ENABLE_BATSCHED
+
 
 #include <signal.h>
 #include <zmq.hpp>
@@ -20,8 +20,6 @@
 #include <fstream>
 
 #include <boost/json.hpp>
-
-#endif
 
 #include <wrench/logging/TerminalOutput.h>
 #include "wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h"
@@ -42,7 +40,6 @@ namespace wrench {
      * @brief Initialization method
      */
     void BatschedBatchScheduler::init() {
-#ifdef ENABLE_BATSCHED
 
         // Launch the Batsched process
 
@@ -202,31 +199,23 @@ namespace wrench {
                     "Error while fork-exec of batsched");
         }
 
-#else
-        throw std::runtime_error("BatschedBatchScheduler::init(): BATSCHED_ENABLE should be set to 'on'");
-#endif
     }
 
     /**
      * @brief Method to launch Batsched
      */
     void BatschedBatchScheduler::launch() {
-#ifdef ENABLE_BATSCHED
         // Start the Batsched Network Listener
         try {
             this->startBatschedNetworkListener();
         } catch (std::runtime_error &e) {
             throw;
         }
-#else
-        throw std::runtime_error("BatschedBatchScheduler::launch(): BATSCHED_ENABLE should be set to 'on'");
-#endif
     }
 
 
     std::map<std::string, double> BatschedBatchScheduler::getStartTimeEstimates(
             std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
-#ifdef ENABLE_BATSCHED
 
         std::set<std::string> supported_algorithms = {"conservative_bf", "fast_conservative_bf", "fcfs_fast"};
         if (supported_algorithms.find(this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM)) == supported_algorithms.end()) {
@@ -269,7 +258,6 @@ namespace wrench {
         for (auto job: set_of_jobs) {
             // Get the answer
             std::unique_ptr<SimulationMessage> message = nullptr;
-            message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
             auto msg = S4U_Mailbox::getMessage<BatchQueryAnswerMessage>(batchsched_query_mailbox,
                                                                         "[This error likely means that the scheduling algorithm that Batsched was configured to use (\"" +
                                                                                 this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
@@ -278,9 +266,6 @@ namespace wrench {
             job_estimated_start_times[std::get<0>(job)] = msg->estimated_start_time;
         }
         return job_estimated_start_times;
-#else
-        throw std::runtime_error("BatschedBatchScheduler::init(): BATSCHED_ENABLE should be set to 'on'");
-#endif
     }
 
 
@@ -288,7 +273,6 @@ namespace wrench {
      * @brief Method to shutdown Batsched
      */
     void BatschedBatchScheduler::shutdown() {
-#ifdef ENABLE_BATSCHED
 
         // Stop Batsched
         zmq::context_t context(1);
@@ -326,14 +310,10 @@ namespace wrench {
                     "BatschedBatchScheduler::shutdown(): Upon termination batsched returned a non-empty event set, which is unexpected");
         }
 
-#else
-        throw std::runtime_error("BatschedBatchScheduler::shutdown(): BATSCHED_ENABLE should be set to 'on'");
-#endif
     }
 
 
     void BatschedBatchScheduler::processQueuedJobs() {
-#if ENABLE_BATSCHED
         if (this->cs->batch_queue.empty()) {
             return;
         }
@@ -384,52 +364,33 @@ namespace wrench {
         network_listener->setSimulation(this->cs->getSimulation());
         network_listener->start(network_listener, true, false);// Daemonized, no auto-restart
         network_listener = nullptr;                            // detached mode
-#else
-        throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
-#endif
     }
 
 
     void BatschedBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
-#ifdef ENABLE_BATSCHED
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
 
         this->appendJobInfoToCSVOutputFile(batch_job.get(), "FAILED");
-#else
-        throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
-#endif
     }
 
 
     void BatschedBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
-#ifdef ENABLE_BATSCHED
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
         this->appendJobInfoToCSVOutputFile(batch_job.get(), "success");
-#else
-        throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
-#endif
     }
 
 
     void BatschedBatchScheduler::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
-#ifdef ENABLE_BATSCHED
         // Fake it as a success
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_KILLED", "terminated by users", "JOB_COMPLETED");
         this->appendJobInfoToCSVOutputFile(batch_job.get(), "TERMINATED");
-#else
-        throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
-#endif
     }
 
 
     void BatschedBatchScheduler::processUnknownJobTermination(std::string job_id) {
-#ifdef ENABLE_BATSCHED
         // Fake it as a success
         this->notifyJobEventsToBatSched(job_id, "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
 //        this->appendJobInfoToCSVOutputFile(job_id, "TERMINATED");
-#else
-        throw std::runtime_error("BatschedBatchScheduler::processUnknownJobTermination(): BATSCHED_ENABLE should be set to 'on'");
-#endif
     }
 
     void BatschedBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob> batch_job) {
@@ -441,7 +402,6 @@ namespace wrench {
      * HELPER METHODS
      */
 
-#ifdef ENABLE_BATSCHED
 
     /**
     * @brief Notify a job even to batsched (batsched ONLY)
@@ -590,6 +550,7 @@ namespace wrench {
             throw;
         }
     }
-#endif
 
 }// namespace wrench
+
+#endif // ENABLE_BATSCHED

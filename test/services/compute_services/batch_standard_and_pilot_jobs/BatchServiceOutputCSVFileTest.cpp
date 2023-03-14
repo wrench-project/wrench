@@ -88,7 +88,7 @@ public:
 private:
     BatchServiceOutputCSVFileTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -107,19 +107,19 @@ private:
                 four_hosts_five_cores;
 
         two_hosts_ten_cores["-N"] = "2";
-        two_hosts_ten_cores["-t"] = "2";
+        two_hosts_ten_cores["-t"] = "120";
         two_hosts_ten_cores["-c"] = "10";
 
         two_hosts_five_cores["-N"] = "2";
-        two_hosts_five_cores["-t"] = "2";
+        two_hosts_five_cores["-t"] = "120";
         two_hosts_five_cores["-c"] = "5";
 
         one_hosts_five_cores["-N"] = "1";
-        one_hosts_five_cores["-t"] = "2";
+        one_hosts_five_cores["-t"] = "120";
         one_hosts_five_cores["-c"] = "5";
 
         four_hosts_five_cores["-N"] = "4";
-        four_hosts_five_cores["-t"] = "2";
+        four_hosts_five_cores["-t"] = "120";
         four_hosts_five_cores["-c"] = "5";
 
         std::map<std::string, std::string> job_args[8] = {

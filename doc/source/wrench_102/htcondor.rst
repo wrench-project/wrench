@@ -97,7 +97,7 @@ In the example below, we show both kinds of job submissions:
    std::map<std::string, std::string> service_specific_args;
    service_specific_args["-N"] = "2"; // 2 compute nodes
    service_specific_args["-c"] = "4"; // 4 cores per compute nodes
-   service_specific_args["-t"] = "60"; // runs for one hour
+   service_specific_args["-t"] = "3600"; // runs for one hour
    service_specific_args["universe"] = "grid"; // Grid universe
    // Set it to run on the first batch compute service
    service_specific_args["-service"] = batch1_cs->getName(); 

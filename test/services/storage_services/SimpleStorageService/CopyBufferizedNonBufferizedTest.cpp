@@ -87,7 +87,7 @@ private:
     CopyBufferizedNonBufferizedTest *test;
     std::string mode;
 
-    int main() {
+    int main() override {
 
         // Create the files
         this->test->storage_service_bufferized_1->createFile(this->test->file_1_size_100);

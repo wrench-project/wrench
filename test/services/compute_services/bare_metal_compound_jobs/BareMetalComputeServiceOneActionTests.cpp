@@ -140,7 +140,7 @@ public:
 private:
     BareMetalComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         return 0;
     }
@@ -284,7 +284,7 @@ public:
 private:
     BareMetalComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         wrench::TerminalOutput::disableColor();// just for increasing stupid coverage
 
@@ -320,7 +320,7 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -381,7 +381,7 @@ public:
 private:
     BareMetalComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -533,7 +533,7 @@ public:
 private:
     BareMetalComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -801,7 +801,7 @@ public:
 private:
     BareMetalComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -949,7 +949,7 @@ public:
 private:
     BareMetalComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -1071,7 +1071,7 @@ public:
 private:
     BareMetalComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -1243,7 +1243,7 @@ public:
 private:
     BareMetalComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -1380,7 +1380,7 @@ public:
 private:
     BareMetalComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -1487,7 +1487,7 @@ public:
 private:
     BareMetalComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -1595,7 +1595,7 @@ public:
 private:
     BareMetalComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -1688,7 +1688,7 @@ public:
 private:
     BareMetalComputeServiceOneActionTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();

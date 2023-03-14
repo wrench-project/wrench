@@ -70,7 +70,7 @@ private:
     std::shared_ptr<wrench::StorageService> storage_service;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;
 
-    int main() {
+    int main() override {
 
         // read the file
         wrench::StorageService::readFileAtLocation(

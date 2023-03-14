@@ -129,7 +129,7 @@ private:
     FileReadActionExecutorTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -257,7 +257,7 @@ private:
     FileReadActionExecutorTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -370,7 +370,7 @@ private:
     FileReadActionExecutorTest *test;
     double sleep_before_fail;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -482,7 +482,7 @@ private:
     FileReadActionExecutorTest *test;
     double sleep_before_fail;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();

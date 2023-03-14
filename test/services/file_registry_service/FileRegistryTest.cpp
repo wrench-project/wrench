@@ -135,7 +135,7 @@ public:
 private:
     FileRegistryTest *test;
 
-    int main() {
+    int main() override {
 
         auto file1 = this->test->workflow->addFile("file1", 100.0);
         auto file2 = this->test->workflow->addFile("file2", 100.0);
@@ -326,7 +326,7 @@ public:
 private:
     FileRegistryTest *test;
 
-    int main() {
+    int main() override {
 
         std::shared_ptr<wrench::DataFile> file1 = this->test->workflow->addFile("file1", 100.0);
         std::shared_ptr<wrench::DataFile> nullptr_file = nullptr;

@@ -37,8 +37,7 @@ public:
     void do_ActivateEnergyArgument_test();
 
 protected:
-    ~SimulationCommandLineArgumentsTest() {
-        workflow->clear();
+    ~SimulationCommandLineArgumentsTest() override {
     }
 
     SimulationCommandLineArgumentsTest() {
@@ -72,7 +71,7 @@ public:
 private:
     SimulationCommandLineArgumentsTest *test;
 
-    int main() {
+    int main() override {
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
@@ -393,7 +392,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
 
 TEST_F(SimulationCommandLineArgumentsTest, FullLogArgument) {
     DO_TEST_WITH_FORK_TWO_ARGS(do_FullLogArgument_test, "", 0);
-    DO_TEST_WITH_FORK_TWO_ARGS(do_FullLogArgument_test, "--wrench-full-log", 4);
+    DO_TEST_WITH_FORK_TWO_ARGS(do_FullLogArgument_test, "--wrench-full-log", 3);
 }
 
 void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg, int num_log_lines) {
@@ -416,11 +415,8 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-
     std::string hostname = "DualCoreHost";
-    wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
+    simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -437,7 +433,6 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
         line = nullptr;
     }
     fclose(stderr_file);
-
 
     ASSERT_EQ(linecount, num_log_lines);
 

@@ -91,7 +91,7 @@ public:
 protected:
     SimulationTimestampFileCopyTest *test;
 
-    int main() {
+    int main() override {
 
         auto dmm = this->createDataMovementManager();
 

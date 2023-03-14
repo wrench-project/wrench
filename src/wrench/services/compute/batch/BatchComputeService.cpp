@@ -8,6 +8,7 @@
  */
 
 #include <boost/json.hpp>
+#include <memory>
 #include <boost/algorithm/string.hpp>
 
 #include <wrench/exceptions/ExecutionException.h>
@@ -222,9 +223,8 @@ namespace wrench {
         } catch (ExecutionException &e) {
             throw;
         } catch (std::exception &e) {
-            throw ExecutionException(std::shared_ptr<FunctionalityNotAvailable>(
-                    new FunctionalityNotAvailable(
-                            this->getSharedPtr<BatchComputeService>(), "start time estimates")));
+            throw ExecutionException(std::make_shared<FunctionalityNotAvailable>(
+                    this->getSharedPtr<BatchComputeService>(), "start time estimates"));
         }
     }
 
@@ -333,10 +333,10 @@ namespace wrench {
         // Get all arguments
         unsigned long num_hosts = 0;
         unsigned long num_cores_per_host = 0;
-        unsigned long time_asked_for_in_minutes = 0;
+        unsigned long time_asked_for_in_seconds = 0;
         num_hosts = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-N", batch_job_args);
         num_cores_per_host = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-c", batch_job_args);
-        time_asked_for_in_minutes = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-t",
+        time_asked_for_in_seconds = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-t",
                                                                                                   batch_job_args);
 
         std::string username = "you";
@@ -345,14 +345,14 @@ namespace wrench {
         }
 
         // Sanity check
-        if ((num_hosts == 0) or (num_cores_per_host == 0) or (time_asked_for_in_minutes == 0)) {
+        if ((num_hosts == 0) or (num_cores_per_host == 0) or (time_asked_for_in_seconds == 0)) {
             throw std::invalid_argument(
                     "BatchComputeService::submitCompoundJob(): service-specific arguments should have non-zero values");
         }
 
         // Create a Batch Job
         unsigned long jobid = wrench::BatchComputeService::generateUniqueJobID();
-        auto batch_job = std::shared_ptr<BatchJob>(new BatchJob(job, jobid, time_asked_for_in_minutes,
+        auto batch_job = std::shared_ptr<BatchJob>(new BatchJob(job, jobid, time_asked_for_in_seconds,
                                                                 num_hosts, num_cores_per_host, username, -1,
                                                                 S4U_Simulation::getClock()));
 

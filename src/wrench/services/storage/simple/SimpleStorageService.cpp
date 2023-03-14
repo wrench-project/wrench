@@ -81,7 +81,6 @@ namespace wrench {
      * @brief Destructor
      */
     SimpleStorageService::~SimpleStorageService() {
-        this->default_property_values.clear();
     }
 
     /**

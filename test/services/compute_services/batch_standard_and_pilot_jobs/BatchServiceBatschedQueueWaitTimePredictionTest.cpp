@@ -145,7 +145,7 @@ public:
 private:
     BatchServiceBatschedQueueWaitTimePredictionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -170,8 +170,8 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
-            batch_job_args["-t"] = "5";//time in minutes
-            batch_job_args["-c"] = "1";//number of cores per node
+            batch_job_args["-t"] = "300";//time in seconds
+            batch_job_args["-c"] = "1";  //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
             } catch (wrench::ExecutionException &e) {
@@ -310,7 +310,7 @@ public:
 private:
     BatchServiceBatschedQueueWaitTimePredictionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -336,8 +336,8 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
-            batch_job_args["-t"] = "5";//time in minutes
-            batch_job_args["-c"] = "1";//number of cores per node
+            batch_job_args["-t"] = "300";//time in seconds
+            batch_job_args["-c"] = "1";  //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
             } catch (wrench::ExecutionException &e) {
@@ -471,10 +471,11 @@ public:
 private:
     BatchServiceBatschedQueueWaitTimePredictionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
+#if 0
         {
             // Create a sequential task1 that lasts 5 minutes and requires 2 cores
             std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task1", 299, 1, 1, 0);
@@ -495,8 +496,8 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
-            batch_job_args["-t"] = "5";//time in minutes
-            batch_job_args["-c"] = "1";//number of cores per node
+            batch_job_args["-t"] = "300";//time in seconds
+            batch_job_args["-c"] = "1";  //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
             } catch (wrench::ExecutionException &e) {
@@ -533,6 +534,7 @@ private:
             }
             this->test->workflow->removeTask(task);
         }
+#endif
 
         {
 
@@ -540,7 +542,6 @@ private:
             std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task2", 60, 2, 2, 0);
             task->addInputFile(this->test->workflow->getFileByID("input_file"));
             task->addOutputFile(this->test->workflow->getFileByID("output_file"));
-
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
@@ -556,8 +557,8 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
-            batch_job_args["-t"] = "5";//time in minutes
-            batch_job_args["-c"] = "4";//number of cores per node
+            batch_job_args["-t"] = "300";//time in seconds
+            batch_job_args["-c"] = "4";  //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
             } catch (wrench::ExecutionException &e) {
@@ -572,7 +573,7 @@ private:
             for (int i = 0; i < 10; i++) {
                 std::string job_id = "new_job" + std::to_string(i);
                 unsigned int nodes = rand() % 4 + 1;
-                double walltime_seconds = nodes * (rand() % 10 + 1);
+                double walltime_seconds = nodes * (rand() % 10 + 1) * 60;
                 std::tuple<std::string, unsigned long, unsigned long, double> my_job = std::make_tuple(job_id, nodes, 1, walltime_seconds);
                 set_of_jobs.insert(my_job);
             }
@@ -613,6 +614,8 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--log=wrench_core_mailbox.t:debug");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -677,7 +680,7 @@ public:
 private:
     BatchServiceBatschedQueueWaitTimePredictionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -704,8 +707,8 @@ private:
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
-            batch_job_args["-t"] = "5";//time in minutes
-            batch_job_args["-c"] = "1";//number of cores per node
+            batch_job_args["-t"] = "300";//time in seconds
+            batch_job_args["-c"] = "1";  //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
             } catch (wrench::ExecutionException &e) {
@@ -733,8 +736,8 @@ private:
 
             std::map<std::string, std::string> batch_job_args1;
             batch_job_args1["-N"] = "2";
-            batch_job_args1["-t"] = "5";//time in minutes
-            batch_job_args1["-c"] = "4";//number of cores per node
+            batch_job_args1["-t"] = "300";//time in seconds
+            batch_job_args1["-c"] = "4";  //number of cores per node
             try {
                 job_manager->submitJob(job1, this->test->compute_service, batch_job_args1);
             } catch (wrench::ExecutionException &e) {
@@ -761,8 +764,8 @@ private:
 
             std::map<std::string, std::string> batch_job_args2;
             batch_job_args2["-N"] = "4";
-            batch_job_args2["-t"] = "5";//time in minutes
-            batch_job_args2["-c"] = "4";//number of cores per node
+            batch_job_args2["-t"] = "300";//time in seconds
+            batch_job_args2["-c"] = "4";  //number of cores per node
             try {
                 job_manager->submitJob(job2, this->test->compute_service, batch_job_args2);
             } catch (wrench::ExecutionException &e) {

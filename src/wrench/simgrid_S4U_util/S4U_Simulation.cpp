@@ -43,6 +43,7 @@ namespace wrench {
         }
         // Set the SMPI options
         simgrid::s4u::Engine::set_config("smpi/simulate-computation:no");
+        simgrid::s4u::Engine::set_config("smpi/host-speed:1000Gf");
         simgrid::s4u::Engine::set_config("smpi/init:0");
         simgrid::s4u::Engine::set_config("smpi/shared-malloc:global");
 
@@ -77,6 +78,15 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void S4U_Simulation::runSimulation() {
+
+        // Setup a handler for deadlocks
+        simgrid::s4u::Engine::on_deadlock_cb([]() {
+            throw std::runtime_error("The simulation has deadlocked."
+                                     " Run with logs enabled (e.g., --wrench-full-log) "
+                                     "to see the SimGrid-generated transcript that describes "
+                                     "the current state of all deadlocked actors.");
+        });
+
         if (this->initialized) {
             SMPI_init();
             this->engine->run();
@@ -503,7 +513,6 @@ namespace wrench {
      * @param sequential_work: the sequential work (in flops)
      * @param parallel_per_thread_work: the parallel per thread work (in flops)
      */
-
     void S4U_Simulation::compute_multi_threaded(unsigned long num_threads,
                                                 double thread_creation_overhead,
                                                 double sequential_work,
@@ -883,12 +892,12 @@ namespace wrench {
     }
 
     /**
-* @brief Get the minimum power consumption (i.e., idling) for a host at its current pstate
-* @param hostname: the host name
-* @return The power consumption for this host if idle (as specified in the platform xml description file)
-* @throw std::invalid_argument
-* @throw std::runtime_error
-*/
+    * @brief Get the minimum power consumption (i.e., idling) for a host at its current pstate
+    * @param hostname: the host name
+    * @return The power consumption for this host if idle (as specified in the platform xml description file)
+    * @throw std::invalid_argument
+    * @throw std::runtime_error
+    */
     double S4U_Simulation::getMinPowerConsumption(const std::string &hostname) {
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -905,12 +914,12 @@ namespace wrench {
     }
 
     /**
-* @brief Get the maximum power consumption (i.e., 100% load) for a host at its current pstate
-* @param hostname: the host name
-* @return The power consumption for this host if 100% used (as specified in the platform xml description file)
-* @throw std::invalid_argument
-* @throw std::runtime_error
-*/
+    * @brief Get the maximum power consumption (i.e., 100% load) for a host at its current pstate
+    * @param hostname: the host name
+    * @return The power consumption for this host if 100% used (as specified in the platform xml description file)
+    * @throw std::invalid_argument
+    * @throw std::runtime_error
+    */
     double S4U_Simulation::getMaxPowerConsumption(const std::string &hostname) {
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -930,12 +939,12 @@ namespace wrench {
     }
 
     /**
-* @brief Get the list of power states available for a host
-* @param hostname: the host name
-* @return a list of power states available for the host (as specified in the platform xml description file)
-* @throw std::invalid_argument
-* @throw std::runtime_error
-*/
+    * @brief Get the list of power states available for a host
+    * @param hostname: the host name
+    * @return a list of power states available for the host (as specified in the platform xml description file)
+    * @throw std::invalid_argument
+    * @throw std::runtime_error
+    */
     std::vector<int> S4U_Simulation::getListOfPstates(const std::string &hostname) {
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -958,10 +967,10 @@ namespace wrench {
     }
 
     /**
-* @brief Compute zero flop, which take zero time but will block if the host's pstate
-*        has a zero flop/sec speed, until the host's pstate is changed to a pstate with
-*        non-zero flop/sec speed.
-*/
+    * @brief Compute zero flop, which take zero time but will block if the host's pstate
+    *        has a zero flop/sec speed, until the host's pstate is changed to a pstate with
+    *        non-zero flop/sec speed.
+    */
     void S4U_Simulation::computeZeroFlop() {
         if (S4U_Simulation::getFlopRate() <= 0) {
             S4U_Simulation::compute(0);
@@ -970,12 +979,12 @@ namespace wrench {
 
 
     /**
-* @brief Gets set of disks, i.e., mount points, available at a host
-* @param hostname: the host's name
-* @return a vector of mount points
-*
-* @throw std::invalid_argument
-*/
+    * @brief Gets set of disks, i.e., mount points, available at a host
+    * @param hostname: the host's name
+    * @return a vector of mount points
+    *
+    * @throw std::invalid_argument
+    */
     std::vector<std::string> S4U_Simulation::getDisks(const std::string &hostname) {
         simgrid::s4u::Host *host;
         try {

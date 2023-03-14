@@ -64,13 +64,13 @@ namespace wrench {
         /* Record the batch_standard_and_pilot_jobs node's core flop rate */
         double core_flop_rate = (*(batch_compute_service->getCoreFlopRate().begin())).second;
 
-        /* For each task, estimate its execution time in minutes */
-        std::map<std::shared_ptr<WorkflowTask>, long> execution_times_in_minutes;
+        /* For each task, estimate its execution time in seconds */
+        std::map<std::shared_ptr<WorkflowTask>, long> execution_times_in_seconds;
         for (auto const &t: this->workflow->getTasks()) {
             double parallel_efficiency =
                     std::dynamic_pointer_cast<wrench::ConstantEfficiencyParallelModel>(t->getParallelModel())->getEfficiency();
             double in_seconds = (t->getFlops() / core_flop_rate) / (10 * parallel_efficiency);
-            execution_times_in_minutes[t] = 1 + std::lround(in_seconds / 60.0);
+            execution_times_in_seconds[t] = 1 + std::lround(in_seconds);
             // The +1 above is just  so that we don't cut it too tight
         }
 
@@ -134,20 +134,20 @@ namespace wrench {
             // number of cores
             service_specific_arguments["-c"] = "10";
             // time
-            WRENCH_INFO("Task %s should run in under %ld minutes",
-                        ready_task->getID().c_str(), execution_times_in_minutes[ready_task]);
+            WRENCH_INFO("Task %s should run in under %ld seconds",
+                        ready_task->getID().c_str(), execution_times_in_seconds[ready_task]);
             if (ready_task2) {
-                WRENCH_INFO("Task %s should run in under %ld minutes",
-                            ready_task2->getID().c_str(), execution_times_in_minutes[ready_task2]);
+                WRENCH_INFO("Task %s should run in under %ld seconds",
+                            ready_task2->getID().c_str(), execution_times_in_seconds[ready_task2]);
             }
 
             // But let's submit the job so that it requests time sufficient only
             // for the cheaper task, which will lead to the
             // expensive task, if any, to be terminated prematurely (i.e., it will fail and thus still be ready).
 
-            service_specific_arguments["-t"] = std::to_string(execution_times_in_minutes[ready_task]);
+            service_specific_arguments["-t"] = std::to_string(execution_times_in_seconds[ready_task]);
 
-            WRENCH_INFO("Submitting the job, asking for %s %s-core nodes for %s minutes",
+            WRENCH_INFO("Submitting the job, asking for %s %s-core nodes for %s seconds",
                         service_specific_arguments["-N"].c_str(),
                         service_specific_arguments["-c"].c_str(),
                         service_specific_arguments["-t"].c_str());

@@ -111,7 +111,7 @@ namespace wrench {
                 std::map<std::string, std::string> batch_service_args;
 
                 //   The job will run no longer than 1 hour
-                batch_service_args["-t"] = "60";
+                batch_service_args["-t"] = "3600";
 
                 //   The job will run on 1 compute node
                 batch_service_args["-N"] = "1";

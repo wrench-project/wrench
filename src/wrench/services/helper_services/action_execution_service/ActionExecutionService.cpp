@@ -39,7 +39,6 @@ namespace wrench {
      * @brief Destructor
      */
     ActionExecutionService::~ActionExecutionService() {
-        this->default_property_values.clear();
     }
 
     /**
@@ -736,12 +735,12 @@ namespace wrench {
     void ActionExecutionService::processActionExecutorCompletion(
             const std::shared_ptr<ActionExecutor> &executor) {
 
-        hostname = executor->getHostname();
+        auto executor_hostname = executor->getHostname();
         auto action = executor->getAction();
 
         // Update RAM availabilities and running thread counts
-        this->ram_availabilities[hostname] += executor->getMemoryAllocated();
-        this->running_thread_counts[hostname] -= executor->getNumCoresAllocated();
+        this->ram_availabilities[executor_hostname] += executor->getMemoryAllocated();
+        this->running_thread_counts[executor_hostname] -= executor->getNumCoresAllocated();
 
         // Forget the action executor
         this->action_executors.erase(action);

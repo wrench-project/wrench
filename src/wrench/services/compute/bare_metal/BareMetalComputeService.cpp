@@ -36,7 +36,6 @@ namespace wrench {
      * @brief Destructor
      */
     BareMetalComputeService::~BareMetalComputeService() {
-        this->default_property_values.clear();
     }
 
     /**
