@@ -1210,7 +1210,7 @@ namespace wrench {
         this->processCompoundJobTimeout(compound_job);
     }
 
-#ifdef BATSCHED
+#ifdef ENABLE_BATSCHED
     /**
      * @brief Method to hand incoming batsched message
      *
