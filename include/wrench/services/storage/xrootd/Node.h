@@ -43,6 +43,7 @@ namespace wrench {
             /***********************/
 
             using StorageService::createFile;
+            using StorageService::removeFile;
             using StorageService::deleteFile;
             using StorageService::hasFile;
             using StorageService::lookupFile;
