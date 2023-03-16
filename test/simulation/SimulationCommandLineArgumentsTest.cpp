@@ -406,10 +406,10 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     argv[0] = strdup("unit_test");
     argv[1] = strdup(arg.c_str());
 
-    ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Redirecting to file, but this is complicated due to the simgrid logging...
     close(2);
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
     FILE *stderr_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stderr").c_str(), "w");
 
     // Setting up the platform
