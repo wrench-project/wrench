@@ -1147,7 +1147,6 @@ namespace wrench {
                 }
             }
 #endif
-
         }
 
         //        WRENCH_INFO("pending: %d   running: %d   waiting: %d", is_pending, is_running, is_waiting);
