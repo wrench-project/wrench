@@ -355,9 +355,9 @@ namespace wrench {
 
         // Create a Batch Job
         unsigned long jobid = wrench::BatchComputeService::generateUniqueJobID();
-        auto batch_job = std::shared_ptr<BatchJob>(new BatchJob(job, jobid, time_asked_for_in_seconds,
+        auto batch_job = std::make_shared<BatchJob>(job, jobid, time_asked_for_in_seconds,
                                                                 num_hosts, num_cores_per_host, username, -1,
-                                                                S4U_Simulation::getClock()));
+                                                                S4U_Simulation::getClock());
 
         // Set job display color for csv output
         auto it = batch_job_args.find("-color");
