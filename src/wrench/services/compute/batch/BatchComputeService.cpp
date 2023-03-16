@@ -608,6 +608,7 @@ namespace wrench {
             this->batch_queue.pop_front();
         }
 
+#ifdef ENABLE_BATSCHED
         while (not this->waiting_jobs.empty()) {
             auto batch_job = (*(this->waiting_jobs.begin()));
             auto compound_job = batch_job->getCompoundJob();
@@ -641,6 +642,7 @@ namespace wrench {
 
             this->waiting_jobs.erase(batch_job);
         }
+#endif
 
         // UNLOCK
         this->releaseDaemonLock();
@@ -1130,6 +1132,7 @@ namespace wrench {
                 }
             }
 
+#ifdef ENABLE_BATSCHED
             if (not is_pending) {
                 if (batch_job == nullptr && batch_pending_it == this->batch_queue.end()) {
                     // Is it waiting?
@@ -1143,6 +1146,8 @@ namespace wrench {
                     }
                 }
             }
+#endif
+
         }
 
         //        WRENCH_INFO("pending: %d   running: %d   waiting: %d", is_pending, is_running, is_waiting);
@@ -1158,7 +1163,6 @@ namespace wrench {
             return;
         }
 
-        // Is it running?
         if (is_running) {
             this->scheduler->processJobTermination(batch_job);
             terminateRunningCompoundJob(job, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
@@ -1172,11 +1176,13 @@ namespace wrench {
             this->batch_queue.erase(batch_pending_it);
             this->removeBatchJobFromJobsList(to_free);
         }
+#ifdef ENABLE_BATSCHED
         if (is_waiting) {
             this->scheduler->processJobTermination(batch_job);
             this->waiting_jobs.erase(batch_job);
             this->removeBatchJobFromJobsList(batch_job);
         }
+#endif
         auto answer_message =
                 new ComputeServiceTerminateCompoundJobAnswerMessage(
                         job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
