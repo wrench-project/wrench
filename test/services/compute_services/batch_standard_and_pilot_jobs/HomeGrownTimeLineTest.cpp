@@ -61,7 +61,7 @@ class NodeAvailabilityTimelineTestWMS : public wrench::ExecutionController {
 public:
     NodeAvailabilityTimelineTestWMS(
             BatchServiceAvailabilityTimeLineTest *test,
-            const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+            const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
@@ -144,7 +144,7 @@ class CoreAvailabilityTimelineTestWMS : public wrench::ExecutionController {
 
 public:
     explicit CoreAvailabilityTimelineTestWMS(
-            const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
+            const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
     }
 
 

@@ -280,7 +280,6 @@ namespace wrench {
 #ifdef ENABLE_BATSCHED
         void processExecuteJobFromBatSched(const std::string &bat_sched_reply);
 #endif
-
     };
 }// namespace wrench
 
