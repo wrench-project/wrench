@@ -402,7 +402,7 @@ namespace wrench {
      * @return true on success, false on failure (i.e., mount point not found)
      */
     bool SimpleStorageService::splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point) {
-        auto sanitized_path = FileLocation::sanitizePath(path);
+        gitauto sanitized_path = FileLocation::sanitizePath(path);
         for (auto const &fs: this->file_systems) {
             auto mp = fs.first;
             if (FileLocation::properPathPrefix(mp, sanitized_path)) {

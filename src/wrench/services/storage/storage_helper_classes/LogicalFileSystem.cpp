@@ -123,8 +123,12 @@ namespace wrench {
         if (devnull) {
             return false;
         }
-        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
-        return (this->content.find(fixed_path) != this->content.end());
+        if (absolute_path == "/") {// Common case
+            return true;
+        } else {
+            auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+            return (this->content.find(fixed_path) != this->content.end());
+        }
     }
 
     /**
