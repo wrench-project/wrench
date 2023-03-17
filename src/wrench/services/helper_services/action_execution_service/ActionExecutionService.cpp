@@ -110,6 +110,7 @@ namespace wrench {
         }
 
 #if 0  // These checks should have ALL happened before
+
         // Check that service-specific args that are provided are well-formatted
         std::string action_name = action->getName();
         auto service_specific_args = action->getJob()->getServiceSpecificArguments();
