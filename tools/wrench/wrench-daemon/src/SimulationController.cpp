@@ -362,14 +362,18 @@ namespace wrench {
      */
     json SimulationController::addBareMetalComputeService(json data) {
         std::string head_host = data["head_host"];
-        //map<std::string, std::tuple<unsigned long, double>> resource = data["resource"];
+        map<std::string, std::tuple<unsigned long, double>> resources;
         std::string resource = data["resources"];
         std::string scratch_space = data["scratch_space"];
-        //wrench::WRENCH_PROPERTY_COLLECTION_TYPE property_list = data["property_list"];
-        //wrench::WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = data["messagepayload_list"];
+        WRENCH_PROPERTY_COLLECTION_TYPE property_list = data["property_list"];
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list;
+        ServiceMessagePayload payloadMessage;
         json jsonData = json::parse(resource);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            resources.emplace(it.key(), it.value());
+        }
         // Create the new service
-        auto new_service = new BareMetalComputeService(head_host, {resource}, scratch_space, {}, {});
+        auto new_service = new BareMetalComputeService(head_host, resources, scratch_space, {}, {});
         // Put in the list of services to start (this is because this method is called
         // by the server thread, and therefore, it will segfault horribly if it calls any
         // SimGrid simulation methods, e.g., to start a service)
