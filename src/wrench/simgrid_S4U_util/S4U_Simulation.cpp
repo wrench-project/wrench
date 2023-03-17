@@ -553,7 +553,7 @@ namespace wrench {
             auto disk_list = host->get_disks();
             for (auto d: disk_list) {
                 std::string disk_mountpoint =
-                        FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+                        FileLocation::sanitizePath(std::string(disk->get_property("mount")));
                 if (disk_mountpoint == mount_point) {
                     disk = d;
                     break;
@@ -634,7 +634,7 @@ namespace wrench {
             auto disk_list = host->get_disks();
             for (auto d: disk_list) {
                 std::string disk_mountpoint =
-                        FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+                        FileLocation::sanitizePath(std::string(disk->get_property("mount")));
 
                 if (disk_mountpoint == mount_point) {
                     disk = d;
