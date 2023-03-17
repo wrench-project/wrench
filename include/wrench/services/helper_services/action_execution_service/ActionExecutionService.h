@@ -50,8 +50,7 @@ namespace wrench {
         };
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}
-        };
+                {ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}};
 
     public:
         // Public Constructor
