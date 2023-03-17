@@ -345,7 +345,7 @@ void SimulationPlatformTest::do_ProgrammaticPlatformTest_test() {
     PlatformCreator platform_creator(100 * 1000000.0);
 
     ASSERT_THROW(simulation->instantiatePlatform(platform_creator), std::runtime_error);
-    
+
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     simulation->instantiatePlatform(platform_creator);
@@ -354,5 +354,3 @@ void SimulationPlatformTest::do_ProgrammaticPlatformTest_test() {
         free(argv[i]);
     free(argv);
 }
-
-
