@@ -308,7 +308,7 @@ namespace wrench {
 
             // If the file is not already there, do a capacity check/update
             // (If the file is already there, then there will just be an overwrite.
-            bool file_already_there = fs->doesDirectoryExist(path_at_mount_point) and fs->isFileInDirectory(file, path_at_mount_point);
+            bool file_already_there = fs->isFileInDirectory(file, path_at_mount_point);
 
             if (not file_already_there) {
                 // Reserve space
@@ -382,13 +382,13 @@ namespace wrench {
     }
 
     /**
- * @brief Handle a file read request
- * @param location: the file's location
- * @param num_bytes_to_read: the number of bytes to read
- * @param answer_mailbox: the mailbox to which the answer should be sent
- * @param requesting_host: the requesting_host
- * @return
- */
+     * @brief Handle a file read request
+     * @param location: the file's location
+     * @param num_bytes_to_read: the number of bytes to read
+     * @param answer_mailbox: the mailbox to which the answer should be sent
+     * @param requesting_host: the requesting_host
+     * @return
+     */
     bool SimpleStorageServiceNonBufferized::processFileReadRequest(
             const std::shared_ptr<FileLocation> &location,
             double num_bytes_to_read,
@@ -465,12 +465,12 @@ namespace wrench {
     }
 
     /**
- * @brief Handle a file copy request
- * @param src_location: the source location
- * @param dst_location: the destination location
- * @param answer_mailbox: the mailbox to which the answer should be sent
- * @return
- */
+     * @brief Handle a file copy request
+     * @param src_location: the source location
+     * @param dst_location: the destination location
+     * @param answer_mailbox: the mailbox to which the answer should be sent
+     * @return
+     */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(
             std::shared_ptr<FileLocation> &src_location,
             std::shared_ptr<FileLocation> &dst_location,
@@ -557,12 +557,12 @@ namespace wrench {
 
 
     /**
- * @brief Handle a file copy request
- * @param src_location: the source location
- * @param dst_location: the destination location
- * @param answer_mailbox: the mailbox to which the answer should be sent
- * @return
- */
+     * @brief Handle a file copy request
+     * @param src_location: the source location
+     * @param dst_location: the destination location
+     * @param answer_mailbox: the mailbox to which the answer should be sent
+     * @return
+     */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequestIAmTheSource(
             std::shared_ptr<FileLocation> &src_location,
             std::shared_ptr<FileLocation> &dst_location,
@@ -686,8 +686,8 @@ namespace wrench {
     }
 
     /**
-* @brief Start pending file transfer threads if any and if possible
-*/
+    * @brief Start pending file transfer threads if any and if possible
+    */
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
         while ((not this->pending_transactions.empty()) and
                (this->running_transactions.size() < this->num_concurrent_connections)) {
@@ -712,14 +712,21 @@ namespace wrench {
     }
 
     /**
-* @brief Get the load (number of concurrent reads) on the storage service
-* @return the load on the service
-*/
+    * @brief Get the load (number of concurrent reads) on the storage service
+    * @return the load on the service
+    */
     double SimpleStorageServiceNonBufferized::getLoad() {
         return (double) this->running_transactions.size() + (double) this->pending_transactions.size();
     }
 
 
+    /**
+     * @brief Process a file copy request
+     * @param src: the source location
+     * @param dst: the dst location
+     * @param answer_mailbox: the answer mailbox
+     * @return true is the service should continue;
+     */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequest(std::shared_ptr<FileLocation> &src,
                                                                    std::shared_ptr<FileLocation> &dst,
                                                                    simgrid::s4u::Mailbox *answer_mailbox) {

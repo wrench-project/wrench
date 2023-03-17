@@ -169,7 +169,7 @@ namespace wrench {
  * @param file: the file
  * @param absolute_path: the directory's absolute path
  *
- * @return true if the file is present
+ * @return true if the file is present, false if not (or if directory does not exist)
  *
  * @throw std::invalid_argument
  */
@@ -282,7 +282,6 @@ namespace wrench {
         if (absolute_path != "/") {
             fixed_path = FileLocation::sanitizePath(absolute_path + "/");
         }
-
 
         std::string key = fixed_path + file->getID();
 
