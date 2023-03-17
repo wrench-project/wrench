@@ -16,11 +16,9 @@
 class FailureCommandLineArgsTest : public ::testing::Test {
 
 public:
-
     void do_MissingFailureCommandLineArgsTest_test();
 
 protected:
-
     FailureCommandLineArgsTest() {
         // Create a platform file
         std::string xml = R"(<?xml version='1.0'?>
@@ -71,7 +69,7 @@ class MissingFailureCommandLineArgsTestWMS : public wrench::ExecutionController 
 
 public:
     MissingFailureCommandLineArgsTestWMS(FailureCommandLineArgsTest *test,
-                                      std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                         std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
