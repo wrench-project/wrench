@@ -354,5 +354,3 @@ void SimulationPlatformTest::do_ProgrammaticPlatformTest_test() {
         free(argv[i]);
     free(argv);
 }
-
-
