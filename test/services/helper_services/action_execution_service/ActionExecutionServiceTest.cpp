@@ -126,7 +126,7 @@ class ActionExecutionServiceOneActionSuccessTestWMS : public wrench::ExecutionCo
 
 public:
     ActionExecutionServiceOneActionSuccessTestWMS(ActionExecutionServiceTest *test,
-                                                  const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                  const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -228,7 +228,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionSuccessTestWMS(this, "Host1")));
+                            new ActionExecutionServiceOneActionSuccessTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -323,7 +323,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionBogusSpecTest
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionBogusSpecTestWMS(this, "Host1")));
+                            new ActionExecutionServiceOneActionBogusSpecTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -343,7 +343,7 @@ class ActionExecutionServiceNonReadyActionTestWMS : public wrench::ExecutionCont
 
 public:
     ActionExecutionServiceNonReadyActionTestWMS(ActionExecutionServiceTest *test,
-                                                                   const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -382,17 +382,17 @@ private:
         } catch (std::runtime_error &ignore) {
         }
 
-//        {
-//            std::map<std::string, std::string> args;
-//            args["compute"] = "BOGUS";
-//            // Submit the action to the action executor
-//
-//            try {
-//                action_execution_service->submitAction(action1);
-//            } catch (std::invalid_argument &e) {
-//            }
-//
-//        }
+        //        {
+        //            std::map<std::string, std::string> args;
+        //            args["compute"] = "BOGUS";
+        //            // Submit the action to the action executor
+        //
+        //            try {
+        //                action_execution_service->submitAction(action1);
+        //            } catch (std::invalid_argument &e) {
+        //            }
+        //
+        //        }
 
         return 0;
     }
@@ -430,7 +430,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceNonReadyActionTest_tes
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceNonReadyActionTestWMS(this, "Host1")));
+                            new ActionExecutionServiceNonReadyActionTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -548,7 +548,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionTerminateTestWMS(this, "Host1")));
+                            new ActionExecutionServiceOneActionTerminateTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -570,7 +570,7 @@ class ActionExecutionServiceOneActionCrashRestartTestWMS : public wrench::Execut
 public:
     ActionExecutionServiceOneActionCrashRestartTestWMS(ActionExecutionServiceTest *test,
                                                        std::shared_ptr<wrench::Workflow> workflow,
-                                                       const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                       const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -715,7 +715,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionCrashRestartTestWMS(this, this->workflow, "Host1")));
+                            new ActionExecutionServiceOneActionCrashRestartTestWMS(this, this->workflow, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -841,7 +841,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionCrashNoRestartTestWMS(this, "Host1")));
+                            new ActionExecutionServiceOneActionCrashNoRestartTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -973,7 +973,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionFailureTestWMS(this, "Host1")));
+                            new ActionExecutionServiceOneActionFailureTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -1078,7 +1078,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionNotEnoughResourcesTestWMS(this, "Host1")));
+                            new ActionExecutionServiceOneActionNotEnoughResourcesTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -1244,7 +1244,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceThreeActionsInSequenceTestWMS(this, "Host1")));
+                            new ActionExecutionServiceThreeActionsInSequenceTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
