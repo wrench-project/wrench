@@ -250,6 +250,10 @@ private:
         wrench::Simulation::getLinknameList();
         wrench::Simulation::getLinkBandwidth("1");
         wrench::Simulation::getLinkUsage("1");
+        try {
+            wrench::Simulation::getLinkUsage("");
+            throw std::runtime_error("Shouldn't be able to get link usage for an empty-name link");
+        } catch (std::invalid_argument &ignore) {}
         wrench::Simulation::isLinkOn("1");
 
         try {
