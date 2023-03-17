@@ -108,6 +108,8 @@ namespace wrench {
         if (action->getState() != Action::State::READY) {
             throw std::runtime_error("Can only submit a ready action to the ActionExecutionService");
         }
+
+#if 0  // These checks should have ALL happened before
         // Check that service-specific args that are provided are well-formatted
         std::string action_name = action->getName();
         auto service_specific_args = action->getJob()->getServiceSpecificArguments();
@@ -149,6 +151,7 @@ namespace wrench {
                 }
             }
         }
+#endif
 
         // At this point, there may still be insufficient resources to run the action, but that will
         // be handled later (and some ExecutionError with a "not enough resources" FailureCause
