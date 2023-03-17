@@ -499,6 +499,7 @@ set(TEST_FILES
         test/services/bandwidth_meter_service/BandwidthMeterServiceTest.cpp
         test/simulated_failures/host_failures/ServiceStartReStartTest.cpp
         test/simulated_failures/host_failures/ComprehensiveIntegrationTest.cpp
+        test/simulated_failures/FailureCommandLineArgsTest.cpp
         test/simulated_failures/host_failures/FailureDetectorHostFailuresTest.cpp
         test/simulated_failures/host_failures/BareMetalComputeServiceHostFailuresTest.cpp
         test/simulated_failures/host_failures/CloudComputeServiceHostFailuresTest.cpp
