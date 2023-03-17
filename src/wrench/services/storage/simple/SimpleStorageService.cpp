@@ -144,8 +144,7 @@ namespace wrench {
             auto fs = this->file_systems[mount_point].get();
             auto file = location->getFile();
 
-            if ((not fs->doesDirectoryExist(path_at_mount_point)) or
-                (not fs->isFileInDirectory(file, path_at_mount_point))) {
+            if ((not fs->isFileInDirectory(file, path_at_mount_point))) {
                 // If this is scratch, we don't care, perhaps it was taken care of elsewhere...
                 if (not this->isScratch()) {
                     failure_cause = std::shared_ptr<FailureCause>(
