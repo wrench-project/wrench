@@ -538,9 +538,6 @@ namespace wrench {
                                      std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
         bool is_scratch;
-
-
-
     };
 
 
