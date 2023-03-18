@@ -103,8 +103,8 @@ namespace wrench {
         this->setProperties(this->default_property_values, std::move(property_list));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
-        this->StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD = this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD);
-        this->StorageServiceMessagePayload_FILE_READ_ANSWER_MESSAGE_PAYLOAD = this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD);
+//        this->StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD = this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD);
+//        this->StorageServiceMessagePayload_FILE_READ_ANSWER_MESSAGE_PAYLOAD = this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD);
 
         this->validateProperties();
 

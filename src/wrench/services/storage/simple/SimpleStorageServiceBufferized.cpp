@@ -313,7 +313,7 @@ namespace wrench {
                         mailbox_to_receive_the_file_content,
                         buffer_size,
                         1,
-                        this->StorageServiceMessagePayload_FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {

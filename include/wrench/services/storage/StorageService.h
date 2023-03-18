@@ -522,8 +522,8 @@ namespace wrench {
         virtual void setIsScratch(bool is_scratch);
 
         /** Fast-Access common message payloads! **/
-        double StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD;
-        double StorageServiceMessagePayload_FILE_READ_ANSWER_MESSAGE_PAYLOAD;
+//        double StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD;
+//        double StorageServiceMessagePayload_FILE_READ_ANSWER_MESSAGE_PAYLOAD;
         /***********************/
         /** \endcond          **/
         /***********************/
