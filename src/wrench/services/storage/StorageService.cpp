@@ -260,7 +260,7 @@ namespace wrench {
                                         simgrid::s4u::this_actor::get_host(),
                                         location,
                                         num_bytes,
-                                        this->StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD));
+                                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
 
 
         if (wait_for_answer) {
