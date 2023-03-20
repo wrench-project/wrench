@@ -27,238 +27,238 @@ public:
         // Set up all post request handlers
         CROW_ROUTE(app, "/simulation/startSimulation").methods(crow::HTTPMethod::POST)
                 ([this](const crow::request& req){
-                    json result = json::parse(req.body);
+                    json req_json = json::parse(req.body);
                     crow::response res;
-                    this->genericRequestHandler(req, res, "startSimulation");
+                    this->genericRequestHandler(req_json, res, "startSimulation");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/getTime").methods(crow::HTTPMethod::GET)
                 ([this](const crow::request& req, const std::string& simid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "getTime");
+                    this->genericRequestHandler(req_json, res, "getTime");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/advanceTime").methods(crow::HTTPMethod::PUT)
                 ([this](const crow::request& req, const std::string& simid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "advanceTime");
+                    this->genericRequestHandler(req_json, res, "advanceTime");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/createTask").methods(crow::HTTPMethod::PUT)
                 ([this](const crow::request& req, const std::string& simid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "createTask");
+                    this->genericRequestHandler(req_json, res, "createTask");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/waitForNextSimulationEvent").methods(crow::HTTPMethod::GET)
                 ([this](const crow::request& req, const std::string& simid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "waitForNextSimulationEvent");
+                    this->genericRequestHandler(req_json, res, "waitForNextSimulationEvent");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/simulationEvents").methods(crow::HTTPMethod::GET)
                 ([this](const crow::request& req, const std::string& simid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "getSimulationEvents");
+                    this->genericRequestHandler(req_json, res, "getSimulationEvents");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/hostnames").methods(crow::HTTPMethod::GET)
                 ([this](const crow::request& req, const std::string& simid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "getAllHostnames");
+                    this->genericRequestHandler(req_json, res, "getAllHostnames");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/tasks/<string>/inputFiles").methods(crow::HTTPMethod::GET)
                 ([this](const crow::request& req, const std::string& simid, const std::string& tid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
-                    result[toStr(tid)] = tid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
+                    req_json[toStr(tid)] = tid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "getTaskInputFiles");
+                    this->genericRequestHandler(req_json, res, "getTaskInputFiles");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/tasks/<string>/addInputFile").methods(crow::HTTPMethod::PUT)
                 ([this](const crow::request& req, const std::string& simid, const std::string& tid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
-                    result[toStr(tid)] = tid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
+                    req_json[toStr(tid)] = tid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "addInputFile");
+                    this->genericRequestHandler(req_json, res, "addInputFile");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/tasks/<string>/addOutputFile").methods(crow::HTTPMethod::PUT)
                 ([this](const crow::request& req, const std::string& simid, const std::string& tid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
-                    result[toStr(tid)] = tid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
+                    req_json[toStr(tid)] = tid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "addOutputFile");
+                    this->genericRequestHandler(req_json, res, "addOutputFile");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/inputFiles").methods(crow::HTTPMethod::GET)
                 ([this](const crow::request& req, const std::string& simid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "getInputFiles");
+                    this->genericRequestHandler(req_json, res, "getInputFiles");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/addFile").methods(crow::HTTPMethod::PUT)
                 ([this](const crow::request& req, const std::string& simid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "addFile");
+                    this->genericRequestHandler(req_json, res, "addFile");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/files/<string>/size").methods(crow::HTTPMethod::GET)
                 ([this](const crow::request& req, const std::string& simid, const std::string& file_id){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
-                    result[toStr(file_id)] = file_id;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
+                    req_json[toStr(file_id)] = file_id;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "fileGetSize");
+                    this->genericRequestHandler(req_json, res, "fileGetSize");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/jobs/<string>/tasks").methods(crow::HTTPMethod::GET)
-                ([this](const crow::request& req, const std::string& simid, const std::string& jid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
-                    result[toStr(jid)] = jid;
+                ([this](const crow::request& req, const std::string& simid, const std::string& job_name){
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
+                    req_json[toStr(job_name)] = job_name;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "standardJobGetTasks");
+                    this->genericRequestHandler(req_json, res, "standardJobGetTasks");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/tasks/<string>/taskGetFlops").methods(crow::HTTPMethod::GET)
-                ([this](const crow::request& req, const std::string& simid, const std::string& tid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
-                    result[toStr(tid)] = tid;
+                ([this](const crow::request& req, const std::string& simid, const std::string& name){
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
+                    req_json[toStr(name)] = name;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "taskGetFlops");
+                    this->genericRequestHandler(req_json, res, "taskGetFlops");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/tasks/<string>/taskGetMinNumCores").methods(crow::HTTPMethod::GET)
-                ([this](const crow::request& req, const std::string& simid, const std::string& tid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
-                    result[toStr(tid)] = tid;
+                ([this](const crow::request& req, const std::string& simid, const std::string& name){
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
+                    req_json[toStr(name)] = name;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "taskGetMinNumCores");
+                    this->genericRequestHandler(req_json, res, "taskGetMinNumCores");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/tasks/<string>/taskGetMaxNumCores").methods(crow::HTTPMethod::GET)
-                ([this](const crow::request& req, const std::string& simid, const std::string& tid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
-                    result[toStr(tid)] = tid;
+                ([this](const crow::request& req, const std::string& simid, const std::string& name){
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
+                    req_json[toStr(name)] = name;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "taskGetMaxNumCores");
+                    this->genericRequestHandler(req_json, res, "taskGetMaxNumCores");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/tasks/<string>/taskGetMemory").methods(crow::HTTPMethod::GET)
-                ([this](const crow::request& req, const std::string& simid, const std::string& tid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
-                    result[toStr(tid)] = tid;
+                ([this](const crow::request& req, const std::string& simid, const std::string& name){
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
+                    req_json[toStr(name)] = name;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "taskGetMemory");
+                    this->genericRequestHandler(req_json, res, "taskGetMemory");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/createStandardJob").methods(crow::HTTPMethod::PUT)
                 ([this](const crow::request& req, const std::string& simid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "createStandardJob");
+                    this->genericRequestHandler(req_json, res, "createStandardJob");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/<string>/submit").methods(crow::HTTPMethod::POST)
-                ([this](const crow::request& req, const std::string& simid, const std::string& jid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
-                    result[toStr(jid)] = jid;
+                ([this](const crow::request& req, const std::string& simid, const std::string& job_name){
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
+                    req_json[toStr(job_name)] = job_name;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "submitStandardJob");
+                    this->genericRequestHandler(req_json, res, "submitStandardJob");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/addBareMetalComputeService").methods(crow::HTTPMethod::POST)
                 ([this](const crow::request& req, const std::string& simid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "addBareMetalComputeService");
+                    this->genericRequestHandler(req_json, res, "addBareMetalComputeService");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/addSimpleStorageService").methods(crow::HTTPMethod::POST)
                 ([this](const crow::request& req, const std::string& simid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "addSimpleStorageService");
+                    this->genericRequestHandler(req_json, res, "addSimpleStorageService");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/addFileRegistryService").methods(crow::HTTPMethod::POST)
                 ([this](const crow::request& req, const std::string& simid){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "addFileRegistryService");
+                    this->genericRequestHandler(req_json, res, "addFileRegistryService");
                     return res;
                 });
 
         CROW_ROUTE(app, "/simulation/<string>/<string>/createFileCopy").methods(crow::HTTPMethod::POST)
-                ([this](const crow::request& req, const std::string& simid, const std::string& storage_service_id){
-                    json result = json::parse(req.body);
-                    result[toStr(simid)] = simid;
-                    result[toStr(storage_service_id)] = storage_service_id;
+                ([this](const crow::request& req, const std::string& simid, const std::string& storage_service_name){
+                    json req_json = json::parse(req.body);
+                    req_json[toStr(simid)] = simid;
+                    req_json[toStr(storage_service_name)] = storage_service_name;
                     crow::response res;
-                    this->genericRequestHandler(req, res, "createFileCopyAtStorageService");
+                    this->genericRequestHandler(req_json, res, "createFileCopyAtStorageService");
                     return res;
                 });
     }
 
-    void genericRequestHandler(const crow::request &req, crow::response &res, const std::string& api_function) {
-        display_request_function(req);
+    void genericRequestHandler(const json &req, crow::response &res, const std::string& api_function) {
+        //display_request_function(req);
 
         json answer;
         try {
             auto request_handler = this->request_handlers[api_function];
-            answer = request_handler(json::parse(req.body));
+            answer = request_handler(req);
             answer["wrench_api_request_success"] = true;
         } catch (std::exception &e) {
             answer["wrench_api_request_success"] = false;
