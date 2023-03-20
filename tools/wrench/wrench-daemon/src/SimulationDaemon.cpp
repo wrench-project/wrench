@@ -25,8 +25,9 @@ using json = nlohmann::json;
  */
 void SimulationDaemon::run() {
     std::cout<<"about to  crash down"<<std::endl;
+    // ToDo: add simid
     // Set up GET request handler for the (likely useless) "alive" path
-    CROW_ROUTE(app, "/api/alive").methods("Get"_method)
+    CROW_ROUTE(app, "/simulation/alive").methods("GET"_method)
             ([this](const crow::request& req){
                 crow::response res;
                 this->alive(req, res);
@@ -34,7 +35,8 @@ void SimulationDaemon::run() {
             });
     std::cout<<"register one functions"<<std::endl;
     // Set up POST request handler for terminating simulation
-    CROW_ROUTE(app, "/api/terminateSimulation").methods("POST"_method)
+    // ToDo: add simid
+    CROW_ROUTE(app, "/simulation/terminateSimulation").methods("POST"_method)
             ([this](const crow::request& req){
                 crow::response res;
                 this->terminateSimulation(req, res);

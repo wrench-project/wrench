@@ -1,16 +1,19 @@
 /**
- * Copyright (c) 2021. The WRENCH Team.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- */
+* Copyright (c) 2021. The WRENCH Team.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*/
 
 #ifndef WRENCH_DAEMON_H
 #define WRENCH_DAEMON_H
 
-#include "crow.h"
+#include "httplib.h"
+
+using httplib::Request;
+using httplib::Response;
 
 #include <wrench-dev.h>
 #include <map>
@@ -23,29 +26,31 @@
 using json = nlohmann::json;
 
 /**
- * @brief A class that implements a the main wrench-daemon process (in the run() method)
- */
+* @brief A class that implements a the main wrench-daemon process (in the run() method)
+*/
 class WRENCHDaemon {
 
 public:
-    WRENCHDaemon(bool simulation_logging,
-                 bool daemon_logging,
-                 int port_number,
-                 int sleep_us);
+   WRENCHDaemon(bool simulation_logging,
+                bool daemon_logging,
+                int port_number,
+                int sleep_us);
 
-    void run();
+   void run();
 
 private:
-    crow::SimpleApp app; //define your crow application
+   httplib::Server server;
 
-    bool simulation_logging;
-    bool daemon_logging;
-    int port_number;
-    int sleep_us;
+   bool simulation_logging;
+   bool daemon_logging;
+   int port_number;
+   int sleep_us;
 
-    void startSimulation(const crow::request &req, crow::response &res);
+   void startSimulation(const Request &req, Response &res);
 
-    static bool isPortTaken(int port);
+   static bool isPortTaken(int port);
+
+   static void error_handling(const Request &req, Response &res);
 };
 
 #endif// WRENCH_DAEMON_H
