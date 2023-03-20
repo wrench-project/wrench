@@ -175,6 +175,7 @@ namespace wrench {
 
         json answer;
         answer["time"] = Simulation::getCurrentSimulatedDate();
+        std::cout<<"testing Gettime"<<Simulation::getCurrentSimulatedDate()<<std::endl;
         return answer;
     }
 
