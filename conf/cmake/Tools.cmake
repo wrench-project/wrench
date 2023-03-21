@@ -24,6 +24,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/tools/wrench/wrench-init/wrench-init
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )
 
+
 # compile/install the wfcommons workflow parser
 set(WFCOMMONS_WORKFLOW_PARSER_SOURCE_FILES
         tools/wfcommons/src/WfCommonsWorkflowParser.cpp
