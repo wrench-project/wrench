@@ -598,20 +598,20 @@ namespace wrench {
             vm_name = this->getName() + "_vm" + std::to_string(CloudComputeService::VM_ID++);
         } while (S4U_Simulation::hostExists(vm_name));
 
-//        // If we couldn't find a VM name, somehow, then return a failure
-//        if (vm_name.empty()) {
-//            std::string empty = std::string();
-//
-//            msg_to_send_back = new CloudComputeServiceCreateVMAnswerMessage(
-//                    false,
-//                    empty,
-//                    std::shared_ptr<FailureCause>(
-//                            new NotAllowed(this->getSharedPtr<CloudComputeService>(), error_msg)),
-//                    this->getMessagePayloadValue(
-//                            CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
-//            S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
-//            return;
-//        }
+        //        // If we couldn't find a VM name, somehow, then return a failure
+        //        if (vm_name.empty()) {
+        //            std::string empty = std::string();
+        //
+        //            msg_to_send_back = new CloudComputeServiceCreateVMAnswerMessage(
+        //                    false,
+        //                    empty,
+        //                    std::shared_ptr<FailureCause>(
+        //                            new NotAllowed(this->getSharedPtr<CloudComputeService>(), error_msg)),
+        //                    this->getMessagePayloadValue(
+        //                            CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
+        //            S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+        //            return;
+        //        }
 
         // Create the VM
         auto vm = std::make_shared<S4U_VirtualMachine>(vm_name,
@@ -1114,7 +1114,7 @@ namespace wrench {
     void CloudComputeService::processIsThereAtLeastOneHostWithAvailableResources(
             simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram) {
         bool answer = false;
-        for (auto const &h : this->used_cores_per_execution_host) {
+        for (auto const &h: this->used_cores_per_execution_host) {
             auto available_num_cores = Simulation::getHostNumCores(h.first) - h.second;
             auto available_ram = Simulation::getHostMemoryCapacity(h.first) - this->used_ram_per_execution_host[h.first];
             if ((available_num_cores >= num_cores) and (available_ram >= ram)) {
