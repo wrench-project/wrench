@@ -339,7 +339,7 @@ namespace wrench {
 
         auto current_rect_x_range = std::pair<unsigned long long, unsigned long long>(
                 current_execution_instance.whole_task.first * PRECISION,
-                current_execution_instance.getTaskEndTime() * PRECISION);
+                        current_execution_instance.getTaskEndTime() * PRECISION);
 
         unsigned long long num_cores_allocated = current_execution_instance.num_cores_allocated;
         unsigned long long execution_host_num_cores = current_execution_instance.host_num_cores;
@@ -364,7 +364,7 @@ namespace wrench {
 
             auto current_rect_y_range = std::pair<unsigned long long, unsigned long long>(
                     vertical_position,
-                    vertical_position + num_cores_allocated);
+                            vertical_position + num_cores_allocated);
 
             //              std::cout << spaces + "  pos = " <<  vertical_position << "\n";
             /*
@@ -379,11 +379,11 @@ namespace wrench {
                 if (current_execution_instance.hostname == other_execution_instance.hostname) {
                     auto other_rect_x_range = std::pair<unsigned long long, unsigned long long>(
                             other_execution_instance.whole_task.first * PRECISION,
-                            other_execution_instance.getTaskEndTime() * PRECISION);
+                                    other_execution_instance.getTaskEndTime() * PRECISION);
 
                     auto other_rect_y_range = std::pair<unsigned long long, unsigned long long>(
                             other_execution_instance.vertical_position,
-                            other_execution_instance.vertical_position + other_execution_instance.num_cores_allocated);
+                                    other_execution_instance.vertical_position + other_execution_instance.num_cores_allocated);
 
                     /*
                      * Check overlap for the x_ranges first. If there is no overlap, we can guarantee that the rectangles
@@ -650,14 +650,10 @@ namespace wrench {
 
         // Set the "vertical position" of each WorkflowExecutionInstance so we know where to plot each rectangle
         if (generate_host_utilization_layout) {
-            try {
-                generateHostUtilizationGraphLayout(data);
-                std::ofstream output("host_utilization_layout.json");
-                output << std::setw(4) << host_utilization_layout << std::endl;
-                output.close();
-            } catch (std::runtime_error &e) {
-                throw;
-            }
+            generateHostUtilizationGraphLayout(data);
+            std::ofstream output("host_utilization_layout.json");
+            output << std::setw(4) << host_utilization_layout << std::endl;
+            output.close();
         }
 
         nlohmann::json workflow_execution_json;
@@ -1011,7 +1007,7 @@ namespace wrench {
                      {"cluster_id", host_to_cluster[host->get_name()]},
                      {"flop_rate", host->get_speed()},
                      {"memory_manager_service", Simulation::getHostMemoryCapacity(
-                                                        host->get_name())},
+                             host->get_name())},
                      {"cores", host->get_core_count()}});
         }
 
@@ -1406,38 +1402,34 @@ namespace wrench {
 
         nlohmann::json bandwidth_json;
 
-        try {
-            auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-            std::vector<simgrid::s4u::Link *> links = get_all_links();
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+        std::vector<simgrid::s4u::Link *> links = get_all_links();
 
-            for (const auto &link: links) {
-                nlohmann::json datum;
-                datum["linkname"] = link->get_name();
+        for (const auto &link: links) {
+            nlohmann::json datum;
+            datum["linkname"] = link->get_name();
 
-                for (const auto &link_usage_timestamp: this->getTrace<SimulationTimestampLinkUsage>()) {
-                    if (link->get_name() == link_usage_timestamp->getContent()->getLinkname()) {
-                        datum["link_usage_trace"].push_back(
-                                {{"time", link_usage_timestamp->getDate()},
-                                 {"bytes per second", link_usage_timestamp->getContent()->getUsage()}});
-                    }
+            for (const auto &link_usage_timestamp: this->getTrace<SimulationTimestampLinkUsage>()) {
+                if (link->get_name() == link_usage_timestamp->getContent()->getLinkname()) {
+                    datum["link_usage_trace"].push_back(
+                            {{"time", link_usage_timestamp->getDate()},
+                             {"bytes per second", link_usage_timestamp->getContent()->getUsage()}});
                 }
-
-                bandwidth_json.push_back(datum);
             }
 
-            nlohmann::json link_usage;
-            nlohmann::json links_list;
-            links_list["links"] = bandwidth_json;
-            link_usage["link_usage"] = links_list;
-            bandwidth_json_part = links_list;
+            bandwidth_json.push_back(datum);
+        }
 
-            if (writing_file) {
-                std::ofstream output(file_path);
-                output << std::setw(4) << link_usage << std::endl;
-                output.close();
-            }
-        } catch (std::runtime_error &e) {
-            throw;
+        nlohmann::json link_usage;
+        nlohmann::json links_list;
+        links_list["links"] = bandwidth_json;
+        link_usage["link_usage"] = links_list;
+        bandwidth_json_part = links_list;
+
+        if (writing_file) {
+            std::ofstream output(file_path);
+            output << std::setw(4) << link_usage << std::endl;
+            output.close();
         }
     }
 

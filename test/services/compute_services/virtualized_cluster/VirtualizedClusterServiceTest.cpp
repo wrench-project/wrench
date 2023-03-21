@@ -330,6 +330,18 @@ private:
             }
         }
 
+        // Coverage
+        try {
+            cs->getVMComputeService("bogus");
+            throw std::runtime_error("Should not be able to get a Compute Service for a bogus VM");
+        } catch (std::invalid_argument &ignore) {
+        }
+        try {
+            cs->getVMPhysicalHostname("bogus");
+            throw std::runtime_error("Should not be able to get a Physical Hostname for a bogus VM");
+        } catch (std::invalid_argument &ignore) {
+        }
+
         // Check that we cannot get the CS back
         if (cs->getVMComputeService(vm_name) != nullptr) {
             throw std::runtime_error("A non-started VM should have a nullptr compute service");
@@ -349,6 +361,10 @@ private:
         cs->suspendVM(vm_name);
         wrench::Simulation::sleep(1.0);
         cs->resumeVM(vm_name);
+
+        // Coverage
+        cs->getMemoryCapacity();
+        cs->getPerHostAvailableMemoryCapacity();
 
         // Check that we can get the CS back
         auto vm_cs_should_be_same = cs->getVMComputeService(vm_name);
@@ -390,9 +406,7 @@ private:
         // Coverage
         cs->isThereAtLeastOneHostWithIdleResources(1,0);
 
-        // Coverage
-        cs->getMemoryCapacity();
-        cs->getPerHostAvailableMemoryCapacity();
+
 
         // Shutdown a bogus VM, for coverage
         try {
@@ -757,17 +771,25 @@ private:
             auto cs = this->test->compute_service;
             std::string execution_host = cs->getExecutionHosts()[0];
 
-            cs->startVM(cs->createVM(1, 10));
+            auto vm1 = cs->createVM(1, 10);
+            cs->startVM(vm1);
+            auto vm2 = cs->createVM(1, 10, execution_host);
+            cs->startVM(vm2);
             cs->startVM(cs->createVM(1, 10, execution_host));
             cs->startVM(cs->createVM(1, 10, execution_host));
-            cs->startVM(cs->createVM(1, 10, execution_host));
+            wrench::Simulation::sleep(1);
+            //suspend one for coverage
+            cs->suspendVM(vm1);
+            // stop one for coverage
+            cs->shutdownVM(vm2);
+
 
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
         wrench::Simulation::sleep(10);
-
+        
         // stop all VMs
         this->test->compute_service->stop();
 

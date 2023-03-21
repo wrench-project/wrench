@@ -106,11 +106,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        try {
-            this->submitCompoundJob(job, service_specific_args);
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        this->submitCompoundJob(job, service_specific_args);
     }
 
     /**
@@ -129,11 +125,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        try {
-            this->terminateCompoundJob(job);
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        this->terminateCompoundJob(job);
     }
 
     /**
@@ -162,20 +154,16 @@ namespace wrench {
         if (this->scratch_space_mount_point.empty()) return;// No mount point provided
 
         double buffer_size = 1000000000;// TODO: Make this configurable?
-        try {
 
-            auto ss = SimpleStorageService::createSimpleStorageService(
-                    hostname,
-                    {scratch_space_mount_point},
-                    {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {});
+        auto ss = SimpleStorageService::createSimpleStorageService(
+                hostname,
+                {scratch_space_mount_point},
+                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {});
 
-            ss->setIsScratch(true);
-            this->scratch_space_storage_service =
-                    this->simulation->startNewService(ss);
+        ss->setIsScratch(true);
+        this->scratch_space_storage_service =
+                this->simulation->startNewService(ss);
 
-        } catch (std::runtime_error &e) {
-            throw;
-        }
     }
 
     /**
@@ -201,11 +189,7 @@ namespace wrench {
      */
     unsigned long ComputeService::getNumHosts() {
         std::map<std::string, double> dict;
-        try {
-            dict = this->getServiceResourceInformation("num_hosts");
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        dict = this->getServiceResourceInformation("num_hosts");
 
         return (unsigned long) (*(dict.begin())).second;
     }
@@ -219,11 +203,7 @@ namespace wrench {
       */
     std::vector<std::string> ComputeService::getHosts() {
         std::map<std::string, double> dict;
-        try {
-            dict = this->getServiceResourceInformation("num_cores");
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        dict = this->getServiceResourceInformation("num_cores");
 
         std::vector<std::string> to_return;
         to_return.reserve(dict.size());
@@ -245,11 +225,7 @@ namespace wrench {
       */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumCores() {
         std::map<std::string, double> dict;
-        try {
-            dict = this->getServiceResourceInformation("num_cores");
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        dict = this->getServiceResourceInformation("num_cores");
 
         std::map<std::string, unsigned long> to_return;
 
@@ -269,11 +245,7 @@ namespace wrench {
       */
     unsigned long ComputeService::getTotalNumCores() {
         std::map<std::string, double> dict;
-        try {
-            dict = this->getServiceResourceInformation("num_cores");
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        dict = this->getServiceResourceInformation("num_cores");
 
         unsigned long count = 0;
         for (auto const &x: dict) {
@@ -295,11 +267,7 @@ namespace wrench {
      */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumIdleCores() {
         std::map<std::string, double> dict;
-        try {
-            dict = this->getServiceResourceInformation("num_idle_cores");
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        dict = this->getServiceResourceInformation("num_idle_cores");
 
         std::map<std::string, unsigned long> to_return;
 
@@ -319,11 +287,7 @@ namespace wrench {
      */
     std::map<std::string, double> ComputeService::getPerHostAvailableMemoryCapacity() {
         std::map<std::string, double> dict;
-        try {
-            dict = this->getServiceResourceInformation("ram_availabilities");
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        dict = this->getServiceResourceInformation("ram_availabilities");
 
         std::map<std::string, double> to_return;
 
@@ -346,11 +310,7 @@ namespace wrench {
      */
     unsigned long ComputeService::getTotalNumIdleCores() {
         std::map<std::string, double> dict;
-        try {
-            dict = this->getServiceResourceInformation("num_idle_cores");
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        dict = this->getServiceResourceInformation("num_idle_cores");
 
 
         unsigned long count = 0;
@@ -377,11 +337,11 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
-                                                       answer_mailbox,
-                                                       num_cores,
-                                                       ram,
-                                                       this->getMessagePayloadValue(
-                                                               ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
+                answer_mailbox,
+                num_cores,
+                ram,
+                this->getMessagePayloadValue(
+                        ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         auto msg = S4U_Mailbox::getMessage<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage>(
@@ -400,11 +360,7 @@ namespace wrench {
     */
     std::map<std::string, double> ComputeService::getCoreFlopRate() {
         std::map<std::string, double> dict;
-        try {
-            dict = this->getServiceResourceInformation("flop_rates");
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        dict = this->getServiceResourceInformation("flop_rates");
 
         std::map<std::string, double> to_return;
         for (auto const &x: dict) {
@@ -422,11 +378,7 @@ namespace wrench {
     */
     std::map<std::string, double> ComputeService::getMemoryCapacity() {
         std::map<std::string, double> dict;
-        try {
-            dict = this->getServiceResourceInformation("ram_capacities");
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        dict = this->getServiceResourceInformation("ram_capacities");
 
         std::map<std::string, double> to_return;
 
@@ -452,10 +404,10 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
-                                                       answer_mailbox,
-                                                       key,
-                                                       this->getMessagePayloadValue(
-                                                               ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
+                answer_mailbox,
+                key,
+                this->getMessagePayloadValue(
+                        ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         auto msg = S4U_Mailbox::getMessage<ComputeServiceResourceInformationAnswerMessage>(

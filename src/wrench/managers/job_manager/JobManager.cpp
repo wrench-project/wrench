@@ -379,11 +379,7 @@ namespace wrench {
             throw std::invalid_argument("JobManager::submitJob(): Job was previously submitted");
         }
 
-        try {
-            compute_service->assertServiceIsUp();
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        compute_service->assertServiceIsUp();
 
         if (not compute_service->supportsStandardJobs()) {
             throw std::invalid_argument("JobManager::submitJob(): service does not support standard jobs");
@@ -428,11 +424,7 @@ namespace wrench {
                 if (workflow == nullptr) {
                     throw std::invalid_argument("JobManager::submitJob():  invalid service-specific argument {" + arg.first + "," + arg.second + "} (unknown task ID " + arg.first + ")");
                 }
-                try {
-                    task = workflow->getTaskByID(arg.first);
-                } catch (std::invalid_argument &e) {
-                    throw;
-                }
+                task = workflow->getTaskByID(arg.first);
                 new_args[job->task_compute_actions[task]->getName()] = arg.second;
             }
         }
@@ -519,11 +511,7 @@ namespace wrench {
             throw std::invalid_argument("JobManager::submitJob(): Cannot submit a job that doesn't have any actions");
         }
 
-        try {
-            compute_service->assertServiceIsUp();
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        compute_service->assertServiceIsUp();
 
         if (not compute_service->supportsCompoundJobs()) {
             throw std::invalid_argument("JobManager::submitJob(): service does not support compound jobs");
@@ -595,11 +583,7 @@ namespace wrench {
             throw std::invalid_argument("JobManager::submitJob(): Job was previously submitted");
         }
 
-        try {
-            compute_service->assertServiceIsUp();
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        compute_service->assertServiceIsUp();
 
         if (not compute_service->supportsPilotJobs()) {
             throw std::invalid_argument("JobManager::submitJob(): service does not support pilot jobs");
@@ -612,37 +596,37 @@ namespace wrench {
                 "pilot_job_",
                 0, 0,
                 [callback_mailbox, job, compute_service](const std::shared_ptr<ActionExecutor> &executor) {
-                    // Create a bare-metal compute service and start it
-                    auto execution_service = executor->getActionExecutionService();
+                  // Create a bare-metal compute service and start it
+                  auto execution_service = executor->getActionExecutionService();
 
-                    // TODO: Deal with Properties!
-                    auto bm_cs = std::shared_ptr<BareMetalComputeService>(
-                            new BareMetalComputeService(
-                                    executor->hostname,
-                                    execution_service->getComputeResources(),
-                                    {},
-                                    {},
-                                    nullptr,
-                                    "_one_shot_bm",
-                                    std::dynamic_pointer_cast<ComputeService>(execution_service->getParentService())->getScratch()));
+                  // TODO: Deal with Properties!
+                  auto bm_cs = std::shared_ptr<BareMetalComputeService>(
+                          new BareMetalComputeService(
+                                  executor->hostname,
+                                  execution_service->getComputeResources(),
+                                  {},
+                                  {},
+                                  nullptr,
+                                  "_one_shot_bm",
+                                  std::dynamic_pointer_cast<ComputeService>(execution_service->getParentService())->getScratch()));
 
-                    bm_cs->simulation = executor->getSimulation();
-                    bm_cs->start(bm_cs, true, false);// Daemonized, no auto-restart
-                    job->compute_service = bm_cs;
+                  bm_cs->simulation = executor->getSimulation();
+                  bm_cs->start(bm_cs, true, false);// Daemonized, no auto-restart
+                  job->compute_service = bm_cs;
 
-                    // Send a call back
-                    S4U_Mailbox::dputMessage(
-                            callback_mailbox,
-                            new ComputeServicePilotJobStartedMessage(
-                                    job, compute_service,
-                                    compute_service->getMessagePayloadValue(
-                                            BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
+                  // Send a call back
+                  S4U_Mailbox::dputMessage(
+                          callback_mailbox,
+                          new ComputeServicePilotJobStartedMessage(
+                                  job, compute_service,
+                                  compute_service->getMessagePayloadValue(
+                                          BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
 
-                    // Sleep FOREVER (will be killed by service above)
-                    Simulation::sleep(DBL_MAX);
+                  // Sleep FOREVER (will be killed by service above)
+                  Simulation::sleep(DBL_MAX);
                 },
                 [job](const std::shared_ptr<ActionExecutor> &executor) {
-                    job->compute_service->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
+                  job->compute_service->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
                 });
 
         job->compound_job = cjob;
@@ -733,11 +717,7 @@ namespace wrench {
         }
         this->releaseDaemonLock();
 
-        try {
-            job->getParentComputeService()->terminateJob(job->compound_job);
-        } catch (std::exception &e) {
-            throw;
-        }
+        job->getParentComputeService()->terminateJob(job->compound_job);
 
         job->compound_job->state = CompoundJob::State::DISCONTINUED;
         job->state = StandardJob::State::TERMINATED;
@@ -769,11 +749,7 @@ namespace wrench {
             throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
         }
 
-        try {
-            job->getParentComputeService()->terminateJob(job);
-        } catch (std::exception &e) {
-            throw;
-        }
+        job->getParentComputeService()->terminateJob(job);
         job->state = CompoundJob::State::DISCONTINUED;
     }
 
@@ -796,11 +772,7 @@ namespace wrench {
             throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
         }
 
-        try {
-            job->getParentComputeService()->terminateJob(job->compound_job);
-        } catch (std::exception &e) {
-            throw;
-        }
+        job->getParentComputeService()->terminateJob(job->compound_job);
         job->state = PilotJob::State::TERMINATED;
     }
 
