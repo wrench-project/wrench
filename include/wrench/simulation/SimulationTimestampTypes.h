@@ -65,7 +65,6 @@ namespace std {
 
 namespace wrench {
 
-
     class WorkflowTask;
     class StorageService;
     class FileLocation;

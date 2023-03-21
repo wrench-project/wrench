@@ -3,6 +3,10 @@ message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CM
 
 project(my-wrench-simulator)
 
+# Disable annoying warnings
+add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
+#add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
+
 add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
 
 set(CMAKE_CXX_STANDARD 17)

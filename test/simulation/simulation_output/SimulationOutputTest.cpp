@@ -112,7 +112,7 @@ public:
 private:
     SimulationOutputTest *test;
 
-    int main() {
+    int main() override {
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         try {
@@ -154,7 +154,7 @@ void SimulationOutputTest::do_emptyTrace_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new EmptySimulationOutputWMS(this, hostname)));
 

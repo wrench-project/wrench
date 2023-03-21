@@ -149,7 +149,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -275,7 +275,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyApiAccessExceptionsTestWMS(
                                     this, hostname)));
@@ -314,7 +314,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -431,7 +431,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyApiAccessExceptionsPluginNotActiveTestWMS(
                                     this, hostname)));
@@ -470,7 +470,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -548,7 +548,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyConsumptionTestWMS(
                                     this, hostname)));
@@ -586,7 +586,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
         {
@@ -689,7 +689,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyAPICheckTestWMS(
                                     this, hostname)));
@@ -728,7 +728,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
 
         //The tests is just to switch pstate and check if energy consumed is +ve and we don't have any segfaults or something
         // Create a job manager
@@ -857,7 +857,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyConsumptionPStateChangeTestWMS(
                                     this, hostname)));
@@ -896,7 +896,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
 
         //The tests is just to switch pstate and check if energy consumed is +ve and we don't have any segfaults or something
         // Create a job manager
@@ -952,7 +952,7 @@ void EnergyConsumptionTest::do_PluginNotActive_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new PluginNotActivatedTestWMS(this, hostname)));
 

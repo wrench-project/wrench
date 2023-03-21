@@ -9,6 +9,8 @@
 
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
 
+#include <utility>
+
 namespace wrench {
 
     /**
@@ -25,7 +27,7 @@ namespace wrench {
      * @param hostname: the name of the host that has turned on
      */
     HostHasTurnedOnMessage::HostHasTurnedOnMessage(std::string hostname) : HostStateChangeDetectorMessage() {
-        this->hostname = hostname;
+        this->hostname = std::move(hostname);
     }
 
     /**
@@ -34,7 +36,7 @@ namespace wrench {
      * @param hostname: the name of the host that has turned off
      */
     HostHasTurnedOffMessage::HostHasTurnedOffMessage(std::string hostname) : HostStateChangeDetectorMessage() {
-        this->hostname = hostname;
+        this->hostname = std::move(hostname);
     }
 
     /**
@@ -44,7 +46,7 @@ namespace wrench {
      * @param speed: the host's new speed
      */
     HostHasChangedSpeedMessage::HostHasChangedSpeedMessage(std::string hostname, double speed) : HostStateChangeDetectorMessage() {
-        this->hostname = hostname;
+        this->hostname = std::move(hostname);
         this->speed = speed;
     }
 
