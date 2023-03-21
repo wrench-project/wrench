@@ -339,7 +339,7 @@ namespace wrench {
 
         auto current_rect_x_range = std::pair<unsigned long long, unsigned long long>(
                 current_execution_instance.whole_task.first * PRECISION,
-                        current_execution_instance.getTaskEndTime() * PRECISION);
+                current_execution_instance.getTaskEndTime() * PRECISION);
 
         unsigned long long num_cores_allocated = current_execution_instance.num_cores_allocated;
         unsigned long long execution_host_num_cores = current_execution_instance.host_num_cores;
@@ -364,7 +364,7 @@ namespace wrench {
 
             auto current_rect_y_range = std::pair<unsigned long long, unsigned long long>(
                     vertical_position,
-                            vertical_position + num_cores_allocated);
+                    vertical_position + num_cores_allocated);
 
             //              std::cout << spaces + "  pos = " <<  vertical_position << "\n";
             /*
@@ -379,11 +379,11 @@ namespace wrench {
                 if (current_execution_instance.hostname == other_execution_instance.hostname) {
                     auto other_rect_x_range = std::pair<unsigned long long, unsigned long long>(
                             other_execution_instance.whole_task.first * PRECISION,
-                                    other_execution_instance.getTaskEndTime() * PRECISION);
+                            other_execution_instance.getTaskEndTime() * PRECISION);
 
                     auto other_rect_y_range = std::pair<unsigned long long, unsigned long long>(
                             other_execution_instance.vertical_position,
-                                    other_execution_instance.vertical_position + other_execution_instance.num_cores_allocated);
+                            other_execution_instance.vertical_position + other_execution_instance.num_cores_allocated);
 
                     /*
                      * Check overlap for the x_ranges first. If there is no overlap, we can guarantee that the rectangles
@@ -1007,7 +1007,7 @@ namespace wrench {
                      {"cluster_id", host_to_cluster[host->get_name()]},
                      {"flop_rate", host->get_speed()},
                      {"memory_manager_service", Simulation::getHostMemoryCapacity(
-                             host->get_name())},
+                                                        host->get_name())},
                      {"cores", host->get_core_count()}});
         }
 
