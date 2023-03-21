@@ -316,7 +316,7 @@ private:
             if (!real_error->isTimeout()) {
                 throw std::runtime_error("Network error failure cause should be a time out");
             }
-            real_error->toString(); // coverage
+            real_error->toString();// coverage
         }
 
         {
