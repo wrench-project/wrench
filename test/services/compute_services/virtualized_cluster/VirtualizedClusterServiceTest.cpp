@@ -218,9 +218,9 @@ private:
 
         cs->getCoreFlopRate();// coverage
 
-        cs->supportsCompoundJobs(); // coverage
-        cs->supportsPilotJobs(); // coverage
-        cs->supportsStandardJobs(); // coverage
+        cs->supportsCompoundJobs();// coverage
+        cs->supportsPilotJobs();   // coverage
+        cs->supportsStandardJobs();// coverage
 
         // Non-existent VM operations (for coverage)
         try {
@@ -404,7 +404,7 @@ private:
         cs->destroyVM(vm_name);
 
         // Coverage
-        cs->isThereAtLeastOneHostWithIdleResources(1,0);
+        cs->isThereAtLeastOneHostWithIdleResources(1, 0);
 
 
 
