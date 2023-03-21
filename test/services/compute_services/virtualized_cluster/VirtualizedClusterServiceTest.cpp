@@ -218,6 +218,10 @@ private:
 
         cs->getCoreFlopRate();// coverage
 
+        cs->supportsCompoundJobs(); // coverage
+        cs->supportsPilotJobs(); // coverage
+        cs->supportsStandardJobs(); // coverage
+
         // Non-existent VM operations (for coverage)
         try {
             cs->startVM("NON_EXISTENT_VM");
@@ -334,12 +338,23 @@ private:
         // Start the VM
         auto vm_cs = cs->startVM(vm_name);
 
+        // Try to destroy the VM which should fail
+        try {
+            cs->destroyVM(vm_name);
+            throw std::runtime_error("Shouldn't be able to destroy a running VM");
+        } catch (wrench::ExecutionException &ignore) {
+        }
+
+        // coverage
+        cs->suspendVM(vm_name);
+        wrench::Simulation::sleep(1.0);
+        cs->resumeVM(vm_name);
+
         // Check that we can get the CS back
         auto vm_cs_should_be_same = cs->getVMComputeService(vm_name);
         if (vm_cs != vm_cs_should_be_same) {
             throw std::runtime_error("It should be possible to get the computer service of a started VM");
         }
-
 
         // Check the state
         if (not cs->isVMRunning(vm_name)) {
@@ -368,6 +383,16 @@ private:
 
         // Shutdown the VM, because why not
         cs->shutdownVM(vm_name);
+
+        // Destroy the VM
+        cs->destroyVM(vm_name);
+
+        // Coverage
+        cs->isThereAtLeastOneHostWithIdleResources(1,0);
+
+        // Coverage
+        cs->getMemoryCapacity();
+        cs->getPerHostAvailableMemoryCapacity();
 
         // Shutdown a bogus VM, for coverage
         try {
