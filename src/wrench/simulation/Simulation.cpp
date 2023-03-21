@@ -523,14 +523,14 @@ namespace wrench {
         }
     }
 
-//    /**
-//     * @brief Checks whether the simulation is running or not
-//     *
-//     * @return true or false
-//     */
-//    bool Simulation::isRunning() const {
-//        return this->is_running;
-//    }
+    //    /**
+    //     * @brief Checks whether the simulation is running or not
+    //     *
+    //     * @return true or false
+    //     */
+    //    bool Simulation::isRunning() const {
+    //        return this->is_running;
+    //    }
 
     /**
      * @brief Check that the simulation is correctly instantiated by the user
