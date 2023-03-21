@@ -421,25 +421,25 @@ namespace wrench {
         return 0;
     }
 
-//    /**
-//     * @brief Send a message request
-//     *
-//     * @param answer_mailbox: the mailbox to which the answer message should be sent
-//     * @param message: message to be sent
-//     * @return a simulation message
-//     *
-//     * @throw std::runtime_error
-//     */
-//    template<class TMessageType>
-//    std::shared_ptr<TMessageType> CloudComputeService::sendRequestAndWaitForAnswer(simgrid::s4u::Mailbox *answer_mailbox,
-//                                                                                   ComputeServiceMessage *tosend) {
-//        serviceSanityCheck();
-//
-//        S4U_Mailbox::putMessage(this->mailbox, tosend);
-//
-//        // Wait for a reply
-//        return S4U_Mailbox::getMessage<TMessageType>(answer_mailbox, this->network_timeout, "CloudComputeService::sendRequestAndWaitForAnswer(): received an");
-//    }
+    //    /**
+    //     * @brief Send a message request
+    //     *
+    //     * @param answer_mailbox: the mailbox to which the answer message should be sent
+    //     * @param message: message to be sent
+    //     * @return a simulation message
+    //     *
+    //     * @throw std::runtime_error
+    //     */
+    //    template<class TMessageType>
+    //    std::shared_ptr<TMessageType> CloudComputeService::sendRequestAndWaitForAnswer(simgrid::s4u::Mailbox *answer_mailbox,
+    //                                                                                   ComputeServiceMessage *tosend) {
+    //        serviceSanityCheck();
+    //
+    //        S4U_Mailbox::putMessage(this->mailbox, tosend);
+    //
+    //        // Wait for a reply
+    //        return S4U_Mailbox::getMessage<TMessageType>(answer_mailbox, this->network_timeout, "CloudComputeService::sendRequestAndWaitForAnswer(): received an");
+    //    }
 
     /**
      * @brief Wait for and react to any incoming message
@@ -748,36 +748,36 @@ namespace wrench {
             // Sort the possible hosts to implement best fit (using RAM first)
             std::sort(possible_hosts.begin(), possible_hosts.end(),
                       [](std::string const &a, std::string const &b) {
-                        unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                        double a_ram = Simulation::getHostMemoryCapacity(a);
-                        unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                        double b_ram = Simulation::getHostMemoryCapacity(b);
+                          unsigned long a_num_cores = Simulation::getHostNumCores(a);
+                          double a_ram = Simulation::getHostMemoryCapacity(a);
+                          unsigned long b_num_cores = Simulation::getHostNumCores(b);
+                          double b_ram = Simulation::getHostMemoryCapacity(b);
 
-                        if (a_ram != b_ram) {
-                            return a_ram < b_ram;
-                        } else if (a_num_cores < b_num_cores) {
-                            return a_num_cores < b_num_cores;
-                        } else {
-                            return a < b;// string order
-                        }
+                          if (a_ram != b_ram) {
+                              return a_ram < b_ram;
+                          } else if (a_num_cores < b_num_cores) {
+                              return a_num_cores < b_num_cores;
+                          } else {
+                              return a < b;// string order
+                          }
                       });
 
         } else if (vm_resource_allocation_algorithm == "best-fit-cores-first") {
             // Sort the possible hosts to implement best fit (using cores first)
             std::sort(possible_hosts.begin(), possible_hosts.end(),
                       [](std::string const &a, std::string const &b) {
-                        unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                        double a_ram = Simulation::getHostMemoryCapacity(a);
-                        unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                        double b_ram = Simulation::getHostMemoryCapacity(b);
+                          unsigned long a_num_cores = Simulation::getHostNumCores(a);
+                          double a_ram = Simulation::getHostMemoryCapacity(a);
+                          unsigned long b_num_cores = Simulation::getHostNumCores(b);
+                          double b_ram = Simulation::getHostMemoryCapacity(b);
 
-                        if (a_num_cores != b_num_cores) {
-                            return a_num_cores < b_num_cores;
-                        } else if (a_ram < b_ram) {
-                            return a_ram < b_ram;
-                        } else {
-                            return a < b;// string order
-                        }
+                          if (a_num_cores != b_num_cores) {
+                              return a_num_cores < b_num_cores;
+                          } else if (a_ram < b_ram) {
+                              return a_ram < b_ram;
+                          } else {
+                              return a < b;// string order
+                          }
                       });
         }
 
@@ -792,8 +792,8 @@ namespace wrench {
      * @param vm_name: the name of the VM
      */
     void CloudComputeService::
-    processStartVM(simgrid::s4u::Mailbox *answer_mailbox,
-                   const std::string &vm_name) {
+            processStartVM(simgrid::s4u::Mailbox *answer_mailbox,
+                           const std::string &vm_name) {
         auto vm_tuple = this->vm_list[vm_name];
         auto vm = std::get<0>(vm_tuple);
         auto host = std::get<1>(vm_tuple);
