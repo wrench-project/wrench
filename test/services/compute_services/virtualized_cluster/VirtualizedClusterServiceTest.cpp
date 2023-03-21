@@ -407,7 +407,6 @@ private:
         cs->isThereAtLeastOneHostWithIdleResources(1, 0);
 
 
-
         // Shutdown a bogus VM, for coverage
         try {
             cs->shutdownVM("bogus");
@@ -799,7 +798,7 @@ private:
         }
 
         wrench::Simulation::sleep(10);
-        
+
         // stop all VMs
         this->test->compute_service->stop();
 
