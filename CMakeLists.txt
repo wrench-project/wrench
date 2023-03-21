@@ -3,12 +3,17 @@ message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CM
 
 project(wrench CXX)
 
+# Disable annoying warnings
+add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
+#add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
+
 # Make Release the default build type
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
+add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field -Wno-unused-local-typedefs" )
+
 if (ENABLE_BATSCHED)
     add_definitions(-DENABLE_BATSCHED)
 endif ()
@@ -25,7 +30,7 @@ find_package(SimGrid REQUIRED)
 
 find_package(nlohmann_json)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "2")
@@ -58,8 +63,11 @@ set(HEADER_FILES
         include/wrench.h
         include/wrench/exceptions/ExecutionException.h
         include/wrench/logging/TerminalOutput.h
-        include/wrench/managers/DataMovementManager.h
-        include/wrench/managers/JobManager.h
+        include/wrench/managers/data_movement_manager/DataMovementManager.h
+        include/wrench/managers/data_movement_manager/DataMovementManagerMessage.h
+        include/wrench/managers/data_movement_manager/FileReaderThread.h
+        include/wrench/managers/data_movement_manager/FileWriterThread.h
+        include/wrench/managers/job_manager/JobManager.h
         include/wrench/services/Service.h
         include/wrench/services/ServiceMessage.h
         include/wrench/services/ServiceMessagePayload.h
@@ -117,9 +125,12 @@ set(HEADER_FILES
         include/wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h
         include/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.h
         include/wrench/services/storage/simple/SimpleStorageServiceProperty.h
+        include/wrench/services/storage/compound/CompoundStorageService.h
+        include/wrench/services/storage/compound/CompoundStorageServiceProperty.h
+        include/wrench/services/storage/compound/CompoundStorageServiceMessagePayload.h
         include/wrench/services/storage/storage_helpers/FileLocation.h
-        include/wrench/services/memory/Block.h
-        include/wrench/services/memory/MemoryManager.h
+#        include/wrench/services/memory/Block.h
+#        include/wrench/services/memory/MemoryManager.h
         include/wrench/simgrid_S4U_util/S4U_Daemon.h
         include/wrench/simgrid_S4U_util/S4U_Mailbox.h
         include/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
@@ -147,12 +158,18 @@ set(HEADER_FILES
         include/wrench/execution_events/PilotJobExpiredEvent.h
         include/wrench/execution_events/FileCopyCompletedEvent.h
         include/wrench/execution_events/FileCopyFailedEvent.h
+        include/wrench/execution_events/FileReadCompletedEvent.h
+        include/wrench/execution_events/FileReadFailedEvent.h
+        include/wrench/execution_events/FileWriteCompletedEvent.h
+        include/wrench/execution_events/FileWriteFailedEvent.h
         include/wrench/execution_events/TimerEvent.h
         include/wrench/failure_causes/ComputationHasDied.h
         include/wrench/failure_causes/FailureCause.h
         include/wrench/failure_causes/SomeActionsHaveFailed.h
         include/wrench/failure_causes/FatalFailure.h
         include/wrench/failure_causes/FileAlreadyBeingCopied.h
+        include/wrench/failure_causes/FileAlreadyBeingRead.h
+        include/wrench/failure_causes/FileAlreadyBeingWritten.h
         include/wrench/failure_causes/FileNotFound.h
         include/wrench/failure_causes/FunctionalityNotAvailable.h
         include/wrench/failure_causes/HostError.h
@@ -171,6 +188,7 @@ set(HEADER_FILES
         include/wrench/action/Action.h
         include/wrench/action/SleepAction.h
         include/wrench/action/CustomAction.h
+        include/wrench/action/MPIAction.h
         include/wrench/action/FileReadAction.h
         include/wrench/action/FileWriteAction.h
         include/wrench/action/FileCopyAction.h
@@ -195,6 +213,10 @@ set(HEADER_FILES
         include/wrench/services/storage/xrootd/SearchStack.h
         include/wrench/services/storage/xrootd/Cache.h
         include/wrench/services/storage/xrootd/XRootDProperty.h
+        include/wrench/services/storage/proxy/StorageServiceProxy.h
+        include/wrench/services/storage/proxy/StorageServiceProxyProperty.h
+        include/wrench/communicator/Communicator.h
+        include/wrench/communicator/SMPIExecutor.h
         )
 
 # source files
@@ -206,10 +228,13 @@ set(SOURCE_FILES
         include/wrench/services/storage/storage_helpers/LogicalFileSystemNoCaching.h
         include/wrench/services/storage/storage_helpers/LogicalFileSystemLRUCaching.h
         src/wrench/logging/TerminalOutput.cpp
-        src/wrench/managers/DataMovementManager.cpp
-        src/wrench/managers/JobManager.cpp
-        src/wrench/managers/JobManagerMessage.cpp
-        include/wrench/managers/JobManagerMessage.h
+        src/wrench/managers/data_movement_manager/DataMovementManager.cpp
+        src/wrench/managers/data_movement_manager/DataMovementManagerMessage.cpp
+        src/wrench/managers/data_movement_manager/FileReaderThread.cpp
+        src/wrench/managers/data_movement_manager/FileWriterThread.cpp
+        src/wrench/managers/job_manager/JobManager.cpp
+        src/wrench/managers/job_manager/JobManagerMessage.cpp
+        include/wrench/managers/job_manager/JobManagerMessage.h
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessagePayload.cpp
@@ -297,14 +322,15 @@ set(SOURCE_FILES
         src/wrench/services/storage/simple/SimpleStorageServiceNonBufferized.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
+        src/wrench/services/storage/compound/CompoundStorageService.cpp
+        src/wrench/services/storage/compound/CompoundStorageServiceProperty.cpp
+        src/wrench/services/storage/compound/CompoundStorageServiceMessagePayload.cpp
         src/wrench/services/storage/storage_helper_classes/FileLocation.cpp
         src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
         include/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystem.cpp
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystemNoCaching.cpp
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystemLRUCaching.cpp
-        src/wrench/services/memory/Block.cpp
-        src/wrench/services/memory/MemoryManager.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
         include/wrench/simgrid_S4U_util/S4U_DaemonActor.h
@@ -333,6 +359,8 @@ set(SOURCE_FILES
         src/wrench/failure_causes/SomeActionsHaveFailed.cpp
         src/wrench/failure_causes/FatalFailure.cpp
         src/wrench/failure_causes/FileAlreadyBeingCopied.cpp
+        src/wrench/failure_causes/FileAlreadyBeingRead.cpp
+        src/wrench/failure_causes/FileAlreadyBeingWritten.cpp
         src/wrench/failure_causes/FileNotFound.cpp
         src/wrench/failure_causes/FunctionalityNotAvailable.cpp
         src/wrench/failure_causes/HostError.cpp
@@ -351,6 +379,7 @@ set(SOURCE_FILES
         src/wrench/action/Action.cpp
         src/wrench/action/SleepAction.cpp
         src/wrench/action/CustomAction.cpp
+        src/wrench/action/MPIAction.cpp
         src/wrench/action/FileReadAction.cpp
         src/wrench/action/FileWriteAction.cpp
         src/wrench/action/FileCopyAction.cpp
@@ -368,6 +397,10 @@ set(SOURCE_FILES
         src/wrench/services/storage/xrootd/XRootDMessagePayload.cpp
         src/wrench/services/storage/xrootd/XRootDMessage.cpp
         src/wrench/services/storage/xrootd/XRootDProperty.cpp
+        src/wrench/services/storage/proxy/StorageServiceProxy.cpp
+        src/wrench/services/storage/proxy/StorageServiceProxyProperty.cpp
+        src/wrench/communicator/Communicator.cpp
+        src/wrench/communicator/SMPIExecutor.cpp
         )
 
 # test files
@@ -382,7 +415,7 @@ set(TEST_FILES
         test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowParallelModelTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
-        test/services/memory_manager_service/MemoryManagerTest.cpp
+#        test/services/memory_manager_service/MemoryManagerTest.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceOneActionTests.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiActionTests.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiJobTests.cpp
@@ -393,7 +426,7 @@ set(TEST_FILES
         test/services/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
         test/services/storage_services/SimpleStorageService/StorageServiceDeleteRegisterTest.cpp
-        test/services/storage_services/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
+        test/managers/DataMovementManagerTest.cpp
         test/services/storage_services/SimpleStorageService/ZeroSizeFileTest.cpp
         test/services/storage_services/SimpleStorageService/ChunkingTest.cpp
         test/services/storage_services/SimpleStorageService/CopyBufferizedNonBufferizedTest.cpp
@@ -412,6 +445,7 @@ set(TEST_FILES
         test/services/helper_services/action_execution_service/ActionExecutionServiceTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceResourceInformationTest.cpp
         test/services/compute_services/batch_compound_jobs/BatchComputeServiceOneActionTests.cpp
+        test/services/compute_services/batch_compound_jobs/BatchComputeServiceMPIActionTests.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/HomeGrownTimeLineTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceFCFSTest.cpp
@@ -424,6 +458,7 @@ set(TEST_FILES
         test/services/helper_services/AlarmTest.cpp
         test/services/storage_services/XRootDStorageService/XRootDStorageServiceBasicFunctionalTest.cpp
         test/services/storage_services/XRootDStorageService/XRootDStorageServiceFullFunctionalTest.cpp
+        test/services/storage_services/CompoundStorageService/CompoundStorageServiceFunctionalTest.cpp
         test/wms/WMSTest.cpp
         test/wms/MultipleWMSTest.cpp
         test/services/compute_services/virtualized_cluster/VirtualizedClusterServiceTest.cpp
@@ -463,6 +498,7 @@ set(TEST_FILES
         test/services/bandwidth_meter_service/BandwidthMeterServiceTest.cpp
         test/simulated_failures/host_failures/ServiceStartReStartTest.cpp
         test/simulated_failures/host_failures/ComprehensiveIntegrationTest.cpp
+        test/simulated_failures/FailureCommandLineArgsTest.cpp
         test/simulated_failures/host_failures/FailureDetectorHostFailuresTest.cpp
         test/simulated_failures/host_failures/BareMetalComputeServiceHostFailuresTest.cpp
         test/simulated_failures/host_failures/CloudComputeServiceHostFailuresTest.cpp
@@ -483,6 +519,9 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
         test/simulation/S4U_MailboxTest.cpp
         test/misc/UnitParserTest.cpp
+        test/services/storage_services/StorageServiceProxy/StorageServiceProxyBasicTest.cpp
+        test/services/storage_services/StorageServiceProxy/StorageServiceProxySequentialTest.cpp
+        test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceActionsThatCommunicateTests.cpp
         )
 
 
@@ -516,9 +555,6 @@ else()
 endif()
 
 
-
-
-
 # additional packages
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/DefinePackages.cmake)
 
@@ -527,6 +563,9 @@ include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Tools.cmake)
 
 # build examples
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Examples.cmake)
+
+# build benchmark
+include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Benchmark.cmake)
 
 # build documentation
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Documentation.cmake)

@@ -69,16 +69,16 @@ namespace wrench {
         auto file_1 = this->workflow->getFileByID("file_1");
         auto file_2 = this->workflow->getFileByID("file_2");
 
-        /* For each task, estimate its execution time in minutes */
-        std::map<std::shared_ptr<WorkflowTask>, long> execution_times_in_minutes;
+        /* For each task, estimate its execution time in seconds */
+        std::map<std::shared_ptr<WorkflowTask>, long> execution_times_in_seconds;
         for (auto const &t: this->workflow->getTasks()) {
             double parallel_efficiency =
                     std::dynamic_pointer_cast<wrench::ConstantEfficiencyParallelModel>(t->getParallelModel())->getEfficiency();
             double in_seconds = (t->getFlops() / core_flop_rate) / (10 * parallel_efficiency);
-            execution_times_in_minutes[t] = 1 + std::lround(in_seconds / 60.0);
+            execution_times_in_seconds[t] = 1 + std::lround(in_seconds);
             // The +1 above is just  so that we don't cut it too tight
-            WRENCH_INFO("Task %s should run in under %ld minutes",
-                        t->getID().c_str(), execution_times_in_minutes[t]);
+            WRENCH_INFO("Task %s should run in under %ld seconds",
+                        t->getID().c_str(), execution_times_in_seconds[t]);
         }
 
         /* Create a Pilot job */
@@ -91,9 +91,9 @@ namespace wrench {
         service_specific_arguments["-c"] = "10";
         // time: not enough to run both tasks
         service_specific_arguments["-t"] =
-                std::to_string((execution_times_in_minutes[task_0] + execution_times_in_minutes[task_1]) / 2);
+                std::to_string((execution_times_in_seconds[task_0] + execution_times_in_seconds[task_1]) / 2);
 
-        WRENCH_INFO("Submitting a pilot job that  requests %s %s-core nodes for %s minutes",
+        WRENCH_INFO("Submitting a pilot job that  requests %s %s-core nodes for %s seconds",
                     service_specific_arguments["-N"].c_str(),
                     service_specific_arguments["-c"].c_str(),
                     service_specific_arguments["-t"].c_str());

@@ -27,13 +27,13 @@
  ** and outputs energy consumption measures. 
  **
  ** Example invocation of the simulator for a 10-task workflow, with no logging:
- **    ./wrench-example-cloud-bag-of-tasks 10 ./four_hosts.xml --wrench-energy-simulation
+ **    ./wrench-example-cloud-bag-of-tasks 10 ./dragonfly_cluster.xml --wrench-energy-simulation
  **
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
- **    ./wrench-example-cloud-bag-of-tasks 10 ./four_hosts.xml --wrench-energy-simulation --log=custom_wms.threshold=info
+ **    ./wrench-example-cloud-bag-of-tasks 10 ./dragonfly_cluster.xml --wrench-energy-simulation --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator for a 6-task workflow with full logging:
- **    ./wrench-example-cloud-bag-of-tasks 6 ./four_hosts.xml --wrench-energy-simulation  --wrench-full-log
+ **    ./wrench-example-cloud-bag-of-tasks 6 ./dragonfly_cluster.xml --wrench-energy-simulation  --wrench-full-log
  **/
 
 

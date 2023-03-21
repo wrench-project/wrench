@@ -17,7 +17,7 @@ The examples code fragments below showcase the creation of a
 controller. Let’s start with the creation (in main). Note that arguments
 to service constructors are omitted for brevity (see the execution
 controller implementation in
-``examples/workflow_api/condor-grid-example/CondorWMS.cp`` for a complete and working
+``examples/workflow_api/condor-grid-example/CondorWMS.cpp`` for a complete and working
 example).
 
 .. code:: cpp
@@ -32,14 +32,13 @@ example).
    // Create a HTCondorComputeService instance with the above 
    // three services as "child" services
    auto htcondor_cs = simulation->add(
-        new wrench::HTCondorComputeService("some_host", 
-                                           {some_baremetal_cs, some_batch1_cs, some_batch2_cs}, 
-                                           "/scratch");
+        new wrench::HTCondorComputeService("some_host",
+                                           {some_baremetal_cs, some_batch1_cs, some_batch2_cs}));
 
    // One CloudComputeService instance
-   std::shared_ptr<wrench::CloudComputeService> somecloud_cs;
+   std::shared_ptr<wrench::CloudComputeService> some_cloud_cs;
 
-Let’s now say that an execution controller was created that has access
+Let's now say that an execution controller was created that has access
 to all 5 above services, but will choose to submit all jobs via
 HTCondor. The first thing to do, so as to make the use of the cloud
 service possible, is to create a few VM instances and add them as child
@@ -60,7 +59,7 @@ services to the HTCondor service:
 So, at this point, HTCondor has access to 3 bare-metal compute services
 (2 of which are running inside VMs), and 2 batch compute services.
 
-Let’s consider an execution controller that will submit
+Let's consider an execution controller that will submit
 :cpp:class:`wrench::StandardJob` instances to HTCondor. These jobs can be of two
 kinds or, in HTCondor parlance, belong to one of two universes: **grid**
 jobs and **non-grid** jobs. By default a job is considered to be in the
@@ -98,7 +97,7 @@ In the example below, we show both kinds of job submissions:
    std::map<std::string, std::string> service_specific_args;
    service_specific_args["-N"] = "2"; // 2 compute nodes
    service_specific_args["-c"] = "4"; // 4 cores per compute nodes
-   service_specific_args["-t"] = "60"; // runs for one hour
+   service_specific_args["-t"] = "3600"; // runs for one hour
    service_specific_args["universe"] = "grid"; // Grid universe
    // Set it to run on the first batch compute service
    service_specific_args["-service"] = batch1_cs->getName(); 

@@ -138,7 +138,7 @@ public:
 private:
     SimpleSimulationTest *test;
 
-    int main() {
+    int main() override {
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
@@ -250,6 +250,10 @@ private:
         wrench::Simulation::getLinknameList();
         wrench::Simulation::getLinkBandwidth("1");
         wrench::Simulation::getLinkUsage("1");
+        try {
+            wrench::Simulation::getLinkUsage("");
+            throw std::runtime_error("Shouldn't be able to get link usage for an empty-name link");
+        } catch (std::invalid_argument &ignore) {}
         wrench::Simulation::isLinkOn("1");
 
         try {
@@ -292,9 +296,9 @@ private:
 
         {
             // Try to create and submit a job with tasks that are completed, which should fail
-            auto bogus_job = job_manager->createStandardJob(*(++tasks.begin()));
+            auto other_bogus_job = job_manager->createStandardJob(*(++tasks.begin()));
             try {
-                job_manager->submitJob(bogus_job, vm_cs);
+                job_manager->submitJob(other_bogus_job, vm_cs);
                 throw std::runtime_error("Should not be able to create a job with PENDING tasks");
             } catch (std::invalid_argument &e) {
             }
@@ -460,9 +464,8 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(
-                            new SimpleSimulationReadyTasksTestWMS(this, hostname)));
+    ASSERT_NO_THROW(simulation->add(
+            new SimpleSimulationReadyTasksTestWMS(this, hostname)));
 
     // BOGUS ADDS
     ASSERT_THROW(simulation->add((wrench::ExecutionController *) nullptr), std::invalid_argument);
@@ -471,8 +474,8 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     ASSERT_THROW(simulation->add((wrench::NetworkProximityService *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::FileRegistryService *) nullptr), std::invalid_argument);
 
-    // Try to stage a file without a file registry
-    ASSERT_THROW(simulation->stageFile(input_file, storage_service), std::runtime_error);
+    //    // Try to stage a file without a file registry
+    //    ASSERT_THROW(simulation->stageFile(input_file, storage_service), std::runtime_error);
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;

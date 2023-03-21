@@ -5,7 +5,10 @@ WRENCH Release Notes
 
 - Implementation of non-bufferized (i.e., buffer size of zero) storage services, which is transparent to the user but can vastly reduce simulation time by using a fluid (rather than message-based) model for how storage services read/write data to/from disk while sending/receiving that same data to/from the network. 
 - API change by which a `FileLocation` now includes a `DataFile`.
+- Added a CACHING_BEHAVIOR property to StorageService, which can take value "NONE" (the original behavior in which when full the storage service fails on writes) and "LRU" (the storage service implements a Least Recently Used strategy so as to function as a cache).
+- Implement a File Proxy Service, which acts as a proxy for a file service while maintaining a local cache for files.
 - Minor bug fixes and scalability improvements.
+
 
 **note**: master requires [simgrid](https://simgrid.org) master, commit tag 17ac6c61bd407825851b824adbfa28d64fb69587. 
 

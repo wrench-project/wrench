@@ -35,9 +35,6 @@ namespace wrench {
         /***********************/
 
         std::string toString() override;
-
-    private:
-        std::string message;
     };
 
 

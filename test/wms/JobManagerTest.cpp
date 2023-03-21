@@ -117,7 +117,7 @@ public:
 private:
     JobManagerTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -151,7 +151,7 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new JobManagerConstructorTestWMS(
                                     this, workflow, hostname)));
@@ -181,7 +181,7 @@ public:
 private:
     JobManagerTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -322,7 +322,7 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new JobManagerCreateJobTestWMS(
                                     this, hostname)));
@@ -352,7 +352,7 @@ public:
 private:
     JobManagerTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -406,7 +406,7 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new JobManagerSubmitJobTestWMS(
                                     this, hostname)));
@@ -435,7 +435,7 @@ public:
 private:
     JobManagerTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -531,7 +531,7 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new JobManagerResubmitJobTestWMS(
                                     this, "Host1")));
@@ -565,7 +565,7 @@ public:
 private:
     JobManagerTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -666,7 +666,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new JobManagerTerminateJobTestWMS(
                                     this, "Host1")));

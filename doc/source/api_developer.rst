@@ -1,7 +1,7 @@
 .. _developer-api:
 
 WRENCH Developer API
-***************
+********************
 
 Runtime System Developers/Researchers use WRENCH to prototype and 
 evaluate runtime system designs and/or to investigate and evaluate 
