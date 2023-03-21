@@ -509,12 +509,12 @@ private:
                 throw std::runtime_error("Shouldn't be able to create a VM on a bogus host");
             } catch (std::invalid_argument &e) {}
 
-            try{
+            try {
                 cs->createVM(wrench::ComputeService::ALL_CORES, 10, src_host);
                 throw std::runtime_error("Shouldn't be able to pass ALL_CORES to createVM()");
             } catch (std::invalid_argument &ignore) {}
 
-            try{
+            try {
                 cs->createVM(2, wrench::ComputeService::ALL_RAM, src_host);
                 throw std::runtime_error("Shouldn't be able to pass ALL_RAM to createVM()");
             } catch (std::invalid_argument &ignore) {}
