@@ -40,6 +40,7 @@
         ],
         "summary": "Start a new simulation",
         "operationId": "startSimulation",
+        "backendMethod": "startSimulation",
         "requestBody": {
           "description": "Start a new simulation based on a platform file and a controller hostname.",
           "content": {
@@ -594,7 +595,7 @@
         }
       }
     },
-    "/simulation/{simid}/jobs/{jid}/tasks": {
+    "/simulation/{simid}/jobs/{job_name}/tasks": {
       "get": {
         "tags": [
           "WRENCH"
@@ -613,7 +614,7 @@
             }
           },
           {
-            "name": "jid",
+            "name": "job_name",
             "in": "path",
             "description": "ID of the job",
             "required": true,
@@ -644,7 +645,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{tid}/taskGetFlops": {
+    "/simulation/{simid}/tasks/{name}/taskGetFlops": {
       "get": {
         "tags": [
           "WRENCH"
@@ -663,7 +664,7 @@
             }
           },
           {
-            "name": "tid",
+            "name": "name",
             "in": "path",
             "description": "ID of the task",
             "required": true,
@@ -694,7 +695,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{tid}/taskGetMinNumCores": {
+    "/simulation/{simid}/tasks/{name}/taskGetMinNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -713,7 +714,7 @@
             }
           },
           {
-            "name": "tid",
+            "name": "name",
             "in": "path",
             "description": "ID of the task",
             "required": true,
@@ -744,7 +745,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{tid}/taskGetMaxNumCores": {
+    "/simulation/{simid}/tasks/{name}/taskGetMaxNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -763,7 +764,7 @@
             }
           },
           {
-            "name": "tid",
+            "name": "name",
             "in": "path",
             "description": "ID of the task",
             "required": true,
@@ -794,7 +795,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{tid}/taskGetMemory": {
+    "/simulation/{simid}/tasks/{name}/taskGetMemory": {
       "get": {
         "tags": [
           "WRENCH"
@@ -813,7 +814,7 @@
             }
           },
           {
-            "name": "tid",
+            "name": "name",
             "in": "path",
             "description": "ID of the task",
             "required": true,
@@ -891,7 +892,7 @@
         }
       }
     },
-    "/simulation/{simid}/{jid}/submit": {
+    "/simulation/{simid}/{job_name}/submit": {
       "post": {
         "tags": [
           "WRENCH"
@@ -909,7 +910,7 @@
             }
           },
           {
-            "name": "jid",
+            "name": "job_name",
             "in": "path",
             "description": "ID of the job",
             "required": true,
@@ -1108,7 +1109,7 @@
         }
       }
     },
-    "/simulation/{simid}/{storage_service_id}/createFileCopy": {
+    "/simulation/{simid}/{storage_service_name}/createFileCopy": {
       "post": {
         "tags": [
           "WRENCH"
@@ -1126,7 +1127,7 @@
             }
           },
           {
-            "name": "storage_service_id",
+            "name": "storage_service_name",
             "in": "path",
             "description": "The storage service's head host",
             "required": true,
