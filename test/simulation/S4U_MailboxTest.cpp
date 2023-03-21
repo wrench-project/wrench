@@ -54,7 +54,7 @@ class AsynchronousCommunicationTestWMS : public wrench::ExecutionController {
 
 public:
     AsynchronousCommunicationTestWMS(S4U_MailboxTest *test,
-                                     const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
+                                     const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -279,7 +279,7 @@ class NetworkTimeoutTestWMS : public wrench::ExecutionController {
 
 public:
     NetworkTimeoutTestWMS(S4U_MailboxTest *test,
-                          const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
+                          const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -301,7 +301,7 @@ private:
             if (!real_error->isTimeout()) {
                 throw std::runtime_error("Network error failure cause should be a time out");
             }
-            real_error->toString(); // coverage
+            real_error->toString();// coverage
         }
 
         return 0;
@@ -321,7 +321,7 @@ void S4U_MailboxTest::do_NetworkTimeout_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-link-shutdown-simulation");
+    //    argv[1] = strdup("--wrench-link-shutdown-simulation");
     //    argv[2] = strdup("--wrench-log-full");
 
     simulation->init(&argc, argv);
