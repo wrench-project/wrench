@@ -145,7 +145,7 @@ public:
 private:
     NetworkProximityTest *test;
 
-    int main() {
+    int main() override {
 
         std::pair<std::string, std::string> hosts_to_compute_proximity;
         hosts_to_compute_proximity = std::make_pair(wrench::Simulation::getHostnameList()[2],
@@ -318,7 +318,7 @@ public:
 private:
     NetworkProximityTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -435,7 +435,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new CompareProxTestWMS(this, hostname)));
 
@@ -463,7 +463,7 @@ private:
     NetworkProximityTest *test;
     std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -602,7 +602,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
                                                                  {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"}})));
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new VivaldiConvergeWMS(
                                     this, {alltoall_network_service, vivaldi_network_service}, hostname)));
@@ -630,7 +630,7 @@ public:
 private:
     NetworkProximityTest *test;
 
-    int main() {
+    int main() override {
         //      wrench::S4U_Simulation::sleep(10);
         return 0;
     }
@@ -767,7 +767,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
 
     //Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new ValidatePropertiesWMS(
                                     this, hostname)));

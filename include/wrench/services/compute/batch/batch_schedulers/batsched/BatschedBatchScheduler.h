@@ -7,6 +7,8 @@
  * (at your option) any later version.
  */
 
+#ifdef ENABLE_BATSCHED
+
 #ifndef WRENCH_BATSCHEDBATCHSCHEDULER_H
 #define WRENCH_BATSCHEDBATCHSCHEDULER_H
 
@@ -91,8 +93,6 @@ namespace wrench {
         std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
 
     private:
-#ifdef ENABLE_BATSCHED
-
         void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
                                        std::string kill_reason, std::string event_type);
 
@@ -104,9 +104,6 @@ namespace wrench {
         pid_t pid;
 
         unsigned long batsched_port;
-
-
-#endif
     };
 
     /***********************/
@@ -117,3 +114,5 @@ namespace wrench {
 
 
 #endif//WRENCH_BATSCHEDBATCHSCHEDULER_H
+
+#endif// ENABLE_BATSCHED

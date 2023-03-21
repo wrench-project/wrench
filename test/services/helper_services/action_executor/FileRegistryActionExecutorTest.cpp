@@ -123,7 +123,7 @@ private:
     FileRegistryActionExecutorTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -244,7 +244,7 @@ void FileRegistryActionExecutorTest::do_FileRegistryActionExecutorSuccessTest_te
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
+    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a file registry
     this->fr = simulation->add(new wrench::FileRegistryService("Host1"));

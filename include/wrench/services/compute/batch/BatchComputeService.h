@@ -243,7 +243,6 @@ namespace wrench {
 
         void terminateRunningCompoundJob(const std::shared_ptr<CompoundJob> &job, ComputeService::TerminationCause termination_cause);
 
-
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup(bool has_returned_from_main, int return_value) override;
 
@@ -275,10 +274,12 @@ namespace wrench {
         void startJob(const std::map<std::string, std::tuple<unsigned long, double>> &, const std::shared_ptr<CompoundJob> &,
                       const std::shared_ptr<BatchJob> &, unsigned long, unsigned long, unsigned long);
 
-
-        void processExecuteJobFromBatSched(const std::string &bat_sched_reply);
-
+        // process a resource request
         void processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
+
+#ifdef ENABLE_BATSCHED
+        void processExecuteJobFromBatSched(const std::string &bat_sched_reply);
+#endif
     };
 }// namespace wrench
 

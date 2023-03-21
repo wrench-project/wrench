@@ -90,6 +90,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+        friend class S4U_Simulation;
 
         /**
          * @brief Assert for the service being up
@@ -114,7 +115,6 @@ namespace wrench {
 
         void setMessagePayloads(WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values,
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE overriden_messagepayload_values);
-
 
         void serviceSanityCheck();
 
@@ -150,6 +150,8 @@ namespace wrench {
         double getPropertyValueWithUnitsAsValue(
                 WRENCH_PROPERTY_TYPE property,
                 const std::function<double(std::string &s)> &unit_parsing_function);
+
+        static std::set<std::shared_ptr<Service>> servicesSetToAutoRestart;
 
         /***********************/
         /** \endcond           */

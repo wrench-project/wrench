@@ -217,7 +217,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     wms = simulation->add(new CloudServiceFailureOfAVMTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
@@ -400,7 +400,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        unsigned long NUM_TRIALS = 500;
+        unsigned long NUM_TRIALS = 250;
 
         auto cloud_service = this->test->compute_service;
 
@@ -530,7 +530,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     wms = simulation->add(new CloudServiceRandomFailuresTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service

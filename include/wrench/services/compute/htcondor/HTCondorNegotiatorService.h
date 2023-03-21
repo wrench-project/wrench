@@ -36,12 +36,13 @@ namespace wrench {
                                   double startup_overhead,
                                   double grid_pre_overhead,
                                   double non_grid_pre_overhead,
+                                  bool instant_resource_availabilities,
                                   std::set<std::shared_ptr<ComputeService>> &compute_services,
                                   std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
                                   std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
                                   simgrid::s4u::Mailbox *reply_mailbox);
 
-        ~HTCondorNegotiatorService();
+        ~HTCondorNegotiatorService() override;
 
     private:
         int main() override;
@@ -53,7 +54,7 @@ namespace wrench {
 
         std::shared_ptr<ComputeService> pickTargetComputeService(std::shared_ptr<CompoundJob> job, std::map<std::string, std::string> service_specific_arguments);
         std::shared_ptr<ComputeService> pickTargetComputeServiceGridUniverse(std::shared_ptr<CompoundJob> job, std::map<std::string, std::string> service_specific_arguments);
-        std::shared_ptr<ComputeService> pickTargetComputeServiceNonGridUniverse(std::shared_ptr<CompoundJob> job, std::map<std::string, std::string> service_specific_arguments);
+        std::shared_ptr<ComputeService> pickTargetComputeServiceNonGridUniverse(const std::shared_ptr<CompoundJob> &job, std::map<std::string, std::string> service_specific_arguments);
 
         /** startup overhead **/
         double startup_overhead;
@@ -61,6 +62,10 @@ namespace wrench {
         double grid_pre_overhead;
         /** non-grid, pre-overhead */
         double non_grid_pre_overhead;
+
+        bool instant_resource_availabilities;
+
+
         /** mailbox to reply **/
         simgrid::s4u::Mailbox *reply_mailbox;
         /** set of compute resources **/

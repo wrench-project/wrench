@@ -94,7 +94,7 @@ public:
 private:
     NetworkProximityHostFailuresTest *test;
 
-    int main() {
+    int main() override {
 
         // Starting a FailedHost1 murderer!!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
@@ -200,7 +200,7 @@ void NetworkProximityHostFailuresTest::do_HostFailures_Test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new NetworkProxFailuresTestWMS(this, stable_hostname)));
 

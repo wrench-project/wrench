@@ -23,6 +23,8 @@
 #include <simgrid/version.h>
 
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
+#include "smpi/smpi.h"
+
 
 WRENCH_LOG_CATEGORY(wrench_core_s4u_simulation, "Log category for S4U_Simulation");
 
@@ -39,9 +41,18 @@ namespace wrench {
         if (not Simulation::isSurfPrecisionSetByUser()) {
             simgrid::s4u::Engine::set_config("surf/precision:1e-9");
         }
+        // Set the SMPI options
+        simgrid::s4u::Engine::set_config("smpi/simulate-computation:no");
+        simgrid::s4u::Engine::set_config("smpi/host-speed:1000Gf");
+        simgrid::s4u::Engine::set_config("smpi/init:0");
+        simgrid::s4u::Engine::set_config("smpi/shared-malloc:global");
+
+        // Create the mailbox pool
         S4U_Mailbox::createMailboxPool(S4U_Mailbox::mailbox_pool_size);
+        S4U_Mailbox::NULL_MAILBOX = simgrid::s4u::Mailbox::by_name("NULL_MAILBOX");
         this->initialized = true;
-        sg_storage_file_system_init();
+
+        //        sg_storage_file_system_init();
     }
 
     /**
@@ -67,8 +78,19 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void S4U_Simulation::runSimulation() {
+
+        // Setup a handler for deadlocks
+        simgrid::s4u::Engine::on_deadlock_cb([]() {
+            throw std::runtime_error("The simulation has deadlocked."
+                                     " Run with logs enabled (e.g., --wrench-full-log) "
+                                     "to see the SimGrid-generated transcript that describes "
+                                     "the current state of all deadlocked actors.");
+        });
+
         if (this->initialized) {
+            SMPI_init();
             this->engine->run();
+            SMPI_finalize();
         } else {
             throw std::runtime_error("S4U_Simulation::runSimulation(): Simulation has not been initialized");
         }
@@ -186,7 +208,20 @@ namespace wrench {
         }
         return links.at(0)->get_bandwidth();
     }
-
+    /**
+     * @brief Set a link's new bandwidth
+     * @param name: the link's name
+     * @param bandwidth: the new bandwidth
+     *
+     */
+    void S4U_Simulation::setLinkBandwidth(const std::string &name, double bandwidth) {
+        auto links = simgrid::s4u::Engine::get_instance()->get_filtered_links(
+                [name](simgrid::s4u::Link *l) { return (l->get_name() == name); });
+        if (links.empty()) {
+            throw std::invalid_argument("S4U_Simulation::setLinkBandwidth(): unknown link " + name);
+        }
+        links.at(0)->set_bandwidth(bandwidth);
+    }
     /**
      * @brief Get a link's bandwidth usage
      * @param name: the link's name
@@ -478,7 +513,6 @@ namespace wrench {
      * @param sequential_work: the sequential work (in flops)
      * @param parallel_per_thread_work: the parallel per thread work (in flops)
      */
-
     void S4U_Simulation::compute_multi_threaded(unsigned long num_threads,
                                                 double thread_creation_overhead,
                                                 double sequential_work,
@@ -498,33 +532,37 @@ namespace wrench {
     }
 
     /**
-* @brief Simulates a disk write
-*
-* @param num_bytes: number of bytes to write
-* @param hostname: name of host to which disk is attached
-* @param mount_point: mount point
-*/
-    void S4U_Simulation::writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point) {
+    * @brief Simulates a disk write
+    *
+    * @param num_bytes: number of bytes to write
+    * @param hostname: name of host to which disk is attached
+    * @param mount_point: mount point
+    * @param disk: a disk to write to, if known
+    */
+    void S4U_Simulation::writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk) {
         mount_point = FileLocation::sanitizePath(mount_point);
 
         WRENCH_DEBUG("Writing %lf bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
 
-        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
-        if (not host) {
-            throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown host " + hostname);
-        }
-
-        auto disk_list = host->get_disks();
-        for (auto disk: disk_list) {
-            std::string disk_mountpoint =
-                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
-            if (disk_mountpoint == mount_point) {
-                disk->write((sg_size_t) num_bytes);
-                return;
+        if (not disk) {
+            auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
+            if (not host) {
+                throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown host " + hostname);
             }
+
+            auto disk_list = host->get_disks();
+            for (auto d: disk_list) {
+                std::string disk_mountpoint =
+                        FileLocation::sanitizePath(std::string(disk->get_property("mount")));
+                if (disk_mountpoint == mount_point) {
+                    disk = d;
+                    break;
+                }
+            }
+            throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown path " +
+                                        mount_point + " at host " + hostname);
         }
-        throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown path " +
-                                    mount_point + " at host " + hostname);
+        disk->write((sg_size_t) num_bytes);
     }
 
 
@@ -536,35 +574,39 @@ namespace wrench {
 * @param hostname: the host at which the disks are located
 * @param read_mount_point: the mountpoint to read from
 * @param write_mount_point: the mountpoint to write to
+* @param src_disk: source disk (nullptr if not known)
+* @param dst_disk: dst disk (nullptr if not known)
 */
     void S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                                 const std::string &hostname,
                                                                 const std::string &read_mount_point,
-                                                                const std::string &write_mount_point) {
+                                                                const std::string &write_mount_point,
+                                                                simgrid::s4u::Disk *src_disk,
+                                                                simgrid::s4u::Disk *dst_disk) {
         WRENCH_DEBUG("Reading %.2lf bytes from disk %s:%s and writing %lf bytes to disk %s:%s",
                      num_bytes_to_read, hostname.c_str(), read_mount_point.c_str(),
                      num_bytes_to_write, hostname.c_str(), write_mount_point.c_str());
 
-        simgrid::s4u::Disk *read_disk = nullptr;
-        simgrid::s4u::Disk *write_disk = nullptr;
+        if ((not src_disk) or (not dst_disk)) {
 
-        auto disk_list = S4U_Simulation::get_host_or_vm_by_name(hostname)->get_disks();
-        for (auto disk: disk_list) {
-            std::string disk_mountpoint =
-                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
-            if (disk_mountpoint == read_mount_point) {
-                read_disk = disk;
-            }
-            if (disk_mountpoint == write_mount_point) {
-                write_disk = disk;
+            auto disk_list = S4U_Simulation::get_host_or_vm_by_name(hostname)->get_disks();
+            for (auto disk: disk_list) {
+                std::string disk_mountpoint =
+                        FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+                if (disk_mountpoint == read_mount_point) {
+                    src_disk = disk;
+                }
+                if (disk_mountpoint == write_mount_point) {
+                    dst_disk = disk;
+                }
             }
         }
 
         // Start asynchronous read
-        auto read_activity = read_disk->io_init((sg_size_t) num_bytes_to_read, simgrid::s4u::Io::OpType::READ);
+        auto read_activity = src_disk->io_init((sg_size_t) num_bytes_to_read, simgrid::s4u::Io::OpType::READ);
         read_activity->start();
         // Do synchronous write
-        write_disk->write((sg_size_t) num_bytes_to_write);
+        dst_disk->write((sg_size_t) num_bytes_to_write);
         // Wait for asynchronous read to be done
         read_activity->wait();
     }
@@ -576,29 +618,33 @@ namespace wrench {
 * @param num_bytes: number of bytes to read
 * @param hostname: name of host to which disk is attached
 * @param mount_point: mount point
+ * @param disk: disk to read from (nullptr if not known)
 */
-    void S4U_Simulation::readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point) {
+    void S4U_Simulation::readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk) {
         mount_point = FileLocation::sanitizePath(mount_point);
 
         WRENCH_DEBUG("Reading %.2lf bytes from disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
 
-        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
-        if (not host) {
-            throw std::invalid_argument("S4U_Simulation::readFromDisk(): unknown host " + hostname);
-        }
-
-        auto disk_list = host->get_disks();
-        for (auto disk: disk_list) {
-            std::string disk_mountpoint =
-                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
-
-            if (disk_mountpoint == mount_point) {
-                disk->read((sg_size_t) num_bytes);
-                return;
+        if (not disk) {
+            auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
+            if (not host) {
+                throw std::invalid_argument("S4U_Simulation::readFromDisk(): unknown host " + hostname);
             }
+
+            auto disk_list = host->get_disks();
+            for (auto d: disk_list) {
+                std::string disk_mountpoint =
+                        FileLocation::sanitizePath(std::string(disk->get_property("mount")));
+
+                if (disk_mountpoint == mount_point) {
+                    disk = d;
+                    break;
+                }
+            }
+            throw std::invalid_argument("S4U_Simulation::readFromDisk(): invalid mount point " +
+                                        mount_point + " at host " + hostname);
         }
-        throw std::invalid_argument("S4U_Simulation::readFromDisk(): invalid mount point " +
-                                    mount_point + " at host " + hostname);
+        disk->read((sg_size_t) num_bytes);
     }
 
 
@@ -846,12 +892,12 @@ namespace wrench {
     }
 
     /**
-* @brief Get the minimum power consumption (i.e., idling) for a host at its current pstate
-* @param hostname: the host name
-* @return The power consumption for this host if idle (as specified in the platform xml description file)
-* @throw std::invalid_argument
-* @throw std::runtime_error
-*/
+    * @brief Get the minimum power consumption (i.e., idling) for a host at its current pstate
+    * @param hostname: the host name
+    * @return The power consumption for this host if idle (as specified in the platform xml description file)
+    * @throw std::invalid_argument
+    * @throw std::runtime_error
+    */
     double S4U_Simulation::getMinPowerConsumption(const std::string &hostname) {
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -868,12 +914,12 @@ namespace wrench {
     }
 
     /**
-* @brief Get the maximum power consumption (i.e., 100% load) for a host at its current pstate
-* @param hostname: the host name
-* @return The power consumption for this host if 100% used (as specified in the platform xml description file)
-* @throw std::invalid_argument
-* @throw std::runtime_error
-*/
+    * @brief Get the maximum power consumption (i.e., 100% load) for a host at its current pstate
+    * @param hostname: the host name
+    * @return The power consumption for this host if 100% used (as specified in the platform xml description file)
+    * @throw std::invalid_argument
+    * @throw std::runtime_error
+    */
     double S4U_Simulation::getMaxPowerConsumption(const std::string &hostname) {
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -893,12 +939,12 @@ namespace wrench {
     }
 
     /**
-* @brief Get the list of power states available for a host
-* @param hostname: the host name
-* @return a list of power states available for the host (as specified in the platform xml description file)
-* @throw std::invalid_argument
-* @throw std::runtime_error
-*/
+    * @brief Get the list of power states available for a host
+    * @param hostname: the host name
+    * @return a list of power states available for the host (as specified in the platform xml description file)
+    * @throw std::invalid_argument
+    * @throw std::runtime_error
+    */
     std::vector<int> S4U_Simulation::getListOfPstates(const std::string &hostname) {
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -921,10 +967,10 @@ namespace wrench {
     }
 
     /**
-* @brief Compute zero flop, which take zero time but will block if the host's pstate
-*        has a zero flop/sec speed, until the host's pstate is changed to a pstate with
-*        non-zero flop/sec speed.
-*/
+    * @brief Compute zero flop, which take zero time but will block if the host's pstate
+    *        has a zero flop/sec speed, until the host's pstate is changed to a pstate with
+    *        non-zero flop/sec speed.
+    */
     void S4U_Simulation::computeZeroFlop() {
         if (S4U_Simulation::getFlopRate() <= 0) {
             S4U_Simulation::compute(0);
@@ -933,12 +979,12 @@ namespace wrench {
 
 
     /**
-* @brief Gets set of disks, i.e., mount points, available at a host
-* @param hostname: the host's name
-* @return a vector of mount points
-*
-* @throw std::invalid_argument
-*/
+    * @brief Gets set of disks, i.e., mount points, available at a host
+    * @param hostname: the host's name
+    * @return a vector of mount points
+    *
+    * @throw std::invalid_argument
+    */
     std::vector<std::string> S4U_Simulation::getDisks(const std::string &hostname) {
         simgrid::s4u::Host *host;
         try {
@@ -1091,10 +1137,6 @@ namespace wrench {
                                        double write_bandwidth_in_bytes_per_sec,
                                        double capacity_in_bytes,
                                        const std::string &mount_point) {
-        if (read_bandwidth_in_bytes_per_sec != write_bandwidth_in_bytes_per_sec) {
-            throw std::invalid_argument("Simulation::createNewDisk(): For now, disks must have equal "
-                                        "read and write bandwidth");
-        }
 
         // Get the host
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -1117,6 +1159,7 @@ namespace wrench {
         // Add the required disk properties
         disk->set_property("size", std::to_string(capacity_in_bytes) + "B");
         disk->set_property("mount", mount_point);
+        disk->seal();
     }
 
     /**

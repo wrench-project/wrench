@@ -107,6 +107,30 @@ private:
 
         auto root = this->xrootd_deployment->getRootSupervisor();
 
+        root->getChild(0)->createFile(files[0]);
+
+
+        root->getChild(0)->removeFile(files[0]);                                    // coverage
+        root->getChild(0)->getTotalSpace();                                         // coverage
+        auto location = wrench::FileLocation::LOCATION(root->getChild(0), files[0]);// coverage
+        root->getChild(0)->reserveSpace(location);                                  // coverage
+        root->getChild(0)->unreserveSpace(location);                                // coverage
+        location = wrench::FileLocation::LOCATION(root, files[0]);                  // coverage
+        try {
+            root->reserveSpace(location);
+            throw std::runtime_error("Shouldn't be able to reserve space on a non-storage node");
+        } catch (std::runtime_error &ignore) {
+        }
+        try {
+            root->unreserveSpace(location);
+            throw std::runtime_error("Shouldn't be able to unreserve space on a non-storage node");
+        } catch (std::runtime_error &ignore) {
+        }
+        try {
+            root->removeFile(files[0]);
+            throw std::runtime_error("Shouldn't be able to call removeFile() on a non-storage node");
+        } catch (std::runtime_error &ignore) {
+        }
 
         root->getChild(0)->createFile(files[0]);
         root->getChild(1)->createFile(files[1]);

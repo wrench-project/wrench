@@ -12,21 +12,21 @@
 #include <boost/algorithm/string/split.hpp>
 #include <utility>
 
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/managers/JobManager.h>
-#include <wrench/services/compute/ComputeService.h>
-#include <wrench/services/ServiceMessage.h>
-#include <wrench/services/compute/ComputeServiceMessage.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/simulation/SimulationMessage.h>
-#include <wrench/workflow/WorkflowTask.h>
-#include <wrench/job/StandardJob.h>
-#include <wrench/job/CompoundJob.h>
-#include <wrench/job/PilotJob.h>
-#include <wrench/services/helper_services/action_executor/ActionExecutor.h>
-#include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
-#include "wrench/managers/JobManagerMessage.h"
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/managers/job_manager/JobManager.h"
+#include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/ServiceMessage.h"
+#include "wrench/services/compute/ComputeServiceMessage.h"
+#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simulation/SimulationMessage.h"
+#include "wrench/workflow/WorkflowTask.h"
+#include "wrench/job/StandardJob.h"
+#include "wrench/job/CompoundJob.h"
+#include "wrench/job/PilotJob.h"
+#include "wrench/services/helper_services/action_executor/ActionExecutor.h"
+#include "wrench/services/helper_services/action_execution_service/ActionExecutionService.h"
+#include "wrench/managers/job_manager/JobManagerMessage.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_job_manager, "Log category for Job Manager");
 
@@ -45,8 +45,6 @@ namespace wrench {
      * @brief Destructor, which kills the daemon (and clears all the jobs)
      */
     JobManager::~JobManager() {
-        this->jobs_to_dispatch.clear();
-        this->jobs_dispatched.clear();
     }
 
     /**
@@ -359,11 +357,11 @@ namespace wrench {
     *             this many cores, but will choose the host on which to run it.
     *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
     *             task with the specified number of cores on that host.
-    *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"taskID":"[node_index:]num_cores"}] [,{"-u":"<string>" (username)}]}
+    *      - to a BatchComputeService: {{"-t":"<int>" (requested number of seconds)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"taskID":"[node_index:]num_cores"}] [,{"-u":"<string>" (username)}]}
     *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
     *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
     *      - to a HTCondorComputeService:
-    *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"-universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (BatchComputeService service name)}] [, {"taskID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
+    *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"-universe":"grid", {"-t":"<int>" (requested number of seconds)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (BatchComputeService service name)}] [, {"taskID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
     *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
     *
     *
@@ -416,7 +414,7 @@ namespace wrench {
         // Tweak the service_specific_arguments
         std::map<std::string, std::string> new_args;
 
-        std::shared_ptr<Workflow> workflow = nullptr;
+        Workflow *workflow = nullptr;
         if (not job->getTasks().empty()) {
             workflow = (*(job->getTasks().begin()))->getWorkflow();
         }
@@ -495,11 +493,11 @@ namespace wrench {
      *             this many cores, but will choose the host on which to run it.
      *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
      *             task with the specified number of cores on that host.
-     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"actionID":"[node_index:]num_cores"}] [,{"-u":"<string>" (username)}]}
+     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of seconds)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"actionID":"[node_index:]num_cores"}] [,{"-u":"<string>" (username)}]}
      *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
      *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
      *      - to a HTCondorComputeService:
-     *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"-universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (BatchComputeService service name)}] [, {"actionID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
+     *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"-universe":"grid", {"-t":"<int>" (requested number of seconds)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (BatchComputeService service name)}] [, {"actionID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
      *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
      *
      *
@@ -577,7 +575,7 @@ namespace wrench {
      * @param job: a pilot job
      * @param compute_service: a compute service
      * @param service_specific_args: arguments specific for compute services:
-     *      - to a BatchComputeService: {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}
+     *      - to a BatchComputeService: {"-t":"<int>" (requested number of seconds)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}
      *      - to a BareMetalComputeService: {} (pilot jobs should not be submitted directly to the service)}
      *      - to a VirtualizedClusterComputeService: {} (pilot jobs should not be submitted directly to the service)}
      *      - to a CloudComputeService: {} (pilot jobs should not be submitted directly to the service)}
@@ -899,7 +897,7 @@ namespace wrench {
      * @return
      */
     bool JobManager::processNextMessage() {
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (ExecutionException &e) {
@@ -915,13 +913,13 @@ namespace wrench {
         WRENCH_DEBUG("Job Manager got a %s message", message->getName().c_str());
         WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
 
-        if (dynamic_cast<JobManagerWakeupMessage *>(message.get())) {
+        if (std::dynamic_pointer_cast<JobManagerWakeupMessage>(message)) {
             // Just wakeup
             return true;
-        } else if (dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        } else if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // There shouldn't be any need to clean up any state
             return false;
-        } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobDoneMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobDoneMessage>(message)) {
             // Is this in fact a standard job???
             if (this->cjob_to_sjob_map.find(msg->job) != this->cjob_to_sjob_map.end()) {
                 auto sjob = this->cjob_to_sjob_map[msg->job];
@@ -931,7 +929,7 @@ namespace wrench {
                 processCompoundJobCompletion(msg->job, msg->compute_service);
             }
             return true;
-        } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobFailedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobFailedMessage>(message)) {
             if (this->cjob_to_sjob_map.find(msg->job) != this->cjob_to_sjob_map.end()) {
                 auto sjob = this->cjob_to_sjob_map[msg->job];
                 this->cjob_to_sjob_map.erase(msg->job);
@@ -949,10 +947,10 @@ namespace wrench {
                 processCompoundJobFailure(msg->job, msg->compute_service);
             }
             return true;
-        } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
             processPilotJobStart(msg->job, msg->compute_service);
             return true;
-        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
             processPilotJobExpiration(msg->job, msg->compute_service);
             return true;
         } else {
@@ -983,7 +981,6 @@ namespace wrench {
         this->jobs_dispatched.erase(job->compound_job);
 
         // Forward the notification along the notification chain
-
         auto callback_mailbox = job->popCallbackMailbox();
         if (callback_mailbox) {
             auto augmented_msg = new JobManagerStandardJobCompletedMessage(
