@@ -304,6 +304,30 @@ private:
             real_error->toString(); // coverage
         }
 
+        try {
+            auto pending = wrench::S4U_Mailbox::igetMessage(this->mailbox);
+            pending->wait(10);
+            throw std::runtime_error("Should have gotten an exception");
+        } catch (wrench::ExecutionException &e) {
+            auto real_error = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
+            if (not real_error) {
+                throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString());
+            }
+            if (!real_error->isTimeout()) {
+                throw std::runtime_error("Network error failure cause should be a time out");
+            }
+            real_error->toString(); // coverage
+        }
+
+        {
+            auto pending = wrench::S4U_Mailbox::igetMessage(this->mailbox);
+            std::vector<wrench::S4U_PendingCommunication *> pending_comms = {pending.get()};
+            auto index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(pending_comms, 10);
+            if (index != ULONG_MAX) {
+                throw std::runtime_error("Should have gotten ULONG_MAX");
+            }
+        }
+
         return 0;
     }
 };
