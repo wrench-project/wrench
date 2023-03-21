@@ -28,7 +28,7 @@ More information and Documentation: [WRENCH Project Website](http://wrench-proje
 
 ## Prerequisites
 
-WRENCH is fully developed in C++. The code follows the **C++14** standard, and thus 
+WRENCH is fully developed in C++. The code follows the **C++17** standard, and thus 
 older compilers tend to fail the compilation process. Therefore, we strongly 
 recommend users to satisfy the following requirements:
 
