@@ -44,7 +44,7 @@ namespace wrench {
                                                                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
 
         bool bufferized = false;// By default, non-bufferized
-                                //        bool bufferized = true; // By default, bufferized
+        //        bool bufferized = true; // By default, bufferized
 
         if (property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != property_list.end()) {
             double buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
@@ -111,14 +111,10 @@ namespace wrench {
         if (mount_points.empty()) {
             throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): A storage service must have at least one mount point");
         }
-        try {
-            for (const auto &mp: mount_points) {
-                this->file_systems[mp] = LogicalFileSystem::createLogicalFileSystem(
-                        this->getHostname(), this,
-                        FileLocation::sanitizePath(mp), this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR));
-            }
-        } catch (std::invalid_argument &e) {
-            throw;
+        for (const auto &mp: mount_points) {
+            this->file_systems[mp] = LogicalFileSystem::createLogicalFileSystem(
+                    this->getHostname(), this,
+                    FileLocation::sanitizePath(mp), this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR));
         }
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(

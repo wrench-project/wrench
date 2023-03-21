@@ -237,7 +237,7 @@ namespace wrench {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
                 throw std::runtime_error(
-                        "VirtualizedClusterComputeService::processNextMessage(): Received a service termination message for an unknown BareMetalComputeService!");
+                        "VirtualizedClusterComputeService::processNextMessage(): Internal Error: Received a service termination message for a non-BareMetalComputeService!");
             }
             return true;
         } else {

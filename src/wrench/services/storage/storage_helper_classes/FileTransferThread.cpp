@@ -307,13 +307,13 @@ namespace wrench {
                         }
                     } else {
 #endif
-                        // Write to disk
-                        auto dst_ss = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService());
-                        if (!dst_ss) {
-                            throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Storage Service should be a SimpleStorageService for disk write");
-                        }
-                        simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
-                                                dst_ss->getPathMountPoint(location->getPath()), dst_location->getDiskOrNull());
+                    // Write to disk
+                    auto dst_ss = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService());
+                    if (!dst_ss) {
+                        throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Storage Service should be a SimpleStorageService for disk write");
+                    }
+                    simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
+                                            dst_ss->getPathMountPoint(location->getPath()), dst_location->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
                     }
 #endif
@@ -321,7 +321,7 @@ namespace wrench {
                     // Wait for the comm to finish
                     msg = req->wait();
                     if (auto file_content_chunk_msg =
-                                dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
+                            dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                         done = file_content_chunk_msg->last_chunk;
                     } else {
                         throw std::runtime_error(
@@ -342,13 +342,13 @@ namespace wrench {
                     }
                 } else {
 #endif
-                    // Write to disk
-                    auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
-                    if (!ss) {
-                        throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
-                    }
-                    simulation->writeToDisk(msg->payload, ss->hostname,
-                                            ss->getPathMountPoint(location->getPath()), location->getDiskOrNull());
+                // Write to disk
+                auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
+                if (!ss) {
+                    throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
+                }
+                simulation->writeToDisk(msg->payload, ss->hostname,
+                                        ss->getPathMountPoint(location->getPath()), location->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
                 }
 #endif
@@ -403,13 +403,13 @@ namespace wrench {
                         simulation->readWithMemoryCache(f, chunk_size, location);
                     } else {
 #endif
-                        WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
-                        auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
-                        if (!ss) {
-                            throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
-                        }
-                        simulation->readFromDisk(chunk_size, ss->hostname,
-                                                 ss->getPathMountPoint(location->getPath()), location->getDiskOrNull());
+                    WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
+                    auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
+                    if (!ss) {
+                        throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
+                    }
+                    simulation->readFromDisk(chunk_size, ss->hostname,
+                                             ss->getPathMountPoint(location->getPath()), location->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
                     }
 #endif
@@ -529,28 +529,20 @@ namespace wrench {
         //            mailbox_that_should_receive_file_content = nullptr;
         //        }
 
-        try {
-            S4U_Mailbox::putMessage(
-                    src_loc->getStorageService()->mailbox,
-                    new StorageServiceFileReadRequestMessage(
-                            request_answer_mailbox,
-                            simgrid::s4u::this_actor::get_host(),
-                            src_loc,
-                            f->getSize(),
-                            src_loc->getStorageService()->getMessagePayloadValue(
-                                    StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        S4U_Mailbox::putMessage(
+                src_loc->getStorageService()->mailbox,
+                new StorageServiceFileReadRequestMessage(
+                        request_answer_mailbox,
+                        simgrid::s4u::this_actor::get_host(),
+                        src_loc,
+                        f->getSize(),
+                        src_loc->getStorageService()->getMessagePayloadValue(
+                                StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply to the request
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-        try {
-            message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
 
         simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content;
         if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
@@ -572,7 +564,7 @@ namespace wrench {
             // Receive the first chunk
             auto msg = S4U_Mailbox::getMessage(mailbox_to_receive_the_file_content);
             if (auto file_content_chunk_msg =
-                        dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
+                    dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                 done = file_content_chunk_msg->last_chunk;
             } else {
                 S4U_Mailbox::retireTemporaryMailbox(mailbox_to_receive_the_file_content);
@@ -597,10 +589,10 @@ namespace wrench {
                     simulation->writebackWithMemoryCache(f, msg->payload, dst_loc, false);
                 } else {
 #endif
-                    // Write to disk
-                    simulation->writeToDisk(msg->payload,
-                                            dst_ss->getHostname(),
-                                            dst_ss->getPathMountPoint(dst_loc->getPath()), dst_loc->getDiskOrNull());
+                // Write to disk
+                simulation->writeToDisk(msg->payload,
+                                        dst_ss->getHostname(),
+                                        dst_ss->getPathMountPoint(dst_loc->getPath()), dst_loc->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
                 }
 #endif
@@ -608,7 +600,7 @@ namespace wrench {
                 //                    WRENCH_INFO("Wrote of %f of f  %s", msg->payload, f->getID().c_str());
                 msg = req->wait();
                 if (auto file_content_chunk_msg =
-                            dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
+                        dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                     done = file_content_chunk_msg->last_chunk;
                 } else {
                     S4U_Mailbox::retireTemporaryMailbox(mailbox_to_receive_the_file_content);
@@ -625,10 +617,10 @@ namespace wrench {
                 simulation->writebackWithMemoryCache(f, msg->payload, dst_loc, false);
             } else {
 #endif
-                // Write to disk
-                simulation->writeToDisk(msg->payload,
-                                        dst_ss->getHostname(),
-                                        dst_ss->getPathMountPoint(dst_loc->getPath()), dst_loc->getDiskOrNull());
+            // Write to disk
+            simulation->writeToDisk(msg->payload,
+                                    dst_ss->getHostname(),
+                                    dst_ss->getPathMountPoint(dst_loc->getPath()), dst_loc->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
             }
 #endif

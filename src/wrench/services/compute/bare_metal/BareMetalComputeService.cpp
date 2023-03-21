@@ -128,11 +128,7 @@ namespace wrench {
                 (not service_specific_args.at(action->getName()).empty())) {
                 std::tuple<std::string, unsigned long> parsed_spec;
 
-                try {
-                    parsed_spec = BareMetalComputeService::parseResourceSpec(service_specific_args.at(action->getName()));
-                } catch (std::invalid_argument &e) {
-                    throw;
-                }
+                parsed_spec = BareMetalComputeService::parseResourceSpec(service_specific_args.at(action->getName()));
 
                 std::string target_host = std::get<0>(parsed_spec);
                 unsigned long target_num_cores = std::get<1>(parsed_spec);
@@ -353,21 +349,17 @@ namespace wrench {
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
         // Create an ActionExecutionService
-        try {
-            this->action_execution_service = std::shared_ptr<ActionExecutionService>(new ActionExecutionService(
-                    hostname,
-                    compute_resources,
-                    nullptr,
-                    {
-                            {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD, this->getPropertyValueAsString(BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
-                            {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, this->getPropertyValueAsString(BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)},
-                            {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, this->getPropertyValueAsString(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)},
-                    },
-                    {}));
-            this->action_execution_service->setSimulation(this->simulation);
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
+        this->action_execution_service = std::shared_ptr<ActionExecutionService>(new ActionExecutionService(
+                hostname,
+                compute_resources,
+                nullptr,
+                {
+                        {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD, this->getPropertyValueAsString(BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
+                        {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, this->getPropertyValueAsString(BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)},
+                        {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, this->getPropertyValueAsString(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)},
+                },
+                {}));
+        this->action_execution_service->setSimulation(this->simulation);
     }
 
     /**
@@ -655,9 +647,9 @@ namespace wrench {
         bool answer = this->action_execution_service->IsThereAtLeastOneHostWithAvailableResources(num_cores, ram);
         S4U_Mailbox::dputMessage(
                 answer_mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
-                                        answer,
-                                        this->getMessagePayloadValue(
-                                                BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
+                        answer,
+                        this->getMessagePayloadValue(
+                                BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
     }
 
     /**
@@ -686,14 +678,10 @@ namespace wrench {
     void BareMetalComputeService::cleanUpScratch() {
         for (auto const &j: this->files_in_scratch) {
             for (auto const &f: j.second) {
-                try {
-                    this->getScratch()->deleteFile(
-                            f,
-                            this->getScratch()->getBaseRootPath() +
-                                    j.first->getName());
-                } catch (ExecutionException &e) {
-                    throw;
-                }
+                this->getScratch()->deleteFile(
+                        f,
+                        this->getScratch()->getBaseRootPath() +
+                        j.first->getName());
             }
         }
     }
@@ -733,35 +721,35 @@ namespace wrench {
         // TODO: This may be a performance bottleneck... may have to remedy
         std::sort(this->ready_actions.begin(), this->ready_actions.end(),
                   [](const std::shared_ptr<Action> &a, const std::shared_ptr<Action> &b) -> bool {
-                      if (a->getJob() != b->getJob()) {
-                          if (a->getJob()->getPriority() > b->getJob()->getPriority()) {
-                              return true;
-                          } else if (a->getJob()->getPriority() < b->getJob()->getPriority()) {
-                              return false;
-                          } else if (a->getPriority() > b->getPriority()) {
-                              return true;
-                          } else if (a->getPriority() < b->getPriority()) {
-                              return false;
-                          } else if (a->getName() < b->getName()) {
-                              return true;
-                          } else if (a->getName() < b->getName()) {
-                              return false;
-                          } else {
-                              return (unsigned long) (a->getJob().get()) > (unsigned long) (b->getJob().get());
-                          }
-                      } else {
-                          if (a->getPriority() > b->getPriority()) {
-                              return true;
-                          } else if (a->getPriority() < b->getPriority()) {
-                              return false;
-                          } else if (a->getName() < b->getName()) {
-                              return true;
-                          } else if (a->getName() > b->getName()) {
-                              return false;
-                          } else {
-                              return (unsigned long) (a.get()) > (unsigned long) (b.get());
-                          }
-                      }
+                    if (a->getJob() != b->getJob()) {
+                        if (a->getJob()->getPriority() > b->getJob()->getPriority()) {
+                            return true;
+                        } else if (a->getJob()->getPriority() < b->getJob()->getPriority()) {
+                            return false;
+                        } else if (a->getPriority() > b->getPriority()) {
+                            return true;
+                        } else if (a->getPriority() < b->getPriority()) {
+                            return false;
+                        } else if (a->getName() < b->getName()) {
+                            return true;
+                        } else if (a->getName() < b->getName()) {
+                            return false;
+                        } else {
+                            return (unsigned long) (a->getJob().get()) > (unsigned long) (b->getJob().get());
+                        }
+                    } else {
+                        if (a->getPriority() > b->getPriority()) {
+                            return true;
+                        } else if (a->getPriority() < b->getPriority()) {
+                            return false;
+                        } else if (a->getName() < b->getName()) {
+                            return true;
+                        } else if (a->getName() > b->getName()) {
+                            return false;
+                        } else {
+                            return (unsigned long) (a.get()) > (unsigned long) (b.get());
+                        }
+                    }
                   });
 
         for (auto const &action: this->ready_actions) {

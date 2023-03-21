@@ -105,7 +105,7 @@ namespace wrench {
                     this->time_to_next_measurement.end(),
                     [](decltype(this->time_to_next_measurement)::value_type &lhs,
                        decltype(this->time_to_next_measurement)::value_type &rhs) {
-                        return lhs.second < rhs.second;
+                      return lhs.second < rhs.second;
                     });
 
             double time_to_next_measure = min_el->second;
@@ -145,15 +145,11 @@ namespace wrench {
     bool EnergyMeterService::processNextMessage(double timeout) {
 
         try {
-            try {
-                auto msg = S4U_Mailbox::getMessage<ServiceStopDaemonMessage>(
-                        this->mailbox,
-                        timeout,
-                        "EnergyMeter::waitForNextMessage(): Received an");
-                WRENCH_INFO("Energy Meter got a %s message", msg->getName().c_str());
-            } catch (std::runtime_error &e) {
-                throw;
-            }
+            auto msg = S4U_Mailbox::getMessage<ServiceStopDaemonMessage>(
+                    this->mailbox,
+                    timeout,
+                    "EnergyMeter::waitForNextMessage(): Received an");
+            WRENCH_INFO("Energy Meter got a %s message", msg->getName().c_str());
             return true;
         } catch (ExecutionException &e) {
             return true;
