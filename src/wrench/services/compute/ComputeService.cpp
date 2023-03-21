@@ -163,7 +163,6 @@ namespace wrench {
         ss->setIsScratch(true);
         this->scratch_space_storage_service =
                 this->simulation->startNewService(ss);
-
     }
 
     /**
@@ -337,11 +336,11 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
-                answer_mailbox,
-                num_cores,
-                ram,
-                this->getMessagePayloadValue(
-                        ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
+                                                       answer_mailbox,
+                                                       num_cores,
+                                                       ram,
+                                                       this->getMessagePayloadValue(
+                                                               ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         auto msg = S4U_Mailbox::getMessage<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage>(
@@ -404,10 +403,10 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
-                answer_mailbox,
-                key,
-                this->getMessagePayloadValue(
-                        ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
+                                                       answer_mailbox,
+                                                       key,
+                                                       this->getMessagePayloadValue(
+                                                               ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         auto msg = S4U_Mailbox::getMessage<ComputeServiceResourceInformationAnswerMessage>(
