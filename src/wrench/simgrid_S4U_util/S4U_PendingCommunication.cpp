@@ -95,7 +95,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     unsigned long S4U_PendingCommunication::waitForSomethingToHappen(
-            const std::vector<std::shared_ptr<S4U_PendingCommunication>>& pending_comms, double timeout) {
+            const std::vector<std::shared_ptr<S4U_PendingCommunication>> &pending_comms, double timeout) {
         std::vector<S4U_PendingCommunication *> raw_pointer_comms;
         raw_pointer_comms.reserve(pending_comms.size());
         for (auto const &pc: pending_comms) {
