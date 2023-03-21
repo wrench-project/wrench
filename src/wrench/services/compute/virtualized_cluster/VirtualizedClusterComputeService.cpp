@@ -40,7 +40,7 @@ namespace wrench {
                                                                        const std::string &scratch_space_mount_point,
                                                                        WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                                        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
-        : CloudComputeService(hostname, execution_hosts, scratch_space_mount_point) {
+            : CloudComputeService(hostname, execution_hosts, scratch_space_mount_point) {
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
         // Set default and specified message payloads
@@ -87,7 +87,7 @@ namespace wrench {
         // send a "create vm" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceCreateVMAnswerMessage>(
                 answer_mailbox,
                 new CloudComputeServiceCreateVMRequestMessage(
                         answer_mailbox,
@@ -96,15 +96,10 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceCreateVMAnswerMessage *>(answer_message.get())) {
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            } else {
-                return msg->vm_name;
-            }
+        if (not answer_message->success) {
+            throw ExecutionException(answer_message->failure_cause);
         } else {
-            throw std::runtime_error(
-                    "CloudComputeService::createVM(): Unexpected [" + answer_message->getName() + "] message");
+            return answer_message->vm_name;
         }
     }
 
@@ -124,21 +119,15 @@ namespace wrench {
         // send a "migrate vm" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+        auto answer_message = sendRequestAndWaitForAnswer<VirtualizedClusterComputeServiceMigrateVMAnswerMessage>(
                 answer_mailbox,
                 new VirtualizedClusterComputeServiceMigrateVMRequestMessage(
                         answer_mailbox, vm_name, dest_pm_hostname,
                         this->getMessagePayloadValue(
                                 VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<VirtualizedClusterComputeServiceMigrateVMAnswerMessage *>(
-                    answer_message.get())) {
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "VirtualizedClusterComputeService::migrateVM(): Unexpected [" + answer_message->getName() + "] message");
+        if (not answer_message->success) {
+            throw ExecutionException(answer_message->failure_cause);
         }
     }
 
@@ -239,7 +228,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<VirtualizedClusterComputeServiceMigrateVMRequestMessage *>(
-                           message.get())) {
+                message.get())) {
             processMigrateVM(msg->answer_mailbox, msg->vm_name, msg->dest_pm_hostname);
             return true;
 
