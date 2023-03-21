@@ -83,7 +83,7 @@ private:
 
             // Another send
             auto another_pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage(100));
-            another_pending_send->wait(0.01);
+            another_pending_send->wait(0.01 - wrench::Simulation::getCurrentSimulatedDate());
 
             // Two sends, no timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends;
@@ -178,7 +178,7 @@ private:
 
             // Another recv
             auto another_pending_recv = wrench::S4U_Mailbox::igetMessage(this->test->wms2->mailbox);
-            another_pending_recv->wait(0.01);
+            another_pending_recv->wait(0.01 - wrench::Simulation::getCurrentSimulatedDate());
 
             // Two recv, no timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> recvs;
