@@ -2,7 +2,7 @@
 set(CMAKE_CXX_STANDARD 14)
 
 # ToDo: change it to my script generate html form swagger gen maybe?
-#[[add_custom_command(
+add_custom_command(
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/REST_API_generated_code.h
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/doc/
@@ -10,7 +10,16 @@ set(CMAKE_CXX_STANDARD 14)
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         COMMENT "Generating REST API code and documentation"
         VERBATIM
-)]]
+)
+
+add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/doc/
+        COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_crow_routes.py ${CMAKE_CURRENT_SOURCE_DIR}/doc/wrench-openapi.json ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h
+        COMMENT "Generating CROW routes"
+        VERBATIM
+)
 
 
 # Add needed packages
@@ -35,7 +44,7 @@ add_executable(wrench-daemon
         include/KeyValueStore.h
         include/REST_API.h
         include/REST_API_generated_code.h
-       )
+        include/routes.h)
 
 # Add pthreads
 set(THREADS_PREFER_PTHREAD_FLAG ON)
