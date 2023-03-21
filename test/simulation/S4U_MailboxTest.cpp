@@ -21,6 +21,7 @@ public:
     std::shared_ptr<wrench::ExecutionController> wms1, wms2;
 
     void do_AsynchronousCommunication_test();
+    void do_NetworkTimeout_test();
 
 protected:
     S4U_MailboxTest() {
@@ -53,7 +54,7 @@ class AsynchronousCommunicationTestWMS : public wrench::ExecutionController {
 
 public:
     AsynchronousCommunicationTestWMS(S4U_MailboxTest *test,
-                                     std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                                     const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -261,6 +262,76 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
     auto workflow = wrench::Workflow::createWorkflow();
     this->wms1 = simulation->add(new AsynchronousCommunicationTestWMS(this, "Host1"));
     this->wms2 = simulation->add(new AsynchronousCommunicationTestWMS(this, "Host2"));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  NETWORK TIMEOUT TEST                                            **/
+/**********************************************************************/
+
+class NetworkTimeoutTestWMS : public wrench::ExecutionController {
+
+public:
+    NetworkTimeoutTestWMS(S4U_MailboxTest *test,
+                          const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+    S4U_MailboxTest *test;
+    std::string mode;
+
+    int main() override {
+
+        try {
+            wrench::S4U_Mailbox::getMessage<wrench::SimulationMessage>(this->mailbox, 10);
+            throw std::runtime_error("Should have gotten an exception");
+        } catch (wrench::ExecutionException &e) {
+            auto real_error = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
+            if (not real_error) {
+                throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString());
+            }
+            if (!real_error->isTimeout()) {
+                throw std::runtime_error("Network error failure cause should be a time out");
+            }
+            real_error->toString(); // coverage
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(S4U_MailboxTest, NetworkTimeout) {
+    DO_TEST_WITH_FORK(do_NetworkTimeout_test);
+}
+
+void S4U_MailboxTest::do_NetworkTimeout_test() {
+
+
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-link-shutdown-simulation");
+    //    argv[2] = strdup("--wrench-log-full");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    simulation->instantiatePlatform(platform_file_path);
+
+    // Create the WMSs
+    auto workflow = wrench::Workflow::createWorkflow();
+    this->wms1 = simulation->add(new NetworkTimeoutTestWMS(this, "Host1"));
 
     simulation->launch();
 
