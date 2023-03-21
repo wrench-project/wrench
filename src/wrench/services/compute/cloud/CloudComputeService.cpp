@@ -748,36 +748,36 @@ namespace wrench {
             // Sort the possible hosts to implement best fit (using RAM first)
             std::sort(possible_hosts.begin(), possible_hosts.end(),
                       [](std::string const &a, std::string const &b) {
-                          unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                          double a_ram = Simulation::getHostMemoryCapacity(a);
-                          unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                          double b_ram = Simulation::getHostMemoryCapacity(b);
+                        unsigned long a_num_cores = Simulation::getHostNumCores(a);
+                        double a_ram = Simulation::getHostMemoryCapacity(a);
+                        unsigned long b_num_cores = Simulation::getHostNumCores(b);
+                        double b_ram = Simulation::getHostMemoryCapacity(b);
 
-                          if (a_ram != b_ram) {
-                              return a_ram < b_ram;
-                          } else if (a_num_cores < b_num_cores) {
-                              return a_num_cores < b_num_cores;
-                          } else {
-                              return a < b;// string order
-                          }
+                        if (a_ram != b_ram) {
+                            return a_ram < b_ram;
+                        } else if (a_num_cores < b_num_cores) {
+                            return a_num_cores < b_num_cores;
+                        } else {
+                            return a < b;// string order
+                        }
                       });
 
         } else if (vm_resource_allocation_algorithm == "best-fit-cores-first") {
             // Sort the possible hosts to implement best fit (using cores first)
             std::sort(possible_hosts.begin(), possible_hosts.end(),
                       [](std::string const &a, std::string const &b) {
-                          unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                          double a_ram = Simulation::getHostMemoryCapacity(a);
-                          unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                          double b_ram = Simulation::getHostMemoryCapacity(b);
+                        unsigned long a_num_cores = Simulation::getHostNumCores(a);
+                        double a_ram = Simulation::getHostMemoryCapacity(a);
+                        unsigned long b_num_cores = Simulation::getHostNumCores(b);
+                        double b_ram = Simulation::getHostMemoryCapacity(b);
 
-                          if (a_num_cores != b_num_cores) {
-                              return a_num_cores < b_num_cores;
-                          } else if (a_ram < b_ram) {
-                              return a_ram < b_ram;
-                          } else {
-                              return a < b;// string order
-                          }
+                        if (a_num_cores != b_num_cores) {
+                            return a_num_cores < b_num_cores;
+                        } else if (a_ram < b_ram) {
+                            return a_ram < b_ram;
+                        } else {
+                            return a < b;// string order
+                        }
                       });
         }
 
@@ -792,8 +792,8 @@ namespace wrench {
      * @param vm_name: the name of the VM
      */
     void CloudComputeService::
-            processStartVM(simgrid::s4u::Mailbox *answer_mailbox,
-                           const std::string &vm_name) {
+    processStartVM(simgrid::s4u::Mailbox *answer_mailbox,
+                   const std::string &vm_name) {
         auto vm_tuple = this->vm_list[vm_name];
         auto vm = std::get<0>(vm_tuple);
         auto host = std::get<1>(vm_tuple);
@@ -859,11 +859,7 @@ namespace wrench {
         }
 
         // Start the service
-        try {
-            cs->start(cs, true, false);// Daemonized
-        } catch (std::runtime_error &e) {
-            throw;// This shouldn't happen
-        }
+        cs->start(cs, true, false);// Daemonized
 
         // Create a failure detector for the service
         auto termination_detector = std::make_shared<ServiceTerminationDetector>(
@@ -1124,9 +1120,9 @@ namespace wrench {
         }
         S4U_Mailbox::dputMessage(
                 answer_mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
-                                        answer,
-                                        this->getMessagePayloadValue(
-                                                CloudComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
+                        answer,
+                        this->getMessagePayloadValue(
+                                CloudComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
     }
 
 

@@ -181,11 +181,11 @@ namespace wrench {
         // to the simulator if host shutdowns are to be simulated
         simgrid::s4u::Host::on_state_change.connect(
                 [](simgrid::s4u::Host const &h) {
-                    if (not Simulation::host_shutdown_enabled) {
-                        throw std::runtime_error(
-                                "It looks like you are simulating host failures/shutdowns during the simulated execution."
-                                " Please restart your simulation passing it the --wrench-host-shutdown-simulation command-line flag.");
-                    }
+                  if (not Simulation::host_shutdown_enabled) {
+                      throw std::runtime_error(
+                              "It looks like you are simulating host failures/shutdowns during the simulated execution."
+                              " Please restart your simulation passing it the --wrench-host-shutdown-simulation command-line flag.");
+                  }
                 });
 
         // Register a callback on link state changes to warn users
@@ -193,11 +193,11 @@ namespace wrench {
         // to the simulator if host shutdowns are to be simulated
         simgrid::s4u::Link::on_state_change_cb(
                 [](simgrid::s4u::Link const &l) {
-                    if (not Simulation::link_shutdown_enabled) {
-                        throw std::runtime_error(
-                                "It looks like you are simulating link failures/shutdowns during the simulated execution."
-                                " Please restart your simulation passing it the --wrench-link-shutdown-simulation command-line flag.");
-                    }
+                  if (not Simulation::link_shutdown_enabled) {
+                      throw std::runtime_error(
+                              "It looks like you are simulating link failures/shutdowns during the simulated execution."
+                              " Please restart your simulation passing it the --wrench-link-shutdown-simulation command-line flag.");
+                  }
                 });
 
 
@@ -307,11 +307,7 @@ namespace wrench {
 
         this->s4u_simulation->setupPlatform(filename);
 
-        try {
-            this->platformSanityCheck();
-        } catch (std::exception &e) {
-            throw;
-        }
+        this->platformSanityCheck();
 
         this->already_setup = true;
     }
@@ -332,11 +328,7 @@ namespace wrench {
 
         this->s4u_simulation->setupPlatform(creation_function);
 
-        try {
-            this->platformSanityCheck();
-        } catch (std::exception &e) {
-            throw;
-        }
+        this->platformSanityCheck();
 
         this->already_setup = true;
     }
@@ -562,48 +554,44 @@ namespace wrench {
      */
     void Simulation::startAllProcesses() {
 
-        try {
-            // Start the execution controllers
-            for (const auto &execution_controller: this->execution_controllers) {
-                execution_controller->start(execution_controller, execution_controller->daemonized, false);// Not daemonized, no auto-restart
-            }
+        // Start the execution controllers
+        for (const auto &execution_controller: this->execution_controllers) {
+            execution_controller->start(execution_controller, execution_controller->daemonized, false);// Not daemonized, no auto-restart
+        }
 
-            // Start the compute services
-            for (const auto &compute_service: this->compute_services) {
-                compute_service->start(compute_service, true, false);// Daemonized, no auto-restart
-            }
+        // Start the compute services
+        for (const auto &compute_service: this->compute_services) {
+            compute_service->start(compute_service, true, false);// Daemonized, no auto-restart
+        }
 
-            // Start the storage services
-            for (const auto &storage_service: this->storage_services) {
-                storage_service->start(storage_service, true, true);// Daemonized, AUTO-RESTART
-            }
+        // Start the storage services
+        for (const auto &storage_service: this->storage_services) {
+            storage_service->start(storage_service, true, true);// Daemonized, AUTO-RESTART
+        }
 
 
-            //            // Start the scratch services
-            //            for (const auto &compute_service: this->compute_services) {
-            //                if (compute_service->hasScratch()) {
-            //                    compute_service->getScratch()->simulation = this;
-            //                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
-            //                                                         false);// Daemonized, no auto-restart
-            //                }
-            //            }
+        //            // Start the scratch services
+        //            for (const auto &compute_service: this->compute_services) {
+        //                if (compute_service->hasScratch()) {
+        //                    compute_service->getScratch()->simulation = this;
+        //                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
+        //                                                         false);// Daemonized, no auto-restart
+        //                }
+        //            }
 
-            // Start the network proximity services
-            for (const auto &network_proximity_service: this->network_proximity_services) {
-                network_proximity_service->start(network_proximity_service, true, false);// Daemonized, no auto-restart
-            }
+        // Start the network proximity services
+        for (const auto &network_proximity_service: this->network_proximity_services) {
+            network_proximity_service->start(network_proximity_service, true, false);// Daemonized, no auto-restart
+        }
 
-            // Start the file registry services
-            for (const auto &frs: this->file_registry_services) {
-                frs->start(frs, true, false);// Daemonized, no auto-restart
-            }
+        // Start the file registry services
+        for (const auto &frs: this->file_registry_services) {
+            frs->start(frs, true, false);// Daemonized, no auto-restart
+        }
 
-            // Start the energy meter services
-            for (const auto &frs: this->energy_meter_services) {
-                frs->start(frs, true, false);// Daemonized, no auto-restart
-            }
-        } catch (std::runtime_error &e) {
-            throw;
+        // Start the energy meter services
+        for (const auto &frs: this->energy_meter_services) {
+            frs->start(frs, true, false);// Daemonized, no auto-restart
         }
     }
 
@@ -1337,10 +1325,10 @@ namespace wrench {
         std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
         this->compute_services.insert(shared_ptr);
         shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
-                                                   //        if (service->hasScratch()) {
-                                                   //            service->getScratch()->simulation = this;
-                                                   //            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
-                                                   //        }
+        //        if (service->hasScratch()) {
+        //            service->getScratch()->simulation = this;
+        //            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
+        //        }
 
         return shared_ptr;
     }

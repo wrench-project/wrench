@@ -402,13 +402,7 @@ namespace wrench {
         auto stripped_service_specific_args = service_specific_args;
         stripped_service_specific_args.erase("-universe");
         stripped_service_specific_args.erase("-service");// which may not be there, but whatever
-        try {
-            target_cs->validateServiceSpecificArguments(job, stripped_service_specific_args);
-        } catch (ExecutionException &e) {
-            throw;
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
+        target_cs->validateServiceSpecificArguments(job, stripped_service_specific_args);
     }
 
     /**
