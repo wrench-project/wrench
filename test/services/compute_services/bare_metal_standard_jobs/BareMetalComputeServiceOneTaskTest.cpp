@@ -454,7 +454,7 @@ private:
 
             job = job_manager->createStandardJob({test->task, task_big},
                                                  {{nullptr, wrench::FileLocation::LOCATION(
-                                                                              test->storage_service1, test->output_file)}});
+                                                                    test->storage_service1, test->output_file)}});
             throw std::runtime_error("Should not be able to create a job with an nullptr file in file locations");
         } catch (std::invalid_argument &e) {
         }
