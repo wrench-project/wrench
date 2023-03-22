@@ -252,6 +252,38 @@ private:
             throw std::runtime_error("Getting property for valid host should have returned the set value");
         }
 
+        // Testing misc platform update things
+        wrench::S4U_Simulation::setLinkBandwidth("1", 1234);
+        try {
+            wrench::S4U_Simulation::setLinkBandwidth("Bogus", 10);
+            throw std::runtime_error("Should not be able to set bandwidth of a non-existing link");
+        } catch (std::invalid_argument &ignore) {}
+
+        // Test misc S4U functions
+        wrench::S4U_Simulation::writeToDisk(1000, "Host1", "/tmp/", nullptr);
+        try {
+            wrench::S4U_Simulation::writeToDisk(1000, "bogus", "/tmp", nullptr);
+            throw std::runtime_error("Should not be able to write disk for non-existing host");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            wrench::S4U_Simulation::writeToDisk(1000, "Host1", "/bogus", nullptr);
+            throw std::runtime_error("Should not be able to write disk for non-existing mount point");
+        } catch (std::invalid_argument &ignore) {}
+
+        wrench::S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(1000, 1000, "Host1", "/tmp", "/", nullptr, nullptr);
+        try {
+            wrench::S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(1000, 1000, "Bogus", "/tmp", "/", nullptr, nullptr);
+            throw std::runtime_error("Should not be able to read/write to disk on non-existing host");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            wrench::S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(1000, 1000, "Host1", "/bogus", "/", nullptr, nullptr);
+            throw std::runtime_error("Should not be able to read/write to disk on non-existing src mountpoint");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            wrench::S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(1000, 1000, "Host1", "/tmp", "/bogus", nullptr, nullptr);
+            throw std::runtime_error("Should not be able to read/write to disk on non-existing dst mountpoint");
+        } catch (std::invalid_argument &ignore) {}
+
         return 0;
     }
 };
