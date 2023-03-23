@@ -270,6 +270,17 @@ private:
             throw std::runtime_error("Should not be able to write disk for non-existing mount point");
         } catch (std::invalid_argument &ignore) {}
 
+        // Test misc S4U functions
+        wrench::S4U_Simulation::readFromDisk(1000, "Host1", "/tmp/", nullptr);
+        try {
+            wrench::S4U_Simulation::readFromDisk(1000, "bogus", "/tmp", nullptr);
+            throw std::runtime_error("Should not be able to write disk for non-existing host");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            wrench::S4U_Simulation::readFromDisk(1000, "Host1", "/bogus", nullptr);
+            throw std::runtime_error("Should not be able to write disk for non-existing mount point");
+        } catch (std::invalid_argument &ignore) {}
+
         wrench::S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(1000, 1000, "Host1", "/tmp", "/", nullptr, nullptr);
         try {
             wrench::S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(1000, 1000, "Bogus", "/tmp", "/", nullptr, nullptr);
