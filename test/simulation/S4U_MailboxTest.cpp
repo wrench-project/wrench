@@ -22,6 +22,7 @@ public:
 
     void do_AsynchronousCommunication_test();
     void do_NetworkTimeout_test();
+    void do_NullMailbox_test();
 
 protected:
     S4U_MailboxTest() {
@@ -356,6 +357,74 @@ void S4U_MailboxTest::do_NetworkTimeout_test() {
     // Create the WMSs
     auto workflow = wrench::Workflow::createWorkflow();
     this->wms1 = simulation->add(new NetworkTimeoutTestWMS(this, "Host1"));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  NULL MAILBOX TEST                                               **/
+/**********************************************************************/
+
+class NullMailboxTestWMS : public wrench::ExecutionController {
+
+public:
+    NullMailboxTestWMS(S4U_MailboxTest *test,
+                       const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+    S4U_MailboxTest *test;
+    std::string mode;
+
+    int main() override {
+
+        // Coverage
+        wrench::S4U_Mailbox::putMessage(wrench::S4U_Mailbox::NULL_MAILBOX, nullptr);
+        wrench::S4U_Mailbox::iputMessage(wrench::S4U_Mailbox::NULL_MAILBOX, nullptr);
+        try {
+            wrench::S4U_Mailbox::getMessage(wrench::S4U_Mailbox::NULL_MAILBOX);
+            throw std::runtime_error("Shouldn't be able to get message from NULL_MAILBOX");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            wrench::S4U_Mailbox::igetMessage(wrench::S4U_Mailbox::NULL_MAILBOX);
+            throw std::runtime_error("Shouldn't be able to get message from NULL_MAILBOX");
+        } catch (std::invalid_argument &ignore) {}
+
+        return 0;
+    }
+};
+
+TEST_F(S4U_MailboxTest, NullMailbox) {
+    DO_TEST_WITH_FORK(do_NullMailbox_test);
+}
+
+void S4U_MailboxTest::do_NullMailbox_test() {
+
+
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-link-shutdown-simulation");
+    //    argv[2] = strdup("--wrench-log-full");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    simulation->instantiatePlatform(platform_file_path);
+
+    // Create the WMSs
+    this->wms1 = simulation->add(new NullMailboxTestWMS(this, "Host1"));
 
     simulation->launch();
 
