@@ -185,7 +185,6 @@ void CopyBufferizedNonBufferizedTest::do_CopyBufferizedNonBufferizedTest_test() 
 }
 
 
-
 /***********************************************************************************/
 /** SELF-COPY BUFFERIZED / NON-BUFFERIZED                                         **/
 /***********************************************************************************/
@@ -193,7 +192,7 @@ void CopyBufferizedNonBufferizedTest::do_CopyBufferizedNonBufferizedTest_test() 
 class SelfCopyBufferizedNonBufferizedTestWMS : public wrench::ExecutionController {
 public:
     SelfCopyBufferizedNonBufferizedTestWMS(CopyBufferizedNonBufferizedTest *test,
-                                       const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                           const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
