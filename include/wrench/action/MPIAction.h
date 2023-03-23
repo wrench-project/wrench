@@ -36,7 +36,7 @@ namespace wrench {
 
         MPIAction(const std::string &name,
                   unsigned long num_processes,
-                  unsigned long num_cores_per_processes,
+                  unsigned long num_cores_per_process,
                   std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> lambda_mpi);
 
         unsigned long getMinNumCores() const override;
@@ -48,7 +48,7 @@ namespace wrench {
 
     private:
         unsigned long num_processes;
-        unsigned long num_cores_per_processes;
+        unsigned long num_cores_per_process;
 
         std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> lambda_mpi;
 
