@@ -148,7 +148,7 @@ namespace wrench {
          * @brief Send a message request
          *
          * @param answer_mailbox: the mailbox to which the answer message should be sent
-         * @param message: message to be sent
+         * @param tosend: message to be sent
          * @return a simulation message
          *
          * @throw std::runtime_error
