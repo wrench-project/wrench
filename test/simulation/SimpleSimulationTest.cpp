@@ -371,16 +371,16 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
     ASSERT_THROW(simulation->add(
-            new wrench::CloudComputeService("DualCoreHost", hosts, "/scratch")),
+                         new wrench::CloudComputeService("DualCoreHost", hosts, "/scratch")),
                  std::runtime_error);
     ASSERT_THROW(simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("DualCoreHost", {"/"})),
+                         wrench::SimpleStorageService::createSimpleStorageService("DualCoreHost", {"/"})),
                  std::runtime_error);
     ASSERT_THROW(simulation->add(
-            new wrench::NetworkProximityService("DualCoreHost", hosts)),
+                         new wrench::NetworkProximityService("DualCoreHost", hosts)),
                  std::runtime_error);
     ASSERT_THROW(simulation->add(
-            new wrench::FileRegistryService("DualCoreHost")),
+                         new wrench::FileRegistryService("DualCoreHost")),
                  std::runtime_error);
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -398,8 +398,8 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
 
     // Create a Storage Service
     ASSERT_THROW(storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"}, {},
-                                                                     {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})),
+                         wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"}, {},
+                                                                                  {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})),
                  std::invalid_argument);
 
     storage_service = simulation->add(
@@ -428,13 +428,13 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
 
     ASSERT_THROW(storage_service->getMessagePayloadValue(-1), std::invalid_argument);
     ASSERT_EQ(123, storage_service->getMessagePayloadValue(
-            wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
+                           wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
     ASSERT_EQ(123, storage_service->getMessagePayloadValue(
-            wrench::ServiceMessagePayload::translateString("StorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD")));
+                           wrench::ServiceMessagePayload::translateString("StorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD")));
     ASSERT_EQ(234, storage_service->getMessagePayloadValue(
-            wrench::SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
+                           wrench::SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
     ASSERT_EQ(234, storage_service->getMessagePayloadValue(
-            wrench::ServiceMessagePayload::translateString("StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD")));
+                           wrench::ServiceMessagePayload::translateString("StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD")));
 
     // Create a Cloud Service with predefined maps for properties and payloads
     //    std::vector<std::string> execution_hosts = {"QuadCoreHost"};
@@ -447,8 +447,8 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     };
 
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::CloudComputeService(hostname, {{"QuadCoreHost"}}, "/scratch",
-                                            property_list, messagepayload_list)));
+                            new wrench::CloudComputeService(hostname, {{"QuadCoreHost"}}, "/scratch",
+                                                            property_list, messagepayload_list)));
 
     // Check on properties and payload
     ASSERT_DOUBLE_EQ(compute_service->getPropertyValueAsTimeInSecond(wrench::CloudComputeServiceProperty::VM_BOOT_OVERHEAD), 0.1);
