@@ -92,7 +92,7 @@ class S4U_SimulationAPITestWMS : public wrench::ExecutionController {
 
 public:
     S4U_SimulationAPITestWMS(S4U_SimulationTest *test,
-                             const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                             const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -382,7 +382,7 @@ void S4U_SimulationTest::do_deadlock_Test() {
                     this, hostname)));
 
     // Running a "run a single task" simulation
-    close(2); // To avoid pesky deadlock stderr message
+    close(2);// To avoid pesky deadlock stderr message
     try {
         simulation->launch();
         throw std::runtime_error("launch() should have thrown a runtime_error due to a deadlock");
