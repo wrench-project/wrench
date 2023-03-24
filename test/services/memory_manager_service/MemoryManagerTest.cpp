@@ -153,7 +153,7 @@ private:
     MemoryManagerTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -246,7 +246,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new MemoryManagerChainOfTasksTestWMS(this, workflow, hostname)));
     // Create a File Registry Service

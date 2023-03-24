@@ -114,7 +114,7 @@ namespace wrench {
             if (auto file_copy_completion_event = std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(
                         event)) {
                 WRENCH_INFO("Notified of the file copy completion for file %s, as expected",
-                            file_copy_completion_event->file->getID().c_str());
+                            file_copy_completion_event->src->getFile()->getID().c_str());
             } else {
                 throw std::runtime_error("Unexpected event (" + event->toString() + ")");
             }
@@ -125,7 +125,7 @@ namespace wrench {
 
         /* Delete outfile_2 on storage_service2 */
         WRENCH_INFO("Deleting file outfile_2 from storage_service2");
-        StorageService::deleteFile(FileLocation::LOCATION(storage_service2, outfile_2));
+        StorageService::deleteFileAtLocation(FileLocation::LOCATION(storage_service2, outfile_2));
         WRENCH_INFO("File deleted");
 
         WRENCH_INFO("Workflow execution complete");

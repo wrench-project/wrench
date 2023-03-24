@@ -12,10 +12,12 @@
 #include <csignal>
 #include <simgrid/plugins/live_migration.h>
 
+#include <wrench/exceptions//ExecutionException.h>
 #include <wrench/execution_controller/ExecutionController.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
 #include <wrench/services/storage/StorageService.h>
+#include <wrench/services/storage/compound/CompoundStorageService.h>
 #include <wrench/simulation/Simulation.h>
 #include "simgrid/plugins/energy.h"
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
@@ -82,7 +84,6 @@ namespace wrench {
      */
     Simulation::~Simulation() {
         this->s4u_simulation->shutdown();
-        this->compute_services.clear();
     }
 
     /**
@@ -125,8 +126,6 @@ namespace wrench {
         }
 
         std::vector<std::string> cleanedup_args;
-
-
         for (i = 0; i < *argc; i++) {
             if (not strcmp(argv[i], "--help")) {
                 simulator_help_requested = true;
@@ -137,7 +136,7 @@ namespace wrench {
                        (not strcmp(argv[i], "--wrench-log-full")) or
                        (not strcmp(argv[i], "--wrench-logs-full"))) {
                 xbt_log_control_set("root.thresh:info");
-            } else if (not strncmp(argv[i], "--wrench-mailbox-pool-size", strlen("--mailbox-pool-size"))) {
+            } else if (not strncmp(argv[i], "--wrench-mailbox-pool-size", strlen("--wrench-mailbox-pool-size"))) {
                 char *equal_sign = strchr(argv[i], '=');
                 if (!equal_sign) {
                     throw std::invalid_argument("Invalid --wrench-mailbox-pool-size argument value");
@@ -231,7 +230,8 @@ namespace wrench {
 
         *argc = 0;
         for (const auto &a: cleanedup_args) {
-            //free(argv[(*argc)]);//you cant free the base args, so no one is going to try to free ours.  This is just going to have to stay a memory leak
+            //free(argv[(*argc)]);//you cant free the base args, so no one is going to try to free ours.
+            //This is just going to have to stay a memory leak
             argv[(*argc)] = strdup(a.c_str());
             (*argc)++;
         }
@@ -512,21 +512,25 @@ namespace wrench {
         try {
             this->is_running = true;
             this->s4u_simulation->runSimulation();
+            wrench::FileLocation::file_location_map.clear();
+            //            Service::deleteLifeSaversOfAutorestartServices();
             this->is_running = false;
         } catch (std::runtime_error &e) {
+            wrench::FileLocation::file_location_map.clear();
+            //            Service::deleteLifeSaversOfAutorestartServices();
             this->is_running = false;
             throw;
         }
     }
 
-    /**
-     * @brief Checks whether the simulation is running or not
-     *
-     * @return true or false
-     */
-    bool Simulation::isRunning() const {
-        return this->is_running;
-    }
+//    /**
+//     * @brief Checks whether the simulation is running or not
+//     *
+//     * @return true or false
+//     */
+//    bool Simulation::isRunning() const {
+//        return this->is_running;
+//    }
 
     /**
      * @brief Check that the simulation is correctly instantiated by the user
@@ -557,6 +561,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Simulation::startAllProcesses() {
+
         try {
             // Start the execution controllers
             for (const auto &execution_controller: this->execution_controllers) {
@@ -573,14 +578,15 @@ namespace wrench {
                 storage_service->start(storage_service, true, true);// Daemonized, AUTO-RESTART
             }
 
-            // Start the scratch services
-            for (const auto &compute_service: this->compute_services) {
-                if (compute_service->hasScratch()) {
-                    compute_service->getScratch()->simulation = this;
-                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
-                                                         false);// Daemonized, no auto-restart
-                }
-            }
+
+            //            // Start the scratch services
+            //            for (const auto &compute_service: this->compute_services) {
+            //                if (compute_service->hasScratch()) {
+            //                    compute_service->getScratch()->simulation = this;
+            //                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
+            //                                                         false);// Daemonized, no auto-restart
+            //                }
+            //            }
 
             // Start the network proximity services
             for (const auto &network_proximity_service: this->network_proximity_services) {
@@ -706,6 +712,7 @@ namespace wrench {
         this->bandwidth_meter_services.insert(service);
     }
 
+#ifdef PAGE_CACHE_SIMULATION
     /**
       * @brief Add a MemoryManager to the simulation.
       *
@@ -720,37 +727,10 @@ namespace wrench {
         memory_manager->simulation = this;
         this->memory_managers.insert(memory_manager);
     }
+#endif
 
     /**
-     * @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
-     *
-     * @param file: a file to stage on a storage service
-     * @param storage_service: a storage service
-     *
-     * @throw std::runtime_error
-     * @throw std::invalid_argument
-     */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &storage_service) {
-        Simulation::stageFile(FileLocation::LOCATION(storage_service, file));
-    }
-
-    /**
-     * @brief Stage a copy of a file at a storage service in a particular directory
-     *
-     * @param file: a file to stage on a storage service
-     * @param storage_service: a storage service
-     * @param directory_absolute_path: the absolute path of the directory where the file should be stored
-     *
-     * @throw std::runtime_error
-     * @throw std::invalid_argument
-     */
-    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &storage_service,
-                               std::string directory_absolute_path) {
-        Simulation::stageFile(FileLocation::LOCATION(storage_service, directory_absolute_path, file));
-    }
-
-    /**
-     * @brief State a copy of a file at a location, and update the file registry service
+     * @brief Stage a copy of a file at a location (and add entries to all file registry services, if any)
      * @param location: the file location
      */
     void Simulation::stageFile(const std::shared_ptr<FileLocation> &location) {
@@ -758,67 +738,61 @@ namespace wrench {
             throw std::invalid_argument("Simulation::stageFile(): Invalid nullptr arguments");
         }
 
+        if (std::dynamic_pointer_cast<CompoundStorageService>(location->getStorageService())) {
+            throw std::invalid_argument("Simulation::stageFile(): Can't stage on CompoundStorageService (it is only an abstraction layer)");
+        }
+
         if (this->is_running) {
             throw std::runtime_error(" Simulation::stageFile(): Cannot stage a file once the simulation has started");
         }
 
-        // Check that a FileRegistryService has been set
-        if (this->file_registry_services.empty()) {
-            throw std::runtime_error(
-                    "Simulation::stageFile(): At least one FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
-        }
-
         // Put the file on the storage service (not via the service daemon)
         try {
-            StorageService::stageFile(location);
-        } catch (std::invalid_argument &e) {
-            throw;
+            location->getStorageService()->createFile(location);
+        } catch (ExecutionException &e) {
+            throw std::invalid_argument("Simulation::stageFile(): Not enough space on disk");
         }
 
-        // Update all file registry services
+        // Update all file registry services (perhaps none)
         for (const auto &frs: this->file_registry_services) {
             frs->addEntryToDatabase(location);
         }
     }
-    /**
-     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-     * at that location.
-     *
-     * @param location: a file location
-     *
-     * @throw std::invalid_argument
-     */
 
-    void Simulation::createFile(const std::shared_ptr<FileLocation> &location) {
-        location->getStorageService()->createFile(location);
-    }
+
     /**
-     * @brief Store a file on a particular file server ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
-     * at that location.
-     * @param file: a file
-     * @param service: a storage service
-     *
-     * @throw std::invalid_argument
+     * @brief Method to create a new disk in the platform, which can be handy
+     * @param hostname: the name of the host to which the disk should be attached
+     * @param disk_id: the nae of the disk
+     * @param read_bandwidth_in_bytes_per_sec: the disk's read bandwidth in byte/sec
+     * @param write_bandwidth_in_bytes_per_sec: the disk's write bandwidth in byte/sec
+     * @param capacity_in_bytes: the disk's capacity in bytes
+     * @param mount_point: the disk's mount point (most people use "/")
      */
-    [[deprecated("Replaced by StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location), do not use if using XRootD or other distributed file system")]] void Simulation::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &service) {
-        service->createFile(file);
+    void Simulation::createNewDisk(const std::string &hostname, const std::string &disk_id,
+                                   double read_bandwidth_in_bytes_per_sec,
+                                   double write_bandwidth_in_bytes_per_sec,
+                                   double capacity_in_bytes,
+                                   const std::string &mount_point) {
+        S4U_Simulation::createNewDisk(hostname, disk_id, read_bandwidth_in_bytes_per_sec, write_bandwidth_in_bytes_per_sec, capacity_in_bytes, mount_point);
     }
 
     /**
      * @brief Wrapper enabling timestamps for disk reads
      *
-     * @param num_bytes - number of bytes read
-     * @param hostname - hostname to read from
-     * @param mount_point - mount point of disk to read from
+     * @param num_bytes: number of bytes read
+     * @param hostname: hostname to read from
+     * @param mount_point: mount point of disk to read from
+     * @param disk: disk to read from (nullptr if not known)
      *
      * @throw invalid_argument
      */
-    void Simulation::readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point) {
+    void Simulation::readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
-            S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point);
+            S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point, disk);
         } catch (const std::invalid_argument &ia) {
             this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
                                                           temp_unique_sequence_number);
@@ -835,13 +809,17 @@ namespace wrench {
      * @param hostname - hostname where disk is located
      * @param read_mount_point - mount point of disk to read from
      * @param write_mount_point - mount point of disk to write to
+     * @param src_disk: source disk (nullptr if not known)
+     * @param dst_disk: dst disk (nullptr if not known)
      *
      * @throw invalid_argument
      */
     void Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                             const std::string &hostname,
                                                             const std::string &read_mount_point,
-                                                            const std::string &write_mount_point) {
+                                                            const std::string &write_mount_point,
+                                                            simgrid::s4u::Disk *src_disk,
+                                                            simgrid::s4u::Disk *dst_disk) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
@@ -850,7 +828,7 @@ namespace wrench {
                                                      temp_unique_sequence_number);
         try {
             S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname,
-                                                                   read_mount_point, write_mount_point);
+                                                                   read_mount_point, write_mount_point, src_disk, dst_disk);
         } catch (const std::invalid_argument &ia) {
             this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
                                                            temp_unique_sequence_number);
@@ -870,15 +848,16 @@ namespace wrench {
      * @param num_bytes: number of bytes written
      * @param hostname: name of the host to write to
      * @param mount_point: mount point of the disk to write to at the host
+     * @param disk: a simgrid disk to write to (nullptr if not known)
      *
      * @throw invalid_argument
      */
-    void Simulation::writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point) {
+    void Simulation::writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
-            S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point);
+            S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point, disk);
         } catch (const std::invalid_argument &ia) {
             this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
                                                            temp_unique_sequence_number);
@@ -888,6 +867,7 @@ namespace wrench {
                                                           temp_unique_sequence_number);
     }
 
+#ifdef PAGE_CACHE_SIMULATION
     /**
      * @brief Read file locally, only available if writeback is activated.
      *
@@ -900,7 +880,7 @@ namespace wrench {
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, location->getPath(), n_bytes,
                                                     temp_unique_sequence_number);
 
         auto mem_mng = getMemoryManagerByHost(hostname);
@@ -927,7 +907,7 @@ namespace wrench {
         //        Anonymous used by application
         mem_mng->useAnonymousMemory(n_bytes);
 
-        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getPath(), n_bytes,
                                                          temp_unique_sequence_number);
     }
 
@@ -979,7 +959,7 @@ namespace wrench {
             remaining -= to_cache;
         }
 
-        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getPath(), n_bytes,
                                                           temp_unique_sequence_number);
     }
 
@@ -996,12 +976,16 @@ namespace wrench {
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, location->getPath(), n_bytes,
                                                      temp_unique_sequence_number);
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
 
         // Write to disk
+        auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
+        if (!ss) {
+            throw...
+        }
         this->writeToDisk(n_bytes, hostname, location->getMountPoint());
 
         mem_mng->evict(n_bytes - mem_mng->getFreeMemory(), file->getID());
@@ -1025,6 +1009,7 @@ namespace wrench {
         }
         return nullptr;
     }
+#endif
 
     /**
      * @brief Wrapper for S4U_Simulation hostExists()
@@ -1079,6 +1064,16 @@ namespace wrench {
      */
     double Simulation::getHostFlopRate(const std::string &hostname) {
         return S4U_Simulation::getHostFlopRate(hostname);
+    }
+
+    /**
+     * @brief Determine if a host has a disk mounted at some mount point
+     * @param hostname: the hostname
+     * @param mount_point: the mount point
+     * @return true or false
+     */
+    bool Simulation::hostHasMountPoint(const std::string &hostname, const std::string &mount_point) {
+        return S4U_Simulation::hostHasMountPoint(hostname, mount_point);
     }
 
     /**
@@ -1177,6 +1172,20 @@ namespace wrench {
      */
     void Simulation::compute(double flops) {
         S4U_Simulation::compute(flops);
+    }
+
+    /**
+     * @brief Simulates a multi-threaded computation
+     * @param num_threads: the number of threads
+     * @param thread_creation_overhead: the thread creation overhead in seconds
+     * @param sequential_work: the sequential work (in flops)
+     * @param parallel_per_thread_work: the parallel per thread work (in flops)
+     */
+    void Simulation::computeMultiThreaded(unsigned long num_threads,
+                                          double thread_creation_overhead,
+                                          double sequential_work,
+                                          double parallel_per_thread_work) {
+        S4U_Simulation::compute_multi_threaded(num_threads, thread_creation_overhead, sequential_work, parallel_per_thread_work);
     }
 
     /**
@@ -1328,10 +1337,10 @@ namespace wrench {
         std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
         this->compute_services.insert(shared_ptr);
         shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
-        if (service->hasScratch()) {
-            service->getScratch()->simulation = this;
-            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
-        }
+                                                   //        if (service->hasScratch()) {
+                                                   //            service->getScratch()->simulation = this;
+                                                   //            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
+                                                   //        }
 
         return shared_ptr;
     }
@@ -1353,6 +1362,7 @@ namespace wrench {
         if (not this->is_running) {
             throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
         }
+
 
         service->simulation = this;
         std::shared_ptr<StorageService> shared_ptr = std::shared_ptr<StorageService>(service);
@@ -1414,6 +1424,7 @@ namespace wrench {
         return shared_ptr;
     }
 
+#ifdef PAGE_CACHE_SIMULATION
     /**
      * @brief Starts a new memory_manager_service manager service during execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
@@ -1439,6 +1450,7 @@ namespace wrench {
 
         return shared_ptr;
     }
+#endif
 
     /**
      * @brief Checks that the platform is well defined
@@ -1484,7 +1496,7 @@ namespace wrench {
                                                     " has two disks with the same mount point '" + disks[i] + "'");
                     }
                     if ((disks[j] != "/") and (disks[i] != "/") and
-                        (FileLocation::properPathPrefix(disks[i], disks[j]))) {
+                        (FileLocation::properPathPrefix(FileLocation::sanitizePath(disks[i]), FileLocation::sanitizePath(disks[j])))) {
                         throw std::invalid_argument("Simulation::platformSanityCheck(): Host " + h +
                                                     " has two disks, with one of them having a mount point that "
                                                     "is a prefix of the other (" +

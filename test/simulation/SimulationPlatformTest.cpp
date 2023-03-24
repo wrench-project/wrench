@@ -42,7 +42,12 @@ protected:
     </cluster>
 
     <zone id="host_zone" routing="Full">
-        <host id="subzonehost" speed="1f" core="2"/>
+        <host id="subzonehost" speed="1f" core="2">
+           <disk id="scratch" read_bw="100MBps" write_bw="100MBps">
+               <prop id="size" value="100B"/>
+               <prop id="mount" value="/scratch"/>
+           </disk>
+        </host>
     </zone>
 
     <zone id="subzone" routing="Full">
@@ -76,7 +81,7 @@ public:
 private:
     SimulationPlatformTest *test;
 
-    int main() {
+    int main() override {
 
         // Testing finding subzones
         auto subnetzones = wrench::S4U_Simulation::getAllSubZoneIDsByZone();
@@ -200,11 +205,6 @@ private:
 
     int main() override {
 
-        try {
-            wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 20.0, 100.0, "/foo");
-            throw std::runtime_error("Should not be able to create a disk with different read and write bandwidths");
-        } catch (std::invalid_argument &ignore) {}
-
         // Create a new disk on subzonehost
         wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 10.0, 100.0, "/foo");
 
@@ -214,11 +214,13 @@ private:
         // Create a file on it
         auto too_big = wrench::Simulation::addFile("too_big", 200.0);
         try {
-            wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, too_big));
+            wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, too_big));
             throw std::runtime_error("Should not be able to create a file that big on the newly created storage service");
-        } catch (std::invalid_argument &ignore) {}
+        } catch (wrench::ExecutionException &ignore) {}
         auto not_too_big = wrench::Simulation::addFile("not_too_big", 20.0);
-        wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, not_too_big));
+        wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
+        wrench::StorageService::removeFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
+        wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
 
         return 0;
     }
@@ -266,7 +268,7 @@ void SimulationPlatformTest::do_CreateNewDiskTest_test() {
 class PlatformCreator {
 
 public:
-    PlatformCreator(double link_bw) : link_bw(link_bw) {}
+    explicit PlatformCreator(double link_bw) : link_bw(link_bw) {}
 
     void operator()() const {
         create_platform(this->link_bw);
@@ -275,7 +277,7 @@ public:
 private:
     double link_bw;
 
-    void create_platform(double link_bw) const {
+    static void create_platform(double link_bw) {
         // Create the top-level zone
         auto zone = simgrid::s4u::create_full_zone("AS0");
         // Create the WMSHost host with its disk
@@ -340,10 +342,12 @@ void SimulationPlatformTest::do_ProgrammaticPlatformTest_test() {
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
+    PlatformCreator platform_creator(100 * 1000000.0);
+
+    ASSERT_THROW(simulation->instantiatePlatform(platform_creator), std::runtime_error);
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
-    PlatformCreator platform_creator(100 * 1000000.0);
     simulation->instantiatePlatform(platform_creator);
 
     for (int i = 0; i < argc; i++)

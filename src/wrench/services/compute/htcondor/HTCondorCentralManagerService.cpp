@@ -21,6 +21,8 @@
 #include <wrench/services/compute/htcondor/HTCondorNegotiatorService.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/NotAllowed.h>
+#include <wrench/failure_causes/NotEnoughResources.h>
 
 #include <memory>
 
@@ -39,6 +41,7 @@ namespace wrench {
      * @param grid_post_overhead: grid job post-overhead
      * @param non_grid_pre_overhead: non-grid job pre-overhead
      * @param non_grid_post_overhead: non-grid job post-overhead
+     * @param fast_bmcs_resource_availability: whether to obtain direct availabily information from bare-metal services
      * @param compute_services: a set of 'child' compute resources available to and via the HTCondor pool
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -52,6 +55,7 @@ namespace wrench {
             double grid_post_overhead,
             double non_grid_pre_overhead,
             double non_grid_post_overhead,
+            bool fast_bmcs_resource_availability,
             std::set<shared_ptr<ComputeService>> compute_services,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
@@ -62,6 +66,7 @@ namespace wrench {
         this->grid_post_overhead = grid_post_overhead;
         this->non_grid_pre_overhead = non_grid_pre_overhead;
         this->non_grid_post_overhead = non_grid_post_overhead;
+        this->fast_bmcs_resource_availability = fast_bmcs_resource_availability;
 
         this->compute_services = compute_services;
 
@@ -76,9 +81,6 @@ namespace wrench {
      * @brief Destructor
      */
     HTCondorCentralManagerService::~HTCondorCentralManagerService() {
-        this->pending_jobs.clear();
-        this->compute_services.clear();
-        this->running_jobs.clear();
     }
 
     /**
@@ -119,18 +121,9 @@ namespace wrench {
                                 HTCondorCentralManagerServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox);
-
-        if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobAnswerMessage *>(message.get())) {
-            // If no success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "HTCondorCentralManagerService::submitCompoundJob(): Received an unexpected [" + message->getName() +
-                    "] message!");
+        auto msg = S4U_Mailbox::getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(answer_mailbox, "HTCondorCentralManagerService::submitCompoundJob(): Received an");
+        if (not msg->success) {
+            throw ExecutionException(msg->failure_cause);
         }
     }
 
@@ -158,6 +151,7 @@ namespace wrench {
                             this->negotiator_startup_overhead,
                             this->grid_pre_overhead,
                             this->non_grid_pre_overhead,
+                            this->fast_bmcs_resource_availability,
                             this->compute_services,
                             this->running_jobs, this->pending_jobs, this->mailbox);
                     negotiator->setSimulation(this->simulation);
@@ -195,7 +189,7 @@ namespace wrench {
 
         WRENCH_INFO("HTCondor Central Manager got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->terminate();
             // This is Synchronous
             try {
@@ -209,27 +203,15 @@ namespace wrench {
             }
             return false;
 
-        } else if (dynamic_cast<CentralManagerWakeUpMessage *>(message.get())) {
+        } else if (std::dynamic_pointer_cast<CentralManagerWakeUpMessage>(message)) {
             // Do nothing
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitCompoundJobRequestMessage>(message)) {
             processSubmitCompoundJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-            //        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-            //            processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-            //            return true;
-            //
-            //        } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
-            //            processPilotJobStarted(msg->job);
-            //            return true;
-            //
-            //        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
-            //            processPilotJobCompletion(msg->job);
-            //            return true;
-            //
-        } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobDoneMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobDoneMessage>(message)) {
             if (HTCondorComputeService::isJobGridUniverse(msg->job)) {
                 S4U_Simulation::sleep(this->grid_post_overhead);
             } else {
@@ -238,7 +220,7 @@ namespace wrench {
             processCompoundJobCompletion(msg->job);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobFailedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobFailedMessage>(message)) {
             if (HTCondorComputeService::isJobGridUniverse(msg->job)) {
                 S4U_Simulation::sleep(this->grid_post_overhead);
             } else {
@@ -247,7 +229,7 @@ namespace wrench {
             processCompoundJobFailure(msg->job);
             return true;
 
-        } else if (auto msg = dynamic_cast<NegotiatorCompletionMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<NegotiatorCompletionMessage>(message)) {
             processNegotiatorCompletion(msg->scheduled_jobs);
             return true;
 
@@ -412,40 +394,40 @@ namespace wrench {
         this->running_jobs.clear();
     }
 
-    /**
-   * @brief Helper function to check whether a job kind is supported
-   * @param job: the job
-   * @param service_specific_arguments: the service-specific argument
-   * @return true or false
-   */
-    bool HTCondorCentralManagerService::jobKindIsSupported(
-            const std::shared_ptr<Job> &job,
-            std::map<std::string, std::string> service_specific_arguments) {
-        bool is_grid_universe =
-                (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
-                (service_specific_arguments["-universe"] == "grid");
-        bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
-
-        bool found_one = false;
-        for (auto const &cs: this->compute_services) {
-            if (is_grid_universe and (std::dynamic_pointer_cast<BatchComputeService>(cs) == nullptr)) {
-                continue;
-            }
-            if ((not is_grid_universe) and (std::dynamic_pointer_cast<BareMetalComputeService>(cs) == nullptr)) {
-                continue;
-            }
-            if (is_standard_job and (not cs->supportsStandardJobs())) {
-                continue;
-            }
-            if ((not is_standard_job) and (not cs->supportsPilotJobs())) {
-                continue;
-            }
-            found_one = true;
-            break;
-        }
-
-        return found_one;
-    }
+    //    /**
+    //   * @brief Helper function to check whether a job kind is supported
+    //   * @param job: the job
+    //   * @param service_specific_arguments: the service-specific argument
+    //   * @return true or false
+    //   */
+    //    bool HTCondorCentralManagerService::jobKindIsSupported(
+    //            const std::shared_ptr<Job> &job,
+    //            std::map<std::string, std::string> service_specific_arguments) {
+    //        bool is_grid_universe =
+    //                (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
+    //                (service_specific_arguments["-universe"] == "grid");
+    //        bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
+    //
+    //        bool found_one = false;
+    //        for (auto const &cs: this->compute_services) {
+    //            if (is_grid_universe and (std::dynamic_pointer_cast<BatchComputeService>(cs) == nullptr)) {
+    //                continue;
+    //            }
+    //            if ((not is_grid_universe) and (std::dynamic_pointer_cast<BareMetalComputeService>(cs) == nullptr)) {
+    //                continue;
+    //            }
+    //            if (is_standard_job and (not cs->supportsStandardJobs())) {
+    //                continue;
+    //            }
+    //            if ((not is_standard_job) and (not cs->supportsPilotJobs())) {
+    //                continue;
+    //            }
+    //            found_one = true;
+    //            break;
+    //        }
+    //
+    //        return found_one;
+    //    }
 
     /**
      * @brief Helper function to check whether a job can run on at least one child compute service
@@ -453,13 +435,18 @@ namespace wrench {
      * @param service_specific_arguments: the service-specific argument
      * @return true or false
      */
-    bool HTCondorCentralManagerService::jobCanRunSomewhere(
-            std::shared_ptr<CompoundJob> job,
+    std::shared_ptr<FailureCause> HTCondorCentralManagerService::jobCanRunSomewhere(
+            const std::shared_ptr<CompoundJob> &job,
             std::map<std::string, std::string> service_specific_arguments) {
+
+        std::shared_ptr<FailureCause> failure_cause;
+        bool there_is_a_grid_appropriate_service = false;
+
         bool is_grid_universe =
                 (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
                 (service_specific_arguments["-universe"] == "grid");
         bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
+
 
         bool found_one = false;
         for (auto const &cs: this->compute_services) {
@@ -469,6 +456,10 @@ namespace wrench {
             }
             if ((not is_grid_universe) and (std::dynamic_pointer_cast<BareMetalComputeService>(cs) == nullptr)) {
                 continue;
+            }
+            if (((is_grid_universe and (std::dynamic_pointer_cast<BatchComputeService>(cs))) or
+                 ((not is_grid_universe) and (std::dynamic_pointer_cast<BareMetalComputeService>(cs))))) {
+                there_is_a_grid_appropriate_service = true;
             }
 
             // Check for resources for a grid universe job
@@ -522,7 +513,19 @@ namespace wrench {
             break;
         }
 
-        return found_one;
+        if (not there_is_a_grid_appropriate_service) {
+            std::string error_message;
+            if (is_grid_universe) {
+                error_message = "Grid universe jobs not supported";
+            } else {
+                error_message = "Non-grid universe jobs not supported";
+            }
+            return std::make_shared<NotAllowed>(this->shared_from_this(), error_message);
+        } else if (not found_one) {
+            return std::make_shared<NotEnoughResources>(job, this->shared_from_this());
+        } else {
+            return nullptr;
+        }
     }
 
     /**

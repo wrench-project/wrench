@@ -73,7 +73,7 @@ public:
 private:
     SimulationTimestampEnergyTest *test;
 
-    int main() {
+    int main() override {
         // default ptstate = 0
         wrench::S4U_Simulation::sleep(10.000001);
 
@@ -110,7 +110,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     std::string host = wrench::Simulation::getHostnameList()[0];
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new SimulationTimestampPstateSetTestWMS(
                                     this, host)));
@@ -169,7 +169,7 @@ public:
 private:
     SimulationTimestampEnergyTest *test;
 
-    int main() {
+    int main() override {
         const double MEGAFLOP = 1000.0 * 1000.0;
         wrench::S4U_Simulation::compute(100.0 * MEGAFLOP);                       // compute for 1 second
         auto c1 = this->simulation->getEnergyConsumed(this->getHostname(), true);// 200 joules
@@ -203,7 +203,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
     std::string host = wrench::Simulation::getHostnameList()[0];
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new SimulationTimestampEnergyConsumptionTestWMS(
                                     this, host)));
@@ -258,7 +258,7 @@ public:
 private:
     SimulationTimestampEnergyTest *test;
 
-    int main() {
+    int main() override {
         // EnergyMeter constructor tests
         try {
             auto fail_em1 = this->createEnergyMeter(std::vector<std::string>(), 1.0);
@@ -333,7 +333,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
     std::string host = wrench::Simulation::getHostnameList()[0];
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyMeterTestWMS(
                                     this, workflow, host)));
@@ -435,7 +435,7 @@ public:
 private:
     SimulationTimestampEnergyTest *test;
 
-    int main() {
+    int main() override {
 
         const std::map<std::string, double> measurement_periods = {
                 {"host1", 2.0},
@@ -469,7 +469,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
     std::string host = wrench::Simulation::getHostnameList()[0];
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     EXPECT_NO_THROW(wms = simulation->add(
                             new EnergyMeterMultipleMeasurementPeriodTestWMS(
                                     this, host)));

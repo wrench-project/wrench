@@ -62,13 +62,13 @@ namespace wrench {
         /** \cond DEVELOPER         */
         /****************************/
 
-        std::set<std::shared_ptr<FileLocation>> lookupEntry(std::shared_ptr<DataFile> file);
+        std::set<std::shared_ptr<FileLocation>> lookupEntry(const std::shared_ptr<DataFile> &file);
 
         std::map<double, std::shared_ptr<FileLocation>> lookupEntry(
-                std::shared_ptr<DataFile> file, std::string reference_host,
-                std::shared_ptr<NetworkProximityService> network_proximity_service);
+                const std::shared_ptr<DataFile> &file, const std::string &reference_host,
+                const std::shared_ptr<NetworkProximityService> &network_proximity_service);
 
-        void addEntry(std::shared_ptr<FileLocation> location);
+        void addEntry(const std::shared_ptr<FileLocation> &location);
 
         void removeEntry(const std::shared_ptr<FileLocation> &location);
 

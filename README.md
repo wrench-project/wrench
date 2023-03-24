@@ -42,7 +42,7 @@ And, one of the following:
 
 ### Required Dependencies 
 
-- [SimGrid](https://framagit.org/simgrid/simgrid/) - **master branch, commit tag 17ac6c61bd407825851b824adbfa28d64fb69587**
+- [SimGrid](https://framagit.org/simgrid/simgrid/) - **master branch, commit tag dbb4b9d8b72ec01fe1748a7eb6b32222ffe3ece5**
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
 
 ### Optional Dependencies
@@ -51,6 +51,7 @@ And, one of the following:
 - [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
 - [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html) - version 4.5 or higher along with the following Python packages: `pip3 install sphinx-rtd-theme breathe recommonmark`  (only required for generating documentation)
 - [Batsched](https://gitlab.inria.fr/batsim/batsched) - version 1.4 - useful for expanded batch-scheduled resource simulation capabilities
+- [Asio](https://github.com/chriskohlhoff/asio/) - necessary only for building wrench-daemon
 
 ## Building From Source
 

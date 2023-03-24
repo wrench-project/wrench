@@ -129,7 +129,7 @@ private:
     FileReadActionExecutorTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -225,7 +225,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
+    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -257,7 +257,7 @@ private:
     FileReadActionExecutorTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -337,7 +337,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
+    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -370,7 +370,7 @@ private:
     FileReadActionExecutorTest *test;
     double sleep_before_fail;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -482,7 +482,7 @@ private:
     FileReadActionExecutorTest *test;
     double sleep_before_fail;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -571,7 +571,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
+    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

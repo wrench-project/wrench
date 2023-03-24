@@ -135,7 +135,7 @@ public:
 private:
     FileRegistryTest *test;
 
-    int main() {
+    int main() override {
 
         auto file1 = this->test->workflow->addFile("file1", 100.0);
         auto file2 = this->test->workflow->addFile("file2", 100.0);
@@ -299,7 +299,7 @@ void FileRegistryTest::do_FileRegistry_Test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new FileRegistryTestWMS(
                                     this, hostname)));
@@ -326,7 +326,7 @@ public:
 private:
     FileRegistryTest *test;
 
-    int main() {
+    int main() override {
 
         std::shared_ptr<wrench::DataFile> file1 = this->test->workflow->addFile("file1", 100.0);
         std::shared_ptr<wrench::DataFile> nullptr_file = nullptr;
@@ -463,7 +463,7 @@ void FileRegistryTest::do_lookupEntry_Test() {
     file_registry_service = simulation->add(new wrench::FileRegistryService(host1));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     wms = simulation->add(
             new FileRegistryLookupEntryTestWMS(
                     this, host1));
