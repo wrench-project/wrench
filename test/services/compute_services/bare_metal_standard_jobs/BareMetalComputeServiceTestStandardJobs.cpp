@@ -69,7 +69,7 @@ public:
     void do_ShutdownStorageServiceBeforeJobIsSubmitted_test(double buffer_size);
 
 protected:
-    ~BareMetalComputeServiceTestStandardJobs() {
+    ~BareMetalComputeServiceTestStandardJobs() override {
         workflow->clear();
     }
 
@@ -170,7 +170,7 @@ public:
 private:
     BareMetalComputeServiceTestStandardJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -259,7 +259,7 @@ public:
 private:
     BareMetalComputeServiceTestStandardJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -367,7 +367,7 @@ public:
 private:
     BareMetalComputeServiceTestStandardJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -511,7 +511,7 @@ public:
 private:
     BareMetalComputeServiceTestStandardJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -634,7 +634,7 @@ public:
 private:
     BareMetalComputeServiceTestStandardJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -768,7 +768,7 @@ public:
 private:
     BareMetalComputeServiceTestStandardJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -997,7 +997,7 @@ public:
 private:
     BareMetalComputeServiceTestStandardJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -1113,7 +1113,7 @@ public:
 private:
     BareMetalComputeServiceTestStandardJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -1233,7 +1233,7 @@ public:
 private:
     BareMetalComputeServiceTestStandardJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -1341,7 +1341,7 @@ public:
 private:
     BareMetalComputeServiceTestStandardJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -1416,7 +1416,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BareMetalComputeServiceCompletedJobTerminationTestWMS(
                                     this, hostname)));
@@ -1460,7 +1460,7 @@ public:
 private:
     BareMetalComputeServiceTestStandardJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -1546,7 +1546,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
                                     this, hostname)));
@@ -1590,7 +1590,7 @@ public:
 private:
     BareMetalComputeServiceTestStandardJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -1616,15 +1616,17 @@ private:
         }
         auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
         if (real_event) {
-            auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);
+            auto cause = std::dynamic_pointer_cast<wrench::InvalidDirectoryPath>(real_event->failure_cause);
             if (not cause) {
                 throw std::runtime_error("Got the expected job failure but unexpected failure cause: " +
-                                         real_event->failure_cause->toString() + " (expected: FileNotFound)");
+                                         real_event->failure_cause->toString() + " (expected: InvalidDirectoryPath)");
             }
-            if (cause->getFile() != this->test->input_file) {
+            if (cause->getLocation()->getStorageService() != this->test->compute_service->getScratch()) {
                 throw std::runtime_error(
-                        "Got the correct failure even, a correct cause type, but the cause points to the wrong file");
+                        "Got the correct failure even, a correct cause type, but the cause points to the wrong storage service");
             }
+            cause->toString();// coverage
+
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
@@ -1646,7 +1648,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1669,7 +1671,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
                                     this, hostname)));

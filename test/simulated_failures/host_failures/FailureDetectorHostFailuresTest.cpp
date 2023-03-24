@@ -189,7 +189,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new FailureDetectorForSleeperTestWMS(this, hostname)));
 
@@ -310,7 +310,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForComputerTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new FailureDetectorForComputerTestWMS(this, hostname)));
 

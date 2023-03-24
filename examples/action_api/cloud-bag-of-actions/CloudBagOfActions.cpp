@@ -21,13 +21,13 @@
  ** compute service, that has access to the 10 cores of hosts CloudComputeNode1 and CloudComputeNode2, on which it can start VMs.
  **
  ** Example invocation of the simulator for a 10-compute-action workload, with no logging:
- **    ./wrench-example-cloud-bag-of-actions 10 ./four_hosts.xml
+ **    ./wrench-example-cloud-bag-of-actions 10 ./dragonfly_cluster.xml
  **
  ** Example invocation of the simulator for a 10-compute-action workload, with only execution controller logging:
- **    ./wrench-example-cloud-bag-of-actions 10 ./four_hosts.xml --log=custom_controller.threshold=info
+ **    ./wrench-example-cloud-bag-of-actions 10 ./dragonfly_cluster.xml --log=custom_controller.threshold=info
  **
  ** Example invocation of the simulator for a 6-compute-action workload with full logging:
- **    ./wrench-example-cloud-bag-of-actions 6 ./four_hosts.xml --wrench-full-log
+ **    ./wrench-example-cloud-bag-of-actions 6 ./dragonfly_cluster.xml --wrench-full-log
  **/
 
 

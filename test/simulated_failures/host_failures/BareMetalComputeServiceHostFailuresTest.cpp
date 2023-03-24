@@ -161,7 +161,7 @@ private:
         }
 
         // Paranoid check
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file))) {
             throw std::runtime_error("Output file not written to storage service");
         }
@@ -207,7 +207,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
@@ -272,7 +272,7 @@ private:
         }
 
         // Paranoid check
-        if (not wrench::StorageService::lookupFile(
+        if (not wrench::StorageService::lookupFileAtLocation(
                     wrench::FileLocation::LOCATION(this->test->storage_service, this->test->output_file))) {
             throw std::runtime_error("Output file not written to storage service");
         }
@@ -320,7 +320,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
@@ -451,7 +451,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     wms = simulation->add(new BareMetalComputeServiceRandomFailuresTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
@@ -553,7 +553,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     wms = simulation->add(new BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service

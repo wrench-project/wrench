@@ -11,7 +11,7 @@
  ** This simulator simulates the execution of a one-action job, where the
  ** action is a powerful custom action
  **
- ** The compute platform comprises 6 hosts hosts, UserHost, StorageHost1, StorageHost2, ComputeHost1,
+ ** The compute platform comprises 7 hosts hosts, UserHost, StorageHost1, StorageHost2, ComputeHost1,
  ** ComputeHost2, CloudHeadHost, and CloudComputeHost.
  ** On UserHost runs a controller (defined in class MultiActionMultiJobController). On StorageHost1 and
  ** StorageHost2 run two storage services.  On ComputeHost1 runs a bare-metal
@@ -21,13 +21,13 @@
  **
  **
  ** Example invocation of the simulator with no logging:
- **    ./wrench-example-super-custom-action ./four_hosts.xml
+ **    ./wrench-example-super-custom-action ./seven_hosts.xml
  **
  ** Example invocation of the simulator with only WMS logging:
- **    ./wrench-example-super-custom-action ./four_hosts.xml --log=custom_controller.threshold=info
+ **    ./wrench-example-super-custom-action ./seven_hosts.xml --log=custom_controller.threshold=info
  **
  ** Example invocation of the simulator with full logging:
- **    ./wrench-example-super-custom-action ./four_hosts.xml --wrench-full-log
+ **    ./wrench-example-super-custom-action ./seven_hosts.xml --wrench-full-log
  **/
 
 #include <iostream>

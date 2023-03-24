@@ -70,8 +70,6 @@ namespace wrench {
      * @brief Destructor
      */
     CloudComputeService::~CloudComputeService() {
-        this->default_property_values.clear();
-        this->vm_list.clear();
     }
 
     /**
@@ -447,6 +445,9 @@ namespace wrench {
         WRENCH_INFO("Cloud Service starting on host %s listening on mailbox_name %s",
                     this->hostname.c_str(),
                     this->mailbox->get_cname());
+
+        // Start the Scratch Storage Service
+        this->startScratchStorageService();
 
         /** Main loop **/
         while (this->processNextMessage()) {
@@ -892,7 +893,7 @@ namespace wrench {
                                                 compute_resources,
                                                 plist,
                                                 vm->getMessagePayloadList(),
-                                                getScratch()));
+                                                this->getScratch()));
             cs->simulation = this->simulation;
             std::get<2>(this->vm_list[vm_name]) = cs;
         }

@@ -38,6 +38,7 @@ namespace wrench {
     class FileRegistryDeleteEntryAction;
     class ParallelModel;
     class CustomAction;
+    class MPIAction;
     class ActionExecutor;
     class DataFile;
     /**
@@ -71,6 +72,8 @@ namespace wrench {
         std::string getStateAsString();
         void setPriority(double p) override;
 
+        ~CompoundJob() = default;
+
         std::shared_ptr<SleepAction> addSleepAction(const std::string &name, double sleep_time);
 
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
@@ -81,21 +84,6 @@ namespace wrench {
                                                           const std::shared_ptr<DataFile> &file,
                                                           const std::shared_ptr<StorageService> &storageService,
                                                           double num_bytes_to_read);
-
-
-        std::shared_ptr<FileWriteAction> addFileWriteAction(const std::string &name,
-                                                            const std::shared_ptr<DataFile> &file,
-                                                            const std::shared_ptr<StorageService> &storageService);
-
-        std::shared_ptr<FileCopyAction> addFileCopyAction(const std::string &name,
-                                                          const std::shared_ptr<DataFile> &file,
-                                                          const std::shared_ptr<StorageService> &src_storageService,
-                                                          const std::shared_ptr<StorageService> &dest_storageService);
-
-        std::shared_ptr<FileDeleteAction> addFileDeleteAction(const std::string &name,
-                                                              const std::shared_ptr<DataFile> &file,
-                                                              const std::shared_ptr<StorageService> &storageService);
-
 
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
                                                           const std::shared_ptr<FileLocation> &file_location);
@@ -110,6 +98,19 @@ namespace wrench {
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
                                                           const std::vector<std::shared_ptr<FileLocation>> &file_locations,
                                                           double num_bytes_to_read);
+
+        std::shared_ptr<FileWriteAction> addFileWriteAction(const std::string &name,
+                                                            const std::shared_ptr<DataFile> &file,
+                                                            const std::shared_ptr<StorageService> &storageService);
+
+        std::shared_ptr<FileCopyAction> addFileCopyAction(const std::string &name,
+                                                          const std::shared_ptr<DataFile> &file,
+                                                          const std::shared_ptr<StorageService> &src_storageService,
+                                                          const std::shared_ptr<StorageService> &dest_storageService);
+
+        std::shared_ptr<FileDeleteAction> addFileDeleteAction(const std::string &name,
+                                                              const std::shared_ptr<DataFile> &file,
+                                                              const std::shared_ptr<StorageService> &storageService);
 
         std::shared_ptr<FileWriteAction> addFileWriteAction(const std::string &name,
                                                             const std::shared_ptr<FileLocation> &file_location);
@@ -144,6 +145,11 @@ namespace wrench {
 
         std::shared_ptr<CustomAction> addCustomAction(std::shared_ptr<CustomAction> custom_action);
 
+        std::shared_ptr<MPIAction> addMPIAction(const std::string &name,
+                                                const std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> &mpi_code,
+                                                unsigned long num_processes,
+                                                unsigned long num_cores_per_process);
+
         void removeAction(std::shared_ptr<Action> &action);
 
         void addActionDependency(const std::shared_ptr<Action> &parent, const std::shared_ptr<Action> &child);
@@ -163,6 +169,7 @@ namespace wrench {
         unsigned long getMinimumRequiredNumCores();
 
         double getMinimumRequiredMemory();
+
 
         /***********************/
         /** \cond INTERNAL     */

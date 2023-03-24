@@ -58,7 +58,7 @@ namespace wrench {
 
         static simgrid::s4u::Mailbox *getRunningActorRecvMailbox();
 
-        S4U_Daemon(std::string hostname, std::string process_name_prefix);
+        S4U_Daemon(const std::string &hostname, const std::string &process_name_prefix);
 
         // Daemon without a mailbox (not needed?)
         //        S4U_Daemon(std::string hostname, std::string process_name_prefix);
@@ -68,6 +68,7 @@ namespace wrench {
         void startDaemon(bool _daemonized, bool _auto_restart);
 
         void createLifeSaver(std::shared_ptr<S4U_Daemon> reference);
+        void deleteLifeSaver();
 
         virtual void cleanup(bool has_returned_from_main, int return_value);
 
@@ -94,6 +95,8 @@ namespace wrench {
 
         /** @brief Daemon states */
         enum State {
+            /** @brief CREATED state: the daemon has been created but not started */
+            CREATED,
             /** @brief UP state: the daemon has been started and is still running */
             UP,
             /** @brief DOWN state: the daemon has been shutdown and/or has terminated */
@@ -143,8 +146,10 @@ namespace wrench {
 
         bool has_returned_from_main = false;// Set to true after main returns
         int return_value = 0;               // Set to the value returned by main
-        bool daemonized;                    // Set to true if daemon is daemonized
-        bool auto_restart;                  // Set to true if daemon is supposed to auto-restart
+        bool daemonized{};                  // Set to true if daemon is daemonized
+        bool auto_restart{};                // Set to true if daemon is supposed to auto-restart
+
+        static int num_non_daemonized_actors_running;
 
 
 #ifdef ACTOR_TRACKING_OUTPUT

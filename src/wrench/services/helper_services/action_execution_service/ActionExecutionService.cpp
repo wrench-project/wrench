@@ -39,7 +39,6 @@ namespace wrench {
      * @brief Destructor
      */
     ActionExecutionService::~ActionExecutionService() {
-        this->default_property_values.clear();
     }
 
     /**
@@ -109,6 +108,9 @@ namespace wrench {
         if (action->getState() != Action::State::READY) {
             throw std::runtime_error("Can only submit a ready action to the ActionExecutionService");
         }
+
+#if 0// These checks should have ALL happened before
+
         // Check that service-specific args that are provided are well-formatted
         std::string action_name = action->getName();
         auto service_specific_args = action->getJob()->getServiceSpecificArguments();
@@ -150,6 +152,7 @@ namespace wrench {
                 }
             }
         }
+#endif
 
         // At this point, there may still be insufficient resources to run the action, but that will
         // be handled later (and some ExecutionError with a "not enough resources" FailureCause
@@ -164,18 +167,13 @@ namespace wrench {
                                         0.0));
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        if (auto msg = dynamic_cast<ActionExecutionServiceSubmitActionAnswerMessage *>(message.get())) {
-            // If not a success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "ActionExecutionService::submitActions(): Received an unexpected [" + message->getName() +
-                    "] message!");
+        auto msg = S4U_Mailbox::getMessage<ActionExecutionServiceSubmitActionAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "ActionExecutionService::submitActions(): Received an");
+        // If not a success, throw an exception
+        if (not msg->success) {
+            throw ExecutionException(msg->cause);
         }
     }
 
@@ -533,15 +531,15 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
-        if (dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
+        if (std::dynamic_pointer_cast<HostHasTurnedOnMessage>(message)) {
             // Do nothing, just wake up
             return true;
 
-        } else if (dynamic_cast<HostHasChangedSpeedMessage *>(message.get())) {
+        } else if (std::dynamic_pointer_cast<HostHasChangedSpeedMessage>(message)) {
             // Do nothing, just wake up
             return true;
 
-        } else if (dynamic_cast<HostHasTurnedOffMessage *>(message.get())) {
+        } else if (std::dynamic_pointer_cast<HostHasTurnedOffMessage>(message)) {
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
                         ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
@@ -563,7 +561,7 @@ namespace wrench {
                 }
             }
 
-        } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
 
             // This is Synchronous
@@ -575,15 +573,15 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<ActionExecutionServiceSubmitActionRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ActionExecutionServiceSubmitActionRequestMessage>(message)) {
             processSubmitAction(msg->reply_mailbox, msg->action);
             return true;
 
-        } else if (auto msg = dynamic_cast<ActionExecutionServiceTerminateActionRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ActionExecutionServiceTerminateActionRequestMessage>(message)) {
             processActionTerminationRequest(msg->action, msg->reply_mailbox, msg->termination_cause);
             return true;
 
-        } else if (auto msg = dynamic_cast<ActionExecutorDoneMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ActionExecutorDoneMessage>(message)) {
             if (msg->action_executor->getAction()->getState() == Action::State::COMPLETED) {
                 processActionExecutorCompletion(msg->action_executor);
             } else {
@@ -591,7 +589,7 @@ namespace wrench {
             }
             return true;
 
-        } else if (auto msg = dynamic_cast<ServiceHasCrashedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ServiceHasCrashedMessage>(message)) {
             auto service = msg->service;
             auto action_executor = std::dynamic_pointer_cast<ActionExecutor>(service);
             if (not action_executor) {
@@ -724,18 +722,13 @@ namespace wrench {
                                         answer_mailbox, std::move(action), termination_cause, 0.0));
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        if (auto msg = dynamic_cast<ActionExecutionServiceTerminateActionAnswerMessage *>(message.get())) {
-            // If no success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "ActionExecutionService::terminateAction(): Received an unexpected [" +
-                    message->getName() + "] message!");
+        auto msg = S4U_Mailbox::getMessage<ActionExecutionServiceTerminateActionAnswerMessage>(
+                answer_mailbox,
+                this->network_timeout,
+                "ActionExecutionService::terminateAction(): Received an");
+        // If no success, throw an exception
+        if (not msg->success) {
+            throw ExecutionException(msg->cause);
         }
     }
 
@@ -745,19 +738,23 @@ namespace wrench {
      */
     void ActionExecutionService::processActionExecutorCompletion(
             const std::shared_ptr<ActionExecutor> &executor) {
+
+        auto executor_hostname = executor->getHostname();
+        auto action = executor->getAction();
+
         // Update RAM availabilities and running thread counts
-        this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
-        this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
+        this->ram_availabilities[executor_hostname] += executor->getMemoryAllocated();
+        this->running_thread_counts[executor_hostname] -= executor->getNumCoresAllocated();
 
         // Forget the action executor
-        this->action_executors.erase(executor->getAction());
-        this->all_actions.erase(executor->getAction());
-        this->action_run_specs.erase(executor->getAction());
+        this->action_executors.erase(action);
+        this->all_actions.erase(action);
+        this->action_run_specs.erase(action);
 
         // Send the notification to the originator
         S4U_Mailbox::dputMessage(
                 this->parent_service->mailbox, new ActionExecutionServiceActionDoneMessage(
-                                                       executor->getAction(), 0.0));
+                                                       action, 0.0));
     }
 
     /**
