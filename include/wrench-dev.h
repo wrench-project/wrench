@@ -19,6 +19,8 @@
 #include "wrench/failure_causes/FatalFailure.h"
 #include "wrench/failure_causes/SomeActionsHaveFailed.h"
 #include "wrench/failure_causes/FileAlreadyBeingCopied.h"
+#include "wrench/failure_causes/FileAlreadyBeingWritten.h"
+#include "wrench/failure_causes/FileAlreadyBeingRead.h"
 #include "wrench/failure_causes/FileNotFound.h"
 #include "wrench/failure_causes/FunctionalityNotAvailable.h"
 #include "wrench/failure_causes/InvalidDirectoryPath.h"
@@ -48,8 +50,8 @@
 #include "wrench/services/file_registry/FileRegistryServiceProperty.h"
 
 // Managers
-#include "wrench/managers/JobManager.h"
-#include "wrench/managers/DataMovementManager.h"
+#include "wrench/managers/job_manager/JobManager.h"
+#include "wrench/managers/data_movement_manager/DataMovementManager.h"
 
 // Logging
 #include "wrench/logging/TerminalOutput.h"
@@ -62,6 +64,7 @@
 #include "wrench/action/Action.h"
 #include "wrench/action/ComputeAction.h"
 #include "wrench/action/CustomAction.h"
+#include "wrench/action/MPIAction.h"
 #include "wrench/action/FileCopyAction.h"
 #include "wrench/action/FileDeleteAction.h"
 #include "wrench/action/FileReadAction.h"
@@ -71,6 +74,9 @@
 #include "wrench/action/FileWriteAction.h"
 #include "wrench/action/SleepAction.h"
 #include "wrench/services/helper_services/action_executor/ActionExecutor.h"
+
+// Communicator
+#include "wrench/communicator/Communicator.h"
 
 
 // Job

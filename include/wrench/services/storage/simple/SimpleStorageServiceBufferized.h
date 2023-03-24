@@ -49,7 +49,6 @@ namespace wrench {
                 {SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 1024},
         };
 
-    private:
         friend class SimpleStorageService;
 
         // Public Constructor
@@ -58,15 +57,15 @@ namespace wrench {
                                        WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
+
+    public:
+        double getLoad() override;
+
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
-
-    public:
         void cleanup(bool has_returned_from_main, int return_value) override;
-        double getLoad() override;
         double countRunningFileTransferThreads();
-
 
         /***********************/
         /** \endcond          **/
@@ -79,17 +78,15 @@ namespace wrench {
 
         bool processNextMessage();
 
-        bool processFileWriteRequest(const std::shared_ptr<FileLocation> &location, simgrid::s4u::Mailbox *answer_mailbox,
-                                     double buffer_size);
+        bool processFileWriteRequest(std::shared_ptr<FileLocation> &location, simgrid::s4u::Mailbox *answer_mailbox);
 
         bool
         processFileReadRequest(const std::shared_ptr<FileLocation> &location,
-                               double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox,
-                               simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content);
+                               double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processFileCopyRequest(
-                const std::shared_ptr<FileLocation> &src,
-                const std::shared_ptr<FileLocation> &dst,
+                std::shared_ptr<FileLocation> &src,
+                std::shared_ptr<FileLocation> &dst,
                 simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processFileTransferThreadNotification(

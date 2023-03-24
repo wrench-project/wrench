@@ -26,7 +26,7 @@ namespace wrench {
      */
     class ServiceMessage : public SimulationMessage {
     protected:
-        ServiceMessage(double payload);
+        explicit ServiceMessage(double payload);
     };
 
     /**
@@ -51,7 +51,7 @@ namespace wrench {
      */
     class ServiceDaemonStoppedMessage : public ServiceMessage {
     public:
-        ServiceDaemonStoppedMessage(double payload);
+        explicit ServiceDaemonStoppedMessage(double payload);
     };
 
     /***********************/

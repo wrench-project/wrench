@@ -21,25 +21,15 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param file: the file that is already being copied
      * @param src: the source location
      * @param dst: the destination location
      */
-    FileAlreadyBeingCopied::FileAlreadyBeingCopied(std::shared_ptr<DataFile> file,
-                                                   std::shared_ptr<FileLocation> src,
+    FileAlreadyBeingCopied::FileAlreadyBeingCopied(std::shared_ptr<FileLocation> src,
                                                    std::shared_ptr<FileLocation> dst) {
-        this->file = std::move(file);
         this->src_location = std::move(src);
         this->dst_location = std::move(dst);
     }
 
-    /**
-     * @brief Getter
-     * @return the file
-     */
-    std::shared_ptr<DataFile> FileAlreadyBeingCopied::getFile() {
-        return this->file;
-    }
 
     /**
      * @brief Getter
@@ -62,7 +52,7 @@ namespace wrench {
      * @return the message
      */
     std::string FileAlreadyBeingCopied::toString() {
-        return "File " + this->file->getID() + " is already being copied (" +
+        return "File " + this->src_location->getFile()->getID() + " is already being copied (" +
                "src = " + this->src_location->toString() + "; " +
                "dst = " + this->dst_location->toString() + ")";
     }

@@ -101,7 +101,7 @@ public:
 private:
     FileRegistryLinkFailuresTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a bunch of files
         std::vector<std::shared_ptr<wrench::DataFile>> files;
@@ -198,7 +198,7 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new FileRegistryLinkFailuresTestWMS(
                                     this, "Host1")));

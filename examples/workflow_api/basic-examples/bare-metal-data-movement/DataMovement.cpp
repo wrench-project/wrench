@@ -19,13 +19,13 @@
  ** the completion time of each workflow task is printed.
  **
  ** Example invocation of the simulator with no logging:
- **    ./wrench-example-bare-metal-data-movement ./four_hosts.xml
+ **    ./wrench-example-bare-metal-data-movement ./dragonfly_cluster.xml
  **
  ** Example invocation of the simulator with only WMS logging:
- **    ./wrench-example-bare-metal-data-movement ./four_hosts.xml --log=custom_wms.threshold=info
+ **    ./wrench-example-bare-metal-data-movement ./dragonfly_cluster.xml --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator with full logging:
- **    ./wrench-example-bare-metal-data-movement ./four_hosts.xml --wrench-full-log
+ **    ./wrench-example-bare-metal-data-movement ./dragonfly_cluster.xml --wrench-full-log
  **/
 
 

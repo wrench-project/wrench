@@ -132,7 +132,7 @@ private:
     ComputeActionExecutorTest *test;
     bool simulation_computation_as_sleep;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -227,7 +227,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test(bool si
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
+    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -259,7 +259,7 @@ public:
 private:
     ComputeActionExecutorTest *test;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -350,7 +350,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorFailureTest_test() {
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss, file));
+    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

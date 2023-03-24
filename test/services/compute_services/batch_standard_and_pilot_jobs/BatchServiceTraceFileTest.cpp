@@ -100,7 +100,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -205,7 +205,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BatchTraceFileReplayTestWMS(
                                     this, hostname)));
@@ -237,7 +237,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
 
         this->simulation->sleep(10 * 3600);
 
@@ -284,7 +284,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new BatchTraceFileReplayTestWithFailedJobWMS(
                                     this, hostname)));
@@ -315,7 +315,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -375,7 +375,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWFBatchServiceShutdown_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFBatchServiceShutdownTestWMS(
                             this, hostname)));
 
@@ -404,7 +404,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -431,7 +431,7 @@ private:
 
         // Create the BatchComputeService-specific argument
         batch_job_args["-N"] = std::to_string(2);   // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(1800);// Time in minutes (at least 1 minute)
+        batch_job_args["-t"] = std::to_string(1800);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
         // Submit this job to the BatchComputeService service
@@ -456,7 +456,7 @@ private:
         // Create the BatchComputeService-specific argument
         batch_job_args.clear();
         batch_job_args["-N"] = std::to_string(4);   // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(1800);// Time in minutes (at least 1 minute)
+        batch_job_args["-t"] = std::to_string(1800);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
         // Submit this job to the BatchComputeService service
@@ -726,7 +726,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFTestWMS(
                             this, hostname)));
 
@@ -768,7 +768,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -792,9 +792,9 @@ private:
         auto standard_job_2_nodes = job_manager->createStandardJob(tasks);
 
         // Create the BatchComputeService-specific argument
-        batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(10);// Time in minutes (at least 1 minute)
-        batch_job_args["-c"] = std::to_string(10);//number of cores per task1
+        batch_job_args["-N"] = std::to_string(2);  // Number of nodes/tasks
+        batch_job_args["-t"] = std::to_string(600);// Time in seconds (at least 1 minute)
+        batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
         // Submit this job to the BatchComputeService service
         job_manager->submitJob(standard_job_2_nodes, this->test->compute_service, batch_job_args);
@@ -888,7 +888,7 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesSWF_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFRequestedTimesTestWMS(
                             this, hostname)));
 
@@ -919,7 +919,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -943,9 +943,9 @@ private:
         auto standard_job_2_nodes = job_manager->createStandardJob(tasks);
 
         // Create the BatchComputeService-specific argument
-        batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(10);// Time in minutes (at least 1 minute)
-        batch_job_args["-c"] = std::to_string(10);//number of cores per task1
+        batch_job_args["-N"] = std::to_string(2);  // Number of nodes/tasks
+        batch_job_args["-t"] = std::to_string(600);// Time in seconds (at least 1 minute)
+        batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
         // Submit this job to the BatchComputeService service
         job_manager->submitJob(standard_job_2_nodes, this->test->compute_service, batch_job_args);
@@ -1040,7 +1040,7 @@ void BatchServiceTest::do_WorkloadTraceFileDifferentTimeOriginSWF_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFDifferentTimeOriginTestWMS(
                             this, hostname)));
 
@@ -1071,7 +1071,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1098,7 +1098,7 @@ private:
 
         // Create the BatchComputeService-specific argument
         batch_job_args["-N"] = std::to_string(2);   // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(1800);// Time in minutes (at least 1 minute)
+        batch_job_args["-t"] = std::to_string(1800);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
         // Submit this job to the BatchComputeService service
@@ -1124,7 +1124,7 @@ private:
         // Create the BatchComputeService-specific argument
         batch_job_args.clear();
         batch_job_args["-N"] = std::to_string(4);   // Number of nodes/tasks
-        batch_job_args["-t"] = std::to_string(1800);// Time in minutes (at least 1 minute)
+        batch_job_args["-t"] = std::to_string(1800);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
         // Submit this job to the BatchComputeService service
@@ -1581,7 +1581,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileJSONTestWMS(
                             this, hostname)));
 
@@ -1612,7 +1612,7 @@ public:
 private:
     BatchServiceTest *test;
 
-    int main() {
+    int main() override {
 
         auto cs = this->test->compute_service;
 
@@ -1722,7 +1722,7 @@ void BatchServiceTest::do_GetQueueState_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(new GetQueueStateTestWMS(this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());

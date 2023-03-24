@@ -156,7 +156,7 @@ private:
     bool kill;
     std::string action_type;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -353,7 +353,7 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
 
     // Create a file to read
     this->file = this->workflow->addFile("some_file", 1000000.0);
-    wrench::Simulation::createFile(wrench::FileLocation::LOCATION(ss1, file));
+    simulation->stageFile(wrench::FileLocation::LOCATION(ss1, file));
 
     // Create a file to write
     this->file_to_write = this->workflow->addFile("some_file_to_write", 1000000.0);

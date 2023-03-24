@@ -15,10 +15,10 @@ service via a job manager. For instance:
 
    // Create a standard job with 4 workflow tasks 
    auto job = job_manager->createStandardJob(
-                    {this->getWorklow()->getTaskByID("task"),
-                     this->getWorklow()->getTaskByID("task2"),
-                     this->getWorklow()->getTaskByID("task3"),
-                     this->getWorklow()->getTaskByID("task4")});
+                    {this->getWorkflow()->getTaskByID("task"),
+                     this->getWorkflow()->getTaskByID("task2"),
+                     this->getWorkflow()->getTaskByID("task3"),
+                     this->getWorkflow()->getTaskByID("task4")});
 
    // Submit the job to the bare-metal service
    job_manager->submitJob(job, some_bare_metal_service);
@@ -67,8 +67,8 @@ In the above example, for instance, the job submission could be done as:
 
 .. code:: cpp
 
-   // Create a service-specific argument std::map<std::string, std::string>
-   service_specific_args;
+   // Create a service-specific argument
+   std::map<std::string, std::string> service_specific_args;
 
    // task will run on host Node1 with as many cores as possible
    service_specific_args["task"] = "Node1";
@@ -82,8 +82,8 @@ In the above example, for instance, the job submission could be done as:
    // task4 will run on some host with 4 cores
    service_specific_args["task4"] = "4";
 
-   // Submit the job job_manager->submitJob(job, some_bare_metal_service,
-   service_specific_args);
+   // Submit the job 
+   job_manager->submitJob(job, some_bare_metal_service, service_specific_args);
 
 If the service-specific arguments are invalid (e.g., invalid hostname,
 unknown task, number of cores too large), the

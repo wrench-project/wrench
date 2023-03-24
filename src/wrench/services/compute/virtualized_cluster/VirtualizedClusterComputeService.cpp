@@ -34,7 +34,6 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
-     * @throw std::runtime_error
      */
     VirtualizedClusterComputeService::VirtualizedClusterComputeService(const std::string &hostname,
                                                                        std::vector<std::string> &execution_hosts,
@@ -56,10 +55,10 @@ namespace wrench {
      * @param num_cores: the desired number of cores in the VM
      * @param ram_memory: the desired memory size of the VM
      * @param physical_host: the physical host on which to create the VM
+     * @param property_list: the property list for the underlying BareMetalComputeService
+     * @param messagepayload_list: the message payload list for the underlying BareMetalComputeService
      *
      * @return A VM name
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     std::string
     VirtualizedClusterComputeService::createVM(unsigned long num_cores,
@@ -115,7 +114,6 @@ namespace wrench {
      * @param vm_name: virtual machine name
      * @param dest_pm_hostname: the name of the destination physical machine host
      *
-     * @throw std::invalid_argument
      */
     void VirtualizedClusterComputeService::migrateVM(const std::string &vm_name, const std::string &dest_pm_hostname) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -156,6 +154,9 @@ namespace wrench {
                 this->hostname.c_str(),
                 this->mailbox->get_cname());
 
+        // Start the Scratch Storage Service
+        this->startScratchStorageService();
+
         /** Main loop **/
         while (this->processNextMessage()) {
             // no specific action
@@ -171,7 +172,6 @@ namespace wrench {
      *
      * @return false if the daemon should terminate, true otherwise
      *
-     * @throw std::runtime_error
      */
     bool VirtualizedClusterComputeService::processNextMessage() {
         S4U_Simulation::computeZeroFlop();
@@ -263,7 +263,6 @@ namespace wrench {
      * @param vm_name: the name of the VM host
      * @param dest_pm_hostname: the name of the destination physical machine host
      *
-     * @throw std::runtime_error
      */
     void
     VirtualizedClusterComputeService::processMigrateVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name,

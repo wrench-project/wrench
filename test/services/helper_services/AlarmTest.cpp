@@ -86,7 +86,7 @@ public:
 private:
     AlarmTest *test;
 
-    int main() {
+    int main() override {
 
         // Turn off Host2
         wrench::Simulation::turnOffHost("Host2");
@@ -129,7 +129,7 @@ void AlarmTest::do_downHost_Test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ;
+
     ASSERT_NO_THROW(wms = simulation->add(
                             new AlarmDownHostTestWMS(this, hostname)));
 

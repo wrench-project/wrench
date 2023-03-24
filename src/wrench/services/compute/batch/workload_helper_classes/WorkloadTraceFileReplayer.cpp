@@ -93,10 +93,10 @@ namespace wrench {
 
             // Create the BatchComputeService-specific argument
             std::map<std::string, std::string> batch_job_args;
-            batch_job_args["-N"] = std::to_string(num_nodes);              // Number of nodes/taks
-            batch_job_args["-t"] = std::to_string(1 + requested_time / 60);// Time in minutes (note the +1)
-            batch_job_args["-c"] = std::to_string(num_cores_per_node);     //number of cores per task
-            batch_job_args["-u"] = username;                               // username
+            batch_job_args["-N"] = std::to_string(num_nodes);         // Number of nodes/tasks
+            batch_job_args["-t"] = std::to_string(requested_time);    // Time in second
+            batch_job_args["-c"] = std::to_string(num_cores_per_node);//number of cores per task
+            batch_job_args["-u"] = username;                          // username
             batch_job_args["-color"] = "green";
 
             // Submit this job to the BatchComputeService service
