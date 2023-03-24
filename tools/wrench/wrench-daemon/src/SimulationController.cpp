@@ -362,18 +362,34 @@ namespace wrench {
      */
     json SimulationController::addBareMetalComputeService(json data) {
         std::string head_host = data["head_host"];
-        map<std::string, std::tuple<unsigned long, double>> resources;
         std::string resource = data["resources"];
         std::string scratch_space = data["scratch_space"];
-        WRENCH_PROPERTY_COLLECTION_TYPE property_list = data["property_list"];
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list;
-        ServiceMessagePayload payloadMessage;
+        std::string property_list = data["property_list"];
+        std::string message_payload_list = data["message_payload_list"];
+
+        map<std::string, std::tuple<unsigned long, double>> resources;
         json jsonData = json::parse(resource);
         for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
             resources.emplace(it.key(), it.value());
         }
+
+        WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
+        jsonData = json::parse(property_list);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            auto property_key = ServiceProperty::translateString(it.key());
+            service_property_list[property_key] = it.value();
+        }
+
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;
+        jsonData = json::parse(message_payload_list);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            auto message_payload_key = ServiceMessagePayload::translateString(it.key());
+            service_message_payload_list[message_payload_key] = it.value();
+        }
+
         // Create the new service
-        auto new_service = new BareMetalComputeService(head_host, resources, scratch_space, {}, {});
+        auto new_service = new BareMetalComputeService(head_host, resources, scratch_space,
+                                                       service_property_list, service_message_payload_list);
         // Put in the list of services to start (this is because this method is called
         // by the server thread, and therefore, it will segfault horribly if it calls any
         // SimGrid simulation methods, e.g., to start a service)
