@@ -25,7 +25,8 @@ namespace wrench {
      */
     class HTCondorCentralManagerService : public ComputeService {
     private:
-        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {};
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
+        };
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {HTCondorCentralManagerServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},

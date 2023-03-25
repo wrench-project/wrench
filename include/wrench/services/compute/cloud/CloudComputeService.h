@@ -38,7 +38,8 @@ namespace wrench {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {CloudComputeServiceProperty::VM_BOOT_OVERHEAD, "0"},
-                {CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}};
+                {CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"},
+                {CloudComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
