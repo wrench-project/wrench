@@ -33,8 +33,7 @@ namespace wrench {
                 {HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY, "0.0"},
                 {HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY, "0.0"},
                 {HTCondorComputeServiceProperty::INSTANT_RESOURCE_AVAILABILITIES, "true"},
-                {HTCondorComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}
-        };
+                {HTCondorComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {HTCondorComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
