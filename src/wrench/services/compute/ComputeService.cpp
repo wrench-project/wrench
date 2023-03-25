@@ -153,12 +153,18 @@ namespace wrench {
         if (this->scratch_space_storage_service) return;    // Already started by somebody else
         if (this->scratch_space_mount_point.empty()) return;// No mount point provided
 
-        double buffer_size = 1000000000;// TODO: Make this configurable?
+
+        if (wrench::Simulation::isLinkShutdownSimulationEnabled() and (this->getPropertyValueAsDouble(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE) == 0)) {
+            throw std::runtime_error("ComputeService::startScratchStorageService(): Compute service " + this->name +
+                                     " cannot start a scratch service with (default) buffer size 0 because link shutdown " +
+                                     "simulation is enabled. Set a non-zero buffer size by setting the "
+                                     "SCRATCH_SPACE_BUFFER_SIZE property of this compute service");
+        }
 
         auto ss = SimpleStorageService::createSimpleStorageService(
                 hostname,
                 {scratch_space_mount_point},
-                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {});
+                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, this->getPropertyValueAsString(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE)}}, {});
 
         ss->setIsScratch(true);
         this->scratch_space_storage_service =
