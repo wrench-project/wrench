@@ -401,6 +401,45 @@ namespace wrench {
         return answer;
     }
 
+    json SimulationController::addCloudComputeService(json data) {
+        std::string hostname = data["hostname"];
+        std::string execution_host_string = data["execution_host"];
+        std::string scratch_space = data["scratch_space"];
+        std::string property_list_string = data["property_list"];
+        std::string message_payload_list_string = data["message_payload_list"];
+
+        std::vector<std::string> execution_host_vector = {};
+        json jsonData = json::parse(execution_host_string);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            execution_host_vector.push_back(it.value());
+        }
+        WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
+        jsonData = json::parse(property_list_string);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            auto property_key = ServiceProperty::translateString(it.key());
+            service_property_list[property_key] = it.value();
+        }
+
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;
+        jsonData = json::parse(message_payload_list_string);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            auto message_payload_key = ServiceMessagePayload::translateString(it.key());
+            service_message_payload_list[message_payload_key] = it.value();
+        }
+        // Create the new service
+        auto new_service = new CloudComputeService(hostname, execution_host_vector, scratch_space,
+                                                   service_property_list, service_message_payload_list);
+        // Put in the list of services to start (this is because this method is called
+        // by the server thread, and therefore, it will segfault horribly if it calls any
+        // SimGrid simulation methods, e.g., to start a service)
+        this->compute_services_to_start.push(new_service);
+
+        // Return the expected answer
+        json answer;
+        answer["service_name"] = new_service->getName();
+        return answer;
+    }
+
     /**
      * REST API Handler
      * @param data JSON input
