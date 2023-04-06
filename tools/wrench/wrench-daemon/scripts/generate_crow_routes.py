@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     for crow in crows.keys():
         route = crows[crow]
-        app = '\tCROW_ROUTE(app, "{0}").methods(crow::HTTPMethod::{1})\n'.format(crow, route['method'].upper())
+        app = '\tCROW_ROUTE(app, "{0}").methods(crow::HTTPMethod::{1})\n'.format(crow, route['method'].capitalize())
         app += '\t\t'
 
         type_list = re.findall("\<(.*?)\>", crow, re.I|re.M)
