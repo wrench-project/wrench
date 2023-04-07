@@ -15,21 +15,13 @@ add_custom_command(
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/doc/
         COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_crow_routes.py ${CMAKE_CURRENT_SOURCE_DIR}/doc/wrench-openapi.json ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         COMMENT "Generating CROW routes"
         VERBATIM
 )
 
 MESSAGE(STATUS "swagger-codegen generate -i ${CMAKE_CURRENT_SOURCE_DIR}/doc/wrench-openapi.json -l html2 -o ${CMAKE_CURRENT_SOURCE_DIR}/doc/")
-add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/doc/index.html
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/doc/
-        COMMAND swagger-codegen generate -i ${CMAKE_CURRENT_SOURCE_DIR}/doc/wrench-openapi.json -l html2 -o ${CMAKE_CURRENT_SOURCE_DIR}/doc/
-        COMMENT "Generating HTML"
-        VERBATIM
-)
 
 # Add needed packages
 find_package(Boost REQUIRED)
