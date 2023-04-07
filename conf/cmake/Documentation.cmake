@@ -44,6 +44,11 @@ if (DOXYGEN_FOUND)
 
     add_custom_target(doc DEPENDS wrench ${WRENCH_SECTIONS_LIST})
 
+    add_custom_command(TARGET doc
+            COMMAND swagger-codegen generate -i ${CMAKE_HOME_DIRECTORY}/tools/wrench/wrench-daemon/doc/wrench-openapi.json -l html2 -o ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}/restapi
+            COMMENT "Generating REST API HTML"
+            VERBATIM
+            )
     add_custom_command(TARGET doc COMMAND python3 
                         ${CMAKE_HOME_DIRECTORY}/doc/scripts/generate_rst.py 
                         ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}
