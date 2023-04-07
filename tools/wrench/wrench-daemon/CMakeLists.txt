@@ -74,12 +74,3 @@ else()
 endif()
 
 install(TARGETS wrench-daemon DESTINATION bin)
-
-add_custom_command(TARGET wrench-daemon
-        POST_BUILD
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/doc/
-        COMMAND swagger-codegen generate -i ${CMAKE_CURRENT_SOURCE_DIR}/doc/wrench-openapi.json -l html2 -o ${CMAKE_CURRENT_SOURCE_DIR}/doc/
-        COMMENT "Generating HTML"
-        VERBATIM
-        )
