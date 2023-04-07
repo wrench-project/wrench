@@ -1,4 +1,4 @@
 WRENCH REST API
 ***************
 
-Wrench provides REST API, for more details, please go to `this <restapi/index.html>`_
+Wrench provides a REST API, whihc is documented on `this page <restapi/index.html>`_
