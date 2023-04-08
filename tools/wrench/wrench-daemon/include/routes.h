@@ -12,7 +12,7 @@
 			json req_json = json::parse(req.body);
 			req_json[toStr(simid)] = simid;
 			crow::response res;
-			this->genericRequestHandler(req_json, res, "getTime");
+			this->genericRequestHandler(req_json, res, "getSimulationTime");
 			return res;
 		});
 
@@ -115,7 +115,7 @@
 			req_json[toStr(simid)] = simid;
 			req_json[toStr(file_id)] = file_id;
 			crow::response res;
-			this->genericRequestHandler(req_json, res, "fileGetSize");
+			this->genericRequestHandler(req_json, res, "getFileSize");
 			return res;
 		});
 
@@ -125,7 +125,7 @@
 			req_json[toStr(simid)] = simid;
 			req_json[toStr(job_name)] = job_name;
 			crow::response res;
-			this->genericRequestHandler(req_json, res, "standardJobGetTasks");
+			this->genericRequestHandler(req_json, res, "getStandardJobTasks");
 			return res;
 		});
 
@@ -135,7 +135,7 @@
 			req_json[toStr(simid)] = simid;
 			req_json[toStr(name)] = name;
 			crow::response res;
-			this->genericRequestHandler(req_json, res, "taskGetFlops");
+			this->genericRequestHandler(req_json, res, "getTaskFlops");
 			return res;
 		});
 
@@ -145,7 +145,7 @@
 			req_json[toStr(simid)] = simid;
 			req_json[toStr(name)] = name;
 			crow::response res;
-			this->genericRequestHandler(req_json, res, "taskGetMinNumCores");
+			this->genericRequestHandler(req_json, res, "getTaskMinNumCores");
 			return res;
 		});
 
@@ -155,7 +155,7 @@
 			req_json[toStr(simid)] = simid;
 			req_json[toStr(name)] = name;
 			crow::response res;
-			this->genericRequestHandler(req_json, res, "taskGetMaxNumCores");
+			this->genericRequestHandler(req_json, res, "getTaskMaxNumCores");
 			return res;
 		});
 
@@ -165,7 +165,7 @@
 			req_json[toStr(simid)] = simid;
 			req_json[toStr(name)] = name;
 			crow::response res;
-			this->genericRequestHandler(req_json, res, "taskGetMemory");
+			this->genericRequestHandler(req_json, res, "getTaskMemory");
 			return res;
 		});
 
