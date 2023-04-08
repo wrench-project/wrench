@@ -4,8 +4,9 @@ set(CMAKE_CXX_STANDARD 14)
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_crow_routes.py ${CMAKE_CURRENT_SOURCE_DIR}/doc/wrench-openapi.json ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h
+	    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_crow_routes.py ${CMAKE_CURRENT_SOURCE_DIR}/doc/wrench-openapi.json ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h ${CMAKE_CURRENT_SOURCE_DIR}/include/callback-map.h
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/doc/wrench-openapi.json
         COMMENT "Generating CROW routes"
         VERBATIM
 )
@@ -33,7 +34,7 @@ add_executable(wrench-daemon
         include/BlockingQueue.h
         include/KeyValueStore.h
         include/REST_API.h
-        include/REST_API_generated_code.h
+        include/callback-map.h
         include/routes.h)
 
 # Add pthreads
