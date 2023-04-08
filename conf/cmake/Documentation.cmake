@@ -1,6 +1,17 @@
 find_package(Doxygen QUIET)
+if (NOT DOXYGEN_FOUND) 
+    message("-- Doxygen: No (warning: Doxygen is needed in case you want to generate WRENCH documentation)")
+endif()
 
-if (DOXYGEN_FOUND)
+find_program(SWAGGER_CODEGEN_FOUND "swagger-codegen" QUIET)
+
+if (NOT SWAGGER_CODEGEN_FOUND) 
+    message("-- swagger-codegen: No (warning: swagger-codegen is needed in case you want to generate WRENCH documentation)")
+else()
+    message("-- Found swagger-codegen")
+endif()
+
+if (DOXYGEN_FOUND AND SWAGGER_CODEGEN_FOUND)
 
     # WRENCH APIs documentation
     foreach (SECTION USER DEVELOPER INTERNAL)
@@ -61,6 +72,4 @@ if (DOXYGEN_FOUND)
                         ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}
                         ${CMAKE_HOME_DIRECTORY}/docs/build/latest)
 
-else (DOXYGEN_FOUND)
-    message("-- Doxygen: No (warning: Doxygen is needed in case you want to generate WRENCH documentation)")
-endif (DOXYGEN_FOUND)
+endif()
