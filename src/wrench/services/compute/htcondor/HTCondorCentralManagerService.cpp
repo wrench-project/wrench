@@ -141,6 +141,12 @@ namespace wrench {
 
         // main loop
         while (this->processNextMessage()) {
+            if (not this->pending_jobs.empty()) {
+                std::cerr << "LIST OF PENDING JOBS!\n";
+                for (auto const &j: this->pending_jobs) {
+                    std::cerr << "\t===> " << std::get<0>(j)->getName() << "\n";
+                }
+            }
             if (not this->dispatching_jobs && not this->resources_unavailable) {
                 // dispatching standard or pilot jobs
                 if (not this->pending_jobs.empty()) {
@@ -329,6 +335,7 @@ namespace wrench {
         WRENCH_INFO("A compound job has completed: %s", job->getName().c_str());
         auto callback_mailbox = job->popCallbackMailbox();
 
+        std::cerr << Simulation::getCurrentSimulatedDate() << ": JOB " << job->getName() << " HAS COMPLETED\n";
         // Send the callback to the originator
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceCompoundJobDoneMessage(

@@ -717,7 +717,7 @@ namespace wrench {
     void BareMetalComputeService::dispatchReadyActions() {
         //        std::cerr << "DISPACHING READY ACTIONS: |" << this->ready_actions.size() << " |\n";
 
-        // Sort all the actions in the ready queue by (job.priority, action.priority, action.name)
+        // Sort all the actions in the ready queue by (job.priority, action.priority, action.job.submit_time, action.name)
         // TODO: This may be a performance bottleneck... may have to remedy
         std::sort(this->ready_actions.begin(), this->ready_actions.end(),
                   [](const std::shared_ptr<Action> &a, const std::shared_ptr<Action> &b) -> bool {
@@ -730,6 +730,8 @@ namespace wrench {
                               return true;
                           } else if (a->getPriority() < b->getPriority()) {
                               return false;
+                          } else if (a->getJob()->getSubmitDate() < b->getJob()->getSubmitDate()) {
+                              return true;
                           } else if (a->getName() < b->getName()) {
                               return true;
                           } else if (a->getName() < b->getName()) {
@@ -753,6 +755,7 @@ namespace wrench {
                   });
 
         for (auto const &action: this->ready_actions) {
+            std::cerr << "BM_CS: STARTING ACTION FROM JOB " << action->getJob()->getName() << "\n";
             this->action_execution_service->submitAction(action);
             this->num_dispatched_actions_for_cjob[action->getJob()]++;
             this->dispatched_actions.insert(action);
