@@ -84,7 +84,6 @@ namespace wrench {
 
         void terminate();
 
-
         /** set of compute resources **/
         std::set<std::shared_ptr<ComputeService>> compute_services;
         /** queue of pending jobs **/

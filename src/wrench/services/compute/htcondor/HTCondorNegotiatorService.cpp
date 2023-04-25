@@ -114,6 +114,7 @@ namespace wrench {
                 } else {
                     S4U_Simulation::sleep(this->non_grid_pre_overhead);
                 }
+                std::cerr << Simulation::getCurrentSimulatedDate() << ": NEGOTIATOR SUBMITTING JOB " << job->getName() << "\n";
                 target_compute_service->submitCompoundJob(job, service_specific_arguments);
                 this->running_jobs.insert(std::make_pair(job, target_compute_service));
                 scheduled_jobs.push_back(job);
