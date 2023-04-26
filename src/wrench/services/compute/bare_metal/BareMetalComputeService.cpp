@@ -755,7 +755,6 @@ namespace wrench {
                   });
 
         for (auto const &action: this->ready_actions) {
-            std::cerr << "BM_CS: STARTING ACTION FROM JOB " << action->getJob()->getName() << "\n";
             this->action_execution_service->submitAction(action);
             this->num_dispatched_actions_for_cjob[action->getJob()]++;
             this->dispatched_actions.insert(action);

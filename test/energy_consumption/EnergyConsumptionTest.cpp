@@ -363,7 +363,6 @@ private:
             }
 
             try {
-                std::cerr << "CALLING\n";
                 wrench::Simulation::getCurrentPstate("MyHost1");
                 throw std::runtime_error(
                         "Should not have been able to read the energy without activating energy plugin");
