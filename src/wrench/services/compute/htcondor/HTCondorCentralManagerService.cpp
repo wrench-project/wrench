@@ -334,7 +334,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processCompoundJobCompletion(const std::shared_ptr<CompoundJob>& job) {
+    void HTCondorCentralManagerService::processCompoundJobCompletion(const std::shared_ptr<CompoundJob> &job) {
         WRENCH_INFO("A compound job has completed: %s", job->getName().c_str());
         auto callback_mailbox = job->popCallbackMailbox();
 
@@ -355,7 +355,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processCompoundJobFailure(const std::shared_ptr<CompoundJob>& job) {
+    void HTCondorCentralManagerService::processCompoundJobFailure(const std::shared_ptr<CompoundJob> &job) {
         WRENCH_INFO("A compound job has failed: %s", job->getName().c_str());
         auto callback_mailbox = job->popCallbackMailbox();
 

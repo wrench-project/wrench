@@ -77,9 +77,9 @@ namespace wrench {
         void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<CompoundJob> job,
                                       std::map<std::string, std::string> &service_specific_args);
 
-        void processCompoundJobCompletion(const std::shared_ptr<CompoundJob>& job);
+        void processCompoundJobCompletion(const std::shared_ptr<CompoundJob> &job);
 
-        void processCompoundJobFailure(const std::shared_ptr<CompoundJob>& job);
+        void processCompoundJobFailure(const std::shared_ptr<CompoundJob> &job);
 
         void processNegotiatorCompletion(std::set<std::shared_ptr<Job>> &pending_jobs);
 
