@@ -101,6 +101,7 @@ namespace wrench {
                 this->getPropertyValueAsTimeInSecond(HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY),
                 this->getPropertyValueAsTimeInSecond(HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY),
                 this->getPropertyValueAsBoolean(HTCondorComputeServiceProperty::INSTANT_RESOURCE_AVAILABILITIES),
+                this->getPropertyValueAsBoolean(HTCondorComputeServiceProperty::FCFS),
                 compute_services, property_list, messagepayload_list);
     }
 
