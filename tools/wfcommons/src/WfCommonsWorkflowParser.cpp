@@ -56,12 +56,25 @@ namespace wrench {
             throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid Json file");
         }
 
+        // Check schema version
+        nlohmann::json schema_version;
+        try {
+            schema_version = j.at("schemaVersion");
+        } catch (std::out_of_range &e) {
+            throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Could not find a 'schema_version' key");
+        }
+        if (schema_version != "1.4") {
+            throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Only handles WfFormat schema version 1.4");
+        }
+
         nlohmann::json workflow_spec;
         try {
             workflow_spec = j.at("workflow");
         } catch (std::out_of_range &e) {
             throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Could not find a 'workflow' key");
         }
+
+
 
 
         // Gather machine information if any
