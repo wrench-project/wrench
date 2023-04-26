@@ -75,8 +75,6 @@ namespace wrench {
         }
 
 
-
-
         // Gather machine information if any
         std::map<std::string, std::pair<unsigned long, double>> machines;
         for (nlohmann::json::iterator it = workflow_spec.begin(); it != workflow_spec.end(); ++it) {
