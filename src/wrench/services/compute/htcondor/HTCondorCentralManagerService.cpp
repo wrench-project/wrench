@@ -332,7 +332,6 @@ namespace wrench {
         WRENCH_INFO("A compound job has completed: %s", job->getName().c_str());
         auto callback_mailbox = job->popCallbackMailbox();
 
-        std::cerr << Simulation::getCurrentSimulatedDate() << ": JOB " << job->getName() << " HAS COMPLETED\n";
         // Send the callback to the originator
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceCompoundJobDoneMessage(
