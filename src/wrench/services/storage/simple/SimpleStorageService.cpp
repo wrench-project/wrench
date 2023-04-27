@@ -214,6 +214,19 @@ namespace wrench {
     }
 
     /**
+     * @brief Return current total free space from all mount point (in zero simulation time)
+     *        for IO tracing purpose.
+     * @return total free space in bytes
+    */
+    double SimpleStorageService::traceTotalFreeSpace() {
+        double free_space = 0;
+        for (auto const &mp: this->file_systems) {
+            free_space += mp.second->getFreeSpace();
+        }
+        return free_space;
+    }
+
+    /**
      * @brief Determine whether the storage service has multiple mount points
      * @return true if multiple mount points, false otherwise
      */
