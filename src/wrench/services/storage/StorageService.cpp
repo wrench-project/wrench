@@ -441,9 +441,9 @@ namespace wrench {
             throw std::invalid_argument("StorageService::copyFile(): src and dst locations should be for the same file");
         }
 
-        if (std::dynamic_pointer_cast<CompoundStorageService>(src_location->getStorageService()) or 
+        if (std::dynamic_pointer_cast<CompoundStorageService>(src_location->getStorageService()) or
             std::dynamic_pointer_cast<CompoundStorageService>(dst_location->getStorageService())) {
-            return CompoundStorageService::copyFile(src_location, dst_location); 
+            return CompoundStorageService::copyFile(src_location, dst_location);
         }
 
         assertServiceIsUp(src_location->getStorageService());

@@ -85,7 +85,7 @@ namespace wrench {
     /***********************/
     /** \endcond INTERNAL     */
     /***********************/
-    
+
 }// namespace wrench
 
 
