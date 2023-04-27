@@ -27,21 +27,21 @@ namespace wrench {
             const std::shared_ptr<DataFile> &,
             const std::map<std::string, std::vector<std::shared_ptr<StorageService>>> &,
             const std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &,
-            const std::vector<std::shared_ptr<FileLocation>>& previous_allocations)>;
+            const std::vector<std::shared_ptr<FileLocation>> &previous_allocations)>;
 
     /**
      * @brief Enum for IO actions in traces
     */
-    enum class IOAction: std::uint8_t {
-        ReadStart = 1, 
-        ReadEnd = 2, 
-        WriteStart = 3, 
-        WriteEnd = 4, 
-        CopyToStart = 5, 
-        CopyToEnd = 6, 
-        CopyFromStart = 7, 
-        CopyFromEnd = 8, 
-        DeleteStart = 9, 
+    enum class IOAction : std::uint8_t {
+        ReadStart = 1,
+        ReadEnd = 2,
+        WriteStart = 3,
+        WriteEnd = 4,
+        CopyToStart = 5,
+        CopyToEnd = 6,
+        CopyFromStart = 7,
+        CopyFromEnd = 8,
+        DeleteStart = 9,
         DeleteEnd = 10,
         None = 11,
     };
@@ -50,7 +50,7 @@ namespace wrench {
         std::shared_ptr<StorageService> service;
         double free_space;
         std::string file_name;
-        double load;        // not actually used so far
+        double load;// not actually used so far
     };
 
     /**
@@ -59,8 +59,8 @@ namespace wrench {
     struct AllocationTrace {
         double ts;
         IOAction act;
-        std::vector<DiskUsage> disk_usage;                              // new usage stats for updated disks
-        std::vector<std::shared_ptr<FileLocation>> internal_locations;  
+        std::vector<DiskUsage> disk_usage;// new usage stats for updated disks
+        std::vector<std::shared_ptr<FileLocation>> internal_locations;
     };
 
     /**
@@ -204,12 +204,12 @@ namespace wrench {
         */
         static void copyFile(const std::shared_ptr<FileLocation> &src_location,
                              const std::shared_ptr<FileLocation> &dst_location);
-        
+
         void copyFileIamSource(const std::shared_ptr<FileLocation> &src_location,
-                             const std::shared_ptr<FileLocation> &dst_location);
+                               const std::shared_ptr<FileLocation> &dst_location);
 
         void copyFileIamDestination(const std::shared_ptr<FileLocation> &src_location,
-                             const std::shared_ptr<FileLocation> &dst_location);
+                                    const std::shared_ptr<FileLocation> &dst_location);
 
         // Publicly accessible traces... (TODO: cleanup access to traces)
         std::map<std::string, AllocationTrace> read_traces = {};
@@ -258,8 +258,7 @@ namespace wrench {
                 {CompoundStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 0},
                 {CompoundStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 0},
                 {CompoundStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD, 1024}
-        };
+                {CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD, 1024}};
 
         static unsigned long getNewUniqueNumber();
 
@@ -278,9 +277,9 @@ namespace wrench {
 
         std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location);
 
-        bool processStorageSelectionMessage(const CompoundStorageAllocationRequestMessage* msg);
+        bool processStorageSelectionMessage(const CompoundStorageAllocationRequestMessage *msg);
 
-        bool processStorageLookupMessage(const CompoundStorageLookupRequestMessage* msg);
+        bool processStorageLookupMessage(const CompoundStorageLookupRequestMessage *msg);
 
         bool processNextMessage(SimulationMessage *message);
 

@@ -21,9 +21,9 @@ namespace wrench {
     */
     class CompoundStorageServiceMessagePayload : public StorageServiceMessagePayload {
 
-        public:
-            /** @brief The number of bytes in the control message sent by the daemon to answer a storage selection request **/
-            DECLARE_MESSAGEPAYLOAD_NAME(STORAGE_SELECTION_PAYLOAD);
+    public:
+        /** @brief The number of bytes in the control message sent by the daemon to answer a storage selection request **/
+        DECLARE_MESSAGEPAYLOAD_NAME(STORAGE_SELECTION_PAYLOAD);
     };
 
 };// namespace wrench
