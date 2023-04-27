@@ -29,7 +29,7 @@ nlohmann::json read_from_file(char *path) {
     return json_object;
 }
 
-std::map<std::string, double> get_task_runtimes(const nlohmann::json& workflow) {
+std::map<std::string, double> get_task_runtimes(const nlohmann::json &workflow) {
     std::map<std::string, double> to_return;
     try {
         auto tasks = workflow.at("workflow").at("tasks");
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 
     // Update the original task runtimes in JSON
     auto tasks = original_workflow_json.at("workflow").at("tasks");
-    nlohmann::json new_tasks; // new array of tasks
+    nlohmann::json new_tasks;// new array of tasks
     for (auto &task: tasks) {
         if (task["type"] != "compute") {
             continue;
@@ -81,6 +81,4 @@ int main(int argc, char **argv) {
 
     // Dump the modified workflow to stdout
     std::cout << original_workflow_json.dump(4) << "\n";
-
-
 }
