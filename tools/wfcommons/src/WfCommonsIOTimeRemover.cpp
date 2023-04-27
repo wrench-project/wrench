@@ -50,7 +50,17 @@ std::map<std::string, double> get_task_runtimes(const nlohmann::json &workflow) 
 int main(int argc, char **argv) {
 
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <original workflow path> <zero-cpu-work workflow path>\n";
+        std::cerr << "Usage: " << argv[0] << " <original workflow path> <zero-cpu-work workflow path>\n\n";
+        std::cerr << "  This program takes as input two WfCommons workflow instance JSON files that correspond to the same "
+                     "workflow (i.e. identical set of 'compute' tasks). It outputs on stdout the JSON for the first workflow "
+                     "but where the runtimeInSeconds value of each 'compute' task has been reduced by the runtimeInSeconds value "
+                     "for that task in the second workflow.";
+        std::cerr << " This is useful because the runtimeInSeconds of WfCommons workflow instances includes both CPU and I/O. As a "
+                     "result, before importing a WfCommons workflow instance into a WRENCH simulation, and if a 'zero-cpu-work' execution "
+                     "of the workflow is available, this program makes it possible to correct task runtimeInSeconds values to discount "
+                     "the I/O part (this is, in general, a coarse approximation since I/O and computation can be concurrent). This program "
+                     "is typically used for WfBench-generated instances, for which zero-cpu-work execution are easily obtained and for which "
+                     "there is no concurrent I/O and computation.\n";
         exit(1);
     }
 
