@@ -50,7 +50,7 @@ std::map<std::string, double> get_task_runtimes(const nlohmann::json &workflow) 
 int main(int argc, char **argv) {
 
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <original workflow path> <zero-cpu-work workflow path>\n\n";
+        std::cerr << "Usage: " << argv[0] << " <path to JSON workflow #1> <path to JSON workflow #2>\n\n";
         std::cerr << "  This program takes as input two WfCommons workflow instance JSON files that correspond to the same "
                      "workflow (i.e. identical set of 'compute' tasks). It outputs on stdout the JSON for the first workflow "
                      "but where the runtimeInSeconds value of each 'compute' task has been reduced by the runtimeInSeconds value "
@@ -58,7 +58,8 @@ int main(int argc, char **argv) {
         std::cerr << " This is useful because the runtimeInSeconds of WfCommons workflow instances includes both CPU and I/O. As a "
                      "result, before importing a WfCommons workflow instance into a WRENCH simulation, and if a 'zero-cpu-work' execution "
                      "of the workflow is available, this program makes it possible to correct task runtimeInSeconds values to discount "
-                     "the I/O part (this is, in general, a coarse approximation since I/O and computation can be concurrent). This program "
+                     "the I/O part of task executions (this is, in general, a coarse approximation since I/O and computation can be concurrent). "
+                     "This program "
                      "is typically used for WfBench-generated instances, for which zero-cpu-work execution are easily obtained and for which "
                      "there is no concurrent I/O and computation.\n";
         exit(1);
@@ -72,6 +73,15 @@ int main(int argc, char **argv) {
     std::map<std::string, double> original_runtimeInSeconds = get_task_runtimes(original_workflow_json);
     std::map<std::string, double> zero_cpu_runtimeInSeconds = get_task_runtimes(zero_cpu_workflow_json);
 
+    // Check that each task in the original workflow appears in the zero_cpu workflow
+    for (const auto &task : original_runtimeInSeconds) {
+        if (zero_cpu_runtimeInSeconds.find(task.first) == zero_cpu_runtimeInSeconds.end()) {
+            std::cerr << "Error: Task with id='" + task.first + "' appears in the original workflow ('" +
+                         std::string(argv[1]) + "') but not in the zero-cpu-work workflow '(" +
+                         std::string(argv[1]) + "')\n";
+            exit(1);
+        }
+    }
     // Update the original task runtimes in JSON
     auto tasks = original_workflow_json.at("workflow").at("tasks");
     nlohmann::json new_tasks;// new array of tasks
