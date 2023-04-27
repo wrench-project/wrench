@@ -33,11 +33,11 @@ public:
     // External storage
     std::shared_ptr<wrench::SimpleStorageService> simple_storage_service_external = nullptr;
 
-    // Services for disks of node SimpleStorageHost0 
+    // Services for disks of node SimpleStorageHost0
     std::shared_ptr<wrench::SimpleStorageService> simple_storage_service_100_0 = nullptr;
     std::shared_ptr<wrench::SimpleStorageService> simple_storage_service_510_0 = nullptr;
     std::shared_ptr<wrench::SimpleStorageService> simple_storage_service_1000_0 = nullptr;
-    // Services for disks of node SimpleStorageHost1 
+    // Services for disks of node SimpleStorageHost1
     std::shared_ptr<wrench::SimpleStorageService> simple_storage_service_100_1 = nullptr;
     std::shared_ptr<wrench::SimpleStorageService> simple_storage_service_510_1 = nullptr;
     std::shared_ptr<wrench::SimpleStorageService> simple_storage_service_1000_1 = nullptr;
@@ -131,7 +131,7 @@ std::shared_ptr<wrench::FileLocation> defaultStorageServiceSelection(
         const std::shared_ptr<wrench::DataFile> &file,
         const std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &resources,
         const std::map<std::shared_ptr<wrench::DataFile>, std::vector<std::shared_ptr<wrench::FileLocation>>> &mapping,
-        const std::vector<std::shared_ptr<wrench::FileLocation>>& previous_allocations) {
+        const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations) {
 
     // Init round-robin
     static auto last_selected_server = resources.begin()->first;
@@ -216,14 +216,13 @@ private:
         auto job_manager = this->createJobManager();
         auto job = job_manager->createCompoundJob("copyToCSSJob");
 
-        // ## Stage file on external storage    
+        // ## Stage file on external storage
         wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_100));
         // Copy to CSS
         auto fileCopyAction = job->addFileCopyAction(
-            "stagingCopy_1", 
-            wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_100),
-            wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100)
-        );
+                "stagingCopy_1",
+                wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_100),
+                wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100));
 
         // Read from CSS
         auto fileReadAction = job->addFileReadAction("fRead_1", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100));
@@ -233,10 +232,9 @@ private:
         wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_500));
         // Copy to CSS
         auto fileCopyAction_2 = job->addFileCopyAction(
-            "stagingCopy_2", 
-            wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_500),
-            wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_500)
-        );
+                "stagingCopy_2",
+                wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_500),
+                wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_500));
         job->addActionDependency(fileReadAction, fileCopyAction_2);
 
         // Read from CSS
@@ -268,9 +266,9 @@ private:
         if (read_file_copy_2.size() != 2) {
             throw std::runtime_error("Lookup returned an incorrect number of parts for file_500 on CSS");
         }
-        for (auto part : read_file_copy_2) {
+        for (auto part: read_file_copy_2) {
             auto file_location = wrench::FileLocation::LOCATION(test->simple_storage_service_external, part->getFile());
-            if (test->simple_storage_service_external->hasFile(file_location)){
+            if (test->simple_storage_service_external->hasFile(file_location)) {
                 throw std::runtime_error("Src file part from stripping shouldn't be on source anymore");
             }
         }
@@ -285,12 +283,11 @@ private:
         if (external_free_space != 400) {
             throw std::runtime_error("Residual data on external free space not cleaned up after stropped copy");
         }
-    
+
         wrench::S4U_Mailbox::retireTemporaryMailbox(tmp_mailbox);
 
         return 0;
     }
-
 };
 
 
@@ -321,7 +318,7 @@ void CompoundStorageServiceFunctionalTest::do_CopyToCSS_test() {
             compute_service = simulation->add(
                     new wrench::BareMetalComputeService("ComputeHost",
                                                         {std::make_pair("ComputeHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                 wrench::ComputeService::ALL_RAM))},
+                                                                                                       wrench::ComputeService::ALL_RAM))},
                                                         {})));
 
     // Create some simple storage services (unbufferized)
@@ -335,15 +332,14 @@ void CompoundStorageServiceFunctionalTest::do_CopyToCSS_test() {
     ASSERT_NO_THROW(simple_storage_service_external = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("SimpleStorageHost1", {"/disk1000"},
                                                                                      {}, {})));
-    
+
     // Create a valid Compound Storage Service, without user provided callback (no intercept capabilities)
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
                             new wrench::CompoundStorageService(
-                                "CompoundStorageHost", 
-                                {simple_storage_service_510_0, simple_storage_service_1000_0}, 
-                                defaultStorageServiceSelection, 
-                                {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "400"}}, {})
-                            ));
+                                    "CompoundStorageHost",
+                                    {simple_storage_service_510_0, simple_storage_service_1000_0},
+                                    defaultStorageServiceSelection,
+                                    {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "400"}}, {})));
 
     // Create a Controler
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -359,7 +355,6 @@ void CompoundStorageServiceFunctionalTest::do_CopyToCSS_test() {
 }
 
 
-
 /**********************************************************************/
 /**  WRITE TO CSS TEST                                                **/
 /**********************************************************************/
@@ -369,7 +364,7 @@ class CSSWriteToCSSTestCtrl : public wrench::ExecutionController {
 
 public:
     CSSWriteToCSSTestCtrl(CompoundStorageServiceFunctionalTest *test,
-                         const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                          const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -425,7 +420,6 @@ private:
 
         return 0;
     }
-
 };
 
 
@@ -456,7 +450,7 @@ void CompoundStorageServiceFunctionalTest::do_WriteToCSS_test() {
             compute_service = simulation->add(
                     new wrench::BareMetalComputeService("ComputeHost",
                                                         {std::make_pair("ComputeHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                 wrench::ComputeService::ALL_RAM))},
+                                                                                                       wrench::ComputeService::ALL_RAM))},
                                                         {})));
 
     // Create some simple storage services (unbufferized)
@@ -466,15 +460,14 @@ void CompoundStorageServiceFunctionalTest::do_WriteToCSS_test() {
     ASSERT_NO_THROW(simple_storage_service_1000_0 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("SimpleStorageHost0", {"/disk1000"},
                                                                                      {}, {})));
-    
+
     // Create a valid Compound Storage Service, without user provided callback (no intercept capabilities)
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
                             new wrench::CompoundStorageService(
-                                "CompoundStorageHost", 
-                                {simple_storage_service_510_0, simple_storage_service_1000_0}, 
-                                defaultStorageServiceSelection, 
-                                {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "400"}}, {})
-                            ));
+                                    "CompoundStorageHost",
+                                    {simple_storage_service_510_0, simple_storage_service_1000_0},
+                                    defaultStorageServiceSelection,
+                                    {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "400"}}, {})));
 
     // Create a Controler
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -499,7 +492,7 @@ class CSSCopyFromCSSTestCtrl : public wrench::ExecutionController {
 
 public:
     CSSCopyFromCSSTestCtrl(CompoundStorageServiceFunctionalTest *test,
-                         const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                           const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -515,20 +508,18 @@ private:
         // Write to CSS
         auto fileWriteAction_1 = job->addFileWriteAction("fWrite_1", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100));
         // Copy to external storage
-        auto fileCopyAction_1 = job->addFileCopyAction("fCopy_1", 
-            wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100),
-            wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_100)
-        );
+        auto fileCopyAction_1 = job->addFileCopyAction("fCopy_1",
+                                                       wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_100),
+                                                       wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_100));
         job->addActionDependency(fileWriteAction_1, fileCopyAction_1);
 
         // Write to CSS
         auto fileWriteAction_2 = job->addFileWriteAction("fWrite_2", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_500));
         job->addActionDependency(fileCopyAction_1, fileWriteAction_2);
         // Copy to external storage (with stripping)
-        auto fileCopyAction_2 = job->addFileCopyAction("fCopy_2", 
-            wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_500),
-            wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_500)
-        );
+        auto fileCopyAction_2 = job->addFileCopyAction("fCopy_2",
+                                                       wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_500),
+                                                       wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_500));
         job->addActionDependency(fileWriteAction_2, fileCopyAction_2);
 
         job_manager->submitJob(job, test->compute_service, {});
@@ -543,7 +534,7 @@ private:
         }
 
         // Check that all file copies worked as intended
-        
+
         auto tmp_mailbox = wrench::S4U_Mailbox::getTemporaryMailbox();
 
         auto write_file_lookup_1 = test->compound_storage_service->lookupFileLocation(test->file_100, tmp_mailbox);
@@ -555,10 +546,10 @@ private:
         }
 
 
-        if (!test->simple_storage_service_external->hasFile(wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_500))){
+        if (!test->simple_storage_service_external->hasFile(wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_500))) {
             throw std::runtime_error("File 500 not found on external storage");
         }
-        if (!test->simple_storage_service_external->hasFile(wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_100))){
+        if (!test->simple_storage_service_external->hasFile(wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_100))) {
             throw std::runtime_error("File 100 not found on external storage");
         }
         if (test->simple_storage_service_external->getTotalFreeSpace() != 400) {
@@ -580,7 +571,6 @@ private:
 
         return 0;
     }
-
 };
 
 
@@ -611,7 +601,7 @@ void CompoundStorageServiceFunctionalTest::do_CopyFromCSS_test() {
             compute_service = simulation->add(
                     new wrench::BareMetalComputeService("ComputeHost",
                                                         {std::make_pair("ComputeHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                 wrench::ComputeService::ALL_RAM))},
+                                                                                                       wrench::ComputeService::ALL_RAM))},
                                                         {})));
 
     // Create some simple storage services (unbufferized)
@@ -621,7 +611,7 @@ void CompoundStorageServiceFunctionalTest::do_CopyFromCSS_test() {
     ASSERT_NO_THROW(simple_storage_service_1000_0 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("SimpleStorageHost0", {"/disk1000"},
                                                                                      {}, {})));
-    
+
     ASSERT_NO_THROW(simple_storage_service_external = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("SimpleStorageHost1", {"/disk1000"},
                                                                                      {}, {})));
@@ -629,11 +619,10 @@ void CompoundStorageServiceFunctionalTest::do_CopyFromCSS_test() {
     // Create a valid Compound Storage Service, without user provided callback (no intercept capabilities)
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
                             new wrench::CompoundStorageService(
-                                "CompoundStorageHost", 
-                                {simple_storage_service_510_0, simple_storage_service_1000_0}, 
-                                defaultStorageServiceSelection, 
-                                {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "400"}}, {})
-                            ));
+                                    "CompoundStorageHost",
+                                    {simple_storage_service_510_0, simple_storage_service_1000_0},
+                                    defaultStorageServiceSelection,
+                                    {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "400"}}, {})));
 
     // Create a Controler
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -658,7 +647,7 @@ class CSSFullJobTestCtrl : public wrench::ExecutionController {
 
 public:
     CSSFullJobTestCtrl(CompoundStorageServiceFunctionalTest *test,
-                         const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                       const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -684,15 +673,14 @@ private:
 
         wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_1000));
         auto stagingAction = job->addFileCopyAction(
-            "stagingCopy_1000", 
-            wrench::FileLocation::LOCATION(test->simple_storage_service_external, test->file_1000),
-            wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1000)
-        );
+                "stagingCopy_1000",
+                wrench::FileLocation::LOCATION(test->simple_storage_service_external, test->file_1000),
+                wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1000));
         actions.push_back(stagingAction);
         auto fileReadAction = job->addFileReadAction("fRead_1000", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1000));
         actions.push_back(fileReadAction);
         job->addActionDependency(stagingAction, fileReadAction);
-        
+
         // Compute would go here
 
         auto fileWriteAction = job->addFileWriteAction("fWrite_500", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_500));
@@ -706,40 +694,39 @@ private:
 
         // "Archive" hypothetical results to external storage
         auto archiveAction = job->addFileCopyAction(
-                "archiveCopy_500", 
+                "archiveCopy_500",
                 wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_500),
-                wrench::FileLocation::LOCATION(test->simple_storage_service_external,  test->file_500)
-        );
+                wrench::FileLocation::LOCATION(test->simple_storage_service_external, test->file_500));
         actions.push_back(archiveAction);
         job->addActionDependency(deleteExternalFileAction, archiveAction);
 
         // Cleanup CSS (initial file 1000 and written file 500)
-        auto deleteCSS1000Action = job->addFileDeleteAction("delRF_1000", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1000)); 
+        auto deleteCSS1000Action = job->addFileDeleteAction("delRF_1000", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1000));
         actions.push_back(deleteCSS1000Action);
         job->addActionDependency(archiveAction, deleteCSS1000Action);
 
-        auto deleteCSS500Action = job->addFileDeleteAction("delRF_500", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_500)); 
+        auto deleteCSS500Action = job->addFileDeleteAction("delRF_500", wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_500));
         actions.push_back(deleteCSS500Action);
         job->addActionDependency(deleteCSS1000Action, deleteCSS500Action);
 
         job_manager->submitJob(job, test->compute_service);
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
 
-        for (auto const &a : actions) {
+        for (auto const &a: actions) {
             if (a->getState() != wrench::Action::State::COMPLETED) {
                 auto exc_msg = "Action " + a->getName() + " did not complete";
                 throw std::runtime_error(exc_msg);
             }
         }
 
-        if (!test->simple_storage_service_external->hasFile(wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_500))){
+        if (!test->simple_storage_service_external->hasFile(wrench::FileLocation::LOCATION(test->simple_storage_service_external, "/disk1000", test->file_500))) {
             throw std::runtime_error("File 500 not found on external storage");
         }
 
         auto external_free_space = test->simple_storage_service_external->getTotalFreeSpace();
         if (external_free_space != 500) {
             auto exc_msg = "External free space has " + std::to_string(external_free_space) + "B of free space."
-                            "It should have 500B";
+                                                                                              "It should have 500B";
             throw std::runtime_error(exc_msg);
         }
 
@@ -783,7 +770,7 @@ void CompoundStorageServiceFunctionalTest::do_fullJob_test() {
             compute_service = simulation->add(
                     new wrench::BareMetalComputeService("ComputeHost",
                                                         {std::make_pair("ComputeHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                 wrench::ComputeService::ALL_RAM))},
+                                                                                                       wrench::ComputeService::ALL_RAM))},
                                                         {})));
 
     // Create some simple storage services (unbufferized)
@@ -793,7 +780,7 @@ void CompoundStorageServiceFunctionalTest::do_fullJob_test() {
     ASSERT_NO_THROW(simple_storage_service_1000_0 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("SimpleStorageHost0", {"/disk1000"},
                                                                                      {}, {})));
-    
+
     ASSERT_NO_THROW(simple_storage_service_100_1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("SimpleStorageHost1", {"/disk100"},
                                                                                      {}, {})));
@@ -805,11 +792,10 @@ void CompoundStorageServiceFunctionalTest::do_fullJob_test() {
     // Create a valid Compound Storage Service, without user provided callback (no intercept capabilities)
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
                             new wrench::CompoundStorageService(
-                                "CompoundStorageHost", 
-                                {simple_storage_service_510_0, simple_storage_service_100_1, simple_storage_service_1000_0}, 
-                                defaultStorageServiceSelection, 
-                                {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "100"}}, {})
-                            ));
+                                    "CompoundStorageHost",
+                                    {simple_storage_service_510_0, simple_storage_service_100_1, simple_storage_service_1000_0},
+                                    defaultStorageServiceSelection,
+                                    {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "100"}}, {})));
 
     // Create a Controler
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -846,11 +832,10 @@ private:
         // Retrieve internal SimpleStorageServices
         auto simple_storage_services = test->compound_storage_service->getAllServices();
         std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> expected_services{
-            {"SimpleStorageHost0", {test->simple_storage_service_100_0}}, 
-            {"SimpleStorageHost1", {test->simple_storage_service_510_1}}
-        };
-        
-        for (auto const& svc: simple_storage_services) {
+                {"SimpleStorageHost0", {test->simple_storage_service_100_0}},
+                {"SimpleStorageHost1", {test->simple_storage_service_510_1}}};
+
+        for (auto const &svc: simple_storage_services) {
             if (expected_services.find(svc.first) == expected_services.end()) {
                 throw std::runtime_error("Can't find one of the hosts in the services list");
             }
@@ -970,7 +955,7 @@ private:
 
         // This one simply answers that the file was not found
         if (wrench::StorageService::lookupFileAtLocation(file_1_loc_css))
-            throw std::runtime_error("Should not be able to lookup file from a CompoundStorageService if it has not been written/copied to it first");  
+            throw std::runtime_error("Should not be able to lookup file from a CompoundStorageService if it has not been written/copied to it first");
 
         return 0;
     }
@@ -1004,7 +989,7 @@ void CompoundStorageServiceFunctionalTest::do_BasicFunctionality_test() {
             compute_service = simulation->add(
                     new wrench::BareMetalComputeService("ComputeHost",
                                                         {std::make_pair("ComputeHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                 wrench::ComputeService::ALL_RAM))},
+                                                                                                       wrench::ComputeService::ALL_RAM))},
                                                         {})));
 
     // Create some simple storage services
@@ -1029,9 +1014,9 @@ void CompoundStorageServiceFunctionalTest::do_BasicFunctionality_test() {
 
     // Create a valid Compound Storage Service, without user provided callback (no intercept capabilities)
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
-                            new wrench::CompoundStorageService("CompoundStorageHost", 
-                            {simple_storage_service_100_0, simple_storage_service_510_1}, 
-                            {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "100"}})));
+                            new wrench::CompoundStorageService("CompoundStorageHost",
+                                                               {simple_storage_service_100_0, simple_storage_service_510_1},
+                                                               {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "100"}})));
 
     // Create a Controler
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -1102,7 +1087,7 @@ private:
                 wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1000));
 
         job_manager->submitJob(jobReadError, test->compute_service, {});
-        
+
         simulation->sleep(10000);
 
         // 4 - Try to write a file too big on CSS
@@ -1122,7 +1107,7 @@ private:
                 wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1000));
 
         job_manager->submitJob(jobDeleteError, test->compute_service, {});
-        
+
 
         // 1
         this->waitForNextEvent();
@@ -1137,14 +1122,14 @@ private:
             throw std::runtime_error("2-Unexpected job state: " + jobCopySizeError->getStateAsString());
         if (!std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(fileCopyActionSS_CSS->getFailureCause()))
             throw std::runtime_error("2-Did not receive a 'StorageServiceNotEnoughSpace' failure cause as expected");
-        
+
         // 3
         this->waitForNextEvent();
         if (!jobReadError->hasFailed())
             throw std::runtime_error("3-Unexpected job state: " + jobReadError->getStateAsString());
         if (!std::dynamic_pointer_cast<wrench::FileNotFound>(fileReadActionCSS->getFailureCause()))
             throw std::runtime_error("3-Did not receive a 'FileNotFound' failure cause as expected");
-        
+
         // 4
         this->waitForNextEvent();
         if (!jobWriteError->hasFailed())
@@ -1158,7 +1143,7 @@ private:
             throw std::runtime_error("5-Unexpected job state: " + jobDeleteError->getStateAsString());
         if (!std::dynamic_pointer_cast<wrench::FileNotFound>(fileDeleteActionCSS->getFailureCause()))
             throw std::runtime_error("5-Did not receive a 'FileNotFound' failure cause as expected");
-        
+
 
         return 0;
     }
@@ -1193,7 +1178,7 @@ void CompoundStorageServiceFunctionalTest::do_BasicError_test() {
             compute_service = simulation->add(
                     new wrench::BareMetalComputeService("ComputeHost",
                                                         {std::make_pair("ComputeHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                 wrench::ComputeService::ALL_RAM))},
+                                                                                                       wrench::ComputeService::ALL_RAM))},
                                                         {})));
 
     // Create some simple storage services
@@ -1216,10 +1201,10 @@ void CompoundStorageServiceFunctionalTest::do_BasicError_test() {
     // CAREFUL -> REUSING CALLBACK FROM PREVIOUS TEST
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
                             new wrench::CompoundStorageService(
-                                "CompoundStorageHost", 
-                                {simple_storage_service_510_1}, 
-                                defaultStorageServiceSelection, 
-                                {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "100"}})));
+                                    "CompoundStorageHost",
+                                    {simple_storage_service_510_1},
+                                    defaultStorageServiceSelection,
+                                    {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "100"}})));
 
     // Create a Controller
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

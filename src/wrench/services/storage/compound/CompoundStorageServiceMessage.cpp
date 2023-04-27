@@ -28,7 +28,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     CompoundStorageAllocationRequestMessage::CompoundStorageAllocationRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                                                                                 std::shared_ptr<DataFile> file, double payload)
+                                                                                     std::shared_ptr<DataFile> file, double payload)
         : CompoundStorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_mailbox == nullptr) {
@@ -53,7 +53,7 @@ namespace wrench {
         this->locations = locations;
     }
 
-        /**
+    /**
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file for which storage allocation is requested

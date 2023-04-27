@@ -74,11 +74,11 @@ int main(int argc, char **argv) {
     std::map<std::string, double> zero_cpu_runtimeInSeconds = get_task_runtimes(zero_cpu_workflow_json);
 
     // Check that each task in the original workflow appears in the zero_cpu workflow
-    for (const auto &task : original_runtimeInSeconds) {
+    for (const auto &task: original_runtimeInSeconds) {
         if (zero_cpu_runtimeInSeconds.find(task.first) == zero_cpu_runtimeInSeconds.end()) {
             std::cerr << "Error: Task with id='" + task.first + "' appears in the original workflow ('" +
-                         std::string(argv[1]) + "') but not in the zero-cpu-work workflow '(" +
-                         std::string(argv[1]) + "')\n";
+                                 std::string(argv[1]) + "') but not in the zero-cpu-work workflow '(" +
+                                 std::string(argv[1]) + "')\n";
             exit(1);
         }
     }
