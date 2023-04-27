@@ -40,13 +40,13 @@ install(FILES "${WFCOMMONS_WORKFLOW_PARSER_HEADER_FILES}"
         )
 
 # Compile/install the WfCommons I/O-time remover
-set(WFCOMMONS_WORKFLOW_IOTIME_REMOVER_SOURCE_FILES
-tools/wfcommons/src/WfCommonsIOTimeRemover.cpp
-)
+set(WFCOMMONS_WORKFLOW_COMPUTE_RUNTIME_SUBTRACTOR_SOURCE_FILES
+tools/wfcommons/src/WfCommonsComputeRuntimeSubtractor.cpp
+        )
 
-add_executable(wrench-wfcommons-iotime-remover ${WFCOMMONS_WORKFLOW_IOTIME_REMOVER_SOURCE_FILES})
-add_dependencies(wrench-wfcommons-iotime-remover wrench)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wrench-wfcommons-iotime-remover
+add_executable(wrench-wfcommons-compute-runtime-subtractor ${WFCOMMONS_WORKFLOW_COMPUTE_RUNTIME_SUBTRACTOR_SOURCE_FILES})
+add_dependencies(wrench-wfcommons-compute-runtime-subtractor wrench)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wrench-wfcommons-compute-runtime-subtractor
         DESTINATION bin
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )
