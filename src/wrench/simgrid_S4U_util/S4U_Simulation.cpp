@@ -22,8 +22,10 @@
 
 #include <simgrid/version.h>
 
+#include <fstream>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include "smpi/smpi.h"
+#include <cstdio>
 
 
 WRENCH_LOG_CATEGORY(wrench_core_s4u_simulation, "Log category for S4U_Simulation");
@@ -137,6 +139,33 @@ namespace wrench {
         this->platform_setup = true;
     }
 
+    /**
+     * @brief Initialize the simulated platform. Must only be called once, exclusive with setupPlatform.
+     *
+     * @param filename the path to an XML platform description file
+     *
+     * @throw std::invalid_argument
+     */
+    void S4U_Simulation::setupPlatformFromString(const std::string &platform) {
+        auto temp_dir = std::filesystem::temp_directory_path();
+        auto temp_path = temp_dir / ("tmp_wrench_platform_"+ to_string(::getpid())+"_"+to_string(std::time(nullptr))+".json");
+        ofstream myfile;
+        myfile.open (temp_path);
+        myfile << platform<<std::endl;
+        myfile.close();
+
+        try {
+
+            this->engine->load_platform(temp_path);
+        } catch (simgrid::ParseError &e) {
+            throw std::invalid_argument("XML Platform description file error: " + std::string(e.what()));
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
+
+        this->platform_setup = true;
+        remove(temp_path);
+    }
 
     /**
      * @brief Initialize the simulated platform. Must only be called once.
