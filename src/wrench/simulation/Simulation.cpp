@@ -322,10 +322,10 @@ namespace wrench {
      */
     void Simulation::instantiatePlatformFromString(const std::string &platform) {
         auto temp_dir = std::filesystem::temp_directory_path();
-        auto temp_path = temp_dir / ("tmp_wrench_platform_"+ to_string(::getpid())+"_"+to_string(std::time(nullptr))+".xml");
+        auto temp_path = temp_dir / ("tmp_wrench_platform_" + to_string(::getpid()) + "_" + to_string(std::time(nullptr)) + ".xml");
         ofstream myfile;
-        myfile.open (temp_path);
-        myfile << platform<<std::endl;
+        myfile.open(temp_path);
+        myfile << platform << std::endl;
         myfile.close();
 
         instantiatePlatform(temp_path);
