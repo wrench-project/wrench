@@ -1380,6 +1380,8 @@ namespace wrench {
                              {"bytes per second", link_usage_timestamp->getContent()->getUsage()}});
                 }
             }
+
+            bandwidth_json.push_back(datum);
         }
 
         boost::json::object link_usage;
