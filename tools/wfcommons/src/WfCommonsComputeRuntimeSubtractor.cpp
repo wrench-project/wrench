@@ -34,8 +34,20 @@ std::map<std::string, double> get_task_runtimes(const nlohmann::json &workflow) 
     try {
         auto tasks = workflow.at("workflow").at("tasks");
         for (auto &task: tasks) {
+            if (task.find("type") == task.end()) {
+                std::cerr << "Error processing JSON: Missing 'type' for task " << task["name"] << "\n";
+                exit(1);
+            }
             if (task["type"] != "compute") {
                 continue;
+            }
+            if (task.find("id") == task.end()) {
+                std::cerr << "Error processing JSON: Missing 'id' for task " << task["name"] << "\n";
+                exit(1);
+            }
+            if (task.find("runtimeInSeconds") == task.end()) {
+                std::cerr << "Error processing JSON: Missing 'runtimeInSeconds' for task " << task["name"] << "\n";
+                exit(1);
             }
             to_return[task["id"]] = task["runtimeInSeconds"];
         }
@@ -49,8 +61,9 @@ std::map<std::string, double> get_task_runtimes(const nlohmann::json &workflow) 
 
 int main(int argc, char **argv) {
 
-    if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <path to JSON workflow #1> <path to JSON workflow #2>\n\n";
+    bool valid_args = (argc == 3) or ((argc == 4) and (std::string(argv[3]) == "--set-avgCPU-to-100"));
+    if (not valid_args) {
+        std::cerr << "Usage: " << argv[0] << " <path to JSON workflow #1> <path to JSON workflow #2> [--set-avgCPU-to-100]\n\n";
         std::cerr << "  This program takes as input two WfCommons workflow instance JSON files that correspond to the same "
                      "workflow (i.e. identical set of 'compute' tasks). It outputs on stdout the JSON for the first workflow "
                      "but where the runtimeInSeconds value of each 'compute' task has been reduced by the runtimeInSeconds value "
@@ -64,6 +77,8 @@ int main(int argc, char **argv) {
                      "there is no concurrent I/O and computation.\n";
         exit(1);
     }
+
+    bool set_avgCPU_to_100 = (argc == 4);
 
     // Read in the original workflow into a JSON object
     nlohmann::json original_workflow_json = read_from_file(argv[1]);
@@ -92,6 +107,13 @@ int main(int argc, char **argv) {
         double updated_runtime = original_runtimeInSeconds[task["id"]] - zero_cpu_runtimeInSeconds[task["id"]];
         nlohmann::json update;
         update["runtimeInSeconds"] = updated_runtime;
+        if (set_avgCPU_to_100) {
+            double num_cores = 1;
+            if (task.find("cores") != task.end()) {
+                num_cores = task["cores"];
+            }
+            update["avgCPU"] = num_cores * 100.0;
+        }
         task.update(update);
         new_tasks.push_back(task);
     }
