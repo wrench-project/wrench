@@ -6,14 +6,12 @@
 #include <iostream>
 #include "crow/utility.h"
 
-namespace crow
-{
+namespace crow {
     const char cr = '\r';
     const char lf = '\n';
     const std::string crlf("\r\n");
 
-    enum class HTTPMethod : char
-    {
+    enum class HTTPMethod : char {
 #ifndef DELETE
         DELETE = 0,
         GET,
@@ -107,57 +105,55 @@ namespace crow
         // should not add an item below this line: used for array count
     };
 
-    constexpr const char* method_strings[] =
-      {
-        "DELETE",
-        "GET",
-        "HEAD",
-        "POST",
-        "PUT",
+    constexpr const char *method_strings[] =
+            {
+                    "DELETE",
+                    "GET",
+                    "HEAD",
+                    "POST",
+                    "PUT",
 
-        "CONNECT",
-        "OPTIONS",
-        "TRACE",
+                    "CONNECT",
+                    "OPTIONS",
+                    "TRACE",
 
-        "PATCH",
-        "PURGE",
+                    "PATCH",
+                    "PURGE",
 
-        "COPY",
-        "LOCK",
-        "MKCOL",
-        "MOVE",
-        "PROPFIND",
-        "PROPPATCH",
-        "SEARCH",
-        "UNLOCK",
-        "BIND",
-        "REBIND",
-        "UNBIND",
-        "ACL",
+                    "COPY",
+                    "LOCK",
+                    "MKCOL",
+                    "MOVE",
+                    "PROPFIND",
+                    "PROPPATCH",
+                    "SEARCH",
+                    "UNLOCK",
+                    "BIND",
+                    "REBIND",
+                    "UNBIND",
+                    "ACL",
 
-        "REPORT",
-        "MKACTIVITY",
-        "CHECKOUT",
-        "MERGE",
+                    "REPORT",
+                    "MKACTIVITY",
+                    "CHECKOUT",
+                    "MERGE",
 
-        "M-SEARCH",
-        "NOTIFY",
-        "SUBSCRIBE",
-        "UNSUBSCRIBE",
+                    "M-SEARCH",
+                    "NOTIFY",
+                    "SUBSCRIBE",
+                    "UNSUBSCRIBE",
 
-        "MKCALENDAR",
+                    "MKCALENDAR",
 
-        "LINK",
-        "UNLINK",
+                    "LINK",
+                    "UNLINK",
 
-        "SOURCE"};
+                    "SOURCE"};
 
 
-    inline std::string method_name(HTTPMethod method)
-    {
-        if (CROW_LIKELY(method < HTTPMethod::InternalMethodCount))
-        {
-            return method_strings[(unsigned char)method];
+    inline std::string method_name(HTTPMethod method) {
+        if (CROW_LIKELY(method < HTTPMethod::InternalMethodCount)) {
+            return method_strings[(unsigned char) method];
         }
         return "invalid";
     }
@@ -211,8 +207,7 @@ namespace crow
 
     // clang-format on
 
-    enum class ParamType : char
-    {
+    enum class ParamType : char {
         INT,
         UINT,
         DOUBLE,
@@ -223,26 +218,24 @@ namespace crow
     };
 
     /// @cond SKIP
-    struct routing_params
-    {
+    struct routing_params {
         std::vector<int64_t> int_params;
         std::vector<uint64_t> uint_params;
         std::vector<double> double_params;
         std::vector<std::string> string_params;
 
-        void debug_print() const
-        {
+        void debug_print() const {
             std::cerr << "routing_params" << std::endl;
-            for (auto i : int_params)
+            for (auto i: int_params)
                 std::cerr << i << ", ";
             std::cerr << std::endl;
-            for (auto i : uint_params)
+            for (auto i: uint_params)
                 std::cerr << i << ", ";
             std::cerr << std::endl;
-            for (auto i : double_params)
+            for (auto i: double_params)
                 std::cerr << i << ", ";
             std::cerr << std::endl;
-            for (auto& i : string_params)
+            for (auto &i: string_params)
                 std::cerr << i << ", ";
             std::cerr << std::endl;
         }
@@ -252,32 +245,27 @@ namespace crow
     };
 
     template<>
-    inline int64_t routing_params::get<int64_t>(unsigned index) const
-    {
+    inline int64_t routing_params::get<int64_t>(unsigned index) const {
         return int_params[index];
     }
 
     template<>
-    inline uint64_t routing_params::get<uint64_t>(unsigned index) const
-    {
+    inline uint64_t routing_params::get<uint64_t>(unsigned index) const {
         return uint_params[index];
     }
 
     template<>
-    inline double routing_params::get<double>(unsigned index) const
-    {
+    inline double routing_params::get<double>(unsigned index) const {
         return double_params[index];
     }
 
     template<>
-    inline std::string routing_params::get<std::string>(unsigned index) const
-    {
+    inline std::string routing_params::get<std::string>(unsigned index) const {
         return string_params[index];
     }
     /// @endcond
 
-    struct routing_handle_result
-    {
+    struct routing_handle_result {
         uint16_t rule_index;
         std::vector<uint16_t> blueprint_indices;
         routing_params r_params;
@@ -285,18 +273,16 @@ namespace crow
 
         routing_handle_result() {}
 
-        routing_handle_result(uint16_t rule_index_, std::vector<uint16_t> blueprint_indices_, routing_params r_params_):
-          rule_index(rule_index_),
-          blueprint_indices(blueprint_indices_),
-          r_params(r_params_) {}
+        routing_handle_result(uint16_t rule_index_, std::vector<uint16_t> blueprint_indices_, routing_params r_params_) : rule_index(rule_index_),
+                                                                                                                          blueprint_indices(blueprint_indices_),
+                                                                                                                          r_params(r_params_) {}
 
-        routing_handle_result(uint16_t rule_index_, std::vector<uint16_t> blueprint_indices_, routing_params r_params_, HTTPMethod method_):
-          rule_index(rule_index_),
-          blueprint_indices(blueprint_indices_),
-          r_params(r_params_),
-          method(method_) {}
+        routing_handle_result(uint16_t rule_index_, std::vector<uint16_t> blueprint_indices_, routing_params r_params_, HTTPMethod method_) : rule_index(rule_index_),
+                                                                                                                                              blueprint_indices(blueprint_indices_),
+                                                                                                                                              r_params(r_params_),
+                                                                                                                                              method(method_) {}
     };
-} // namespace crow
+}// namespace crow
 
 // clang-format off
 #ifndef CROW_MSVC_WORKAROUND
