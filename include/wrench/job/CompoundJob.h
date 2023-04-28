@@ -38,6 +38,7 @@ namespace wrench {
     class FileRegistryDeleteEntryAction;
     class ParallelModel;
     class CustomAction;
+    class MPIAction;
     class ActionExecutor;
     class DataFile;
     /**
@@ -144,6 +145,11 @@ namespace wrench {
 
         std::shared_ptr<CustomAction> addCustomAction(std::shared_ptr<CustomAction> custom_action);
 
+        std::shared_ptr<MPIAction> addMPIAction(const std::string &name,
+                                                const std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> &mpi_code,
+                                                unsigned long num_processes,
+                                                unsigned long num_cores_per_process);
+
         void removeAction(std::shared_ptr<Action> &action);
 
         void addActionDependency(const std::shared_ptr<Action> &parent, const std::shared_ptr<Action> &child);
@@ -163,6 +169,7 @@ namespace wrench {
         unsigned long getMinimumRequiredNumCores();
 
         double getMinimumRequiredMemory();
+
 
         /***********************/
         /** \cond INTERNAL     */

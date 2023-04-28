@@ -156,7 +156,7 @@ private:
     bool kill;
     std::string action_type;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();

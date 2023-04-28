@@ -95,7 +95,7 @@ public:
 private:
     BareMetalComputeServiceTestPilotJobs *test;
 
-    int main() {
+    int main() override {
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();

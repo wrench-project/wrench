@@ -49,8 +49,6 @@ namespace wrench {
      * @brief Destructor
      */
     NetworkProximityService::~NetworkProximityService() {
-        this->default_property_values.clear();// To avoid memory_manager_service leaks
-        this->network_daemons.clear();
     }
 
     /**
@@ -216,12 +214,8 @@ namespace wrench {
         }
 
         // Start all network daemons
-        try {
-            for (auto &network_daemon: this->network_daemons) {
-                network_daemon->start(network_daemon, true, true);// Daemonized, AUTO RESTART
-            }
-        } catch (std::runtime_error &e) {
-            throw;
+        for (auto &network_daemon: this->network_daemons) {
+            network_daemon->start(network_daemon, true, true);// Daemonized, AUTO RESTART
         }
 
         /** Main loop **/

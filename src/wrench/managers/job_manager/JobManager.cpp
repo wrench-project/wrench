@@ -45,8 +45,6 @@ namespace wrench {
      * @brief Destructor, which kills the daemon (and clears all the jobs)
      */
     JobManager::~JobManager() {
-        this->jobs_to_dispatch.clear();
-        this->jobs_dispatched.clear();
     }
 
     /**
@@ -359,11 +357,11 @@ namespace wrench {
     *             this many cores, but will choose the host on which to run it.
     *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
     *             task with the specified number of cores on that host.
-    *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"taskID":"[node_index:]num_cores"}] [,{"-u":"<string>" (username)}]}
+    *      - to a BatchComputeService: {{"-t":"<int>" (requested number of seconds)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"taskID":"[node_index:]num_cores"}] [,{"-u":"<string>" (username)}]}
     *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
     *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
     *      - to a HTCondorComputeService:
-    *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"-universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (BatchComputeService service name)}] [, {"taskID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
+    *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"-universe":"grid", {"-t":"<int>" (requested number of seconds)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (BatchComputeService service name)}] [, {"taskID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
     *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
     *
     *
@@ -381,11 +379,7 @@ namespace wrench {
             throw std::invalid_argument("JobManager::submitJob(): Job was previously submitted");
         }
 
-        try {
-            compute_service->assertServiceIsUp();
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        compute_service->assertServiceIsUp();
 
         if (not compute_service->supportsStandardJobs()) {
             throw std::invalid_argument("JobManager::submitJob(): service does not support standard jobs");
@@ -430,11 +424,7 @@ namespace wrench {
                 if (workflow == nullptr) {
                     throw std::invalid_argument("JobManager::submitJob():  invalid service-specific argument {" + arg.first + "," + arg.second + "} (unknown task ID " + arg.first + ")");
                 }
-                try {
-                    task = workflow->getTaskByID(arg.first);
-                } catch (std::invalid_argument &e) {
-                    throw;
-                }
+                task = workflow->getTaskByID(arg.first);
                 new_args[job->task_compute_actions[task]->getName()] = arg.second;
             }
         }
@@ -495,11 +485,11 @@ namespace wrench {
      *             this many cores, but will choose the host on which to run it.
      *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
      *             task with the specified number of cores on that host.
-     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"actionID":"[node_index:]num_cores"}] [,{"-u":"<string>" (username)}]}
+     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of seconds)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"actionID":"[node_index:]num_cores"}] [,{"-u":"<string>" (username)}]}
      *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
      *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
      *      - to a HTCondorComputeService:
-     *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"-universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (BatchComputeService service name)}] [, {"actionID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
+     *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"-universe":"grid", {"-t":"<int>" (requested number of seconds)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (BatchComputeService service name)}] [, {"actionID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
      *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
      *
      *
@@ -521,11 +511,7 @@ namespace wrench {
             throw std::invalid_argument("JobManager::submitJob(): Cannot submit a job that doesn't have any actions");
         }
 
-        try {
-            compute_service->assertServiceIsUp();
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        compute_service->assertServiceIsUp();
 
         if (not compute_service->supportsCompoundJobs()) {
             throw std::invalid_argument("JobManager::submitJob(): service does not support compound jobs");
@@ -577,7 +563,7 @@ namespace wrench {
      * @param job: a pilot job
      * @param compute_service: a compute service
      * @param service_specific_args: arguments specific for compute services:
-     *      - to a BatchComputeService: {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}
+     *      - to a BatchComputeService: {"-t":"<int>" (requested number of seconds)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}
      *      - to a BareMetalComputeService: {} (pilot jobs should not be submitted directly to the service)}
      *      - to a VirtualizedClusterComputeService: {} (pilot jobs should not be submitted directly to the service)}
      *      - to a CloudComputeService: {} (pilot jobs should not be submitted directly to the service)}
@@ -597,11 +583,7 @@ namespace wrench {
             throw std::invalid_argument("JobManager::submitJob(): Job was previously submitted");
         }
 
-        try {
-            compute_service->assertServiceIsUp();
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        compute_service->assertServiceIsUp();
 
         if (not compute_service->supportsPilotJobs()) {
             throw std::invalid_argument("JobManager::submitJob(): service does not support pilot jobs");
@@ -735,11 +717,7 @@ namespace wrench {
         }
         this->releaseDaemonLock();
 
-        try {
-            job->getParentComputeService()->terminateJob(job->compound_job);
-        } catch (std::exception &e) {
-            throw;
-        }
+        job->getParentComputeService()->terminateJob(job->compound_job);
 
         job->compound_job->state = CompoundJob::State::DISCONTINUED;
         job->state = StandardJob::State::TERMINATED;
@@ -771,11 +749,7 @@ namespace wrench {
             throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
         }
 
-        try {
-            job->getParentComputeService()->terminateJob(job);
-        } catch (std::exception &e) {
-            throw;
-        }
+        job->getParentComputeService()->terminateJob(job);
         job->state = CompoundJob::State::DISCONTINUED;
     }
 
@@ -798,11 +772,7 @@ namespace wrench {
             throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
         }
 
-        try {
-            job->getParentComputeService()->terminateJob(job->compound_job);
-        } catch (std::exception &e) {
-            throw;
-        }
+        job->getParentComputeService()->terminateJob(job->compound_job);
         job->state = PilotJob::State::TERMINATED;
     }
 
@@ -983,7 +953,6 @@ namespace wrench {
         this->jobs_dispatched.erase(job->compound_job);
 
         // Forward the notification along the notification chain
-
         auto callback_mailbox = job->popCallbackMailbox();
         if (callback_mailbox) {
             auto augmented_msg = new JobManagerStandardJobCompletedMessage(

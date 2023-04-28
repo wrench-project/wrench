@@ -96,7 +96,7 @@ public:
 private:
     S4U_VirtualMachineTest *test;
 
-    int main() {
+    int main() override {
 
         auto vm = new wrench::S4U_VirtualMachine("vm", 1, 1, {}, {});
 

@@ -20,11 +20,9 @@ WRENCH_LOG_CATEGORY(data_movement_manager_test, "Log category for DataMovementMa
 class DataMovementManagerTest : public ::testing::Test {
 
 public:
-
     void do_AsyncCopy_test();
     void do_AsyncWrite_test();
     void do_AsyncRead_test();
-
 
 
     std::shared_ptr<wrench::DataFile> src_file_1;
@@ -321,7 +319,7 @@ private:
         //
 
         if (not wrench::StorageService::lookupFileAtLocation(
-                wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src2_file_2))) {
+                    wrench::FileLocation::LOCATION(this->test->dst_storage_service, this->test->src2_file_2))) {
             throw std::runtime_error("Asynchronous file copy should have completed even though the FileRegistryService was down.");
         }
 
@@ -352,20 +350,20 @@ void DataMovementManagerTest::do_AsyncCopy_test() {
 
     // Create a (unused) Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("WMSHost",
-                                                {std::make_pair("WMSHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                           wrench::ComputeService::ALL_RAM))},
-                                                {})));
+                            new wrench::BareMetalComputeService("WMSHost",
+                                                                {std::make_pair("WMSHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                           wrench::ComputeService::ALL_RAM))},
+                                                                {})));
 
     // Create src and dst storage services
     ASSERT_NO_THROW(src_storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("SrcHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("SrcHost", {"/"})));
 
     ASSERT_NO_THROW(src2_storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/"})));
 
     ASSERT_NO_THROW(dst_storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("DstHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("DstHost", {"/"})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -374,7 +372,7 @@ void DataMovementManagerTest::do_AsyncCopy_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new DataMovementManagerAsyncCopyTestWMS(
-            this, file_registry_service, "WMSHost")));
+                            this, file_registry_service, "WMSHost")));
 
     // Stage the 2 files on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(src_file_1, src_storage_service));
@@ -392,7 +390,6 @@ void DataMovementManagerTest::do_AsyncCopy_test() {
         free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -416,6 +413,14 @@ private:
         auto data_movement_manager = this->createDataMovementManager();
 
         {
+
+            try {
+                data_movement_manager->initiateAsynchronousFileWrite(nullptr, file_registry_service);
+                throw std::runtime_error("Should not be able to do a file write with a nullptr location");
+            } catch (std::invalid_argument &ignore) {
+            }
+
+
             // try asynchronous write and register that should work
             std::shared_ptr<wrench::ExecutionEvent> async_write_event;
 
@@ -426,8 +431,25 @@ private:
                         write_location,
                         file_registry_service);
             } catch (wrench::ExecutionException &e) {
-                throw std::runtime_error("Got an exception while trying to instantiate a file write: " + std::string(e.what()));
+                throw std::runtime_error("Got an exception while trying to instantiate a file write: " + e.getCause()->toString());
             }
+
+            wrench::Simulation::sleep(0.01);
+
+            try {
+                data_movement_manager->initiateAsynchronousFileWrite(
+                        write_location,
+                        file_registry_service);
+                throw std::runtime_error("Should not be able to concurrently write to the same location");
+            } catch (wrench::ExecutionException &e) {
+                auto real_cause = std::dynamic_pointer_cast<wrench::FileAlreadyBeingWritten>(e.getCause());
+                if (not real_cause) {
+                    throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString());
+                }
+                real_cause->toString();   // coverage
+                real_cause->getLocation();// coverage
+            }
+
 
             try {
                 async_write_event = this->waitForNextEvent();
@@ -497,7 +519,6 @@ private:
             if (not std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(real_event->failure_cause)) {
                 throw std::runtime_error("wrong failure cause: " + real_event->failure_cause->toString());
             }
-
         }
 
         // Stop the data movement manager
@@ -518,7 +539,7 @@ void DataMovementManagerTest::do_AsyncWrite_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -527,20 +548,20 @@ void DataMovementManagerTest::do_AsyncWrite_test() {
 
     // Create a (unused) Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("WMSHost",
-                                                {std::make_pair("WMSHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                           wrench::ComputeService::ALL_RAM))},
-                                                {})));
+                            new wrench::BareMetalComputeService("WMSHost",
+                                                                {std::make_pair("WMSHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                           wrench::ComputeService::ALL_RAM))},
+                                                                {})));
 
     // Create src and dst storage services
     ASSERT_NO_THROW(src_storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("SrcHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("SrcHost", {"/"})));
 
     ASSERT_NO_THROW(src2_storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/"})));
 
     ASSERT_NO_THROW(dst_storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("DstHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("DstHost", {"/"})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -549,7 +570,7 @@ void DataMovementManagerTest::do_AsyncWrite_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new DataMovementManagerAsyncWriteTestWMS(
-            this, file_registry_service, "WMSHost")));
+                            this, file_registry_service, "WMSHost")));
 
     // Stage the 2 files on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(src_file_1, src_storage_service));
@@ -589,6 +610,15 @@ private:
 
 
         {
+
+
+            try {
+                data_movement_manager->initiateAsynchronousFileRead(nullptr, 10);
+                throw std::runtime_error("Should not be able to do a file read with a nullptr location");
+            } catch (std::invalid_argument &ignore) {
+            }
+
+
             // try asynchronous read that should work
             std::shared_ptr<wrench::ExecutionEvent> async_read_event;
 
@@ -598,6 +628,22 @@ private:
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Got an exception while trying to instantiate a file read: " + std::string(e.what()));
             }
+
+            wrench::Simulation::sleep(0.01);
+
+            try {
+                data_movement_manager->initiateAsynchronousFileRead(
+                        wrench::FileLocation::LOCATION(this->test->src_storage_service, this->test->src_file_1));
+                throw std::runtime_error("Should not be able to concurrently read from the same location");
+            } catch (wrench::ExecutionException &e) {
+                auto real_cause = std::dynamic_pointer_cast<wrench::FileAlreadyBeingRead>(e.getCause());
+                if (not real_cause) {
+                    throw std::runtime_error("Unexpected failure cause: " + real_cause->toString());
+                }
+                real_cause->toString();   // coverage
+                real_cause->getLocation();// coverage
+            }
+
 
             try {
                 async_read_event = this->waitForNextEvent();
@@ -663,7 +709,7 @@ void DataMovementManagerTest::do_AsyncRead_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//        argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -672,20 +718,20 @@ void DataMovementManagerTest::do_AsyncRead_test() {
 
     // Create a (unused) Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("WMSHost",
-                                                {std::make_pair("WMSHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                           wrench::ComputeService::ALL_RAM))},
-                                                {})));
+                            new wrench::BareMetalComputeService("WMSHost",
+                                                                {std::make_pair("WMSHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                           wrench::ComputeService::ALL_RAM))},
+                                                                {})));
 
     // Create src and dst storage services
     ASSERT_NO_THROW(src_storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("SrcHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("SrcHost", {"/"})));
 
     ASSERT_NO_THROW(src2_storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("WMSHost", {"/"})));
 
     ASSERT_NO_THROW(dst_storage_service = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService("DstHost", {"/"})));
+                            wrench::SimpleStorageService::createSimpleStorageService("DstHost", {"/"})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -694,7 +740,7 @@ void DataMovementManagerTest::do_AsyncRead_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new DataMovementManagerAsyncReadTestWMS(
-            this,"WMSHost")));
+                            this, "WMSHost")));
 
     // Stage files
     ASSERT_NO_THROW(simulation->stageFile(src_file_1, src_storage_service));

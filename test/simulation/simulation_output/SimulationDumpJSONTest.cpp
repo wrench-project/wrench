@@ -791,7 +791,7 @@ public:
 private:
     SimulationDumpJSONTest *test;
 
-    int main() {
+    int main() override {
 
         // default pstate is set to 1, change it back to 0
         // at time 0.0, the pstate is set to 1 as specified in the platform file,
@@ -1023,7 +1023,7 @@ public:
 private:
     SimulationDumpJSONTest *test;
 
-    int main() {
+    int main() override {
         //creating the bandwidth meter service
         const std::vector<std::string> linknames = wrench::Simulation::getLinknameList();
         const double TWO_SECOND_PERIOD = 2.0;

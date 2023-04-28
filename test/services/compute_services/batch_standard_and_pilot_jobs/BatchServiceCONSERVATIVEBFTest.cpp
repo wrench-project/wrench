@@ -90,7 +90,7 @@ public:
 private:
     BatchServiceCONSERVATIVE_BFTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -110,19 +110,19 @@ private:
                 job4;
 
         job1["-N"] = "2";
-        job1["-t"] = "10";
+        job1["-t"] = "600";
         job1["-c"] = "10";
 
         job2["-N"] = "2";
-        job2["-t"] = "2";
+        job2["-t"] = "120";
         job2["-c"] = "10";
 
         job3["-N"] = "4";
-        job3["-t"] = "2";
+        job3["-t"] = "120";
         job3["-c"] = "10";
 
         job4["-N"] = "2";
-        job4["-t"] = "5";
+        job4["-t"] = "300";
         job4["-c"] = "10";
 
 
@@ -251,7 +251,7 @@ public:
 private:
     BatchServiceCONSERVATIVE_BFTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -273,7 +273,7 @@ private:
                 random = random * 17 + 4123451;
                 job_specific_args["-N"] = std::to_string(1 + random % 4);
                 random = random * 17 + 4123451;
-                job_specific_args["-t"] = std::to_string(1 + random % 100);
+                job_specific_args["-t"] = std::to_string(60 * (1 + random % 100));
                 job_specific_args["-c"] = "10";
                 job_manager->submitJob(jobs[i], this->test->compute_service, job_specific_args);
             }
@@ -326,7 +326,7 @@ private:
                     job->getServiceSpecificArguments()["-t"].c_str() << " (real=" <<
                     job->getTasks().at(0)->getFlops()/60 << ")   \tCT="<<
                     completion_time/60.0 << "\n";
-//            WRENCH_INFO("COMPLETION TIME %s (%s nodes, %s minutes): %lf",
+//            WRENCH_INFO("COMPLETION TIME %s (%s nodes, %s seconds): %lf",
 //                        i.first.c_str(),
 //                        job->getServiceSpecificArguments()["-N"].c_str(),
 //                        job->getServiceSpecificArguments()["-t"].c_str(),
@@ -416,7 +416,7 @@ public:
 private:
     BatchServiceCONSERVATIVE_BFTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -436,20 +436,20 @@ private:
                 three_hosts_ten_cores_1min;
 
         one_hosts_ten_cores_1min["-N"] = "1";
-        one_hosts_ten_cores_1min["-t"] = "1";
+        one_hosts_ten_cores_1min["-t"] = "60";
         one_hosts_ten_cores_1min["-c"] = "10";
 
         two_hosts_ten_cores_1min["-N"] = "2";
-        two_hosts_ten_cores_1min["-t"] = "1";
+        two_hosts_ten_cores_1min["-t"] = "60";
         two_hosts_ten_cores_1min["-c"] = "10";
 
         two_hosts_ten_cores_2min["-N"] = "2";
-        two_hosts_ten_cores_2min["-t"] = "2";
+        two_hosts_ten_cores_2min["-t"] = "120";
         two_hosts_ten_cores_2min["-c"] = "10";
 
 
         three_hosts_ten_cores_1min["-N"] = "3";
-        three_hosts_ten_cores_1min["-t"] = "1";
+        three_hosts_ten_cores_1min["-t"] = "60";
         three_hosts_ten_cores_1min["-c"] = "10";
 
 
@@ -580,7 +580,7 @@ public:
 private:
     BatchServiceCONSERVATIVE_BFTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -599,23 +599,23 @@ private:
                 job5;
 
         job1["-N"] = "4";
-        job1["-t"] = "75";
+        job1["-t"] = std::to_string(75 * 60);
         job1["-c"] = "10";
 
         job2["-N"] = "2";
-        job2["-t"] = "25";
+        job2["-t"] = std::to_string(25 * 60);
         job2["-c"] = "10";
 
         job3["-N"] = "4";
-        job3["-t"] = "67";
+        job3["-t"] = std::to_string(67 * 60);
         job3["-c"] = "10";
 
         job4["-N"] = "2";
-        job4["-t"] = "25";
+        job4["-t"] = std::to_string(25 * 60);
         job4["-c"] = "10";
 
         job5["-N"] = "4";
-        job5["-t"] = "59";
+        job5["-t"] = std::to_string(59 * 60);
         job5["-c"] = "10";
 
         int num_jobs_submitted = 0;
@@ -658,7 +658,7 @@ private:
         for (auto const &i: actual_completion_times) {
             auto job = i.second.first;
             double completion_time = i.second.second;
-            WRENCH_INFO("COMPLETION TIME %s (%s nodes, %s minutes): %lf",
+            WRENCH_INFO("COMPLETION TIME %s (%s nodes, %s seconds): %lf",
                         i.first.c_str(),
                         job->getServiceSpecificArguments()["-N"].c_str(),
                         job->getServiceSpecificArguments()["-t"].c_str(),
@@ -748,7 +748,7 @@ public:
 private:
     BatchServiceCONSERVATIVE_BFTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -768,19 +768,19 @@ private:
                 job4;
 
         job1["-N"] = "4";
-        job1["-t"] = "1";
+        job1["-t"] = "60";
         job1["-c"] = "5";
 
         job2["-N"] = "2";
-        job2["-t"] = "1";
+        job2["-t"] = "60";
         job2["-c"] = "8";
 
         job3["-N"] = "4";
-        job3["-t"] = "1";
+        job3["-t"] = "60";
         job3["-c"] = "6";
 
         job4["-N"] = "4";
-        job4["-t"] = "1";
+        job4["-t"] = "60";
         job4["-c"] = "1";
 
 
@@ -916,7 +916,7 @@ public:
 private:
     BatchServiceCONSERVATIVE_BFTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -938,7 +938,7 @@ private:
                 random = random * 17 + 4123451;
                 job_specific_args["-N"] = std::to_string(1 + random % 4);
                 random = random * 17 + 4123451;
-                job_specific_args["-t"] = std::to_string(1 + random % 100);
+                job_specific_args["-t"] = std::to_string(60 * (1 + random % 100));
                 job_specific_args["-c"] = "10";
                 job_manager->submitJob(jobs[i], this->test->compute_service, job_specific_args);
             }
@@ -993,7 +993,7 @@ private:
                     job->getServiceSpecificArguments()["-t"].c_str() << " (real=" <<
                     job->getTasks().at(0)->getFlops()/60 << ")   \tCT="<<
                     completion_time/60.0 << "\n";
-//            WRENCH_INFO("COMPLETION TIME %s (%s nodes, %s minutes): %lf",
+//            WRENCH_INFO("COMPLETION TIME %s (%s nodes, %s seconds): %lf",
 //                        i.first.c_str(),
 //                        job->getServiceSpecificArguments()["-N"].c_str(),
 //                        job->getServiceSpecificArguments()["-t"].c_str(),

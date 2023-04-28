@@ -149,7 +149,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -224,6 +224,13 @@ private:
                 this->simulation->setPstate("dummy_unavailable_host", 2);
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts");
+            } catch (std::invalid_argument &e) {
+            }
+
+            try {
+                this->simulation->setPstate("MyHost1", 1000);
+                throw std::runtime_error(
+                        "Should not have been able to set a bogus pstate");
             } catch (std::invalid_argument &e) {
             }
         }
@@ -314,7 +321,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -336,7 +343,7 @@ private:
             this->waitForAndProcessNextEvent();
 
             try {
-                double value = this->simulation->getEnergyConsumed("MyHost1");
+                this->simulation->getEnergyConsumed("MyHost1");
                 throw std::runtime_error("Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
@@ -349,28 +356,28 @@ private:
             }
 
             try {
-                double value = this->simulation->getNumberofPstates("MyHost1");
+                wrench::Simulation::getNumberofPstates("MyHost1");
                 throw std::runtime_error(
                         "Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
 
             try {
-                double value = this->simulation->getCurrentPstate("MyHost1");
+                wrench::Simulation::getCurrentPstate("MyHost1");
                 throw std::runtime_error(
                         "Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
 
             try {
-                double value = this->simulation->getMinPowerConsumption("MyHost1");
+                wrench::Simulation::getMinPowerConsumption("MyHost1");
                 throw std::runtime_error(
                         "Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
 
             try {
-                double value = this->simulation->getMaxPowerConsumption("MyHost1");
+                wrench::Simulation::getMaxPowerConsumption("MyHost1");
                 throw std::runtime_error(
                         "Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
@@ -379,7 +386,7 @@ private:
             try {
                 this->simulation->setPstate("MyHost1", 1);
                 throw std::runtime_error(
-                        "Should not have been able to read the energy without activating energy plugin");
+                        "Should not have been able to set the pstate without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
         }
@@ -470,7 +477,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -586,7 +593,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
         {
@@ -596,7 +603,14 @@ private:
             double cur_max_possible = this->simulation->getMaxPowerConsumption(simulation_hosts[1]);
             double cur_min_possible = this->simulation->getMinPowerConsumption(simulation_hosts[1]);
             //switch pstates right off the bat
-            std::vector<int> list_of_pstates = this->simulation->getListOfPstates(simulation_hosts[1]);
+
+            // coverage
+            try {
+                wrench::Simulation::getListOfPstates("bogus");
+                throw std::runtime_error("Shouldn't be able to get list of pstate for a bogus host");
+            } catch (std::invalid_argument &ignore) {}
+
+            std::vector<int> list_of_pstates = wrench::Simulation::getListOfPstates(simulation_hosts[1]);
             int max_num_pstate = list_of_pstates.size();
             int pstate = std::max(0, max_num_pstate - 1);
             this->simulation->setPstate(simulation_hosts[1], pstate);
@@ -728,7 +742,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
 
         //The tests is just to switch pstate and check if energy consumed is +ve and we don't have any segfaults or something
         // Create a job manager
@@ -896,7 +910,7 @@ public:
 private:
     EnergyConsumptionTest *test;
 
-    int main() {
+    int main() override {
 
         //The tests is just to switch pstate and check if energy consumed is +ve and we don't have any segfaults or something
         // Create a job manager

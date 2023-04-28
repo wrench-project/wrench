@@ -111,7 +111,7 @@ private:
     MessageConstructorTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
-    int main() {
+    int main() override {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -265,6 +265,7 @@ private:
         CUSTOM_NO_THROW(new wrench::CloudComputeServiceDestroyVMAnswerMessage(true, nullptr, 666));
 
         CUSTOM_NO_THROW(new wrench::StorageServiceFreeSpaceRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), "/", 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFreeSpaceRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), "", 666));
         CUSTOM_THROW(new wrench::StorageServiceFreeSpaceRequestMessage(nullptr, "/", 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::StorageServiceFreeSpaceAnswerMessage(1000, 666));

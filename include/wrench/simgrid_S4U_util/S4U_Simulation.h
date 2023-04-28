@@ -59,12 +59,14 @@ namespace wrench {
                                            double parallel_per_thread_work);
         static void sleep(double);
         static void computeZeroFlop();
-        static void writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point);
-        static void readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point);
+        static void writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk);
+        static void readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk);
         static void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                            const std::string &hostname,
                                                            const std::string &read_mount_point,
-                                                           const std::string &write_mount_point);
+                                                           const std::string &write_mount_point,
+                                                           simgrid::s4u::Disk *src_disk,
+                                                           simgrid::s4u::Disk *dst_disk);
 
         static double getDiskCapacity(const std::string &hostname, std::string mount_point);
         static std::vector<std::string> getDisks(const std::string &hostname);

@@ -31,14 +31,10 @@ namespace wrench {
     class FileWriterThread : public Service {
 
     public:
-
-        void kill();
-
         FileWriterThread(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox,
-                                  std::shared_ptr<FileLocation> location);
+                         std::shared_ptr<FileLocation> location);
 
     protected:
-
     private:
         int main() override;
 

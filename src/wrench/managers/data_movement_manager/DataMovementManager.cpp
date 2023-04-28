@@ -78,26 +78,28 @@ namespace wrench {
 
         DataMovementManager::CopyRequestSpecs request(src, dst, file_registry_service);
 
-        try {
-            for (auto const &p: this->pending_file_copies) {
-                if (*p == request) {
-                    throw ExecutionException(
-                            std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
-                }
+        for (auto const &p: this->pending_file_copies) {
+            if (*p == request) {
+                throw ExecutionException(
+                        std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
             }
-        } catch (ExecutionException &e) {
-            throw;
         }
 
 
-        try {
-            this->pending_file_copies.push_front(std::make_unique<CopyRequestSpecs>(src, dst, file_registry_service));
-            wrench::StorageService::initiateFileCopy(this->mailbox, src, dst);
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        this->pending_file_copies.push_front(std::make_unique<CopyRequestSpecs>(src, dst, file_registry_service));
+        wrench::StorageService::initiateFileCopy(this->mailbox, src, dst);
     }
 
+    /**
+     * @brief Ask the data manager to initiate an asynchronous file read
+     * @param location: the location to read from
+     *
+     * @throw std::invalid_argument
+     * @throw ExecutionException
+     */
+    void DataMovementManager::initiateAsynchronousFileRead(const std::shared_ptr<FileLocation> &location) {
+        this->initiateAsynchronousFileRead(location, location->getFile()->getSize());
+    }
 
     /**
      * @brief Ask the data manager to initiate an asynchronous file read
@@ -122,15 +124,11 @@ namespace wrench {
             }
         }
 
-        try {
-            this->pending_file_reads.push_front(std::make_unique<ReadRequestSpecs>(location, num_bytes));
-            // Initiate the read in a thread
-            auto frt = std::make_shared<FileReaderThread>(this->hostname, this->mailbox, location, num_bytes);
-            frt->setSimulation(this->simulation);
-            frt->start(frt, true, false);
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        this->pending_file_reads.push_front(std::make_unique<ReadRequestSpecs>(location, num_bytes));
+        // Initiate the read in a thread
+        auto frt = std::make_shared<FileReaderThread>(this->hostname, this->mailbox, location, num_bytes);
+        frt->setSimulation(this->simulation);
+        frt->start(frt, true, false);
     }
 
     /**
@@ -152,20 +150,16 @@ namespace wrench {
         for (auto const &p: this->pending_file_writes) {
             if (*p == request) {
                 throw ExecutionException(
-                        std::shared_ptr<FailureCause>(new FileAlreadyBeingRead(location)));
+                        std::shared_ptr<FailureCause>(new FileAlreadyBeingWritten(location)));
             }
         }
 
-        try {
-            this->pending_file_writes.push_front(std::make_unique<WriteRequestSpecs>(location, file_registry_service));
+        this->pending_file_writes.push_front(std::make_unique<WriteRequestSpecs>(location, file_registry_service));
 
-            // Initiate the write in a thread
-            auto fwt = std::make_shared<FileWriterThread>(this->hostname, this->mailbox, location);
-            fwt->setSimulation(this->simulation);
-            fwt->start(fwt, true, false);
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        // Initiate the write in a thread
+        auto fwt = std::make_shared<FileWriterThread>(this->hostname, this->mailbox, location);
+        fwt->setSimulation(this->simulation);
+        fwt->start(fwt, true, false);
     }
 
 
@@ -190,25 +184,17 @@ namespace wrench {
 
         DataMovementManager::CopyRequestSpecs request(src, dst, file_registry_service);
 
-        try {
-            for (auto const &p: this->pending_file_copies) {
-                if (*p == request) {
-                    throw ExecutionException(
-                            std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
-                }
+        for (auto const &p: this->pending_file_copies) {
+            if (*p == request) {
+                throw ExecutionException(
+                        std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
             }
-
-            StorageService::copyFile(src, dst);
-        } catch (ExecutionException &e) {
-            throw;
         }
 
-        try {
-            if (file_registry_service) {
-                file_registry_service->addEntry(dst);
-            }
-        } catch (ExecutionException &e) {
-            throw;
+        StorageService::copyFile(src, dst);
+
+        if (file_registry_service) {
+            file_registry_service->addEntry(dst);
         }
     }
 
@@ -342,7 +328,7 @@ namespace wrench {
                                                                            std::move(msg->failure_cause)));
             return true;
 
-        }  else {
+        } else {
             throw std::runtime_error(
                     "DataMovementManager::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
         }
