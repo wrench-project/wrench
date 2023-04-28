@@ -64,6 +64,8 @@ namespace wrench {
 
         json addBareMetalComputeService(json data);
 
+        json addCloudComputeService(json data);
+
         json addSimpleStorageService(json data);
 
         json createFileCopyAtStorageService(json data);

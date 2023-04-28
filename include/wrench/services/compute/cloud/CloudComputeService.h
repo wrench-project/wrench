@@ -67,6 +67,7 @@ namespace wrench {
         };
 
     public:
+
         CloudComputeService(const std::string &hostname,
                             const std::vector<std::string> &execution_hosts,
                             const std::string &scratch_space_mount_point,
