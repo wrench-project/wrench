@@ -71,7 +71,6 @@ namespace wrench {
                                                                 bool enforce_num_cores = false,
                                                                 bool ignore_avg_cpu = false,
                                                                 bool show_warnings = false);
-
     };
 
 }// namespace wrench

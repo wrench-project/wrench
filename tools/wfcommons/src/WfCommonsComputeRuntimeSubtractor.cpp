@@ -61,9 +61,10 @@ std::map<std::string, double> get_task_runtimes(const nlohmann::json &workflow) 
 
 int main(int argc, char **argv) {
 
-    bool valid_args = (argc == 3) or ((argc == 4) and (std::string(argv[3]) == "--set-avgCPU-to-100"));
+    bool valid_args = (argc == 3) or ((argc == 4) and (std::string(argv[3]) == "--do-not-update-avgCPU"));
     if (not valid_args) {
-        std::cerr << "Usage: " << argv[0] << " <path to JSON workflow #1> <path to JSON workflow #2> [--set-avgCPU-to-100]\n\n";
+        std::cerr << "Usage: " << argv[0] << " <path to JSON workflow #1> <path to JSON workflow #2> [--do-not-update-avgCPU]\n";
+        std::cerr << "        if --do-not-update-avgCPU is specified, then the avgCPU of tasks will be left unmodified, instead of being set to 100*#cores %\n";
         std::cerr << "  This program takes as input two WfCommons workflow instance JSON files that correspond to the same "
                      "workflow (i.e. identical set of 'compute' tasks). It outputs on stdout the JSON for the first workflow "
                      "but where the runtimeInSeconds value of each 'compute' task has been reduced by the runtimeInSeconds value "
@@ -78,7 +79,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    bool set_avgCPU_to_100 = (argc == 4);
+    bool set_avgCPU_to_100 = (argc == 3);
 
     // Read in the original workflow into a JSON object
     nlohmann::json original_workflow_json = read_from_file(argv[1]);

@@ -221,7 +221,6 @@ TEST_F(WorkflowTaskTest, GetSet) {
     ASSERT_EQ(t1->getBytesWritten(), -1);
     ASSERT_EQ(t4->getBytesRead(), 1000010);
     ASSERT_EQ(t4->getBytesWritten(), 1000);
-
 }
 
 TEST_F(WorkflowTaskTest, InputOutputFile) {

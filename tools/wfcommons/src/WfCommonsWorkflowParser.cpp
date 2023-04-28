@@ -157,25 +157,23 @@ namespace wrench {
                         }
 
                         if ((num_cores < 0) and (avg_cpu < 0)) {
-                            if (show_warnings) std::cerr << "[WARNING]: Task " << name  <<
-                                                         " does not specify a number of cores or an avgCPU: "
-                                                         "Assuming 1 core and avgCPU at 100%.\n";
+                            if (show_warnings) std::cerr << "[WARNING]: Task " << name << " does not specify a number of cores or an avgCPU: "
+                                                                                          "Assuming 1 core and avgCPU at 100%.\n";
                             num_cores = 1.0;
                             avg_cpu = 100.0;
                         } else if (num_cores < 0) {
                             if (show_warnings) std::cerr << "[WARNING]: Task " << name << " has avgCPU " << avg_cpu
-                                                         << "% but does not specify the number of cores:" <<
-                                                         "Assuming " << std::ceil(avg_cpu / 100.0) << " cores\n";
+                                                         << "% but does not specify the number of cores:"
+                                                         << "Assuming " << std::ceil(avg_cpu / 100.0) << " cores\n";
                             num_cores = std::ceil(avg_cpu / 100.0);
                         } else if (avg_cpu < 0) {
                             if (show_warnings) std::cerr << "[WARNING]: Task " + name + " does not specify avgCPU: "
                                                                                         "Assuming 100%.\n";
                             avg_cpu = 100.0;
-                        } else if (avg_cpu  > 100 * num_cores) {
+                        } else if (avg_cpu > 100 * num_cores) {
                             if (show_warnings) {
-                                std::cerr << "[WARNING]: Task " << name << " specifies " <<
-                                          (unsigned long)num_cores <<  " cores and avgCPU " << avg_cpu << "%, " <<
-                                          "which is impossible: Assuming avgCPU " << 100.0 * num_cores << " instead.\n";
+                                std::cerr << "[WARNING]: Task " << name << " specifies " << (unsigned long) num_cores << " cores and avgCPU " << avg_cpu << "%, "
+                                          << "which is impossible: Assuming avgCPU " << 100.0 * num_cores << " instead.\n";
                             }
                             avg_cpu = 100.0 * num_cores;
                         }
