@@ -21,6 +21,8 @@ public:
     std::shared_ptr<wrench::ExecutionController> wms1, wms2;
 
     void do_AsynchronousCommunication_test();
+    void do_NetworkTimeout_test();
+    void do_NullMailbox_test();
 
 protected:
     S4U_MailboxTest() {
@@ -53,7 +55,7 @@ class AsynchronousCommunicationTestWMS : public wrench::ExecutionController {
 
 public:
     AsynchronousCommunicationTestWMS(S4U_MailboxTest *test,
-                                     std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                                     const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -82,7 +84,7 @@ private:
 
             // Another send
             auto another_pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage(100));
-            another_pending_send->wait(0.01);
+            another_pending_send->wait(0.01 - wrench::Simulation::getCurrentSimulatedDate());
 
             // Two sends, no timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends;
@@ -177,7 +179,7 @@ private:
 
             // Another recv
             auto another_pending_recv = wrench::S4U_Mailbox::igetMessage(this->test->wms2->mailbox);
-            another_pending_recv->wait(0.01);
+            another_pending_recv->wait(0.01 - wrench::Simulation::getCurrentSimulatedDate());
 
             // Two recv, no timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> recvs;
@@ -261,6 +263,167 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
     auto workflow = wrench::Workflow::createWorkflow();
     this->wms1 = simulation->add(new AsynchronousCommunicationTestWMS(this, "Host1"));
     this->wms2 = simulation->add(new AsynchronousCommunicationTestWMS(this, "Host2"));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  NETWORK TIMEOUT TEST                                            **/
+/**********************************************************************/
+
+class NetworkTimeoutTestWMS : public wrench::ExecutionController {
+
+public:
+    NetworkTimeoutTestWMS(S4U_MailboxTest *test,
+                          const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+    S4U_MailboxTest *test;
+    std::string mode;
+
+    int main() override {
+
+        try {
+            wrench::S4U_Mailbox::getMessage<wrench::SimulationMessage>(this->mailbox, 10);
+            throw std::runtime_error("Should have gotten an exception");
+        } catch (wrench::ExecutionException &e) {
+            auto real_error = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
+            if (not real_error) {
+                throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString());
+            }
+            if (!real_error->isTimeout()) {
+                throw std::runtime_error("Network error failure cause should be a time out");
+            }
+            real_error->toString();// coverage
+        }
+
+        try {
+            auto pending = wrench::S4U_Mailbox::igetMessage(this->mailbox);
+            pending->wait(10);
+            throw std::runtime_error("Should have gotten an exception");
+        } catch (wrench::ExecutionException &e) {
+            auto real_error = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
+            if (not real_error) {
+                throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString());
+            }
+            if (!real_error->isTimeout()) {
+                throw std::runtime_error("Network error failure cause should be a time out");
+            }
+            real_error->toString();// coverage
+        }
+
+        {
+            auto pending = wrench::S4U_Mailbox::igetMessage(this->mailbox);
+            std::vector<wrench::S4U_PendingCommunication *> pending_comms = {pending.get()};
+            auto index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(pending_comms, 10);
+            if (index != ULONG_MAX) {
+                throw std::runtime_error("Should have gotten ULONG_MAX");
+            }
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(S4U_MailboxTest, NetworkTimeout) {
+    DO_TEST_WITH_FORK(do_NetworkTimeout_test);
+}
+
+void S4U_MailboxTest::do_NetworkTimeout_test() {
+
+
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-link-shutdown-simulation");
+    //    argv[2] = strdup("--wrench-log-full");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    simulation->instantiatePlatform(platform_file_path);
+
+    // Create the WMSs
+    auto workflow = wrench::Workflow::createWorkflow();
+    this->wms1 = simulation->add(new NetworkTimeoutTestWMS(this, "Host1"));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  NULL MAILBOX TEST                                               **/
+/**********************************************************************/
+
+class NullMailboxTestWMS : public wrench::ExecutionController {
+
+public:
+    NullMailboxTestWMS(S4U_MailboxTest *test,
+                       const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+    S4U_MailboxTest *test;
+    std::string mode;
+
+    int main() override {
+
+        // Coverage
+        wrench::S4U_Mailbox::putMessage(wrench::S4U_Mailbox::NULL_MAILBOX, nullptr);
+        wrench::S4U_Mailbox::iputMessage(wrench::S4U_Mailbox::NULL_MAILBOX, nullptr);
+        try {
+            wrench::S4U_Mailbox::getMessage(wrench::S4U_Mailbox::NULL_MAILBOX);
+            throw std::runtime_error("Shouldn't be able to get message from NULL_MAILBOX");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            wrench::S4U_Mailbox::igetMessage(wrench::S4U_Mailbox::NULL_MAILBOX);
+            throw std::runtime_error("Shouldn't be able to get message from NULL_MAILBOX");
+        } catch (std::invalid_argument &ignore) {}
+
+        return 0;
+    }
+};
+
+TEST_F(S4U_MailboxTest, NullMailbox) {
+    DO_TEST_WITH_FORK(do_NullMailbox_test);
+}
+
+void S4U_MailboxTest::do_NullMailbox_test() {
+
+
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-link-shutdown-simulation");
+    //    argv[2] = strdup("--wrench-log-full");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    simulation->instantiatePlatform(platform_file_path);
+
+    // Create the WMSs
+    this->wms1 = simulation->add(new NullMailboxTestWMS(this, "Host1"));
 
     simulation->launch();
 

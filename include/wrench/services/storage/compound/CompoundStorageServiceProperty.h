@@ -26,7 +26,7 @@ namespace wrench {
          *         CompoundStorageService being passive. A future option would be
          *         to have the CSS take the decision upon receiving an IO request.
          */
-        DECLARE_PROPERTY_NAME(STORAGE_SELECTION_METHOD);
+        DECLARE_PROPERTY_NAME(MAX_ALLOCATION_CHUNK_SIZE);
     };
 
 };// namespace wrench

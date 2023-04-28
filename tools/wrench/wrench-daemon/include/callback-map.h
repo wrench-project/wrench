@@ -18,6 +18,7 @@ request_handlers["taskGetMemory"] = [sc](json data) { return sc->getTaskMemory(s
 request_handlers["createStandardJob"] = [sc](json data) { return sc->createStandardJob(std::move(data)); };
 request_handlers["submit"] = [sc](json data) { return sc->submitStandardJob(std::move(data)); };
 request_handlers["addBareMetalComputeService"] = [sc](json data) { return sc->addBareMetalComputeService(std::move(data)); };
+request_handlers["addCloudComputeService"] = [sc](json data) { return sc->addCloudComputeService(std::move(data)); };
 request_handlers["addSimpleStorageService"] = [sc](json data) { return sc->addSimpleStorageService(std::move(data)); };
 request_handlers["addFileRegistryService"] = [sc](json data) { return sc->addFileRegistryService(std::move(data)); };
 request_handlers["createFileCopy"] = [sc](json data) { return sc->createFileCopyAtStorageService(std::move(data)); };

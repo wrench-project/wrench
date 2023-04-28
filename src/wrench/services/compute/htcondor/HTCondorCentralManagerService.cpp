@@ -42,6 +42,7 @@ namespace wrench {
      * @param non_grid_pre_overhead: non-grid job pre-overhead
      * @param non_grid_post_overhead: non-grid job post-overhead
      * @param fast_bmcs_resource_availability: whether to obtain direct availabily information from bare-metal services
+     * @param fcfs: whether to enforce FCFS scheduling of jobs
      * @param compute_services: a set of 'child' compute resources available to and via the HTCondor pool
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -56,6 +57,7 @@ namespace wrench {
             double non_grid_pre_overhead,
             double non_grid_post_overhead,
             bool fast_bmcs_resource_availability,
+            bool fcfs,
             std::set<shared_ptr<ComputeService>> compute_services,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
@@ -67,6 +69,7 @@ namespace wrench {
         this->non_grid_pre_overhead = non_grid_pre_overhead;
         this->non_grid_post_overhead = non_grid_post_overhead;
         this->fast_bmcs_resource_availability = fast_bmcs_resource_availability;
+        this->fcfs = fcfs;
 
         this->compute_services = compute_services;
 
@@ -145,13 +148,13 @@ namespace wrench {
                 // dispatching standard or pilot jobs
                 if (not this->pending_jobs.empty()) {
                     this->dispatching_jobs = true;
-                    //WRENCH_INFO("adding BatchComputeService service to new negotiator---> %p", this->grid_universe_batch_service_shared_ptr.get());
                     auto negotiator = std::make_shared<HTCondorNegotiatorService>(
                             this->hostname,
                             this->negotiator_startup_overhead,
                             this->grid_pre_overhead,
                             this->non_grid_pre_overhead,
                             this->fast_bmcs_resource_availability,
+                            this->fcfs,
                             this->compute_services,
                             this->running_jobs, this->pending_jobs, this->mailbox);
                     negotiator->setSimulation(this->simulation);
@@ -325,7 +328,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processCompoundJobCompletion(std::shared_ptr<CompoundJob> job) {
+    void HTCondorCentralManagerService::processCompoundJobCompletion(const std::shared_ptr<CompoundJob> &job) {
         WRENCH_INFO("A compound job has completed: %s", job->getName().c_str());
         auto callback_mailbox = job->popCallbackMailbox();
 
@@ -345,7 +348,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processCompoundJobFailure(std::shared_ptr<CompoundJob> job) {
+    void HTCondorCentralManagerService::processCompoundJobFailure(const std::shared_ptr<CompoundJob> &job) {
         WRENCH_INFO("A compound job has failed: %s", job->getName().c_str());
         auto callback_mailbox = job->popCallbackMailbox();
 
@@ -365,14 +368,14 @@ namespace wrench {
      * @param scheduled_jobs: list of scheduled jobs upon negotiator cycle completion
      */
     void HTCondorCentralManagerService::processNegotiatorCompletion(
-            std::vector<std::shared_ptr<Job>> &scheduled_jobs) {
+            std::set<std::shared_ptr<Job>> &scheduled_jobs) {
         if (scheduled_jobs.empty()) {
             this->resources_unavailable = true;
             this->dispatching_jobs = false;
             return;
         }
 
-        for (auto sjob: scheduled_jobs) {
+        for (const auto &sjob: scheduled_jobs) {
             for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); ++it) {
                 auto pjob = std::get<0>(*it);
                 if (sjob == pjob) {
@@ -474,14 +477,10 @@ namespace wrench {
                 }
                 unsigned long num_hosts = 0;
                 unsigned long num_cores_per_host = 0;
-                try {
-                    num_hosts = BatchComputeService::parseUnsignedLongServiceSpecificArgument(
-                            "-N", service_specific_arguments);
-                    num_cores_per_host = BatchComputeService::parseUnsignedLongServiceSpecificArgument(
-                            "-c", service_specific_arguments);
-                } catch (std::invalid_argument &e) {
-                    throw;
-                }
+                num_hosts = BatchComputeService::parseUnsignedLongServiceSpecificArgument(
+                        "-N", service_specific_arguments);
+                num_cores_per_host = BatchComputeService::parseUnsignedLongServiceSpecificArgument(
+                        "-c", service_specific_arguments);
                 if (cs->getNumHosts() < num_hosts) {
                     continue;
                 }

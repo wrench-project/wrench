@@ -197,6 +197,15 @@
 			return res;
 		});
 
+	CROW_ROUTE(app, "/simulation/<string>/addCloudComputeService").methods(crow::HTTPMethod::Post)
+		([this](const crow::request& req, const std::string& simid){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "addCloudComputeService");
+			return res;
+		});
+
 	CROW_ROUTE(app, "/simulation/<string>/addSimpleStorageService").methods(crow::HTTPMethod::Post)
 		([this](const crow::request& req, const std::string& simid){
 			json req_json = json::parse(req.body);
