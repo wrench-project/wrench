@@ -142,7 +142,7 @@ public:
 private:
     DynamicServiceCreationTest *test;
 
-    int main() {
+    int main() override {
 
         // Coverage
         try {

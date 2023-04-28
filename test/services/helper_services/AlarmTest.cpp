@@ -86,7 +86,7 @@ public:
 private:
     AlarmTest *test;
 
-    int main() {
+    int main() override {
 
         // Turn off Host2
         wrench::Simulation::turnOffHost("Host2");

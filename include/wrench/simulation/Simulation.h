@@ -165,10 +165,10 @@ namespace wrench {
         static void turnOffLink(const std::string &link_name);
 
         static void createNewDisk(const std::string &hostname, const std::string &disk_id,
-                           double read_bandwidth_in_bytes_per_sec,
-                           double write_bandwidth_in_bytes_per_sec,
-                           double capacity_in_bytes,
-                           const std::string &mount_point);
+                                  double read_bandwidth_in_bytes_per_sec,
+                                  double write_bandwidth_in_bytes_per_sec,
+                                  double capacity_in_bytes,
+                                  const std::string &mount_point);
 
         // pstate related calls
         void setPstate(const std::string &hostname, int pstate);
@@ -186,6 +186,11 @@ namespace wrench {
 
         static void sleep(double duration);
         static void compute(double flops);
+        static void computeMultiThreaded(unsigned long num_threads,
+                                         double thread_creation_overhead,
+                                         double sequential_work,
+                                         double parallel_per_thread_work);
+
         /***********************/
         /** \endcond           */
         /***********************/
@@ -193,17 +198,19 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        void readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point);
+        void readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk);
         void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                     const std::string &hostname,
                                                     const std::string &read_mount_point,
-                                                    const std::string &write_mount_point);
-        void writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point);
+                                                    const std::string &write_mount_point,
+                                                    simgrid::s4u::Disk *src_disk,
+                                                    simgrid::s4u::Disk *dst_disk);
+        void writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk);
 
+#ifdef PAGE_CACHE_SIMULATION
         void readWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location);
         void writebackWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location, bool is_dirty);
         void writeThroughWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location);
-#ifdef PAGE_CACHE_SIMULATION
         MemoryManager *getMemoryManagerByHost(const std::string &hostname);
 #endif
 
@@ -249,7 +256,7 @@ namespace wrench {
 
         void platformSanityCheck();
         void checkSimulationSetup();
-        bool isRunning() const;
+        //        bool isRunning() const;
 
         void startAllProcesses();
         void addService(const std::shared_ptr<ComputeService> &service);

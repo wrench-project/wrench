@@ -517,7 +517,7 @@ private:
 
         // Submit a pilot job
         try {
-            job_manager->submitJob(pilot_job, this->test->compute_service, {{"-N", "1"}, {"-c", "1"}, {"-t", "60"}});
+            job_manager->submitJob(pilot_job, this->test->compute_service, {{"-N", "1"}, {"-c", "1"}, {"-t", "3600"}});
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
         }

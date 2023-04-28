@@ -18,7 +18,6 @@
 
 WRENCH_LOG_CATEGORY(bogus_message_test, "Log category for BogusMessageTest");
 
-
 class BogusMessageTest : public ::testing::Test {
 
 public:

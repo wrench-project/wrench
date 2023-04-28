@@ -129,6 +129,7 @@ set(HEADER_FILES
         include/wrench/services/storage/compound/CompoundStorageService.h
         include/wrench/services/storage/compound/CompoundStorageServiceProperty.h
         include/wrench/services/storage/compound/CompoundStorageServiceMessagePayload.h
+        include/wrench/services/storage/compound/CompoundStorageServiceMessage.h
         include/wrench/services/storage/storage_helpers/FileLocation.h
 #        include/wrench/services/memory/Block.h
 #        include/wrench/services/memory/MemoryManager.h
@@ -189,6 +190,7 @@ set(HEADER_FILES
         include/wrench/action/Action.h
         include/wrench/action/SleepAction.h
         include/wrench/action/CustomAction.h
+        include/wrench/action/MPIAction.h
         include/wrench/action/FileReadAction.h
         include/wrench/action/FileWriteAction.h
         include/wrench/action/FileCopyAction.h
@@ -325,6 +327,7 @@ set(SOURCE_FILES
         src/wrench/services/storage/compound/CompoundStorageService.cpp
         src/wrench/services/storage/compound/CompoundStorageServiceProperty.cpp
         src/wrench/services/storage/compound/CompoundStorageServiceMessagePayload.cpp
+        src/wrench/services/storage/compound/CompoundStorageServiceMessage.cpp
         src/wrench/services/storage/storage_helper_classes/FileLocation.cpp
         src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
         include/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
@@ -379,6 +382,7 @@ set(SOURCE_FILES
         src/wrench/action/Action.cpp
         src/wrench/action/SleepAction.cpp
         src/wrench/action/CustomAction.cpp
+        src/wrench/action/MPIAction.cpp
         src/wrench/action/FileReadAction.cpp
         src/wrench/action/FileWriteAction.cpp
         src/wrench/action/FileCopyAction.cpp
@@ -444,6 +448,7 @@ set(TEST_FILES
         test/services/helper_services/action_execution_service/ActionExecutionServiceTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceResourceInformationTest.cpp
         test/services/compute_services/batch_compound_jobs/BatchComputeServiceOneActionTests.cpp
+        test/services/compute_services/batch_compound_jobs/BatchComputeServiceMPIActionTests.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/HomeGrownTimeLineTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceFCFSTest.cpp
@@ -496,6 +501,7 @@ set(TEST_FILES
         test/services/bandwidth_meter_service/BandwidthMeterServiceTest.cpp
         test/simulated_failures/host_failures/ServiceStartReStartTest.cpp
         test/simulated_failures/host_failures/ComprehensiveIntegrationTest.cpp
+        test/simulated_failures/FailureCommandLineArgsTest.cpp
         test/simulated_failures/host_failures/FailureDetectorHostFailuresTest.cpp
         test/simulated_failures/host_failures/BareMetalComputeServiceHostFailuresTest.cpp
         test/simulated_failures/host_failures/CloudComputeServiceHostFailuresTest.cpp

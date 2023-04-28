@@ -650,14 +650,10 @@ namespace wrench {
 
         // Set the "vertical position" of each WorkflowExecutionInstance so we know where to plot each rectangle
         if (generate_host_utilization_layout) {
-            try {
-                generateHostUtilizationGraphLayout(data);
-                std::ofstream output("host_utilization_layout.json");
-                output << std::setw(4) << host_utilization_layout << std::endl;
-                output.close();
-            } catch (std::runtime_error &e) {
-                throw;
-            }
+            generateHostUtilizationGraphLayout(data);
+            std::ofstream output("host_utilization_layout.json");
+            output << std::setw(4) << host_utilization_layout << std::endl;
+            output.close();
         }
 
         nlohmann::json workflow_execution_json;
@@ -1406,38 +1402,34 @@ namespace wrench {
 
         nlohmann::json bandwidth_json;
 
-        try {
-            auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-            std::vector<simgrid::s4u::Link *> links = get_all_links();
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+        std::vector<simgrid::s4u::Link *> links = get_all_links();
 
-            for (const auto &link: links) {
-                nlohmann::json datum;
-                datum["linkname"] = link->get_name();
+        for (const auto &link: links) {
+            nlohmann::json datum;
+            datum["linkname"] = link->get_name();
 
-                for (const auto &link_usage_timestamp: this->getTrace<SimulationTimestampLinkUsage>()) {
-                    if (link->get_name() == link_usage_timestamp->getContent()->getLinkname()) {
-                        datum["link_usage_trace"].push_back(
-                                {{"time", link_usage_timestamp->getDate()},
-                                 {"bytes per second", link_usage_timestamp->getContent()->getUsage()}});
-                    }
+            for (const auto &link_usage_timestamp: this->getTrace<SimulationTimestampLinkUsage>()) {
+                if (link->get_name() == link_usage_timestamp->getContent()->getLinkname()) {
+                    datum["link_usage_trace"].push_back(
+                            {{"time", link_usage_timestamp->getDate()},
+                             {"bytes per second", link_usage_timestamp->getContent()->getUsage()}});
                 }
-
-                bandwidth_json.push_back(datum);
             }
 
-            nlohmann::json link_usage;
-            nlohmann::json links_list;
-            links_list["links"] = bandwidth_json;
-            link_usage["link_usage"] = links_list;
-            bandwidth_json_part = links_list;
+            bandwidth_json.push_back(datum);
+        }
 
-            if (writing_file) {
-                std::ofstream output(file_path);
-                output << std::setw(4) << link_usage << std::endl;
-                output.close();
-            }
-        } catch (std::runtime_error &e) {
-            throw;
+        nlohmann::json link_usage;
+        nlohmann::json links_list;
+        links_list["links"] = bandwidth_json;
+        link_usage["link_usage"] = links_list;
+        bandwidth_json_part = links_list;
+
+        if (writing_file) {
+            std::ofstream output(file_path);
+            output << std::setw(4) << link_usage << std::endl;
+            output.close();
         }
     }
 

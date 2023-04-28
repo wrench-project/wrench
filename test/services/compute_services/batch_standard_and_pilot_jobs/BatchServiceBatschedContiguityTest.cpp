@@ -84,7 +84,7 @@ public:
 private:
     BatchServiceBatschedContiguityTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -108,7 +108,7 @@ private:
             job = job_manager->createStandardJob(task1);
             std::map<std::string, std::string> batch_job_args1;
             batch_job_args1["-N"] = "1";
-            batch_job_args1["-t"] = "1"; //time in minutes
+            batch_job_args1["-t"] = "60";//time in seconds
             batch_job_args1["-c"] = "10";// Get all cores
             try {
                 job_manager->submitJob(job, cs, batch_job_args1);
@@ -120,8 +120,8 @@ private:
             job = job_manager->createStandardJob(task2);
             std::map<std::string, std::string> batch_job_args2;
             batch_job_args2["-N"] = "2";
-            batch_job_args2["-t"] = "2"; //time in minutes
-            batch_job_args2["-c"] = "10";// Get all cores
+            batch_job_args2["-t"] = "120";//time in seconds
+            batch_job_args2["-c"] = "10"; // Get all cores
             try {
                 job_manager->submitJob(job, cs, batch_job_args2);
             } catch (wrench::ExecutionException &e) {
@@ -132,7 +132,7 @@ private:
             job = job_manager->createStandardJob(task3);
             std::map<std::string, std::string> batch_job_args3;
             batch_job_args3["-N"] = "1";
-            batch_job_args3["-t"] = "1"; //time in minutes
+            batch_job_args3["-t"] = "60";//time in seconds
             batch_job_args3["-c"] = "10";// Get all cores
             try {
                 job_manager->submitJob(job, cs, batch_job_args3);
@@ -144,7 +144,7 @@ private:
             job = job_manager->createStandardJob(task4);
             std::map<std::string, std::string> batch_job_args4;
             batch_job_args4["-N"] = "2";
-            batch_job_args4["-t"] = "1"; //time in minutes
+            batch_job_args4["-t"] = "60";//time in seconds
             batch_job_args4["-c"] = "10";// Get all cores
             try {
                 job_manager->submitJob(job, cs, batch_job_args4);

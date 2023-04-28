@@ -164,7 +164,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
 
         return 0;
     }
@@ -306,7 +306,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
 
         wrench::TerminalOutput::disableColor();// just for increasing stupid coverage
 
@@ -405,7 +405,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -445,6 +445,7 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
+
         // Create another task1
         std::shared_ptr<wrench::WorkflowTask> task_big = this->test->workflow->addTask("task2", 3600, 2, 2, 2048);
 
@@ -453,9 +454,7 @@ private:
 
             job = job_manager->createStandardJob({test->task, task_big},
                                                  {{nullptr, wrench::FileLocation::LOCATION(
-                                                                    test->storage_service1, nullptr)},
-                                                  {test->output_file, wrench::FileLocation::LOCATION(
-                                                                              test->storage_service1, test->output_file)}});
+                                                                    test->storage_service1, test->output_file)}});
             throw std::runtime_error("Should not be able to create a job with an nullptr file in file locations");
         } catch (std::invalid_argument &e) {
         }
@@ -671,7 +670,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         double ram_capacity;
 
         ram_capacity = wrench::Simulation::getHostMemoryCapacity("TwoCoreHost");
@@ -905,7 +904,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1048,7 +1047,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1160,7 +1159,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1308,7 +1307,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1434,7 +1433,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1549,7 +1548,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1668,7 +1667,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1777,7 +1776,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1886,7 +1885,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1992,7 +1991,7 @@ public:
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
-    int main() {
+    int main() override {
         // Create a job manager
         auto job_manager = this->createJobManager();
 

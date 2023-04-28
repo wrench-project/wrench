@@ -56,6 +56,8 @@ protected:
             <prop id="wattage_off" value="0.0" />
         </cluster>
     </zone>
+
+    <link id="link" bandwidth="40MBps" latency="10us" />
 </zone>
 </platform>
 )";
@@ -81,7 +83,7 @@ public:
 private:
     SimulationPlatformTest *test;
 
-    int main() {
+    int main() override {
 
         // Testing finding subzones
         auto subnetzones = wrench::S4U_Simulation::getAllSubZoneIDsByZone();
@@ -149,6 +151,7 @@ private:
         if (wrench::S4U_Simulation::getClusterProperty("simple", "wattage_off") != "0.0") {
             throw std::runtime_error("Invalid cluster property value");
         }
+
 
         return 0;
     }
@@ -218,6 +221,8 @@ private:
             throw std::runtime_error("Should not be able to create a file that big on the newly created storage service");
         } catch (wrench::ExecutionException &ignore) {}
         auto not_too_big = wrench::Simulation::addFile("not_too_big", 20.0);
+        wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
+        wrench::StorageService::removeFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
         wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
 
         return 0;
@@ -340,10 +345,12 @@ void SimulationPlatformTest::do_ProgrammaticPlatformTest_test() {
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
+    PlatformCreator platform_creator(100 * 1000000.0);
+
+    ASSERT_THROW(simulation->instantiatePlatform(platform_creator), std::runtime_error);
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
-    PlatformCreator platform_creator(100 * 1000000.0);
     simulation->instantiatePlatform(platform_creator);
 
     for (int i = 0; i < argc; i++)

@@ -307,11 +307,7 @@ namespace wrench {
 
         this->s4u_simulation->setupPlatform(filename);
 
-        try {
-            this->platformSanityCheck();
-        } catch (std::exception &e) {
-            throw;
-        }
+        this->platformSanityCheck();
 
         this->already_setup = true;
     }
@@ -332,11 +328,7 @@ namespace wrench {
 
         this->s4u_simulation->setupPlatform(creation_function);
 
-        try {
-            this->platformSanityCheck();
-        } catch (std::exception &e) {
-            throw;
-        }
+        this->platformSanityCheck();
 
         this->already_setup = true;
     }
@@ -523,14 +515,14 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Checks whether the simulation is running or not
-     *
-     * @return true or false
-     */
-    bool Simulation::isRunning() const {
-        return this->is_running;
-    }
+    //    /**
+    //     * @brief Checks whether the simulation is running or not
+    //     *
+    //     * @return true or false
+    //     */
+    //    bool Simulation::isRunning() const {
+    //        return this->is_running;
+    //    }
 
     /**
      * @brief Check that the simulation is correctly instantiated by the user
@@ -562,48 +554,44 @@ namespace wrench {
      */
     void Simulation::startAllProcesses() {
 
-        try {
-            // Start the execution controllers
-            for (const auto &execution_controller: this->execution_controllers) {
-                execution_controller->start(execution_controller, execution_controller->daemonized, false);// Not daemonized, no auto-restart
-            }
+        // Start the execution controllers
+        for (const auto &execution_controller: this->execution_controllers) {
+            execution_controller->start(execution_controller, execution_controller->daemonized, false);// Not daemonized, no auto-restart
+        }
 
-            // Start the compute services
-            for (const auto &compute_service: this->compute_services) {
-                compute_service->start(compute_service, true, false);// Daemonized, no auto-restart
-            }
+        // Start the compute services
+        for (const auto &compute_service: this->compute_services) {
+            compute_service->start(compute_service, true, false);// Daemonized, no auto-restart
+        }
 
-            // Start the storage services
-            for (const auto &storage_service: this->storage_services) {
-                storage_service->start(storage_service, true, true);// Daemonized, AUTO-RESTART
-            }
+        // Start the storage services
+        for (const auto &storage_service: this->storage_services) {
+            storage_service->start(storage_service, true, true);// Daemonized, AUTO-RESTART
+        }
 
 
-            //            // Start the scratch services
-            //            for (const auto &compute_service: this->compute_services) {
-            //                if (compute_service->hasScratch()) {
-            //                    compute_service->getScratch()->simulation = this;
-            //                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
-            //                                                         false);// Daemonized, no auto-restart
-            //                }
-            //            }
+        //            // Start the scratch services
+        //            for (const auto &compute_service: this->compute_services) {
+        //                if (compute_service->hasScratch()) {
+        //                    compute_service->getScratch()->simulation = this;
+        //                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
+        //                                                         false);// Daemonized, no auto-restart
+        //                }
+        //            }
 
-            // Start the network proximity services
-            for (const auto &network_proximity_service: this->network_proximity_services) {
-                network_proximity_service->start(network_proximity_service, true, false);// Daemonized, no auto-restart
-            }
+        // Start the network proximity services
+        for (const auto &network_proximity_service: this->network_proximity_services) {
+            network_proximity_service->start(network_proximity_service, true, false);// Daemonized, no auto-restart
+        }
 
-            // Start the file registry services
-            for (const auto &frs: this->file_registry_services) {
-                frs->start(frs, true, false);// Daemonized, no auto-restart
-            }
+        // Start the file registry services
+        for (const auto &frs: this->file_registry_services) {
+            frs->start(frs, true, false);// Daemonized, no auto-restart
+        }
 
-            // Start the energy meter services
-            for (const auto &frs: this->energy_meter_services) {
-                frs->start(frs, true, false);// Daemonized, no auto-restart
-            }
-        } catch (std::runtime_error &e) {
-            throw;
+        // Start the energy meter services
+        for (const auto &frs: this->energy_meter_services) {
+            frs->start(frs, true, false);// Daemonized, no auto-restart
         }
     }
 
@@ -770,28 +758,29 @@ namespace wrench {
      * @param mount_point: the disk's mount point (most people use "/")
      */
     void Simulation::createNewDisk(const std::string &hostname, const std::string &disk_id,
-                                       double read_bandwidth_in_bytes_per_sec,
-                                       double write_bandwidth_in_bytes_per_sec,
-                                       double capacity_in_bytes,
-                                       const std::string &mount_point) {
+                                   double read_bandwidth_in_bytes_per_sec,
+                                   double write_bandwidth_in_bytes_per_sec,
+                                   double capacity_in_bytes,
+                                   const std::string &mount_point) {
         S4U_Simulation::createNewDisk(hostname, disk_id, read_bandwidth_in_bytes_per_sec, write_bandwidth_in_bytes_per_sec, capacity_in_bytes, mount_point);
     }
 
     /**
      * @brief Wrapper enabling timestamps for disk reads
      *
-     * @param num_bytes - number of bytes read
-     * @param hostname - hostname to read from
-     * @param mount_point - mount point of disk to read from
+     * @param num_bytes: number of bytes read
+     * @param hostname: hostname to read from
+     * @param mount_point: mount point of disk to read from
+     * @param disk: disk to read from (nullptr if not known)
      *
      * @throw invalid_argument
      */
-    void Simulation::readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point) {
+    void Simulation::readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
-            S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point);
+            S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point, disk);
         } catch (const std::invalid_argument &ia) {
             this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
                                                           temp_unique_sequence_number);
@@ -808,13 +797,17 @@ namespace wrench {
      * @param hostname - hostname where disk is located
      * @param read_mount_point - mount point of disk to read from
      * @param write_mount_point - mount point of disk to write to
+     * @param src_disk: source disk (nullptr if not known)
+     * @param dst_disk: dst disk (nullptr if not known)
      *
      * @throw invalid_argument
      */
     void Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                             const std::string &hostname,
                                                             const std::string &read_mount_point,
-                                                            const std::string &write_mount_point) {
+                                                            const std::string &write_mount_point,
+                                                            simgrid::s4u::Disk *src_disk,
+                                                            simgrid::s4u::Disk *dst_disk) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
@@ -823,7 +816,7 @@ namespace wrench {
                                                      temp_unique_sequence_number);
         try {
             S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname,
-                                                                   read_mount_point, write_mount_point);
+                                                                   read_mount_point, write_mount_point, src_disk, dst_disk);
         } catch (const std::invalid_argument &ia) {
             this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
                                                            temp_unique_sequence_number);
@@ -843,15 +836,16 @@ namespace wrench {
      * @param num_bytes: number of bytes written
      * @param hostname: name of the host to write to
      * @param mount_point: mount point of the disk to write to at the host
+     * @param disk: a simgrid disk to write to (nullptr if not known)
      *
      * @throw invalid_argument
      */
-    void Simulation::writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point) {
+    void Simulation::writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
-            S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point);
+            S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point, disk);
         } catch (const std::invalid_argument &ia) {
             this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
                                                            temp_unique_sequence_number);
@@ -1169,6 +1163,20 @@ namespace wrench {
     }
 
     /**
+     * @brief Simulates a multi-threaded computation
+     * @param num_threads: the number of threads
+     * @param thread_creation_overhead: the thread creation overhead in seconds
+     * @param sequential_work: the sequential work (in flops)
+     * @param parallel_per_thread_work: the parallel per thread work (in flops)
+     */
+    void Simulation::computeMultiThreaded(unsigned long num_threads,
+                                          double thread_creation_overhead,
+                                          double sequential_work,
+                                          double parallel_per_thread_work) {
+        S4U_Simulation::compute_multi_threaded(num_threads, thread_creation_overhead, sequential_work, parallel_per_thread_work);
+    }
+
+    /**
      * @brief Get the simulation output object
      * @return simulation output object
      */
@@ -1317,10 +1325,10 @@ namespace wrench {
         std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
         this->compute_services.insert(shared_ptr);
         shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
-                                                   //        if (service->hasScratch()) {
-                                                   //            service->getScratch()->simulation = this;
-                                                   //            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
-                                                   //        }
+        //        if (service->hasScratch()) {
+        //            service->getScratch()->simulation = this;
+        //            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
+        //        }
 
         return shared_ptr;
     }

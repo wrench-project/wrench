@@ -62,7 +62,7 @@ public:
 private:
     SimulationLoggingTest *test;
 
-    int main() {
+    int main() override {
 
         WRENCH_INFO("Testing WRENCH_INFO without color");
         wrench::TerminalOutput::setThisProcessLoggingColor(wrench::TerminalOutput::COLOR_BLUE);
@@ -89,6 +89,8 @@ TEST_F(SimulationLoggingTest, Logging) {
 }
 
 void SimulationLoggingTest::do_logging_test() {
+
+    close(2);
 
     // Re-enable logging just for this test
     xbt_log_control_set("simulation_logging_test.thresh:debug");
