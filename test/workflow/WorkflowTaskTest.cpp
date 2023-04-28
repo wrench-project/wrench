@@ -43,7 +43,6 @@ protected:
         t1 = workflow->addTask("task1-01", 100000, 1, 1, 0);
         t2 = workflow->addTask("task1-02", 100, 2, 4, 0);
         t2->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.5));
-        t2->setAverageCPU(90.2);
 
         // Coverage
         t1->setColor("blue");
@@ -69,7 +68,6 @@ protected:
         t4->addOutputFile(t4_output_file);
         t4->setBytesRead(1000010);
         t4->setBytesWritten(1000);
-        t4->setAverageCPU(50.5);
 
         workflow->getTasksThatInput(large_input_file); // coverage
         workflow->getTaskThatOutputs(large_input_file);// coverage
@@ -224,9 +222,6 @@ TEST_F(WorkflowTaskTest, GetSet) {
     ASSERT_EQ(t4->getBytesRead(), 1000010);
     ASSERT_EQ(t4->getBytesWritten(), 1000);
 
-    ASSERT_EQ(t1->getAverageCPU(), -1.0);
-    ASSERT_EQ(t2->getAverageCPU(), 90.2);
-    ASSERT_EQ(t4->getAverageCPU(), 50.5);
 }
 
 TEST_F(WorkflowTaskTest, InputOutputFile) {
