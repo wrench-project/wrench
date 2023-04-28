@@ -22,7 +22,7 @@ public:
              std::shared_ptr<wrench::SimulationController> &sc) : display_request_function(std::move(display_request_function)) {
 
         // Set up all request handlers (automatically generated code!)
-#include "./REST_API_generated_code.h"
+#include "./callback-map.h"
 
 #include "./routes.h"
     }
