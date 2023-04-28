@@ -22,12 +22,9 @@ class S4U_SimulationTest : public ::testing::Test {
 
 public:
     void do_basicAPI_Test();
+    void do_deadlock_Test();
 
 protected:
-    ~S4U_SimulationTest() {
-        workflow->clear();
-    }
-
     S4U_SimulationTest() {
 
         // Create the simplest workflow
@@ -95,7 +92,7 @@ class S4U_SimulationAPITestWMS : public wrench::ExecutionController {
 
 public:
     S4U_SimulationAPITestWMS(S4U_SimulationTest *test,
-                             std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                             const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -252,6 +249,49 @@ private:
             throw std::runtime_error("Getting property for valid host should have returned the set value");
         }
 
+        // Testing misc platform update things
+        wrench::S4U_Simulation::setLinkBandwidth("1", 1234);
+        try {
+            wrench::S4U_Simulation::setLinkBandwidth("Bogus", 10);
+            throw std::runtime_error("Should not be able to set bandwidth of a non-existing link");
+        } catch (std::invalid_argument &ignore) {}
+
+        // Test misc S4U functions
+        wrench::S4U_Simulation::writeToDisk(1000, "Host1", "/tmp/", nullptr);
+        try {
+            wrench::S4U_Simulation::writeToDisk(1000, "bogus", "/tmp", nullptr);
+            throw std::runtime_error("Should not be able to write disk for non-existing host");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            wrench::S4U_Simulation::writeToDisk(1000, "Host1", "/bogus", nullptr);
+            throw std::runtime_error("Should not be able to write disk for non-existing mount point");
+        } catch (std::invalid_argument &ignore) {}
+
+        // Test misc S4U functions
+        wrench::S4U_Simulation::readFromDisk(1000, "Host1", "/tmp/", nullptr);
+        try {
+            wrench::S4U_Simulation::readFromDisk(1000, "bogus", "/tmp", nullptr);
+            throw std::runtime_error("Should not be able to write disk for non-existing host");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            wrench::S4U_Simulation::readFromDisk(1000, "Host1", "/bogus", nullptr);
+            throw std::runtime_error("Should not be able to write disk for non-existing mount point");
+        } catch (std::invalid_argument &ignore) {}
+
+        wrench::S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(1000, 1000, "Host1", "/tmp", "/", nullptr, nullptr);
+        try {
+            wrench::S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(1000, 1000, "Bogus", "/tmp", "/", nullptr, nullptr);
+            throw std::runtime_error("Should not be able to read/write to disk on non-existing host");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            wrench::S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(1000, 1000, "Host1", "/bogus", "/", nullptr, nullptr);
+            throw std::runtime_error("Should not be able to read/write to disk on non-existing src mountpoint");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            wrench::S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(1000, 1000, "Host1", "/tmp", "/bogus", nullptr, nullptr);
+            throw std::runtime_error("Should not be able to read/write to disk on non-existing dst mountpoint");
+        } catch (std::invalid_argument &ignore) {}
+
         return 0;
     }
 };
@@ -278,14 +318,76 @@ void S4U_SimulationTest::do_basicAPI_Test() {
     std::string hostname = "Host1";
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-
-    ASSERT_NO_THROW(wms = simulation->add(
-                            new S4U_SimulationAPITestWMS(
-                                    this, hostname)));
+    ASSERT_NO_THROW(simulation->add(
+            new S4U_SimulationAPITestWMS(
+                    this, hostname)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
+
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  DEADLOCK  TEST                                                  **/
+/**********************************************************************/
+
+
+class S4U_DeadlockTestWMS : public wrench::ExecutionController {
+
+public:
+    S4U_DeadlockTestWMS(S4U_SimulationTest *test,
+                        std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+    }
+
+private:
+    S4U_SimulationTest *test;
+
+    int main() override {
+
+        wrench::S4U_Mailbox::getMessage(this->mailbox);
+
+        return 0;
+    }
+};
+
+TEST_F(S4U_SimulationTest, Deadlock) {
+    DO_TEST_WITH_FORK(do_deadlock_Test);
+}
+
+void S4U_SimulationTest::do_deadlock_Test() {
+
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+    int argc = 1;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = "Host1";
+
+    // Create a WMS
+    ASSERT_NO_THROW(simulation->add(
+            new S4U_DeadlockTestWMS(
+                    this, hostname)));
+
+    // Running a "run a single task" simulation
+    close(2);// To avoid pesky deadlock stderr message
+    try {
+        simulation->launch();
+        throw std::runtime_error("launch() should have thrown a runtime_error due to a deadlock");
+    } catch (std::runtime_error &ignore) {
+    }
 
 
     for (int i = 0; i < argc; i++)

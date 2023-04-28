@@ -72,7 +72,8 @@ namespace wrench {
                 {BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG, ""},
                 {BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "false"},
                 {BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
-                {BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "false"}};
+                {BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "false"},
+                {BatchComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},

@@ -218,6 +218,10 @@ private:
 
         cs->getCoreFlopRate();// coverage
 
+        cs->supportsCompoundJobs();// coverage
+        cs->supportsPilotJobs();   // coverage
+        cs->supportsStandardJobs();// coverage
+
         // Non-existent VM operations (for coverage)
         try {
             cs->startVM("NON_EXISTENT_VM");
@@ -326,6 +330,18 @@ private:
             }
         }
 
+        // Coverage
+        try {
+            cs->getVMComputeService("bogus");
+            throw std::runtime_error("Should not be able to get a Compute Service for a bogus VM");
+        } catch (std::invalid_argument &ignore) {
+        }
+        try {
+            cs->getVMPhysicalHostname("bogus");
+            throw std::runtime_error("Should not be able to get a Physical Hostname for a bogus VM");
+        } catch (std::invalid_argument &ignore) {
+        }
+
         // Check that we cannot get the CS back
         if (cs->getVMComputeService(vm_name) != nullptr) {
             throw std::runtime_error("A non-started VM should have a nullptr compute service");
@@ -334,12 +350,27 @@ private:
         // Start the VM
         auto vm_cs = cs->startVM(vm_name);
 
+        // Try to destroy the VM which should fail
+        try {
+            cs->destroyVM(vm_name);
+            throw std::runtime_error("Shouldn't be able to destroy a running VM");
+        } catch (wrench::ExecutionException &ignore) {
+        }
+
+        // coverage
+        cs->suspendVM(vm_name);
+        wrench::Simulation::sleep(1.0);
+        cs->resumeVM(vm_name);
+
+        // Coverage
+        cs->getMemoryCapacity();
+        cs->getPerHostAvailableMemoryCapacity();
+
         // Check that we can get the CS back
         auto vm_cs_should_be_same = cs->getVMComputeService(vm_name);
         if (vm_cs != vm_cs_should_be_same) {
             throw std::runtime_error("It should be possible to get the computer service of a started VM");
         }
-
 
         // Check the state
         if (not cs->isVMRunning(vm_name)) {
@@ -368,6 +399,13 @@ private:
 
         // Shutdown the VM, because why not
         cs->shutdownVM(vm_name);
+
+        // Destroy the VM
+        cs->destroyVM(vm_name);
+
+        // Coverage
+        cs->isThereAtLeastOneHostWithIdleResources(1, 0);
+
 
         // Shutdown a bogus VM, for coverage
         try {
@@ -470,6 +508,16 @@ private:
                 cs->createVM(2, 10, "NON-EXISTENT");
                 throw std::runtime_error("Shouldn't be able to create a VM on a bogus host");
             } catch (std::invalid_argument &e) {}
+
+            try {
+                cs->createVM(wrench::ComputeService::ALL_CORES, 10, src_host);
+                throw std::runtime_error("Shouldn't be able to pass ALL_CORES to createVM()");
+            } catch (std::invalid_argument &ignore) {}
+
+            try {
+                cs->createVM(2, wrench::ComputeService::ALL_RAM, src_host);
+                throw std::runtime_error("Shouldn't be able to pass ALL_RAM to createVM()");
+            } catch (std::invalid_argument &ignore) {}
 
             auto vm_name = cs->createVM(2, 10, src_host);
 
@@ -732,10 +780,18 @@ private:
             auto cs = this->test->compute_service;
             std::string execution_host = cs->getExecutionHosts()[0];
 
-            cs->startVM(cs->createVM(1, 10));
+            auto vm1 = cs->createVM(1, 10);
+            cs->startVM(vm1);
+            auto vm2 = cs->createVM(1, 10, execution_host);
+            cs->startVM(vm2);
             cs->startVM(cs->createVM(1, 10, execution_host));
             cs->startVM(cs->createVM(1, 10, execution_host));
-            cs->startVM(cs->createVM(1, 10, execution_host));
+            wrench::Simulation::sleep(1);
+            //suspend one for coverage
+            cs->suspendVM(vm1);
+            // stop one for coverage
+            cs->shutdownVM(vm2);
+
 
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());

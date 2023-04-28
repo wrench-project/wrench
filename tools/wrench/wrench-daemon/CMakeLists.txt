@@ -19,6 +19,7 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 
 include_directories(src/ include/ ${Boost_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR}/include /usr/local/include /opt/local/include /usr/local/include/wrench /opt/local/include)
 
+
 # Add source to this project's executable.
 add_executable(wrench-daemon
         include/httplib.h
@@ -36,6 +37,8 @@ add_executable(wrench-daemon
         include/REST_API.h
         include/callback-map.h
         include/routes.h)
+
+add_dependencies(wrench-daemon wrench)
 
 # Add pthreads
 set(THREADS_PREFER_PTHREAD_FLAG ON)
