@@ -5,8 +5,7 @@
 #include "crow/http_request.h"
 #include "crow/http_response.h"
 
-namespace crow
-{
+namespace crow {
     // Any middleware requires following 3 members:
 
     // struct context;
@@ -30,33 +29,26 @@ namespace crow
     //      template <typename AllContext>
     //      void after_handle(request& req, response& res, context& ctx, AllContext& all_ctx)
 
-    struct CookieParser
-    {
+    struct CookieParser {
         // Cookie stores key, value and attributes
-        struct Cookie
-        {
-            enum class SameSitePolicy
-            {
+        struct Cookie {
+            enum class SameSitePolicy {
                 Strict,
                 Lax,
                 None
             };
 
             template<typename U>
-            Cookie(const std::string& key, U&& value):
-              Cookie()
-            {
+            Cookie(const std::string &key, U &&value) : Cookie() {
                 key_ = key;
                 value_ = std::forward<U>(value);
             }
 
-            Cookie(const std::string& key):
-              Cookie(key, "") {}
+            Cookie(const std::string &key) : Cookie(key, "") {}
 
             // format cookie to HTTP header format
-            std::string dump() const
-            {
-                const static char* HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT";
+            std::string dump() const {
+                const static char *HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT";
 
                 std::stringstream ss;
                 ss << key_ << '=';
@@ -65,20 +57,16 @@ namespace crow
                 dumpString(ss, !path_.empty(), "Path=", path_);
                 dumpString(ss, secure_, "Secure");
                 dumpString(ss, httponly_, "HttpOnly");
-                if (expires_at_)
-                {
+                if (expires_at_) {
                     ss << DIVIDER << "Expires="
                        << std::put_time(expires_at_.get(), HTTP_DATE_FORMAT);
                 }
-                if (max_age_)
-                {
+                if (max_age_) {
                     ss << DIVIDER << "Max-Age=" << *max_age_;
                 }
-                if (same_site_)
-                {
+                if (same_site_) {
                     ss << DIVIDER << "SameSite=";
-                    switch (*same_site_)
-                    {
+                    switch (*same_site_) {
                         case SameSitePolicy::Strict:
                             ss << "Strict";
                             break;
@@ -93,75 +81,64 @@ namespace crow
                 return ss.str();
             }
 
-            const std::string& name()
-            {
+            const std::string &name() {
                 return key_;
             }
 
             template<typename U>
-            Cookie& value(U&& value)
-            {
+            Cookie &value(U &&value) {
                 value_ = std::forward<U>(value);
                 return *this;
             }
 
             // Expires attribute
-            Cookie& expires(const std::tm& time)
-            {
+            Cookie &expires(const std::tm &time) {
                 expires_at_ = std::unique_ptr<std::tm>(new std::tm(time));
                 return *this;
             }
 
             // Max-Age attribute
-            Cookie& max_age(long long seconds)
-            {
+            Cookie &max_age(long long seconds) {
                 max_age_ = std::unique_ptr<long long>(new long long(seconds));
                 return *this;
             }
 
             // Domain attribute
-            Cookie& domain(const std::string& name)
-            {
+            Cookie &domain(const std::string &name) {
                 domain_ = name;
                 return *this;
             }
 
             // Path attribute
-            Cookie& path(const std::string& path)
-            {
+            Cookie &path(const std::string &path) {
                 path_ = path;
                 return *this;
             }
 
             // Secured attribute
-            Cookie& secure()
-            {
+            Cookie &secure() {
                 secure_ = true;
                 return *this;
             }
 
             // HttpOnly attribute
-            Cookie& httponly()
-            {
+            Cookie &httponly() {
                 httponly_ = true;
                 return *this;
             }
 
             // SameSite attribute
-            Cookie& same_site(SameSitePolicy ssp)
-            {
+            Cookie &same_site(SameSitePolicy ssp) {
                 same_site_ = std::unique_ptr<SameSitePolicy>(new SameSitePolicy(ssp));
                 return *this;
             }
 
-            Cookie(const Cookie& c):
-              key_(c.key_),
-              value_(c.value_),
-              domain_(c.domain_),
-              path_(c.path_),
-              secure_(c.secure_),
-              httponly_(c.httponly_)
-            {
+            Cookie(const Cookie &c) : key_(c.key_),
+                                      value_(c.value_),
+                                      domain_(c.domain_),
+                                      path_(c.path_),
+                                      secure_(c.secure_),
+                                      httponly_(c.httponly_) {
                 if (c.max_age_)
                     max_age_ = std::unique_ptr<long long>(new long long(*c.max_age_));
 
@@ -175,11 +152,9 @@ namespace crow
         private:
             Cookie() = default;
 
-            static void dumpString(std::stringstream& ss, bool cond, const char* prefix,
-                                   const std::string& value = "")
-            {
-                if (cond)
-                {
+            static void dumpString(std::stringstream &ss, bool cond, const char *prefix,
+                                   const std::string &value = "") {
+                if (cond) {
                     ss << DIVIDER << prefix << value;
                 }
             }
@@ -195,16 +170,14 @@ namespace crow
             std::unique_ptr<std::tm> expires_at_{};
             std::unique_ptr<SameSitePolicy> same_site_{};
 
-            static constexpr const char* DIVIDER = "; ";
+            static constexpr const char *DIVIDER = "; ";
         };
 
 
-        struct context
-        {
+        struct context {
             std::unordered_map<std::string, std::string> jar;
 
-            std::string get_cookie(const std::string& key) const
-            {
+            std::string get_cookie(const std::string &key) const {
                 auto cookie = jar.find(key);
                 if (cookie != jar.end())
                     return cookie->second;
@@ -212,14 +185,12 @@ namespace crow
             }
 
             template<typename U>
-            Cookie& set_cookie(const std::string& key, U&& value)
-            {
+            Cookie &set_cookie(const std::string &key, U &&value) {
                 cookies_to_add.emplace_back(key, std::forward<U>(value));
                 return cookies_to_add.back();
             }
 
-            Cookie& set_cookie(Cookie cookie)
-            {
+            Cookie &set_cookie(Cookie cookie) {
                 cookies_to_add.push_back(std::move(cookie));
                 return cookies_to_add.back();
             }
@@ -229,22 +200,19 @@ namespace crow
             std::vector<Cookie> cookies_to_add;
         };
 
-        void before_handle(request& req, response& res, context& ctx)
-        {
+        void before_handle(request &req, response &res, context &ctx) {
             // TODO(dranikpg): remove copies, use string_view with c++17
             int count = req.headers.count("Cookie");
             if (!count)
                 return;
-            if (count > 1)
-            {
+            if (count > 1) {
                 res.code = 400;
                 res.end();
                 return;
             }
             std::string cookies = req.get_header_value("Cookie");
             size_t pos = 0;
-            while (pos < cookies.size())
-            {
+            while (pos < cookies.size()) {
                 size_t pos_equal = cookies.find('=', pos);
                 if (pos_equal == cookies.npos)
                     break;
@@ -258,8 +226,7 @@ namespace crow
                 std::string value = cookies.substr(pos, pos_semicolon - pos);
 
                 value = utility::trim(value);
-                if (value[0] == '"' && value[value.size() - 1] == '"')
-                {
+                if (value[0] == '"' && value[value.size() - 1] == '"') {
                     value = value.substr(1, value.size() - 2);
                 }
 
@@ -272,10 +239,8 @@ namespace crow
             }
         }
 
-        void after_handle(request& /*req*/, response& res, context& ctx)
-        {
-            for (const auto& cookie : ctx.cookies_to_add)
-            {
+        void after_handle(request & /*req*/, response &res, context &ctx) {
+            for (const auto &cookie: ctx.cookies_to_add) {
                 res.add_header("Set-Cookie", cookie.dump());
             }
         }
@@ -304,4 +269,4 @@ namespace crow
 
     SimpleApp
     */
-} // namespace crow
+}// namespace crow
