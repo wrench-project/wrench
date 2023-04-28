@@ -12,6 +12,7 @@
 #define WRENCH_COMPOUNDSTORAGESERVICEMESSAGEPAYLOAD_H
 
 #include "wrench/services/storage/StorageServiceMessagePayload.h"
+#include "wrench/services/ServiceMessagePayload.h"
 
 namespace wrench {
 
@@ -19,7 +20,10 @@ namespace wrench {
     * @brief Configurable message payloads for a CompoundStorageService
     */
     class CompoundStorageServiceMessagePayload : public StorageServiceMessagePayload {
+
     public:
+        /** @brief The number of bytes in the control message sent by the daemon to answer a storage selection request **/
+        DECLARE_MESSAGEPAYLOAD_NAME(STORAGE_SELECTION_PAYLOAD);
     };
 
 };// namespace wrench

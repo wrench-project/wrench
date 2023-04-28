@@ -101,6 +101,7 @@ namespace wrench {
                 this->getPropertyValueAsTimeInSecond(HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY),
                 this->getPropertyValueAsTimeInSecond(HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY),
                 this->getPropertyValueAsBoolean(HTCondorComputeServiceProperty::INSTANT_RESOURCE_AVAILABILITIES),
+                this->getPropertyValueAsBoolean(HTCondorComputeServiceProperty::FCFS),
                 compute_services, property_list, messagepayload_list);
     }
 
@@ -402,13 +403,7 @@ namespace wrench {
         auto stripped_service_specific_args = service_specific_args;
         stripped_service_specific_args.erase("-universe");
         stripped_service_specific_args.erase("-service");// which may not be there, but whatever
-        try {
-            target_cs->validateServiceSpecificArguments(job, stripped_service_specific_args);
-        } catch (ExecutionException &e) {
-            throw;
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
+        target_cs->validateServiceSpecificArguments(job, stripped_service_specific_args);
     }
 
     /**

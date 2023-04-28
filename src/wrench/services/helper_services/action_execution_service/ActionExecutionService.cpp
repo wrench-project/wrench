@@ -118,11 +118,7 @@ namespace wrench {
         if ((service_specific_args.find(action_name) != service_specific_args.end()) and
             (not service_specific_args.at(action_name).empty())) {
             std::tuple<std::string, unsigned long> parsed_spec;
-            try {
                 parsed_spec = parseResourceSpec(service_specific_args.at(action_name));
-            } catch (std::invalid_argument &e) {
-                throw;
-            }
 
             std::string target_host = std::get<0>(parsed_spec);
             unsigned long target_num_cores = std::get<1>(parsed_spec);

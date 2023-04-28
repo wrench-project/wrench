@@ -85,20 +85,14 @@ namespace wrench {
         // send a "get execution hosts" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceGetExecutionHostsAnswerMessage>(
                 answer_mailbox,
                 new CloudComputeServiceGetExecutionHostsRequestMessage(
                         answer_mailbox,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceGetExecutionHostsAnswerMessage *>(answer_message.get())) {
-            return msg->execution_hosts;
-        } else {
-            throw std::runtime_error(
-                    "CloudComputeService::sendRequest(): Received an unexpected [" + answer_message->getName() +
-                    "] message!");
-        }
+        return answer_message->execution_hosts;
     }
 
     /**
@@ -132,7 +126,7 @@ namespace wrench {
         // send a "create vm" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceCreateVMAnswerMessage>(
                 answer_mailbox,
                 new CloudComputeServiceCreateVMRequestMessage(
                         answer_mailbox,
@@ -140,15 +134,10 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceCreateVMAnswerMessage *>(answer_message.get())) {
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            } else {
-                return msg->vm_name;
-            }
+        if (not answer_message->success) {
+            throw ExecutionException(answer_message->failure_cause);
         } else {
-            throw std::runtime_error(
-                    "CloudComputeService::createVM(): Unexpected [" + answer_message->getName() + "] message");
+            return answer_message->vm_name;
         }
     }
 
@@ -186,20 +175,15 @@ namespace wrench {
         // send a "shutdown vm" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceShutdownVMAnswerMessage>(
                 answer_mailbox,
                 new CloudComputeServiceShutdownVMRequestMessage(
                         answer_mailbox, vm_name, send_failure_notifications, termination_cause,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceShutdownVMAnswerMessage *>(answer_message.get())) {
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "CloudComputeService::shutdownVM(): Unexpected [" + answer_message->getName() + "] message");
+        if (not answer_message->success) {
+            throw ExecutionException(answer_message->failure_cause);
         }
     }
 
@@ -222,22 +206,17 @@ namespace wrench {
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceStartVMAnswerMessage>(
                 answer_mailbox,
                 new CloudComputeServiceStartVMRequestMessage(
                         answer_mailbox, vm_name,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceStartVMAnswerMessage *>(answer_message.get())) {
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-            return msg->cs;
-        } else {
-            throw std::runtime_error(
-                    "CloudComputeService::startVM(): Unexpected [" + answer_message->getName() + "] message");
+        if (not answer_message->success) {
+            throw ExecutionException(answer_message->failure_cause);
         }
+        return answer_message->cs;
     }
 
     /**
@@ -292,20 +271,15 @@ namespace wrench {
         // send a "shutdown vm" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceSuspendVMAnswerMessage>(
                 answer_mailbox,
                 new CloudComputeServiceSuspendVMRequestMessage(
                         answer_mailbox, vm_name,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceSuspendVMAnswerMessage *>(answer_message.get())) {
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "CloudComputeService::suspendVM(): Unexpected [" + answer_message->getName() + "] message");
+        if (not answer_message->success) {
+            throw ExecutionException(answer_message->failure_cause);
         }
     }
 
@@ -327,21 +301,15 @@ namespace wrench {
         // send a "shutdown vm" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceResumeVMAnswerMessage>(
                 answer_mailbox,
                 new CloudComputeServiceResumeVMRequestMessage(
                         answer_mailbox, vm_name,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceResumeVMAnswerMessage *>(answer_message.get())) {
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-            // Got the expected reply
-        } else {
-            throw std::runtime_error(
-                    "CloudComputeService::resumeVM(): Unexpected [" + answer_message->getName() + "] message");
+        if (not answer_message->success) {
+            throw ExecutionException(answer_message->failure_cause);
         }
     }
 
@@ -363,20 +331,15 @@ namespace wrench {
         // send a "shutdown vm" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceDestroyVMAnswerMessage>(
                 answer_mailbox,
                 new CloudComputeServiceDestroyVMRequestMessage(
                         answer_mailbox, vm_name,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceDestroyVMAnswerMessage *>(answer_message.get())) {
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "CloudComputeService::destroyVM(): Unexpected [" + answer_message->getName() + "] message");
+        if (not answer_message->success) {
+            throw ExecutionException(answer_message->failure_cause);
         }
     }
 
@@ -458,28 +421,25 @@ namespace wrench {
         return 0;
     }
 
-    /**
-     * @brief Send a message request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param message: message to be sent
-     * @return a simulation message
-     *
-     * @throw std::runtime_error
-     */
-    std::shared_ptr<SimulationMessage> CloudComputeService::sendRequest(simgrid::s4u::Mailbox *answer_mailbox,
-                                                                        ComputeServiceMessage *message) {
-        serviceSanityCheck();
-
-        S4U_Mailbox::putMessage(this->mailbox, message);
-
-        // Wait for a reply
-        std::shared_ptr<SimulationMessage> answer_message = nullptr;
-
-        answer_message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-
-        return answer_message;
-    }
+    //    /**
+    //     * @brief Send a message request
+    //     *
+    //     * @param answer_mailbox: the mailbox to which the answer message should be sent
+    //     * @param message: message to be sent
+    //     * @return a simulation message
+    //     *
+    //     * @throw std::runtime_error
+    //     */
+    //    template<class TMessageType>
+    //    std::shared_ptr<TMessageType> CloudComputeService::sendRequestAndWaitForAnswer(simgrid::s4u::Mailbox *answer_mailbox,
+    //                                                                                   ComputeServiceMessage *tosend) {
+    //        serviceSanityCheck();
+    //
+    //        S4U_Mailbox::putMessage(this->mailbox, tosend);
+    //
+    //        // Wait for a reply
+    //        return S4U_Mailbox::getMessage<TMessageType>(answer_mailbox, this->network_timeout, "CloudComputeService::sendRequestAndWaitForAnswer(): received an");
+    //    }
 
     /**
      * @brief Wait for and react to any incoming message
@@ -638,20 +598,20 @@ namespace wrench {
             vm_name = this->getName() + "_vm" + std::to_string(CloudComputeService::VM_ID++);
         } while (S4U_Simulation::hostExists(vm_name));
 
-        // If we couldn't find a VM name, somehow, then return a failure
-        if (vm_name.empty()) {
-            std::string empty = std::string();
-
-            msg_to_send_back = new CloudComputeServiceCreateVMAnswerMessage(
-                    false,
-                    empty,
-                    std::shared_ptr<FailureCause>(
-                            new NotAllowed(this->getSharedPtr<CloudComputeService>(), error_msg)),
-                    this->getMessagePayloadValue(
-                            CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
-            S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
-            return;
-        }
+        //        // If we couldn't find a VM name, somehow, then return a failure
+        //        if (vm_name.empty()) {
+        //            std::string empty = std::string();
+        //
+        //            msg_to_send_back = new CloudComputeServiceCreateVMAnswerMessage(
+        //                    false,
+        //                    empty,
+        //                    std::shared_ptr<FailureCause>(
+        //                            new NotAllowed(this->getSharedPtr<CloudComputeService>(), error_msg)),
+        //                    this->getMessagePayloadValue(
+        //                            CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
+        //            S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+        //            return;
+        //        }
 
         // Create the VM
         auto vm = std::make_shared<S4U_VirtualMachine>(vm_name,
@@ -899,11 +859,7 @@ namespace wrench {
         }
 
         // Start the service
-        try {
-            cs->start(cs, true, false);// Daemonized
-        } catch (std::runtime_error &e) {
-            throw;// This shouldn't happen
-        }
+        cs->start(cs, true, false);// Daemonized
 
         // Create a failure detector for the service
         auto termination_detector = std::make_shared<ServiceTerminationDetector>(
@@ -1153,8 +1109,20 @@ namespace wrench {
      */
     void CloudComputeService::processIsThereAtLeastOneHostWithAvailableResources(
             simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram) {
-        throw std::runtime_error(
-                "CloudComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A Cloud service does not support this operation");
+        bool answer = false;
+        for (auto const &h: this->used_cores_per_execution_host) {
+            auto available_num_cores = Simulation::getHostNumCores(h.first) - h.second;
+            auto available_ram = Simulation::getHostMemoryCapacity(h.first) - this->used_ram_per_execution_host[h.first];
+            if ((available_num_cores >= num_cores) and (available_ram >= ram)) {
+                answer = true;
+                break;
+            }
+        }
+        S4U_Mailbox::dputMessage(
+                answer_mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
+                                        answer,
+                                        this->getMessagePayloadValue(
+                                                CloudComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
     }
 
 
