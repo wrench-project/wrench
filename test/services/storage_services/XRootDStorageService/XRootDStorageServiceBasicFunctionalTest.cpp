@@ -28,7 +28,7 @@ protected:
 
 
         // Create a one-host platform file
-        std::string platform_file = "<?xml version='1.0'?>"
+        std::string platform = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
@@ -247,7 +247,7 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    simulation->instantiatePlatform(platform_file_path);
+    simulation->instantiatePlatformFromString(platform);
 
     // Create a XRootD Manager object
     wrench::XRootD::Deployment xrootd_deployment(simulation, {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"}, {wrench::XRootD::Property::REDUCED_SIMULATION, arg}, {wrench::XRootD::Property::FILE_NOT_FOUND_TIMEOUT, "10"}}, {{wrench::StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 1024}});
