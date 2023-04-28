@@ -95,6 +95,10 @@ if __name__ == "__main__":
         (route['parameter_list'], type_list)
         parameter_list = []
 
+        # use last part of the path as the key to find the value
+        sep = crow.split('/')
+        key = sep[-1]
+
         parameter_list.append('const crow::request& req')
         for i in range(len(route['parameter_list'])):
             if type_list[i] == 'string':
@@ -110,7 +114,7 @@ if __name__ == "__main__":
 
         app += '\t\t\tcrow::response res;\n'
         operationId = route['operationId']
-        app += '\t\t\tthis->genericRequestHandler(req_json, res, "{0}");\n'.format(operationId)
+        app += '\t\t\tthis->genericRequestHandler(req_json, res, "{0}");\n'.format(key)
 
         app += '\t\t\treturn res;\n'
         app += '\t\t});\n'
