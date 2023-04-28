@@ -24,8 +24,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/tools/wrench/wrench-init/wrench-init
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )
 
-
-# compile/install the wfcommons workflow parser
+# Compile/install the WfCommons workflow parser
 set(WFCOMMONS_WORKFLOW_PARSER_SOURCE_FILES
         tools/wfcommons/src/WfCommonsWorkflowParser.cpp
         )
@@ -39,4 +38,17 @@ install(TARGETS wrenchwfcommonsworkflowparser DESTINATION lib)
 install(FILES "${WFCOMMONS_WORKFLOW_PARSER_HEADER_FILES}"
         DESTINATION include/wrench/tools/wfcommons/
         )
+
+# Compile/install the WfCommons I/O-time remover
+set(WFCOMMONS_WORKFLOW_COMPUTE_RUNTIME_SUBTRACTOR_SOURCE_FILES
+tools/wfcommons/src/WfCommonsComputeRuntimeSubtractor.cpp
+        )
+
+add_executable(wrench-wfcommons-compute-runtime-subtractor ${WFCOMMONS_WORKFLOW_COMPUTE_RUNTIME_SUBTRACTOR_SOURCE_FILES})
+add_dependencies(wrench-wfcommons-compute-runtime-subtractor wrench)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wrench-wfcommons-compute-runtime-subtractor
+        DESTINATION bin
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+        )
+
 

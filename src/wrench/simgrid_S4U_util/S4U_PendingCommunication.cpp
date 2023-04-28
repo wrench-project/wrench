@@ -15,6 +15,8 @@
 #include <wrench/util/MessageManager.h>
 #endif
 
+#include <wrench/simulation/Simulation.h>
+
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
 #include <wrench/simulation/SimulationMessage.h>
@@ -61,7 +63,7 @@ namespace wrench {
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait(double timeout) {
         try {
             if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
-                this->comm_ptr->wait_until(timeout);
+                this->comm_ptr->wait_until(Simulation::getCurrentSimulatedDate() + timeout);
             }
         } catch (simgrid::NetworkFailureException &e) {
             if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
@@ -93,8 +95,9 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     unsigned long S4U_PendingCommunication::waitForSomethingToHappen(
-            std::vector<std::shared_ptr<S4U_PendingCommunication>> pending_comms, double timeout) {
+            const std::vector<std::shared_ptr<S4U_PendingCommunication>> &pending_comms, double timeout) {
         std::vector<S4U_PendingCommunication *> raw_pointer_comms;
+        raw_pointer_comms.reserve(pending_comms.size());
         for (auto const &pc: pending_comms) {
             raw_pointer_comms.push_back(pc.get());
         }

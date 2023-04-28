@@ -260,8 +260,7 @@ namespace wrench {
                                         simgrid::s4u::this_actor::get_host(),
                                         location,
                                         num_bytes,
-                                        this->getMessagePayloadValue(
-                                                StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+                                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
 
 
         if (wait_for_answer) {
@@ -442,6 +441,11 @@ namespace wrench {
             throw std::invalid_argument("StorageService::copyFile(): src and dst locations should be for the same file");
         }
 
+        if (std::dynamic_pointer_cast<CompoundStorageService>(src_location->getStorageService()) or
+            std::dynamic_pointer_cast<CompoundStorageService>(dst_location->getStorageService())) {
+            return CompoundStorageService::copyFile(src_location, dst_location);
+        }
+
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
 
@@ -456,9 +460,9 @@ namespace wrench {
         //        }
 
         simgrid::s4u::Mailbox *mailbox_to_contact;
-        if (dst_is_non_bufferized and !(std::dynamic_pointer_cast<CompoundStorageService>(src_location->getStorageService()))) {
+        if (dst_is_non_bufferized) {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
-        } else if (src_is_non_bufferized and !(std::dynamic_pointer_cast<CompoundStorageService>(dst_location->getStorageService()))) {
+        } else if (src_is_non_bufferized) {
             mailbox_to_contact = src_location->getStorageService()->mailbox;
         } else {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
@@ -470,7 +474,6 @@ namespace wrench {
         src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
                                                                                              src_location,
                                                                                              dst_location);
-
         S4U_Mailbox::putMessage(
                 mailbox_to_contact,
                 new StorageServiceFileCopyRequestMessage(
@@ -483,10 +486,11 @@ namespace wrench {
         // Wait for a reply
         std::unique_ptr<SimulationMessage> message = nullptr;
 
+
         auto msg = S4U_Mailbox::getMessage<StorageServiceFileCopyAnswerMessage>(answer_mailbox);
 
-
         if (msg->failure_cause) {
+            WRENCH_DEBUG("%s", msg->failure_cause->toString().c_str());
             throw ExecutionException(std::move(msg->failure_cause));
         }
     }

@@ -107,11 +107,8 @@ namespace wrench {
     double Service::getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE property) {
         double value;
         std::string string_value;
-        try {
-            string_value = this->getPropertyValueAsString(property);
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
+        string_value = this->getPropertyValueAsString(property);
+
         if (string_value == "infinity") {
             return DBL_MAX;
         }
@@ -135,11 +132,8 @@ namespace wrench {
     double Service::getPropertyValueWithUnitsAsValue(WRENCH_PROPERTY_TYPE property,
                                                      const std::function<double(std::string &s)> &unit_parsing_function) {
         std::string string_value;
-        try {
-            string_value = this->getPropertyValueAsString(property);
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
+        string_value = this->getPropertyValueAsString(property);
+
         if (string_value == "infinity") {
             return DBL_MAX;
         }
@@ -186,11 +180,7 @@ namespace wrench {
     unsigned long Service::getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE property) {
         unsigned long value;
         std::string string_value;
-        try {
-            string_value = this->getPropertyValueAsString(property);
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
+        string_value = this->getPropertyValueAsString(property);
         if (string_value == "infinity") {
             return ULONG_MAX;
         }
@@ -253,11 +243,7 @@ namespace wrench {
      */
     bool Service::getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE property) {
         std::string string_value;
-        try {
-            string_value = this->getPropertyValueAsString(property);
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
+        string_value = this->getPropertyValueAsString(property);
         if (string_value == "true" or string_value == "True") {
             return true;
         } else if (string_value == "false" or string_value == "False") {
@@ -279,36 +265,32 @@ namespace wrench {
      * @throw std::shared_ptr<HostError>
      */
     void Service::start(const std::shared_ptr<Service> &this_service, bool daemonize, bool auto_restart) {
-        try {
-            // Setting the state to UP
-            this->state = Service::UP;
+        // Setting the state to UP
+        this->state = Service::UP;
 
-            // Creating the life saver so that the actor will never see the
-            // Service object deleted from under its feet
-            this->createLifeSaver(this_service);
+        // Creating the life saver so that the actor will never see the
+        // Service object deleted from under its feet
+        this->createLifeSaver(this_service);
 
-            //            // Keep track of the master share_ptr reference to this service
-            //            Service::service_shared_ptr_map[this] = this_service;
+        //            // Keep track of the master share_ptr reference to this service
+        //            Service::service_shared_ptr_map[this] = this_service;
 
-            // Start the daemon for the service
-            this->startDaemon(daemonize, auto_restart);
+        // Start the daemon for the service
+        this->startDaemon(daemonize, auto_restart);
 
-            if (auto_restart) {
-                Service::servicesSetToAutoRestart.insert(this_service);
-            }
-
-            //            // Print some information a out the currently tracked daemons
-            //            WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
-            //                         Service::service_shared_ptr_map.size(), Service::num_terminated_services);
-
-            //            if ((Service::service_shared_ptr_map.size() > 5000) or
-            //                (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
-            //                Service::cleanupTrackedServices();
-            //                Service::num_terminated_services = 0;
-            //            }
-        } catch (ExecutionException &e) {
-            throw;
+        if (auto_restart) {
+            Service::servicesSetToAutoRestart.insert(this_service);
         }
+
+        //            // Print some information a out the currently tracked daemons
+        //            WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
+        //                         Service::service_shared_ptr_map.size(), Service::num_terminated_services);
+
+        //            if ((Service::service_shared_ptr_map.size() > 5000) or
+        //                (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
+        //                Service::cleanupTrackedServices();
+        //                Service::num_terminated_services = 0;
+        //            }
     }
 
 

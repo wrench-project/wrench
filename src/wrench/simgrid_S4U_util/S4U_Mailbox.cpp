@@ -78,7 +78,7 @@ namespace wrench {
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox, bool log) {
         if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
-            throw std::runtime_error("S4U_Mailbox::getMessage(): Cannot be called with NULL_MAILBOX");
+            throw std::invalid_argument("S4U_Mailbox::getMessage(): Cannot be called with NULL_MAILBOX");
         }
 
         if (log) WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox->get_cname());
@@ -112,7 +112,7 @@ namespace wrench {
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox, double timeout, bool log) {
         if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
-            throw std::runtime_error("S4U_Mailbox::getMessage(): Cannot be called with NULL_MAILBOX");
+            throw std::invalid_argument("S4U_Mailbox::getMessage(): Cannot be called with NULL_MAILBOX");
         }
 
         if (timeout < 0) {
@@ -268,7 +268,7 @@ namespace wrench {
     std::shared_ptr<S4U_PendingCommunication> S4U_Mailbox::igetMessage(simgrid::s4u::Mailbox *mailbox) {
 
         if (mailbox == S4U_Mailbox::NULL_MAILBOX) {
-            throw std::runtime_error("S4U_Mailbox::igetMessage(): Cannot be called with NULL_MAILBOX");
+            throw std::invalid_argument("S4U_Mailbox::igetMessage(): Cannot be called with NULL_MAILBOX");
         }
 
         simgrid::s4u::CommPtr comm_ptr = nullptr;

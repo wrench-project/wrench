@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/InvalidDirectoryPath.h>
 #include <wrench/failure_causes/FileNotFound.h>
 #include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
 
@@ -45,7 +44,7 @@ namespace wrench {
                                                                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
 
         bool bufferized = false;// By default, non-bufferized
-                                //        bool bufferized = true; // By default, bufferized
+        //        bool bufferized = true; // By default, bufferized
 
         if (property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != property_list.end()) {
             double buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
@@ -103,19 +102,19 @@ namespace wrench {
 
         this->setProperties(this->default_property_values, std::move(property_list));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+
+        //        this->StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD = this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD);
+        //        this->StorageServiceMessagePayload_FILE_READ_ANSWER_MESSAGE_PAYLOAD = this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD);
+
         this->validateProperties();
 
         if (mount_points.empty()) {
             throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): A storage service must have at least one mount point");
         }
-        try {
-            for (const auto &mp: mount_points) {
-                this->file_systems[mp] = LogicalFileSystem::createLogicalFileSystem(
-                        this->getHostname(), this,
-                        FileLocation::sanitizePath(mp), this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR));
-            }
-        } catch (std::invalid_argument &e) {
-            throw;
+        for (const auto &mp: mount_points) {
+            this->file_systems[mp] = LogicalFileSystem::createLogicalFileSystem(
+                    this->getHostname(), this,
+                    FileLocation::sanitizePath(mp), this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR));
         }
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(
@@ -145,8 +144,7 @@ namespace wrench {
             auto fs = this->file_systems[mount_point].get();
             auto file = location->getFile();
 
-            if ((not fs->doesDirectoryExist(path_at_mount_point)) or
-                (not fs->isFileInDirectory(file, path_at_mount_point))) {
+            if ((not fs->isFileInDirectory(file, path_at_mount_point))) {
                 // If this is scratch, we don't care, perhaps it was taken care of elsewhere...
                 if (not this->isScratch()) {
                     failure_cause = std::shared_ptr<FailureCause>(
@@ -213,6 +211,19 @@ namespace wrench {
             capacity += fs.second->getTotalCapacity();
         }
         return capacity;
+    }
+
+    /**
+     * @brief Return current total free space from all mount point (in zero simulation time)
+     *        for IO tracing purpose.
+     * @return total free space in bytes
+    */
+    double SimpleStorageService::traceTotalFreeSpace() {
+        double free_space = 0;
+        for (auto const &mp: this->file_systems) {
+            free_space += mp.second->getFreeSpace();
+        }
+        return free_space;
     }
 
     /**

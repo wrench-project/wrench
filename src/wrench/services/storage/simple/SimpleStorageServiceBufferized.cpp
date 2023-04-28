@@ -126,7 +126,7 @@ namespace wrench {
             message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (ExecutionException &e) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
-            return true;// oh well
+            return true;
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
@@ -313,8 +313,7 @@ namespace wrench {
                         mailbox_to_receive_the_file_content,
                         buffer_size,
                         1,
-                        this->getMessagePayloadValue(
-                                SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
+                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
@@ -518,7 +517,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(answer_mailbox_if_read, new StorageServiceAckMessage(src_location));
         }
 
-        // Send back the relevant ack if this was a write
+        // Send back the relevant ack if this was a write operation
         if (answer_mailbox_if_write and success) {
             WRENCH_INFO(
                     "Sending back an ack since this was a file write and some client is waiting for me to say something");

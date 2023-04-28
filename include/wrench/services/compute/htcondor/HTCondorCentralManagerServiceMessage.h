@@ -36,10 +36,10 @@ namespace wrench {
      */
     class NegotiatorCompletionMessage : public HTCondorCentralManagerServiceMessage {
     public:
-        NegotiatorCompletionMessage(std::vector<std::shared_ptr<Job>> scheduled_jobs, double payload);
+        NegotiatorCompletionMessage(std::set<std::shared_ptr<Job>> scheduled_jobs, double payload);
 
         /** @brief List of scheduled jobs */
-        std::vector<std::shared_ptr<Job>> scheduled_jobs;
+        std::set<std::shared_ptr<Job>> scheduled_jobs;
     };
 
     /**
@@ -48,7 +48,7 @@ namespace wrench {
      */
     class CentralManagerWakeUpMessage : public HTCondorCentralManagerServiceMessage {
     public:
-        CentralManagerWakeUpMessage(double payload);
+        explicit CentralManagerWakeUpMessage(double payload);
     };
 
     /***********************/

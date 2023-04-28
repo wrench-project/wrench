@@ -20,6 +20,7 @@
 #include "wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
 #include "wrench/job/PilotJob.h"
+#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 
 namespace wrench {
@@ -37,7 +38,8 @@ namespace wrench {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {CloudComputeServiceProperty::VM_BOOT_OVERHEAD, "0"},
-                {CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}};
+                {CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"},
+                {CloudComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
@@ -141,7 +143,24 @@ namespace wrench {
 
         int main() override;
 
-        std::shared_ptr<SimulationMessage> sendRequest(simgrid::s4u::Mailbox *answer_mailbox, ComputeServiceMessage *message);
+        template<class TMessageType>
+
+        /**
+         * @brief Send a message request
+         *
+         * @param answer_mailbox: the mailbox to which the answer message should be sent
+         * @param tosend: message to be sent
+         * @return a simulation message
+         *
+         * @throw std::runtime_error
+         */
+        std::shared_ptr<TMessageType> sendRequestAndWaitForAnswer(simgrid::s4u::Mailbox *answer_mailbox, ComputeServiceMessage *tosend) {
+            serviceSanityCheck();
+            S4U_Mailbox::putMessage(this->mailbox, tosend);
+
+            // Wait for a reply
+            return S4U_Mailbox::getMessage<TMessageType>(answer_mailbox, this->network_timeout, "CloudComputeService::sendRequestAndWaitForAnswer(): received an");
+        }
 
         virtual bool processNextMessage();
 

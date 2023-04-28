@@ -125,8 +125,8 @@ namespace wrench {
                                        std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments,
                                        std::shared_ptr<FailureCause> &job_failure_cause,
                                        Simulation *simulation);
-        void applyTaskUpdates(std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
-                              std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments);
+        static void applyTaskUpdates(std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
+                                     std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments);
 
         static void analyzeActions(const std::vector<std::shared_ptr<Action>> &actions,
                                    bool *at_least_one_failed,

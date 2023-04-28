@@ -512,16 +512,16 @@ namespace wrench {
                 boost::json::array file_reads;
                 for (auto const &r: current_execution_instance.reads) {
                     boost::json::object file_read = boost::json::object({{"end", std::get<1>(r)},
-                                                                       {"start", std::get<0>(r)},
-                                                                       {"id", std::get<2>(r)}});
+                                                                         {"start", std::get<0>(r)},
+                                                                         {"id", std::get<2>(r)}});
                     file_reads.push_back(file_read);
                 }
 
                 boost::json::array file_writes;
                 for (auto const &r: current_execution_instance.writes) {
                     boost::json::object file_write = boost::json::object({{"end", std::get<1>(r)},
-                                                                        {"start", std::get<0>(r)},
-                                                                        {"id", std::get<2>(r)}});
+                                                                          {"start", std::get<0>(r)},
+                                                                          {"id", std::get<2>(r)}});
                     file_writes.push_back(file_write);
                 }
                 task_json.push_back(
@@ -596,14 +596,10 @@ namespace wrench {
 
         // Set the "vertical position" of each WorkflowExecutionInstance so we know where to plot each rectangle
         if (generate_host_utilization_layout) {
-            try {
-                generateHostUtilizationGraphLayout(data);
-                std::ofstream output("host_utilization_layout.json");
-                output << std::setw(4) << host_utilization_layout << std::endl;
-                output.close();
-            } catch (std::runtime_error &e) {
-                throw;
-            }
+            generateHostUtilizationGraphLayout(data);
+            std::ofstream output("host_utilization_layout.json");
+            output << std::setw(4) << host_utilization_layout << std::endl;
+            output.close();
         }
 
         boost::json::object workflow_execution_json;
@@ -803,16 +799,16 @@ namespace wrench {
 
                     if (current_state_watts.size() == 2) {
                         datum_pstates.push_back({{"pstate", pstate},
-                                                    {"speed", host->get_pstate_speed((int) pstate)},
-                                                    {"idle", current_state_watts.at(0)},
-                                                    {"epsilon", current_state_watts.at(0)},
-                                                    {"all_cores", current_state_watts.at(1)}});
+                                                 {"speed", host->get_pstate_speed((int) pstate)},
+                                                 {"idle", current_state_watts.at(0)},
+                                                 {"epsilon", current_state_watts.at(0)},
+                                                 {"all_cores", current_state_watts.at(1)}});
                     } else if (current_state_watts.size() == 3) {
                         datum_pstates.push_back({{"pstate", pstate},
-                                                    {"speed", host->get_pstate_speed((int) pstate)},
-                                                    {"idle", current_state_watts.at(0)},
-                                                    {"epsilon", current_state_watts.at(1)},
-                                                    {"all_cores", current_state_watts.at(2)}});
+                                                 {"speed", host->get_pstate_speed((int) pstate)},
+                                                 {"idle", current_state_watts.at(0)},
+                                                 {"epsilon", current_state_watts.at(1)},
+                                                 {"all_cores", current_state_watts.at(2)}});
                     } else {
                         throw std::runtime_error("Host " + std::string(host->get_name()) +
                                                  "'s wattage_per_state property is invalid (should have 2 or 3 " +
@@ -963,7 +959,7 @@ namespace wrench {
                      {"cluster_id", host_to_cluster[host->get_name()]},
                      {"flop_rate", host->get_speed()},
                      {"memory_manager_service", Simulation::getHostMemoryCapacity(
-                                                        host->get_name())},
+                             host->get_name())},
                      {"cores", host->get_core_count()}});
         }
 
@@ -1276,9 +1272,9 @@ namespace wrench {
                 boost::json::array disk_reads;
                 for (auto const &r: reads) {
                     auto disk_read = boost::json::object({{"start", std::get<0>(r)},
-                                                                       {"end", std::get<1>(r)},
-                                                                       {"bytes", std::get<2>(r)},
-                                                                       {"failed", "-1"}});
+                                                          {"end", std::get<1>(r)},
+                                                          {"bytes", std::get<2>(r)},
+                                                          {"failed", "-1"}});
                     disk_reads.push_back(disk_read);
                 }
                 if (!read_failure_timestamps.empty()) {
@@ -1295,9 +1291,9 @@ namespace wrench {
                 boost::json::array disk_writes;
                 for (auto const &w: writes) {
                     auto disk_write = boost::json::object({{"start", std::get<0>(w)},
-                                                                        {"end", std::get<1>(w)},
-                                                                        {"bytes", std::get<2>(w)},
-                                                                        {"failed", "-1"}});
+                                                           {"end", std::get<1>(w)},
+                                                           {"bytes", std::get<2>(w)},
+                                                           {"failed", "-1"}});
                     disk_writes.push_back(disk_write);
                 }
                 if (!write_failure_timestamps.empty()) {
@@ -1369,39 +1365,34 @@ namespace wrench {
 
         boost::json::array bandwidth_json;
 
-        try {
-            auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-            std::vector<simgrid::s4u::Link *> links = get_all_links();
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+        std::vector<simgrid::s4u::Link *> links = get_all_links();
 
-            for (const auto &link: links) {
-                boost::json::object datum;
-                datum["linkname"] = link->get_name();
-                datum["link_usage_trace"] = boost::json::array();
+        for (const auto &link: links) {
+            boost::json::object datum;
+            datum["linkname"] = link->get_name();
+            datum["link_usage_trace"] = boost::json::array();
 
-                for (const auto &link_usage_timestamp: this->getTrace<SimulationTimestampLinkUsage>()) {
-                    if (link->get_name() == link_usage_timestamp->getContent()->getLinkname()) {
-                        datum["link_usage_trace"].as_array().push_back(
-                                {{"time", link_usage_timestamp->getDate()},
-                                 {"bytes per second", link_usage_timestamp->getContent()->getUsage()}});
-                    }
+            for (const auto &link_usage_timestamp: this->getTrace<SimulationTimestampLinkUsage>()) {
+                if (link->get_name() == link_usage_timestamp->getContent()->getLinkname()) {
+                    datum["link_usage_trace"].as_array().push_back(
+                            {{"time", link_usage_timestamp->getDate()},
+                             {"bytes per second", link_usage_timestamp->getContent()->getUsage()}});
                 }
-
-                bandwidth_json.push_back(datum);
             }
+        }
 
-            boost::json::object link_usage;
-            boost::json::object links_list;
-            links_list["links"] = bandwidth_json;
-            link_usage["link_usage"] = links_list;
-            bandwidth_json_part = links_list;
+        boost::json::object link_usage;
+        boost::json::object links_list;
+        links_list["links"] = bandwidth_json;
+        link_usage["link_usage"] = links_list;
+        bandwidth_json_part = links_list;
 
-            if (writing_file) {
-                std::ofstream output(file_path);
-                output << std::setw(4) << link_usage << std::endl;
-                output.close();
-            }
-        } catch (std::runtime_error &e) {
-            throw;
+
+        if (writing_file) {
+            std::ofstream output(file_path);
+            output << std::setw(4) << link_usage << std::endl;
+            output.close();
         }
     }
 

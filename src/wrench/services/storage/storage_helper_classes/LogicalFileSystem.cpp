@@ -123,8 +123,12 @@ namespace wrench {
         if (devnull) {
             return false;
         }
-        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
-        return (this->content.find(fixed_path) != this->content.end());
+        if (absolute_path == "/") {// Common case
+            return true;
+        } else {
+            auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+            return (this->content.find(fixed_path) != this->content.end());
+        }
     }
 
     /**
@@ -165,7 +169,7 @@ namespace wrench {
  * @param file: the file
  * @param absolute_path: the directory's absolute path
  *
- * @return true if the file is present
+ * @return true if the file is present, false if not (or if directory does not exist)
  *
  * @throw std::invalid_argument
  */
@@ -173,6 +177,10 @@ namespace wrench {
         if (devnull) {
             return false;
         }
+        if (absolute_path == "/") {
+            return (this->content["/"].find(file) != this->content["/"].end());
+        }
+
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
         // If directory does not exist, say "no"
@@ -234,10 +242,13 @@ namespace wrench {
             return true;
         }
 
-        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+        std::string fixed_path = "/";
+        if (absolute_path != "/") {
+            fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+        }
 
 
-        std::string key = FileLocation::sanitizePath(fixed_path) + file->getID();
+        std::string key = fixed_path + file->getID();
         if (this->reserved_space.find(key) != this->reserved_space.end()) {
             WRENCH_WARN("LogicalFileSystem::reserveSpace(): Space was already being reserved for storing file %s at path %s:%s. "
                         "This is likely a redundant copy, and nothing needs to be done",
@@ -266,9 +277,13 @@ namespace wrench {
         if (this->devnull) {
             return;
         }
-        auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
-        std::string key = FileLocation::sanitizePath(fixed_path) + file->getID();
+        std::string fixed_path = "/";
+        if (absolute_path != "/") {
+            fixed_path = FileLocation::sanitizePath(absolute_path + "/");
+        }
+
+        std::string key = fixed_path + file->getID();
 
         if (this->reserved_space.find(key) == this->reserved_space.end()) {
             return;// oh well, the transfer was cancelled/terminated/whatever

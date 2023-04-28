@@ -529,28 +529,20 @@ namespace wrench {
         //            mailbox_that_should_receive_file_content = nullptr;
         //        }
 
-        try {
-            S4U_Mailbox::putMessage(
-                    src_loc->getStorageService()->mailbox,
-                    new StorageServiceFileReadRequestMessage(
-                            request_answer_mailbox,
-                            simgrid::s4u::this_actor::get_host(),
-                            src_loc,
-                            f->getSize(),
-                            src_loc->getStorageService()->getMessagePayloadValue(
-                                    StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        S4U_Mailbox::putMessage(
+                src_loc->getStorageService()->mailbox,
+                new StorageServiceFileReadRequestMessage(
+                        request_answer_mailbox,
+                        simgrid::s4u::this_actor::get_host(),
+                        src_loc,
+                        f->getSize(),
+                        src_loc->getStorageService()->getMessagePayloadValue(
+                                StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply to the request
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-        try {
-            message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
 
         simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content;
         if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {

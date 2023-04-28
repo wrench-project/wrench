@@ -16,6 +16,7 @@
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/services/storage/compound/CompoundStorageServiceProperty.h"
 #include "wrench/services/storage/compound/CompoundStorageServiceMessagePayload.h"
+#include "wrench/services/storage/compound/CompoundStorageServiceMessage.h"
 
 namespace wrench {
 
@@ -24,8 +25,43 @@ namespace wrench {
      */
     using StorageSelectionStrategyCallback = std::function<std::shared_ptr<FileLocation>(
             const std::shared_ptr<DataFile> &,
-            const std::set<std::shared_ptr<StorageService>> &,
-            const std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> &)>;
+            const std::map<std::string, std::vector<std::shared_ptr<StorageService>>> &,
+            const std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &,
+            const std::vector<std::shared_ptr<FileLocation>> &previous_allocations)>;
+
+    /**
+     * @brief Enum for IO actions in traces
+    */
+    enum class IOAction : std::uint8_t {
+        ReadStart = 1,
+        ReadEnd = 2,
+        WriteStart = 3,
+        WriteEnd = 4,
+        CopyToStart = 5,
+        CopyToEnd = 6,
+        CopyFromStart = 7,
+        CopyFromEnd = 8,
+        DeleteStart = 9,
+        DeleteEnd = 10,
+        None = 11,
+    };
+
+    struct DiskUsage {
+        std::shared_ptr<StorageService> service;
+        double free_space;
+        std::string file_name;
+        double load;// not actually used so far
+    };
+
+    /**
+     * @brief Structure for tracing file allocations for each job 
+     */
+    struct AllocationTrace {
+        double ts;
+        IOAction act;
+        std::vector<DiskUsage> disk_usage;// new usage stats for updated disks
+        std::vector<std::shared_ptr<FileLocation>> internal_locations;
+    };
 
     /**
      * @brief An abstract storage service which holds a collection of concrete storage services (eg. 
@@ -34,11 +70,10 @@ namespace wrench {
      *        action (read, write, copy, etc) until a later time in the simulation, rather than during
      *        job definition. A typical use for the CompoundStorageService is to select a definitive
      *        SimpleStorageService for each action of a job during its scheduling in a BatchScheduler class.
-     *        This service is able to receive and handle the same messages as any standard storage service 
-     *        (File Read/Write/Delete/Copy/Lookup requests), but will always answer that it is unable to 
-     *        process any of these requests, which should be addressed directly to the correct underlying 
-     *        storage service. (A possible future patch could give it the ability to automatically forward 
-     *        said request to one of the underlying storage services).
+     *        This should never receive messages for I/O operations, as any standard storage service 
+     *        (File Read/Write/Delete/Copy/Lookup requests), instead, it overides the main functions of 
+     *        StorageService (readFile / writeFile /...) and will craft messages intended for one or many of 
+     *        its underlying storage services.
      */
     class CompoundStorageService : public StorageService {
     public:
@@ -139,14 +174,49 @@ namespace wrench {
         /**
          * @brief Method to return the collection of known StorageServices
          */
-        std::set<std::shared_ptr<StorageService>> &getAllServices();
+        std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &getAllServices();
 
-        std::shared_ptr<FileLocation> lookupFileLocation(const std::shared_ptr<DataFile> &file);
+        std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<DataFile> &file, simgrid::s4u::Mailbox *answer_mailbox);
 
-        std::shared_ptr<FileLocation> lookupFileLocation(const std::shared_ptr<FileLocation> &location);
-
+        std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<FileLocation> &location);
 
         bool hasFile(const std::shared_ptr<FileLocation> &location) override;
+
+        void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+                       const std::shared_ptr<FileLocation> &location,
+                       bool wait_for_answer) override;
+
+        void readFile(simgrid::s4u::Mailbox *answer_mailbox,
+                      const std::shared_ptr<FileLocation> &location,
+                      double num_bytes,
+                      bool wait_for_answer) override;
+
+        void deleteFile(simgrid::s4u::Mailbox *answer_mailbox,
+                        const std::shared_ptr<FileLocation> &location,
+                        bool wait_for_answer) override;
+
+        bool lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
+                        const std::shared_ptr<FileLocation> &location) override;
+
+        /**
+         * @brief Intended to be called by StorageService::copyFile() when the use 
+         *        of a CSS is detected in a file copy.
+        */
+        static void copyFile(const std::shared_ptr<FileLocation> &src_location,
+                             const std::shared_ptr<FileLocation> &dst_location);
+
+        void copyFileIamSource(const std::shared_ptr<FileLocation> &src_location,
+                               const std::shared_ptr<FileLocation> &dst_location);
+
+        void copyFileIamDestination(const std::shared_ptr<FileLocation> &src_location,
+                                    const std::shared_ptr<FileLocation> &dst_location);
+
+        // Publicly accessible traces... (TODO: cleanup access to traces)
+        std::map<std::string, AllocationTrace> read_traces = {};
+        std::map<std::string, AllocationTrace> write_traces = {};
+        std::map<std::string, AllocationTrace> copy_traces = {};
+        std::map<std::string, AllocationTrace> delete_traces = {};
+        std::vector<std::pair<double, AllocationTrace>> internal_storage_use = {};
 
         /***********************/
         /** \endcond           */
@@ -166,7 +236,6 @@ namespace wrench {
 
         /** @brief Default property values **/
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {CompoundStorageServiceProperty::STORAGE_SELECTION_METHOD, "external"},
                 {CompoundStorageServiceProperty::CACHING_BEHAVIOR, "NONE"},
         };
 
@@ -189,12 +258,11 @@ namespace wrench {
                 {CompoundStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 0},
                 {CompoundStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 0},
                 {CompoundStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, 0},
-        };
+                {CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD, 1024}};
 
         static unsigned long getNewUniqueNumber();
 
         bool processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox);
-
 
         /***********************/
         /** \endcond           */
@@ -205,32 +273,33 @@ namespace wrench {
 
         int main() override;
 
-        std::shared_ptr<FileLocation> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location);
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location, simgrid::s4u::Mailbox *answer_mailbox);
 
-        std::shared_ptr<FileLocation> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location);
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location);
+
+        bool processStorageSelectionMessage(const CompoundStorageAllocationRequestMessage *msg);
+
+        bool processStorageLookupMessage(const CompoundStorageLookupRequestMessage *msg);
 
         bool processNextMessage(SimulationMessage *message);
 
-        bool processFileDeleteRequest(StorageServiceFileDeleteRequestMessage *msg);
+        std::map<std::string, std::vector<std::shared_ptr<StorageService>>> storage_services = {};
 
-        bool processFileLookupRequest(StorageServiceFileLookupRequestMessage *msg);
-
-        bool processFileCopyRequest(StorageServiceFileCopyRequestMessage *msg);
-
-        bool processFileWriteRequest(StorageServiceFileWriteRequestMessage *msg);
-
-        bool processFileReadRequest(StorageServiceFileReadRequestMessage *msg);
-
-        std::set<std::shared_ptr<StorageService>> storage_services = {};
-
-        std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_location_mapping = {};
+        std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_location_mapping = {};
 
         StorageSelectionStrategyCallback storage_selection;
 
-        bool isStorageSelectionUserProvided;
+        /**
+         * @brief Chunk size for file stripping
+         *        Should usually be user-provided, or will be 
+         *        set to the smallest disk size as default.
+        */
+        double max_chunk_size = 0;
 
-        /** @brief File systems */// TODO: Is this really needed now that file_systems are no longer in StorageService.h?
-        std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
+        /**
+         * @brief Dirty log tracing method (needs to be improved)
+        */
+        void traceInternalStorageUse(IOAction action, const std::vector<std::shared_ptr<FileLocation>> &locations = {});
     };
 
 };// namespace wrench

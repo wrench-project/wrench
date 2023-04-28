@@ -255,6 +255,7 @@ namespace wrench {
             queue_state.emplace_back(tuple);
         }
 
+#ifdef ENABLE_BATSCHED
         //  Go through the waiting jobs (BATSCHED only)
         for (auto const &j: this->waiting_jobs) {
             auto tuple = std::make_tuple(
@@ -267,6 +268,7 @@ namespace wrench {
                     -1.0);
             queue_state.emplace_back(tuple);
         }
+#endif
 
         // Go through the pending jobs
         for (auto const &j: this->batch_queue) {
@@ -313,6 +315,7 @@ namespace wrench {
                         "BatchComputeService::parseUnsignedLongServiceSpecificArgument(): Invalid " + key + " value '" +
                         (*it).second + "'");
             }
+
         } else {
             throw std::invalid_argument(
                     "BatchComputeService::parseUnsignedLongServiceSpecificArgument(): Batch Service requires " + key +
@@ -352,9 +355,9 @@ namespace wrench {
 
         // Create a Batch Job
         unsigned long jobid = wrench::BatchComputeService::generateUniqueJobID();
-        auto batch_job = std::shared_ptr<BatchJob>(new BatchJob(job, jobid, time_asked_for_in_seconds,
-                                                                num_hosts, num_cores_per_host, username, -1,
-                                                                S4U_Simulation::getClock()));
+        auto batch_job = std::make_shared<BatchJob>(job, jobid, time_asked_for_in_seconds,
+                                                    num_hosts, num_cores_per_host, username, -1,
+                                                    S4U_Simulation::getClock());
 
         // Set job display color for csv output
         auto it = batch_job_args.find("-color");
@@ -462,11 +465,6 @@ namespace wrench {
 
         std::shared_ptr<BatchJob> batch_job = this->all_jobs[job];
 
-        //        std::cerr << "IN sendCompoundJobFailureNotification \n";
-        // NO IDEA WHAT THIS WAS HERE - DEFINITELY A BUG!
-        //        this->scheduler->processJobFailure(batch_job);
-
-        //        job->printCallbackMailboxStack();
         try {
             S4U_Mailbox::putMessage(
                     job->popCallbackMailbox(),
@@ -610,6 +608,7 @@ namespace wrench {
             this->batch_queue.pop_front();
         }
 
+#ifdef ENABLE_BATSCHED
         while (not this->waiting_jobs.empty()) {
             auto batch_job = (*(this->waiting_jobs.begin()));
             auto compound_job = batch_job->getCompoundJob();
@@ -643,6 +642,7 @@ namespace wrench {
 
             this->waiting_jobs.erase(batch_job);
         }
+#endif
 
         // UNLOCK
         this->releaseDaemonLock();
@@ -763,9 +763,11 @@ namespace wrench {
             processAlarmJobTimeout(msg->job);
             return true;
 
+#ifdef ENABLE_BATSCHED
         } else if (auto msg = std::dynamic_pointer_cast<BatchExecuteJobFromBatSchedMessage>(message)) {
             processExecuteJobFromBatSched(msg->batsched_decision_reply);
             return true;
+#endif
 
         } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage>(message)) {
             processIsThereAtLeastOneHostWithAvailableResources(msg->answer_mailbox, msg->num_cores, msg->ram);
@@ -1130,6 +1132,7 @@ namespace wrench {
                 }
             }
 
+#ifdef ENABLE_BATSCHED
             if (not is_pending) {
                 if (batch_job == nullptr && batch_pending_it == this->batch_queue.end()) {
                     // Is it waiting?
@@ -1143,6 +1146,7 @@ namespace wrench {
                     }
                 }
             }
+#endif
         }
 
         //        WRENCH_INFO("pending: %d   running: %d   waiting: %d", is_pending, is_running, is_waiting);
@@ -1158,7 +1162,6 @@ namespace wrench {
             return;
         }
 
-        // Is it running?
         if (is_running) {
             this->scheduler->processJobTermination(batch_job);
             terminateRunningCompoundJob(job, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
@@ -1172,11 +1175,13 @@ namespace wrench {
             this->batch_queue.erase(batch_pending_it);
             this->removeBatchJobFromJobsList(to_free);
         }
+#ifdef ENABLE_BATSCHED
         if (is_waiting) {
             this->scheduler->processJobTermination(batch_job);
             this->waiting_jobs.erase(batch_job);
             this->removeBatchJobFromJobsList(batch_job);
         }
+#endif
         auto answer_message =
                 new ComputeServiceTerminateCompoundJobAnswerMessage(
                         job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
@@ -1210,6 +1215,7 @@ namespace wrench {
         this->processCompoundJobTimeout(compound_job);
     }
 
+#ifdef ENABLE_BATSCHED
     /**
      * @brief Method to hand incoming batsched message
      *
@@ -1282,6 +1288,7 @@ namespace wrench {
         startJob(resources, compound_job, batch_job, num_nodes_allocated, time_in_seconds,
                  cores_per_node_asked_for);
     }
+#endif
 
     /**
      * @brief Process a host available resource request
@@ -1316,7 +1323,7 @@ namespace wrench {
             if (key == "-N") {
                 found_dash_N = true;
                 unsigned long num_nodes;
-                if (sscanf(value.c_str(), "%lu", &num_nodes) != 1) {
+                if ((sscanf(value.c_str(), "%lu", &num_nodes) != 1) or (num_nodes == 0)) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value + "\"}");
                 }
                 if (this->compute_hosts.size() < num_nodes) {
@@ -1325,13 +1332,13 @@ namespace wrench {
             } else if (key == "-t") {
                 found_dash_t = true;
                 unsigned long requested_time;
-                if (sscanf(value.c_str(), "%lu", &requested_time) != 1) {
+                if ((sscanf(value.c_str(), "%lu", &requested_time) != 1) or (requested_time == 0)) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value + "\"}");
                 }
             } else if (key == "-c") {
                 found_dash_c = true;
                 unsigned long num_cores;
-                if (sscanf(value.c_str(), "%lu", &num_cores) != 1) {
+                if ((sscanf(value.c_str(), "%lu", &num_cores) != 1) or (num_cores == 0)) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value + "\"}");
                 }
                 if (this->num_cores_per_node < num_cores) {

@@ -393,6 +393,16 @@ namespace wrench {
          */
         virtual double getTotalFreeSpaceAtPath(const std::string &path);
 
+        /** Service free space tracing (doesn't incur simulated overhead) */
+        /**
+         *  @brief Get the storage service's total free space (no simulated overhead)
+         *  @return Current free space in bytes
+         * 
+        */
+        virtual double traceTotalFreeSpace() {
+            throw std::runtime_error("StorageService::traceTotalFreeSpace: should have been overridden by derived class");
+        }
+
         /**
          * @brief Get the storage's service base root path
          * @return a path
@@ -521,6 +531,9 @@ namespace wrench {
 
         virtual void setIsScratch(bool is_scratch);
 
+        /** Fast-Access common message payloads! **/
+        //        double StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD;
+        //        double StorageServiceMessagePayload_FILE_READ_ANSWER_MESSAGE_PAYLOAD;
         /***********************/
         /** \endcond          **/
         /***********************/

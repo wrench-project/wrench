@@ -110,7 +110,6 @@ private:
             }
         }
 
-
         /* Create a compound job that will hold an MPI action */
         auto job = job_manager->createCompoundJob("my_mpi_job");
 

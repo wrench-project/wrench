@@ -72,7 +72,8 @@ namespace wrench {
                 {BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG, ""},
                 {BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "false"},
                 {BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
-                {BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "false"}};
+                {BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "false"},
+                {BatchComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
@@ -243,7 +244,6 @@ namespace wrench {
 
         void terminateRunningCompoundJob(const std::shared_ptr<CompoundJob> &job, ComputeService::TerminationCause termination_cause);
 
-
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup(bool has_returned_from_main, int return_value) override;
 
@@ -275,10 +275,12 @@ namespace wrench {
         void startJob(const std::map<std::string, std::tuple<unsigned long, double>> &, const std::shared_ptr<CompoundJob> &,
                       const std::shared_ptr<BatchJob> &, unsigned long, unsigned long, unsigned long);
 
-
-        void processExecuteJobFromBatSched(const std::string &bat_sched_reply);
-
+        // process a resource request
         void processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
+
+#ifdef ENABLE_BATSCHED
+        void processExecuteJobFromBatSched(const std::string &bat_sched_reply);
+#endif
     };
 }// namespace wrench
 

@@ -194,7 +194,7 @@ void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_
                     std::make_pair("Host2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
             },
             "/scratch",
-            {},
+            {{wrench::BareMetalComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "10MB"}},
             {
                     {wrench::BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1},
                     {wrench::BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1},
@@ -300,7 +300,7 @@ void BareMetalComputeServiceLinkFailuresTest::do_MultiActionJobLinkFailure_test(
                                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                                 wrench::ComputeService::ALL_RAM))},
                                                                 {"/scratch"},
-                                                                {})));
+                                                                {{wrench::BareMetalComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "10MB"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

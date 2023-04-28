@@ -90,6 +90,8 @@ TEST_F(SimulationLoggingTest, Logging) {
 
 void SimulationLoggingTest::do_logging_test() {
 
+    close(2);
+
     // Re-enable logging just for this test
     xbt_log_control_set("simulation_logging_test.thresh:debug");
 

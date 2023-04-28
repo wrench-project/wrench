@@ -78,24 +78,16 @@ namespace wrench {
 
         DataMovementManager::CopyRequestSpecs request(src, dst, file_registry_service);
 
-        try {
-            for (auto const &p: this->pending_file_copies) {
-                if (*p == request) {
-                    throw ExecutionException(
-                            std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
-                }
+        for (auto const &p: this->pending_file_copies) {
+            if (*p == request) {
+                throw ExecutionException(
+                        std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
             }
-        } catch (ExecutionException &e) {
-            throw;
         }
 
 
-        try {
-            this->pending_file_copies.push_front(std::make_unique<CopyRequestSpecs>(src, dst, file_registry_service));
-            wrench::StorageService::initiateFileCopy(this->mailbox, src, dst);
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        this->pending_file_copies.push_front(std::make_unique<CopyRequestSpecs>(src, dst, file_registry_service));
+        wrench::StorageService::initiateFileCopy(this->mailbox, src, dst);
     }
 
     /**
@@ -192,25 +184,17 @@ namespace wrench {
 
         DataMovementManager::CopyRequestSpecs request(src, dst, file_registry_service);
 
-        try {
-            for (auto const &p: this->pending_file_copies) {
-                if (*p == request) {
-                    throw ExecutionException(
-                            std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
-                }
+        for (auto const &p: this->pending_file_copies) {
+            if (*p == request) {
+                throw ExecutionException(
+                        std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
             }
-
-            StorageService::copyFile(src, dst);
-        } catch (ExecutionException &e) {
-            throw;
         }
 
-        try {
-            if (file_registry_service) {
-                file_registry_service->addEntry(dst);
-            }
-        } catch (ExecutionException &e) {
-            throw;
+        StorageService::copyFile(src, dst);
+
+        if (file_registry_service) {
+            file_registry_service->addEntry(dst);
         }
     }
 

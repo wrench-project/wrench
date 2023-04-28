@@ -37,6 +37,7 @@ namespace wrench {
                                   double grid_pre_overhead,
                                   double non_grid_pre_overhead,
                                   bool instant_resource_availabilities,
+                                  bool fcfs,
                                   std::set<std::shared_ptr<ComputeService>> &compute_services,
                                   std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
                                   std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
@@ -52,9 +53,9 @@ namespace wrench {
                             std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>> &rhs);
         };
 
-        std::shared_ptr<ComputeService> pickTargetComputeService(std::shared_ptr<CompoundJob> job, std::map<std::string, std::string> service_specific_arguments);
-        std::shared_ptr<ComputeService> pickTargetComputeServiceGridUniverse(std::shared_ptr<CompoundJob> job, std::map<std::string, std::string> service_specific_arguments);
-        std::shared_ptr<ComputeService> pickTargetComputeServiceNonGridUniverse(const std::shared_ptr<CompoundJob> &job, std::map<std::string, std::string> service_specific_arguments);
+        std::shared_ptr<ComputeService> pickTargetComputeService(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &service_specific_arguments);
+        std::shared_ptr<ComputeService> pickTargetComputeServiceGridUniverse(const std::shared_ptr<CompoundJob> &job, std::map<std::string, std::string> service_specific_arguments);
+        std::shared_ptr<ComputeService> pickTargetComputeServiceNonGridUniverse(const std::shared_ptr<CompoundJob> &job, const std::map<std::string, std::string> &service_specific_arguments);
 
         /** startup overhead **/
         double startup_overhead;
@@ -62,8 +63,10 @@ namespace wrench {
         double grid_pre_overhead;
         /** non-grid, pre-overhead */
         double non_grid_pre_overhead;
-
+        /** instant resource availability activated */
         bool instant_resource_availabilities;
+        /** FCFS scheduling enforced */
+        bool fcfs;
 
 
         /** mailbox to reply **/

@@ -38,6 +38,7 @@ public:
 
     void do_ActionExecutionServiceOneActionSuccessTest_test();
     void do_ActionExecutionServiceOneActionBogusSpecTest_test();
+    void do_ActionExecutionServiceNonReadyActionTest_test();
     void do_ActionExecutionServiceOneActionTerminateTest_test();
     void do_ActionExecutionServiceOneActionCrashRestartTest_test();
     void do_ActionExecutionServiceOneActionCrashNoRestartTest_test();
@@ -125,7 +126,7 @@ class ActionExecutionServiceOneActionSuccessTestWMS : public wrench::ExecutionCo
 
 public:
     ActionExecutionServiceOneActionSuccessTestWMS(ActionExecutionServiceTest *test,
-                                                  std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                  const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -186,6 +187,9 @@ private:
         if (action->getState() != wrench::Action::State::COMPLETED) {
             throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
         }
+
+        // Shutdown the service for coverage
+        action_execution_service->stop();
 
         return 0;
     }
@@ -259,10 +263,9 @@ private:
         // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
-                new wrench::ActionExecutionService(
-                        "Host2", compute_resources,
-                        {}, {}));
+        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
+                "Host2", compute_resources,
+                {}, {}));
 
         action_execution_service->setParentService(this->getSharedPtr<Service>());
 
@@ -332,6 +335,113 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionBogusSpecTest
 }
 
 /**********************************************************************/
+/**  ACTION SCHEDULER NON-READY ACTION TEST                          **/
+/**********************************************************************/
+
+
+class ActionExecutionServiceNonReadyActionTestWMS : public wrench::ExecutionController {
+
+public:
+    ActionExecutionServiceNonReadyActionTestWMS(ActionExecutionServiceTest *test,
+                                                const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+    }
+
+private:
+    ActionExecutionServiceTest *test;
+
+    int main() override {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create an ActionExecutionService
+        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
+                "Host2", compute_resources,
+                {}, {}));
+
+        action_execution_service->setParentService(this->getSharedPtr<Service>());
+
+        // Start it
+        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->start(action_execution_service, true, false);
+
+        // Create a Compound Job
+        auto job = job_manager->createCompoundJob("my_job");
+
+        // Add two compute actions to it
+        auto action1 = job->addComputeAction("compute1", 100.0, 0.0, 1, 2, wrench::ParallelModel::CONSTANTEFFICIENCY(1.0));
+        auto action2 = job->addComputeAction("compute2", 100.0, 0.0, 1, 2, wrench::ParallelModel::CONSTANTEFFICIENCY(1.0));
+        job->addActionDependency(action1, action2);
+
+        // Coverage
+        try {
+            action_execution_service->submitAction(action2);
+            throw std::runtime_error("Should not be able to submit a non-READY action");
+        } catch (std::runtime_error &ignore) {
+        }
+
+        //        {
+        //            std::map<std::string, std::string> args;
+        //            args["compute"] = "BOGUS";
+        //            // Submit the action to the action executor
+        //
+        //            try {
+        //                action_execution_service->submitAction(action1);
+        //            } catch (std::invalid_argument &e) {
+        //            }
+        //
+        //        }
+
+        return 0;
+    }
+};
+
+TEST_F(ActionExecutionServiceTest, OneActionNonReadyAction) {
+    DO_TEST_WITH_FORK(do_ActionExecutionServiceNonReadyActionTest_test);
+}
+
+void ActionExecutionServiceTest::do_ActionExecutionServiceNonReadyActionTest_test() {
+
+    // Create and initialize a simulation
+    simulation = wrench::Simulation::createSimulation();
+    int argc = 1;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //    argv[2] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    this->workflow = wrench::Workflow::createWorkflow();
+
+    // Create a Storage Service
+    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"},
+                                                                                        {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
+
+    // Create a file
+    this->file = this->workflow->addFile("some_file", 1000000.0);
+
+    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+
+    // Create a WMS
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+                            new ActionExecutionServiceNonReadyActionTestWMS(this, "Host1")));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    this->workflow->clear();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+/**********************************************************************/
 /**  ACTION SCHEDULER ONE ACTION TERMINATE TEST                      **/
 /**********************************************************************/
 
@@ -355,9 +465,9 @@ private:
         // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
-                new wrench::ActionExecutionService("Host2", compute_resources,
-                                                   {}, {}));
+        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
+                "Host2", compute_resources,
+                {}, {}));
         action_execution_service->setParentService(this->getSharedPtr<Service>());
 
         // Start it
@@ -460,7 +570,7 @@ class ActionExecutionServiceOneActionCrashRestartTestWMS : public wrench::Execut
 public:
     ActionExecutionServiceOneActionCrashRestartTestWMS(ActionExecutionServiceTest *test,
                                                        std::shared_ptr<wrench::Workflow> workflow,
-                                                       std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                       const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:

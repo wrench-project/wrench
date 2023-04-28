@@ -87,11 +87,7 @@ namespace wrench {
         std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
                 new Alarm(date, hostname, reply_mailbox, msg, suffix));
         alarm_ptr->simulation = simulation;
-        try {
-            alarm_ptr->start(alarm_ptr, true, false);// Daemonized, no auto-restart
-        } catch (ExecutionException &e) {
-            throw;
-        }
+        alarm_ptr->start(alarm_ptr, true, false);// Daemonized, no auto-restart
         return alarm_ptr;
     }
 

@@ -49,7 +49,8 @@ namespace wrench {
                 {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"},
         };
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {};
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+                {ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}};
 
     public:
         // Public Constructor

@@ -12,6 +12,8 @@
 #include <wrench-dev.h>
 
 #include <memory>
+#include <utility>
+#include <utility>
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
@@ -32,6 +34,7 @@ public:
 
     void do_BadSetup_test();
     void do_OneSleepAction_test();
+    void do_BadServiceSpecificArgs_test();
     void do_OneComputeActionNotEnoughResources_test();
     void do_OneComputeActionBogusServiceSpecificArgs_test();
     void do_OneSleepActionServiceCrashed_test();
@@ -228,7 +231,7 @@ class BatchOneSleepActionTestWMS : public wrench::ExecutionController {
 public:
     BatchOneSleepActionTestWMS(BatchComputeServiceOneActionTest *test,
                                std::shared_ptr<wrench::BatchComputeService> batch_compute_service,
-                               std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test), batch_compute_service(batch_compute_service) {
+                               std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test), batch_compute_service(std::move(std::move(batch_compute_service))) {
     }
 
 private:
@@ -254,17 +257,45 @@ private:
         } catch (std::invalid_argument &ignore) {
         }
 
-        // Missing service-specific arguments
+        {
+            // Missing service-specific arguments
+            std::map<std::string, std::string> service_specific_args;
+            service_specific_args["-N"] = "1";
+            service_specific_args["-c"] = "1";
+            try {
+                job_manager->submitJob(job, this->test->compute_service, service_specific_args);
+                throw std::runtime_error("Should not be able to submit job with missing service-specific arguments");
+            } catch (std::invalid_argument &ignore) {
+            }
+        }
+
+        {
+            // Missing service-specific arguments
+            std::map<std::string, std::string> service_specific_args;
+            service_specific_args["-N"] = "1";
+            service_specific_args["-t"] = "1";
+            try {
+                job_manager->submitJob(job, this->test->compute_service, service_specific_args);
+                throw std::runtime_error("Should not be able to submit job with missing service-specific arguments");
+            } catch (std::invalid_argument &ignore) {
+            }
+        }
+
+        {
+            // Missing service-specific arguments
+            std::map<std::string, std::string> service_specific_args;
+            service_specific_args["-t"] = "1";
+            service_specific_args["-t"] = "1";
+            try {
+                job_manager->submitJob(job, this->test->compute_service, service_specific_args);
+                throw std::runtime_error("Should not be able to submit job with missing service-specific arguments");
+            } catch (std::invalid_argument &ignore) {
+            }
+        }
+
         std::map<std::string, std::string> service_specific_args;
         service_specific_args["-N"] = "1";
         service_specific_args["-c"] = "1";
-        try {
-            job_manager->submitJob(job, this->test->compute_service, service_specific_args);
-            throw std::runtime_error("Should not be able to submit job with missing service-specific arguments");
-        } catch (std::invalid_argument &ignore) {
-        }
-
-
         service_specific_args["-t"] = "3600";
         job_manager->submitJob(job, this->test->compute_service, service_specific_args);
 
@@ -295,7 +326,7 @@ private:
         }
 
         if ((action->getStartDate() > 0.0001) or (fabs(action->getEndDate() - 10.0) > 0.0001)) {
-            throw std::runtime_error("Unexpected action stard/end dates");
+            throw std::runtime_error("Unexpected action start/end dates");
         }
 
         //        std::cerr << action->getStartDate() << "\n";
@@ -357,6 +388,129 @@ void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
                             new BatchOneSleepActionTestWMS(
+                                    this, compute_service,
+                                    hostname)));
+
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
+                 std::invalid_argument);
+    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+    // Running a "do nothing" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  ONE SLEEP ACTION TEST                                           **/
+/**********************************************************************/
+
+class BatchBadServiceSpecificArgsTestWMS : public wrench::ExecutionController {
+public:
+    BatchBadServiceSpecificArgsTestWMS(BatchComputeServiceOneActionTest *test,
+                                       std::shared_ptr<wrench::BatchComputeService> batch_compute_service,
+                                       std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test), batch_compute_service(batch_compute_service) {
+    }
+
+private:
+    BatchComputeServiceOneActionTest *test;
+    std::shared_ptr<wrench::BatchComputeService> batch_compute_service;
+
+    int main() override {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a data movement manager
+        auto data_movement_manager = this->createDataMovementManager();
+
+        // Create a compound job and submit it
+        auto job = job_manager->createCompoundJob("my_job");
+        auto action = job->addSleepAction("my_sleep", 10.0);
+
+        {
+            // Bogus service-specific arguments
+            std::map<std::string, std::string> service_specific_args;
+            service_specific_args["-N"] = "bogus";
+            service_specific_args["-c"] = "gobus";
+            service_specific_args["-t"] = "bogus";
+
+            try {
+                job_manager->submitJob(job, this->test->compute_service, service_specific_args);
+                throw std::runtime_error("Shouldn't be able to submit job with bogus service-specific arguments");
+            } catch (std::invalid_argument &ignore) {
+            }
+        }
+
+        {
+            // Zero service-specific arguments
+            std::map<std::string, std::string> service_specific_args;
+            service_specific_args["-N"] = "0";
+            service_specific_args["-c"] = "0";
+            service_specific_args["-t"] = "0";
+
+            try {
+                job_manager->submitJob(job, this->test->compute_service, service_specific_args);
+                throw std::runtime_error("Shouldn't be able to submit job with zero service-specific arguments");
+            } catch (std::invalid_argument &ignore) {
+            }
+        }
+
+
+        return 0;
+    }
+};
+
+TEST_F(BatchComputeServiceOneActionTest, BadServiceSpecificArgs) {
+    DO_TEST_WITH_FORK(do_BadServiceSpecificArgs_test);
+}
+
+void BatchComputeServiceOneActionTest::do_BadServiceSpecificArgs_test() {
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("one_action_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+
+    // Create a Compute Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(compute_service = simulation->add(
+                            new wrench::BatchComputeService("Host3",
+                                                            {"Host4"},
+                                                            {"/scratch"},
+                                                            {})));
+
+    // Create a Storage Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+
+    // Create a WMS
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    std::string hostname = "Host1";
+    ASSERT_NO_THROW(wms = simulation->add(
+                            new BatchBadServiceSpecificArgsTestWMS(
                                     this, compute_service,
                                     hostname)));
 

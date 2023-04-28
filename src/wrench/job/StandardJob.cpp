@@ -78,7 +78,7 @@ namespace wrench {
      */
     unsigned long StandardJob::getMinimumRequiredNumCores() const {
         unsigned long max_min_num_cores = 1;
-        for (auto t: tasks) {
+        for (const auto &t: tasks) {
             max_min_num_cores = std::max<unsigned long>(max_min_num_cores, t->getMinNumCores());
         }
         return max_min_num_cores;
@@ -90,9 +90,9 @@ namespace wrench {
      * @return the number of cores
      */
     double StandardJob::getMinimumRequiredMemory() const {
-        unsigned long max_ram = 0;
+        double max_ram = 0;
         for (auto const &t: tasks) {
-            max_ram = std::max<unsigned long>(max_ram, (unsigned long) (t->getMemoryRequirement()));
+            max_ram = std::max<double>(max_ram, (double) (t->getMemoryRequirement()));
         }
         return max_ram;
     }
@@ -784,7 +784,6 @@ namespace wrench {
         }
 
         /** Let's not care about the SCRATCH cleanup action. If it failed, oh well **/
-        return;
     }
 
     /**

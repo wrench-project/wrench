@@ -45,6 +45,7 @@ namespace wrench {
                                       double non_grid_pre_overhead,
                                       double non_grid_post_overhead,
                                       bool fast_bmcs_resource_availability,
+                                      bool fcfs,
                                       std::set<std::shared_ptr<ComputeService>> compute_services,
                                       WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                       WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
@@ -76,14 +77,13 @@ namespace wrench {
         void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<CompoundJob> job,
                                       std::map<std::string, std::string> &service_specific_args);
 
-        void processCompoundJobCompletion(std::shared_ptr<CompoundJob> job);
+        void processCompoundJobCompletion(const std::shared_ptr<CompoundJob> &job);
 
-        void processCompoundJobFailure(std::shared_ptr<CompoundJob> job);
+        void processCompoundJobFailure(const std::shared_ptr<CompoundJob> &job);
 
-        void processNegotiatorCompletion(std::vector<std::shared_ptr<Job>> &pending_jobs);
+        void processNegotiatorCompletion(std::set<std::shared_ptr<Job>> &pending_jobs);
 
         void terminate();
-
 
         /** set of compute resources **/
         std::set<std::shared_ptr<ComputeService>> compute_services;
@@ -97,8 +97,10 @@ namespace wrench {
         bool resources_unavailable = false;
         /** negotiator startup overhead in seconds **/
         double negotiator_startup_overhead = 0.0;
-
+        /** fast resource availaiblity activated */
         bool fast_bmcs_resource_availability;
+        /** FCFS scheduling enforced */
+        bool fcfs;
 
         double grid_pre_overhead = 0.0;
         double grid_post_overhead = 0.0;

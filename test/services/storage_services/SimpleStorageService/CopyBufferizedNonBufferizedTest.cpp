@@ -17,6 +17,7 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service_non_bufferized_2 = nullptr;
 
     void do_CopyBufferizedNonBufferizedTest_test();
+    void do_SelfCopyBufferizedNonBufferizedTest_test();
 
 protected:
     ~CopyBufferizedNonBufferizedTest() {
@@ -76,6 +77,10 @@ protected:
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
+
+/***********************************************************************************/
+/** COPY BUFFERIZED / NON-BUFFERIZED                                              **/
+/***********************************************************************************/
 
 class CopyBufferizedNonBufferizedTestWMS : public wrench::ExecutionController {
 public:
@@ -170,8 +175,89 @@ void CopyBufferizedNonBufferizedTest::do_CopyBufferizedNonBufferizedTest_test() 
                                                                                       {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new CopyBufferizedNonBufferizedTestWMS(this, "WMSHost")));
+    ASSERT_NO_THROW(simulation->add(new CopyBufferizedNonBufferizedTestWMS(this, "WMSHost")));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/***********************************************************************************/
+/** SELF-COPY BUFFERIZED / NON-BUFFERIZED                                         **/
+/***********************************************************************************/
+
+class SelfCopyBufferizedNonBufferizedTestWMS : public wrench::ExecutionController {
+public:
+    SelfCopyBufferizedNonBufferizedTestWMS(CopyBufferizedNonBufferizedTest *test,
+                                           const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+    }
+
+private:
+    CopyBufferizedNonBufferizedTest *test;
+    std::string mode;
+
+    int main() override {
+
+        // Create the files
+        this->test->storage_service_bufferized_1->createFile(this->test->file_1_size_100, "/disk1");
+        this->test->storage_service_non_bufferized_1->createFile(this->test->file_2_size_200, "/disk1");
+
+        auto data_movement_manager = this->createDataMovementManager();
+
+        data_movement_manager->doSynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_1, "/disk1", this->test->file_1_size_100),
+                wrench::FileLocation::LOCATION(this->test->storage_service_bufferized_1, "/disk2", this->test->file_1_size_100));
+
+        if (not this->test->storage_service_bufferized_1->lookupFile(this->test->file_1_size_100, "/disk2")) {
+            throw std::runtime_error("Cannot find copied file after self copy bufferized");
+        }
+
+        data_movement_manager->doSynchronousFileCopy(
+                wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_1, "/disk1", this->test->file_2_size_200),
+                wrench::FileLocation::LOCATION(this->test->storage_service_non_bufferized_1, "/disk2", this->test->file_2_size_200));
+
+        if (not this->test->storage_service_non_bufferized_1->lookupFile(this->test->file_2_size_200, "/disk2")) {
+            throw std::runtime_error("Cannot find copied file after self copy non-bufferized");
+        }
+
+
+        return 0;
+    }
+};
+
+TEST_F(CopyBufferizedNonBufferizedTest, SelfCopy) {
+    DO_TEST_WITH_FORK(do_SelfCopyBufferizedNonBufferizedTest_test);
+}
+
+
+void CopyBufferizedNonBufferizedTest::do_SelfCopyBufferizedNonBufferizedTest_test() {
+
+    // Create and initialize the simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 1;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // set up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    ASSERT_NO_THROW(storage_service_bufferized_1 = simulation->add(
+                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost1", {"/disk1", "/disk2"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "1MB"},
+                                                                                      {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
+    ASSERT_NO_THROW(storage_service_non_bufferized_1 = simulation->add(
+                            wrench::SimpleStorageService::createSimpleStorageService("StorageHost2", {"/disk1", "/disk2"},
+                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"},
+                                                                                      {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
+    // Create a WMS
+    ASSERT_NO_THROW(simulation->add(new SelfCopyBufferizedNonBufferizedTestWMS(this, "WMSHost")));
 
     ASSERT_NO_THROW(simulation->launch());
 

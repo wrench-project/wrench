@@ -48,7 +48,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> wait(double timeout);
 
         static unsigned long waitForSomethingToHappen(
-                std::vector<std::shared_ptr<S4U_PendingCommunication>> pending_comms,
+                const std::vector<std::shared_ptr<S4U_PendingCommunication>> &pending_comms,
                 double timeout);
 
         static unsigned long waitForSomethingToHappen(

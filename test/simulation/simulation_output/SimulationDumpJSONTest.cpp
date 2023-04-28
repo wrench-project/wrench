@@ -1119,6 +1119,8 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
 
     auto result_json = readJSONFromFile(link_usage_json_file_path);
 
+    std::cerr << "RESULT = " << result_json << "\n";
+
     EXPECT_TRUE((expected_json_link_usage_version1 == result_json) or (expected_json_link_usage_version2 == result_json));
 
     link_usage_workflow->clear();

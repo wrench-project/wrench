@@ -699,12 +699,10 @@ namespace wrench {
      * @return true if the job uses scratch, false otherwise
      */
     bool CompoundJob::usesScratch() {
-        for (auto const &a: this->actions) {
-            if (a->usesScratch()) {
-                return true;
-            }
-        }
-        return false;
+        return std::any_of(this->actions.begin(), this->actions.end(),
+                           [](const std::shared_ptr<Action> &action) {
+                               return (action->usesScratch());
+                           });
     }
 
 

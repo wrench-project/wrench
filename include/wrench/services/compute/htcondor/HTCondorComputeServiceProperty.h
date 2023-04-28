@@ -59,6 +59,13 @@ namespace wrench {
          * of all "tell me how many free resources you have right now?" and "this is what I got!" control messages.
          */
         DECLARE_PROPERTY_NAME(INSTANT_RESOURCE_AVAILABILITIES);
+
+        /**
+         * @brief Whether the HTCondorComputeService should enforce First-Come-First-Serve
+         * when scheduling jobs, or allow jobs that can run to be "backfilled" before jobs
+         * that were submitted earlier but that cannot run. Default: false.
+         */
+        DECLARE_PROPERTY_NAME(FCFS);
     };
 }// namespace wrench
 

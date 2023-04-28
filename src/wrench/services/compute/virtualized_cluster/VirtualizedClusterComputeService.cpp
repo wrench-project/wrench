@@ -87,7 +87,7 @@ namespace wrench {
         // send a "create vm" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceCreateVMAnswerMessage>(
                 answer_mailbox,
                 new CloudComputeServiceCreateVMRequestMessage(
                         answer_mailbox,
@@ -96,15 +96,10 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceCreateVMAnswerMessage *>(answer_message.get())) {
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            } else {
-                return msg->vm_name;
-            }
+        if (not answer_message->success) {
+            throw ExecutionException(answer_message->failure_cause);
         } else {
-            throw std::runtime_error(
-                    "CloudComputeService::createVM(): Unexpected [" + answer_message->getName() + "] message");
+            return answer_message->vm_name;
         }
     }
 
@@ -124,21 +119,15 @@ namespace wrench {
         // send a "migrate vm" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+        auto answer_message = sendRequestAndWaitForAnswer<VirtualizedClusterComputeServiceMigrateVMAnswerMessage>(
                 answer_mailbox,
                 new VirtualizedClusterComputeServiceMigrateVMRequestMessage(
                         answer_mailbox, vm_name, dest_pm_hostname,
                         this->getMessagePayloadValue(
                                 VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<VirtualizedClusterComputeServiceMigrateVMAnswerMessage *>(
-                    answer_message.get())) {
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "VirtualizedClusterComputeService::migrateVM(): Unexpected [" + answer_message->getName() + "] message");
+        if (not answer_message->success) {
+            throw ExecutionException(answer_message->failure_cause);
         }
     }
 
@@ -248,7 +237,7 @@ namespace wrench {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
                 throw std::runtime_error(
-                        "VirtualizedClusterComputeService::processNextMessage(): Received a service termination message for an unknown BareMetalComputeService!");
+                        "VirtualizedClusterComputeService::processNextMessage(): Internal Error: Received a service termination message for a non-BareMetalComputeService!");
             }
             return true;
         } else {

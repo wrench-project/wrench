@@ -255,7 +255,7 @@ namespace wrench {
 
         void platformSanityCheck();
         void checkSimulationSetup();
-        bool isRunning() const;
+        //        bool isRunning() const;
 
         void startAllProcesses();
         void addService(const std::shared_ptr<ComputeService> &service);
