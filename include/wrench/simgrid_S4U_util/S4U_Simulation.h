@@ -34,7 +34,6 @@ namespace wrench {
         void initialize(int *argc, char **argv);
         void setupPlatform(const std::string & filepath);
         void setupPlatform(const std::function<void()> &creation_function);
-        void setupPlatformFromString(const std::string & platform);
         void runSimulation();
         static double getClock();
         static std::string getHostName();
