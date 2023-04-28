@@ -24,11 +24,11 @@ public:
     std::shared_ptr<wrench::SimpleStorageService> standalone_ss;
 
 protected:
-    XRootDServiceBasicFunctionalTest() {
+    XRootDServiceBasicFunctionalTest() {}
 
 
         // Create a one-host platform file
-        std::string xml = "<?xml version='1.0'?>"
+        std::string platform_file = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
@@ -58,12 +58,7 @@ protected:
                           "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"link23\"/> </route>"
                           "   </zone> "
                           "</platform>";
-        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
-        fprintf(platform_file, "%s", xml.c_str());
-        fclose(platform_file);
-    }
 
-    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
 
 
