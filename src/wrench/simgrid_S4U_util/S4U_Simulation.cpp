@@ -139,7 +139,7 @@ namespace wrench {
         this->platform_setup = true;
     }
 
-    
+
     /**
      * @brief Initialize the simulated platform. Must only be called once.
      *
