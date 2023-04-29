@@ -22,8 +22,10 @@
 
 #include <simgrid/version.h>
 
+#include <fstream>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include "smpi/smpi.h"
+#include <cstdio>
 
 
 WRENCH_LOG_CATEGORY(wrench_core_s4u_simulation, "Log category for S4U_Simulation");

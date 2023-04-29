@@ -69,3 +69,7 @@ tools/wrench/wrench-daemon/include/REST_API_generated_code.h
 .swp
 .bash_history
 .viminfo
+
+# Swagger-gen
+.swagger-codegen-ignore
+.swagger-codegen/

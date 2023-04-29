@@ -1,6 +1,17 @@
 find_package(Doxygen QUIET)
+if (NOT DOXYGEN_FOUND) 
+    message("-- Doxygen: No (warning: Doxygen is needed in case you want to generate WRENCH documentation)")
+endif()
 
-if (DOXYGEN_FOUND)
+find_program(SWAGGER_CODEGEN_FOUND "swagger-codegen" QUIET)
+
+if (NOT SWAGGER_CODEGEN_FOUND) 
+    message("-- swagger-codegen: No (warning: swagger-codegen is needed in case you want to generate WRENCH documentation)")
+else()
+    message("-- Found swagger-codegen")
+endif()
+
+if (DOXYGEN_FOUND AND SWAGGER_CODEGEN_FOUND)
 
     # WRENCH APIs documentation
     foreach (SECTION USER DEVELOPER INTERNAL)
@@ -44,6 +55,11 @@ if (DOXYGEN_FOUND)
 
     add_custom_target(doc DEPENDS wrench ${WRENCH_SECTIONS_LIST})
 
+    add_custom_command(TARGET doc
+            COMMAND swagger-codegen generate -i ${CMAKE_HOME_DIRECTORY}/tools/wrench/wrench-daemon/doc/wrench-openapi.json -l html2 -o ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}/restapi
+            COMMENT "Generating REST API HTML"
+            VERBATIM
+            )
     add_custom_command(TARGET doc COMMAND python3 
                         ${CMAKE_HOME_DIRECTORY}/doc/scripts/generate_rst.py 
                         ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}
@@ -56,6 +72,4 @@ if (DOXYGEN_FOUND)
                         ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}
                         ${CMAKE_HOME_DIRECTORY}/docs/build/latest)
 
-else (DOXYGEN_FOUND)
-    message("-- Doxygen: No (warning: Doxygen is needed in case you want to generate WRENCH documentation)")
-endif (DOXYGEN_FOUND)
+endif()

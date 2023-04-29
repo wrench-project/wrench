@@ -30,6 +30,7 @@
 
 #include <memory>
 #include <utility>
+#include <fstream>
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation, "Log category for Simulation");
 
@@ -312,6 +313,24 @@ namespace wrench {
         this->already_setup = true;
     }
 
+    /**
+     * @brief Instantiate a simulated platform
+     *
+     * @param platform: the string representation of a SimGrid XML platform description
+     *
+     * @throw std::runtime_error
+     */
+    void Simulation::instantiatePlatformFromString(const std::string &platform) {
+        auto temp_dir = std::filesystem::temp_directory_path();
+        auto temp_path = temp_dir / ("tmp_wrench_platform_" + to_string(::getpid()) + "_" + to_string(std::time(nullptr)) + ".xml");
+        ofstream myfile;
+        myfile.open(temp_path);
+        myfile << platform << std::endl;
+        myfile.close();
+
+        instantiatePlatform(temp_path);
+        remove(temp_path);
+    }
 
     /**
      * @brief Instantiate a simulated platform

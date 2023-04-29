@@ -51,4 +51,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wrench-wfcommons-compute-runtime-subtr
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )
 
+# compile/install the wrench-daemon
+add_subdirectory("${CMAKE_HOME_DIRECTORY}/tools/wrench/wrench-daemon" EXCLUDE_FROM_ALL)
 

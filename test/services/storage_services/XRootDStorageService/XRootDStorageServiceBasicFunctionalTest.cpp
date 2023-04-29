@@ -24,46 +24,40 @@ public:
     std::shared_ptr<wrench::SimpleStorageService> standalone_ss;
 
 protected:
-    XRootDServiceBasicFunctionalTest() {
+    XRootDServiceBasicFunctionalTest() {}
 
 
-        // Create a one-host platform file
-        std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
-                          "<platform version=\"4.1\"> "
-                          "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\">"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100GB\"/>"
-                          "             <prop id=\"mount\" value=\"/disk100/\"/>"
-                          "          </disk>"
-                          "       </host>"
-                          "       <host id=\"Host2\" speed=\"1f\">"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100GB\"/>"
-                          "             <prop id=\"mount\" value=\"/disk100/\"/>"
-                          "          </disk>"
-                          "       </host>"
-                          "       <host id=\"Host3\" speed=\"1f\">"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100GB\"/>"
-                          "             <prop id=\"mount\" value=\"/disk100/\"/>"
-                          "          </disk>"
-                          "       </host>"
-                          "       <link id=\"link12\" bandwidth=\"5GBps\" latency=\"10us\"/>"
-                          "       <link id=\"link13\" bandwidth=\"5GBps\" latency=\"10us\"/>"
-                          "       <link id=\"link23\" bandwidth=\"5GBps\" latency=\"10us\"/>"
-                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"link12\"/> </route>"
-                          "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"link13\"/> </route>"
-                          "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"link23\"/> </route>"
-                          "   </zone> "
-                          "</platform>";
-        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
-        fprintf(platform_file, "%s", xml.c_str());
-        fclose(platform_file);
-    }
-
-    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
+    // Create a one-host platform file
+    std::string platform = "<?xml version='1.0'?>"
+                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
+                           "<platform version=\"4.1\"> "
+                           "   <zone id=\"AS0\" routing=\"Full\"> "
+                           "       <host id=\"Host1\" speed=\"1f\">"
+                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "             <prop id=\"size\" value=\"100GB\"/>"
+                           "             <prop id=\"mount\" value=\"/disk100/\"/>"
+                           "          </disk>"
+                           "       </host>"
+                           "       <host id=\"Host2\" speed=\"1f\">"
+                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "             <prop id=\"size\" value=\"100GB\"/>"
+                           "             <prop id=\"mount\" value=\"/disk100/\"/>"
+                           "          </disk>"
+                           "       </host>"
+                           "       <host id=\"Host3\" speed=\"1f\">"
+                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "             <prop id=\"size\" value=\"100GB\"/>"
+                           "             <prop id=\"mount\" value=\"/disk100/\"/>"
+                           "          </disk>"
+                           "       </host>"
+                           "       <link id=\"link12\" bandwidth=\"5GBps\" latency=\"10us\"/>"
+                           "       <link id=\"link13\" bandwidth=\"5GBps\" latency=\"10us\"/>"
+                           "       <link id=\"link23\" bandwidth=\"5GBps\" latency=\"10us\"/>"
+                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"link12\"/> </route>"
+                           "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"link13\"/> </route>"
+                           "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"link23\"/> </route>"
+                           "   </zone> "
+                           "</platform>";
 };
 
 
@@ -252,7 +246,7 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    simulation->instantiatePlatform(platform_file_path);
+    simulation->instantiatePlatformFromString(platform);
 
     // Create a XRootD Manager object
     wrench::XRootD::Deployment xrootd_deployment(simulation, {{wrench::XRootD::Property::CACHE_MAX_LIFETIME, "28800"}, {wrench::XRootD::Property::REDUCED_SIMULATION, arg}, {wrench::XRootD::Property::FILE_NOT_FOUND_TIMEOUT, "10"}}, {{wrench::StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 1024}});

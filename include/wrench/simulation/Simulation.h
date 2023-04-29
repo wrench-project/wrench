@@ -69,6 +69,7 @@ namespace wrench {
 
         void instantiatePlatform(const std::string &);
         void instantiatePlatform(const std::function<void()> &);
+        void instantiatePlatformFromString(const std::string &platform);
 
         static std::vector<std::string> getHostnameList();
         static std::map<std::string, std::vector<std::string>> getHostnameListByCluster();
