@@ -27,7 +27,7 @@ public:
 #include "./routes.h"
     }
 
-    void genericRequestHandler(const json &req, crow::response &res, const std::string& api_function) {
+    void genericRequestHandler(const json &req, crow::response &res, const std::string &api_function) {
         //display_request_function(req);
 
         json answer;
