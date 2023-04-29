@@ -29,5 +29,6 @@ else()
             wrench
             ${SimGrid_LIBRARY}
             ${Boost_LIBRARIES}
+	    -lstdc++fs
             )
 endif()
