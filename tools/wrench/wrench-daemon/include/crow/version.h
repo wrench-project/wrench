@@ -1,6 +1,5 @@
 #pragma once
 
-namespace crow
-{
+namespace crow {
     constexpr const char VERSION[] = "master";
 }
