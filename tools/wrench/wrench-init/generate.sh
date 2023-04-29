@@ -5,10 +5,8 @@ if [ $# -ne 2 ]; then
         exit 0
 fi
 
-mkdir -p $2"/tools/wrench/wrench-init/"
-
 # Redirect output
-exec 1> $2"/tools/wrench/wrench-init/wrench-init"
+exec 1> $2"/wrench-init"
 
 echo "#!/usr/bin/env python3
 #
