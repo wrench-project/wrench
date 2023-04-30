@@ -46,6 +46,9 @@ namespace wrench {
         None = 11,
     };
 
+    /**
+     * @brief Structure to tracking disk usage 
+     */
     struct DiskUsage {
         std::shared_ptr<StorageService> service;
         double free_space;
