@@ -80,7 +80,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void S4U_Simulation::runSimulation() {
-
         // Setup a handler for deadlocks
         simgrid::s4u::Engine::on_deadlock_cb([]() {
             throw std::runtime_error("The simulation has deadlocked."
@@ -148,7 +147,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void S4U_Simulation::setupPlatform(const std::function<void()> &creation_function) {
-
         creation_function();
         this->platform_setup = true;
     }
@@ -848,7 +846,6 @@ namespace wrench {
 * @throw std::runtime_error
 */
     void S4U_Simulation::setPstate(const std::string &hostname, unsigned long pstate) {
-
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("S4U_Simulation::setPstate(): Unknown hostname " + hostname);
@@ -875,7 +872,6 @@ namespace wrench {
 * @throw std::runtime_error
 */
     int S4U_Simulation::getNumberofPstates(const std::string &hostname) {
-
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -896,7 +892,6 @@ namespace wrench {
 * @throw std::runtime_error
 */
     unsigned long S4U_Simulation::getCurrentPstate(const std::string &hostname) {
-
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -918,7 +913,6 @@ namespace wrench {
     * @throw std::runtime_error
     */
     double S4U_Simulation::getMinPowerConsumption(const std::string &hostname) {
-
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -940,7 +934,6 @@ namespace wrench {
     * @throw std::runtime_error
     */
     double S4U_Simulation::getMaxPowerConsumption(const std::string &hostname) {
-
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -965,7 +958,6 @@ namespace wrench {
     * @throw std::runtime_error
     */
     std::vector<int> S4U_Simulation::getListOfPstates(const std::string &hostname) {
-
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -1156,7 +1148,6 @@ namespace wrench {
                                        double write_bandwidth_in_bytes_per_sec,
                                        double capacity_in_bytes,
                                        const std::string &mount_point) {
-
         // Get the host
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (not host) {
