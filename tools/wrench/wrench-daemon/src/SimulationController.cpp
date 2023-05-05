@@ -127,20 +127,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "advanceTime",
-     *   "documentation":
-     *     {
-     *       "purpose": "Advances current simulated time by some number of seconds",
-     *       "json_input": {
-     *         "increment": ["double", "increment in seconds"]
-     *       },
-     *       "json_output": {
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::advanceTime(json data) {
         // Simply set the time_horizon_to_reach variable so that
@@ -154,20 +140,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "getTime",
-     *   "documentation":
-     *     {
-     *       "purpose": "Retrieve the current simulated time",
-     *       "json_input": {
-     *       },
-     *       "json_output": {
-     *         "time": ["double", "simulation time in seconds"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getSimulationTime(json data) {
         // This is not called by the simulation thread, but getting the
@@ -211,20 +183,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "waitForNextSimulationEvent",
-     *   "documentation":
-     *     {
-     *       "purpose": "Retrieve the next simulation event",
-     *       "json_input": {
-     *       },
-     *       "json_output": {
-     *         "event": ["json", "JSON event description"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::waitForNextSimulationEvent(json data) {
         // Set the time horizon to -1, to signify the "wait for next event" to the execution_controller
@@ -248,20 +206,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "getSimulationEvents",
-     *   "documentation":
-     *     {
-     *       "purpose": "Retrieve all simulation events since last time we checked",
-     *       "json_input": {
-     *       },
-     *       "json_output": {
-     *         "events": ["list<json>", "List of JSON event descriptions"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getSimulationEvents(json data) {
         // Deal with all events
@@ -283,20 +227,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "getAllHostnames",
-     *   "documentation":
-     *     {
-     *       "purpose": "Retrieve the names of all hosts in the simulated platform",
-     *       "json_input": {
-     *       },
-     *       "json_output": {
-     *         "hostnames": ["list<string>", "List of host names"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getAllHostnames(json data) {
         std::vector<std::string> hostname_list = Simulation::getHostnameList();
@@ -309,21 +239,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "standardJobGetTasks",
-     *   "documentation":
-     *     {
-     *       "purpose": "Retrieve the tasks in a standard job",
-     *       "json_input": {
-     *         "job_name": ["string", "The job's name"]
-     *       },
-     *       "json_output": {
-     *         "tasks": ["list<string>", "A list of task names"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getStandardJobTasks(json data) {
         std::shared_ptr<StandardJob> job;
@@ -344,21 +259,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "addBareMetalComputeService",
-     *   "documentation":
-     *     {
-     *       "purpose": "Create and start a bare-metal compute service",
-     *       "json_input": {
-     *         "head_host": ["string", "The service's head host"]
-     *       },
-     *       "json_output": {
-     *         "service_name": ["string", "The new service's name"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::addBareMetalComputeService(json data) {
         std::string head_host = data["head_host"];
@@ -402,19 +302,14 @@ namespace wrench {
     }
 
     json SimulationController::addCloudComputeService(json data) {
-        std::string hostname = data["hostname"];
-        std::string execution_host_string = data["execution_host"];
+        std::string hostname = data["head_host"];
+        std::vector<std::string> resources = data["resources"];
         std::string scratch_space = data["scratch_space"];
         std::string property_list_string = data["property_list"];
         std::string message_payload_list_string = data["message_payload_list"];
 
-        std::vector<std::string> execution_host_vector = {};
-        json jsonData = json::parse(execution_host_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            execution_host_vector.push_back(it.value());
-        }
         WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
-        jsonData = json::parse(property_list_string);
+        json jsonData = json::parse(property_list_string);
         for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
             auto property_key = ServiceProperty::translateString(it.key());
             service_property_list[property_key] = it.value();
@@ -426,8 +321,10 @@ namespace wrench {
             auto message_payload_key = ServiceMessagePayload::translateString(it.key());
             service_message_payload_list[message_payload_key] = it.value();
         }
+
+
         // Create the new service
-        auto new_service = new CloudComputeService(hostname, execution_host_vector, scratch_space,
+        auto new_service = new CloudComputeService(hostname, resources, scratch_space,
                                                    service_property_list, service_message_payload_list);
         // Put in the list of services to start (this is because this method is called
         // by the server thread, and therefore, it will segfault horribly if it calls any
@@ -444,21 +341,6 @@ namespace wrench {
      * REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "addSimpleStorageService",
-     *   "documentation":
-     *     {
-     *       "purpose": "Create and start a simple storage service",
-     *       "json_input": {
-     *         "head_host": ["string", "The service's head host"]
-     *       },
-     *       "json_output": {
-     *         "service_name": ["string", "The new service's name"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::addSimpleStorageService(json data) {
         std::string head_host = data["head_host"];
@@ -480,21 +362,6 @@ namespace wrench {
      * REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "createFileCopyAtStorageService",
-     *   "documentation":
-     *     {
-     *       "purpose": "Create, ex nihilo, a copy of a file copy at a storage service",
-     *       "json_input": {
-     *         "storage_service_name": ["string", "The storage service's head host"],
-     *         "filename": ["string", "The file name"]
-     *       },
-     *       "json_output": {
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::createFileCopyAtStorageService(json data) {
         std::string ss_name = data["storage_service_name"];
@@ -522,21 +389,6 @@ namespace wrench {
      * REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "addFileRegistryService",
-     *   "documentation":
-     *     {
-     *       "purpose": "Create and start a file registery service",
-     *       "json_input": {
-     *         "head_host": ["string", "The service's head host"]
-     *       },
-     *       "json_output": {
-     *         "service_name": ["string", "The new service's name"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::addFileRegistryService(json data) {
         std::string head_host = data["head_host"];
@@ -558,21 +410,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "createStandardJob",
-     *   "documentation":
-     *     {
-     *       "purpose": "Create a new standard job",
-     *       "json_input": {
-     *         "tasks": ["list<string>", "List of task names"]
-     *       },
-     *       "json_output": {
-     *         "job_name": ["string", "The new job's name"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::createStandardJob(json data) {
         std::vector<std::shared_ptr<WorkflowTask>> tasks;
@@ -592,21 +429,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "submitStandardJob",
-     *   "documentation":
-     *     {
-     *       "purpose": "Submit a standard job for execution to a compute service",
-     *       "json_input": {
-     *         "job_name": ["string", "The job's name"],
-     *         "compute_service_name": ["string", "The compute service's name"]
-     *       },
-     *       "json_output": {
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::submitStandardJob(json data) {
         std::string job_name = data["job_name"];
@@ -630,24 +452,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "createTask",
-     *   "documentation":
-     *     {
-     *       "purpose": "Create a new task",
-     *       "json_input": {
-     *         "name": ["string", "The task's name"],
-     *         "flops": ["double", "The task's flops"],
-     *         "min_num_cores": ["double", "The task's minimum number of cores"],
-     *         "max_num_cores": ["double", "The task's maximum number of cores"],
-     *         "memory": ["double", "The task's memory requirement"]
-     *       },
-     *       "json_output": {
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::createTask(json data) {
 
@@ -663,21 +467,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "taskGetFlops",
-     *   "documentation":
-     *     {
-     *       "purpose": "Get a task's flops",
-     *       "json_input": {
-     *         "name": ["string", "The task's name"]
-     *       },
-     *       "json_output": {
-     *         "flops": ["double", "The task's flops"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getTaskFlops(json data) {
         json answer;
@@ -689,21 +478,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "taskGetMinNumCores",
-     *   "documentation":
-     *     {
-     *       "purpose": "Get a task's minimum number of cores",
-     *       "json_input": {
-     *         "name": ["string", "The task's name"]
-     *       },
-     *       "json_output": {
-     *         "min_num_cores": ["double", "The task's minimum number of cores"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getTaskMinNumCores(json data) {
         json answer;
@@ -715,21 +489,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "taskGetMaxNumCores",
-     *   "documentation":
-     *     {
-     *       "purpose": "Get a task's maximum number of cores",
-     *       "json_input": {
-     *         "name": ["string", "The task's name"]
-     *       },
-     *       "json_output": {
-     *         "max_num_cores": ["double", "The task's maximum number of cores"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getTaskMaxNumCores(json data) {
         json answer;
@@ -741,21 +500,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "taskGetMemory",
-     *   "documentation":
-     *     {
-     *       "purpose": "Get a task's memory requirement",
-     *       "json_input": {
-     *         "name": ["string", "The task's name"]
-     *       },
-     *       "json_output": {
-     *         "memory": ["double", "The task's memory requirement in bytes"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getTaskMemory(json data) {
         json answer;
@@ -767,21 +511,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "addFile",
-     *   "documentation":
-     *     {
-     *       "purpose": "Add a file to the workflow",
-     *       "json_input": {
-     *         "name": ["string", "The file's name"],
-     *         "size": ["int", "The file's size in bytes"]
-     *       },
-     *       "json_output": {
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::addFile(json data) {
         auto file = this->workflow->addFile(data["name"], data["size"]);
@@ -792,21 +521,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "fileGetSize",
-     *   "documentation":
-     *     {
-     *       "purpose": "Get a file size",
-     *       "json_input": {
-     *         "name": ["string", "The file's name"]
-     *       },
-     *       "json_output": {
-     *         "size": ["int", "The file's size in bytes"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getFileSize(json data) {
         auto file = this->workflow->getFileByID(data["name"]);
@@ -819,21 +533,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "addInputFile",
-     *   "documentation":
-     *     {
-     *       "purpose": "Add an input file to a task",
-     *       "json_input": {
-     *         "task": ["string", "The task's ID"],
-     *         "file": ["string", "The input file's ID"]
-     *       },
-     *       "json_output": {
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::addInputFile(json data) {
         auto task = this->workflow->getTaskByID(data["task"]);
@@ -846,21 +545,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "addOutputFile",
-     *   "documentation":
-     *     {
-     *       "purpose": "Add an output file to a task",
-     *       "json_input": {
-     *         "task": ["string", "The task's ID"],
-     *         "file": ["string", "The output file's ID"]
-     *       },
-     *       "json_output": {
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::addOutputFile(json data) {
         auto task = this->workflow->getTaskByID(data["task"]);
@@ -873,21 +557,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "getTaskInputFiles",
-     *   "documentation":
-     *     {
-     *       "purpose": "Return the list of input files for a given task",
-     *       "json_input": {
-     *         "task": ["string", "The task's ID"]
-     *       },
-     *       "json_output": {
-     *         "files": ["list<string>", "A list of input files"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getTaskInputFiles(json data) {
         auto task = this->workflow->getTaskByID(data["task"]);
@@ -905,20 +574,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "getInputFiles",
-     *   "documentation":
-     *     {
-     *       "purpose": "Return the list of input files of the workflow",
-     *       "json_input": {
-     *       },
-     *       "json_output": {
-     *         "files": ["list<string>", "A list of input files"]
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getInputFiles(json data) {
         auto files = this->workflow->getInputFiles();
@@ -935,20 +590,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-     * BEGIN_REST_API_DOCUMENTATION
-     * {
-     *   "REST_func": "stageInputFiles",
-     *   "documentation":
-     *     {
-     *       "purpose": "Stage all input files of a workflow on a given storage service",
-     *       "json_input": {
-     *         "storage": ["string", "Storage service on which stage the file"]
-     *       },
-     *       "json_output": {
-     *       }
-     *     }
-     * }
-     * END_REST_API_DOCUMENTATION
      */
     json SimulationController::stageInputFiles(json data) {
         std::shared_ptr<StorageService> storage_service;

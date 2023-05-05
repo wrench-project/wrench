@@ -101,10 +101,6 @@ namespace wrench {
 
         unsigned long getPriority() const;
 
-        void setAverageCPU(double);
-
-        double getAverageCPU() const;
-
         void setBytesRead(unsigned long);
 
         unsigned long getBytesRead() const;
@@ -276,7 +272,6 @@ namespace wrench {
         std::string cluster_id;          // ID for clustered task
         std::string color;               // A RGB color formatted as "#rrggbb"
         double flops;                    // Number of flops
-        double average_cpu = -1;         // Average CPU utilization
         unsigned long bytes_read = -1;   // Total bytes read
         unsigned long bytes_written = -1;// Total bytes written
         unsigned long min_num_cores;

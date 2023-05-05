@@ -25,19 +25,17 @@ using json = nlohmann::json;
  */
 void SimulationDaemon::run() {
     // Set up GET request handler for the (likely useless) "alive" path
-    CROW_ROUTE(app, "/simulation/<string>/alive").methods("GET"_method)
-            ([this](const crow::request& req, const string& simid){
-                crow::response res;
-                this->alive(req, res);
-                return res;
-            });
+    CROW_ROUTE(app, "/simulation/<string>/alive").methods("GET"_method)([this](const crow::request &req, const string &simid) {
+        crow::response res;
+        this->alive(req, res);
+        return res;
+    });
     // Set up POST request handler for terminating simulation
-    CROW_ROUTE(app, "/simulation/<string>/terminateSimulation").methods("POST"_method)
-            ([this](const crow::request& req, const string& simid){
-                crow::response res;
-                this->terminateSimulation(req, res);
-                return res;
-            });
+    CROW_ROUTE(app, "/simulation/<string>/terminateSimulation").methods("POST"_method)([this](const crow::request &req, const string &simid) {
+        crow::response res;
+        this->terminateSimulation(req, res);
+        return res;
+    });
     // Set up ALL POST request handlers for API calls
 
     REST_API rest_api(

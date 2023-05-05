@@ -16,14 +16,29 @@ docs_path = pathlib.Path(sys.argv[1])
 src_path = pathlib.Path(sys.argv[2])
 release_version = sys.argv[3]
 
-with open(src_path.joinpath("conf.py"), "a") as f:
-    f.write("breathe_projects = {\n"
+# Check whether anything should be appeneded to conf.py
+should_append = False
+with open(src_path.joinpath("conf.py"), "r") as f:
+    lines = f.readlines()
+    line_index = -1
+    while True:
+        last_line = lines[line_index].strip()
+        if last_line == "" or last_line[0] == "#":
+            line_index -= 1
+            continue
+        else:
+            should_append = last_line != f"release = '{release_version}'"
+            break
+
+if should_append:
+    with open(src_path.joinpath("conf.py"), "a") as f:
+        f.write("breathe_projects = {\n"
             f"    \"user\": \"../../docs/{release_version}/user/xml/\",\n"
             f"    \"developer\": \"../../docs/{release_version}/developer/xml/\",\n"
             f"    \"internal\": \"../../docs/{release_version}/internal/xml/\",\n"
-            "}\n\n"
+            "}\n"
             f"version = '{release_version}'\n"
-            f"release = '{release_version}'\n")
+            f"release = '{release_version}'\n\n")
 
 for section in ["user", "developer", "internal"]:
     section_path = docs_path.joinpath(f"{section}/xml/index.xml")

@@ -34,6 +34,7 @@ namespace wrench {
      * @param grid_pre_overhead: a pre-job overhead for grid jobs, in seconds
      * @param non_grid_pre_overhead: a pre-job overhead for non-grid jobs, in seconds
      * @param instant_resource_availabilities: true is instant resource availabilities to used
+     * @param fcfs: true if FCFS scheduling should be enforced
      * @param compute_services: a set of 'child' compute services available to and via the HTCondor pool
      * @param running_jobs: a list of currently running jobs
      * @param pending_jobs: a list of pending jobs
@@ -45,6 +46,7 @@ namespace wrench {
             double grid_pre_overhead,
             double non_grid_pre_overhead,
             bool instant_resource_availabilities,
+            bool fcfs,
             std::set<std::shared_ptr<ComputeService>> &compute_services,
             std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
             std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
@@ -55,6 +57,7 @@ namespace wrench {
         this->grid_pre_overhead = grid_pre_overhead;
         this->non_grid_pre_overhead = non_grid_pre_overhead;
         this->instant_resource_availabilities = instant_resource_availabilities;
+        this->fcfs = fcfs;
 
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
@@ -90,7 +93,7 @@ namespace wrench {
         WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on mailbox_name %s",
                     this->hostname.c_str(), this->mailbox->get_cname());
 
-        std::vector<std::shared_ptr<Job>> scheduled_jobs;
+        std::set<std::shared_ptr<Job>> scheduled_jobs;
 
         // Simulate startup overhead
         S4U_Simulation::sleep(this->startup_overhead);
@@ -99,24 +102,40 @@ namespace wrench {
         std::sort(this->pending_jobs.begin(), this->pending_jobs.end(), JobPriorityComparator());
 
         // Go through the jobs and schedule them if possible
-        for (auto entry: this->pending_jobs) {
-            auto job = std::get<0>(entry);
-            auto service_specific_arguments = std::get<1>(entry);
-            bool is_standard_job = (std::dynamic_pointer_cast<CompoundJob>(job) != nullptr);
+        bool scheduled_a_job = true;
+        while (scheduled_a_job) {
+            scheduled_a_job = false;
+            for (auto entry: this->pending_jobs) {
 
-            auto target_compute_service = pickTargetComputeService(job, service_specific_arguments);
-
-            if (target_compute_service) {
-                job->pushCallbackMailbox(this->reply_mailbox);
-
-                if (HTCondorComputeService::isJobGridUniverse(job)) {
-                    S4U_Simulation::sleep(this->grid_pre_overhead);
-                } else {
-                    S4U_Simulation::sleep(this->non_grid_pre_overhead);
+                if (scheduled_jobs.find(std::get<0>(entry)) != scheduled_jobs.end()) {
+                    continue;
                 }
-                target_compute_service->submitCompoundJob(job, service_specific_arguments);
-                this->running_jobs.insert(std::make_pair(job, target_compute_service));
-                scheduled_jobs.push_back(job);
+
+                auto job = std::get<0>(entry);
+                auto service_specific_arguments = std::get<1>(entry);
+                bool is_standard_job = (std::dynamic_pointer_cast<CompoundJob>(job) != nullptr);
+
+                auto target_compute_service = pickTargetComputeService(job, service_specific_arguments);
+
+                if (target_compute_service) {
+                    job->pushCallbackMailbox(this->reply_mailbox);
+
+                    if (HTCondorComputeService::isJobGridUniverse(job)) {
+                        S4U_Simulation::sleep(this->grid_pre_overhead);
+                    } else {
+                        S4U_Simulation::sleep(this->non_grid_pre_overhead);
+                    }
+                    target_compute_service->submitCompoundJob(job, service_specific_arguments);
+                    this->running_jobs.insert(std::make_pair(job, target_compute_service));
+                    scheduled_jobs.insert(job);
+
+                    scheduled_a_job = true;
+                    break;
+                } else {
+                    if (this->fcfs) {
+                        break;
+                    }
+                }
             }
         }
 
@@ -143,7 +162,7 @@ namespace wrench {
      */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeService(
             std::shared_ptr<CompoundJob> job,
-            std::map<std::string, std::string> service_specific_arguments) {
+            const std::map<std::string, std::string> &service_specific_arguments) {
 
         if (HTCondorComputeService::isJobGridUniverse(job)) {
             return pickTargetComputeServiceGridUniverse(job, service_specific_arguments);
@@ -159,9 +178,9 @@ namespace wrench {
  * @return
  */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceGridUniverse(
-            std::shared_ptr<CompoundJob> job, std::map<std::string,
-                                                       std::string>
-                                                      service_specific_arguments) {
+            const std::shared_ptr<CompoundJob> &job, std::map<std::string,
+                                                              std::string>
+                                                             service_specific_arguments) {
         std::set<std::shared_ptr<BatchComputeService>> available_batch_compute_services;
 
         // Figure out which BatchComputeService compute services are available
@@ -223,10 +242,13 @@ namespace wrench {
  */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceNonGridUniverse(
             const std::shared_ptr<CompoundJob> &job,
-            std::map<std::string, std::string> service_specific_arguments) {
+            const std::map<std::string, std::string> &service_specific_arguments) {
         std::shared_ptr<BareMetalComputeService> target_cs = nullptr;
 
-        // Figure out which BatchComputeService compute services are available
+        unsigned long min_required_num_cores = job->getMinimumRequiredNumCores();
+        double min_required_memory = job->getMinimumRequiredMemory();
+
+        // Figure out which BareMetalComputeServices are available
         for (auto const &cs: this->compute_services) {
             // Only BareMetalComputeServices can be used
             auto bmcs = std::dynamic_pointer_cast<BareMetalComputeService>(cs);
@@ -244,11 +266,8 @@ namespace wrench {
                                             "service-specific arguments for Non-Grid universe jobs are currently not supported");
             }
 
-            unsigned long min_required_num_cores = job->getMinimumRequiredNumCores();
-            double min_required_memory = job->getMinimumRequiredMemory();
 
             bool enough_idle_resources = false;
-
             if (not this->instant_resource_availabilities) {
                 enough_idle_resources = bmcs->isThereAtLeastOneHostWithIdleResources(min_required_num_cores,
                                                                                      min_required_memory);
