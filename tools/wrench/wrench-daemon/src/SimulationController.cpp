@@ -302,17 +302,11 @@ namespace wrench {
     }
 
     json SimulationController::addCloudComputeService(json data) {
-        std::cerr << data << "\n";
         std::string hostname = data["head_host"];
-        std::cerr << "HEre1\n";
         std::vector<std::string> resources = data["resources"];
-        std::cerr << "HEre2\n";
         std::string scratch_space = data["scratch_space"];
-        std::cerr << "HEre3\n";
         std::string property_list_string = data["property_list"];
-        std::cerr << "HEre4\n";
         std::string message_payload_list_string = data["message_payload_list"];
-        std::cerr << "HEre5\n";
 
         WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
         json jsonData = json::parse(property_list_string);
@@ -327,8 +321,6 @@ namespace wrench {
             auto message_payload_key = ServiceMessagePayload::translateString(it.key());
             service_message_payload_list[message_payload_key] = it.value();
         }
-
-        std::cerr << "CREATING SERVICE\n";
 
         // Create the new service
         auto new_service = new CloudComputeService(hostname, resources, scratch_space,
