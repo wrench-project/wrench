@@ -4,12 +4,13 @@ import json, re, jsonref, sys
 
 if __name__ == "__main__":
 
-    if len(sys.argv) < 3:
-        sys.stderr.write("Usage: " + sys.argv[0] + " <doc path> <include path>\n Generate crow routes header file from json\n")
+    if len(sys.argv) < 4:
+        sys.stderr.write("Usage: " + sys.argv[0] + " <open-api JSON file> <header file for routes> <header file for callback-map>\n Generate crow routes header file from json\n")
         sys.exit(0)
 
     json_path = sys.argv[1]
-    header_path = sys.argv[2]
+    header_routes_path = sys.argv[2]
+    header_callback_map_path = sys.argv[3]
 
     with open(json_path,"r") as f:
         data = jsonref.load(f)
@@ -24,8 +25,7 @@ if __name__ == "__main__":
         To do this, check parameters/schema/type
     '''
 
-
-    #Tempoary check: how many types are in wrench-openapi.json
+    #Temporary check: how many types are in wrench-openapi.json
     basket = set()
     for path in data["paths"].keys():
 
@@ -40,6 +40,7 @@ if __name__ == "__main__":
         operation = data["paths"][path][method]
 
         operationId = data["paths"][path][method]["operationId"]
+        path_suffix = path.split("/")[-1]
 
         if 'parameters' in data["paths"][path][method].keys():
             # try to replace {} into exact type
@@ -76,6 +77,7 @@ if __name__ == "__main__":
         routes['method'] = method
         routes['parameter_list'] = parameter_list
         routes['operationId'] = operationId
+        routes['path_suffix'] = path_suffix
         crows[crow_route] = routes
 
     '''
@@ -86,12 +88,16 @@ if __name__ == "__main__":
 
     for crow in crows.keys():
         route = crows[crow]
-        app = '\tCROW_ROUTE(app, "{0}").methods(crow::HTTPMethod::{1})\n'.format(crow, route['method'].upper())
+        app = '\tCROW_ROUTE(app, "{0}").methods(crow::HTTPMethod::{1})\n'.format(crow, route['method'].capitalize())
         app += '\t\t'
 
         type_list = re.findall("\<(.*?)\>", crow, re.I|re.M)
         (route['parameter_list'], type_list)
         parameter_list = []
+
+        # use last part of the path as the key to find the value
+        sep = crow.split('/')
+        key = sep[-1]
 
         parameter_list.append('const crow::request& req')
         for i in range(len(route['parameter_list'])):
@@ -108,7 +114,7 @@ if __name__ == "__main__":
 
         app += '\t\t\tcrow::response res;\n'
         operationId = route['operationId']
-        app += '\t\t\tthis->genericRequestHandler(req_json, res, "{0}");\n'.format(operationId)
+        app += '\t\t\tthis->genericRequestHandler(req_json, res, "{0}");\n'.format(key)
 
         app += '\t\t\treturn res;\n'
         app += '\t\t});\n'
@@ -116,12 +122,19 @@ if __name__ == "__main__":
         apps += '\n'
         apps += app
 
-    with open(header_path, 'w') as f:
+    with open(header_routes_path, 'w') as f:
         f.write(apps)
 
+    '''
+    Create header file with map
+    '''
+    callback_map = ""
+    for crow in crows.keys():
+        route = crows[crow]
+        key = route["path_suffix"]
+        value = route["operationId"]
+        if key != "startSimulation": # Exlude this SPECIAL route
+            callback_map += 'request_handlers["{0}"] = [sc](json data) {{ return sc->{1}(std::move(data)); }};\n'.format(key, value)
 
-
-
-
-
-
+    with open(header_callback_map_path, 'w') as f:
+        f.write(callback_map)

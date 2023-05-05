@@ -40,7 +40,6 @@
         ],
         "summary": "Start a new simulation",
         "operationId": "startSimulation",
-        "backendMethod": "startSimulation",
         "requestBody": {
           "description": "Start a new simulation based on a platform file and a controller hostname.",
           "content": {
@@ -76,7 +75,7 @@
           "WRENCH"
         ],
         "summary": "Retrieve the current simulated time.",
-        "operationId": "getTime",
+        "operationId": "getSimulationTime",
         "parameters": [
           {
             "name": "simid",
@@ -552,7 +551,7 @@
         ],
         "summary": "Get a file size.",
         "deprecated": false,
-        "operationId": "fileGetSize",
+        "operationId": "getFileSize",
         "parameters": [
           {
             "name": "simid",
@@ -602,7 +601,7 @@
         ],
         "summary": "Retrieve job's tasks",
         "deprecated": false,
-        "operationId": "standardJobGetTasks",
+        "operationId": "getStandardJobTasks",
         "parameters": [
           {
             "name": "simid",
@@ -652,7 +651,7 @@
         ],
         "summary": "Get a task's flops",
         "deprecated": false,
-        "operationId": "taskGetFlops",
+        "operationId": "getTaskFlops",
         "parameters": [
           {
             "name": "simid",
@@ -702,7 +701,7 @@
         ],
         "summary": "Get a task's minimum number of cores.",
         "deprecated": false,
-        "operationId": "taskGetMinNumCores",
+        "operationId": "getTaskMinNumCores",
         "parameters": [
           {
             "name": "simid",
@@ -752,7 +751,7 @@
         ],
         "summary": "Get a task's maximum number of cores.",
         "deprecated": false,
-        "operationId": "taskGetMaxNumCores",
+        "operationId": "getTaskMaxNumCores",
         "parameters": [
           {
             "name": "simid",
@@ -802,7 +801,7 @@
         ],
         "summary": "Get a task's memory requirement.",
         "deprecated": false,
-        "operationId": "taskGetMemory",
+        "operationId": "getTaskMemory",
         "parameters": [
           {
             "name": "simid",

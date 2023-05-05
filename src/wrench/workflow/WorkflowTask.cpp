@@ -388,22 +388,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the task average CPU usage
-     * @return the task average CPU usage
-     */
-    double WorkflowTask::getAverageCPU() const {
-        return this->average_cpu;
-    }
-
-    /**
-     * @brief Set the task average CPU usage
-     * @param a_cpu: task average CPU usage
-     */
-    void WorkflowTask::setAverageCPU(double a_cpu) {
-        this->average_cpu = a_cpu;
-    }
-
-    /**
      * @brief Get the number of bytes read by the task
      * @return number of bytes read by the task
      */
@@ -896,7 +880,7 @@ namespace wrench {
      * @brief Set the task's color
      * @param c: A color string in  "#rrggbb" format
      */
-    void WorkflowTask::setColor(const std::string& c) {
+    void WorkflowTask::setColor(const std::string &c) {
         this->color = c;
     }
 

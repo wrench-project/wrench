@@ -31,26 +31,26 @@ using json = nlohmann::json;
 class WRENCHDaemon {
 
 public:
-   WRENCHDaemon(bool simulation_logging,
-                bool daemon_logging,
-                int port_number,
-                int sleep_us);
+    WRENCHDaemon(bool simulation_logging,
+                 bool daemon_logging,
+                 int port_number,
+                 int sleep_us);
 
-   void run();
+    void run();
 
 private:
-   httplib::Server server;
+    httplib::Server server;
 
-   bool simulation_logging;
-   bool daemon_logging;
-   int port_number;
-   int sleep_us;
+    bool simulation_logging;
+    bool daemon_logging;
+    int port_number;
+    int sleep_us;
 
-   void startSimulation(const Request &req, Response &res);
+    void startSimulation(const Request &req, Response &res);
 
-   static bool isPortTaken(int port);
+    static bool isPortTaken(int port);
 
-   static void error_handling(const Request &req, Response &res);
+    static void error_handling(const Request &req, Response &res);
 };
 
 #endif// WRENCH_DAEMON_H

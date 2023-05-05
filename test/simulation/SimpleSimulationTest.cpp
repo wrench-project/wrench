@@ -258,7 +258,13 @@ private:
 
         try {
             wrench::Simulation::getLinkBandwidth("bogus");
+            throw std::runtime_error("Should not be able to get information about bogus link");
+        } catch (std::invalid_argument &ignore) {}
+        try {
             wrench::Simulation::getLinkUsage("bogus");
+            throw std::runtime_error("Should not be able to get information about bogus link");
+        } catch (std::invalid_argument &ignore) {}
+        try {
             wrench::Simulation::isLinkOn("bogus");
             throw std::runtime_error("Should not be able to get information about bogus link");
         } catch (std::invalid_argument &ignore) {}
@@ -266,10 +272,19 @@ private:
         // For coverage
         std::string src_host = "DualCoreHost";
         std::string dst_host = "QuadCoreHost";
+        std::string bogus = "Bogus";
         auto links = wrench::Simulation::getRoute(src_host, dst_host);
         if ((links.size() != 1) || (*links.begin() != "1")) {
             throw std::runtime_error("Invalid route between hosts returned");
         }
+        try {
+            wrench::Simulation::getRoute(bogus, dst_host);
+            throw std::runtime_error("Shouldn't be able to get route with bogus src endpoint");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            wrench::Simulation::getRoute(src_host, bogus);
+            throw std::runtime_error("Shouldn't be able to get route with bogus dst endpoint");
+        } catch (std::invalid_argument &ignore) {}
 
         // Wait for workflow execution events
         for (auto const &task: tasks) {
