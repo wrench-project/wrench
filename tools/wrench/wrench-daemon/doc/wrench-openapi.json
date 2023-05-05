@@ -1005,6 +1005,58 @@
         }
       }
     },
+    "/simulation/{simid}/addCloudComputeService": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create and start a cloud compute service.",
+        "operationId": "addCloudComputeService",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to start a new service.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "head_host": {
+                    "type": "string",
+                    "description": "The service's head host"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
     "/simulation/{simid}/addSimpleStorageService": {
       "post": {
         "tags": [
