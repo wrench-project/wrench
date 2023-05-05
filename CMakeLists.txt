@@ -128,6 +128,7 @@ set(HEADER_FILES
         include/wrench/services/storage/compound/CompoundStorageService.h
         include/wrench/services/storage/compound/CompoundStorageServiceProperty.h
         include/wrench/services/storage/compound/CompoundStorageServiceMessagePayload.h
+        include/wrench/services/storage/compound/CompoundStorageServiceMessage.h
         include/wrench/services/storage/storage_helpers/FileLocation.h
 #        include/wrench/services/memory/Block.h
 #        include/wrench/services/memory/MemoryManager.h
@@ -325,6 +326,7 @@ set(SOURCE_FILES
         src/wrench/services/storage/compound/CompoundStorageService.cpp
         src/wrench/services/storage/compound/CompoundStorageServiceProperty.cpp
         src/wrench/services/storage/compound/CompoundStorageServiceMessagePayload.cpp
+        src/wrench/services/storage/compound/CompoundStorageServiceMessage.cpp
         src/wrench/services/storage/storage_helper_classes/FileLocation.cpp
         src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
         include/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h

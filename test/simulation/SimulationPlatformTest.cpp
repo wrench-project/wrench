@@ -56,6 +56,8 @@ protected:
             <prop id="wattage_off" value="0.0" />
         </cluster>
     </zone>
+
+    <link id="link" bandwidth="40MBps" latency="10us" />
 </zone>
 </platform>
 )";
@@ -149,6 +151,7 @@ private:
         if (wrench::S4U_Simulation::getClusterProperty("simple", "wattage_off") != "0.0") {
             throw std::runtime_error("Invalid cluster property value");
         }
+
 
         return 0;
     }

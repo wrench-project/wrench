@@ -19,11 +19,10 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
-    class unit_scale;
-
     /**
      * @brief A class used to part string specification of values with units into
-     *        a single value (e.g., "2KB" -> 2048 bytes, "2Kb" -> 256 bytes)
+     *        a single value (e.g., "2KiB" -> 2048 bytes, "1h" -> 3600 seconds). It supports
+     *        all the SimGrid-supported units.
      */
     class UnitParser {
 
@@ -35,7 +34,7 @@ namespace wrench {
         public:
             using std::unordered_map<std::string, double>::unordered_map;
             // tuples are : <unit, value for unit, base (2 or 10), true if abbreviated>
-            explicit unit_scale(std::initializer_list<std::tuple<const std::string, double, int, bool>> generators);
+            unit_scale(std::initializer_list<std::tuple<const std::string, double, int, bool>> generators);
         };
 
     private:

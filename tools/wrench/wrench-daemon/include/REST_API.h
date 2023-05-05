@@ -22,12 +22,12 @@ public:
              std::shared_ptr<wrench::SimulationController> &sc) : display_request_function(std::move(display_request_function)) {
 
         // Set up all request handlers (automatically generated code!)
-#include "./REST_API_generated_code.h"
+#include "./callback-map.h"
 
 #include "./routes.h"
     }
 
-    void genericRequestHandler(const json &req, crow::response &res, const std::string& api_function) {
+    void genericRequestHandler(const json &req, crow::response &res, const std::string &api_function) {
         //display_request_function(req);
 
         json answer;

@@ -70,6 +70,7 @@ namespace wrench {
 
         void instantiatePlatform(const std::string &);
         void instantiatePlatform(const std::function<void()> &);
+        void instantiatePlatformFromString(const std::string &platform);
 
         static std::vector<std::string> getHostnameList();
         static std::map<std::string, std::vector<std::string>> getHostnameListByCluster();
@@ -256,7 +257,7 @@ namespace wrench {
 
         void platformSanityCheck();
         void checkSimulationSetup();
-//        bool isRunning() const;
+        //        bool isRunning() const;
 
         void startAllProcesses();
         void addService(const std::shared_ptr<ComputeService> &service);
