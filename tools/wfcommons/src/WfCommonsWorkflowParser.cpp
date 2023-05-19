@@ -112,25 +112,26 @@ namespace wrench {
                 std::vector<nlohmann::json> tasks = it.value();
 
                 for (auto &task: tasks) {
+
                     std::string name = task.at("name");
                     double runtime = task.at("runtimeInSeconds");
 
+                    double avg_cpu = -1.0;
+                    try {
+                        avg_cpu = task.at("avgCPU");
+                    } catch (nlohmann::json::out_of_range &e) {
+                        // do nothing
+                    }
+
+                    double num_cores = -1.0;
+                    try {
+                        num_cores = task.at("cores");
+                    } catch (nlohmann::json::out_of_range &e) {
+                        // do nothing
+                    }
+
                     // Scale runtime based on avgCPU unless disabled
                     if (not ignore_avg_cpu) {
-                        double avg_cpu = -1.0;
-                        try {
-                            avg_cpu = task.at("avgCPU");
-                        } catch (nlohmann::json::out_of_range &e) {
-                            // do nothing
-                        }
-                        double num_cores = -1;
-                        try {
-                            num_cores = task.at("cores");
-                        } catch (nlohmann::json::out_of_range &e) {
-                            // do nothing
-                        }
-
-
                         if ((num_cores < 0) and (avg_cpu < 0)) {
                             if (show_warnings) std::cerr << "[WARNING]: Task " << name << " does not specify a number of cores or an avgCPU: "
                                                                                           "Assuming 1 core and avgCPU at 100%.\n";
@@ -144,7 +145,7 @@ namespace wrench {
                         } else if (avg_cpu < 0) {
                             if (show_warnings) std::cerr << "[WARNING]: Task " + name + " does not specify avgCPU: "
                                                                                         "Assuming 100%.\n";
-                            avg_cpu = 100.0;
+                            avg_cpu = 100.0 * num_cores;
                         } else if (avg_cpu > 100 * num_cores) {
                             if (show_warnings) {
                                 std::cerr << "[WARNING]: Task " << name << " specifies " << (unsigned long) num_cores << " cores and avgCPU " << avg_cpu << "%, "
@@ -153,7 +154,8 @@ namespace wrench {
                             avg_cpu = 100.0 * num_cores;
                         }
 
-                        runtime = runtime * (avg_cpu / (100.0 * num_cores));
+                        runtime = runtime * avg_cpu / (100.0 * num_cores);
+
                     }
 
                     unsigned long min_num_cores, max_num_cores;
