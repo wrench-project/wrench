@@ -155,7 +155,6 @@ namespace wrench {
                         }
 
                         runtime = runtime * avg_cpu / (100.0 * num_cores);
-
                     }
 
                     unsigned long min_num_cores, max_num_cores;
