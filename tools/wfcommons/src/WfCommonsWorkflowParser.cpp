@@ -254,7 +254,7 @@ namespace wrench {
                             if (not file_path.empty() and file_path.back() == '/') {
                                 file_path.erase(file_path.length() - 1);
                             }
-                        } catch (nlohmann::json::out_of_range &ignore) { }
+                        } catch (nlohmann::json::out_of_range &ignore) {}
 
                         // Prepend the id with the path, if any, to ensure uniqueness
                         if (not file_path.empty()) {
