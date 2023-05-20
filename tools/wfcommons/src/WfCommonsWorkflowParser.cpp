@@ -113,15 +113,15 @@ namespace wrench {
 
                 for (auto &task: tasks) {
 
-                    std::string name = task.at("name"); // required
-                    std::string task_id = ""; // not required, which is terrible
+                    std::string name = task.at("name");// required
+                    std::string task_id = "";          // not required, which is terrible
                     try {
                         task_id = task.at("id");
                     } catch (nlohmann::json::out_of_range &ignore) {
                         // do nothing
                     }
                     if (not task_id.empty()) {
-                        name = name + "_" + task_id;  // Will break parent/children specifications
+                        name = name + "_" + task_id;// Will break parent/children specifications
                     }
 
 
