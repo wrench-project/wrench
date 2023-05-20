@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -rdynamic "CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o" "CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o" -o wrench-example-cloud-bag-of-tasks  -Wl,-rpath,/usr/local/lib ../../../../libwrench.a /usr/local/lib/libsimgrid.so 

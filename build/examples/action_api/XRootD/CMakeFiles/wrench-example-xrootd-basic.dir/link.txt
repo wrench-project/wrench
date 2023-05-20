@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -rdynamic "CMakeFiles/wrench-example-xrootd-basic.dir/Controller.cpp.o" "CMakeFiles/wrench-example-xrootd-basic.dir/Simulator.cpp.o" -o wrench-example-xrootd-basic  -Wl,-rpath,/usr/local/lib ../../../libwrench.a /usr/local/lib/libsimgrid.so 

@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -rdynamic "CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o" "CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o" -o wrench-example-bare-metal-chain  -Wl,-rpath,/usr/local/lib ../../../../libwrench.a /usr/local/lib/libsimgrid.so 

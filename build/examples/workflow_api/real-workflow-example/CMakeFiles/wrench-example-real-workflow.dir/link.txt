@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -rdynamic "CMakeFiles/wrench-example-real-workflow.dir/SimpleWMS.cpp.o" "CMakeFiles/wrench-example-real-workflow.dir/SimpleWorkflowSimulator.cpp.o" -o wrench-example-real-workflow  -Wl,-rpath,/usr/local/lib ../../../libwrench.a ../../../tools/wfcommons/libwrenchwfcommonsworkflowparser.a /usr/local/lib/libsimgrid.so 

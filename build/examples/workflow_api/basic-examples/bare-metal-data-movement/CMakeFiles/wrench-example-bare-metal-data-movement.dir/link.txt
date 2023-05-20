@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -rdynamic "CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o" "CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o" -o wrench-example-bare-metal-data-movement  -Wl,-rpath,/usr/local/lib ../../../../libwrench.a /usr/local/lib/libsimgrid.so 
