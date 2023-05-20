@@ -603,9 +603,19 @@ namespace wrench {
         return {};
     }
 
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::supportsCompoundJobs(json data){
-        auto supported = this->workflow->supportsCompoundJobs();
-        json answer = support;
+        std::string cs_name = data["compute_service_name"];
+
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+        json answer = cs->supportsCompoundJobs();
         return answer;
     }
 

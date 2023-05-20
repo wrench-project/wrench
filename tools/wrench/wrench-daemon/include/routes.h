@@ -206,6 +206,15 @@
 			return res;
 		});
 
+	CROW_ROUTE(app, "/simulation/<string>/supportsCompoundJobs").methods(crow::HTTPMethod::Get)
+		([this](const crow::request& req, const std::string& simid){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "supportsCompoundJobs");
+			return res;
+		});
+
 	CROW_ROUTE(app, "/simulation/<string>/addSimpleStorageService").methods(crow::HTTPMethod::Post)
 		([this](const crow::request& req, const std::string& simid){
 			json req_json = json::parse(req.body);
