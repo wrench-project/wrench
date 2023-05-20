@@ -114,6 +114,17 @@ namespace wrench {
                 for (auto &task: tasks) {
 
                     std::string name = task.at("name");
+                    // If a task id is also provided, append it to the name
+                    std::string task_id = "";
+                    try {
+                        task_id = task.at("id");
+                    } catch (nlohmann::json::out_of_range &ignore) {
+                        // do nothing
+                    }
+                    if (not task_id.empty()) {
+                        name += task_id;
+                    }
+
                     double runtime = task.at("runtimeInSeconds");
 
                     double avg_cpu = -1.0;
@@ -237,6 +248,21 @@ namespace wrench {
                         double size_in_bytes = f.at("sizeInBytes");
                         std::string link = f.at("link");
                         std::string id = f.at("name");
+                        std::string file_path = "";
+                        try {
+                            file_path = f.at("path");
+                            // Remove the training "/" if it's there
+                            if (not file_path.empty() and file_path.back() == '/') {
+                                file_path.erase(file_path.length() - 1);
+                            }
+                        } catch (nlohmann::json::out_of_range &ignore) { }
+
+                        // Prepend the id with the path, if any, to ensure uniqueness
+                        if (not file_path.empty()) {
+                            std::replace(file_path.begin(), file_path.end(), '/', '_');
+                            id = file_path + "_" + id;
+                        }
+
                         std::shared_ptr<wrench::DataFile> workflow_file = nullptr;
                         // Check whether the file already exists
                         try {
