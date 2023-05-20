@@ -611,4 +611,10 @@ namespace wrench {
         return {};
     }
 
+    json SimulationController::supportsCompoundJobs(json data){
+        auto supported = this->workflow->supportsCompoundJobs();
+        json answer = support;
+        return answer;
+    }
+
 }// namespace wrench
