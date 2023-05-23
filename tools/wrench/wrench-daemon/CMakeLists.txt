@@ -12,7 +12,7 @@ add_custom_command(
 )
 
 
-# Add needed packages
+# Add needed packagesf
 find_package(Boost REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
@@ -21,7 +21,7 @@ include_directories(src/ include/ ${Boost_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR}/in
 
 
 # Add source to this project's executable.
-add_executable(wrench-daemon
+add_executable(wrench-daemon EXCLUDE_FROM_ALL
         include/httplib.h
         src/main.cpp
         src/WRENCHDaemon.cpp
