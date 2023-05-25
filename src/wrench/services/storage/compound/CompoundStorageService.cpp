@@ -25,6 +25,7 @@ namespace wrench {
      *  @param file: the file
      *  @param resources: the set of potential storage services
      *  @param mapping: helper data structure to find the relevant location for a file
+     *  @param previous_allocations: previous allocations
      * 
      *  @return nullptr (instead of a valid FileLocation)
     */
@@ -356,6 +357,7 @@ namespace wrench {
      * @brief Lookup for a DataFile in the internal file mapping of the CompoundStorageService (a simplified FileRegistry)
      *
      * @param file: the file of interest
+     * @param answer_mailbox: the answer mailbox
      * 
      * @return A vector of shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or empty vector if it's not.
      */
@@ -717,6 +719,8 @@ namespace wrench {
     /** 
      * @brief Copy file from a SimpleStorageService to a CSS. Src file cannot be stripped, but copy might
      *          result in stripped file on CSS.
+     * @param src_location: the source location
+     * @param dst_location: the destination location
      * 
      */
     void CompoundStorageService::copyFileIamDestination(const std::shared_ptr<FileLocation> &src_location,
