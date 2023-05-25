@@ -28,7 +28,7 @@ WRENCH_LOG_CATEGORY(wrench_core_host_state_change_detector, "Log category for Ho
  */
 void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int return_value) {
     // Unregister the callback!
-    simgrid::s4u::Host::on_state_change.disconnect(this->on_state_change_call_back_id);
+    simgrid::s4u::Host::on_onoff.disconnect(this->on_state_change_call_back_id);
     simgrid::s4u::Host::on_speed_change.disconnect(this->on_speed_change_call_back_id);
 }
 
@@ -62,7 +62,7 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
     this->setProperties(this->default_property_values, std::move(property_list));
 
     // Connect my member method to the on_state_change signal from SimGrid regarding Hosts
-    this->on_state_change_call_back_id = simgrid::s4u::Host::on_state_change.connect(
+    this->on_state_change_call_back_id = simgrid::s4u::Host::on_onoff.connect(
             [this](simgrid::s4u::Host const &h) {
                 this->hostStateChangeCallback(h.get_name());
             });
