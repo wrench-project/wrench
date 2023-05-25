@@ -358,9 +358,9 @@ namespace wrench {
 
             unsigned long available_cores = std::get<0>(r.second) - this->running_thread_counts[r.first];
             if (required_num_cores == 0) {
-                 if (available_cores < action->getMinNumCores()) {
-                     continue;
-                 }
+                if (available_cores < action->getMinNumCores()) {
+                    continue;
+                }
             }
             if (required_num_cores != 0) {
                 if (available_cores < required_num_cores) {
@@ -451,7 +451,6 @@ namespace wrench {
             required_ram = action->getMinRAMFootprint();
             target_host = std::get<0>(allocation);
             target_num_cores = std::get<1>(allocation);
-
 
 
             // If we didn't find a host, forget it
