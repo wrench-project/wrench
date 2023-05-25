@@ -234,7 +234,7 @@ namespace wrench {
         if (links.empty()) {
             throw std::invalid_argument("S4U_Simulation::getLinkUsage(): unknown link " + name);
         }
-        return links.at(0)->get_usage();
+        return links.at(0)->get_load();
     }
 
     /**
