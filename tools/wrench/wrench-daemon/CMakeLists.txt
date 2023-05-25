@@ -1,5 +1,5 @@
 ﻿
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h
@@ -21,7 +21,7 @@ include_directories(src/ include/ ${Boost_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR}/in
 
 
 # Add source to this project's executable.
-add_executable(wrench-daemon
+add_executable(wrench-daemon EXCLUDE_FROM_ALL
         include/httplib.h
         src/main.cpp
         src/WRENCHDaemon.cpp
@@ -65,4 +65,5 @@ else()
             )
 endif()
 
-install(TARGETS wrench-daemon DESTINATION bin)
+install(TARGETS wrench-daemon OPTIONAL DESTINATION bin)
+

@@ -112,25 +112,37 @@ namespace wrench {
                 std::vector<nlohmann::json> tasks = it.value();
 
                 for (auto &task: tasks) {
-                    std::string name = task.at("name");
+
+                    std::string name = task.at("name");// required
+                    std::string task_id = "";          // not required, which is terrible
+                    try {
+                        task_id = task.at("id");
+                    } catch (nlohmann::json::out_of_range &ignore) {
+                        // do nothing
+                    }
+                    if (not task_id.empty()) {
+                        name = name + "_" + task_id;// Will break parent/children specifications
+                    }
+
+
                     double runtime = task.at("runtimeInSeconds");
+
+                    double avg_cpu = -1.0;
+                    try {
+                        avg_cpu = task.at("avgCPU");
+                    } catch (nlohmann::json::out_of_range &e) {
+                        // do nothing
+                    }
+
+                    double num_cores = -1.0;
+                    try {
+                        num_cores = task.at("cores");
+                    } catch (nlohmann::json::out_of_range &e) {
+                        // do nothing
+                    }
 
                     // Scale runtime based on avgCPU unless disabled
                     if (not ignore_avg_cpu) {
-                        double avg_cpu = -1.0;
-                        try {
-                            avg_cpu = task.at("avgCPU");
-                        } catch (nlohmann::json::out_of_range &e) {
-                            // do nothing
-                        }
-                        double num_cores = -1;
-                        try {
-                            num_cores = task.at("cores");
-                        } catch (nlohmann::json::out_of_range &e) {
-                            // do nothing
-                        }
-
-
                         if ((num_cores < 0) and (avg_cpu < 0)) {
                             if (show_warnings) std::cerr << "[WARNING]: Task " << name << " does not specify a number of cores or an avgCPU: "
                                                                                           "Assuming 1 core and avgCPU at 100%.\n";
@@ -144,7 +156,7 @@ namespace wrench {
                         } else if (avg_cpu < 0) {
                             if (show_warnings) std::cerr << "[WARNING]: Task " + name + " does not specify avgCPU: "
                                                                                         "Assuming 100%.\n";
-                            avg_cpu = 100.0;
+                            avg_cpu = 100.0 * num_cores;
                         } else if (avg_cpu > 100 * num_cores) {
                             if (show_warnings) {
                                 std::cerr << "[WARNING]: Task " << name << " specifies " << (unsigned long) num_cores << " cores and avgCPU " << avg_cpu << "%, "
@@ -153,7 +165,7 @@ namespace wrench {
                             avg_cpu = 100.0 * num_cores;
                         }
 
-                        runtime = runtime * (avg_cpu / (100.0 * num_cores));
+                        runtime = runtime * avg_cpu / (100.0 * num_cores);
                     }
 
                     unsigned long min_num_cores, max_num_cores;
@@ -235,6 +247,21 @@ namespace wrench {
                         double size_in_bytes = f.at("sizeInBytes");
                         std::string link = f.at("link");
                         std::string id = f.at("name");
+                        std::string file_path = "";
+                        try {
+                            file_path = f.at("path");
+                            // Remove the training "/" if it's there
+                            if (not file_path.empty() and file_path.back() == '/') {
+                                file_path.erase(file_path.length() - 1);
+                            }
+                        } catch (nlohmann::json::out_of_range &ignore) {}
+
+                        // Prepend the id with the path, if any, to ensure uniqueness
+                        if (not file_path.empty()) {
+                            std::replace(file_path.begin(), file_path.end(), '/', '_');
+                            id = file_path + "_" + id;
+                        }
+
                         std::shared_ptr<wrench::DataFile> workflow_file = nullptr;
                         // Check whether the file already exists
                         try {
