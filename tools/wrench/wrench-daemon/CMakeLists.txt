@@ -12,7 +12,7 @@ add_custom_command(
 )
 
 
-# Add needed packagesf
+# Add needed packages
 find_package(Boost REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
