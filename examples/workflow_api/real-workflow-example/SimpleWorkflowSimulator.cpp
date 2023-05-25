@@ -57,12 +57,7 @@ int main(int argc, char **argv) {
     /* Reading and parsing the workflow description file to create a wrench::Workflow object */
     std::cerr << "Loading workflow..." << std::endl;
     std::shared_ptr<wrench::Workflow> workflow;
-    if (ends_with(workflow_file, "json")) {
-        workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "100Gf");
-    } else {
-        std::cerr << "Workflow file name must end with '.json'" << std::endl;
-        exit(1);
-    }
+    workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "100Gf");
     std::cerr << "The workflow has " << workflow->getNumberOfTasks() << " tasks " << std::endl;
     std::cerr.flush();
 
