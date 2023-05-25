@@ -1,5 +1,5 @@
 ﻿
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h
@@ -65,11 +65,11 @@ else()
             )
 endif()
 
-#install(TARGETS wrench-daemon DESTINATION bin)
+install(TARGETS wrench-daemon OPTIONAL DESTINATION bin)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wrench-daemon
-        DESTINATION bin
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-        )
+#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wrench-daemon
+#        DESTINATION bin
+#        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+#        )
 
 
