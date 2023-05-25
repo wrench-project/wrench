@@ -24,6 +24,7 @@ namespace wrench {
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file for which storage allocation is requested
+    * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
     */
@@ -57,6 +58,7 @@ namespace wrench {
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file for which storage allocation is requested
+    * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
     */

@@ -57,12 +57,7 @@ int main(int argc, char **argv) {
     /* Reading and parsing the workflow description file to create a wrench::Workflow object */
     std::cerr << "Loading workflow..." << std::endl;
     std::shared_ptr<wrench::Workflow> workflow;
-    if (ends_with(workflow_file, "json")) {
-        workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "100Gf");
-    } else {
-        std::cerr << "Workflow file name must end with '.json'" << std::endl;
-        exit(1);
-    }
+    workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "100Gf");
     std::cerr << "The workflow has " << workflow->getNumberOfTasks() << " tasks " << std::endl;
     std::cerr.flush();
 
@@ -81,7 +76,7 @@ int main(int argc, char **argv) {
      * which files can be written and read.  This particular storage service, which is an instance
      * of wrench::SimpleStorageService, is started on WMSHost in the
      * platform (platform/batch_platform.xml), which has an attached disk called large_disk. The SimpleStorageService
-     * is a barebone storage service implementation provided by WRENCH.
+     * is a bare bone storage service implementation provided by WRENCH.
      * Throughout the simulation execution, input/output files of workflow tasks will be located
      * in this storage service.
      */

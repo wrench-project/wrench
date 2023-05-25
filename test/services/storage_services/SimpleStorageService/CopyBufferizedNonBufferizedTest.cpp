@@ -20,7 +20,7 @@ public:
     void do_SelfCopyBufferizedNonBufferizedTest_test();
 
 protected:
-    ~CopyBufferizedNonBufferizedTest() {
+    ~CopyBufferizedNonBufferizedTest() override {
         wrench::Simulation::removeFile(file_1_size_100);
         wrench::Simulation::removeFile(file_2_size_200);
     }

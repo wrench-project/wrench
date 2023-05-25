@@ -30,6 +30,7 @@
 
 #include <memory>
 #include <utility>
+#include <fstream>
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation, "Log category for Simulation");
 
@@ -179,7 +180,7 @@ namespace wrench {
         // Register a callback on host state changes to warn users
         // that the --wrench-host-shutdown-simulation flag should have been passed
         // to the simulator if host shutdowns are to be simulated
-        simgrid::s4u::Host::on_state_change.connect(
+        simgrid::s4u::Host::on_onoff.connect(
                 [](simgrid::s4u::Host const &h) {
                     if (not Simulation::host_shutdown_enabled) {
                         throw std::runtime_error(
@@ -191,7 +192,7 @@ namespace wrench {
         // Register a callback on link state changes to warn users
         // that the --wrench-host-shutdown-simulation flag should have been passed
         // to the simulator if host shutdowns are to be simulated
-        simgrid::s4u::Link::on_state_change_cb(
+        simgrid::s4u::Link::on_onoff_cb(
                 [](simgrid::s4u::Link const &l) {
                     if (not Simulation::link_shutdown_enabled) {
                         throw std::runtime_error(
@@ -312,6 +313,24 @@ namespace wrench {
         this->already_setup = true;
     }
 
+    /**
+     * @brief Instantiate a simulated platform
+     *
+     * @param platform: the string representation of a SimGrid XML platform description
+     *
+     * @throw std::runtime_error
+     */
+    void Simulation::instantiatePlatformFromString(const std::string &platform) {
+        auto temp_dir = std::filesystem::temp_directory_path();
+        auto temp_path = temp_dir / ("tmp_wrench_platform_" + to_string(::getpid()) + "_" + to_string(std::time(nullptr)) + ".xml");
+        ofstream myfile;
+        myfile.open(temp_path);
+        myfile << platform << std::endl;
+        myfile.close();
+
+        instantiatePlatform(temp_path);
+        remove(temp_path);
+    }
 
     /**
      * @brief Instantiate a simulated platform

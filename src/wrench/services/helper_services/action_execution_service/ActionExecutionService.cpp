@@ -334,11 +334,13 @@ namespace wrench {
             const std::string &required_host,
             unsigned long required_num_cores,
             std::set<std::string> &hosts_to_avoid) {
+
         // Compute possible hosts
         std::set<std::string> possible_hosts;
         std::string new_host_to_avoid;
         double new_host_to_avoid_ram_capacity = 0;
         for (auto const &r: this->compute_resources) {
+
             // If there is a required host, then don't even look at others
             if (not required_host.empty() and (r.first != required_host)) {
                 continue;
@@ -354,11 +356,16 @@ namespace wrench {
                 continue;
             }
 
-            if ((required_num_cores == 0) and (std::get<0>(r.second) < action->getMinNumCores())) {
-                continue;
+            unsigned long available_cores = std::get<0>(r.second) - this->running_thread_counts[r.first];
+            if (required_num_cores == 0) {
+                if (available_cores < action->getMinNumCores()) {
+                    continue;
+                }
             }
-            if ((required_num_cores != 0) and (std::get<0>(r.second) < required_num_cores)) {
-                continue;
+            if (required_num_cores != 0) {
+                if (available_cores < required_num_cores) {
+                    continue;
+                }
             }
             if ((action->getMinRAMFootprint() > 0) and (hosts_to_avoid.find(r.first) != hosts_to_avoid.end())) {
                 continue;
@@ -444,6 +451,7 @@ namespace wrench {
             required_ram = action->getMinRAMFootprint();
             target_host = std::get<0>(allocation);
             target_num_cores = std::get<1>(allocation);
+
 
             // If we didn't find a host, forget it
             if (target_host.empty()) {
@@ -635,6 +643,7 @@ namespace wrench {
             auto executor = this->action_executors[action];
             this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
             this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
+
             executor->kill(killed_due_to_job_cancellation);
             executor->getAction()->setFailureCause(cause);
             this->action_executors.erase(action);
@@ -968,7 +977,8 @@ namespace wrench {
                 unsigned long cores = std::get<0>(this->compute_resources[r.first]);
                 unsigned long running_threads = r.second;
                 if (running_threads > cores) {
-                    throw std::runtime_error("TOO MANY THREADS!");
+                    throw std::runtime_error("ActionExecutionService::IsThereAtLeastOneHostWithAvailableResources(): The number of running threads exceeds "
+                                             "the number of cores. This should not have happened [Internal error]");
                 }
                 if (running_threads < cores and (cores - running_threads >= num_cores)) {
                     enough_cores = true;
@@ -1064,6 +1074,7 @@ namespace wrench {
      */
     void ActionExecutionService::processActionExecutorCrash(const std::shared_ptr<ActionExecutor> &executor) {
         std::shared_ptr<Action> action = executor->getAction();
+
 
         WRENCH_INFO("Handling an ActionExecutor crash!");
 
