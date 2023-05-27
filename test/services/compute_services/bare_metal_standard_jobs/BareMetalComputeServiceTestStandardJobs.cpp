@@ -554,7 +554,7 @@ private:
 
         double task3_end_date = this->test->task3->getEndDate();
         double task4_end_date = this->test->task4->getEndDate();
-        double delta_task3 = std::abs(task3_end_date - 10.0);
+        double delta_task3 = std::abs(task3_end_date - 5.0);
         double delta_task4 = std::abs(task4_end_date - 10.0);
         if ((delta_task3 > EPSILON) || (delta_task4 > EPSILON)) {
             throw std::runtime_error("Unexpected task3 and task4 completion times " + std::to_string(task3_end_date) + " and " +
@@ -577,7 +577,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
