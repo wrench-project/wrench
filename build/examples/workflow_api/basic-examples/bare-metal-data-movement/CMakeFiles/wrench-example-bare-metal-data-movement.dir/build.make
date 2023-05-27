@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 # Include any dependencies generated for this target.
 include examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/depend.make
@@ -70,32 +70,32 @@ include examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles
 include examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/flags.make
 
 examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o: examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/flags.make
-examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o: /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp
+examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o: /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp
 examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o: examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o -MF CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o.d -o CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o -c /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o -MF CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o.d -o CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.o -c /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp
 
 examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.i"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp > CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp > CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.i
 
 examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.s"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp -o CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp -o CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovementWMS.cpp.s
 
 examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o: examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/flags.make
-examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o: /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovement.cpp
+examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o: /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovement.cpp
 examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o: examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o -MF CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o.d -o CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o -c /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovement.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o -MF CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o.d -o CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o -c /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovement.cpp
 
 examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.i"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovement.cpp > CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovement.cpp > CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.i
 
 examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.s"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovement.cpp -o CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovement.cpp -o CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.s
 
 # Object files for target wrench-example-bare-metal-data-movement
 wrench__example__bare__metal__data__movement_OBJECTS = \
@@ -109,20 +109,20 @@ examples/workflow_api/basic-examples/bare-metal-data-movement/wrench-example-bar
 examples/workflow_api/basic-examples/bare-metal-data-movement/wrench-example-bare-metal-data-movement: examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DataMovement.cpp.o
 examples/workflow_api/basic-examples/bare-metal-data-movement/wrench-example-bare-metal-data-movement: examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/build.make
 examples/workflow_api/basic-examples/bare-metal-data-movement/wrench-example-bare-metal-data-movement: libwrench.a
-examples/workflow_api/basic-examples/bare-metal-data-movement/wrench-example-bare-metal-data-movement: /usr/local/lib/libsimgrid.so
+examples/workflow_api/basic-examples/bare-metal-data-movement/wrench-example-bare-metal-data-movement: /usr/local/lib/libsimgrid.dylib
 examples/workflow_api/basic-examples/bare-metal-data-movement/wrench-example-bare-metal-data-movement: examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable wrench-example-bare-metal-data-movement"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wrench-example-bare-metal-data-movement.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable wrench-example-bare-metal-data-movement"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wrench-example-bare-metal-data-movement.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/build: examples/workflow_api/basic-examples/bare-metal-data-movement/wrench-example-bare-metal-data-movement
 .PHONY : examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/build
 
 examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/clean:
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-bare-metal-data-movement.dir/cmake_clean.cmake
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-bare-metal-data-movement.dir/cmake_clean.cmake
 .PHONY : examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/clean
 
 examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/riley/Desktop/wrench /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement /home/riley/Desktop/wrench/build /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/henric/Home/WRENCH/wrench /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-data-movement /Users/henric/Home/WRENCH/wrench/build /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeFiles/wrench-example-bare-metal-data-movement.dir/depend
 

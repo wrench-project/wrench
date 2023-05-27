@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 # Utility rule file for wrench-example-cloud-bag-of-tasks-platform-file.
 
@@ -67,7 +67,7 @@ include examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrenc
 include examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file.dir/progress.make
 
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file:
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /bin/sh -c "if [ '/home/riley/Desktop/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks' != '/home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks' ]; then /bin/cp -f /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/four_hosts.xml /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks/four_hosts.xml ; fi ;"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /bin/sh -c "if [ '/Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks' != '/Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks' ]; then /bin/cp -f /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/four_hosts.xml /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks/four_hosts.xml ; fi ;"
 
 wrench-example-cloud-bag-of-tasks-platform-file: examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file
 wrench-example-cloud-bag-of-tasks-platform-file: examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file.dir/build.make
@@ -78,10 +78,10 @@ examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-exampl
 .PHONY : examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file.dir/build
 
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file.dir/clean:
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file.dir/cmake_clean.cmake
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file.dir/cmake_clean.cmake
 .PHONY : examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file.dir/clean
 
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file.dir/depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/riley/Desktop/wrench /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks /home/riley/Desktop/wrench/build /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/henric/Home/WRENCH/wrench /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks /Users/henric/Home/WRENCH/wrench/build /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks-platform-file.dir/depend
 

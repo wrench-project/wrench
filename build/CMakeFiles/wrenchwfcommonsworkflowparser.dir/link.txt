@@ -1,2 +1,0 @@
-/usr/bin/ar qc libwrenchwfcommonsworkflowparser.a CMakeFiles/wrenchwfcommonsworkflowparser.dir/tools/wfcommons/src/WfCommonsWorkflowParser.cpp.o
-/usr/bin/ranlib libwrenchwfcommonsworkflowparser.a

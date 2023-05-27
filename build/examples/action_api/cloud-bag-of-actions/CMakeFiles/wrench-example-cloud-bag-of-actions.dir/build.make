@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 # Include any dependencies generated for this target.
 include examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/depend.make
@@ -70,32 +70,32 @@ include examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud
 include examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/flags.make
 
 examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.o: examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/flags.make
-examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.o: /home/riley/Desktop/wrench/examples/action_api/cloud-bag-of-actions/GreedyExecutionController.cpp
+examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.o: /Users/henric/Home/WRENCH/wrench/examples/action_api/cloud-bag-of-actions/GreedyExecutionController.cpp
 examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.o: examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.o"
-	cd /home/riley/Desktop/wrench/build/examples/action_api/cloud-bag-of-actions && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.o -MF CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.o.d -o CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.o -c /home/riley/Desktop/wrench/examples/action_api/cloud-bag-of-actions/GreedyExecutionController.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.o"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/action_api/cloud-bag-of-actions && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.o -MF CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.o.d -o CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.o -c /Users/henric/Home/WRENCH/wrench/examples/action_api/cloud-bag-of-actions/GreedyExecutionController.cpp
 
 examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.i"
-	cd /home/riley/Desktop/wrench/build/examples/action_api/cloud-bag-of-actions && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/riley/Desktop/wrench/examples/action_api/cloud-bag-of-actions/GreedyExecutionController.cpp > CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/action_api/cloud-bag-of-actions && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/henric/Home/WRENCH/wrench/examples/action_api/cloud-bag-of-actions/GreedyExecutionController.cpp > CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.i
 
 examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.s"
-	cd /home/riley/Desktop/wrench/build/examples/action_api/cloud-bag-of-actions && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/riley/Desktop/wrench/examples/action_api/cloud-bag-of-actions/GreedyExecutionController.cpp -o CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/action_api/cloud-bag-of-actions && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/henric/Home/WRENCH/wrench/examples/action_api/cloud-bag-of-actions/GreedyExecutionController.cpp -o CMakeFiles/wrench-example-cloud-bag-of-actions.dir/GreedyExecutionController.cpp.s
 
 examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o: examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/flags.make
-examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o: /home/riley/Desktop/wrench/examples/action_api/cloud-bag-of-actions/CloudBagOfActions.cpp
+examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o: /Users/henric/Home/WRENCH/wrench/examples/action_api/cloud-bag-of-actions/CloudBagOfActions.cpp
 examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o: examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o"
-	cd /home/riley/Desktop/wrench/build/examples/action_api/cloud-bag-of-actions && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o -MF CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o.d -o CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o -c /home/riley/Desktop/wrench/examples/action_api/cloud-bag-of-actions/CloudBagOfActions.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/action_api/cloud-bag-of-actions && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o -MF CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o.d -o CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o -c /Users/henric/Home/WRENCH/wrench/examples/action_api/cloud-bag-of-actions/CloudBagOfActions.cpp
 
 examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.i"
-	cd /home/riley/Desktop/wrench/build/examples/action_api/cloud-bag-of-actions && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/riley/Desktop/wrench/examples/action_api/cloud-bag-of-actions/CloudBagOfActions.cpp > CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/action_api/cloud-bag-of-actions && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/henric/Home/WRENCH/wrench/examples/action_api/cloud-bag-of-actions/CloudBagOfActions.cpp > CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.i
 
 examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.s"
-	cd /home/riley/Desktop/wrench/build/examples/action_api/cloud-bag-of-actions && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/riley/Desktop/wrench/examples/action_api/cloud-bag-of-actions/CloudBagOfActions.cpp -o CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/action_api/cloud-bag-of-actions && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/henric/Home/WRENCH/wrench/examples/action_api/cloud-bag-of-actions/CloudBagOfActions.cpp -o CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.s
 
 # Object files for target wrench-example-cloud-bag-of-actions
 wrench__example__cloud__bag__of__actions_OBJECTS = \
@@ -109,20 +109,20 @@ examples/action_api/cloud-bag-of-actions/wrench-example-cloud-bag-of-actions: ex
 examples/action_api/cloud-bag-of-actions/wrench-example-cloud-bag-of-actions: examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/CloudBagOfActions.cpp.o
 examples/action_api/cloud-bag-of-actions/wrench-example-cloud-bag-of-actions: examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/build.make
 examples/action_api/cloud-bag-of-actions/wrench-example-cloud-bag-of-actions: libwrench.a
-examples/action_api/cloud-bag-of-actions/wrench-example-cloud-bag-of-actions: /usr/local/lib/libsimgrid.so
+examples/action_api/cloud-bag-of-actions/wrench-example-cloud-bag-of-actions: /usr/local/lib/libsimgrid.dylib
 examples/action_api/cloud-bag-of-actions/wrench-example-cloud-bag-of-actions: examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable wrench-example-cloud-bag-of-actions"
-	cd /home/riley/Desktop/wrench/build/examples/action_api/cloud-bag-of-actions && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wrench-example-cloud-bag-of-actions.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable wrench-example-cloud-bag-of-actions"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/action_api/cloud-bag-of-actions && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wrench-example-cloud-bag-of-actions.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/build: examples/action_api/cloud-bag-of-actions/wrench-example-cloud-bag-of-actions
 .PHONY : examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/build
 
 examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/clean:
-	cd /home/riley/Desktop/wrench/build/examples/action_api/cloud-bag-of-actions && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-cloud-bag-of-actions.dir/cmake_clean.cmake
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/action_api/cloud-bag-of-actions && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-cloud-bag-of-actions.dir/cmake_clean.cmake
 .PHONY : examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/clean
 
 examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/riley/Desktop/wrench /home/riley/Desktop/wrench/examples/action_api/cloud-bag-of-actions /home/riley/Desktop/wrench/build /home/riley/Desktop/wrench/build/examples/action_api/cloud-bag-of-actions /home/riley/Desktop/wrench/build/examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/henric/Home/WRENCH/wrench /Users/henric/Home/WRENCH/wrench/examples/action_api/cloud-bag-of-actions /Users/henric/Home/WRENCH/wrench/build /Users/henric/Home/WRENCH/wrench/build/examples/action_api/cloud-bag-of-actions /Users/henric/Home/WRENCH/wrench/build/examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : examples/action_api/cloud-bag-of-actions/CMakeFiles/wrench-example-cloud-bag-of-actions.dir/depend
 

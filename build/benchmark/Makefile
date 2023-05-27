@@ -48,27 +48,27 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/opt/local/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -78,7 +78,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/local/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -97,49 +97,49 @@ list_install_components/fast: list_install_components
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
+	/opt/local/bin/cmake -P cmake_install.cmake
 .PHONY : install
 
 # Special rule for the target install
 install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
+	/opt/local/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local
 
 # Special rule for the target install/local
 install/local/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
 
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip
 
 # Special rule for the target install/strip
 install/strip/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/riley/Desktop/wrench/build/CMakeFiles /home/riley/Desktop/wrench/build/benchmark//CMakeFiles/progress.marks
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 benchmark/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/riley/Desktop/wrench/build/CMakeFiles 0
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/henric/Home/WRENCH/wrench/build/CMakeFiles /Users/henric/Home/WRENCH/wrench/build/benchmark//CMakeFiles/progress.marks
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 benchmark/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/henric/Home/WRENCH/wrench/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 benchmark/clean
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 benchmark/clean
 .PHONY : clean
 
 # The main clean target
@@ -148,22 +148,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 benchmark/preinstall
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 benchmark/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 benchmark/preinstall
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 benchmark/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 benchmark/CMakeFiles/wrench-stress-test.dir/rule:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 benchmark/CMakeFiles/wrench-stress-test.dir/rule
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 benchmark/CMakeFiles/wrench-stress-test.dir/rule
 .PHONY : benchmark/CMakeFiles/wrench-stress-test.dir/rule
 
 # Convenience name for target.
@@ -172,7 +172,7 @@ wrench-stress-test: benchmark/CMakeFiles/wrench-stress-test.dir/rule
 
 # fast build rule for target.
 wrench-stress-test/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/build
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/build
 .PHONY : wrench-stress-test/fast
 
 Simulator.o: Simulator.cpp.o
@@ -180,7 +180,7 @@ Simulator.o: Simulator.cpp.o
 
 # target to build an object file
 Simulator.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/Simulator.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/Simulator.cpp.o
 .PHONY : Simulator.cpp.o
 
 Simulator.i: Simulator.cpp.i
@@ -188,7 +188,7 @@ Simulator.i: Simulator.cpp.i
 
 # target to preprocess a source file
 Simulator.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/Simulator.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/Simulator.cpp.i
 .PHONY : Simulator.cpp.i
 
 Simulator.s: Simulator.cpp.s
@@ -196,7 +196,7 @@ Simulator.s: Simulator.cpp.s
 
 # target to generate assembly for a file
 Simulator.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/Simulator.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/Simulator.cpp.s
 .PHONY : Simulator.cpp.s
 
 StressTestActionAPIController.o: StressTestActionAPIController.cpp.o
@@ -204,7 +204,7 @@ StressTestActionAPIController.o: StressTestActionAPIController.cpp.o
 
 # target to build an object file
 StressTestActionAPIController.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/StressTestActionAPIController.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/StressTestActionAPIController.cpp.o
 .PHONY : StressTestActionAPIController.cpp.o
 
 StressTestActionAPIController.i: StressTestActionAPIController.cpp.i
@@ -212,7 +212,7 @@ StressTestActionAPIController.i: StressTestActionAPIController.cpp.i
 
 # target to preprocess a source file
 StressTestActionAPIController.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/StressTestActionAPIController.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/StressTestActionAPIController.cpp.i
 .PHONY : StressTestActionAPIController.cpp.i
 
 StressTestActionAPIController.s: StressTestActionAPIController.cpp.s
@@ -220,7 +220,7 @@ StressTestActionAPIController.s: StressTestActionAPIController.cpp.s
 
 # target to generate assembly for a file
 StressTestActionAPIController.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/StressTestActionAPIController.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/StressTestActionAPIController.cpp.s
 .PHONY : StressTestActionAPIController.cpp.s
 
 StressTestWorkflowAPIController.o: StressTestWorkflowAPIController.cpp.o
@@ -228,7 +228,7 @@ StressTestWorkflowAPIController.o: StressTestWorkflowAPIController.cpp.o
 
 # target to build an object file
 StressTestWorkflowAPIController.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/StressTestWorkflowAPIController.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/StressTestWorkflowAPIController.cpp.o
 .PHONY : StressTestWorkflowAPIController.cpp.o
 
 StressTestWorkflowAPIController.i: StressTestWorkflowAPIController.cpp.i
@@ -236,7 +236,7 @@ StressTestWorkflowAPIController.i: StressTestWorkflowAPIController.cpp.i
 
 # target to preprocess a source file
 StressTestWorkflowAPIController.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/StressTestWorkflowAPIController.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/StressTestWorkflowAPIController.cpp.i
 .PHONY : StressTestWorkflowAPIController.cpp.i
 
 StressTestWorkflowAPIController.s: StressTestWorkflowAPIController.cpp.s
@@ -244,7 +244,7 @@ StressTestWorkflowAPIController.s: StressTestWorkflowAPIController.cpp.s
 
 # target to generate assembly for a file
 StressTestWorkflowAPIController.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/StressTestWorkflowAPIController.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f benchmark/CMakeFiles/wrench-stress-test.dir/build.make benchmark/CMakeFiles/wrench-stress-test.dir/StressTestWorkflowAPIController.cpp.s
 .PHONY : StressTestWorkflowAPIController.cpp.s
 
 # Help Target
@@ -280,6 +280,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

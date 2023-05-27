@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 # Include any dependencies generated for this target.
 include examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/depend.make
@@ -70,32 +70,32 @@ include examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-
 include examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/flags.make
 
 examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o: examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/flags.make
-examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o: /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-chain/OneTaskAtATimeWMS.cpp
+examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o: /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-chain/OneTaskAtATimeWMS.cpp
 examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o: examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o -MF CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o.d -o CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o -c /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-chain/OneTaskAtATimeWMS.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o -MF CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o.d -o CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.o -c /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-chain/OneTaskAtATimeWMS.cpp
 
 examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.i"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-chain/OneTaskAtATimeWMS.cpp > CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-chain/OneTaskAtATimeWMS.cpp > CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.i
 
 examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.s"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-chain/OneTaskAtATimeWMS.cpp -o CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-chain/OneTaskAtATimeWMS.cpp -o CMakeFiles/wrench-example-bare-metal-chain.dir/OneTaskAtATimeWMS.cpp.s
 
 examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o: examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/flags.make
-examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o: /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-chain/BareMetalChain.cpp
+examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o: /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-chain/BareMetalChain.cpp
 examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o: examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o -MF CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o.d -o CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o -c /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-chain/BareMetalChain.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o -MF CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o.d -o CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o -c /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-chain/BareMetalChain.cpp
 
 examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.i"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-chain/BareMetalChain.cpp > CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-chain/BareMetalChain.cpp > CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.i
 
 examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.s"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-chain/BareMetalChain.cpp -o CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-chain/BareMetalChain.cpp -o CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.s
 
 # Object files for target wrench-example-bare-metal-chain
 wrench__example__bare__metal__chain_OBJECTS = \
@@ -109,20 +109,20 @@ examples/workflow_api/basic-examples/bare-metal-chain/wrench-example-bare-metal-
 examples/workflow_api/basic-examples/bare-metal-chain/wrench-example-bare-metal-chain: examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/BareMetalChain.cpp.o
 examples/workflow_api/basic-examples/bare-metal-chain/wrench-example-bare-metal-chain: examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/build.make
 examples/workflow_api/basic-examples/bare-metal-chain/wrench-example-bare-metal-chain: libwrench.a
-examples/workflow_api/basic-examples/bare-metal-chain/wrench-example-bare-metal-chain: /usr/local/lib/libsimgrid.so
+examples/workflow_api/basic-examples/bare-metal-chain/wrench-example-bare-metal-chain: /usr/local/lib/libsimgrid.dylib
 examples/workflow_api/basic-examples/bare-metal-chain/wrench-example-bare-metal-chain: examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable wrench-example-bare-metal-chain"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wrench-example-bare-metal-chain.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable wrench-example-bare-metal-chain"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wrench-example-bare-metal-chain.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/build: examples/workflow_api/basic-examples/bare-metal-chain/wrench-example-bare-metal-chain
 .PHONY : examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/build
 
 examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/clean:
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-bare-metal-chain.dir/cmake_clean.cmake
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-bare-metal-chain.dir/cmake_clean.cmake
 .PHONY : examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/clean
 
 examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/riley/Desktop/wrench /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-chain /home/riley/Desktop/wrench/build /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/henric/Home/WRENCH/wrench /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-chain /Users/henric/Home/WRENCH/wrench/build /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : examples/workflow_api/basic-examples/bare-metal-chain/CMakeFiles/wrench-example-bare-metal-chain.dir/depend
 

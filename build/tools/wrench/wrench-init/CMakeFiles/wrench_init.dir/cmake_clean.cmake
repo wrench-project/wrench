@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "/home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init"
+  "/Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init"
   "CMakeFiles/wrench_init"
 )
 

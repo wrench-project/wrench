@@ -48,27 +48,27 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/opt/local/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -78,7 +78,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/local/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -97,49 +97,49 @@ list_install_components/fast: list_install_components
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
+	/opt/local/bin/cmake -P cmake_install.cmake
 .PHONY : install
 
 # Special rule for the target install
 install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
+	/opt/local/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local
 
 # Special rule for the target install/local
 install/local/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
 
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip
 
 # Special rule for the target install/strip
 install/strip/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/riley/Desktop/wrench/build/CMakeFiles /home/riley/Desktop/wrench/build/tools/wrench/wrench-daemon//CMakeFiles/progress.marks
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tools/wrench/wrench-daemon/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/riley/Desktop/wrench/build/CMakeFiles 0
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/henric/Home/WRENCH/wrench/build/CMakeFiles /Users/henric/Home/WRENCH/wrench/build/tools/wrench/wrench-daemon//CMakeFiles/progress.marks
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tools/wrench/wrench-daemon/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/henric/Home/WRENCH/wrench/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tools/wrench/wrench-daemon/clean
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tools/wrench/wrench-daemon/clean
 .PHONY : clean
 
 # The main clean target
@@ -148,22 +148,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tools/wrench/wrench-daemon/preinstall
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tools/wrench/wrench-daemon/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tools/wrench/wrench-daemon/preinstall
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tools/wrench/wrench-daemon/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/rule:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/rule
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/rule
 .PHONY : tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/rule
 
 # Convenience name for target.
@@ -172,7 +172,7 @@ wrench-daemon: tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/rule
 
 # fast build rule for target.
 wrench-daemon/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build
 .PHONY : wrench-daemon/fast
 
 src/SimulationController.o: src/SimulationController.cpp.o
@@ -180,7 +180,7 @@ src/SimulationController.o: src/SimulationController.cpp.o
 
 # target to build an object file
 src/SimulationController.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationController.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationController.cpp.o
 .PHONY : src/SimulationController.cpp.o
 
 src/SimulationController.i: src/SimulationController.cpp.i
@@ -188,7 +188,7 @@ src/SimulationController.i: src/SimulationController.cpp.i
 
 # target to preprocess a source file
 src/SimulationController.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationController.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationController.cpp.i
 .PHONY : src/SimulationController.cpp.i
 
 src/SimulationController.s: src/SimulationController.cpp.s
@@ -196,7 +196,7 @@ src/SimulationController.s: src/SimulationController.cpp.s
 
 # target to generate assembly for a file
 src/SimulationController.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationController.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationController.cpp.s
 .PHONY : src/SimulationController.cpp.s
 
 src/SimulationDaemon.o: src/SimulationDaemon.cpp.o
@@ -204,7 +204,7 @@ src/SimulationDaemon.o: src/SimulationDaemon.cpp.o
 
 # target to build an object file
 src/SimulationDaemon.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationDaemon.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationDaemon.cpp.o
 .PHONY : src/SimulationDaemon.cpp.o
 
 src/SimulationDaemon.i: src/SimulationDaemon.cpp.i
@@ -212,7 +212,7 @@ src/SimulationDaemon.i: src/SimulationDaemon.cpp.i
 
 # target to preprocess a source file
 src/SimulationDaemon.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationDaemon.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationDaemon.cpp.i
 .PHONY : src/SimulationDaemon.cpp.i
 
 src/SimulationDaemon.s: src/SimulationDaemon.cpp.s
@@ -220,7 +220,7 @@ src/SimulationDaemon.s: src/SimulationDaemon.cpp.s
 
 # target to generate assembly for a file
 src/SimulationDaemon.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationDaemon.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationDaemon.cpp.s
 .PHONY : src/SimulationDaemon.cpp.s
 
 src/SimulationLauncher.o: src/SimulationLauncher.cpp.o
@@ -228,7 +228,7 @@ src/SimulationLauncher.o: src/SimulationLauncher.cpp.o
 
 # target to build an object file
 src/SimulationLauncher.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationLauncher.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationLauncher.cpp.o
 .PHONY : src/SimulationLauncher.cpp.o
 
 src/SimulationLauncher.i: src/SimulationLauncher.cpp.i
@@ -236,7 +236,7 @@ src/SimulationLauncher.i: src/SimulationLauncher.cpp.i
 
 # target to preprocess a source file
 src/SimulationLauncher.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationLauncher.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationLauncher.cpp.i
 .PHONY : src/SimulationLauncher.cpp.i
 
 src/SimulationLauncher.s: src/SimulationLauncher.cpp.s
@@ -244,7 +244,7 @@ src/SimulationLauncher.s: src/SimulationLauncher.cpp.s
 
 # target to generate assembly for a file
 src/SimulationLauncher.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationLauncher.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/SimulationLauncher.cpp.s
 .PHONY : src/SimulationLauncher.cpp.s
 
 src/WRENCHDaemon.o: src/WRENCHDaemon.cpp.o
@@ -252,7 +252,7 @@ src/WRENCHDaemon.o: src/WRENCHDaemon.cpp.o
 
 # target to build an object file
 src/WRENCHDaemon.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/WRENCHDaemon.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/WRENCHDaemon.cpp.o
 .PHONY : src/WRENCHDaemon.cpp.o
 
 src/WRENCHDaemon.i: src/WRENCHDaemon.cpp.i
@@ -260,7 +260,7 @@ src/WRENCHDaemon.i: src/WRENCHDaemon.cpp.i
 
 # target to preprocess a source file
 src/WRENCHDaemon.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/WRENCHDaemon.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/WRENCHDaemon.cpp.i
 .PHONY : src/WRENCHDaemon.cpp.i
 
 src/WRENCHDaemon.s: src/WRENCHDaemon.cpp.s
@@ -268,7 +268,7 @@ src/WRENCHDaemon.s: src/WRENCHDaemon.cpp.s
 
 # target to generate assembly for a file
 src/WRENCHDaemon.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/WRENCHDaemon.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/WRENCHDaemon.cpp.s
 .PHONY : src/WRENCHDaemon.cpp.s
 
 src/main.o: src/main.cpp.o
@@ -276,7 +276,7 @@ src/main.o: src/main.cpp.o
 
 # target to build an object file
 src/main.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/main.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/main.cpp.o
 .PHONY : src/main.cpp.o
 
 src/main.i: src/main.cpp.i
@@ -284,7 +284,7 @@ src/main.i: src/main.cpp.i
 
 # target to preprocess a source file
 src/main.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/main.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/main.cpp.i
 .PHONY : src/main.cpp.i
 
 src/main.s: src/main.cpp.s
@@ -292,7 +292,7 @@ src/main.s: src/main.cpp.s
 
 # target to generate assembly for a file
 src/main.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/main.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/build.make tools/wrench/wrench-daemon/CMakeFiles/wrench-daemon.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
 # Help Target
@@ -334,6 +334,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

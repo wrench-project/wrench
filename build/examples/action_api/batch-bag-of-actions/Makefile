@@ -48,27 +48,27 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/opt/local/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -78,7 +78,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/local/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -97,49 +97,49 @@ list_install_components/fast: list_install_components
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
+	/opt/local/bin/cmake -P cmake_install.cmake
 .PHONY : install
 
 # Special rule for the target install
 install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
+	/opt/local/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local
 
 # Special rule for the target install/local
 install/local/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
 
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip
 
 # Special rule for the target install/strip
 install/strip/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/riley/Desktop/wrench/build/CMakeFiles /home/riley/Desktop/wrench/build/examples/action_api/batch-bag-of-actions//CMakeFiles/progress.marks
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-bag-of-actions/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/riley/Desktop/wrench/build/CMakeFiles 0
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/henric/Home/WRENCH/wrench/build/CMakeFiles /Users/henric/Home/WRENCH/wrench/build/examples/action_api/batch-bag-of-actions//CMakeFiles/progress.marks
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-bag-of-actions/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/henric/Home/WRENCH/wrench/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-bag-of-actions/clean
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-bag-of-actions/clean
 .PHONY : clean
 
 # The main clean target
@@ -148,22 +148,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-bag-of-actions/preinstall
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-bag-of-actions/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-bag-of-actions/preinstall
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-bag-of-actions/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/rule:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/rule
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/rule
 .PHONY : examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/rule
 
 # Convenience name for target.
@@ -172,12 +172,12 @@ wrench-example-batch-bag-of-actions: examples/action_api/batch-bag-of-actions/CM
 
 # fast build rule for target.
 wrench-example-batch-bag-of-actions/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build
 .PHONY : wrench-example-batch-bag-of-actions/fast
 
 # Convenience name for target.
 examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions-platform-file.dir/rule:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions-platform-file.dir/rule
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions-platform-file.dir/rule
 .PHONY : examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions-platform-file.dir/rule
 
 # Convenience name for target.
@@ -186,7 +186,7 @@ wrench-example-batch-bag-of-actions-platform-file: examples/action_api/batch-bag
 
 # fast build rule for target.
 wrench-example-batch-bag-of-actions-platform-file/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions-platform-file.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions-platform-file.dir/build
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions-platform-file.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions-platform-file.dir/build
 .PHONY : wrench-example-batch-bag-of-actions-platform-file/fast
 
 BatchBagOfActions.o: BatchBagOfActions.cpp.o
@@ -194,7 +194,7 @@ BatchBagOfActions.o: BatchBagOfActions.cpp.o
 
 # target to build an object file
 BatchBagOfActions.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/BatchBagOfActions.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/BatchBagOfActions.cpp.o
 .PHONY : BatchBagOfActions.cpp.o
 
 BatchBagOfActions.i: BatchBagOfActions.cpp.i
@@ -202,7 +202,7 @@ BatchBagOfActions.i: BatchBagOfActions.cpp.i
 
 # target to preprocess a source file
 BatchBagOfActions.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/BatchBagOfActions.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/BatchBagOfActions.cpp.i
 .PHONY : BatchBagOfActions.cpp.i
 
 BatchBagOfActions.s: BatchBagOfActions.cpp.s
@@ -210,7 +210,7 @@ BatchBagOfActions.s: BatchBagOfActions.cpp.s
 
 # target to generate assembly for a file
 BatchBagOfActions.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/BatchBagOfActions.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/BatchBagOfActions.cpp.s
 .PHONY : BatchBagOfActions.cpp.s
 
 GreedyExecutionController.o: GreedyExecutionController.cpp.o
@@ -218,7 +218,7 @@ GreedyExecutionController.o: GreedyExecutionController.cpp.o
 
 # target to build an object file
 GreedyExecutionController.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/GreedyExecutionController.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/GreedyExecutionController.cpp.o
 .PHONY : GreedyExecutionController.cpp.o
 
 GreedyExecutionController.i: GreedyExecutionController.cpp.i
@@ -226,7 +226,7 @@ GreedyExecutionController.i: GreedyExecutionController.cpp.i
 
 # target to preprocess a source file
 GreedyExecutionController.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/GreedyExecutionController.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/GreedyExecutionController.cpp.i
 .PHONY : GreedyExecutionController.cpp.i
 
 GreedyExecutionController.s: GreedyExecutionController.cpp.s
@@ -234,7 +234,7 @@ GreedyExecutionController.s: GreedyExecutionController.cpp.s
 
 # target to generate assembly for a file
 GreedyExecutionController.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/GreedyExecutionController.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/build.make examples/action_api/batch-bag-of-actions/CMakeFiles/wrench-example-batch-bag-of-actions.dir/GreedyExecutionController.cpp.s
 .PHONY : GreedyExecutionController.cpp.s
 
 # Help Target
@@ -268,6 +268,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

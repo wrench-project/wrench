@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 # Utility rule file for wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file.
 
@@ -67,7 +67,7 @@ include examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmati
 include examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file.dir/progress.make
 
 examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file:
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform && /bin/sh -c "if [ '/home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform' != '/home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform' ]; then /bin/cp -f /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/two_hosts.xml /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/two_hosts.xml ; fi ;"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform && /bin/sh -c "if [ '/Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform' != '/Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform' ]; then /bin/cp -f /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/two_hosts.xml /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/two_hosts.xml ; fi ;"
 
 wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file: examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file
 wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file: examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file.dir/build.make
@@ -78,10 +78,10 @@ examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platfo
 .PHONY : examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file.dir/build
 
 examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file.dir/clean:
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file.dir/cmake_clean.cmake
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file.dir/cmake_clean.cmake
 .PHONY : examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file.dir/clean
 
 examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file.dir/depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/riley/Desktop/wrench /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform /home/riley/Desktop/wrench/build /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/henric/Home/WRENCH/wrench /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform /Users/henric/Home/WRENCH/wrench/build /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeFiles/wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file.dir/depend
 

@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 # Include any dependencies generated for this target.
 include examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/depend.make
@@ -70,32 +70,32 @@ include examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrenc
 include examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/flags.make
 
 examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.o: examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/flags.make
-examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.o: /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp
+examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.o: /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp
 examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.o: examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.o"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.o -MF CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.o.d -o CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.o -c /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.o"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.o -MF CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.o.d -o CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.o -c /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp
 
 examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.i"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp > CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp > CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.i
 
 examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.s"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp -o CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp -o CMakeFiles/wrench-example-batch-bag-of-tasks.dir/TwoTasksAtATimeBatchWMS.cpp.s
 
 examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o: examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/flags.make
-examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o: /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/BatchBagOfTasks.cpp
+examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o: /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/BatchBagOfTasks.cpp
 examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o: examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o -MF CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o.d -o CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o -c /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/BatchBagOfTasks.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o -MF CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o.d -o CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o -c /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/BatchBagOfTasks.cpp
 
 examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.i"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/BatchBagOfTasks.cpp > CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/BatchBagOfTasks.cpp > CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.i
 
 examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.s"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/BatchBagOfTasks.cpp -o CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks/BatchBagOfTasks.cpp -o CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.s
 
 # Object files for target wrench-example-batch-bag-of-tasks
 wrench__example__batch__bag__of__tasks_OBJECTS = \
@@ -109,20 +109,20 @@ examples/workflow_api/basic-examples/batch-bag-of-tasks/wrench-example-batch-bag
 examples/workflow_api/basic-examples/batch-bag-of-tasks/wrench-example-batch-bag-of-tasks: examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/BatchBagOfTasks.cpp.o
 examples/workflow_api/basic-examples/batch-bag-of-tasks/wrench-example-batch-bag-of-tasks: examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/build.make
 examples/workflow_api/basic-examples/batch-bag-of-tasks/wrench-example-batch-bag-of-tasks: libwrench.a
-examples/workflow_api/basic-examples/batch-bag-of-tasks/wrench-example-batch-bag-of-tasks: /usr/local/lib/libsimgrid.so
+examples/workflow_api/basic-examples/batch-bag-of-tasks/wrench-example-batch-bag-of-tasks: /usr/local/lib/libsimgrid.dylib
 examples/workflow_api/basic-examples/batch-bag-of-tasks/wrench-example-batch-bag-of-tasks: examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable wrench-example-batch-bag-of-tasks"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wrench-example-batch-bag-of-tasks.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable wrench-example-batch-bag-of-tasks"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wrench-example-batch-bag-of-tasks.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/build: examples/workflow_api/basic-examples/batch-bag-of-tasks/wrench-example-batch-bag-of-tasks
 .PHONY : examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/build
 
 examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/clean:
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-batch-bag-of-tasks.dir/cmake_clean.cmake
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-batch-bag-of-tasks.dir/cmake_clean.cmake
 .PHONY : examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/clean
 
 examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/riley/Desktop/wrench /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks /home/riley/Desktop/wrench/build /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/henric/Home/WRENCH/wrench /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/batch-bag-of-tasks /Users/henric/Home/WRENCH/wrench/build /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeFiles/wrench-example-batch-bag-of-tasks.dir/depend
 

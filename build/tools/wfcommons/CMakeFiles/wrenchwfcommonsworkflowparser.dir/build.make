@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 # Include any dependencies generated for this target.
 include tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/depend.make
@@ -70,18 +70,18 @@ include tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/progress.ma
 include tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/flags.make
 
 tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o: tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/flags.make
-tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o: /home/riley/Desktop/wrench/tools/wfcommons/src/WfCommonsWorkflowParser.cpp
+tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o: /Users/henric/Home/WRENCH/wrench/tools/wfcommons/src/WfCommonsWorkflowParser.cpp
 tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o: tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o"
-	cd /home/riley/Desktop/wrench/build/tools/wfcommons && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o -MF CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o.d -o CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o -c /home/riley/Desktop/wrench/tools/wfcommons/src/WfCommonsWorkflowParser.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o"
+	cd /Users/henric/Home/WRENCH/wrench/build/tools/wfcommons && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o -MF CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o.d -o CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o -c /Users/henric/Home/WRENCH/wrench/tools/wfcommons/src/WfCommonsWorkflowParser.cpp
 
 tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.i"
-	cd /home/riley/Desktop/wrench/build/tools/wfcommons && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/riley/Desktop/wrench/tools/wfcommons/src/WfCommonsWorkflowParser.cpp > CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build/tools/wfcommons && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/henric/Home/WRENCH/wrench/tools/wfcommons/src/WfCommonsWorkflowParser.cpp > CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.i
 
 tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.s"
-	cd /home/riley/Desktop/wrench/build/tools/wfcommons && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/riley/Desktop/wrench/tools/wfcommons/src/WfCommonsWorkflowParser.cpp -o CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build/tools/wfcommons && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/henric/Home/WRENCH/wrench/tools/wfcommons/src/WfCommonsWorkflowParser.cpp -o CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.s
 
 # Object files for target wrenchwfcommonsworkflowparser
 wrenchwfcommonsworkflowparser_OBJECTS = \
@@ -93,19 +93,19 @@ wrenchwfcommonsworkflowparser_EXTERNAL_OBJECTS =
 tools/wfcommons/libwrenchwfcommonsworkflowparser.a: tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/src/WfCommonsWorkflowParser.cpp.o
 tools/wfcommons/libwrenchwfcommonsworkflowparser.a: tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/build.make
 tools/wfcommons/libwrenchwfcommonsworkflowparser.a: tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libwrenchwfcommonsworkflowparser.a"
-	cd /home/riley/Desktop/wrench/build/tools/wfcommons && $(CMAKE_COMMAND) -P CMakeFiles/wrenchwfcommonsworkflowparser.dir/cmake_clean_target.cmake
-	cd /home/riley/Desktop/wrench/build/tools/wfcommons && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wrenchwfcommonsworkflowparser.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libwrenchwfcommonsworkflowparser.a"
+	cd /Users/henric/Home/WRENCH/wrench/build/tools/wfcommons && $(CMAKE_COMMAND) -P CMakeFiles/wrenchwfcommonsworkflowparser.dir/cmake_clean_target.cmake
+	cd /Users/henric/Home/WRENCH/wrench/build/tools/wfcommons && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wrenchwfcommonsworkflowparser.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/build: tools/wfcommons/libwrenchwfcommonsworkflowparser.a
 .PHONY : tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/build
 
 tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/clean:
-	cd /home/riley/Desktop/wrench/build/tools/wfcommons && $(CMAKE_COMMAND) -P CMakeFiles/wrenchwfcommonsworkflowparser.dir/cmake_clean.cmake
+	cd /Users/henric/Home/WRENCH/wrench/build/tools/wfcommons && $(CMAKE_COMMAND) -P CMakeFiles/wrenchwfcommonsworkflowparser.dir/cmake_clean.cmake
 .PHONY : tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/clean
 
 tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/riley/Desktop/wrench /home/riley/Desktop/wrench/tools/wfcommons /home/riley/Desktop/wrench/build /home/riley/Desktop/wrench/build/tools/wfcommons /home/riley/Desktop/wrench/build/tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/henric/Home/WRENCH/wrench /Users/henric/Home/WRENCH/wrench/tools/wfcommons /Users/henric/Home/WRENCH/wrench/build /Users/henric/Home/WRENCH/wrench/build/tools/wfcommons /Users/henric/Home/WRENCH/wrench/build/tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : tools/wfcommons/CMakeFiles/wrenchwfcommonsworkflowparser.dir/depend
 

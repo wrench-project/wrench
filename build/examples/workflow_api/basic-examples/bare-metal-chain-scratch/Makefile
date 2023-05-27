@@ -48,27 +48,27 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/opt/local/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -78,7 +78,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/local/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -97,49 +97,49 @@ list_install_components/fast: list_install_components
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
+	/opt/local/bin/cmake -P cmake_install.cmake
 .PHONY : install
 
 # Special rule for the target install
 install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
+	/opt/local/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local
 
 # Special rule for the target install/local
 install/local/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
 
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip
 
 # Special rule for the target install/strip
 install/strip/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/riley/Desktop/wrench/build/CMakeFiles /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain-scratch//CMakeFiles/progress.marks
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/workflow_api/basic-examples/bare-metal-chain-scratch/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/riley/Desktop/wrench/build/CMakeFiles 0
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/henric/Home/WRENCH/wrench/build/CMakeFiles /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/bare-metal-chain-scratch//CMakeFiles/progress.marks
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/workflow_api/basic-examples/bare-metal-chain-scratch/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/henric/Home/WRENCH/wrench/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/workflow_api/basic-examples/bare-metal-chain-scratch/clean
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/workflow_api/basic-examples/bare-metal-chain-scratch/clean
 .PHONY : clean
 
 # The main clean target
@@ -148,22 +148,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/workflow_api/basic-examples/bare-metal-chain-scratch/preinstall
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/workflow_api/basic-examples/bare-metal-chain-scratch/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/workflow_api/basic-examples/bare-metal-chain-scratch/preinstall
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/workflow_api/basic-examples/bare-metal-chain-scratch/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/rule:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/rule
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/rule
 .PHONY : examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/rule
 
 # Convenience name for target.
@@ -172,12 +172,12 @@ wrench-example-bare-metal-chain-scratch: examples/workflow_api/basic-examples/ba
 
 # fast build rule for target.
 wrench-example-bare-metal-chain-scratch/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build
 .PHONY : wrench-example-bare-metal-chain-scratch/fast
 
 # Convenience name for target.
 examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch-platform-file.dir/rule:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch-platform-file.dir/rule
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch-platform-file.dir/rule
 .PHONY : examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch-platform-file.dir/rule
 
 # Convenience name for target.
@@ -186,7 +186,7 @@ wrench-example-bare-metal-chain-scratch-platform-file: examples/workflow_api/bas
 
 # fast build rule for target.
 wrench-example-bare-metal-chain-scratch-platform-file/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch-platform-file.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch-platform-file.dir/build
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch-platform-file.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch-platform-file.dir/build
 .PHONY : wrench-example-bare-metal-chain-scratch-platform-file/fast
 
 BareMetalChainScratch.o: BareMetalChainScratch.cpp.o
@@ -194,7 +194,7 @@ BareMetalChainScratch.o: BareMetalChainScratch.cpp.o
 
 # target to build an object file
 BareMetalChainScratch.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/BareMetalChainScratch.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/BareMetalChainScratch.cpp.o
 .PHONY : BareMetalChainScratch.cpp.o
 
 BareMetalChainScratch.i: BareMetalChainScratch.cpp.i
@@ -202,7 +202,7 @@ BareMetalChainScratch.i: BareMetalChainScratch.cpp.i
 
 # target to preprocess a source file
 BareMetalChainScratch.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/BareMetalChainScratch.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/BareMetalChainScratch.cpp.i
 .PHONY : BareMetalChainScratch.cpp.i
 
 BareMetalChainScratch.s: BareMetalChainScratch.cpp.s
@@ -210,7 +210,7 @@ BareMetalChainScratch.s: BareMetalChainScratch.cpp.s
 
 # target to generate assembly for a file
 BareMetalChainScratch.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/BareMetalChainScratch.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/BareMetalChainScratch.cpp.s
 .PHONY : BareMetalChainScratch.cpp.s
 
 WorkflowAsAsingleJobWMS.o: WorkflowAsAsingleJobWMS.cpp.o
@@ -218,7 +218,7 @@ WorkflowAsAsingleJobWMS.o: WorkflowAsAsingleJobWMS.cpp.o
 
 # target to build an object file
 WorkflowAsAsingleJobWMS.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/WorkflowAsAsingleJobWMS.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/WorkflowAsAsingleJobWMS.cpp.o
 .PHONY : WorkflowAsAsingleJobWMS.cpp.o
 
 WorkflowAsAsingleJobWMS.i: WorkflowAsAsingleJobWMS.cpp.i
@@ -226,7 +226,7 @@ WorkflowAsAsingleJobWMS.i: WorkflowAsAsingleJobWMS.cpp.i
 
 # target to preprocess a source file
 WorkflowAsAsingleJobWMS.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/WorkflowAsAsingleJobWMS.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/WorkflowAsAsingleJobWMS.cpp.i
 .PHONY : WorkflowAsAsingleJobWMS.cpp.i
 
 WorkflowAsAsingleJobWMS.s: WorkflowAsAsingleJobWMS.cpp.s
@@ -234,7 +234,7 @@ WorkflowAsAsingleJobWMS.s: WorkflowAsAsingleJobWMS.cpp.s
 
 # target to generate assembly for a file
 WorkflowAsAsingleJobWMS.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/WorkflowAsAsingleJobWMS.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/build.make examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeFiles/wrench-example-bare-metal-chain-scratch.dir/WorkflowAsAsingleJobWMS.cpp.s
 .PHONY : WorkflowAsAsingleJobWMS.cpp.s
 
 # Help Target
@@ -268,6 +268,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

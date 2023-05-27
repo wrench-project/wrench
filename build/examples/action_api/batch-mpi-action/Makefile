@@ -48,27 +48,27 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/opt/local/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -78,7 +78,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/local/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -97,49 +97,49 @@ list_install_components/fast: list_install_components
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
+	/opt/local/bin/cmake -P cmake_install.cmake
 .PHONY : install
 
 # Special rule for the target install
 install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
+	/opt/local/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local
 
 # Special rule for the target install/local
 install/local/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
 
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip
 
 # Special rule for the target install/strip
 install/strip/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/riley/Desktop/wrench/build/CMakeFiles /home/riley/Desktop/wrench/build/examples/action_api/batch-mpi-action//CMakeFiles/progress.marks
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-mpi-action/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/riley/Desktop/wrench/build/CMakeFiles 0
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/henric/Home/WRENCH/wrench/build/CMakeFiles /Users/henric/Home/WRENCH/wrench/build/examples/action_api/batch-mpi-action//CMakeFiles/progress.marks
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-mpi-action/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/henric/Home/WRENCH/wrench/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-mpi-action/clean
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-mpi-action/clean
 .PHONY : clean
 
 # The main clean target
@@ -148,22 +148,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-mpi-action/preinstall
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-mpi-action/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-mpi-action/preinstall
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-mpi-action/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/rule:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/rule
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/rule
 .PHONY : examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/rule
 
 # Convenience name for target.
@@ -172,12 +172,12 @@ wrench-example-batch-mpi-action: examples/action_api/batch-mpi-action/CMakeFiles
 
 # fast build rule for target.
 wrench-example-batch-mpi-action/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build
 .PHONY : wrench-example-batch-mpi-action/fast
 
 # Convenience name for target.
 examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action-platform-file.dir/rule:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action-platform-file.dir/rule
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action-platform-file.dir/rule
 .PHONY : examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action-platform-file.dir/rule
 
 # Convenience name for target.
@@ -186,7 +186,7 @@ wrench-example-batch-mpi-action-platform-file: examples/action_api/batch-mpi-act
 
 # fast build rule for target.
 wrench-example-batch-mpi-action-platform-file/fast:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action-platform-file.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action-platform-file.dir/build
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action-platform-file.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action-platform-file.dir/build
 .PHONY : wrench-example-batch-mpi-action-platform-file/fast
 
 BatchMPIAction.o: BatchMPIAction.cpp.o
@@ -194,7 +194,7 @@ BatchMPIAction.o: BatchMPIAction.cpp.o
 
 # target to build an object file
 BatchMPIAction.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/BatchMPIAction.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/BatchMPIAction.cpp.o
 .PHONY : BatchMPIAction.cpp.o
 
 BatchMPIAction.i: BatchMPIAction.cpp.i
@@ -202,7 +202,7 @@ BatchMPIAction.i: BatchMPIAction.cpp.i
 
 # target to preprocess a source file
 BatchMPIAction.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/BatchMPIAction.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/BatchMPIAction.cpp.i
 .PHONY : BatchMPIAction.cpp.i
 
 BatchMPIAction.s: BatchMPIAction.cpp.s
@@ -210,7 +210,7 @@ BatchMPIAction.s: BatchMPIAction.cpp.s
 
 # target to generate assembly for a file
 BatchMPIAction.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/BatchMPIAction.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/BatchMPIAction.cpp.s
 .PHONY : BatchMPIAction.cpp.s
 
 BatchMPIActionController.o: BatchMPIActionController.cpp.o
@@ -218,7 +218,7 @@ BatchMPIActionController.o: BatchMPIActionController.cpp.o
 
 # target to build an object file
 BatchMPIActionController.cpp.o:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/BatchMPIActionController.cpp.o
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/BatchMPIActionController.cpp.o
 .PHONY : BatchMPIActionController.cpp.o
 
 BatchMPIActionController.i: BatchMPIActionController.cpp.i
@@ -226,7 +226,7 @@ BatchMPIActionController.i: BatchMPIActionController.cpp.i
 
 # target to preprocess a source file
 BatchMPIActionController.cpp.i:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/BatchMPIActionController.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/BatchMPIActionController.cpp.i
 .PHONY : BatchMPIActionController.cpp.i
 
 BatchMPIActionController.s: BatchMPIActionController.cpp.s
@@ -234,7 +234,7 @@ BatchMPIActionController.s: BatchMPIActionController.cpp.s
 
 # target to generate assembly for a file
 BatchMPIActionController.cpp.s:
-	cd /home/riley/Desktop/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/BatchMPIActionController.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build && $(MAKE) $(MAKESILENT) -f examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/build.make examples/action_api/batch-mpi-action/CMakeFiles/wrench-example-batch-mpi-action.dir/BatchMPIActionController.cpp.s
 .PHONY : BatchMPIActionController.cpp.s
 
 # Help Target
@@ -268,6 +268,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

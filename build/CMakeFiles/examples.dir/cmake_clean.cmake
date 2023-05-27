@@ -1,3 +1,6 @@
+file(REMOVE_RECURSE
+  "/Users/henric/Home/WRENCH/wrench/docs"
+)
 
 # Per-language clean rules from dependency scanning.
 foreach(lang )

@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 # Utility rule file for wrench-example-real-workflow-files.
 
@@ -67,8 +67,8 @@ include examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-re
 include examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-real-workflow-files.dir/progress.make
 
 examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-real-workflow-files:
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/real-workflow-example && /bin/sh -c "if [ '/home/riley/Desktop/wrench/examples/workflow_api/real-workflow-example' != '/home/riley/Desktop/wrench/build/examples/workflow_api/real-workflow-example' ]; then /bin/cp -f /home/riley/Desktop/wrench/examples/workflow_api/real-workflow-example/cloud_batch_platform.xml /home/riley/Desktop/wrench/build/examples/workflow_api/real-workflow-example/cloud_batch_platform.xml ; fi ;"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/real-workflow-example && /bin/sh -c "if [ '/home/riley/Desktop/wrench/examples/workflow_api/real-workflow-example' != '/home/riley/Desktop/wrench/build/examples/workflow_api/real-workflow-example' ]; then /bin/cp -f /home/riley/Desktop/wrench/examples/workflow_api/real-workflow-example/1000genome-chameleon-2ch-100k-001.json /home/riley/Desktop/wrench/build/examples/workflow_api/real-workflow-example/1000genome-chameleon-2ch-100k-001.json ; fi ;"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/real-workflow-example && /bin/sh -c "if [ '/Users/henric/Home/WRENCH/wrench/examples/workflow_api/real-workflow-example' != '/Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/real-workflow-example' ]; then /bin/cp -f /Users/henric/Home/WRENCH/wrench/examples/workflow_api/real-workflow-example/cloud_batch_platform.xml /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/real-workflow-example/cloud_batch_platform.xml ; fi ;"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/real-workflow-example && /bin/sh -c "if [ '/Users/henric/Home/WRENCH/wrench/examples/workflow_api/real-workflow-example' != '/Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/real-workflow-example' ]; then /bin/cp -f /Users/henric/Home/WRENCH/wrench/examples/workflow_api/real-workflow-example/1000genome-chameleon-2ch-100k-001.json /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/real-workflow-example/1000genome-chameleon-2ch-100k-001.json ; fi ;"
 
 wrench-example-real-workflow-files: examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-real-workflow-files
 wrench-example-real-workflow-files: examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-real-workflow-files.dir/build.make
@@ -79,10 +79,10 @@ examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-real-workf
 .PHONY : examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-real-workflow-files.dir/build
 
 examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-real-workflow-files.dir/clean:
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/real-workflow-example && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-real-workflow-files.dir/cmake_clean.cmake
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/real-workflow-example && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-real-workflow-files.dir/cmake_clean.cmake
 .PHONY : examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-real-workflow-files.dir/clean
 
 examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-real-workflow-files.dir/depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/riley/Desktop/wrench /home/riley/Desktop/wrench/examples/workflow_api/real-workflow-example /home/riley/Desktop/wrench/build /home/riley/Desktop/wrench/build/examples/workflow_api/real-workflow-example /home/riley/Desktop/wrench/build/examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-real-workflow-files.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/henric/Home/WRENCH/wrench /Users/henric/Home/WRENCH/wrench/examples/workflow_api/real-workflow-example /Users/henric/Home/WRENCH/wrench/build /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/real-workflow-example /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-real-workflow-files.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : examples/workflow_api/real-workflow-example/CMakeFiles/wrench-example-real-workflow-files.dir/depend
 

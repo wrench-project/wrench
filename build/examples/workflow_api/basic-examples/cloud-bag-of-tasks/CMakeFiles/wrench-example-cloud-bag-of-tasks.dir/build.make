@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 # Include any dependencies generated for this target.
 include examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/depend.make
@@ -70,32 +70,32 @@ include examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrenc
 include examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/flags.make
 
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o: examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/flags.make
-examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o: /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/TwoTasksAtATimeCloudWMS.cpp
+examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o: /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/TwoTasksAtATimeCloudWMS.cpp
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o: examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o -MF CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o.d -o CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o -c /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/TwoTasksAtATimeCloudWMS.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o -MF CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o.d -o CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.o -c /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/TwoTasksAtATimeCloudWMS.cpp
 
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.i"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/TwoTasksAtATimeCloudWMS.cpp > CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/TwoTasksAtATimeCloudWMS.cpp > CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.i
 
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.s"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/TwoTasksAtATimeCloudWMS.cpp -o CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/TwoTasksAtATimeCloudWMS.cpp -o CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/TwoTasksAtATimeCloudWMS.cpp.s
 
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o: examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/flags.make
-examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o: /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/CloudBagOfTasks.cpp
+examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o: /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/CloudBagOfTasks.cpp
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o: examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o -MF CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o.d -o CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o -c /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/CloudBagOfTasks.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o -MF CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o.d -o CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o -c /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/CloudBagOfTasks.cpp
 
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.i"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/CloudBagOfTasks.cpp > CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.i
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/CloudBagOfTasks.cpp > CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.i
 
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.s"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/CloudBagOfTasks.cpp -o CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.s
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks/CloudBagOfTasks.cpp -o CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.s
 
 # Object files for target wrench-example-cloud-bag-of-tasks
 wrench__example__cloud__bag__of__tasks_OBJECTS = \
@@ -109,20 +109,20 @@ examples/workflow_api/basic-examples/cloud-bag-of-tasks/wrench-example-cloud-bag
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/wrench-example-cloud-bag-of-tasks: examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/CloudBagOfTasks.cpp.o
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/wrench-example-cloud-bag-of-tasks: examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/build.make
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/wrench-example-cloud-bag-of-tasks: libwrench.a
-examples/workflow_api/basic-examples/cloud-bag-of-tasks/wrench-example-cloud-bag-of-tasks: /usr/local/lib/libsimgrid.so
+examples/workflow_api/basic-examples/cloud-bag-of-tasks/wrench-example-cloud-bag-of-tasks: /usr/local/lib/libsimgrid.dylib
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/wrench-example-cloud-bag-of-tasks: examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable wrench-example-cloud-bag-of-tasks"
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable wrench-example-cloud-bag-of-tasks"
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/build: examples/workflow_api/basic-examples/cloud-bag-of-tasks/wrench-example-cloud-bag-of-tasks
 .PHONY : examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/build
 
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/clean:
-	cd /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/cmake_clean.cmake
+	cd /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks && $(CMAKE_COMMAND) -P CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/cmake_clean.cmake
 .PHONY : examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/clean
 
 examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/riley/Desktop/wrench /home/riley/Desktop/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks /home/riley/Desktop/wrench/build /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks /home/riley/Desktop/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/henric/Home/WRENCH/wrench /Users/henric/Home/WRENCH/wrench/examples/workflow_api/basic-examples/cloud-bag-of-tasks /Users/henric/Home/WRENCH/wrench/build /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks /Users/henric/Home/WRENCH/wrench/build/examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeFiles/wrench-example-cloud-bag-of-tasks.dir/depend
 

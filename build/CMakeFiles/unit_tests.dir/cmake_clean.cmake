@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "/Users/henric/Home/WRENCH/wrench/docs"
   "CMakeFiles/unit_tests.dir/src/wrench/action/Action.cpp.o"
   "CMakeFiles/unit_tests.dir/src/wrench/action/Action.cpp.o.d"
   "CMakeFiles/unit_tests.dir/src/wrench/action/ComputeAction.cpp.o"

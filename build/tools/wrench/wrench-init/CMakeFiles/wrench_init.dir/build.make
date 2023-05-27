@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/local/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/riley/Desktop/wrench
+CMAKE_SOURCE_DIR = /Users/henric/Home/WRENCH/wrench
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/riley/Desktop/wrench/build
+CMAKE_BINARY_DIR = /Users/henric/Home/WRENCH/wrench/build
 
 # Utility rule file for wrench_init.
 
@@ -66,23 +66,23 @@ include tools/wrench/wrench-init/CMakeFiles/wrench_init.dir/compiler_depend.make
 # Include the progress variables for this target.
 include tools/wrench/wrench-init/CMakeFiles/wrench_init.dir/progress.make
 
-tools/wrench/wrench-init/CMakeFiles/wrench_init: /home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init
+tools/wrench/wrench-init/CMakeFiles/wrench_init: /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init
 
-/home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init: /home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init.in
-/home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init: /home/riley/Desktop/wrench/tools/wrench/wrench-init/generate.sh
-/home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init: /home/riley/Desktop/wrench/tools/wrench/wrench-init/base_code/CMakeLists.txt
-/home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init: /home/riley/Desktop/wrench/tools/wrench/wrench-init/base_code/platform.xml
-/home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init: /home/riley/Desktop/wrench/tools/wrench/wrench-init/base_code/Simulator_ACTION.cpp
-/home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init: /home/riley/Desktop/wrench/tools/wrench/wrench-init/base_code/Controller_ACTION.cpp
-/home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init: /home/riley/Desktop/wrench/tools/wrench/wrench-init/base_code/Controller_ACTION.h
-/home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init: /home/riley/Desktop/wrench/tools/wrench/wrench-init/base_code/Simulator_WORKFLOW.cpp
-/home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init: /home/riley/Desktop/wrench/tools/wrench/wrench-init/base_code/Controller_WORKFLOW.cpp
-/home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init: /home/riley/Desktop/wrench/tools/wrench/wrench-init/base_code/Controller_WORKFLOW.h
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/riley/Desktop/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating wrench-init script"
-	cd /home/riley/Desktop/wrench/tools/wrench/wrench-init && /bin/sh generate.sh /home/riley/Desktop/wrench /home/riley/Desktop/wrench/build/tools/wrench/wrench-init
+/Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init: /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init.in
+/Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init: /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/generate.sh
+/Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init: /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/base_code/CMakeLists.txt
+/Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init: /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/base_code/platform.xml
+/Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init: /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/base_code/Simulator_ACTION.cpp
+/Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init: /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/base_code/Controller_ACTION.cpp
+/Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init: /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/base_code/Controller_ACTION.h
+/Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init: /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/base_code/Simulator_WORKFLOW.cpp
+/Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init: /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/base_code/Controller_WORKFLOW.cpp
+/Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init: /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/base_code/Controller_WORKFLOW.h
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/Users/henric/Home/WRENCH/wrench/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating wrench-init script"
+	cd /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init && /bin/sh generate.sh /Users/henric/Home/WRENCH/wrench /Users/henric/Home/WRENCH/wrench/build/tools/wrench/wrench-init
 
 wrench_init: tools/wrench/wrench-init/CMakeFiles/wrench_init
-wrench_init: /home/riley/Desktop/wrench/tools/wrench/wrench-init/wrench-init
+wrench_init: /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init/wrench-init
 wrench_init: tools/wrench/wrench-init/CMakeFiles/wrench_init.dir/build.make
 .PHONY : wrench_init
 
@@ -91,10 +91,10 @@ tools/wrench/wrench-init/CMakeFiles/wrench_init.dir/build: wrench_init
 .PHONY : tools/wrench/wrench-init/CMakeFiles/wrench_init.dir/build
 
 tools/wrench/wrench-init/CMakeFiles/wrench_init.dir/clean:
-	cd /home/riley/Desktop/wrench/build/tools/wrench/wrench-init && $(CMAKE_COMMAND) -P CMakeFiles/wrench_init.dir/cmake_clean.cmake
+	cd /Users/henric/Home/WRENCH/wrench/build/tools/wrench/wrench-init && $(CMAKE_COMMAND) -P CMakeFiles/wrench_init.dir/cmake_clean.cmake
 .PHONY : tools/wrench/wrench-init/CMakeFiles/wrench_init.dir/clean
 
 tools/wrench/wrench-init/CMakeFiles/wrench_init.dir/depend:
-	cd /home/riley/Desktop/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/riley/Desktop/wrench /home/riley/Desktop/wrench/tools/wrench/wrench-init /home/riley/Desktop/wrench/build /home/riley/Desktop/wrench/build/tools/wrench/wrench-init /home/riley/Desktop/wrench/build/tools/wrench/wrench-init/CMakeFiles/wrench_init.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/henric/Home/WRENCH/wrench/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/henric/Home/WRENCH/wrench /Users/henric/Home/WRENCH/wrench/tools/wrench/wrench-init /Users/henric/Home/WRENCH/wrench/build /Users/henric/Home/WRENCH/wrench/build/tools/wrench/wrench-init /Users/henric/Home/WRENCH/wrench/build/tools/wrench/wrench-init/CMakeFiles/wrench_init.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : tools/wrench/wrench-init/CMakeFiles/wrench_init.dir/depend
 

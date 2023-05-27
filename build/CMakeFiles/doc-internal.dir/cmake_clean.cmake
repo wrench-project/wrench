@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "/home/riley/Desktop/wrench/docs"
+  "/Users/henric/Home/WRENCH/wrench/docs"
 )
 
 # Per-language clean rules from dependency scanning.
