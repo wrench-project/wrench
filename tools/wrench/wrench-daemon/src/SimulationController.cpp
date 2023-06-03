@@ -610,7 +610,32 @@ namespace wrench {
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
-        json answer = cs->supportsCompoundJobs();
+        json answer;
+        answer["result"] = cs->supportsCompoundJobs();
+        return answer;
+    }
+
+    json SimulationController::supportsPilotJobs(json data){
+        std::string cs_name = data["compute_service_name"];
+
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+        json answer;
+        answer["result"] = cs->supportsPilotJobs();
+        return answer;
+    }
+
+    json SimulationController::supportsStandardJobs(json data){
+        std::string cs_name = data["compute_service_name"];
+
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+        json answer;
+        answer["result"] = cs->supportsStandardJobs();
         return answer;
     }
 
