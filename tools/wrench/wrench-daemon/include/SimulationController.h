@@ -90,6 +90,10 @@ namespace wrench {
 
         json supportsCompoundJobs(json data);
 
+        json supportsPilotJobs(json data);
+
+        json supportsStandardJobs(json data);
+
     private:
         // Thread-safe key value stores
         KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;

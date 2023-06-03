@@ -1092,6 +1092,78 @@
         }
       }
     },
+    "/simulation/{simid}/supportsPilotJobs": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Returns true if the service supports pilot jobs.",
+        "operationId": "supportsPilotJobs",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/supportsStandardJobs": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Returns true if the service supports standard jobs.",
+        "operationId": "supportsStandardJobs",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
     "/simulation/{simid}/addSimpleStorageService": {
       "post": {
         "tags": [
