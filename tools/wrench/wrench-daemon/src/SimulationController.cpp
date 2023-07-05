@@ -336,6 +336,33 @@ namespace wrench {
         return answer;
     }
 
+    json SimulationController::createVM(json data) {
+        unsigned long num_cores = data["num_cores"];
+        double ram_memory = data["ram_memory"];
+        std::string property_list_string = data["property_list"];
+        std::string message_payload_list_string = data["message_payload_list"];
+
+        WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
+        json jsonData = json::parse(property_list_string);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            auto property_key = ServiceProperty::translateString(it.key());
+            service_property_list[property_key] = it.value();
+        }
+
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;
+        jsonData = json::parse(message_payload_list_string);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            auto message_payload_key = ServiceMessagePayload::translateString(it.key());
+            service_message_payload_list[message_payload_key] = it.value();
+        }
+        std::shared_ptr<CloudComputeService> ccs;
+        // Return the expected answer
+        json answer;
+        answer["result"] = ccs->createVM(num_cores, ram_memory,
+                                         service_property_list, service_message_payload_list);
+        return answer;
+    }
+
     /**
      * REST API Handler
      * @param data JSON input
