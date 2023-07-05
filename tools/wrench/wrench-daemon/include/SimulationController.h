@@ -94,6 +94,8 @@ namespace wrench {
 
         json supportsStandardJobs(json data);
 
+        json createVM(json data);
+
     private:
         // Thread-safe key value stores
         KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;
