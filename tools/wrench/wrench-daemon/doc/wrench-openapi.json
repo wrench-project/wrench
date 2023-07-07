@@ -1338,8 +1338,60 @@
         "tags": [
           "WRENCH"
         ],
-        "summary": "Create a bare metal compute service VM.",
+        "summary": "Create a VM on a cloud compute service.",
         "operationId": "createVM",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to start a new service.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "head_host": {
+                    "type": "string",
+                    "description": "The service's head host"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/startVM": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Starts a VM and get its associated bare metal compute service.",
+        "operationId": "startVM",
         "parameters": [
           {
             "name": "simid",
