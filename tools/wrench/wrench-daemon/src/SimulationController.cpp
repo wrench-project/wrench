@@ -337,6 +337,10 @@ namespace wrench {
     }
 
     json SimulationController::createVM(json data) {
+
+        std::cerr << data << "\n";
+
+        std::string cs_name = data["service_name"];
         unsigned long num_cores = data["num_cores"];
         double ram_memory = data["ram_memory"];
         std::string property_list_string = data["property_list"];
@@ -355,11 +359,24 @@ namespace wrench {
             auto message_payload_key = ServiceMessagePayload::translateString(it.key());
             service_message_payload_list[message_payload_key] = it.value();
         }
-        std::shared_ptr<CloudComputeService> ccs;
-//      Return the expected answer
+
+        std::cerr << "LOOKING UP CCS\n";
+        // Lookup the cloud compute service
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+        std::cerr << "FOUND CCS: " << cloud_cs->getName() << "\n";
+        std::cerr << "FOUND CCS: " << *(cloud_cs->getExecutionHosts().begin()) << "\n";
+
         json answer;
-        answer["result"] = ccs->createVM(num_cores, ram_memory,
+        cloud_cs->createVM(1,1,{},{});
+        std::cerr << "ASDASD\n";
+        answer["result"] = cloud_cs->createVM(num_cores, ram_memory,
                                          service_property_list, service_message_payload_list);
+        std::cerr << "CREATED VM: " << answer["results"] << "\n";
         return answer;
     }
 
