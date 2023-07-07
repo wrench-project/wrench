@@ -356,7 +356,7 @@ namespace wrench {
             service_message_payload_list[message_payload_key] = it.value();
         }
         std::shared_ptr<CloudComputeService> ccs;
-        // Return the expected answer
+//      Return the expected answer
         json answer;
         answer["result"] = ccs->createVM(num_cores, ram_memory,
                                          service_property_list, service_message_payload_list);
