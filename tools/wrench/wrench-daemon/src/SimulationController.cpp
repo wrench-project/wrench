@@ -40,6 +40,8 @@ namespace wrench {
         // Initial setup
         wrench::TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
+        S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()] = this->recv_mailbox;
+
         WRENCH_INFO("Starting");
         this->job_manager = this->createJobManager();
         this->data_movement_manager = this->createDataMovementManager();
@@ -51,6 +53,8 @@ namespace wrench {
                 wrench::ComputeService *new_compute_service = nullptr;
                 wrench::StorageService *new_storage_service = nullptr;
                 wrench::FileRegistryService *new_file_service = nullptr;
+                std::pair<std::tuple<unsigned long, double, WRENCH_PROPERTY_COLLECTION_TYPE, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE>, std::shared_ptr<ComputeService>> spec_vm_to_create;
+                std::pair<std::string, std::shared_ptr<ComputeService>> started_vm;
 
                 if (this->compute_services_to_start.tryPop(new_compute_service)) {
                     // starting compute service
@@ -72,6 +76,31 @@ namespace wrench {
                     auto new_service_shared_ptr = this->simulation->startNewService(new_file_service);
                     // Add the new service to the registry of existing services, so that later we can look it up by name
                     this->file_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
+
+                } else if (this->vm_to_create.tryPop(spec_vm_to_create)) {
+                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(spec_vm_to_create.second);
+                    auto num_cores = std::get<0>(spec_vm_to_create.first);
+                    auto ram_size = std::get<1>(spec_vm_to_create.first);
+                    auto properties = std::get<2>(spec_vm_to_create.first);
+                    auto payloads = std::get<3>(spec_vm_to_create.first);
+                    std::string vm_name;
+                    try {
+                        vm_name = cloud_cs->createVM(num_cores, ram_size, properties, payloads);
+                        this->vm_created.push(std::pair(true, vm_name));
+                    } catch (ExecutionException &e) {
+                        this->vm_created.push(std::pair(false, e.getCause()->toString()));
+                    }
+
+                } else if (this->vm_to_start.tryPop(started_vm)) {
+                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(started_vm.second);
+                    auto vm_name = started_vm.first;
+                    try {
+                        auto bm_cs = cloud_cs->startVM(vm_name);
+                        this->compute_service_registry.insert(bm_cs->getName(), bm_cs);
+                        this->vm_started.push(std::pair(true, bm_cs->getName()));
+                    } catch (ExecutionException &e) {
+                        this->vm_created.push(std::pair(false, e.getCause()->toString()));
+                    }
 
                 } else {
                     break;
@@ -99,7 +128,7 @@ namespace wrench {
             // Moves time forward if needed (because the client has done a sleep),
             // And then add all events that occurred to the event queue
             double time_to_sleep = std::max<double>(0, time_horizon_to_reach -
-                                                               wrench::Simulation::getCurrentSimulatedDate());
+                                                       wrench::Simulation::getCurrentSimulatedDate());
             if (time_to_sleep > 0.0) {
                 WRENCH_INFO("Sleeping %.2lf seconds", time_to_sleep);
                 S4U_Simulation::sleep(time_to_sleep);
@@ -301,6 +330,11 @@ namespace wrench {
         return answer;
     }
 
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::addCloudComputeService(json data) {
         std::string hostname = data["head_host"];
         std::vector<std::string> resources = data["resources"];
@@ -336,9 +370,12 @@ namespace wrench {
         return answer;
     }
 
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::createVM(json data) {
-
-        std::cerr << data << "\n";
 
         std::string cs_name = data["service_name"];
         unsigned long num_cores = data["num_cores"];
@@ -360,24 +397,67 @@ namespace wrench {
             service_message_payload_list[message_payload_key] = it.value();
         }
 
-        std::cerr << "LOOKING UP CCS\n";
         // Lookup the cloud compute service
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
-        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
-        std::cerr << "FOUND CCS: " << cloud_cs->getName() << "\n";
-        std::cerr << "FOUND CCS: " << *(cloud_cs->getExecutionHosts().begin()) << "\n";
+        // Push the request into the blocking queue (will be a single one!)
+        this->vm_to_create.push(
+                std::pair(
+                        std::tuple(num_cores,
+                                   ram_memory,
+                                   service_property_list,
+                                   service_message_payload_list),
+                        cs)
+        );
 
-        json answer;
-        cloud_cs->createVM(1,1,{},{});
-        std::cerr << "ASDASD\n";
-        answer["result"] = cloud_cs->createVM(num_cores, ram_memory,
-                                         service_property_list, service_message_payload_list);
-        std::cerr << "CREATED VM: " << answer["results"] << "\n";
-        return answer;
+        // Pool from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        this->vm_created.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot create VM: " + error_msg);
+        } else {
+            json answer;
+            answer["vm_name"] = std::get<1>(reply);
+            return answer;
+        }
+
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::startVM(json data) {
+        std::string cs_name = data["service_name"];
+        std::string vm_name = data["vm_name"];
+
+        // Lookup the cloud compute service
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        // Push the request into the blocking queue (will be a single one!)
+        this->vm_to_start.push(std::pair(vm_name, cs));
+
+        // Pool from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        this->vm_started.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot start VM: " + error_msg);
+        } else {
+            json answer;
+            answer["service_name"] = std::get<1>(reply);
+            return answer;
+        }
     }
 
     /**

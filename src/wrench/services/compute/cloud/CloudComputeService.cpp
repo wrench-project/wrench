@@ -233,6 +233,9 @@ namespace wrench {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
             throw std::invalid_argument("CloudComputeService::getVMComputeService(): Unknown VM name '" + vm_name + "'");
         }
+        std::cerr << std::get<0>(this->vm_list.at(vm_name)) << "\n";
+        std::cerr << std::get<1>(this->vm_list.at(vm_name)) << "\n";
+        std::cerr << std::get<2>(this->vm_list.at(vm_name)) << "\n";
         return std::get<2>(this->vm_list.at(vm_name));
     }
 
@@ -466,7 +469,6 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
-
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->stopAllVMs(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
             this->vm_list.clear();
@@ -575,7 +577,7 @@ namespace wrench {
 
         // If we couldn't find a host, return a failure
         if (host.empty()) {
-            WRENCH_INFO("Not host on this service can accommodate this VM at this time");
+            WRENCH_INFO("No host on this service can accommodate this VM at this time");
             std::string empty = std::string();
             msg_to_send_back =
                     new CloudComputeServiceCreateVMAnswerMessage(

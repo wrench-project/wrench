@@ -269,3 +269,12 @@
 			this->genericRequestHandler(req_json, res, "createVM");
 			return res;
 		});
+
+	CROW_ROUTE(app, "/simulation/<string>/startVM").methods(crow::HTTPMethod::Post)
+		([this](const crow::request& req, const std::string& simid){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "startVM");
+			return res;
+		});
