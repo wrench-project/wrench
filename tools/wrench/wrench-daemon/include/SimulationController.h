@@ -96,6 +96,8 @@ namespace wrench {
 
         json createVM(json data);
 
+        json startVM(json data);
+
     private:
         // Thread-safe key value stores
         KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;
@@ -105,10 +107,17 @@ namespace wrench {
 
         // Thread-safe queues for the server thread and the simulation thread to communicate
         BlockingQueue<std::pair<double, std::shared_ptr<wrench::ExecutionEvent>>> event_queue;
+
         BlockingQueue<wrench::ComputeService *> compute_services_to_start;
         BlockingQueue<wrench::StorageService *> storage_services_to_start;
         BlockingQueue<wrench::FileRegistryService *> file_service_to_start;
         BlockingQueue<std::pair<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>>> submissions_to_do;
+
+        BlockingQueue<std::pair<std::tuple<unsigned long, double, WRENCH_PROPERTY_COLLECTION_TYPE, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE>, std::shared_ptr<ComputeService>>> vm_to_create;
+        BlockingQueue<std::pair<bool, std::string>> vm_created;
+
+        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_start;
+        BlockingQueue<std::pair<bool, std::string>> vm_started;
 
         // The two managers
         std::shared_ptr<JobManager> job_manager;
