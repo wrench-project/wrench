@@ -54,7 +54,7 @@ namespace wrench {
                 wrench::StorageService *new_storage_service = nullptr;
                 wrench::FileRegistryService *new_file_service = nullptr;
                 std::pair<std::tuple<unsigned long, double, WRENCH_PROPERTY_COLLECTION_TYPE, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE>, std::shared_ptr<ComputeService>> spec_vm_to_create;
-                std::pair<std::string, std::shared_ptr<ComputeService>> started_vm;
+                std::pair<std::string, std::shared_ptr<ComputeService>> vm_id;
 
                 if (this->compute_services_to_start.tryPop(new_compute_service)) {
                     // starting compute service
@@ -91,15 +91,39 @@ namespace wrench {
                         this->vm_created.push(std::pair(false, e.getCause()->toString()));
                     }
 
-                } else if (this->vm_to_start.tryPop(started_vm)) {
-                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(started_vm.second);
-                    auto vm_name = started_vm.first;
+                } else if (this->vm_to_start.tryPop(vm_id)) {
+                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
+                    auto vm_name = vm_id.first;
                     try {
                         auto bm_cs = cloud_cs->startVM(vm_name);
                         this->compute_service_registry.insert(bm_cs->getName(), bm_cs);
                         this->vm_started.push(std::pair(true, bm_cs->getName()));
                     } catch (ExecutionException &e) {
                         this->vm_created.push(std::pair(false, e.getCause()->toString()));
+                    }
+
+                } else if (this->vm_to_shutdown.tryPop(vm_id)) {
+
+                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
+                    auto vm_name = vm_id.first;
+                    try {
+                        auto bm_cs = cloud_cs->getVMComputeService(vm_name);
+                        this->compute_service_registry.remove(bm_cs->getName());
+                        cloud_cs->shutdownVM(vm_name);
+                        this->vm_shutdown.push(std::pair(true, vm_name));
+                    } catch (ExecutionException &e) {
+                        this->vm_shutdown.push(std::pair(false, vm_name));
+                    }
+                    
+                } else if (this->vm_to_destroy.tryPop(vm_id)) {
+
+                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
+                    auto vm_name = vm_id.first;
+                    try {
+                        cloud_cs->destroyVM(vm_name);
+                        this->vm_destroyed.push(std::pair(true, vm_name));
+                    } catch (std::invalid_argument &e) {
+                        this->vm_destroyed.push(std::pair(false, e.what()));
                     }
 
                 } else {
@@ -457,6 +481,66 @@ namespace wrench {
             json answer;
             answer["service_name"] = std::get<1>(reply);
             return answer;
+        }
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::shutdownVM(json data) {
+        std::string cs_name = data["service_name"];
+        std::string vm_name = data["vm_name"];
+
+        // Lookup the cloud compute service
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        // Push the request into the blocking queue (will be a single one!)
+        this->vm_to_shutdown.push(std::pair(vm_name, cs));
+
+        // Pool from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        this->vm_shutdown.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot shutdown VM: " + error_msg);
+        } else {
+            return {};
+        }
+    }
+    
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::destroyVM(json data) {
+        std::string cs_name = data["service_name"];
+        std::string vm_name = data["vm_name"];
+        
+        // Lookup the cloud compute service
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        // Push the request into the blocking queue (will be a single one!)
+        this->vm_to_destroy.push(std::pair(vm_name, cs));
+
+        // Pool from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        this->vm_destroyed.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot destroy VM: " + error_msg);
+        } else {
+            return {};
         }
     }
 
