@@ -1352,7 +1352,7 @@
           }
         ],
         "requestBody": {
-          "description": "Input to start a new service.",
+          "description": "Input to start create a VM.",
           "required": true,
           "content": {
             "application/json": {
@@ -1404,7 +1404,111 @@
           }
         ],
         "requestBody": {
-          "description": "Input to start a new service.",
+          "description": "Input to start a VM.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "head_host": {
+                    "type": "string",
+                    "description": "The service's head host"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/shutdownVM": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Shutdown a VM.",
+        "operationId": "shutdownVM",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to shutdown a VM.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "head_host": {
+                    "type": "string",
+                    "description": "The service's head host"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/destroyVM": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Destroy a VM.",
+        "operationId": "destroyVM",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to destroy a VM.",
           "required": true,
           "content": {
             "application/json": {

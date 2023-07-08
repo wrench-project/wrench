@@ -233,9 +233,6 @@ namespace wrench {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
             throw std::invalid_argument("CloudComputeService::getVMComputeService(): Unknown VM name '" + vm_name + "'");
         }
-        std::cerr << std::get<0>(this->vm_list.at(vm_name)) << "\n";
-        std::cerr << std::get<1>(this->vm_list.at(vm_name)) << "\n";
-        std::cerr << std::get<2>(this->vm_list.at(vm_name)) << "\n";
         return std::get<2>(this->vm_list.at(vm_name));
     }
 

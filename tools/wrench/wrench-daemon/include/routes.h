@@ -278,3 +278,21 @@
 			this->genericRequestHandler(req_json, res, "startVM");
 			return res;
 		});
+
+	CROW_ROUTE(app, "/simulation/<string>/shutdownVM").methods(crow::HTTPMethod::Post)
+		([this](const crow::request& req, const std::string& simid){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "shutdownVM");
+			return res;
+		});
+
+	CROW_ROUTE(app, "/simulation/<string>/destroyVM").methods(crow::HTTPMethod::Post)
+		([this](const crow::request& req, const std::string& simid){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "destroyVM");
+			return res;
+		});

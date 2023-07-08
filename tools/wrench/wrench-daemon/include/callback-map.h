@@ -27,3 +27,5 @@ request_handlers["addFileRegistryService"] = [sc](json data) { return sc->addFil
 request_handlers["createFileCopy"] = [sc](json data) { return sc->createFileCopyAtStorageService(std::move(data)); };
 request_handlers["createVM"] = [sc](json data) { return sc->createVM(std::move(data)); };
 request_handlers["startVM"] = [sc](json data) { return sc->startVM(std::move(data)); };
+request_handlers["shutdownVM"] = [sc](json data) { return sc->shutdownVM(std::move(data)); };
+request_handlers["destroyVM"] = [sc](json data) { return sc->destroyVM(std::move(data)); };
