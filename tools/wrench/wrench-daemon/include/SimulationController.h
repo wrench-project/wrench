@@ -98,6 +98,10 @@ namespace wrench {
 
         json startVM(json data);
 
+        json shutdownVM(json data);
+
+        json destroyVM(json data);
+
     private:
         // Thread-safe key value stores
         KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;
@@ -118,6 +122,12 @@ namespace wrench {
 
         BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_start;
         BlockingQueue<std::pair<bool, std::string>> vm_started;
+
+        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_shutdown;
+        BlockingQueue<std::pair<bool, std::string>> vm_shutdown;
+
+        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_destroy;
+        BlockingQueue<std::pair<bool, std::string>> vm_destroyed;
 
         // The two managers
         std::shared_ptr<JobManager> job_manager;
