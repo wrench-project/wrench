@@ -109,7 +109,7 @@
 			return res;
 		});
 
-	CROW_ROUTE(app, "/simulation/<string>/files/<string>/size").methods(crow::HTTPMethod::Post)
+	CROW_ROUTE(app, "/simulation/<string>/files/<string>/size").methods(crow::HTTPMethod::Get)
 		([this](const crow::request& req, const std::string& simid, const std::string& file_id){
 			json req_json = json::parse(req.body);
 			req_json[toStr(simid)] = simid;
@@ -119,7 +119,7 @@
 			return res;
 		});
 
-	CROW_ROUTE(app, "/simulation/<string>/jobs/<string>/tasks").methods(crow::HTTPMethod::Post)
+	CROW_ROUTE(app, "/simulation/<string>/jobs/<string>/tasks").methods(crow::HTTPMethod::Get)
 		([this](const crow::request& req, const std::string& simid, const std::string& job_name){
 			json req_json = json::parse(req.body);
 			req_json[toStr(simid)] = simid;

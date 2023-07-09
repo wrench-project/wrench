@@ -721,9 +721,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addFile(json data) {
-        std::cerr << "DATA += " << data << "\n";
         auto file = this->workflow->addFile(data["name"], data["size"]);
-        std::cerr << "ADEDE FILE: " << file->getID() << " with size " << file->getSize() << "\n";
         return {};
     }
 
@@ -733,8 +731,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getFileSize(json data) {
-        std::cerr << "FILE GET SIZE: " << data << "\n";
-        auto file = this->workflow->getFileByID(data["name"]);
+        auto file = this->workflow->getFileByID(data["file_id"]);
         json answer;
         answer["size"] = file->getSize();
         return answer;
