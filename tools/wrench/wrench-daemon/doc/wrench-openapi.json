@@ -623,7 +623,7 @@
       }
     },
     "/simulation/{simid}/files/{file_id}/size": {
-      "post": {
+      "get": {
         "tags": [
           "WRENCH"
         ],
@@ -689,7 +689,7 @@
       }
     },
     "/simulation/{simid}/jobs/{job_name}/tasks": {
-      "post": {
+      "get": {
         "tags": [
           "WRENCH"
         ],
