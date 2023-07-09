@@ -579,6 +579,27 @@
             }
           }
         ],
+	"requestBody": {
+          "description": "Input to add a new file.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "name of the file"
+                  },
+                  "size": {
+                    "type": "integer",
+                    "description": "size of the file in bytes"
+                  }
+                }
+              }
+            }
+          }
+        },
+
         "responses": {
           "200": {
             "description": "OK",
@@ -1756,13 +1777,13 @@
       "ServiceResponse": {
         "type": "object",
         "properties": {
-          "service_name": {
-            "type": "string",
-            "description": "The new service's name"
-          },
           "wrench_api_request_success": {
             "type": "boolean",
             "description": "true if success, false if failure"
+          },
+          "service_name": {
+            "type": "string",
+            "description": "The new service's name (if success)"
           },
           "failure_cause": {
             "type": "string",
