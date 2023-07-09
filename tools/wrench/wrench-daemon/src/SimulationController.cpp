@@ -551,9 +551,10 @@ namespace wrench {
      */
     json SimulationController::addSimpleStorageService(json data) {
         std::string head_host = data["head_host"];
+        std::set<std::string> mount_points = data["mount_points"];
 
         // Create the new service
-        auto new_service = SimpleStorageService::createSimpleStorageService(head_host, {"/"}, {}, {});
+        auto new_service = SimpleStorageService::createSimpleStorageService(head_host, mount_points, {}, {});
         // Put in the list of services to start (this is because this method is called
         // by the server thread, and therefore, it will segfault horribly if it calls any
         // SimGrid simulation methods, e.g., to start a service)
@@ -720,7 +721,9 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addFile(json data) {
+        std::cerr << "DATA += " << data << "\n";
         auto file = this->workflow->addFile(data["name"], data["size"]);
+        std::cerr << "ADEDE FILE: " << file->getID() << " with size " << file->getSize() << "\n";
         return {};
     }
 
@@ -730,6 +733,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getFileSize(json data) {
+        std::cerr << "FILE GET SIZE: " << data << "\n";
         auto file = this->workflow->getFileByID(data["name"]);
         json answer;
         answer["size"] = file->getSize();
