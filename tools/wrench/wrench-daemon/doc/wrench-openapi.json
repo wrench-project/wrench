@@ -132,6 +132,7 @@
                 "properties": {
                   "increment": {
                     "type": "number",
+                    "format": "integer",
                     "description": "Increment in seconds."
                   }
                 }
@@ -313,7 +314,7 @@
       }
     },
     "/simulation/{simid}/tasks/{tid}/inputFiles": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -340,6 +341,22 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "Job characteristics.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "task": {
+                    "type": "string",
+                    "description": "The task's ID"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -390,6 +407,26 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "Job characteristics.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "task": {
+                    "type": "string",
+                    "description": "The task's ID"
+                  },
+                  "file": {
+                    "type": "string",
+                    "description": "The file's ID"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -440,6 +477,26 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "Job characteristics.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "task": {
+                    "type": "string",
+                    "description": "The task's ID"
+                  },
+                  "file": {
+                    "type": "string",
+                    "description": "The file's ID"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -545,7 +602,7 @@
       }
     },
     "/simulation/{simid}/files/{file_id}/size": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -572,6 +629,22 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "Job characteristics.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The file's name"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -595,7 +668,7 @@
       }
     },
     "/simulation/{simid}/jobs/{job_name}/tasks": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -622,6 +695,22 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "Job characteristics.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "job_name": {
+                    "type": "string",
+                    "description": "The job's name"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -979,7 +1068,23 @@
                 "properties": {
                   "head_host": {
                     "type": "string",
-                    "description": "The service's head host"
+                    "description": "name of the (simulated) host on which the compute service should run"
+                  },
+                  "resources": {
+                    "type": "object",
+                    "description": "compute resources as a dict of hostnames where values are tuples of #cores and ram in bytes"
+                  },
+                  "scratch_space": {
+                    "type": "string",
+                    "description": "the compute service’s scratch space’s mount point (”” means none)"
+                  },
+                  "property_list": {
+                    "type": "object",
+                    "description": "a property list ({} means “use all defaults”)"
+                  },
+                  "message_payload_list": {
+                    "type": "object",
+                    "description": "a message payload list ({} means “use all defaults”)"
                   }
                 }
               }
@@ -1031,7 +1136,23 @@
                 "properties": {
                   "head_host": {
                     "type": "string",
-                    "description": "The service's head host"
+                    "description": "name of the (simulated) host on which the compute service should run"
+                  },
+                  "resources": {
+                    "type": "object",
+                    "description": "compute resources as a dict of hostnames where values are tuples of #cores and ram in bytes"
+                  },
+                  "scratch_space": {
+                    "type": "string",
+                    "description": "the compute service’s scratch space’s mount point (”” means none)"
+                  },
+                  "property_list": {
+                    "type": "object",
+                    "description": "a property list ({} means “use all defaults”)"
+                  },
+                  "message_payload_list": {
+                    "type": "object",
+                    "description": "a message payload list ({} means “use all defaults”)"
                   }
                 }
               }
@@ -1583,7 +1704,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "Port number to which all subsequent HTTP Post requests should be sent"
+            "description": "Task's name"
           },
           "flops": {
             "type": "number",
@@ -1592,12 +1713,12 @@
           },
           "min_num_cores": {
             "type": "number",
-            "format": "double",
+            "format": "unsigned long",
             "description": "The task's minimum number of cores"
           },
           "max_num_cores": {
             "type": "number",
-            "format": "double",
+            "format": "unsigned long",
             "description": "The task's maximum number of cores"
           },
           "memory": {
