@@ -61,7 +61,7 @@
 			return res;
 		});
 
-	CROW_ROUTE(app, "/simulation/<string>/tasks/<string>/inputFiles").methods(crow::HTTPMethod::Post)
+	CROW_ROUTE(app, "/simulation/<string>/tasks/<string>/inputFiles").methods(crow::HTTPMethod::Get)
 		([this](const crow::request& req, const std::string& simid, const std::string& tid){
 			json req_json = json::parse(req.body);
 			req_json[toStr(simid)] = simid;
@@ -78,6 +78,16 @@
 			req_json[toStr(tid)] = tid;
 			crow::response res;
 			this->genericRequestHandler(req_json, res, "addInputFile");
+			return res;
+		});
+
+	CROW_ROUTE(app, "/simulation/<string>/tasks/<string>/outputFiles").methods(crow::HTTPMethod::Get)
+		([this](const crow::request& req, const std::string& simid, const std::string& tid){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			req_json[toStr(tid)] = tid;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "outputFiles");
 			return res;
 		});
 
@@ -178,7 +188,7 @@
 			return res;
 		});
 
-	CROW_ROUTE(app, "/simulation/<string>/<string>/submit").methods(crow::HTTPMethod::Post)
+	CROW_ROUTE(app, "/simulation/<string>/jobs/<string>/submit").methods(crow::HTTPMethod::Post)
 		([this](const crow::request& req, const std::string& simid, const std::string& job_name){
 			json req_json = json::parse(req.body);
 			req_json[toStr(simid)] = simid;

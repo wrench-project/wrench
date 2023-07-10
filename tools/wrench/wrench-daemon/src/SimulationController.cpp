@@ -765,7 +765,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addOutputFile(json data) {
-        auto task = this->workflow->getTaskByID(data["task"]);
+        auto task = this->workflow->getTaskByID(data["tid"]);
         auto file = this->workflow->getFileByID(data["file"]);
         task->addOutputFile(file);
         return {};
@@ -777,8 +777,27 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskInputFiles(json data) {
-        auto task = this->workflow->getTaskByID(data["task"]);
+
+        auto task = this->workflow->getTaskByID(data["tid"]);
         auto files = task->getInputFiles();
+        json answer;
+        std::vector<std::string> file_names;
+        for (const auto &f: files) {
+            file_names.push_back(f->getID());
+        }
+        answer["files"] = file_names;
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::getTaskOutputFiles(json data) {
+
+        auto task = this->workflow->getTaskByID(data["tid"]);
+        auto files = task->getOutputFiles();
         json answer;
         std::vector<std::string> file_names;
         for (const auto &f: files) {

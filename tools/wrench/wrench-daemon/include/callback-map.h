@@ -6,6 +6,7 @@ request_handlers["simulationEvents"] = [sc](json data) { return sc->getSimulatio
 request_handlers["hostnames"] = [sc](json data) { return sc->getAllHostnames(std::move(data)); };
 request_handlers["inputFiles"] = [sc](json data) { return sc->getTaskInputFiles(std::move(data)); };
 request_handlers["addInputFile"] = [sc](json data) { return sc->addInputFile(std::move(data)); };
+request_handlers["outputFiles"] = [sc](json data) { return sc->getTaskOutputFiles(std::move(data)); };
 request_handlers["addOutputFile"] = [sc](json data) { return sc->addOutputFile(std::move(data)); };
 request_handlers["inputFiles"] = [sc](json data) { return sc->getInputFiles(std::move(data)); };
 request_handlers["addFile"] = [sc](json data) { return sc->addFile(std::move(data)); };
