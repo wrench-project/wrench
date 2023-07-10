@@ -93,7 +93,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GenericResponse"
+                  "$ref": "#/components/schemas/TimeResponse"
                 }
               }
             }
@@ -314,7 +314,7 @@
       }
     },
     "/simulation/{simid}/tasks/{tid}/inputFiles": {
-      "post": {
+      "get": {
         "tags": [
           "WRENCH"
         ],
@@ -341,22 +341,6 @@
             }
           }
         ],
-        "requestBody": {
-          "description": "Job characteristics.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "task": {
-                    "type": "string",
-                    "description": "The task's ID"
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK",
@@ -445,6 +429,57 @@
         }
       }
     },
+    "/simulation/{simid}/tasks/{tid}/outputFiles": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Retrieve task's output files",
+        "deprecated": false,
+        "operationId": "getTaskOutputFiles",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tid",
+            "in": "path",
+            "description": "ID of the task",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+
     "/simulation/{simid}/tasks/{tid}/addOutputFile": {
       "put": {
         "tags": [
@@ -480,10 +515,6 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "task": {
-                    "type": "string",
-                    "description": "The task's ID"
-                  },
                   "file": {
                     "type": "string",
                     "description": "The file's ID"
@@ -646,29 +677,13 @@
             }
           }
         ],
-        "requestBody": {
-          "description": "Job characteristics.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The file's name"
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileResponse"
+                  "$ref": "#/components/schemas/FileSizeResponse"
                 }
               }
             }
@@ -712,22 +727,6 @@
             }
           }
         ],
-        "requestBody": {
-          "description": "Job characteristics.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "job_name": {
-                    "type": "string",
-                    "description": "The job's name"
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK",
@@ -969,7 +968,7 @@
           }
         ],
         "requestBody": {
-          "description": "Job characteristics.",
+          "description": "Job specification.",
           "content": {
             "application/json": {
               "schema": {
@@ -997,7 +996,7 @@
         }
       }
     },
-    "/simulation/{simid}/{job_name}/submit": {
+    "/simulation/{simid}/jobs/{job_name}/submit": {
       "post": {
         "tags": [
           "WRENCH"
@@ -1097,10 +1096,26 @@
                   },
                   "property_list": {
                     "type": "object",
+		    "properties": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
                     "description": "a property list ({} means “use all defaults”)"
                   },
                   "message_payload_list": {
-                    "type": "object",
+		    "type": "object",
+                    "properties": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "number"
+                      }
+                    },
                     "description": "a message payload list ({} means “use all defaults”)"
                   }
                 }
@@ -1165,10 +1180,26 @@
                   },
                   "property_list": {
                     "type": "object",
+                    "properties": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
                     "description": "a property list ({} means “use all defaults”)"
                   },
                   "message_payload_list": {
                     "type": "object",
+		    "properties": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "number"
+                      }
+                    },
                     "description": "a message payload list ({} means “use all defaults”)"
                   }
                 }
@@ -1218,7 +1249,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GenericResponse"
+                  "$ref": "#/components/schemas/BooleanResponse"
                 }
               }
             }
@@ -1254,7 +1285,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GenericResponse"
+                  "$ref": "#/components/schemas/BooleanResponse"
                 }
               }
             }
@@ -1290,7 +1321,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GenericResponse"
+                  "$ref": "#/components/schemas/BooleanResponse"
                 }
               }
             }
@@ -1330,6 +1361,13 @@
                   "head_host": {
                     "type": "string",
                     "description": "The service's head host"
+                  },
+                  "mount_points": {
+		    "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "The service's mount points"
                   }
                 }
               }
@@ -1496,9 +1534,41 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "head_host": {
+                  "service_name": {
                     "type": "string",
-                    "description": "The service's head host"
+                    "description": "The cloud service name"
+                  },
+                  "num_cores": {
+                    "type": "integer",
+                    "description": "The required number of cores"
+                  },
+                  "ram_memory": {
+                    "type": "number",
+                    "description": "The required memory in bytes"
+                  },
+		  "property_list": {
+                    "type": "object",
+		    "properties": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "a property list ({} means “use all defaults”)"
+                  },
+                  "message_payload_list": {
+		    "type": "object",
+                    "properties": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "number"
+                      }
+                    },
+                    "description": "a message payload list ({} means “use all defaults”)"
                   }
                 }
               }
@@ -1511,7 +1581,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
+                  "$ref": "#/components/schemas/VMCreationResponse"
                 }
               }
             }
@@ -1548,9 +1618,13 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "head_host": {
+                  "service_name": {
                     "type": "string",
-                    "description": "The service's head host"
+                    "description": "The cloud service's name"
+                  },
+                  "vm_name": {
+                    "type": "string",
+                    "description": "The name of the VM to start"
                   }
                 }
               }
@@ -1600,9 +1674,13 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "head_host": {
+                  "service_name": {
                     "type": "string",
-                    "description": "The service's head host"
+                    "description": "The cloud service's name"
+                  },
+                  "vm_name": {
+                    "type": "string",
+                    "description": "The name of the VM to shutdown"
                   }
                 }
               }
@@ -1652,9 +1730,13 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "head_host": {
+                  "service_name": {
                     "type": "string",
-                    "description": "The service's head host"
+                    "description": "The cloud service's name"
+                  },
+                  "vm_name": {
+                    "type": "string",
+                    "description": "The name of the VM to destroy"
                   }
                 }
               }
@@ -1667,7 +1749,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
+                  "$ref": "#/components/schemas/GenericResponse"
                 }
               }
             }
@@ -1725,7 +1807,7 @@
           },
           "flops": {
             "type": "number",
-            "format": "double",
+            "format": "number",
             "description": "The task's floating operations per second"
           },
           "min_num_cores": {
@@ -1740,7 +1822,7 @@
           },
           "memory": {
             "type": "number",
-            "format": "double",
+            "format": "number",
             "description": "The task's memory requirement"
           }
         }
@@ -1753,7 +1835,19 @@
             "items": {
               "type": "string"
             },
-            "description": "Port number to which all subsequent HTTP Post requests should be sent"
+            "description": "List of IDs of tasks in the job"
+          },
+          "file_locations": {
+            "type": "object",
+            "properties": {
+              "code": {
+		"type": "string"
+	      },
+	      "text": {
+		"type": "string"
+	      }
+            },
+            "description": "Map of file IDs to storage service names (aka the list of file locations)."
           }
         }
       },
@@ -1787,7 +1881,58 @@
           }
         }
       },
-      "Event": {
+      "TimeResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "time": {
+            "type": "number",
+            "description": "A simulated date"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "BooleanResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "result": {
+            "type": "boolean",
+            "description": "true or false"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "VMCreationResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "vm_name": {
+            "type": "string",
+            "description": "The new VM's name (if success)"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+       "Event": {
         "type": "object",
         "properties": {
           "event": {
@@ -1827,7 +1972,7 @@
       "HostnameList": {
         "type": "object",
         "properties": {
-          "events": {
+          "hostnames": {
             "type": "array",
             "items": {
               "type": "string"
@@ -1867,7 +2012,7 @@
       "FileList": {
         "type": "object",
         "properties": {
-          "tasks": {
+          "files": {
             "type": "array",
             "items": {
               "type": "string"
@@ -1901,7 +2046,7 @@
           }
         }
       },
-      "FileResponse": {
+      "FileSizeResponse": {
         "type": "object",
         "properties": {
           "size": {

@@ -84,6 +84,8 @@ namespace wrench {
 
         json getTaskInputFiles(json data);
 
+        json getTaskOutputFiles(json data);
+
         json getInputFiles(json data);
 
         json stageInputFiles(json data);
