@@ -408,16 +408,12 @@
           }
         ],
         "requestBody": {
-          "description": "Job characteristics.",
+          "description": "Input file.",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "properties": {
-                  "task": {
-                    "type": "string",
-                    "description": "The task's ID"
-                  },
                   "file": {
                     "type": "string",
                     "description": "The file's ID"
