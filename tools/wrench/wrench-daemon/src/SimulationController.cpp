@@ -626,7 +626,17 @@ namespace wrench {
             tasks.push_back(this->workflow->getTaskByID(name));
         }
 
-        auto job = this->job_manager->createStandardJob(tasks);
+        std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
+        for (auto it = data["file_locations"].begin(); it != data["file_locations"].end(); ++it)
+        {
+            auto file = this->workflow->getFileByID(it.key());
+            std::shared_ptr<StorageService> storage_service;
+            this->storage_service_registry.lookup(it.value(), storage_service);
+            file_locations[file] = FileLocation::LOCATION(storage_service, file);
+        }
+
+
+        auto job = this->job_manager->createStandardJob(tasks, file_locations);
         this->job_registry.insert(job->getName(), job);
         json answer;
         answer["job_name"] = job->getName();
@@ -743,7 +753,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addInputFile(json data) {
-        auto task = this->workflow->getTaskByID(data["task"]);
+        auto task = this->workflow->getTaskByID(data["tid"]);
         auto file = this->workflow->getFileByID(data["file"]);
         task->addInputFile(file);
         return {};
