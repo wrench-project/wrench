@@ -44,21 +44,21 @@ namespace wrench {
 
         json advanceTime(json data);
 
-        json createStandardJob(json data);
-
         json getSimulationEvents(json);
 
+        json createStandardJob(json data);
         json submitStandardJob(json data);
-
         json getStandardJobTasks(json data);
+        json addInputFile(json data);
+        json addOutputFile(json data);
 
+        json createTask(json data);
         json getTaskFlops(json data);
-
         json getTaskMinNumCores(json data);
-
         json getTaskMaxNumCores(json data);
-
         json getTaskMemory(json data);
+        json getTaskStartDate(json data);
+        json getTaskEndDate(json data);
 
         json waitForNextSimulationEvent(json data);
 
@@ -72,15 +72,8 @@ namespace wrench {
 
         json addFileRegistryService(json data);
 
-        json createTask(json data);
-
         json addFile(json data);
-
         json getFileSize(json data);
-
-        json addInputFile(json data);
-
-        json addOutputFile(json data);
 
         json getTaskInputFiles(json data);
 
