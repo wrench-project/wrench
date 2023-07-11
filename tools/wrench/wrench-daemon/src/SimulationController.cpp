@@ -55,6 +55,7 @@ namespace wrench {
                 wrench::FileRegistryService *new_file_service = nullptr;
                 std::pair<std::tuple<unsigned long, double, WRENCH_PROPERTY_COLLECTION_TYPE, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE>, std::shared_ptr<ComputeService>> spec_vm_to_create;
                 std::pair<std::string, std::shared_ptr<ComputeService>> vm_id;
+                std::pair<std::shared_ptr<DataFile>, std::shared_ptr<StorageService>> file_lookup_request;
 
                 if (this->compute_services_to_start.tryPop(new_compute_service)) {
                     // starting compute service
@@ -124,6 +125,17 @@ namespace wrench {
                         this->vm_destroyed.push(std::pair(true, vm_name));
                     } catch (std::invalid_argument &e) {
                         this->vm_destroyed.push(std::pair(false, e.what()));
+                    }
+
+                } else if (this->file_to_lookup.tryPop(file_lookup_request)) {
+
+                    auto file = file_lookup_request.first;
+                    auto ss = file_lookup_request.second;
+                    try {
+                        bool result = ss->lookupFile(file);
+                        this->file_looked_up.push(std::tuple(true, result, ""));
+                    } catch (std::invalid_argument &e) {
+                        this->file_looked_up.push(std::tuple(false, false, e.what()));
                     }
 
                 } else {
@@ -591,6 +603,45 @@ namespace wrench {
 
         // Return the expected answer
         return {};
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::lookupFileAtStorageService(json data) {
+        std::string ss_name = data["storage_service_name"];
+        std::string filename = data["filename"];
+
+        std::shared_ptr<StorageService> ss;
+        if (not this->storage_service_registry.lookup(ss_name, ss)) {
+            throw std::runtime_error("Unknown storage service " + ss_name);
+        }
+
+        std::shared_ptr<DataFile> file;
+        try {
+            file = this->workflow->getFileByID(filename);
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Unknown file " + filename);
+        }
+
+        // Push the request into the blocking queue (will be a single one!)
+        this->file_to_lookup.push(std::pair(file, ss));
+
+        // Pool from the shared queue (will be a single one!)
+        std::tuple<bool, bool, std::string> reply;
+        this->file_looked_up.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<2>(reply);
+            throw std::runtime_error("Cannot lookup file:" + error_msg);
+        } else {
+            json answer;
+            answer["result"] = std::get<1>(reply);
+            return answer;
+        }
+
     }
 
     /**
