@@ -1609,6 +1609,71 @@
         }
       }
     },
+    "/simulation/{simid}/{storage_service_name}/lookupFile": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Check if a copy of a file is stored at a storage service.",
+        "operationId": "lookupFileAtStorageService",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "storage_service_name",
+            "in": "path",
+            "description": "The storage service's head host",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to start a new service.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "filename": {
+                    "type": "string",
+                    "description": "The file name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BooleanResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Simulation or storage service not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
     "/simulation/{simid}/createVM": {
       "post": {
         "tags": [

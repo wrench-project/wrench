@@ -291,6 +291,16 @@
 			return res;
 		});
 
+	CROW_ROUTE(app, "/simulation/<string>/<string>/lookupFile").methods(crow::HTTPMethod::Post)
+		([this](const crow::request& req, const std::string& simid, const std::string& storage_service_name){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			req_json[toStr(storage_service_name)] = storage_service_name;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "lookupFile");
+			return res;
+		});
+
 	CROW_ROUTE(app, "/simulation/<string>/createVM").methods(crow::HTTPMethod::Post)
 		([this](const crow::request& req, const std::string& simid){
 			json req_json = json::parse(req.body);
