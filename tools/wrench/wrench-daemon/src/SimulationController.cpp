@@ -96,11 +96,16 @@ namespace wrench {
                     auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
                     auto vm_name = vm_id.first;
                     try {
+                        if (not cloud_cs->isVMDown(vm_name)) {
+                            throw std::invalid_argument("Cannot start VM because it's not down");
+                        }
                         auto bm_cs = cloud_cs->startVM(vm_name);
                         this->compute_service_registry.insert(bm_cs->getName(), bm_cs);
                         this->vm_started.push(std::pair(true, bm_cs->getName()));
                     } catch (ExecutionException &e) {
                         this->vm_created.push(std::pair(false, e.getCause()->toString()));
+                    } catch (std::invalid_argument &e) {
+                        this->vm_started.push(std::pair(false, e.what()));
                     }
 
                 } else if (this->vm_to_shutdown.tryPop(vm_id)) {
@@ -108,12 +113,18 @@ namespace wrench {
                     auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
                     auto vm_name = vm_id.first;
                     try {
+                        if (not cloud_cs->isVMRunning(vm_name)) {
+                            throw std::invalid_argument("Cannot shutdown VM because it's not running");
+                        }
                         auto bm_cs = cloud_cs->getVMComputeService(vm_name);
+
                         this->compute_service_registry.remove(bm_cs->getName());
                         cloud_cs->shutdownVM(vm_name);
                         this->vm_shutdown.push(std::pair(true, vm_name));
                     } catch (ExecutionException &e) {
-                        this->vm_shutdown.push(std::pair(false, vm_name));
+                        this->vm_shutdown.push(std::pair(false, e.what()));
+                    } catch (std::invalid_argument &e) {
+                        this->vm_shutdown.push(std::pair(false, e.what()));
                     }
                     
                 } else if (this->vm_to_destroy.tryPop(vm_id)) {
@@ -121,6 +132,9 @@ namespace wrench {
                     auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
                     auto vm_name = vm_id.first;
                     try {
+                        if (not cloud_cs->isVMDown(vm_name)) {
+                            throw std::invalid_argument("Cannot destroy VM because it's not down");
+                        }
                         cloud_cs->destroyVM(vm_name);
                         this->vm_destroyed.push(std::pair(true, vm_name));
                     } catch (std::invalid_argument &e) {
@@ -511,12 +525,16 @@ namespace wrench {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
+        std::cerr << "PUSHING REQUEST\n";
+
         // Push the request into the blocking queue (will be a single one!)
         this->vm_to_shutdown.push(std::pair(vm_name, cs));
 
         // Pool from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
+        std::cerr << "PULLING\n";
         this->vm_shutdown.waitAndPop(reply);
+        std::cerr << "PULLED!!\n";
         bool success = std::get<0>(reply);
         if (not success) {
             std::string error_msg = std::get<1>(reply);
