@@ -673,12 +673,12 @@ namespace wrench {
      */
     json SimulationController::createTask(json data) {
 
-        this->workflow->addTask(data["name"],
+        auto t = this->workflow->addTask(data["name"],
                                 data["flops"],
                                 data["min_num_cores"],
                                 data["max_num_cores"],
                                 data["memory"]);
-        return json({});
+        return {};
     }
 
     /**
@@ -722,6 +722,28 @@ namespace wrench {
     json SimulationController::getTaskMemory(json data) {
         json answer;
         answer["memory"] = this->workflow->getTaskByID(data["name"])->getMemoryRequirement();
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::getTaskStartDate(json data) {
+        json answer;
+        answer["time"] = this->workflow->getTaskByID(data["name"])->getStartDate();
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::getTaskEndDate(json data) {
+        json answer;
+        answer["time"] = this->workflow->getTaskByID(data["name"])->getEndDate();
         return answer;
     }
 

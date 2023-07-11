@@ -179,6 +179,26 @@
 			return res;
 		});
 
+	CROW_ROUTE(app, "/simulation/<string>/tasks/<string>/taskGetStartDate").methods(crow::HTTPMethod::Get)
+		([this](const crow::request& req, const std::string& simid, const std::string& name){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			req_json[toStr(name)] = name;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "taskGetStartDate");
+			return res;
+		});
+
+	CROW_ROUTE(app, "/simulation/<string>/tasks/<string>/taskGetEndDate").methods(crow::HTTPMethod::Get)
+		([this](const crow::request& req, const std::string& simid, const std::string& name){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			req_json[toStr(name)] = name;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "taskGetEndDate");
+			return res;
+		});
+
 	CROW_ROUTE(app, "/simulation/<string>/createStandardJob").methods(crow::HTTPMethod::Put)
 		([this](const crow::request& req, const std::string& simid){
 			json req_json = json::parse(req.body);
