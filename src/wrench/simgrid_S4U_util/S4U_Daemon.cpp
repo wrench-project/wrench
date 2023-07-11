@@ -396,6 +396,7 @@ namespace wrench {
      * @return the mailbox
      */
     simgrid::s4u::Mailbox *S4U_Daemon::getRunningActorRecvMailbox() {
+
         return S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()];
     }
 

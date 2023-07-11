@@ -28,6 +28,7 @@ request_handlers["supportsStandardJobs"] = [sc](json data) { return sc->supports
 request_handlers["addSimpleStorageService"] = [sc](json data) { return sc->addSimpleStorageService(std::move(data)); };
 request_handlers["addFileRegistryService"] = [sc](json data) { return sc->addFileRegistryService(std::move(data)); };
 request_handlers["createFileCopy"] = [sc](json data) { return sc->createFileCopyAtStorageService(std::move(data)); };
+request_handlers["lookupFile"] = [sc](json data) { return sc->lookupFileAtStorageService(std::move(data)); };
 request_handlers["createVM"] = [sc](json data) { return sc->createVM(std::move(data)); };
 request_handlers["startVM"] = [sc](json data) { return sc->startVM(std::move(data)); };
 request_handlers["shutdownVM"] = [sc](json data) { return sc->shutdownVM(std::move(data)); };

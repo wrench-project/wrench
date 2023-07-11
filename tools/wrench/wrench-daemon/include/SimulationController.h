@@ -69,6 +69,7 @@ namespace wrench {
         json addSimpleStorageService(json data);
 
         json createFileCopyAtStorageService(json data);
+        json lookupFileAtStorageService(json data);
 
         json addFileRegistryService(json data);
 
@@ -123,6 +124,9 @@ namespace wrench {
 
         BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_destroy;
         BlockingQueue<std::pair<bool, std::string>> vm_destroyed;
+
+        BlockingQueue<std::pair<std::shared_ptr<DataFile>, std::shared_ptr<StorageService>>> file_to_lookup;
+        BlockingQueue<std::tuple<bool, bool, std::string>> file_looked_up;
 
         // The two managers
         std::shared_ptr<JobManager> job_manager;
