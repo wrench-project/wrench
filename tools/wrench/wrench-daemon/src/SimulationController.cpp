@@ -126,7 +126,7 @@ namespace wrench {
                     } catch (std::invalid_argument &e) {
                         this->vm_shutdown.push(std::pair(false, e.what()));
                     }
-                    
+
                 } else if (this->vm_to_destroy.tryPop(vm_id)) {
 
                     auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
@@ -178,7 +178,7 @@ namespace wrench {
             // Moves time forward if needed (because the client has done a sleep),
             // And then add all events that occurred to the event queue
             double time_to_sleep = std::max<double>(0, time_horizon_to_reach -
-                                                       wrench::Simulation::getCurrentSimulatedDate());
+                                                               wrench::Simulation::getCurrentSimulatedDate());
             if (time_to_sleep > 0.0) {
                 WRENCH_INFO("Sleeping %.2lf seconds", time_to_sleep);
                 S4U_Simulation::sleep(time_to_sleep);
@@ -460,8 +460,7 @@ namespace wrench {
                                    ram_memory,
                                    service_property_list,
                                    service_message_payload_list),
-                        cs)
-        );
+                        cs));
 
         // Pool from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
@@ -475,7 +474,6 @@ namespace wrench {
             answer["vm_name"] = std::get<1>(reply);
             return answer;
         }
-
     }
 
     /**
@@ -543,7 +541,7 @@ namespace wrench {
             return {};
         }
     }
-    
+
     /**
      * REST API Handler
      * @param data JSON input
@@ -552,7 +550,7 @@ namespace wrench {
     json SimulationController::destroyVM(json data) {
         std::string cs_name = data["service_name"];
         std::string vm_name = data["vm_name"];
-        
+
         // Lookup the cloud compute service
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
@@ -659,7 +657,6 @@ namespace wrench {
             answer["result"] = std::get<1>(reply);
             return answer;
         }
-
     }
 
     /**
@@ -696,8 +693,7 @@ namespace wrench {
         }
 
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
-        for (auto it = data["file_locations"].begin(); it != data["file_locations"].end(); ++it)
-        {
+        for (auto it = data["file_locations"].begin(); it != data["file_locations"].end(); ++it) {
             auto file = this->workflow->getFileByID(it.key());
             std::shared_ptr<StorageService> storage_service;
             this->storage_service_registry.lookup(it.value(), storage_service);
@@ -743,10 +739,10 @@ namespace wrench {
     json SimulationController::createTask(json data) {
 
         auto t = this->workflow->addTask(data["name"],
-                                data["flops"],
-                                data["min_num_cores"],
-                                data["max_num_cores"],
-                                data["memory"]);
+                                         data["flops"],
+                                         data["min_num_cores"],
+                                         data["max_num_cores"],
+                                         data["memory"]);
         return {};
     }
 
@@ -932,7 +928,7 @@ namespace wrench {
         return {};
     }
 
-    json SimulationController::supportsCompoundJobs(json data){
+    json SimulationController::supportsCompoundJobs(json data) {
         std::string cs_name = data["compute_service_name"];
 
         std::shared_ptr<ComputeService> cs;
@@ -944,7 +940,7 @@ namespace wrench {
         return answer;
     }
 
-    json SimulationController::supportsPilotJobs(json data){
+    json SimulationController::supportsPilotJobs(json data) {
         std::string cs_name = data["compute_service_name"];
 
         std::shared_ptr<ComputeService> cs;
@@ -956,7 +952,7 @@ namespace wrench {
         return answer;
     }
 
-    json SimulationController::supportsStandardJobs(json data){
+    json SimulationController::supportsStandardJobs(json data) {
         std::string cs_name = data["compute_service_name"];
 
         std::shared_ptr<ComputeService> cs;
