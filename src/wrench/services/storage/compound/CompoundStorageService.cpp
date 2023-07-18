@@ -357,7 +357,7 @@ namespace wrench {
      * @brief Lookup for a DataFile in the internal file mapping of the CompoundStorageService (a simplified FileRegistry)
      *
      * @param file: the file of interest
-     * @param answer_mailbox: the answer mailbox
+     * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
      * 
      * @return A vector of shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or empty vector if it's not.
      */
@@ -404,7 +404,8 @@ namespace wrench {
      *         try to allocate the file on one of the underlying storage services, using the user-provided 'storage_selection'
      *         callback.
      * 
-     *  @param file the file of interest
+     *  @param file: the file of interest
+     *  @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
      *
      *  @return A vector of shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or could be allocated
      *          or empty vector if it's not / could not be allocated.
@@ -563,6 +564,12 @@ namespace wrench {
         return available;
     }
 
+    /**
+     * @brief Synchronously copy a file
+     *
+     * @param src_location: the source location
+     * @param dst_location: the destination location
+     */
     void CompoundStorageService::copyFile(const std::shared_ptr<FileLocation> &src_location,
                                           const std::shared_ptr<FileLocation> &dst_location) {
 
@@ -607,6 +614,9 @@ namespace wrench {
     /** 
      * @brief Copy file from css to a simple storage service (file might be stripped within the CSS, but should be
      *        reassembled on the SSS)
+     *
+     * @param src_location: the source location
+     * @param dst_location: the destination location
      * 
      */
     void CompoundStorageService::copyFileIamSource(const std::shared_ptr<FileLocation> &src_location,
@@ -873,7 +883,7 @@ namespace wrench {
     /**
      * @brief Synchronously write a file to the storage service
      *
-     * @param answer_mailbox: the mailbox on which to expect the answer
+     * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
      * @param location: the location
      * @param wait_for_answer: whether to wait for the answer
      *
@@ -983,7 +993,7 @@ namespace wrench {
     /**
      * @brief Read a file from the storage service
      *
-     * @param answer_mailbox: the mailbox on which to expect the answer
+     * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
      * @param location: the location
      * @param num_bytes: the number of bytes to read
      * @param wait_for_answer: whether to wait for the answer

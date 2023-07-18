@@ -8,6 +8,7 @@ WRENCH Release Notes
 - API change by which a `FileLocation` now includes a `DataFile`.
 - Added a CACHING_BEHAVIOR property to StorageService, which can take value "NONE" (the original behavior in which when full the storage service fails on writes) and "LRU" (the storage service implements a Least Recently Used strategy so as to function as a cache).
 - Implementation of a File Proxy Service, which acts as a proxy for a file service while maintaining a local cache for files.
+- Implementation of a Compound Storage Service, which acts as a proxy for an arbitrary set of Simple Storage Services and performs file striping.
 - Implementation of an MPI action, which can be part of any job and makes it possible to simulate message-passing programs implemented with the MPI API. The simulation of the MPI program is handled by the SMPI component is SimGrid, which has proven both accurate and scalable. 
 - Minor bug fixes and scalability improvements.
 
