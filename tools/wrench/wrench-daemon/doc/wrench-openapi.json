@@ -1925,6 +1925,286 @@
           }
         }
       }
+    },
+    "/simulation/{simid}/isVMRunning": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Method to check whether a VM is currently running.",
+        "operationId": "isVMRunning",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to check if VM is running.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "service_name": {
+                    "type": "string",
+                    "description": "The cloud service's name"
+                  },
+                  "vm_name": {
+                    "type": "string",
+                    "description": "The name of the VM"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/isVMDown": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Method to check whether a VM is currently down.",
+      "operationId": "isVMRunning",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to check if VM is down.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/suspendVM": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Suspends a running VM.",
+      "operationId": "suspendVM",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to suspend a VM.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/resumeVM": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Resume a suspended VM.",
+      "operationId": "resumeVM",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to resume a VM.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/isVMSuspended": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Method to check whether a VM is currently suspended.",
+      "operationId": "isVMRunning",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to check if VM is suspended.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
     }
   },
   "components": {
