@@ -75,6 +75,7 @@ namespace wrench {
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
+
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
