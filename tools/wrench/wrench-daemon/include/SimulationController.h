@@ -138,11 +138,11 @@ namespace wrench {
         BlockingQueue<std::pair<std::shared_ptr<DataFile>, std::shared_ptr<StorageService>>> file_to_lookup;
         BlockingQueue<std::tuple<bool, bool, std::string>> file_looked_up;
 
-//        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_running;
-//        BlockingQueue<std::pair<bool, std::string>> vm_running;
+        //        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_running;
+        //        BlockingQueue<std::pair<bool, std::string>> vm_running;
 
-//        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_down;
-//        BlockingQueue<std::pair<bool, std::string>> vm_down;
+        //        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_down;
+        //        BlockingQueue<std::pair<bool, std::string>> vm_down;
 
         BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_suspend;
         BlockingQueue<std::pair<bool, std::string>> vm_suspended;
@@ -150,8 +150,8 @@ namespace wrench {
         BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_resume;
         BlockingQueue<std::pair<bool, std::string>> vm_resumed;
 
-//        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> is_vm_to_suspend;
-//        BlockingQueue<std::pair<bool, std::string>> is_vm_suspended;
+        //        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> is_vm_to_suspend;
+        //        BlockingQueue<std::pair<bool, std::string>> is_vm_suspended;
 
         // The two managers
         std::shared_ptr<JobManager> job_manager;
