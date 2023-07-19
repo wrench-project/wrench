@@ -479,7 +479,6 @@
         }
       }
     },
-
     "/simulation/{simid}/tasks/{tid}/addOutputFile": {
       "put": {
         "tags": [
@@ -606,7 +605,7 @@
             }
           }
         ],
-	"requestBody": {
+        "requestBody": {
           "description": "Input to add a new file.",
           "required": true,
           "content": {
@@ -626,7 +625,6 @@
             }
           }
         },
-
         "responses": {
           "200": {
             "description": "OK",
@@ -1196,7 +1194,7 @@
                   },
                   "property_list": {
                     "type": "object",
-		    "properties": {
+                    "properties": {
                       "code": {
                         "type": "string"
                       },
@@ -1207,7 +1205,7 @@
                     "description": "a property list ({} means “use all defaults”)"
                   },
                   "message_payload_list": {
-		    "type": "object",
+                    "type": "object",
                     "properties": {
                       "code": {
                         "type": "string"
@@ -1292,7 +1290,7 @@
                   },
                   "message_payload_list": {
                     "type": "object",
-		    "properties": {
+                    "properties": {
                       "code": {
                         "type": "string"
                       },
@@ -1463,11 +1461,11 @@
                     "description": "The service's head host"
                   },
                   "mount_points": {
-		    "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "description": "The service's mount points"
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "The service's mount points"
                   }
                 }
               }
@@ -1711,9 +1709,9 @@
                     "type": "number",
                     "description": "The required memory in bytes"
                   },
-		  "property_list": {
+                  "property_list": {
                     "type": "object",
-		    "properties": {
+                    "properties": {
                       "code": {
                         "type": "string"
                       },
@@ -1724,7 +1722,7 @@
                     "description": "a property list ({} means “use all defaults”)"
                   },
                   "message_payload_list": {
-		    "type": "object",
+                    "type": "object",
                     "properties": {
                       "code": {
                         "type": "string"
@@ -1927,7 +1925,7 @@
       }
     },
     "/simulation/{simid}/isVMRunning": {
-      "post": {
+      "get": {
         "tags": [
           "WRENCH"
         ],
@@ -1981,228 +1979,228 @@
           }
         }
       }
-    }
-  },
-  "/simulation/{simid}/isVMDown": {
-    "post": {
-      "tags": [
-        "WRENCH"
-      ],
-      "summary": "Method to check whether a VM is currently down.",
-      "operationId": "isVMRunning",
-      "parameters": [
-        {
-          "name": "simid",
-          "in": "path",
-          "description": "ID of the simulation",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "requestBody": {
-        "description": "Input to check if VM is down.",
-        "required": true,
-        "content": {
-          "application/json": {
+    },
+    "/simulation/{simid}/isVMDown": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Method to check whether a VM is currently down.",
+        "operationId": "isVMDown",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
             "schema": {
-              "properties": {
-                "service_name": {
-                  "type": "string",
-                  "description": "The cloud service's name"
-                },
-                "vm_name": {
-                  "type": "string",
-                  "description": "The name of the VM"
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to check if VM is down.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "service_name": {
+                    "type": "string",
+                    "description": "The cloud service's name"
+                  },
+                  "vm_name": {
+                    "type": "string",
+                    "description": "The name of the VM"
+                  }
                 }
               }
             }
           }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceResponse"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
               }
             }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
           }
-        },
-        "405": {
-          "description": "Invalid input",
-          "content": {}
         }
       }
-    }
-  },
-  "/simulation/{simid}/suspendVM": {
-    "post": {
-      "tags": [
-        "WRENCH"
-      ],
-      "summary": "Suspends a running VM.",
-      "operationId": "suspendVM",
-      "parameters": [
-        {
-          "name": "simid",
-          "in": "path",
-          "description": "ID of the simulation",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "requestBody": {
-        "description": "Input to suspend a VM.",
-        "required": true,
-        "content": {
-          "application/json": {
+    },
+    "/simulation/{simid}/suspendVM": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Suspends a running VM.",
+        "operationId": "suspendVM",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
             "schema": {
-              "properties": {
-                "service_name": {
-                  "type": "string",
-                  "description": "The cloud service's name"
-                },
-                "vm_name": {
-                  "type": "string",
-                  "description": "The name of the VM"
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to suspend a VM.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "compute_service_name": {
+                    "type": "string",
+                    "description": "The cloud service's name"
+                  },
+                  "vm_name": {
+                    "type": "string",
+                    "description": "The name of the VM"
+                  }
                 }
               }
             }
           }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceResponse"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
               }
             }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
           }
-        },
-        "405": {
-          "description": "Invalid input",
-          "content": {}
         }
       }
-    }
-  },
-  "/simulation/{simid}/resumeVM": {
-    "post": {
-      "tags": [
-        "WRENCH"
-      ],
-      "summary": "Resume a suspended VM.",
-      "operationId": "resumeVM",
-      "parameters": [
-        {
-          "name": "simid",
-          "in": "path",
-          "description": "ID of the simulation",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "requestBody": {
-        "description": "Input to resume a VM.",
-        "required": true,
-        "content": {
-          "application/json": {
+    },
+    "/simulation/{simid}/resumeVM": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Resume a suspended VM.",
+        "operationId": "resumeVM",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
             "schema": {
-              "properties": {
-                "service_name": {
-                  "type": "string",
-                  "description": "The cloud service's name"
-                },
-                "vm_name": {
-                  "type": "string",
-                  "description": "The name of the VM"
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to resume a VM.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "compute_service_name": {
+                    "type": "string",
+                    "description": "The cloud service's name"
+                  },
+                  "vm_name": {
+                    "type": "string",
+                    "description": "The name of the VM"
+                  }
                 }
               }
             }
           }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceResponse"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
               }
             }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
           }
-        },
-        "405": {
-          "description": "Invalid input",
-          "content": {}
         }
       }
-    }
-  },
-  "/simulation/{simid}/isVMSuspended": {
-    "post": {
-      "tags": [
-        "WRENCH"
-      ],
-      "summary": "Method to check whether a VM is currently suspended.",
-      "operationId": "isVMRunning",
-      "parameters": [
-        {
-          "name": "simid",
-          "in": "path",
-          "description": "ID of the simulation",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "requestBody": {
-        "description": "Input to check if VM is suspended.",
-        "required": true,
-        "content": {
-          "application/json": {
+    },
+    "/simulation/{simid}/isVMSuspended": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Method to check whether a VM is currently suspended.",
+        "operationId": "isVMSuspended",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
             "schema": {
-              "properties": {
-                "service_name": {
-                  "type": "string",
-                  "description": "The cloud service's name"
-                },
-                "vm_name": {
-                  "type": "string",
-                  "description": "The name of the VM"
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to check if VM is suspended.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "service_name": {
+                    "type": "string",
+                    "description": "The cloud service's name"
+                  },
+                  "vm_name": {
+                    "type": "string",
+                    "description": "The name of the VM"
+                  }
                 }
               }
             }
           }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceResponse"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
               }
             }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
           }
-        },
-        "405": {
-          "description": "Invalid input",
-          "content": {}
         }
       }
     }
@@ -2286,11 +2284,11 @@
             "type": "object",
             "properties": {
               "code": {
-		"type": "string"
-	      },
-	      "text": {
-		"type": "string"
-	      }
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              }
             },
             "description": "Map of file IDs to storage service names (aka the list of file locations)."
           }
@@ -2377,7 +2375,7 @@
           }
         }
       },
-       "Event": {
+      "Event": {
         "type": "object",
         "properties": {
           "event": {

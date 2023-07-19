@@ -337,47 +337,47 @@
 			return res;
 		});
 
-    CROW_ROUTE(app, "/simulation/<string>/isVMRunning").methods(crow::HTTPMethod::Get)
-            ([this](const crow::request& req, const std::string& simid){
-                json req_json = json::parse(req.body);
-                req_json[toStr(simid)] = simid;
-                crow::response res;
-                this->genericRequestHandler(req_json, res, "isVMRunning");
-                return res;
-            });
+	CROW_ROUTE(app, "/simulation/<string>/isVMRunning").methods(crow::HTTPMethod::Get)
+		([this](const crow::request& req, const std::string& simid){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "isVMRunning");
+			return res;
+		});
 
-    CROW_ROUTE(app, "/simulation/<string>/isVMDown").methods(crow::HTTPMethod::Get)
-            ([this](const crow::request& req, const std::string& simid){
-                json req_json = json::parse(req.body);
-                req_json[toStr(simid)] = simid;
-                crow::response res;
-                this->genericRequestHandler(req_json, res, "isVMDown");
-                return res;
-            });
+	CROW_ROUTE(app, "/simulation/<string>/isVMDown").methods(crow::HTTPMethod::Get)
+		([this](const crow::request& req, const std::string& simid){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "isVMDown");
+			return res;
+		});
 
-    CROW_ROUTE(app, "/simulation/<string>/suspendVM").methods(crow::HTTPMethod::Post)
-            ([this](const crow::request& req, const std::string& simid){
-                json req_json = json::parse(req.body);
-                req_json[toStr(simid)] = simid;
-                crow::response res;
-                this->genericRequestHandler(req_json, res, "suspendVM");
-                return res;
-            });
+	CROW_ROUTE(app, "/simulation/<string>/suspendVM").methods(crow::HTTPMethod::Post)
+		([this](const crow::request& req, const std::string& simid){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "suspendVM");
+			return res;
+		});
 
-    CROW_ROUTE(app, "/simulation/<string>/resumeVM").methods(crow::HTTPMethod::Post)
-            ([this](const crow::request& req, const std::string& simid){
-                json req_json = json::parse(req.body);
-                req_json[toStr(simid)] = simid;
-                crow::response res;
-                this->genericRequestHandler(req_json, res, "resumeVM");
-                return res;
-            });
+	CROW_ROUTE(app, "/simulation/<string>/resumeVM").methods(crow::HTTPMethod::Post)
+		([this](const crow::request& req, const std::string& simid){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "resumeVM");
+			return res;
+		});
 
-    CROW_ROUTE(app, "/simulation/<string>/isVMSuspended").methods(crow::HTTPMethod::Get)
-            ([this](const crow::request& req, const std::string& simid){
-                json req_json = json::parse(req.body);
-                req_json[toStr(simid)] = simid;
-                crow::response res;
-                this->genericRequestHandler(req_json, res, "isVMSuspended");
-                return res;
-            });
+	CROW_ROUTE(app, "/simulation/<string>/isVMSuspended").methods(crow::HTTPMethod::Get)
+		([this](const crow::request& req, const std::string& simid){
+			json req_json = json::parse(req.body);
+			req_json[toStr(simid)] = simid;
+			crow::response res;
+			this->genericRequestHandler(req_json, res, "isVMSuspended");
+			return res;
+		});

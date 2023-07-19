@@ -141,7 +141,6 @@ namespace wrench {
                         this->vm_destroyed.push(std::pair(false, e.what()));
                     }
 
-<<<<<<< HEAD
                 } else if (this->file_to_lookup.tryPop(file_lookup_request)) {
 
                     auto file = file_lookup_request.first;
@@ -153,35 +152,34 @@ namespace wrench {
                         this->file_looked_up.push(std::tuple(false, false, e.what()));
                     }
 
-=======
-                } else if (this->vm_to_running.tryPop(vm_id)) {
-
-                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
-                    auto vm_name = vm_id.first;
-                    try {
-                        cloud_cs->isVMRunning(vm_name);
-                        this->vm_running.push(std::pair(true, vm_name));
-                    } catch (std::invalid_argument &e) {
-                        this->vm_running.push(std::pair(false, e.what()));
-                    }
-
-                } else if (this->vm_to_down.tryPop(vm_id)) {
-
-                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
-                    auto vm_name = vm_id.first;
-                    try {
-                        cloud_cs->isVMDown(vm_name);
-                        this->vm_down.push(std::pair(true, vm_name));
-                    } catch (std::invalid_argument &e) {
-                        this->vm_down.push(std::pair(false, e.what()));
-                    }
+//                } else if (this->vm_to_running.tryPop(vm_id)) {
+//
+//                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
+//                    auto vm_name = vm_id.first;
+//                    try {
+//                        cloud_cs->isVMRunning(vm_name);
+//                        this->vm_running.push(std::pair(true, vm_name));
+//                    } catch (std::invalid_argument &e) {
+//                        this->vm_running.push(std::pair(false, e.what()));
+//                    }
+//
+//                } else if (this->vm_to_down.tryPop(vm_id)) {
+//
+//                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
+//                    auto vm_name = vm_id.first;
+//                    try {
+//                        cloud_cs->isVMDown(vm_name);
+//                        this->vm_down.push(std::pair(true, vm_name));
+//                    } catch (std::invalid_argument &e) {
+//                        this->vm_down.push(std::pair(false, e.what()));
+//                    }
 
                 } else if (this->vm_to_suspend.tryPop(vm_id)) {
 
                     auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
                     auto vm_name = vm_id.first;
                     try {
-                        cloud_cs->isVMDown(vm_name);
+                        cloud_cs->suspendVM(vm_name);
                         this->vm_suspended.push(std::pair(true, vm_name));
                     } catch (std::invalid_argument &e) {
                         this->vm_suspended.push(std::pair(false, e.what()));
@@ -192,23 +190,22 @@ namespace wrench {
                     auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
                     auto vm_name = vm_id.first;
                     try {
-                        cloud_cs->isVMDown(vm_name);
+                        cloud_cs->resumeVM(vm_name);
                         this->vm_resumed.push(std::pair(true, vm_name));
                     } catch (std::invalid_argument &e) {
                         this->vm_resumed.push(std::pair(false, e.what()));
                     }
 
-                } else if (this->is_vm_to_suspend.tryPop(vm_id)) {
-
-                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
-                    auto vm_name = vm_id.first;
-                    try {
-                        cloud_cs->isVMDown(vm_name);
-                        this->is_vm_suspended.push(std::pair(true, vm_name));
-                    } catch (std::invalid_argument &e) {
-                        this->is_vm_suspended.push(std::pair(false, e.what()));
-                    }
->>>>>>> 084bafc41 (Added fucntionality for isVMDown, isVMRunning, and resume/suspendVM.)
+//                } else if (this->is_vm_to_suspend.tryPop(vm_id)) {
+//
+//                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
+//                    auto vm_name = vm_id.first;
+//                    try {
+//                        cloud_cs->isVMDown(vm_name);
+//                        this->is_vm_suspended.push(std::pair(true, vm_name));
+//                    } catch (std::invalid_argument &e) {
+//                        this->is_vm_suspended.push(std::pair(false, e.what()));
+//                    }
                 } else {
                     break;
                 }
@@ -582,16 +579,12 @@ namespace wrench {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
-        std::cerr << "PUSHING REQUEST\n";
-
         // Push the request into the blocking queue (will be a single one!)
         this->vm_to_shutdown.push(std::pair(vm_name, cs));
 
         // Pool from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
-        std::cerr << "PULLING\n";
         this->vm_shutdown.waitAndPop(reply);
-        std::cerr << "PULLED!!\n";
         bool success = std::get<0>(reply);
         if (not success) {
             std::string error_msg = std::get<1>(reply);
@@ -1034,21 +1027,11 @@ namespace wrench {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
-        this->vm_to_running.push(std::pair(vm_name, cs));
+        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+        json answer;
+        answer["result"] = cloud_cs->isVMRunning(vm_name);
+        return answer;
 
-        // Pool from the shared queue (will be a single one!)
-        std::pair<bool, std::string> reply;
-        this->vm_running.waitAndPop(reply);
-        bool success = std::get<0>(reply);
-        if (not success) {
-            json answer;
-            answer["result"] = false;
-            return answer;;
-        } else {
-            json answer;
-            answer["result"] = true;
-            return answer;
-        }
     }
 
     json SimulationController::isVMDown(json data) {
@@ -1059,21 +1042,11 @@ namespace wrench {
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
-        this->vm_to_down.push(std::pair(vm_name, cs));
 
-        // Pool from the shared queue (will be a single one!)
-        std::pair<bool, std::string> reply;
-        this->vm_down.waitAndPop(reply);
-        bool success = std::get<0>(reply);
-        if (not success) {
-            json answer;
-            answer["result"] = true;
-            return answer;
-        } else {
-            json answer;
-            answer["result"] = false;
-            return answer;
-        }
+        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+        json answer;
+        answer["result"] = cloud_cs->isVMDown(vm_name);
+        return answer;
     }
 
     /**
@@ -1082,7 +1055,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::suspendVM(json data) {
-        std::string cs_name = data["service_name"];
+        std::string cs_name = data["compute_service_name"];
         std::string vm_name = data["vm_name"];
 
         // Lookup the cloud compute service
@@ -1102,9 +1075,7 @@ namespace wrench {
             std::string error_msg = std::get<1>(reply);
             throw std::runtime_error("Cannot suspend VM: " + error_msg);
         } else {
-            json answer;
-            answer["result"] = std::get<1>(reply);
-            return answer;
+            return {};
         }
     }
 
@@ -1116,23 +1087,12 @@ namespace wrench {
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
-        this->is_vm_to_suspend.push(std::pair(vm_name, cs));
 
+        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+        json answer;
+        answer["result"] = cloud_cs->isVMSuspended(vm_name);
 
-
-        // Pool from the shared queue (will be a single one!)
-        std::pair<bool, std::string> reply;
-        this->is_vm_suspended.waitAndPop(reply);
-        bool success = std::get<0>(reply);
-        if (not success){
-            json answer;
-            answer["result"] = false;
-            return answer;;
-        } else {
-            json answer;
-            answer["result"] = true;
-            return answer;
-        }
+        return answer;
     }
 
     /**
@@ -1141,7 +1101,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::resumeVM(json data) {
-        std::string cs_name = data["service_name"];
+        std::string cs_name = data["compute_service_name"];
         std::string vm_name = data["vm_name"];
 
         // Lookup the cloud compute service
@@ -1161,9 +1121,7 @@ namespace wrench {
             std::string error_msg = std::get<1>(reply);
             throw std::runtime_error("Cannot suspend VM: " + error_msg);
         } else {
-            json answer;
-            answer["result"] = std::get<1>(reply);
-            return answer;
+            return {};
         }
     }
 }// namespace wrench
