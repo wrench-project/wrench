@@ -57,6 +57,9 @@ examples/workflow_api/condor-grid-example/wrench-example-condor-grid-universe
 *wrench-example*
 examples/workflow_api/basic-examples/io-pagecache/wrench-example*
 
+# Generated REST API routes
+tools/wrench/wrench-daemon/include/routes.h
+
 #JSON
 host_utilization_layout.json
 
