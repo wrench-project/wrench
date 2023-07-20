@@ -13,9 +13,6 @@
 #include "SimpleWMS.h"
 #include <wrench/tools/wfcommons/WfCommonsWorkflowParser.h>
 
-static bool ends_with(const std::string &str, const std::string &suffix) {
-    return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
-}
 
 /**
  * @brief An example that demonstrate how to run a simulation of a simple Workflow
