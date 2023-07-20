@@ -1041,7 +1041,7 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::isVMRunning(json data){
+    json SimulationController::isVMRunning(json data) {
 =======
     json SimulationController::isVMRunning(json data) {
 >>>>>>> f9d806cdbadd50e6e8df6da790010e874a465454
