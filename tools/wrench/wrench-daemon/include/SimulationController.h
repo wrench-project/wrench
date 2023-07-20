@@ -138,12 +138,27 @@ namespace wrench {
         BlockingQueue<std::pair<std::shared_ptr<DataFile>, std::shared_ptr<StorageService>>> file_to_lookup;
         BlockingQueue<std::tuple<bool, bool, std::string>> file_looked_up;
 
+<<<<<<< HEAD
+=======
+        //        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_running;
+        //        BlockingQueue<std::pair<bool, std::string>> vm_running;
+
+        //        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_down;
+        //        BlockingQueue<std::pair<bool, std::string>> vm_down;
+
+>>>>>>> f9d806cdbadd50e6e8df6da790010e874a465454
         BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_suspend;
         BlockingQueue<std::pair<bool, std::string>> vm_suspended;
 
         BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_resume;
         BlockingQueue<std::pair<bool, std::string>> vm_resumed;
 
+<<<<<<< HEAD
+=======
+        //        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> is_vm_to_suspend;
+        //        BlockingQueue<std::pair<bool, std::string>> is_vm_suspended;
+
+>>>>>>> f9d806cdbadd50e6e8df6da790010e874a465454
         // The two managers
         std::shared_ptr<JobManager> job_manager;
         std::shared_ptr<DataMovementManager> data_movement_manager;
