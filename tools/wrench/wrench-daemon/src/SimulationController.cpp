@@ -152,31 +152,6 @@ namespace wrench {
                         this->file_looked_up.push(std::tuple(false, false, e.what()));
                     }
 
-<<<<<<< HEAD
-=======
-                    //                } else if (this->vm_to_running.tryPop(vm_id)) {
-                    //
-                    //                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
-                    //                    auto vm_name = vm_id.first;
-                    //                    try {
-                    //                        cloud_cs->isVMRunning(vm_name);
-                    //                        this->vm_running.push(std::pair(true, vm_name));
-                    //                    } catch (std::invalid_argument &e) {
-                    //                        this->vm_running.push(std::pair(false, e.what()));
-                    //                    }
-                    //
-                    //                } else if (this->vm_to_down.tryPop(vm_id)) {
-                    //
-                    //                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
-                    //                    auto vm_name = vm_id.first;
-                    //                    try {
-                    //                        cloud_cs->isVMDown(vm_name);
-                    //                        this->vm_down.push(std::pair(true, vm_name));
-                    //                    } catch (std::invalid_argument &e) {
-                    //                        this->vm_down.push(std::pair(false, e.what()));
-                    //                    }
-
->>>>>>> f9d806cdbadd50e6e8df6da790010e874a465454
                 } else if (this->vm_to_suspend.tryPop(vm_id)) {
 
                     auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
@@ -199,19 +174,6 @@ namespace wrench {
                         this->vm_resumed.push(std::pair(false, e.what()));
                     }
 
-<<<<<<< HEAD
-=======
-                    //                } else if (this->is_vm_to_suspend.tryPop(vm_id)) {
-                    //
-                    //                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
-                    //                    auto vm_name = vm_id.first;
-                    //                    try {
-                    //                        cloud_cs->isVMDown(vm_name);
-                    //                        this->is_vm_suspended.push(std::pair(true, vm_name));
-                    //                    } catch (std::invalid_argument &e) {
-                    //                        this->is_vm_suspended.push(std::pair(false, e.what()));
-                    //                    }
->>>>>>> f9d806cdbadd50e6e8df6da790010e874a465454
                 } else {
                     break;
                 }
@@ -1035,16 +997,12 @@ namespace wrench {
         return answer;
     }
 
-<<<<<<< HEAD
     /**
      * REST API Handler
      * @param data JSON input
      * @return JSON output
      */
     json SimulationController::isVMRunning(json data) {
-=======
-    json SimulationController::isVMRunning(json data) {
->>>>>>> f9d806cdbadd50e6e8df6da790010e874a465454
         std::string cs_name = data["compute_service_name"];
         std::string vm_name = data["vm_name"];
 
