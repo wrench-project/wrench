@@ -39,6 +39,8 @@ namespace wrench {
          *                             obtained on an machine with flop rate reference_flop_rate. NOTE: This is only used
          *                             if the JSON file does not provide information regarding the machine on which a task
          *                             was executed. In this case, the machine speed information is used.
+         * @param ignore_machine_specs: If true, always use the above reference_flop_rate instead of using the machine speed information
+         *                              if provided in the JSON file. (default if false)
          * @param redundant_dependencies: Workflows provided by WfCommons
          *                             sometimes include control/data dependencies between tasks that are already induced by
          *                             other control/data dependencies (i.e., they correspond to transitive
@@ -63,7 +65,9 @@ namespace wrench {
          * @return a workflow
          */
 
-        static std::shared_ptr<Workflow> createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
+        static std::shared_ptr<Workflow> createWorkflowFromJSON(const std::string &filename,
+                                                                const std::string &reference_flop_rate,
+                                                                bool ignore_machine_specs = false,
                                                                 bool redundant_dependencies = false,
                                                                 bool ignore_cycle_creating_dependencies = false,
                                                                 unsigned long min_cores_per_task = 1,
