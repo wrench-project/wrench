@@ -191,12 +191,21 @@ namespace wrench {
             }
 
             // Create all activities to wait on
+#if 0
             std::vector<simgrid::s4u::ActivityPtr> pending_activities;
             pending_activities.emplace_back(comm_ptr);
             for (auto const &transaction: this->running_transactions) {
                 pending_activities.emplace_back(transaction->stream);
             }
+#else
+            simgrid::s4u::ActivitySet pending_activities;
+            pending_activities.push(comm_ptr);
+            for (auto const &transaction: this->running_transactions) {
+                pending_activities.push(transaction->stream);
+            }
+#endif
 
+#if 0
             // Wait one activity to complete
             int finished_activity_index;
             try {
@@ -219,18 +228,36 @@ namespace wrench {
             } catch (std::exception &e) {
                 continue;
             }
+#else
+            // Wait one activity to complete
+            simgrid::s4u::ActivityPtr finished_activity;
+            try {
+                finished_activity = pending_activities.wait_any();
+            } catch (simgrid::Exception &e) {
+                auto failed_activity = pending_activities.get_failed_activity();
+                if (failed_activity == comm_ptr) {
+                    // the comm failed
+                    comm_ptr_has_been_posted = false;
+                    continue;// oh well
+                }
 
-            // It's a communication
-            if (finished_activity_index == 0) {
+                auto stream = boost::dynamic_pointer_cast<simgrid::s4u::Io>(finished_activity);
+                auto transaction = this->stream_to_transactions[stream];
+                this->stream_to_transactions.erase(transaction->stream);
+                processTransactionFailure(transaction);
+                continue;
+            }
+#endif
+
+            if (finished_activity == comm_ptr) {
                 comm_ptr_has_been_posted = false;
                 if (not processNextMessage(simulation_message.get())) break;
-            } else if (finished_activity_index > 0) {
-                auto finished_transaction = this->running_transactions.at(finished_activity_index - 1);
-                this->running_transactions.erase(this->running_transactions.begin() + finished_activity_index - 1);
-                this->stream_to_transactions.erase(finished_transaction->stream);
-                processTransactionCompletion(finished_transaction);
-            } else if (finished_activity_index == -1) {
-                throw std::runtime_error("wait_any() returned -1. Not sure what to do with this. ");
+            } else {
+                auto stream = boost::dynamic_pointer_cast<simgrid::s4u::Io>(finished_activity);
+                auto transaction = this->stream_to_transactions[stream];
+                this->running_transactions.erase(transaction);
+                this->stream_to_transactions.erase(transaction->stream);
+                processTransactionCompletion(transaction);
             }
         }
 
@@ -705,7 +732,7 @@ namespace wrench {
             transaction->stream = sg_iostream;
 
             this->stream_to_transactions[sg_iostream] = transaction;
-            this->running_transactions.push_back(transaction);
+            this->running_transactions.insert(transaction);
             sg_iostream->start();
         }
     }

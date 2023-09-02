@@ -13,9 +13,6 @@
 #include "SimpleWMS.h"
 #include <wrench/tools/wfcommons/WfCommonsWorkflowParser.h>
 
-static bool ends_with(const std::string &str, const std::string &suffix) {
-    return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
-}
 
 /**
  * @brief An example that demonstrate how to run a simulation of a simple Workflow
@@ -53,11 +50,10 @@ int main(int argc, char **argv) {
     /* The second argument is the workflow description file, written in JSON using WfCommons's WfFormat format */
     char *workflow_file = argv[2];
 
-
     /* Reading and parsing the workflow description file to create a wrench::Workflow object */
     std::cerr << "Loading workflow..." << std::endl;
     std::shared_ptr<wrench::Workflow> workflow;
-    workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "100Gf");
+    workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "100Gf", true);
     std::cerr << "The workflow has " << workflow->getNumberOfTasks() << " tasks " << std::endl;
     std::cerr.flush();
 

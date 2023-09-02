@@ -142,7 +142,7 @@ namespace wrench {
 
 
         std::deque<std::shared_ptr<Transaction>> pending_transactions;
-        std::vector<std::shared_ptr<Transaction>> running_transactions;
+        std::set<std::shared_ptr<Transaction>> running_transactions;
 
         std::map<simgrid::s4u::IoPtr, std::shared_ptr<Transaction>> stream_to_transactions;
 

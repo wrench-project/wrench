@@ -22,7 +22,7 @@ And, one of the following: - **g++** - version 7.5 or higher - **clang**
 Required Dependencies
 ---------------------
 
--  `SimGrid <https://simgrid.org/>`__ – version 3.32
+-  `SimGrid <https://simgrid.org/>`__ – version 3.34
 -  `JSON for Modern C++ <https://github.com/nlohmann/json>`__ – version
    3.9.0 or higher
 
@@ -45,6 +45,7 @@ Optional Dependencies
 -  `Batsched <https://gitlab.inria.fr/batsim/batsched>`__ – version 1.4
    - useful for expanded batch-scheduled resource simulation
    capabilities
+-  `Asio <https://github.com/chriskohlhoff/asio/>`__ - tag 1.28.0 or later (only required for building `wrench-daemon`, WRENCH's REST API daemon)
 
 .. _install-source:
 

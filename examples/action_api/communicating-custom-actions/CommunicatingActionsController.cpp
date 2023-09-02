@@ -73,7 +73,7 @@ namespace wrench {
 
         /* Now let's create all actions */
         WRENCH_INFO("Adding %lu actions (that will communicate with each other) to the job", COMMUNICATOR_SIZE);
-        for (int i = 0; i < COMMUNICATOR_SIZE; i++) {
+        for (unsigned long i = 0; i < COMMUNICATOR_SIZE; i++) {
 
             auto lambda_execute = [communicator, storage_service, file](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
                 auto my_rank = communicator->join();
@@ -105,7 +105,7 @@ namespace wrench {
                     // Participate in an all to all communication
                     unsigned long num_comm_bytes = 1 * MB;
                     std::map<unsigned long, double> sends;
-                    for (int i = 0; i < num_ranks; i++) {
+                    for (unsigned long i = 0; i < num_ranks; i++) {
                         if (i != my_rank) {
                             sends[i] = num_comm_bytes;
                         }

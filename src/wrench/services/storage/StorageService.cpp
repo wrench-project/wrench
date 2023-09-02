@@ -213,6 +213,7 @@ namespace wrench {
      */
     bool StorageService::lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
                                     const std::shared_ptr<FileLocation> &location) {
+
         if (!answer_mailbox or !location) {
             throw std::invalid_argument("StorageService::lookupFile(): Invalid nullptr arguments");
         }
