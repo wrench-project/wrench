@@ -40,6 +40,8 @@ namespace wrench {
         // Initial setup
         wrench::TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
+        S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()] = this->recv_mailbox;
+
         WRENCH_INFO("Starting");
         this->job_manager = this->createJobManager();
         this->data_movement_manager = this->createDataMovementManager();
@@ -51,6 +53,9 @@ namespace wrench {
                 wrench::ComputeService *new_compute_service = nullptr;
                 wrench::StorageService *new_storage_service = nullptr;
                 wrench::FileRegistryService *new_file_service = nullptr;
+                std::pair<std::tuple<unsigned long, double, WRENCH_PROPERTY_COLLECTION_TYPE, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE>, std::shared_ptr<ComputeService>> spec_vm_to_create;
+                std::pair<std::string, std::shared_ptr<ComputeService>> vm_id;
+                std::pair<std::shared_ptr<DataFile>, std::shared_ptr<StorageService>> file_lookup_request;
 
                 if (this->compute_services_to_start.tryPop(new_compute_service)) {
                     // starting compute service
@@ -72,6 +77,102 @@ namespace wrench {
                     auto new_service_shared_ptr = this->simulation->startNewService(new_file_service);
                     // Add the new service to the registry of existing services, so that later we can look it up by name
                     this->file_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
+
+                } else if (this->vm_to_create.tryPop(spec_vm_to_create)) {
+                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(spec_vm_to_create.second);
+                    auto num_cores = std::get<0>(spec_vm_to_create.first);
+                    auto ram_size = std::get<1>(spec_vm_to_create.first);
+                    auto properties = std::get<2>(spec_vm_to_create.first);
+                    auto payloads = std::get<3>(spec_vm_to_create.first);
+                    std::string vm_name;
+                    try {
+                        vm_name = cloud_cs->createVM(num_cores, ram_size, properties, payloads);
+                        this->vm_created.push(std::pair(true, vm_name));
+                    } catch (ExecutionException &e) {
+                        this->vm_created.push(std::pair(false, e.getCause()->toString()));
+                    }
+
+                } else if (this->vm_to_start.tryPop(vm_id)) {
+                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
+                    auto vm_name = vm_id.first;
+                    try {
+                        if (not cloud_cs->isVMDown(vm_name)) {
+                            throw std::invalid_argument("Cannot start VM because it's not down");
+                        }
+                        auto bm_cs = cloud_cs->startVM(vm_name);
+                        this->compute_service_registry.insert(bm_cs->getName(), bm_cs);
+                        this->vm_started.push(std::pair(true, bm_cs->getName()));
+                    } catch (ExecutionException &e) {
+                        this->vm_created.push(std::pair(false, e.getCause()->toString()));
+                    } catch (std::invalid_argument &e) {
+                        this->vm_started.push(std::pair(false, e.what()));
+                    }
+
+                } else if (this->vm_to_shutdown.tryPop(vm_id)) {
+
+                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
+                    auto vm_name = vm_id.first;
+                    try {
+                        if (not cloud_cs->isVMRunning(vm_name)) {
+                            throw std::invalid_argument("Cannot shutdown VM because it's not running");
+                        }
+                        auto bm_cs = cloud_cs->getVMComputeService(vm_name);
+
+                        this->compute_service_registry.remove(bm_cs->getName());
+                        cloud_cs->shutdownVM(vm_name);
+                        this->vm_shutdown.push(std::pair(true, vm_name));
+                    } catch (ExecutionException &e) {
+                        this->vm_shutdown.push(std::pair(false, e.what()));
+                    } catch (std::invalid_argument &e) {
+                        this->vm_shutdown.push(std::pair(false, e.what()));
+                    }
+
+                } else if (this->vm_to_destroy.tryPop(vm_id)) {
+
+                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
+                    auto vm_name = vm_id.first;
+                    try {
+                        if (not cloud_cs->isVMDown(vm_name)) {
+                            throw std::invalid_argument("Cannot destroy VM because it's not down");
+                        }
+                        cloud_cs->destroyVM(vm_name);
+                        this->vm_destroyed.push(std::pair(true, vm_name));
+                    } catch (std::invalid_argument &e) {
+                        this->vm_destroyed.push(std::pair(false, e.what()));
+                    }
+
+                } else if (this->file_to_lookup.tryPop(file_lookup_request)) {
+
+                    auto file = file_lookup_request.first;
+                    auto ss = file_lookup_request.second;
+                    try {
+                        bool result = ss->lookupFile(file);
+                        this->file_looked_up.push(std::tuple(true, result, ""));
+                    } catch (std::invalid_argument &e) {
+                        this->file_looked_up.push(std::tuple(false, false, e.what()));
+                    }
+
+                } else if (this->vm_to_suspend.tryPop(vm_id)) {
+
+                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
+                    auto vm_name = vm_id.first;
+                    try {
+                        cloud_cs->suspendVM(vm_name);
+                        this->vm_suspended.push(std::pair(true, vm_name));
+                    } catch (std::invalid_argument &e) {
+                        this->vm_suspended.push(std::pair(false, e.what()));
+                    }
+
+                } else if (this->vm_to_resume.tryPop(vm_id)) {
+
+                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
+                    auto vm_name = vm_id.first;
+                    try {
+                        cloud_cs->resumeVM(vm_name);
+                        this->vm_resumed.push(std::pair(true, vm_name));
+                    } catch (std::invalid_argument &e) {
+                        this->vm_resumed.push(std::pair(false, e.what()));
+                    }
 
                 } else {
                     break;
@@ -301,6 +402,11 @@ namespace wrench {
         return answer;
     }
 
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::addCloudComputeService(json data) {
         std::string hostname = data["head_host"];
         std::vector<std::string> resources = data["resources"];
@@ -322,7 +428,6 @@ namespace wrench {
             service_message_payload_list[message_payload_key] = it.value();
         }
 
-
         // Create the new service
         auto new_service = new CloudComputeService(hostname, resources, scratch_space,
                                                    service_property_list, service_message_payload_list);
@@ -342,11 +447,160 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
+    json SimulationController::createVM(json data) {
+
+        std::string cs_name = data["service_name"];
+        unsigned long num_cores = data["num_cores"];
+        double ram_memory = data["ram_memory"];
+        std::string property_list_string = data["property_list"];
+        std::string message_payload_list_string = data["message_payload_list"];
+
+        WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
+        json jsonData = json::parse(property_list_string);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            auto property_key = ServiceProperty::translateString(it.key());
+            service_property_list[property_key] = it.value();
+        }
+
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;
+        jsonData = json::parse(message_payload_list_string);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            auto message_payload_key = ServiceMessagePayload::translateString(it.key());
+            service_message_payload_list[message_payload_key] = it.value();
+        }
+
+        // Lookup the cloud compute service
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        // Push the request into the blocking queue (will be a single one!)
+        this->vm_to_create.push(
+                std::pair(
+                        std::tuple(num_cores,
+                                   ram_memory,
+                                   service_property_list,
+                                   service_message_payload_list),
+                        cs));
+
+        // Pool from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        this->vm_created.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot create VM: " + error_msg);
+        } else {
+            json answer;
+            answer["vm_name"] = std::get<1>(reply);
+            return answer;
+        }
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::startVM(json data) {
+        std::string cs_name = data["service_name"];
+        std::string vm_name = data["vm_name"];
+
+        // Lookup the cloud compute service
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        // Push the request into the blocking queue (will be a single one!)
+        this->vm_to_start.push(std::pair(vm_name, cs));
+
+        // Pool from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        this->vm_started.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot start VM: " + error_msg);
+        } else {
+            json answer;
+            answer["service_name"] = std::get<1>(reply);
+            return answer;
+        }
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::shutdownVM(json data) {
+        std::string cs_name = data["service_name"];
+        std::string vm_name = data["vm_name"];
+
+        // Lookup the cloud compute service
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        // Push the request into the blocking queue (will be a single one!)
+        this->vm_to_shutdown.push(std::pair(vm_name, cs));
+
+        // Pool from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        this->vm_shutdown.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot shutdown VM: " + error_msg);
+        } else {
+            return {};
+        }
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::destroyVM(json data) {
+        std::string cs_name = data["service_name"];
+        std::string vm_name = data["vm_name"];
+
+        // Lookup the cloud compute service
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        // Push the request into the blocking queue (will be a single one!)
+        this->vm_to_destroy.push(std::pair(vm_name, cs));
+
+        // Pool from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        this->vm_destroyed.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot destroy VM: " + error_msg);
+        } else {
+            return {};
+        }
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::addSimpleStorageService(json data) {
         std::string head_host = data["head_host"];
+        std::set<std::string> mount_points = data["mount_points"];
 
         // Create the new service
-        auto new_service = SimpleStorageService::createSimpleStorageService(head_host, {"/"}, {}, {});
+        auto new_service = SimpleStorageService::createSimpleStorageService(head_host, mount_points, {}, {});
         // Put in the list of services to start (this is because this method is called
         // by the server thread, and therefore, it will segfault horribly if it calls any
         // SimGrid simulation methods, e.g., to start a service)
@@ -390,6 +644,44 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
+    json SimulationController::lookupFileAtStorageService(json data) {
+        std::string ss_name = data["storage_service_name"];
+        std::string filename = data["filename"];
+
+        std::shared_ptr<StorageService> ss;
+        if (not this->storage_service_registry.lookup(ss_name, ss)) {
+            throw std::runtime_error("Unknown storage service " + ss_name);
+        }
+
+        std::shared_ptr<DataFile> file;
+        try {
+            file = this->workflow->getFileByID(filename);
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Unknown file " + filename);
+        }
+
+        // Push the request into the blocking queue (will be a single one!)
+        this->file_to_lookup.push(std::pair(file, ss));
+
+        // Pool from the shared queue (will be a single one!)
+        std::tuple<bool, bool, std::string> reply;
+        this->file_looked_up.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<2>(reply);
+            throw std::runtime_error("Cannot lookup file:" + error_msg);
+        } else {
+            json answer;
+            answer["result"] = std::get<1>(reply);
+            return answer;
+        }
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::addFileRegistryService(json data) {
         std::string head_host = data["head_host"];
 
@@ -418,7 +710,16 @@ namespace wrench {
             tasks.push_back(this->workflow->getTaskByID(name));
         }
 
-        auto job = this->job_manager->createStandardJob(tasks);
+        std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
+        for (auto it = data["file_locations"].begin(); it != data["file_locations"].end(); ++it) {
+            auto file = this->workflow->getFileByID(it.key());
+            std::shared_ptr<StorageService> storage_service;
+            this->storage_service_registry.lookup(it.value(), storage_service);
+            file_locations[file] = FileLocation::LOCATION(storage_service, file);
+        }
+
+
+        auto job = this->job_manager->createStandardJob(tasks, file_locations);
         this->job_registry.insert(job->getName(), job);
         json answer;
         answer["job_name"] = job->getName();
@@ -455,12 +756,12 @@ namespace wrench {
      */
     json SimulationController::createTask(json data) {
 
-        this->workflow->addTask(data["name"],
-                                data["flops"],
-                                data["min_num_cores"],
-                                data["max_num_cores"],
-                                data["memory"]);
-        return json({});
+        auto t = this->workflow->addTask(data["name"],
+                                         data["flops"],
+                                         data["min_num_cores"],
+                                         data["max_num_cores"],
+                                         data["memory"]);
+        return {};
     }
 
     /**
@@ -512,6 +813,28 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
+    json SimulationController::getTaskStartDate(json data) {
+        json answer;
+        answer["time"] = this->workflow->getTaskByID(data["name"])->getStartDate();
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::getTaskEndDate(json data) {
+        json answer;
+        answer["time"] = this->workflow->getTaskByID(data["name"])->getEndDate();
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::addFile(json data) {
         auto file = this->workflow->addFile(data["name"], data["size"]);
         return {};
@@ -523,7 +846,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getFileSize(json data) {
-        auto file = this->workflow->getFileByID(data["name"]);
+        auto file = this->workflow->getFileByID(data["file_id"]);
         json answer;
         answer["size"] = file->getSize();
         return answer;
@@ -535,7 +858,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addInputFile(json data) {
-        auto task = this->workflow->getTaskByID(data["task"]);
+        auto task = this->workflow->getTaskByID(data["tid"]);
         auto file = this->workflow->getFileByID(data["file"]);
         task->addInputFile(file);
         return {};
@@ -547,7 +870,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addOutputFile(json data) {
-        auto task = this->workflow->getTaskByID(data["task"]);
+        auto task = this->workflow->getTaskByID(data["tid"]);
         auto file = this->workflow->getFileByID(data["file"]);
         task->addOutputFile(file);
         return {};
@@ -559,8 +882,27 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskInputFiles(json data) {
-        auto task = this->workflow->getTaskByID(data["task"]);
+
+        auto task = this->workflow->getTaskByID(data["tid"]);
         auto files = task->getInputFiles();
+        json answer;
+        std::vector<std::string> file_names;
+        for (const auto &f: files) {
+            file_names.push_back(f->getID());
+        }
+        answer["files"] = file_names;
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::getTaskOutputFiles(json data) {
+
+        auto task = this->workflow->getTaskByID(data["tid"]);
+        auto files = task->getOutputFiles();
         json answer;
         std::vector<std::string> file_names;
         for (const auto &f: files) {
@@ -604,4 +946,175 @@ namespace wrench {
         return {};
     }
 
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::supportsCompoundJobs(json data) {
+        std::string cs_name = data["compute_service_name"];
+
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+        json answer;
+        answer["result"] = cs->supportsCompoundJobs();
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::supportsPilotJobs(json data) {
+        std::string cs_name = data["compute_service_name"];
+
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+        json answer;
+        answer["result"] = cs->supportsPilotJobs();
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::supportsStandardJobs(json data) {
+        std::string cs_name = data["compute_service_name"];
+
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+        json answer;
+        answer["result"] = cs->supportsStandardJobs();
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::isVMRunning(json data) {
+        std::string cs_name = data["compute_service_name"];
+        std::string vm_name = data["vm_name"];
+
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+        json answer;
+        answer["result"] = cloud_cs->isVMRunning(vm_name);
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::isVMDown(json data) {
+        std::string cs_name = data["compute_service_name"];
+        std::string vm_name = data["vm_name"];
+
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+        json answer;
+        answer["result"] = cloud_cs->isVMDown(vm_name);
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::suspendVM(json data) {
+        std::string cs_name = data["compute_service_name"];
+        std::string vm_name = data["vm_name"];
+
+        // Lookup the cloud compute service
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        // Push the request into the blocking queue (will be a single one!)
+        this->vm_to_suspend.push(std::pair(vm_name, cs));
+
+        // Pool from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        this->vm_suspended.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot suspend VM: " + error_msg);
+        } else {
+            return {};
+        }
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::isVMSuspended(json data) {
+        std::string cs_name = data["compute_service_name"];
+        std::string vm_name = data["vm_name"];
+
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+        json answer;
+        answer["result"] = cloud_cs->isVMSuspended(vm_name);
+
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::resumeVM(json data) {
+        std::string cs_name = data["compute_service_name"];
+        std::string vm_name = data["vm_name"];
+
+        // Lookup the cloud compute service
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        // Push the request into the blocking queue (will be a single one!)
+        this->vm_to_resume.push(std::pair(vm_name, cs));
+
+        // Pool from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        this->vm_resumed.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot suspend VM: " + error_msg);
+        } else {
+            return {};
+        }
+    }
 }// namespace wrench

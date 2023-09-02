@@ -26,6 +26,7 @@ namespace wrench {
      */
     std::shared_ptr<Workflow> WfCommonsWorkflowParser::createWorkflowFromJSON(const std::string &filename,
                                                                               const std::string &reference_flop_rate,
+                                                                              bool ignore_machine_specs,
                                                                               bool redundant_dependencies,
                                                                               bool ignore_cycle_creating_dependencies,
                                                                               unsigned long min_cores_per_task,
@@ -104,7 +105,6 @@ namespace wrench {
         }
 
         std::shared_ptr<wrench::WorkflowTask> workflow_task;
-
 
         // Process the tasks
         for (nlohmann::json::iterator it = workflow_spec.begin(); it != workflow_spec.end(); ++it) {
@@ -199,7 +199,7 @@ namespace wrench {
                     if (task.find("machine") != task.end()) {
                         execution_machine = task.at("machine");
                     }
-                    if (execution_machine.empty()) {
+                    if (ignore_machine_specs or execution_machine.empty()) {
                         flop_amount = runtime * flop_rate;
                     } else {
                         if (machines.find(execution_machine) == machines.end()) {

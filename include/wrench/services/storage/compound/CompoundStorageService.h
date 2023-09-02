@@ -50,9 +50,13 @@ namespace wrench {
      * @brief Structure to tracking disk usage 
      */
     struct DiskUsage {
+        /** @brief Storage service */
         std::shared_ptr<StorageService> service;
+        /** @brief Free space in byte */
         double free_space;
+        /** @brief File name */
         std::string file_name;
+        /** @brief Load */
         double load;// not actually used so far
     };
 
@@ -60,9 +64,13 @@ namespace wrench {
      * @brief Structure for tracing file allocations for each job 
      */
     struct AllocationTrace {
+        /** @brief time stamp */
         double ts;
+        /** @brief IO action */
         IOAction act;
+        /** @brief Disk usage */
         std::vector<DiskUsage> disk_usage;// new usage stats for updated disks
+                                          /** @brief internal file locations */
         std::vector<std::shared_ptr<FileLocation>> internal_locations;
     };
 
@@ -215,10 +223,15 @@ namespace wrench {
                                     const std::shared_ptr<FileLocation> &dst_location);
 
         // Publicly accessible traces... (TODO: cleanup access to traces)
+        /** @brief File read traces */
         std::map<std::string, AllocationTrace> read_traces = {};
+        /** @brief File write traces */
         std::map<std::string, AllocationTrace> write_traces = {};
+        /** @brief File copy traces */
         std::map<std::string, AllocationTrace> copy_traces = {};
+        /** @brief File delete traces */
         std::map<std::string, AllocationTrace> delete_traces = {};
+        /** @brief Internal storage use */
         std::vector<std::pair<double, AllocationTrace>> internal_storage_use = {};
 
         /***********************/
