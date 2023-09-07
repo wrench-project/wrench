@@ -78,14 +78,13 @@ namespace wrench {
 
         void setDaemonized(bool daemonized);
 
-    protected:
         ExecutionController(
                 const std::string &hostname,
                 const std::string &suffix);
 
-
         void setTimer(double date, std::string message);
 
+    protected:
 
     private:
         friend class Simulation;
