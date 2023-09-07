@@ -85,7 +85,6 @@ namespace wrench {
         void setTimer(double date, std::string message);
 
     protected:
-
     private:
         friend class Simulation;
         friend class DataMovementManager;
