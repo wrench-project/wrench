@@ -2229,7 +2229,7 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "service_name": {
+                  "compute_service_name": {
                     "type": "string",
                     "description": "The cloud service's name"
                   },
