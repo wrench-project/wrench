@@ -1152,7 +1152,7 @@ namespace wrench {
 
         auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
         json answer;
-        answer["result"] = cloud_cs->getVMPhysicalHostname(vm_name);
+        answer["physical_host"] = cloud_cs->getVMPhysicalHostname(vm_name);
         return answer;
     }
 
