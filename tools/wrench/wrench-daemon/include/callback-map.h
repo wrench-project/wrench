@@ -38,3 +38,5 @@ request_handlers["isVMDown"] = [sc](json data) { return sc->isVMDown(std::move(d
 request_handlers["suspendVM"] = [sc](json data) { return sc->suspendVM(std::move(data)); };
 request_handlers["resumeVM"] = [sc](json data) { return sc->resumeVM(std::move(data)); };
 request_handlers["isVMSuspended"] = [sc](json data) { return sc->isVMSuspended(std::move(data)); };
+request_handlers["getVMPhysicalHostname"] = [sc](json data) { return sc->getVMPhysicalHostname(std::move(data)); };
+request_handlers["getVMComputeService"] = [sc](json data) { return sc->getVMComputeService(std::move(data)); };

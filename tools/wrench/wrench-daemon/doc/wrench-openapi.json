@@ -2203,6 +2203,118 @@
           }
         }
       }
+    },
+    "/simulation/{simid}/getVMPhysicalHostname": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get the name of the physical host on which a VM is running.",
+        "operationId": "getVMPhysicalHostname",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to check physical hostname.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "service_name": {
+                    "type": "string",
+                    "description": "The cloud service's name"
+                  },
+                  "vm_name": {
+                    "type": "string",
+                    "description": "The name of the VM"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/getVMComputeService": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get the compute service running on a VM, if any.",
+        "operationId": "getVMComputeService",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to check compute service of VM.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "service_name": {
+                    "type": "string",
+                    "description": "The cloud service's name"
+                  },
+                  "vm_name": {
+                    "type": "string",
+                    "description": "The name of the VM"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
     }
   },
   "components": {
