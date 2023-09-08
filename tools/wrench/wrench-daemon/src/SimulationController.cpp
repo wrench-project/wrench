@@ -1117,17 +1117,26 @@ namespace wrench {
             return {};
         }
     }
-//    /**
-//     * REST API Handler
-//     * @param data JSON input
-//     * @return JSON output
-//     */
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
 //    json SimulationController::getExecutionHosts(json data) {
-//        std::vector<std::string> execution_hosts_list = CloudComputeService::getExecutionHosts();
+//        std::string cs_name = data["compute_service_name"];
+//        std::shared_ptr<ComputeService> cs;
+//        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+//            throw std::runtime_error("Unknown compute service " + cs_name);
+//        }
+//
+//        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+//
+//        std::vector<std::string> execution_hosts_list = cloud_cs->getExecutionHosts();
 //        json answer {};
 //        answer["execution_hosts"] = execution_hosts_list;
 //        return answer;
 //    }
+
     /**
      * REST API Handler
      * @param data JSON input
@@ -1156,9 +1165,8 @@ namespace wrench {
         }
 
         auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
-        auto bare_metal_cs = std::shared_ptr<BareMetalComputeService>(cs);
         json answer;
-        answer["result"] = cloud_cs->getVMComputeService(vm_name);
+        answer["result"] = cloud_cs->getVMComputeService(vm_name)->getName();
         return answer;
     }
 
