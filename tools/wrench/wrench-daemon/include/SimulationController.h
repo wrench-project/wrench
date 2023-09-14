@@ -108,8 +108,8 @@ namespace wrench {
 
         json isVMSuspended(json data);
 
-//        json getExecutionHosts(json data);
-//
+        json getExecutionHosts(json data);
+
         json getVMPhysicalHostname(json data);
 
         json getVMComputeService(json data);
