@@ -2315,6 +2315,42 @@
           }
         }
       }
+    },
+    "/simulation/{simid}/getExecutionHosts": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get the list of execution hosts available to run VMs.",
+        "operationId": "getExecutionHosts",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HostnameList"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
     }
   },
   "components": {
