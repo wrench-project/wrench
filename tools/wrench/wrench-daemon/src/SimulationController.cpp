@@ -812,6 +812,7 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
+
      */
     json SimulationController::getTaskStartDate(json data) {
         json answer;
@@ -1122,20 +1123,18 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-//    json SimulationController::getExecutionHosts(json data) {
-//        std::string cs_name = data["compute_service_name"];
-//        std::shared_ptr<ComputeService> cs;
-//        if (not this->compute_service_registry.lookup(cs_name, cs)) {
-//            throw std::runtime_error("Unknown compute service " + cs_name);
-//        }
-//
-//        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
-//
-//        std::vector<std::string> execution_hosts_list = cloud_cs->getExecutionHosts();
-//        json answer {};
-//        answer["execution_hosts"] = execution_hosts_list;
-//        return answer;
-//    }
+    json SimulationController::getExecutionHosts(json data) {
+        std::string cs_name = data["compute_service_name"];
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+        std::vector<std::string> execution_hosts_list = cloud_cs->getExecutionHosts();
+        json answer {};
+        answer["execution_hosts"] = execution_hosts_list;
+        return answer;
+    }
 
     /**
      * REST API Handler
@@ -1155,7 +1154,11 @@ namespace wrench {
         answer["physical_host"] = cloud_cs->getVMPhysicalHostname(vm_name);
         return answer;
     }
-
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::getVMComputeService(json data) {
         std::string cs_name = data["compute_service_name"];
         std::string vm_name = data["vm_name"];
@@ -1166,7 +1169,7 @@ namespace wrench {
 
         auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
         json answer;
-        answer["result"] = cloud_cs->getVMComputeService(vm_name)->getName();
+        answer["vm_compute_service"] = cloud_cs->getVMComputeService(vm_name)->getName();
         return answer;
     }
 
