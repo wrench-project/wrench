@@ -72,28 +72,28 @@ namespace wrench {
     CloudComputeService::~CloudComputeService() {
     }
 
-//    /**
-//     * @brief Get the list of execution hosts available to run VMs
-//     *
-//     * @return a list of hostnames
-//     *
-//     * @throw ExecutionException
-//     */
-//    std::vector<std::string> CloudComputeService::getExecutionHosts() {
-//        assertServiceIsUp();
-//
-//        // send a "get execution hosts" message to the daemon's mailbox_name
-//        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-//
-//        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceGetExecutionHostsAnswerMessage>(
-//                answer_mailbox,
-//                new CloudComputeServiceGetExecutionHostsRequestMessage(
-//                        answer_mailbox,
-//                        this->getMessagePayloadValue(
-//                                CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD)));
-//
-//        return answer_message->execution_hosts;
-//    }
+    //    /**
+    //     * @brief Get the list of execution hosts available to run VMs
+    //     *
+    //     * @return a list of hostnames
+    //     *
+    //     * @throw ExecutionException
+    //     */
+    //    std::vector<std::string> CloudComputeService::getExecutionHosts() {
+    //        assertServiceIsUp();
+    //
+    //        // send a "get execution hosts" message to the daemon's mailbox_name
+    //        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+    //
+    //        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceGetExecutionHostsAnswerMessage>(
+    //                answer_mailbox,
+    //                new CloudComputeServiceGetExecutionHostsRequestMessage(
+    //                        answer_mailbox,
+    //                        this->getMessagePayloadValue(
+    //                                CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD)));
+    //
+    //        return answer_message->execution_hosts;
+    //    }
 
     /**
      * @brief Create a BareMetalComputeService VM (balances load on execution hosts)

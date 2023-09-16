@@ -112,7 +112,7 @@ namespace wrench {
         virtual bool isVMDown(const std::string &vm_name);
 
 
-//        std::vector<std::string> getExecutionHosts();
+        //        std::vector<std::string> getExecutionHosts();
 
         /***********************/
         /** \endcond          **/
