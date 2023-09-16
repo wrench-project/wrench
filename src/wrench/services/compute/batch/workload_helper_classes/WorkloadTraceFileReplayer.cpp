@@ -29,7 +29,7 @@ namespace wrench {
      * @param use_actual_runtimes_as_requested_runtimes: if true, use actual runtimes as requested runtimes
      * @param workload_trace: the workload trace to be replayed
      */
-    WorkloadTraceFileReplayer::WorkloadTraceFileReplayer(const std::string& hostname,
+    WorkloadTraceFileReplayer::WorkloadTraceFileReplayer(const std::string &hostname,
                                                          std::shared_ptr<BatchComputeService> batch_service,
                                                          unsigned long num_cores_per_node,
                                                          bool use_actual_runtimes_as_requested_runtimes,
