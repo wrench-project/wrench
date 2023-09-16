@@ -46,7 +46,7 @@ namespace wrench {
         try {
             to_return = stringToPayloadMap.at(message_payload);
         } catch (std::out_of_range &e) {
-           throw std::runtime_error("Unknown message payload specification " + message_payload +
+            throw std::runtime_error("Unknown message payload specification " + message_payload +
                                      ". Perhaps you need to use the superclass name?");
         }
         return to_return;
