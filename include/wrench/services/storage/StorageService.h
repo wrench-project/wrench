@@ -397,10 +397,20 @@ namespace wrench {
         /**
          *  @brief Get the storage service's total free space (no simulated overhead)
          *  @return Current free space in bytes
-         * 
-        */
-        virtual double traceTotalFreeSpace() {
+         *
+         */
+        virtual double getTotalFreeSpaceZeroTime() {
             throw std::runtime_error("StorageService::traceTotalFreeSpace: should have been overridden by derived class");
+        }
+
+        /** Service number of allocated files tracing (doesn't incur simulated overhead) */
+        /**
+         *  @brief Get the number of files registered to the filesystem(s) associated with this service (no simulated overhead)
+         *  @return Current number of registered Datafile for all filesystem(s) from this service
+         *
+         */
+        virtual double getTotalFilesZeroTime() {
+            throw std::runtime_error("StorageService::traceTotalFiles: should have been overridden by derived class");
         }
 
         /**
@@ -500,17 +510,17 @@ namespace wrench {
                                bool wait_for_answer);
 
         /**
-	 * @brief Decrement the number of operations for a location
-     * @param location: a location
-	 **/
+         * @brief Decrement the number of operations for a location
+         * @param location: a location
+         **/
         virtual void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
             // do nothing
         }
 
         /**
-	 * @brief Increment the number of operations for a location
-     * @param location: a location
-	 **/
+         * @brief Increment the number of operations for a location
+         * @param location: a location
+         **/
         virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
             // no nothing
         }
