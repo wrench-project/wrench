@@ -99,25 +99,25 @@ namespace wrench {
 
         virtual bool hasScratch() const;
 
-        unsigned long getNumHosts();
+        unsigned long getNumHosts(bool simulate_it = false);
 
-        std::vector<std::string> getHosts();
+        std::vector<std::string> getHosts(bool simulate_it = false);
 
-        std::map<std::string, unsigned long> getPerHostNumCores();
+        std::map<std::string, unsigned long> getPerHostNumCores(bool simulate_it = false);
 
-        unsigned long getTotalNumCores();
+        unsigned long getTotalNumCores(bool simulate_it = false);
 
-        std::map<std::string, unsigned long> getPerHostNumIdleCores();
+        std::map<std::string, unsigned long> getPerHostNumIdleCores(bool simulate_it = false);
 
-        virtual unsigned long getTotalNumIdleCores();
+        virtual unsigned long getTotalNumIdleCores(bool simulate_it = false);
 
         virtual bool isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, double ram);
 
-        std::map<std::string, double> getMemoryCapacity();
+        std::map<std::string, double> getMemoryCapacity(bool simulate_it = false);
 
-        std::map<std::string, double> getPerHostAvailableMemoryCapacity();
+        std::map<std::string, double> getPerHostAvailableMemoryCapacity(bool simulate_it = false);
 
-        std::map<std::string, double> getCoreFlopRate();
+        std::map<std::string, double> getCoreFlopRate(bool simulate_it = false);
 
         double getTotalScratchSpaceSize();
 
@@ -175,6 +175,8 @@ namespace wrench {
 
         void startScratchStorageService();
 
+        virtual std::map<std::string, double> constructResourceInformation(const std::string &key) = 0;
+
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -193,7 +195,7 @@ namespace wrench {
         std::string scratch_space_mount_point;
         //        std::shared_ptr<StorageService> scratch_space_storage_service_shared_ptr;
 
-        std::map<std::string, double> getServiceResourceInformation(const std::string &desired_entries);
+        std::map<std::string, double> getServiceResourceInformation(const std::string &desired_entries, bool simulate_it);
     };
 
 
