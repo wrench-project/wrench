@@ -112,7 +112,7 @@ namespace wrench {
         virtual bool isVMDown(const std::string &vm_name);
 
 
-        std::vector<std::string> getExecutionHosts();
+//        std::vector<std::string> getExecutionHosts();
 
         /***********************/
         /** \endcond          **/
@@ -180,6 +180,7 @@ namespace wrench {
         virtual void
         processStartVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
 
+
         virtual void processShutdownVM(simgrid::s4u::Mailbox *answer_mailbox,
                                        const std::string &vm_name,
                                        bool send_failure_notifications,
@@ -227,6 +228,7 @@ namespace wrench {
         /***********************/
 
     private:
+        std::map<std::string, double> constructResourceInformation(const std::string &key) override;
         std::string findHost(unsigned long desired_num_cores, double desired_ram, const std::string &desired_host);
     };
 }// namespace wrench
