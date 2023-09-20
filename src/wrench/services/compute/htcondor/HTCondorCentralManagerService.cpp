@@ -169,6 +169,15 @@ namespace wrench {
     }
 
     /**
+     * @brief Construct a dict for resource information
+     * @param key: the desired key
+     * @return a dictionary
+     */
+    std::map<std::string, double> HTCondorCentralManagerService::constructResourceInformation(const std::string &key) {
+        throw std::runtime_error("HTCondorComputeService::constructResourceInformation(): Not implemented in this service.");
+    }
+
+    /**
      * @brief Wait for and react to any incoming message
      *
      * @return false if the daemon should terminate, true otherwise

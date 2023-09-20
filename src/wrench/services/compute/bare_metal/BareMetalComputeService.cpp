@@ -653,15 +653,24 @@ namespace wrench {
     }
 
     /**
- * @brief Process a "get resource description message"
- * @param answer_mailbox: the mailbox to which the description message should be sent
- * @param key: the desired resource information (i.e., dictionary key) that's needed)
- */
+     * @brief Construct a dict for resource information
+     * @param key: the desired key
+     * @return a dictionary
+     */
+    std::map<std::string, double> BareMetalComputeService::constructResourceInformation(const std::string &key) {
+        return this->action_execution_service->getResourceInformation(key);
+    }
+
+    /**
+     * @brief Process a "get resource description message"
+     * @param answer_mailbox: the mailbox to which the description message should be sent
+     * @param key: the desired resource information (i.e., dictionary key) that's needed)
+     */
     void BareMetalComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
                                                                 const std::string &key) {
         std::map<std::string, double> dict;
 
-        dict = this->action_execution_service->getResourceInformation(key);
+        dict = this->constructResourceInformation(key);
 
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(

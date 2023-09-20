@@ -1017,12 +1017,12 @@ namespace wrench {
     }
 
     /**
-    * @brief Process a "get resource description message"
-    * @param answer_mailbox: the mailbox to which the description message should be sent
-    * @param key: the desired resource information (i.e., dictionary key) that's needed)
-    */
-    void BatchComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
-                                                            const std::string &key) {
+     * @brief Construct a dict for resource information
+     * @param key: the desired key
+     * @return a dictionary
+     */
+    std::map<std::string, double> BatchComputeService::constructResourceInformation(const std::string &key) {
+
         // Build a dictionary
         std::map<std::string, double> dict;
 
@@ -1065,6 +1065,18 @@ namespace wrench {
         } else {
             throw std::runtime_error("BatchComputeService::processGetResourceInformation(): unknown key");
         }
+        return dict;
+    }
+
+    /**
+    * @brief Process a "get resource description message"
+    * @param answer_mailbox: the mailbox to which the description message should be sent
+    * @param key: the desired resource information (i.e., dictionary key) that's needed)
+    */
+    void BatchComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
+                                                            const std::string &key) {
+
+        auto dict = this->constructResourceInformation(key);
 
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(
