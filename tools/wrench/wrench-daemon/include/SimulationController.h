@@ -110,6 +110,12 @@ namespace wrench {
 
         json isVMSuspended(json data);
 
+        json getExecutionHosts(json data);
+
+        json getVMPhysicalHostname(json data);
+
+        json getVMComputeService(json data);
+
     private:
         // Thread-safe key value stores
         KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;

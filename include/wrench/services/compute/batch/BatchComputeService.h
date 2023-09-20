@@ -234,6 +234,8 @@ namespace wrench {
 
         void startBackgroundWorkloadProcess();
 
+        std::map<std::string, double> constructResourceInformation(const std::string &key) override;
+
         void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
 
         void processCompoundJobCompletion(const std::shared_ptr<BareMetalComputeServiceOneShot> &executor, const std::shared_ptr<CompoundJob> &job);
