@@ -1178,7 +1178,7 @@ namespace wrench {
         }
         auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
         std::vector<std::string> execution_hosts_list = cloud_cs->getExecutionHosts();
-        json answer {};
+        json answer{};
         answer["execution_hosts"] = execution_hosts_list;
         return answer;
     }
