@@ -36,6 +36,14 @@ namespace wrench {
         return this->efficiency;
     }
 
+    /**
+     * @brief Set the model's parallel efficiency
+     * @param efficiency: a parallel efficiency (a number between 0.0 and 1.0)
+     */
+    void wrench::ConstantEfficiencyParallelModel::setEfficiency(double efficiency)  {
+        this->efficiency = efficiency;
+    }
+
     //    /**
     //     * @brief Returns the amount of work each thread much perform
     //     * @param total_work: total amount of work
