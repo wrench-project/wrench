@@ -137,7 +137,7 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
                                  " instead of " + std::to_string(expected_makespan));
     }
 
-    real_parallel_model->setAlpha(0.5); // coverage
+    real_parallel_model->setAlpha(0.5);// coverage
 
     workflow->clear();
 
