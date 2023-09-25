@@ -144,7 +144,7 @@ namespace wrench {
             return processFileLookupRequest(msg->location, msg->answer_mailbox);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileWriteRequestMessage>(message)) {
-            return processFileWriteRequest(msg->location, msg->answer_mailbox);
+            return processFileWriteRequest(msg->location, msg->num_bytes_to_write, msg->answer_mailbox);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadRequestMessage>(message)) {
             return processFileReadRequest(msg->location, msg->num_bytes_to_read, msg->answer_mailbox);
@@ -174,10 +174,12 @@ namespace wrench {
      * @brief Handle a file write request
      *
      * @param location: the location to write the file to
+     * @param num_bytes_to_write: the number of bytes to write to the file
      * @param answer_mailbox: the mailbox to which the reply should be sent
      * @return true if this process should keep running
      */
     bool SimpleStorageServiceBufferized::processFileWriteRequest(std::shared_ptr<FileLocation> &location,
+                                                                 double num_bytes_to_write,
                                                                  simgrid::s4u::Mailbox *answer_mailbox) {
 
         auto file = location->getFile();
@@ -238,7 +240,7 @@ namespace wrench {
                     this->hostname,
                     this->getSharedPtr<StorageService>(),
                     file,
-                    file->getSize(),
+                    num_bytes_to_write,
                     file_reception_mailbox,
                     location,
                     nullptr,
