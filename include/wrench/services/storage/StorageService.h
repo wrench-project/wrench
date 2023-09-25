@@ -214,7 +214,7 @@ namespace wrench {
          * @param location a location
          */
         virtual void writeFile(const std::shared_ptr<FileLocation> &location) {
-            this->writeFile(S4U_Daemon::getRunningActorRecvMailbox(), location, true);
+            this->writeFile(S4U_Daemon::getRunningActorRecvMailbox(), location, location->getFile()->getSize(), true);
         }
 
         /** Non-Simulation methods **/
@@ -497,6 +497,7 @@ namespace wrench {
 
         virtual void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
                                const std::shared_ptr<FileLocation> &location,
+                               double num_bytes_to_write,
                                bool wait_for_answer);
 
         /**
@@ -543,6 +544,11 @@ namespace wrench {
             READ,
             WRITE,
         };
+
+
+        virtual void writeFilePartial(const std::shared_ptr<FileLocation> &location, double num_bytes_to_write) {
+            this->writeFile(S4U_Daemon::getRunningActorRecvMailbox(), location, num_bytes_to_write, true);
+        }
 
         static void writeOrReadFiles(FileOperation action,
                                      std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
