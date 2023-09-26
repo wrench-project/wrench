@@ -196,6 +196,7 @@ namespace wrench {
 
         void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
                        const std::shared_ptr<FileLocation> &location,
+                       double num_bytes_to_write,
                        bool wait_for_answer) override;
 
         void readFile(simgrid::s4u::Mailbox *answer_mailbox,

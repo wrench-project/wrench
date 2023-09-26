@@ -953,6 +953,7 @@ namespace wrench {
         */
         void Node::writeFile(simgrid::s4u::Mailbox *answer_mailbox,
                              const std::shared_ptr<FileLocation> &location,
+                             double num_bytes_to_write,
                              bool wait_for_answer) {
             if (internalStorage == nullptr) {
                 std::string error_message = "Cannot write file at non-storage XRootD node";
@@ -962,10 +963,10 @@ namespace wrench {
             }
             // Replace the location with
             // TODO: THIS LOCATION REWRITE WAS DONE TO FIX SOMETHING BUT HENRI HAS NO
-            // TODO: IDEA HOW COME IT EVERY WORKED BEFORE SINCE THE FTT INSINCE INTERNALSTORAGE
+            // TODO: IDEA HOW COME IT'S EVER WORKED BEFORE SINCE THE FTT INSIDE THE INTERNALSTORAGE
             // TODO: WILL SAY "THIS IS NOT ME, MY PARENT IS THE INTERNALSTORAGE, NOT THE NODE"
             auto new_location = FileLocation::LOCATION(internalStorage, location->getPath(), location->getFile());
-            internalStorage->writeFile(answer_mailbox, new_location, wait_for_answer);
+            internalStorage->writeFile(answer_mailbox, new_location, num_bytes_to_write, wait_for_answer);
             //            internalStorage->writeFile(answer_mailbox, location, wait_for_answer);
             metavisor->files[location->getFile()].push_back(this->getSharedPtr<Node>());
         }

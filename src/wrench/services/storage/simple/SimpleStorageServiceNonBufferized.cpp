@@ -263,7 +263,9 @@ namespace wrench {
             return processFileLookupRequest(msg->location, msg->answer_mailbox);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message)) {
-            return processFileWriteRequest(msg->location, msg->answer_mailbox,
+            return processFileWriteRequest(msg->location,
+                                           msg->num_bytes_to_write,
+                                           msg->answer_mailbox,
                                            msg->requesting_host);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message)) {
@@ -282,12 +284,15 @@ namespace wrench {
      * @brief Handle a file write request
      *
      * @param location: the location to write the file to
+     * @param num_bytes_to_write: the number of bytes to write to the file
      * @param answer_mailbox: the mailbox to which the reply should be sent
      * @param requesting_host: the requesting host
      * @return true if this process should keep running
      */
     bool SimpleStorageServiceNonBufferized::processFileWriteRequest(std::shared_ptr<FileLocation> &location,
-                                                                    simgrid::s4u::Mailbox *answer_mailbox, simgrid::s4u::Host *requesting_host) {
+                                                                    double num_bytes_to_write,
+                                                                    simgrid::s4u::Mailbox *answer_mailbox,
+                                                                    simgrid::s4u::Host *requesting_host) {
 
         if (buffer_size >= 1.0) {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileWriteRequest(): Cannot process a write requests with a non-zero buffer size");
@@ -373,7 +378,7 @@ namespace wrench {
                 me_host,
                 me_disk,
                 answer_mailbox,
-                file->getSize());
+                num_bytes_to_write);
 
         // Add it to the Pool of pending data communications
         this->pending_transactions.push_back(transaction);
