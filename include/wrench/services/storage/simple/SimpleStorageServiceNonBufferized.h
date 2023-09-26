@@ -111,7 +111,9 @@ namespace wrench {
         bool processNextMessage(SimulationMessage *message);
 
         bool processFileWriteRequest(std::shared_ptr<FileLocation> &location,
-                                     simgrid::s4u::Mailbox *answer_mailbox, simgrid::s4u::Host *requesting_host);
+                                     double num_bytes_to_write,
+                                     simgrid::s4u::Mailbox *answer_mailbox,
+                                     simgrid::s4u::Host *requesting_host);
 
         bool
         processFileReadRequest(const std::shared_ptr<FileLocation> &location,

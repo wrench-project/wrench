@@ -800,12 +800,14 @@ namespace wrench {
      *
      * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
      * @param location: the location
+     * @param num_bytes_to_write: number of bytes to write to the file
      * @param wait_for_answer: whether to wait for the answer
      *
      * @throw ExecutionException
      */
     void CompoundStorageService::writeFile(simgrid::s4u::Mailbox *answer_mailbox,
                                            const std::shared_ptr<FileLocation> &location,
+                                           double num_bytes_to_write,
                                            bool wait_for_answer) {
         WRENCH_INFO("CSS::writeFile(): Writing file %s", location->getFile()->getID().c_str());
 
@@ -841,9 +843,10 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                 dloc->getStorageService()->mailbox,
                 new StorageServiceFileWriteRequestMessage(
-                    recv_mailbox, // tmp_mailbox
+                    tmp_mailbox,
                     simgrid::s4u::this_actor::get_host(),
                     dloc,
+                    num_bytes_to_write,
                     this->getMessagePayloadValue(
                         CompoundStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
             request_count++;
