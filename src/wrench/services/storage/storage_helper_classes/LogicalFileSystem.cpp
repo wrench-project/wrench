@@ -212,7 +212,7 @@ namespace wrench {
         }
         return to_return;
     }
-    
+
     /**
     * @brief
     * @return Total number of files currently stored in Filesytem
@@ -222,7 +222,7 @@ namespace wrench {
 
         double files = 0;
 
-        for (const auto &item : this->content) {
+        for (const auto &item: this->content) {
             files += item.second.size();
         }
 

@@ -39,7 +39,7 @@ namespace wrench {
     StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                  const std::string &path,
                                                                                  double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
@@ -63,7 +63,7 @@ namespace wrench {
      */
     StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(
             double free_space, double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
         this->free_space = free_space;
     }
 
@@ -78,7 +78,7 @@ namespace wrench {
     StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                    const std::shared_ptr<FileLocation> &location,
                                                                                    double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
@@ -100,7 +100,7 @@ namespace wrench {
     StorageServiceFileLookupAnswerMessage::StorageServiceFileLookupAnswerMessage(std::shared_ptr<DataFile> file,
                                                                                  bool file_is_available,
                                                                                  double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (file == nullptr) {
             throw std::invalid_argument(
@@ -122,7 +122,7 @@ namespace wrench {
     StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                    const std::shared_ptr<FileLocation> &location,
                                                                                    double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
@@ -148,7 +148,7 @@ namespace wrench {
                                                                                  bool success,
                                                                                  std::shared_ptr<FailureCause> failure_cause,
                                                                                  double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (storage_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
@@ -202,7 +202,7 @@ namespace wrench {
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
                                                                              double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((src == nullptr) || (dst == nullptr) ||
             (success && (failure_cause != nullptr)) ||
@@ -232,7 +232,7 @@ namespace wrench {
                                                                                  const std::shared_ptr<FileLocation> &location,
                                                                                  double num_bytes_to_write,
                                                                                  double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((!answer_mailbox) or (!requesting_host) or (!location)) {
             throw std::invalid_argument(
