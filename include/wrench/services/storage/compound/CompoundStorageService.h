@@ -71,9 +71,9 @@ namespace wrench {
         double ts;
         /** @brief IO action */
         IOAction act;
-        int parts_count; // number of file parts in location array
+        int parts_count;// number of file parts in location array
         std::string file_name;
-        std::vector<DiskUsage> disk_usage; // new usage stats for updated disks
+        std::vector<DiskUsage> disk_usage;// new usage stats for updated disks
         std::vector<std::shared_ptr<FileLocation>> internal_locations;
     };
 
@@ -247,8 +247,8 @@ namespace wrench {
 
         /** @brief Default property values **/
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-            {CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "64000000"},
-            {CompoundStorageServiceProperty::INTERNAL_STRIPING, "true"},
+                {CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "64000000"},
+                {CompoundStorageServiceProperty::INTERNAL_STRIPING, "true"},
         };
 
         /** @brief Default message payload values
@@ -322,6 +322,6 @@ namespace wrench {
         void traceInternalStorageUse(IOAction action, const std::vector<std::shared_ptr<FileLocation>> &locations = {});
     };
 
-}; // namespace wrench
+};// namespace wrench
 
-#endif // WRENCH_COMPOUNDSTORAGESERVICE_H
+#endif// WRENCH_COMPOUNDSTORAGESERVICE_H

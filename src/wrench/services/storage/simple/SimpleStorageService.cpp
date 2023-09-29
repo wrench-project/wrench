@@ -228,7 +228,7 @@ namespace wrench {
 
     double SimpleStorageService::getTotalFilesZeroTime() {
         double files = 0;
-        for (auto const &mp : this->file_systems) {
+        for (auto const &mp: this->file_systems) {
             files += mp.second->getTotalNumFiles();
         }
         return files;
