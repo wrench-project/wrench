@@ -69,6 +69,7 @@ namespace wrench {
 
         double getTotalCapacity() const;
         double getFreeSpace() const;
+        double getTotalNumFiles() const;
         //        bool hasEnoughFreeSpace(double bytes);
 
         void stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path);
