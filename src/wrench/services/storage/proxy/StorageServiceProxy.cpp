@@ -169,7 +169,8 @@ namespace wrench {
                     pending[msg->location->getFile()].push_back(std::move(message));
                     WRENCH_DEBUG("Adding pending write");
                 }
-                S4U_Mailbox::putMessage(cache->mailbox, new StorageServiceFileWriteRequestMessage(mailbox, msg->requesting_host, FileLocation::LOCATION(cache, msg->location->getFile()), 0));
+                S4U_Mailbox::putMessage(cache->mailbox, new StorageServiceFileWriteRequestMessage(mailbox, msg->requesting_host,
+                                                                                                  FileLocation::LOCATION(cache, msg->location->getFile()), msg->location->getFile()->getSize(), 0));
             } else {
                 S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileWriteAnswerMessage(msg->location, false, nullptr, {}, 0, StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD));
             }
