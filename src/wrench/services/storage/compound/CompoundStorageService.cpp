@@ -843,7 +843,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                 dloc->getStorageService()->mailbox,
                 new StorageServiceFileWriteRequestMessage(
-                    tmp_mailbox,
+                    recv_mailbox,
                     simgrid::s4u::this_actor::get_host(),
                     dloc,
                     num_bytes_to_write,
@@ -948,7 +948,7 @@ namespace wrench {
                     recv_mailbox,
                     simgrid::s4u::this_actor::get_host(),
                     dloc,
-                    dloc->getFile()->getSize(),
+                    num_bytes,
                     dloc->getStorageService()->getMessagePayloadValue(
                         CompoundStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
             request_count++;
