@@ -34,6 +34,6 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(INTERNAL_STRIPING);
     };
 
-}; // namespace wrench
+};// namespace wrench
 
-#endif // WRENCH_COMPOUNDSTORAGESERVICEPROPERTY_H
+#endif// WRENCH_COMPOUNDSTORAGESERVICEPROPERTY_H
