@@ -172,6 +172,7 @@ namespace wrench {
         StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                               simgrid::s4u::Host *requesting_host,
                                               const std::shared_ptr<FileLocation> &location,
+                                              double num_bytes_to_write,
                                               double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
@@ -180,6 +181,8 @@ namespace wrench {
         simgrid::s4u::Host *requesting_host;
         /** @brief The file to write */
         std::shared_ptr<FileLocation> location;
+        /** @brief The number of of bytes to write to the file */
+        double num_bytes_to_write;
     };
 
     /**
