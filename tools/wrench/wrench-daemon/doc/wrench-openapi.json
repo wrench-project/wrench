@@ -1131,6 +1131,18 @@
                   "compute_service_name": {
                     "type": "string",
                     "description": "The compute service's name"
+                  },
+                  "service_specific_args": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "service-specific job arguments ({} means “use all defaults” )"
                   }
                 }
               }
@@ -1195,10 +1207,10 @@
                   "property_list": {
                     "type": "object",
                     "properties": {
-                      "code": {
+                      "name": {
                         "type": "string"
                       },
-                      "text": {
+                      "value": {
                         "type": "string"
                       }
                     },
@@ -1207,10 +1219,10 @@
                   "message_payload_list": {
                     "type": "object",
                     "properties": {
-                      "code": {
+                      "name": {
                         "type": "string"
                       },
-                      "text": {
+                      "value": {
                         "type": "number"
                       }
                     },
@@ -1279,10 +1291,10 @@
                   "property_list": {
                     "type": "object",
                     "properties": {
-                      "code": {
+                      "name": {
                         "type": "string"
                       },
-                      "text": {
+                      "value": {
                         "type": "string"
                       }
                     },
@@ -1291,10 +1303,94 @@
                   "message_payload_list": {
                     "type": "object",
                     "properties": {
-                      "code": {
+                      "name": {
                         "type": "string"
                       },
-                      "text": {
+                      "value": {
+                        "type": "number"
+                      }
+                    },
+                    "description": "a message payload list ({} means “use all defaults”)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/addBatchComputeService": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create and start a batch compute service.",
+        "operationId": "addBatchComputeService",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to start a new service.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "head_host": {
+                    "type": "string",
+                    "description": "name of the (simulated) host on which the compute service should run"
+                  },
+                  "resources": {
+                    "type": "object",
+                    "description": "compute resources as a dict of hostnames where values are tuples of #cores and ram in bytes"
+                  },
+                  "scratch_space": {
+                    "type": "string",
+                    "description": "the compute service’s scratch space’s mount point (”” means none)"
+                  },
+                  "property_list": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "a property list ({} means “use all defaults”)"
+                  },
+                  "message_payload_list": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
                         "type": "number"
                       }
                     },
@@ -1712,10 +1808,10 @@
                   "property_list": {
                     "type": "object",
                     "properties": {
-                      "code": {
+                      "name": {
                         "type": "string"
                       },
-                      "text": {
+                      "value": {
                         "type": "string"
                       }
                     },
@@ -1724,10 +1820,10 @@
                   "message_payload_list": {
                     "type": "object",
                     "properties": {
-                      "code": {
+                      "name": {
                         "type": "string"
                       },
-                      "text": {
+                      "value": {
                         "type": "number"
                       }
                     },
@@ -2203,6 +2299,154 @@
           }
         }
       }
+    },
+    "/simulation/{simid}/getVMPhysicalHostname": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get the name of the physical host on which a VM is running.",
+        "operationId": "getVMPhysicalHostname",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to check physical hostname.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "compute_service_name": {
+                    "type": "string",
+                    "description": "The cloud service's name"
+                  },
+                  "vm_name": {
+                    "type": "string",
+                    "description": "The name of the VM"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/getVMComputeService": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get the compute service running on a VM, if any.",
+        "operationId": "getVMComputeService",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to check compute service of VM.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "service_name": {
+                    "type": "string",
+                    "description": "The cloud service's name"
+                  },
+                  "vm_name": {
+                    "type": "string",
+                    "description": "The name of the VM"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/getExecutionHosts": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get the list of execution hosts available to run VMs.",
+        "operationId": "getExecutionHosts",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HostnameList"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2283,10 +2527,10 @@
           "file_locations": {
             "type": "object",
             "properties": {
-              "code": {
+              "file": {
                 "type": "string"
               },
-              "text": {
+              "storage_service": {
                 "type": "string"
               }
             },

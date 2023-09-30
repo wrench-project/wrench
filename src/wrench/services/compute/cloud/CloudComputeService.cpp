@@ -72,28 +72,28 @@ namespace wrench {
     CloudComputeService::~CloudComputeService() {
     }
 
-    /**
-     * @brief Get the list of execution hosts available to run VMs
-     *
-     * @return a list of hostnames
-     *
-     * @throw ExecutionException
-     */
-    std::vector<std::string> CloudComputeService::getExecutionHosts() {
-        assertServiceIsUp();
-
-        // send a "get execution hosts" message to the daemon's mailbox_name
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-
-        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceGetExecutionHostsAnswerMessage>(
-                answer_mailbox,
-                new CloudComputeServiceGetExecutionHostsRequestMessage(
-                        answer_mailbox,
-                        this->getMessagePayloadValue(
-                                CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD)));
-
-        return answer_message->execution_hosts;
-    }
+    //    /**
+    //     * @brief Get the list of execution hosts available to run VMs
+    //     *
+    //     * @return a list of hostnames
+    //     *
+    //     * @throw ExecutionException
+    //     */
+    //    std::vector<std::string> CloudComputeService::getExecutionHosts() {
+    //        assertServiceIsUp();
+    //
+    //        // send a "get execution hosts" message to the daemon's mailbox_name
+    //        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+    //
+    //        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceGetExecutionHostsAnswerMessage>(
+    //                answer_mailbox,
+    //                new CloudComputeServiceGetExecutionHostsRequestMessage(
+    //                        answer_mailbox,
+    //                        this->getMessagePayloadValue(
+    //                                CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD)));
+    //
+    //        return answer_message->execution_hosts;
+    //    }
 
     /**
      * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
@@ -993,14 +993,12 @@ namespace wrench {
         S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
     }
 
-
     /**
-     * @brief Process a "get resource information message"
-     * @param answer_mailbox: the mailbox to which the description message should be sent
-     * @param key: the desired resource information (i.e., dictionary key) that's needed)
+     * @brief Construct a dict for resource information
+     * @param key: the desired key
+     * @return a dictionary
      */
-    void CloudComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
-                                                            const std::string &key) {
+    std::map<std::string, double> CloudComputeService::constructResourceInformation(const std::string &key) {
         std::map<std::string, double> dict;
 
         if (key == "num_hosts") {
@@ -1057,8 +1055,20 @@ namespace wrench {
             }
 
         } else {
-            throw std::runtime_error("CloudComputeService::processGetResourceInformation(): unknown key");
+            throw std::runtime_error("CloudComputeService::constructResourceInformation(): unknown key");
         }
+
+        return dict;
+    }
+
+    /**
+     * @brief Process a "get resource information message"
+     * @param answer_mailbox: the mailbox to which the description message should be sent
+     * @param key: the desired resource information (i.e., dictionary key) that's needed)
+     */
+    void CloudComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
+                                                            const std::string &key) {
+        auto dict = this->constructResourceInformation(key);
 
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(

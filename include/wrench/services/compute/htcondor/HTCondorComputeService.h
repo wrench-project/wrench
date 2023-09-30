@@ -101,12 +101,14 @@ namespace wrench {
 
         static bool isJobGridUniverse(std::shared_ptr<CompoundJob> &job);
 
+
         /***********************/
         /** \endcond          **/
         /***********************/
 
     private:
         int main() override;
+        std::map<std::string, double> constructResourceInformation(const std::string &key) override;
 
         bool processNextMessage();
 

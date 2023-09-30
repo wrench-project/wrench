@@ -204,6 +204,7 @@ namespace wrench {
 
         void terminateCurrentCompoundJob(const std::shared_ptr<CompoundJob> &job, ComputeService::TerminationCause termination_cause);
 
+
         void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
 
         void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<CompoundJob> &job,
@@ -230,6 +231,9 @@ namespace wrench {
          * @brief The ActionExecutionService that is started by this service
          */
         std::shared_ptr<ActionExecutionService> action_execution_service;
+
+    private:
+        std::map<std::string, double> constructResourceInformation(const std::string &key) override;
 
         /***********************/
         /** \endcond           */
