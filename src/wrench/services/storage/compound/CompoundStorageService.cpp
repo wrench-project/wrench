@@ -138,13 +138,14 @@ namespace wrench {
             }
 
             // Create all activities to wait on (only emplace the communicator)
-            std::vector<simgrid::s4u::ActivityPtr> pending_activities;
-            pending_activities.emplace_back(comm_ptr);
+//            std::vector<simgrid::s4u::ActivityPtr> pending_activities;
+//            pending_activities.emplace_back(comm_ptr);
 
             // Wait one activity (communication in this case) to complete
-            int finished_activity_index;
+//            int finished_activity_index;
             try {
-                finished_activity_index = (int) simgrid::s4u::Activity::wait_any(pending_activities);
+//                finished_activity_index = (int) simgrid::s4u::Activity::wait_any(pending_activities);
+                  comm_ptr->wait();
             } catch (simgrid::NetworkFailureException &e) {
                 comm_ptr_has_been_posted = false;
                 continue;
@@ -153,13 +154,13 @@ namespace wrench {
             }
 
             // It's a communication
-            if (finished_activity_index == 0) {
+//            if (finished_activity_index == 0) {
                 comm_ptr_has_been_posted = false;
                 if (not processNextMessage(simulation_message.get()))
                     break;
-            } else if (finished_activity_index == -1) {
-                throw std::runtime_error("wait_any() returned -1. Not sure what to do with this. ");
-            }
+//            } else if (finished_activity_index == -1) {
+//                throw std::runtime_error("wait_any() returned -1. Not sure what to do with this. ");
+//            }
         }
 
         WRENCH_INFO("Compound Storage Service %s on host %s cleanly terminating!",
