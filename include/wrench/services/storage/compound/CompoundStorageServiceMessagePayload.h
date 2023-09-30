@@ -7,18 +7,17 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_COMPOUNDSTORAGESERVICEMESSAGEPAYLOAD_H
 #define WRENCH_COMPOUNDSTORAGESERVICEMESSAGEPAYLOAD_H
 
-#include "wrench/services/storage/StorageServiceMessagePayload.h"
 #include "wrench/services/ServiceMessagePayload.h"
+#include "wrench/services/storage/StorageServiceMessagePayload.h"
 
 namespace wrench {
 
     /**
-    * @brief Configurable message payloads for a CompoundStorageService
-    */
+     * @brief Configurable message payloads for a CompoundStorageService
+     */
     class CompoundStorageServiceMessagePayload : public StorageServiceMessagePayload {
 
     public:
@@ -28,5 +27,4 @@ namespace wrench {
 
 };// namespace wrench
 
-
-#endif//WRENCH_COMPOUNDSTORAGESERVICEMESSAGEPAYLOAD_H
+#endif// WRENCH_COMPOUNDSTORAGESERVICEMESSAGEPAYLOAD_H

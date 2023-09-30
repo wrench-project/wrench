@@ -80,8 +80,14 @@ namespace wrench {
         // Do the SMPI thing!!!
         auto barrier = simgrid::s4u::Barrier::create(1 + simgrid_hosts.size());
         // Start actors
+        auto meta_lambda = [this](const std::shared_ptr<ActionExecutor> &action_executor) {
+            S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()] = S4U_Mailbox::generateUniqueMailbox("rmb");
+            this->lambda_mpi(action_executor);
+            S4U_Daemon::map_actor_to_recv_mailbox.erase(simgrid::s4u::this_actor::get_pid());
+        };
+
         SMPI_app_instance_start(("MPI_Action_" + std::to_string(simgrid::s4u::this_actor::get_pid())).c_str(),
-                                MPIProcess(this->lambda_mpi, barrier, action_executor),
+                                MPIProcess(meta_lambda, barrier, action_executor),
                                 simgrid_hosts);
         barrier->wait();
     }
