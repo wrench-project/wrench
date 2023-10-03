@@ -165,7 +165,6 @@ namespace wrench {
 
         bool areAllComputeResourcesDownWithNoActionExecutorRunning();
 
-
         int exit_code = 0;
 
         std::shared_ptr<HostStateChangeDetector> host_state_change_monitor;
