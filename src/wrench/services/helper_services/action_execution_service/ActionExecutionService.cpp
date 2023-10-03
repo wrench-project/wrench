@@ -68,10 +68,10 @@ namespace wrench {
     /**
      * @brief Helper static method to parse resource specifications to the <cores,ram> format
      * @param spec: specification string
-     * @return a <cores, ram> tuple
+     * @return a <host, core> tuple
      * @throw std::invalid_argument
      */
-    static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec) {
+    static std::tuple<simgrid::s4u::Host *, unsigned long> parseResourceSpec(const std::string &spec) {
         std::vector<std::string> tokens;
         boost::algorithm::split(tokens, spec, boost::is_any_of(":"));
         switch (tokens.size()) {
@@ -79,9 +79,9 @@ namespace wrench {
             {
                 unsigned long num_threads;
                 if (sscanf(tokens[0].c_str(), "%lu", &num_threads) != 1) {
-                    return std::make_tuple(tokens[0], 0);
+                    return std::make_tuple(S4U_Simulation::get_host_or_vm_by_name(tokens[0]), 0);
                 } else {
-                    return std::make_tuple(std::string(""), num_threads);
+                    return std::make_tuple(nullptr, num_threads);
                 }
             }
             case 2:// "hostname:num_cores"
@@ -90,7 +90,7 @@ namespace wrench {
                 if (sscanf(tokens[1].c_str(), "%lu", &num_threads) != 1) {
                     throw std::invalid_argument("Invalid service-specific argument '" + spec + "'");
                 }
-                return std::make_tuple(tokens[0], num_threads);
+                return std::make_tuple(S4U_Simulation::get_host_or_vm_by_name(tokens[0]), num_threads);
             }
             default: {
                 throw std::invalid_argument("Invalid service-specific argument '" + spec + "'");
@@ -177,7 +177,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the service should be started
-     * @param compute_resources: a map of <num_cores, memory> tuples, indexed by hostname, which represents
+     * @param compute_resources: a map of <num_cores, memory> tuples, indexed by host, which represents
      *        the compute resources available to this service.
      *          - use num_cores = ComputeService::ALL_CORES to use all cores available on the host
      *          - use memory_manager_service = ComputeService::ALL_RAM to use all RAM available on the host
@@ -187,7 +187,7 @@ namespace wrench {
      */
     ActionExecutionService::ActionExecutionService(
             const std::string &hostname,
-            const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
+            const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &compute_resources,
             std::shared_ptr<Service> parent_service,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(hostname,
@@ -207,14 +207,13 @@ namespace wrench {
                     "ActionExecutionService::ActionExecutionService(): the resource list is empty");
         }
         for (auto host: compute_resources) {
-            std::string hname = host.first;
             unsigned long requested_cores = std::get<0>(host.second);
             unsigned long available_cores;
             try {
-                available_cores = S4U_Simulation::getHostNumCores(hname);
+                available_cores = host.first->get_core_count();
             } catch (std::runtime_error &e) {
                 throw std::invalid_argument(
-                        "ActionExecutionService::ActionExecutionService(): Host '" + hname + "' does not exist");
+                        "ActionExecutionService::ActionExecutionService(): Host '" + host.first->get_name() + "' does not exist");
             }
             if (requested_cores == ComputeService::ALL_CORES) {
                 requested_cores = available_cores;
@@ -225,13 +224,13 @@ namespace wrench {
             }
             if (requested_cores > available_cores) {
                 throw std::invalid_argument(
-                        "ActionExecutionService::ActionExecutionService(): " + hname + "only has " +
+                        "ActionExecutionService::ActionExecutionService(): " + host.first->get_name() + "only has " +
                         std::to_string(available_cores) + " cores but " +
                         std::to_string(requested_cores) + " are requested");
             }
 
             double requested_ram = std::get<1>(host.second);
-            double available_ram = S4U_Simulation::getHostMemoryCapacity(hname);
+            double available_ram = S4U_Simulation::getHostMemoryCapacity(host.first);
             if (requested_ram < 0) {
                 throw std::invalid_argument(
                         "ActionExecutionService::ActionExecutionService(): requested RAM should be non-negative");
@@ -243,12 +242,12 @@ namespace wrench {
 
             if (requested_ram > available_ram) {
                 throw std::invalid_argument(
-                        "ActionExecutionService::ActionExecutionService(): host " + hname + "only has " +
+                        "ActionExecutionService::ActionExecutionService(): host " + host.first->get_name() + "only has " +
                         std::to_string(available_ram) + " bytes of RAM but " +
                         std::to_string(requested_ram) + " are requested");
             }
 
-            this->compute_resources[hname] = std::make_tuple(requested_cores, requested_ram);
+            this->compute_resources[host.first] = std::make_tuple(requested_cores, requested_ram);
         }
 
 
@@ -283,7 +282,7 @@ namespace wrench {
             auto host = cr.first;
             auto num_cores = std::get<0>(cr.second);
             auto ram = std::get<1>(cr.second);
-            msg += "  - " + host + ": " + std::to_string(num_cores) + " cores; " + std::to_string(ram / 1000000000) +
+            msg += "  - " + host->get_name() + ": " + std::to_string(num_cores) + " cores; " + std::to_string(ram / 1000000000) +
                    " GB of RAM\n";
         }
         WRENCH_INFO("%s", msg.c_str());
@@ -291,7 +290,7 @@ namespace wrench {
         // Create and start the host state monitor if necessary
         if (Simulation::isEnergySimulationEnabled() or Simulation::isHostShutdownSimulationEnabled()) {
             // Create the host state monitor
-            std::vector<std::string> hosts_to_monitor;
+            std::vector<simgrid::s4u::Host *> hosts_to_monitor;
             for (auto const &h: this->compute_resources) {
                 hosts_to_monitor.push_back(h.first);
             }
@@ -324,35 +323,35 @@ namespace wrench {
      * @brief helper function to figure out where/how an action should run
      *
      * @param action: the action for which this allocation is being computed
-     * @param required_host: the required host per service-specific arguments ("" means: choose one)
+     * @param required_host: the required host per service-specific arguments (nullptr means: choose one)
      * @param required_num_cores: the required number of cores per service-specific arguments (0 means: choose a number)
      * @param hosts_to_avoid: a list of hosts to not even consider
      * @return an allocation
      */
-    std::tuple<std::string, unsigned long> ActionExecutionService::pickAllocation(
+    std::tuple<simgrid::s4u::Host *, unsigned long> ActionExecutionService::pickAllocation(
             const std::shared_ptr<Action> &action,
-            const std::string &required_host,
+            simgrid::s4u::Host *required_host,
             unsigned long required_num_cores,
-            std::set<std::string> &hosts_to_avoid) {
+            std::set<simgrid::s4u::Host *> &hosts_to_avoid) {
 
         // Compute possible hosts
-        std::set<std::string> possible_hosts;
-        std::string new_host_to_avoid;
+        std::set<simgrid::s4u::Host *> possible_hosts;
+        simgrid::s4u::Host *new_host_to_avoid = nullptr;
         double new_host_to_avoid_ram_capacity = 0;
         for (auto const &r: this->compute_resources) {
 
             // If there is a required host, then don't even look at others
-            if (not required_host.empty() and (r.first != required_host)) {
+            if (required_host != nullptr and (r.first != required_host)) {
                 continue;
             }
 
             // If the host is down, then don't look at it
-            if (not Simulation::isHostOn(r.first)) {
+            if (not r.first->is_on()) {
                 continue;
             }
 
             // If the host has compute speed zero, then don't look at it
-            if (Simulation::getHostFlopRate(r.first) <= 0.0) {
+            if (r.first->get_speed() <= 0.0) {
                 continue;
             }
 
@@ -371,7 +370,7 @@ namespace wrench {
                 continue;
             }
             if (this->ram_availabilities[r.first] < action->getMinRAMFootprint()) {
-                if (new_host_to_avoid.empty()) {
+                if (new_host_to_avoid == nullptr) {
                     new_host_to_avoid = r.first;
                     new_host_to_avoid_ram_capacity = this->ram_availabilities[r.first];
                 } else {
@@ -390,20 +389,20 @@ namespace wrench {
         // If none, then reply with an empty tuple
         if (possible_hosts.empty()) {
             // Host to avoid is the one with the lowest ram availability
-            if (not new_host_to_avoid.empty()) {
+            if (new_host_to_avoid != nullptr) {
                 hosts_to_avoid.insert(new_host_to_avoid);
             }
-            return std::make_tuple(std::string(), 0);
+            return std::make_tuple(nullptr, 0);
         }
 
         // Select the "best" host
         double lowest_load = DBL_MAX;
-        std::string picked_host;
+        simgrid::s4u::Host *picked_host;
         unsigned long picked_num_cores = 0;
         for (auto const &h: possible_hosts) {
             unsigned long num_running_threads = this->running_thread_counts[h];
             unsigned long num_cores = std::get<0>(this->compute_resources[h]);
-            double flop_rate = S4U_Simulation::getHostFlopRate(h);
+            double flop_rate = h->get_speed();
             unsigned long used_num_cores;
             if (required_num_cores == 0) {
                 used_num_cores = std::min(num_cores, action->getMaxNumCores());// as many cores as possible
@@ -435,15 +434,15 @@ namespace wrench {
         // Due to a previously considered actions not being
         // able to run on that host due to RAM, and because we don't
         // allow non-zero-ram tasks to jump ahead of other tasks
-        std::set<std::string> no_longer_considered_hosts;
+        std::set<simgrid::s4u::Host*> no_longer_considered_hosts;
 
         for (auto const &action: this->ready_actions) {
             std::string picked_host;
-            std::string target_host;
+            simgrid::s4u::Host *target_host = nullptr;
             unsigned long target_num_cores;
             double required_ram;
 
-            std::tuple<std::string, unsigned long> allocation =
+            std::tuple<simgrid::s4u::Host *, unsigned long> allocation =
                     pickAllocation(action,
                                    std::get<0>(this->action_run_specs[action]),
                                    std::get<1>(this->action_run_specs[action]),
@@ -454,7 +453,7 @@ namespace wrench {
 
 
             // If we didn't find a host, forget it
-            if (target_host.empty()) {
+            if (target_host == nullptr) {
                 continue;
             }
             //            WRENCH_INFO("ALLOC %s: %s %ld %lf", action->getName().c_str(), target_host.c_str(), target_num_cores, required_ram);
@@ -462,7 +461,7 @@ namespace wrench {
             /** Dispatch it **/
             // Create an action executor on the target host
             auto action_executor = std::shared_ptr<ActionExecutor>(
-                    new ActionExecutor(target_host,
+                    new ActionExecutor(target_host->get_name(),
                                        target_num_cores,
                                        required_ram,
                                        this->getPropertyValueAsTimeInSecond(ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD),
@@ -546,7 +545,7 @@ namespace wrench {
         } else if (std::dynamic_pointer_cast<HostHasTurnedOffMessage>(message)) {
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
-                        ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+                    ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
 
             } else {
@@ -604,7 +603,7 @@ namespace wrench {
             processActionExecutorCrash(action_executor);
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
-                        ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+                    ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
 
             } else {
@@ -641,8 +640,8 @@ namespace wrench {
         // If action is running kill the executor
         if (this->action_executors.find(action) != this->action_executors.end()) {
             auto executor = this->action_executors[action];
-            this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
-            this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
+            this->ram_availabilities[executor->getHost()] += executor->getMemoryAllocated();
+            this->running_thread_counts[executor->getHost()] -= executor->getNumCoresAllocated();
 
             executor->kill(killed_due_to_job_cancellation);
             executor->getAction()->setFailureCause(cause);
@@ -744,12 +743,12 @@ namespace wrench {
     void ActionExecutionService::processActionExecutorCompletion(
             const std::shared_ptr<ActionExecutor> &executor) {
 
-        auto executor_hostname = executor->getHostname();
+        auto executor_host = executor->getHost();
         auto action = executor->getAction();
 
         // Update RAM availabilities and running thread counts
-        this->ram_availabilities[executor_hostname] += executor->getMemoryAllocated();
-        this->running_thread_counts[executor_hostname] -= executor->getNumCoresAllocated();
+        this->ram_availabilities[executor_host] += executor->getMemoryAllocated();
+        this->running_thread_counts[executor_host] -= executor->getNumCoresAllocated();
 
         // Forget the action executor
         this->action_executors.erase(action);
@@ -759,7 +758,7 @@ namespace wrench {
         // Send the notification to the originator
         S4U_Mailbox::dputMessage(
                 this->parent_service->mailbox, new ActionExecutionServiceActionDoneMessage(
-                                                       action, 0.0));
+                        action, 0.0));
     }
 
     /**
@@ -771,8 +770,8 @@ namespace wrench {
         auto cause = action->getFailureCause();
 
         // Update RAM availabilities and running thread counts
-        this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
-        this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
+        this->ram_availabilities[executor->getHost()] += executor->getMemoryAllocated();
+        this->running_thread_counts[executor->getHost()] -= executor->getNumCoresAllocated();
 
         // Forget the action executor
         this->action_executors.erase(action);
@@ -871,12 +870,12 @@ namespace wrench {
         }
 
         // Parse the service-specific argument
-        std::tuple<std::string, unsigned long> parsed_spec = parseResourceSpec(
+        std::tuple<simgrid::s4u::Host *, unsigned long> parsed_spec = parseResourceSpec(
                 service_specific_arguments[action->getName()]);
-        std::string desired_host = std::get<0>(parsed_spec);
+        simgrid::s4u::Host *desired_host = std::get<0>(parsed_spec);
         unsigned long desired_num_cores = std::get<1>(parsed_spec);
 
-        if (desired_host.empty()) {
+        if (desired_host == nullptr) {
             // At this point the desired num cores in non-zero
             if (not isThereAtLeastOneHostWithResources(desired_num_cores, action->getMinRAMFootprint())) {
                 return false;
@@ -929,10 +928,10 @@ namespace wrench {
         }
 
         // Construct the action run spec (i.e., keep track of service-specific arguments for the action)
-        std::tuple<std::string, unsigned long> action_run_spec;
+        std::tuple<simgrid::s4u::Host*, unsigned long> action_run_spec;
         if ((service_specific_arguments.find(action->getName()) == service_specific_arguments.end()) or
             (service_specific_arguments[action->getName()].empty())) {
-            action_run_spec = std::make_tuple("", 0);
+            action_run_spec = std::make_tuple(nullptr, 0);
         } else {
             std::string spec = service_specific_arguments[action->getName()];
             action_run_spec = parseResourceSpec(spec);
@@ -1009,7 +1008,7 @@ namespace wrench {
             // Num cores per hosts
             std::map<std::string, double> num_cores;
             for (auto r: this->compute_resources) {
-                num_cores.insert(std::make_pair(r.first, (double) (std::get<0>(r.second))));
+                num_cores.insert(std::make_pair(r.first->get_name(), (double) (std::get<0>(r.second))));
             }
             return num_cores;
 
@@ -1020,7 +1019,7 @@ namespace wrench {
                 unsigned long cores = std::get<0>(this->compute_resources[r.first]);
                 unsigned long running_threads = r.second;
                 num_idle_cores.insert(
-                        std::make_pair(r.first, (double) (std::max<unsigned long>(cores - running_threads, 0))));
+                        std::make_pair(r.first->get_name(), (double) (std::max<unsigned long>(cores - running_threads, 0))));
             }
             return num_idle_cores;
 
@@ -1028,7 +1027,7 @@ namespace wrench {
             // Flop rate per host
             std::map<std::string, double> flop_rates;
             for (auto h: this->compute_resources) {
-                flop_rates.insert(std::make_pair(h.first, S4U_Simulation::getHostFlopRate(std::get<0>(h))));
+                flop_rates.insert(std::make_pair(h.first->get_name(), std::get<0>(h)->get_speed()));
             }
             return flop_rates;
 
@@ -1036,7 +1035,7 @@ namespace wrench {
             // RAM capacity per host
             std::map<std::string, double> ram_capacities;
             for (auto h: this->compute_resources) {
-                ram_capacities.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(std::get<0>(h))));
+                ram_capacities.insert(std::make_pair(h.first->get_name(), S4U_Simulation::getHostMemoryCapacity(std::get<0>(h))));
             }
             return ram_capacities;
 
@@ -1044,7 +1043,7 @@ namespace wrench {
             // RAM availability per host
             std::map<std::string, double> ram_availabilities_to_return;
             for (auto const &r: this->ram_availabilities) {
-                ram_availabilities_to_return.insert(std::make_pair(r.first, r.second));
+                ram_availabilities_to_return.insert(std::make_pair(r.first->get_name(), r.second));
             }
             return ram_availabilities_to_return;
 
@@ -1079,8 +1078,8 @@ namespace wrench {
         WRENCH_INFO("Handling an ActionExecutor crash!");
 
         // Update RAM availabilities and running thread counts
-        this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
-        this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
+        this->ram_availabilities[executor->getHost()] += executor->getMemoryAllocated();
+        this->running_thread_counts[executor->getHost()] -= executor->getNumCoresAllocated();
 
         // Forget the executor
         this->action_executors.erase(action);
@@ -1113,7 +1112,7 @@ namespace wrench {
     bool ActionExecutionService::areAllComputeResourcesDownWithNoActionExecutorRunning() {
         bool all_resources_down = true;
         for (auto const &h: this->compute_resources) {
-            if (Simulation::isHostOn(h.first)) {
+            if (h.first->is_on()) {
                 all_resources_down = false;
                 break;
             }
@@ -1134,7 +1133,7 @@ namespace wrench {
      * @brief Get a (reference to) the compute resources of this service
      * @return the compute resources
      */
-    std::map<std::string, std::tuple<unsigned long, double>> &ActionExecutionService::getComputeResources() {
+    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &ActionExecutionService::getComputeResources() {
         return this->compute_resources;
     }
 

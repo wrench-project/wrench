@@ -46,7 +46,7 @@ void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int r
  *
  */
 wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_which_to_run,
-                                                         std::vector<std::string> hosts_to_monitor,
+                                                         std::vector<simgrid::s4u::Host *> hosts_to_monitor,
                                                          bool notify_when_turned_on, bool notify_when_turned_off, bool notify_when_speed_change,
                                                          std::shared_ptr<S4U_Daemon> creator,
                                                          simgrid::s4u::Mailbox *mailbox_to_notify,
@@ -64,30 +64,27 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
     // Connect my member method to the on_state_change signal from SimGrid regarding Hosts
     this->on_state_change_call_back_id = simgrid::s4u::Host::on_onoff.connect(
             [this](simgrid::s4u::Host const &h) {
-                this->hostStateChangeCallback(h.get_name());
+                this->hostStateChangeCallback(&h);
             });
 
     // Connect my member method to the on_speed_change signal from SimGrid regarding Hosts
     this->on_speed_change_call_back_id = simgrid::s4u::Host::on_speed_change.connect(
             [this](simgrid::s4u::Host const &h) {
-                this->hostSpeedChangeCallback(h.get_name());
+                this->hostSpeedChangeCallback(&h);
             });
 }
 
-void wrench::HostStateChangeDetector::hostStateChangeCallback(std::string const &hostname) {
-    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), hostname) !=
+void wrench::HostStateChangeDetector::hostStateChangeCallback(const simgrid::s4u::Host *host) {
+    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), host) !=
         this->hosts_to_monitor.end()) {
-        auto host = S4U_Simulation::get_host_or_vm_by_name(hostname);
         this->hosts_that_have_recently_changed_state.push_back(std::make_pair(hostname, host->is_on()));
     }
 }
 
-void wrench::HostStateChangeDetector::hostSpeedChangeCallback(std::string const &hostname) {
-    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), hostname) !=
+void wrench::HostStateChangeDetector::hostSpeedChangeCallback(const simgrid::s4u::Host *host) {
+    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), host) !=
         this->hosts_to_monitor.end()) {
-        auto host = S4U_Simulation::get_host_or_vm_by_name(hostname);
-        double speed = host->get_speed();
-        this->hosts_that_have_recently_changed_speed.push_back(std::make_pair(hostname, speed));
+        this->hosts_that_have_recently_changed_speed.push_back(std::make_pair(hostname, host->get_speed()));
     }
 }
 
