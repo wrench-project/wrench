@@ -133,6 +133,13 @@ namespace wrench {
                                 std::shared_ptr<StorageService> scratch_space);// reference to upper level scratch space
 
         BareMetalComputeService(const std::string &hostname,
+                                std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources,
+                                WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+                                std::shared_ptr<PilotJob> pj, const std::string &suffix,
+                                std::shared_ptr<StorageService> scratch_space);
+
+        BareMetalComputeService(const std::string &hostname,
                                 const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
@@ -143,7 +150,7 @@ namespace wrench {
 
         // Low-level constructor helper method
         void initiateInstance(const std::string &hostname,
-                              std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+                              std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources,
                               WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                               std::shared_ptr<PilotJob> pj);
