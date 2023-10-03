@@ -130,10 +130,10 @@ namespace wrench {
 
                 parsed_spec = BareMetalComputeService::parseResourceSpec(service_specific_args.at(action->getName()));
 
-                std::string target_host = std::get<0>(parsed_spec);
+                simgrid::s4u::Host *target_host = S4U_Simulation::get_host_or_vm_by_name(std::get<0>(parsed_spec));
                 unsigned long target_num_cores = std::get<1>(parsed_spec);
 
-                if (not target_host.empty()) {
+                if (target_host != nullptr) {
                     if (compute_resources.find(target_host) == compute_resources.end()) {
                         throw std::invalid_argument(
                                 "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
@@ -234,8 +234,12 @@ namespace wrench {
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname,
                                                                                         "bare_metal",
                                                                                         scratch_space_mount_point) {
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> specified_compute_resources;
+        for (const auto &h: compute_resources) {
+            specified_compute_resources[S4U_Simulation::get_host_or_vm_by_name(h.first)] = compute_resources.at(h.first);
+        }
         initiateInstance(hostname,
-                         compute_resources,
+                         specified_compute_resources,
                          std::move(property_list), std::move(messagepayload_list), nullptr);
     }
 
@@ -256,10 +260,9 @@ namespace wrench {
                                                      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname,
                                                                                                                                  "bare_metal",
                                                                                                                                  scratch_space_mount_point) {
-        std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> specified_compute_resources;
         for (const auto &h: compute_hosts) {
-            specified_compute_resources.insert(
-                    std::make_pair(h, std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM)));
+            specified_compute_resources[S4U_Simulation::get_host_or_vm_by_name(h)] = std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM);
         }
 
         initiateInstance(hostname,
@@ -290,8 +293,44 @@ namespace wrench {
             const std::string &suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
                                                                                                        "bare_metal" + suffix,
                                                                                                        std::move(scratch_space)) {
+
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> specified_compute_resources;
+        for (const auto &h: compute_resources) {
+            specified_compute_resources[S4U_Simulation::get_host_or_vm_by_name(h.first)] = compute_resources[h.first];
+        }
         initiateInstance(hostname,
-                         std::move(compute_resources),
+                         specified_compute_resources,
+                         std::move(property_list),
+                         std::move(messagepayload_list),
+                         std::move(pj));
+    }
+
+
+    /**
+     * @brief Internal constructor
+     *
+     * @param hostname: the name of the host on which the service should be started
+     * @param compute_resources: a list of <host, num_cores, memory_manager_service> tuples, which represent
+     *        the compute resources available to this service
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     * @param pj: a containing PilotJob  (nullptr if none)
+     * @param suffix: a string to append to the process name
+     * @param scratch_space: the scratch storage service
+     *
+     * @throw std::invalid_argument
+     */
+    BareMetalComputeService::BareMetalComputeService(
+            const std::string &hostname,
+            std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources,
+            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+            std::shared_ptr<PilotJob> pj,
+            const std::string &suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
+                                                                                                       "bare_metal" + suffix,
+                                                                                                       std::move(scratch_space)) {
+        initiateInstance(hostname,
+                         compute_resources,
                          std::move(property_list),
                          std::move(messagepayload_list),
                          std::move(pj));
@@ -315,8 +354,13 @@ namespace wrench {
             std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
                                                                             "bare_metal",
                                                                             std::move(scratch_space)) {
+
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> specified_compute_resources;
+        for (const auto &h: compute_resources) {
+            specified_compute_resources[S4U_Simulation::get_host_or_vm_by_name(h.first)] = compute_resources.at(h.first);
+        }
         initiateInstance(hostname,
-                         compute_resources,
+                         specified_compute_resources,
                          std::move(property_list), std::move(messagepayload_list), nullptr);
     }
 
@@ -324,7 +368,7 @@ namespace wrench {
      * @brief Helper method called by all constructors to initiate object instance
      *
      * @param hostname: the name of the host
-     * @param compute_resources: compute_resources: a map of <num_cores, memory_manager_service> pairs, indexed by hostname, which represent
+     * @param compute_resources: compute_resources: a map of <num_cores, RAM> pairs, indexed by host, which represent
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -334,7 +378,7 @@ namespace wrench {
      */
     void BareMetalComputeService::initiateInstance(
             const std::string &hostname,
-            std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+            std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             std::shared_ptr<PilotJob> pj) {

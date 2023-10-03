@@ -62,8 +62,8 @@ private:
     int main() override {
 
         // Create a StateChangeDetector
-        std::vector<std::string> hosts;
-        hosts.push_back("Host2");
+        std::vector<simgrid::s4u::Host *> hosts;
+        hosts.push_back(wrench::S4U_Simulation::get_host_or_vm_by_name("Host2"));
         auto ssd = std::shared_ptr<wrench::HostStateChangeDetector>(
                 new wrench::HostStateChangeDetector(this->hostname, hosts, true, true, this->notify_when_speed_change,
                                                     this->getSharedPtr<wrench::ExecutionController>(), this->mailbox, {}));
