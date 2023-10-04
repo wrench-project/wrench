@@ -91,6 +91,8 @@ namespace wrench {
 
         void validateProperties();
 
+        int num_hosts_turned_on;
+
 
         std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
 
