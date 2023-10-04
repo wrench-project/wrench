@@ -131,26 +131,7 @@ namespace wrench {
         BlockingQueue<wrench::FileRegistryService *> file_service_to_start;
         BlockingQueue<std::tuple<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>, std::map<std::string, std::string>>> submissions_to_do;
 
-        BlockingQueue<std::pair<std::tuple<unsigned long, double, WRENCH_PROPERTY_COLLECTION_TYPE, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE>, std::shared_ptr<ComputeService>>> vm_to_create;
-        BlockingQueue<std::pair<bool, std::string>> vm_created;
-
-        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_start;
-        BlockingQueue<std::pair<bool, std::string>> vm_started;
-
-        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_shutdown;
-        BlockingQueue<std::pair<bool, std::string>> vm_shutdown;
-
-        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_destroy;
-        BlockingQueue<std::pair<bool, std::string>> vm_destroyed;
-
-        BlockingQueue<std::pair<std::shared_ptr<DataFile>, std::shared_ptr<StorageService>>> file_to_lookup;
-        BlockingQueue<std::tuple<bool, bool, std::string>> file_looked_up;
-
-        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_suspend;
-        BlockingQueue<std::pair<bool, std::string>> vm_suspended;
-
-        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_resume;
-        BlockingQueue<std::pair<bool, std::string>> vm_resumed;
+        BlockingQueue<std::function<void()>> things_to_do;
 
         // The two managers
         std::shared_ptr<JobManager> job_manager;
