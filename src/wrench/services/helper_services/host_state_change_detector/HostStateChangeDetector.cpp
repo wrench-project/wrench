@@ -77,14 +77,14 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
 void wrench::HostStateChangeDetector::hostStateChangeCallback(const simgrid::s4u::Host *host) {
     if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), host) !=
         this->hosts_to_monitor.end()) {
-        this->hosts_that_have_recently_changed_state.push_back(std::make_pair(hostname, host->is_on()));
+        this->hosts_that_have_recently_changed_state.push_back(std::make_pair(host->get_name(), host->is_on()));
     }
 }
 
 void wrench::HostStateChangeDetector::hostSpeedChangeCallback(const simgrid::s4u::Host *host) {
     if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), host) !=
         this->hosts_to_monitor.end()) {
-        this->hosts_that_have_recently_changed_speed.push_back(std::make_pair(hostname, host->get_speed()));
+        this->hosts_that_have_recently_changed_speed.push_back(std::make_pair(host->get_name(), host->get_speed()));
     }
 }
 

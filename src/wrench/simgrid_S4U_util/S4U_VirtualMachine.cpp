@@ -125,6 +125,7 @@ namespace wrench {
      * @brief Shutdown the VM
      */
     void S4U_VirtualMachine::shutdown() {
+        std::cerr << "IN S4U_VM:shutdown() \n";
         if (this->state == State::DOWN) {
             throw std::runtime_error(
                     "S4U_VirtualMachine::shutdown(): Cannot shutdown a VM that's in state " + this->getStateAsString());

@@ -272,6 +272,8 @@ namespace wrench {
 
         this->state = Service::UP;
 
+        this->num_hosts_turned_on = this->compute_resources.size();
+
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
         // Print some logging
@@ -535,6 +537,7 @@ namespace wrench {
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (std::dynamic_pointer_cast<HostHasTurnedOnMessage>(message)) {
+            this->num_hosts_turned_on++;
             // Do nothing, just wake up
             return true;
 
@@ -543,7 +546,7 @@ namespace wrench {
             return true;
 
         } else if (std::dynamic_pointer_cast<HostHasTurnedOffMessage>(message)) {
-            // If all hosts being off should not cause the service to terminate, then nevermind
+            this->num_hosts_turned_on--;
             if (this->getPropertyValueAsString(
                     ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
@@ -1111,12 +1114,13 @@ namespace wrench {
      */
     bool ActionExecutionService::areAllComputeResourcesDownWithNoActionExecutorRunning() {
         bool all_resources_down = true;
-        for (auto const &h: this->compute_resources) {
-            if (h.first->is_on()) {
-                all_resources_down = false;
-                break;
-            }
-        }
+//        for (auto const &h: this->compute_resources) {
+//            if (h.first->is_on()) {
+//                all_resources_down = false;
+//                break;
+//            }
+//        }
+        all_resources_down = (this->num_hosts_turned_on == 0);
 
         return all_resources_down and (this->action_executors.empty());
     }
