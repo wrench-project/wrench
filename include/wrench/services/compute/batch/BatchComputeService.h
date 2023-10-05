@@ -177,6 +177,7 @@ namespace wrench {
         std::map<std::string, unsigned long> available_nodes_to_cores;
         std::unordered_map<unsigned long, std::string> host_id_to_names;
         std::vector<std::string> compute_hosts;
+
         /* End Resources information in batch */
 
         // Vector of one-shot bare-metal compute services
