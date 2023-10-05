@@ -117,6 +117,10 @@ namespace wrench {
         json getVMComputeService(json data);
 
     private:
+
+        template<class T>
+        json startService(T *s);
+
         // Thread-safe key value stores
         KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;
         KeyValueStore<std::shared_ptr<ComputeService>> compute_service_registry;
@@ -126,9 +130,6 @@ namespace wrench {
         // Thread-safe queues for the server thread and the simulation thread to communicate
         BlockingQueue<std::pair<double, std::shared_ptr<wrench::ExecutionEvent>>> event_queue;
 
-        BlockingQueue<wrench::ComputeService *> compute_services_to_start;
-        BlockingQueue<wrench::StorageService *> storage_services_to_start;
-        BlockingQueue<wrench::FileRegistryService *> file_service_to_start;
         BlockingQueue<std::tuple<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>, std::map<std::string, std::string>>> submissions_to_do;
 
         BlockingQueue<std::function<void()>> things_to_do;

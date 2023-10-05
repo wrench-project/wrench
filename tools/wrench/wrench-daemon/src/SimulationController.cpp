@@ -31,6 +31,46 @@ namespace wrench {
             std::shared_ptr<Workflow> workflow,
             const std::string &hostname, int sleep_us) : ExecutionController(hostname, "SimulationController"), workflow(workflow), sleep_us(sleep_us) {}
 
+
+    template <class T>
+    json SimulationController::startService(T *s) {
+        BlockingQueue<std::pair<bool, std::string>> s_created;
+
+        this->things_to_do.push([this, s, &s_created](){
+            try {
+                auto new_service_shared_ptr = this->simulation->startNewService(s);
+                if (auto cs = std::dynamic_pointer_cast<wrench::ComputeService>(new_service_shared_ptr)) {
+                    WRENCH_INFO("Started a new compute service");
+                    this->compute_service_registry.insert(new_service_shared_ptr->getName(), cs);
+                } else if (auto ss = std::dynamic_pointer_cast<wrench::StorageService>(new_service_shared_ptr)) {
+                    WRENCH_INFO("Started a new storage service");
+                    this->storage_service_registry.insert(new_service_shared_ptr->getName(), ss);
+                } else if (auto fs = std::dynamic_pointer_cast<wrench::FileRegistryService>(new_service_shared_ptr)) {
+                    WRENCH_INFO("Started a new storage service");
+                    this->file_service_registry.insert(new_service_shared_ptr->getName(), fs);
+                } else {
+                    throw std::runtime_error("SimulationController::startNewService(): Unknown service type");
+                }
+                s_created.push(std::pair(true, ""));
+            } catch (ExecutionException &e) {
+                s_created.push(std::pair(false, e.getCause()->toString()));
+            }
+        });
+
+        // Poll from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        s_created.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot start Service: " + error_msg);
+        } else {
+            json answer;
+            answer["service_name"] = s->getName();
+            return answer;
+        }
+    }
+
     /**
      * @brief Simulation execution_controller's main method
      * 
@@ -48,42 +88,14 @@ namespace wrench {
 
         // Main control loop
         while (keep_going) {
+            
             // Starting compute and storage services that should be started, if any
             while (true) {
-                wrench::ComputeService *new_compute_service = nullptr;
-                wrench::StorageService *new_storage_service = nullptr;
-                wrench::FileRegistryService *new_file_service = nullptr;
-                std::pair<std::tuple<unsigned long, double, WRENCH_PROPERTY_COLLECTION_TYPE, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE>, std::shared_ptr<ComputeService>> spec_vm_to_create;
-                std::pair<std::string, std::shared_ptr<ComputeService>> vm_id;
-                std::pair<std::shared_ptr<DataFile>, std::shared_ptr<StorageService>> file_lookup_request;
                 std::function<void()>   thing_to_do;
 
-                if (this->compute_services_to_start.tryPop(new_compute_service)) {
-                    // starting compute service
-                    WRENCH_INFO("Starting a new compute service...");
-                    auto new_service_shared_ptr = this->simulation->startNewService(new_compute_service);
-                    // Add the new service to the registry of existing services, so that later we can look it up by name
-                    this->compute_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
-
-                } else if (this->storage_services_to_start.tryPop(new_storage_service)) {
-                    // starting storage service
-                    WRENCH_INFO("Starting a new storage service...");
-                    auto new_service_shared_ptr = this->simulation->startNewService(new_storage_service);
-                    // Add the new service to the registry of existing services, so that later we can look it up by name
-                    this->storage_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
-
-                } else if (this->file_service_to_start.tryPop(new_file_service)) {
-                    // start file registry service
-                    WRENCH_INFO("Starting a new file registry service...");
-                    auto new_service_shared_ptr = this->simulation->startNewService(new_file_service);
-                    // Add the new service to the registry of existing services, so that later we can look it up by name
-                    this->file_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
-
-                } else if (this->things_to_do.tryPop(thing_to_do))
-                {
+                if (this->things_to_do.tryPop(thing_to_do)) {
                     thing_to_do();
-                }
-                else {
+                } else {
                     break;
                 }
             }
@@ -109,7 +121,7 @@ namespace wrench {
             // Moves time forward if needed (because the client has done a sleep),
             // And then add all events that occurred to the event queue
             double time_to_sleep = std::max<double>(0, time_horizon_to_reach -
-                                                               wrench::Simulation::getCurrentSimulatedDate());
+                                                       wrench::Simulation::getCurrentSimulatedDate());
             if (time_to_sleep > 0.0) {
                 WRENCH_INFO("Sleeping %.2lf seconds", time_to_sleep);
                 S4U_Simulation::sleep(time_to_sleep);
@@ -300,15 +312,8 @@ namespace wrench {
         // Create the new service
         auto new_service = new BareMetalComputeService(head_host, resources, scratch_space,
                                                        service_property_list, service_message_payload_list);
-        // Put in the list of services to start (this is because this method is called
-        // by the server thread, and therefore, it will segfault horribly if it calls any
-        // SimGrid simulation methods, e.g., to start a service)
-        this->compute_services_to_start.push(new_service);
 
-        // Return the expected answer
-        json answer;
-        answer["service_name"] = new_service->getName();
-        return answer;
+        return this->startService<wrench::ComputeService>(new_service);
     }
 
     /**
@@ -340,16 +345,10 @@ namespace wrench {
         // Create the new service
         auto new_service = new CloudComputeService(hostname, resources, scratch_space,
                                                    service_property_list, service_message_payload_list);
-        // Put in the list of services to start (this is because this method is called
-        // by the server thread, and therefore, it will segfault horribly if it calls any
-        // SimGrid simulation methods, e.g., to start a service)
-        this->compute_services_to_start.push(new_service);
+        return this->startService<wrench::ComputeService>(new_service);
 
-        // Return the expected answer
-        json answer;
-        answer["service_name"] = new_service->getName();
-        return answer;
     }
+
 
     /**
      * REST API Handler
@@ -380,15 +379,8 @@ namespace wrench {
         // Create the new service
         auto new_service = new BatchComputeService(hostname, resources, scratch_space,
                                                    service_property_list, service_message_payload_list);
-        // Put in the list of services to start (this is because this method is called
-        // by the server thread, and therefore, it will segfault horribly if it calls any
-        // SimGrid simulation methods, e.g., to start a service)
-        this->compute_services_to_start.push(new_service);
+        return this->startService<wrench::ComputeService>(new_service);
 
-        // Return the expected answer
-        json answer;
-        answer["service_name"] = new_service->getName();
-        return answer;
     }
 
     /**
@@ -428,17 +420,17 @@ namespace wrench {
 
         // Push the request into the blocking queue (will be a single one!)
         this->things_to_do.push([num_cores, ram_memory, service_property_list, service_message_payload_list, cs, &vm_created](){
-            auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
-            std::string vm_name;
-            try {
-                vm_name = cloud_cs->createVM(num_cores, ram_memory, service_property_list, service_message_payload_list);
-                vm_created.push(std::pair(true, vm_name));
-            } catch (ExecutionException &e) {
-                vm_created.push(std::pair(false, e.getCause()->toString()));
-            }
+          auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+          std::string vm_name;
+          try {
+              vm_name = cloud_cs->createVM(num_cores, ram_memory, service_property_list, service_message_payload_list);
+              vm_created.push(std::pair(true, vm_name));
+          } catch (ExecutionException &e) {
+              vm_created.push(std::pair(false, e.getCause()->toString()));
+          }
         });
 
-        // Pool from the shared queue (will be a single one!)
+        // Poll from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
         vm_created.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -470,22 +462,22 @@ namespace wrench {
         BlockingQueue<std::pair<bool, std::string>> vm_started;
         // Push the request into the blocking queue (will be a single one!)
         this->things_to_do.push([this, vm_name, cs, &vm_started](){
-            auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
-            try {
-                if (not cloud_cs->isVMDown(vm_name)) {
-                    throw std::invalid_argument("Cannot start VM because it's not down");
-                }
-                auto bm_cs = cloud_cs->startVM(vm_name);
-                this->compute_service_registry.insert(bm_cs->getName(), bm_cs);
-                vm_started.push(std::pair(true, bm_cs->getName()));
-            } catch (ExecutionException &e) {
-                vm_started.push(std::pair(false, e.getCause()->toString()));
-            } catch (std::invalid_argument &e) {
-                vm_started.push(std::pair(false, e.what()));
-            }
+          auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+          try {
+              if (not cloud_cs->isVMDown(vm_name)) {
+                  throw std::invalid_argument("Cannot start VM because it's not down");
+              }
+              auto bm_cs = cloud_cs->startVM(vm_name);
+              this->compute_service_registry.insert(bm_cs->getName(), bm_cs);
+              vm_started.push(std::pair(true, bm_cs->getName()));
+          } catch (ExecutionException &e) {
+              vm_started.push(std::pair(false, e.getCause()->toString()));
+          } catch (std::invalid_argument &e) {
+              vm_started.push(std::pair(false, e.what()));
+          }
         });
 
-        // Pool from the shared queue (will be a single one!)
+        // Poll from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
         vm_started.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -519,24 +511,24 @@ namespace wrench {
         // Push the request into the blocking queue (will be a single one!)
         //this->vm_to_shutdown.push(std::pair(vm_name, cs));
         this->things_to_do.push([this, vm_name, cs, &vm_shutdown](){
-            auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
-            try {
-                if (not cloud_cs->isVMRunning(vm_name)) {
-                    throw std::invalid_argument("Cannot shutdown VM because it's not running");
-                }
-                auto bm_cs = cloud_cs->getVMComputeService(vm_name);
+          auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+          try {
+              if (not cloud_cs->isVMRunning(vm_name)) {
+                  throw std::invalid_argument("Cannot shutdown VM because it's not running");
+              }
+              auto bm_cs = cloud_cs->getVMComputeService(vm_name);
 
-                this->compute_service_registry.remove(bm_cs->getName());
-                cloud_cs->shutdownVM(vm_name);
-                vm_shutdown.push(std::pair(true, vm_name));
-            } catch (ExecutionException &e) {
-                vm_shutdown.push(std::pair(false, e.what()));
-            } catch (std::invalid_argument &e) {
-                vm_shutdown.push(std::pair(false, e.what()));
-            }
+              this->compute_service_registry.remove(bm_cs->getName());
+              cloud_cs->shutdownVM(vm_name);
+              vm_shutdown.push(std::pair(true, vm_name));
+          } catch (ExecutionException &e) {
+              vm_shutdown.push(std::pair(false, e.what()));
+          } catch (std::invalid_argument &e) {
+              vm_shutdown.push(std::pair(false, e.what()));
+          }
         });
 
-        // Pool from the shared queue (will be a single one!)
+        // Poll from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
         vm_shutdown.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -567,19 +559,19 @@ namespace wrench {
 
         // Push the request into the blocking queue (will be a single one!)
         this->things_to_do.push([this, vm_name, cs, &vm_destroyed](){
-            auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
-            try {
-                if (not cloud_cs->isVMDown(vm_name)) {
-                    throw std::invalid_argument("Cannot destroy VM because it's not down");
-                }
-                cloud_cs->destroyVM(vm_name);
-                vm_destroyed.push(std::pair(true, vm_name));
-            } catch (std::invalid_argument &e) {
-                vm_destroyed.push(std::pair(false, e.what()));
-            }
+          auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+          try {
+              if (not cloud_cs->isVMDown(vm_name)) {
+                  throw std::invalid_argument("Cannot destroy VM because it's not down");
+              }
+              cloud_cs->destroyVM(vm_name);
+              vm_destroyed.push(std::pair(true, vm_name));
+          } catch (std::invalid_argument &e) {
+              vm_destroyed.push(std::pair(false, e.what()));
+          }
         });
 
-        // Pool from the shared queue (will be a single one!)
+        // Poll from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
         vm_destroyed.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -602,15 +594,8 @@ namespace wrench {
 
         // Create the new service
         auto new_service = SimpleStorageService::createSimpleStorageService(head_host, mount_points, {}, {});
-        // Put in the list of services to start (this is because this method is called
-        // by the server thread, and therefore, it will segfault horribly if it calls any
-        // SimGrid simulation methods, e.g., to start a service)
-        this->storage_services_to_start.push(new_service);
+        return this->startService<wrench::StorageService>(new_service);
 
-        // Return the expected answer
-        json answer;
-        answer["service_name"] = new_service->getName();
-        return answer;
     }
 
     /**
@@ -665,15 +650,15 @@ namespace wrench {
 
         // Push the request into the blocking queue (will be a single one!)
         this->things_to_do.push([this, file, ss, &file_looked_up](){
-            try {
-                bool result = ss->lookupFile(file);
-                file_looked_up.push(std::tuple(true, result, ""));
-            } catch (std::invalid_argument &e) {
-                file_looked_up.push(std::tuple(false, false, e.what()));
-            }
+          try {
+              bool result = ss->lookupFile(file);
+              file_looked_up.push(std::tuple(true, result, ""));
+          } catch (std::invalid_argument &e) {
+              file_looked_up.push(std::tuple(false, false, e.what()));
+          }
         });
 
-        // Pool from the shared queue (will be a single one!)
+        // Poll from the shared queue (will be a single one!)
         std::tuple<bool, bool, std::string> reply;
         file_looked_up.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -697,15 +682,8 @@ namespace wrench {
 
         // Create the new service
         auto new_service = new FileRegistryService(head_host, {}, {});
-        // Put in the list of services to start (this is because this method is called
-        // by the server thread, and therefore, it will segfault horribly if it calls any
-        // SimGrid simulation methods, e.g., to start a service)
-        this->file_service_to_start.push(new_service);
 
-        // Return the expected answer
-        json answer;
-        answer["service_name"] = new_service->getName();
-        return answer;
+        return this->startService<wrench::FileRegistryService>(new_service);
     }
 
     /**
@@ -1074,16 +1052,16 @@ namespace wrench {
         //this->vm_to_suspend.push(std::pair(vm_name, cs));
         BlockingQueue<std::pair<bool, std::string>> vm_suspended;
         this->things_to_do.push([this, vm_name, cs, &vm_suspended](){
-            auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
-            try {
-                cloud_cs->suspendVM(vm_name);
-                vm_suspended.push(std::pair(true, vm_name));
-            } catch (std::invalid_argument &e) {
-                vm_suspended.push(std::pair(false, e.what()));
-            }
+          auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+          try {
+              cloud_cs->suspendVM(vm_name);
+              vm_suspended.push(std::pair(true, vm_name));
+          } catch (std::invalid_argument &e) {
+              vm_suspended.push(std::pair(false, e.what()));
+          }
         });
 
-        // Pool from the shared queue (will be a single one!)
+        // Poll from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
         vm_suspended.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -1135,16 +1113,16 @@ namespace wrench {
 
         // Push the request into the blocking queue (will be a single one!)
         this->things_to_do.push([this, vm_name, cs, &vm_resumed](){
-            auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
-            try {
-                cloud_cs->resumeVM(vm_name);
-                vm_resumed.push(std::pair(true, vm_name));
-            } catch (std::invalid_argument &e) {
-                vm_resumed.push(std::pair(false, e.what()));
-            }
+          auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+          try {
+              cloud_cs->resumeVM(vm_name);
+              vm_resumed.push(std::pair(true, vm_name));
+          } catch (std::invalid_argument &e) {
+              vm_resumed.push(std::pair(false, e.what()));
+          }
         });
 
-        // Pool from the shared queue (will be a single one!)
+        // Poll from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
         vm_resumed.waitAndPop(reply);
         bool success = std::get<0>(reply);
