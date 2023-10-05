@@ -298,8 +298,7 @@ namespace wrench {
             }
             this->host_state_change_monitor = std::shared_ptr<HostStateChangeDetector>(
                     new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true, true,
-                                                this->getSharedPtr<Service>(), this->mailbox,
-                                                {{HostStateChangeDetectorProperty::MONITORING_PERIOD, "1.0"}}));
+                                                this->getSharedPtr<Service>(), this->mailbox));
             this->host_state_change_monitor->setSimulation(this->simulation);
             this->host_state_change_monitor->start(this->host_state_change_monitor, true,
                                                    false);// Daemonized, no auto-restart

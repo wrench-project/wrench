@@ -1162,7 +1162,6 @@ namespace wrench {
         //        WRENCH_INFO("GOT A DEATH NOTIFICATION: %s %ld %lf (exit_code = %d)",
         //                    pm_name.c_str(), used_cores, used_ram, exit_code);
 
-        std::cerr << "IN PROCESS BARE METAL CS TERMINATION, CALLING VM::shutdown()\n";
         if (vm->getState() != S4U_VirtualMachine::State::DOWN) {
             vm->shutdown();
         }

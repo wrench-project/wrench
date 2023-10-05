@@ -631,12 +631,12 @@ private:
         }
 
         // Is the start-date sensible?
-        if (std::abs<double>(action->getStartDate() - 12.0) > EPSILON) {
+        if (std::abs<double>(action->getStartDate() - 11.0) > EPSILON) {
             throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
-        if (std::abs<double>(action->getEndDate() - 45.333333333333335701810) > EPSILON) {
+        if (std::abs<double>(action->getEndDate() - 44.333333333333335701810) > EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
         }
 
@@ -658,9 +658,9 @@ private:
             throw std::runtime_error("Action history most recent: unexpected physical execution host " + history.top().physical_execution_host);
         if (history.top().failure_cause != nullptr)
             throw std::runtime_error("Action history most recent: unexpected failure cause: " + history.top().failure_cause->toString());
-        if (history.top().start_date < 12.0 - EPSILON or history.top().start_date > 12.0 + EPSILON)
+        if (history.top().start_date < 11.0 - EPSILON or history.top().start_date > 11.0 + EPSILON)
             throw std::runtime_error("Action history most recent: unexpected start date: " + std::to_string(history.top().start_date));
-        if (history.top().end_date + EPSILON < 45.33333333333333570181 or history.top().end_date > 45.33333333333333570181 + EPSILON)
+        if (history.top().end_date + EPSILON < 44.33333333333333570181 or history.top().end_date > 44.33333333333333570181 + EPSILON)
             throw std::runtime_error("Action history most recent: unexpected end date: " + std::to_string(history.top().end_date));
         // Older
         history.pop();
