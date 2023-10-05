@@ -156,9 +156,9 @@ namespace wrench {
 
         void processSubmitAction(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<Action> &action);
 
-        std::tuple<simgrid::s4u::Host*, unsigned long> pickAllocation(const std::shared_ptr<Action> &action,
-                                                              simgrid::s4u::Host *required_host, unsigned long required_num_cores,
-                                                              std::set<simgrid::s4u::Host *> &hosts_to_avoid);
+        std::tuple<simgrid::s4u::Host *, unsigned long> pickAllocation(const std::shared_ptr<Action> &action,
+                                                                       simgrid::s4u::Host *required_host, unsigned long required_num_cores,
+                                                                       std::set<simgrid::s4u::Host *> &hosts_to_avoid);
 
 
         bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
