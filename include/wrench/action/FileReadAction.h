@@ -33,6 +33,7 @@ namespace wrench {
         std::shared_ptr<DataFile> getFile() const;
         std::vector<std::shared_ptr<FileLocation>> getFileLocations() const;
         std::shared_ptr<FileLocation> getUsedFileLocation() const;
+        double getNumBytesToRead() const;
         bool usesScratch() const override;
 
     protected:

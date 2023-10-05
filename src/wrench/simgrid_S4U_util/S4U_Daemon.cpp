@@ -72,6 +72,7 @@ namespace wrench {
         this->state = S4U_Daemon::State::CREATED;
         this->daemon_lock = simgrid::s4u::Mutex::create();
         this->hostname = hostname;
+        this->host = S4U_Simulation::get_host_or_vm_by_name(hostname);
         this->simulation = nullptr;
         unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
         this->mailbox = S4U_Mailbox::generateUniqueMailbox("mb");
