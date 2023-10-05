@@ -77,6 +77,9 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
+        simgrid::s4u::Host *getHost();
+
+
         double getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE);
         const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &getMessagePayloadList() const;
 
