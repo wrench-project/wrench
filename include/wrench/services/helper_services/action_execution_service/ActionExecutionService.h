@@ -55,7 +55,7 @@ namespace wrench {
     public:
         // Public Constructor
         ActionExecutionService(const std::string &hostname,
-                               const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
+                               const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &compute_resources,
                                std::shared_ptr<Service> parent_service,
                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
@@ -76,7 +76,7 @@ namespace wrench {
 
         bool IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores, double ram);
 
-        std::map<std::string, std::tuple<unsigned long, double>> &getComputeResources();
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &getComputeResources();
 
         std::map<std::string, double> getResourceInformation(const std::string &key);
 
@@ -91,12 +91,14 @@ namespace wrench {
 
         void validateProperties();
 
+        int num_hosts_turned_on;
 
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
 
         // Core availabilities (for each hosts, how many cores and how many bytes of RAM are currently available on it)
-        std::unordered_map<std::string, double> ram_availabilities;
-        std::unordered_map<std::string, unsigned long> running_thread_counts;
+        std::unordered_map<simgrid::s4u::Host *, double> ram_availabilities;
+        std::unordered_map<simgrid::s4u::Host *, unsigned long> running_thread_counts;
 
         std::shared_ptr<Service> parent_service = nullptr;
 
@@ -106,7 +108,7 @@ namespace wrench {
         std::set<std::shared_ptr<Action>> running_actions;
 
         // Action execution specs
-        std::unordered_map<std::shared_ptr<Action>, std::tuple<std::string, unsigned long>> action_run_specs;
+        std::unordered_map<std::shared_ptr<Action>, std::tuple<simgrid::s4u::Host *, unsigned long>> action_run_specs;
 
         std::set<std::shared_ptr<Action>> all_actions;
         std::deque<std::shared_ptr<Action>> ready_actions;
@@ -154,9 +156,9 @@ namespace wrench {
 
         void processSubmitAction(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<Action> &action);
 
-        std::tuple<std::string, unsigned long> pickAllocation(const std::shared_ptr<Action> &action,
-                                                              const std::string &required_host, unsigned long required_num_cores,
-                                                              std::set<std::string> &hosts_to_avoid);
+        std::tuple<simgrid::s4u::Host *, unsigned long> pickAllocation(const std::shared_ptr<Action> &action,
+                                                                       simgrid::s4u::Host *required_host, unsigned long required_num_cores,
+                                                                       std::set<simgrid::s4u::Host *> &hosts_to_avoid);
 
 
         bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
@@ -164,7 +166,6 @@ namespace wrench {
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 
         bool areAllComputeResourcesDownWithNoActionExecutorRunning();
-
 
         int exit_code = 0;
 
