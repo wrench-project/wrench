@@ -162,6 +162,7 @@ private:
             throw std::runtime_error("Invalid failure cause type: " + real_event->failure_cause->toString() + " (expected: HostError)");
         }
 
+//        WRENCH_INFO("Sleeping for 1s");
 //        wrench::Simulation::sleep(1);
 
         // Check that the VM is down
@@ -294,6 +295,7 @@ private:
         if (not cause) {
             throw std::runtime_error("Invalid failure cause: " + real_event->failure_cause->toString() + " (expected: HostError)");
         }
+
 
         // Check that the VM is down
         if (not cloud_service->isVMDown(vm_name)) {
@@ -474,8 +476,8 @@ private:
                 completed = (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event) != nullptr);
                 if (completed) {
                     cloud_service->shutdownVM(vm_name);
+                    cloud_service->destroyVM(vm_name);
                 }
-                cloud_service->destroyVM(vm_name);
 
             } while (not completed);
 
@@ -507,7 +509,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     argv[2] = strdup("--cfg=contexts/stack-size:100");
-    //    argv[3] = strdup("--wrench-full-log");
+//        argv[3] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
