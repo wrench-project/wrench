@@ -24,8 +24,6 @@ namespace wrench {
 
     class HostStateChangeDetectorProperty : public ServiceProperty {
     public:
-        /** @brief The monitoring period in seconds (default: 1.0) **/
-        DECLARE_PROPERTY_NAME(MONITORING_PERIOD);
     };
 
     /***********************/

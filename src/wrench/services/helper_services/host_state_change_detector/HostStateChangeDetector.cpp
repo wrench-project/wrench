@@ -77,14 +77,16 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
 void wrench::HostStateChangeDetector::hostStateChangeCallback(const simgrid::s4u::Host *host) {
     if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), host) !=
         this->hosts_to_monitor.end()) {
-        this->hosts_that_have_recently_changed_state.push_back(std::make_pair(host->get_name(), host->is_on()));
+        this->hosts_that_have_recently_changed_state.emplace_back(host->get_name(), host->is_on());
+        this->s4u_actor->resume();
     }
 }
 
 void wrench::HostStateChangeDetector::hostSpeedChangeCallback(const simgrid::s4u::Host *host) {
     if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), host) !=
         this->hosts_to_monitor.end()) {
-        this->hosts_that_have_recently_changed_speed.push_back(std::make_pair(host->get_name(), host->get_speed()));
+        this->hosts_that_have_recently_changed_speed.emplace_back(host->get_name(), host->get_speed());
+        this->s4u_actor->resume();
     }
 }
 
@@ -96,8 +98,8 @@ int wrench::HostStateChangeDetector::main() {
             WRENCH_INFO("My Creator has terminated/died, so must I...");
             break;
         }
-        // Sleeping for my monitoring period
-        Simulation::sleep(this->getPropertyValueAsDouble(HostStateChangeDetectorProperty::MONITORING_PERIOD));
+
+        simgrid::s4u::this_actor::suspend();
 
         // State Changes
         while (not this->hosts_that_have_recently_changed_state.empty()) {
