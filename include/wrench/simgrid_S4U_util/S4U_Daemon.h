@@ -140,8 +140,8 @@ namespace wrench {
 
         /** @brief The number of time that this daemon has started (i.e., 1 + number of restarts) */
         unsigned int num_starts = 0;
-    private:
 
+    private:
         // Lock used typically to prevent kill() from killing the actor
         // while it's in the middle of doing something critical
         simgrid::s4u::MutexPtr daemon_lock;

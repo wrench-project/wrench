@@ -435,7 +435,7 @@ namespace wrench {
         // Due to a previously considered actions not being
         // able to run on that host due to RAM, and because we don't
         // allow non-zero-ram tasks to jump ahead of other tasks
-        std::set<simgrid::s4u::Host*> no_longer_considered_hosts;
+        std::set<simgrid::s4u::Host *> no_longer_considered_hosts;
 
         for (auto const &action: this->ready_actions) {
             std::string picked_host;
@@ -547,7 +547,7 @@ namespace wrench {
         } else if (std::dynamic_pointer_cast<HostHasTurnedOffMessage>(message)) {
             this->num_hosts_turned_on--;
             if (this->getPropertyValueAsString(
-                    ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+                        ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
 
             } else {
@@ -605,7 +605,7 @@ namespace wrench {
             processActionExecutorCrash(action_executor);
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
-                    ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+                        ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
 
             } else {
@@ -760,7 +760,7 @@ namespace wrench {
         // Send the notification to the originator
         S4U_Mailbox::dputMessage(
                 this->parent_service->mailbox, new ActionExecutionServiceActionDoneMessage(
-                        action, 0.0));
+                                                       action, 0.0));
     }
 
     /**
@@ -930,7 +930,7 @@ namespace wrench {
         }
 
         // Construct the action run spec (i.e., keep track of service-specific arguments for the action)
-        std::tuple<simgrid::s4u::Host*, unsigned long> action_run_spec;
+        std::tuple<simgrid::s4u::Host *, unsigned long> action_run_spec;
         if ((service_specific_arguments.find(action->getName()) == service_specific_arguments.end()) or
             (service_specific_arguments[action->getName()].empty())) {
             action_run_spec = std::make_tuple(nullptr, 0);
@@ -1112,12 +1112,12 @@ namespace wrench {
      */
     bool ActionExecutionService::areAllComputeResourcesDownWithNoActionExecutorRunning() {
         bool all_resources_down = true;
-//        for (auto const &h: this->compute_resources) {
-//            if (h.first->is_on()) {
-//                all_resources_down = false;
-//                break;
-//            }
-//        }
+        //        for (auto const &h: this->compute_resources) {
+        //            if (h.first->is_on()) {
+        //                all_resources_down = false;
+        //                break;
+        //            }
+        //        }
         all_resources_down = (this->num_hosts_turned_on == 0);
 
         return all_resources_down and (this->action_executors.empty());
