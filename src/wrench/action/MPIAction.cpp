@@ -43,11 +43,11 @@ namespace wrench {
         // Make A COPY of the list of usable hosts
         auto resources_ref = action_executor->getActionExecutionService()->getComputeResources();
         std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources(resources_ref.begin(), resources_ref.end());
-//        std::vector<std::string> hostnames;
-//        hostnames.reserve(resources.size());
-//        for (auto const &h: resources) {
-//            hostnames.push_back(h.first);
-//        }
+        //        std::vector<std::string> hostnames;
+        //        hostnames.reserve(resources.size());
+        //        for (auto const &h: resources) {
+        //            hostnames.push_back(h.first);
+        //        }
 
         // Determine the host list (using worst fit)
         std::vector<simgrid::s4u::Host *> simgrid_hosts;
@@ -71,11 +71,11 @@ namespace wrench {
         }
 
         // Transform the list of hosts into a list of simgrid hosts
-//        std::vector<simgrid::s4u::Host *> simgrid_hosts;
-//        simgrid_hosts.reserve(hosts.size());
-//        for (auto const &host: hosts) {
-//            simgrid_hosts.push_back(host);
-//        }
+        //        std::vector<simgrid::s4u::Host *> simgrid_hosts;
+        //        simgrid_hosts.reserve(hosts.size());
+        //        for (auto const &host: hosts) {
+        //            simgrid_hosts.push_back(host);
+        //        }
 
         // Do the SMPI thing!!!
         auto barrier = simgrid::s4u::Barrier::create(1 + simgrid_hosts.size());

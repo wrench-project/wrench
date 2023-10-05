@@ -1006,7 +1006,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<simgrid::s4u::Host*, std::tuple<unsigned long, double>> compute_resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
         compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
@@ -1110,8 +1110,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<simgrid::s4u::Host*, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name( "Host3")] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
                                                    {}, {}));

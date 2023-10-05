@@ -191,7 +191,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//        argv[2] = strdup("--wrench-full-log");
+    //        argv[2] = strdup("--wrench-full-log");
 
 
     simulation->init(&argc, argv);
@@ -506,7 +506,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     argv[2] = strdup("--cfg=contexts/stack-size:100");
-//        argv[3] = strdup("--wrench-full-log");
+    //        argv[3] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
