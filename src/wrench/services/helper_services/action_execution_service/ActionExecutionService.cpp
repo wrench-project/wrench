@@ -1077,7 +1077,6 @@ namespace wrench {
     void ActionExecutionService::processActionExecutorCrash(const std::shared_ptr<ActionExecutor> &executor) {
         std::shared_ptr<Action> action = executor->getAction();
 
-
         WRENCH_INFO("Handling an ActionExecutor crash!");
 
         // Update RAM availabilities and running thread counts
