@@ -375,6 +375,14 @@ namespace wrench {
     }
 
     /**
+    * @brief Get the the host on which the service is / will be running
+    * @return the hostname
+    */
+    simgrid::s4u::Host *Service::getHost() {
+        return this->host;
+    }
+
+    /**
     * @brief Get the physical name of the host on which the service is / will be running
     * @return the physical hostname
     */
