@@ -127,7 +127,7 @@ namespace wrench {
 
         zmq::message_t request(strlen(this->data_to_send.c_str()));
         memcpy(request.data(), this->data_to_send.c_str(), strlen(this->data_to_send.c_str()));
-        socket.send(request);
+        socket.send(request, zmq::send_flags::none);
 
         //  Get the reply.
         zmq::message_t reply;
