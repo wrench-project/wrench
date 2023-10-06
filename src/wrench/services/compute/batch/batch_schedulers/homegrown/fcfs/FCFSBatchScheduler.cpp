@@ -39,6 +39,9 @@ namespace wrench {
      */
     std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> FCFSBatchScheduler::scheduleOnHosts(
             unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
+
+        std::cerr << "IN SCHEDULE ON HOST\n";
+
         if (ram_per_node == ComputeService::ALL_RAM) {
             ram_per_node = S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
         }
@@ -119,7 +122,7 @@ namespace wrench {
                 resources.insert(std::make_pair(target_host, std::make_tuple(cores_per_node, ComputeService::ALL_RAM)));
             }
         } else if (host_selection_algorithm == "ROUNDROBIN") {
-            static unsigned long round_robin_host_selector_idx = 0;
+            static unsigned long round_robin_host_selector_idx = -1;
             unsigned long cur_host_idx = round_robin_host_selector_idx;
             unsigned long host_count = 0;
             do {

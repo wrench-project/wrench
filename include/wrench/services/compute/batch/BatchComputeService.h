@@ -172,10 +172,10 @@ namespace wrench {
         /* Resources information in batch */
         unsigned long total_num_of_nodes;
         unsigned long num_cores_per_node;
-        std::unordered_map<simgrid::s4u::Host *, unsigned long> nodes_to_cores_map;
+        std::map<simgrid::s4u::Host *, unsigned long> nodes_to_cores_map;
         std::vector<double> timeslots;
         std::map<simgrid::s4u::Host *, unsigned long> available_nodes_to_cores;
-        std::unordered_map<unsigned long, simgrid::s4u::Host *> host_id_to_names;
+        std::map<unsigned long, simgrid::s4u::Host *> host_id_to_names;
         std::vector<simgrid::s4u::Host *> compute_hosts;
 
         /* End Resources information in batch */
