@@ -102,13 +102,13 @@ namespace wrench {
         }
 
         // Get the hosts
-        for (const auto &h : compute_hosts) {
+        for (const auto &h: compute_hosts) {
             this->compute_hosts.push_back(S4U_Simulation::get_host_or_vm_by_name(h));
         }
 
-//        for (const auto &h : this->compute_hosts) {
-//            std::cerr << "==> " << h->get_name() << "\n";
-//        }
+        //        for (const auto &h : this->compute_hosts) {
+        //            std::cerr << "==> " << h->get_name() << "\n";
+        //        }
 
         // Check Platform homogeneity
         auto first_host = *(this->compute_hosts.begin());
@@ -130,7 +130,7 @@ namespace wrench {
                         "to be homogeneous (different RAM capacities detected)");
             }
             // Num cores
-            if ((double)(h->get_core_count()) != num_cores_available) {
+            if ((double) (h->get_core_count()) != num_cores_available) {
                 throw std::invalid_argument(
                         "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different RAM capacities detected)");
@@ -994,7 +994,7 @@ namespace wrench {
         compound_job->pushCallbackMailbox(this->mailbox);
 
         std::map<std::string, std::tuple<unsigned long, double>> resources_by_hostname;
-        for (auto const &h : resources) {
+        for (auto const &h: resources) {
             resources_by_hostname[h.first->get_name()] = h.second;
         }
         auto executor = std::shared_ptr<BareMetalComputeServiceOneShot>(
@@ -1071,7 +1071,7 @@ namespace wrench {
         } else if (key == "ram_availabilities") {
             // RAM availability per host  (0 if something is running, full otherwise)
             for (const auto &h: this->available_nodes_to_cores) {
-                if ((double)h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
+                if ((double) h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
                     dict.insert(std::make_pair(h.first->get_name(), 0.0));
                 } else {
                     dict.insert(std::make_pair(h.first->get_name(), S4U_Simulation::getHostMemoryCapacity(h.first)));
