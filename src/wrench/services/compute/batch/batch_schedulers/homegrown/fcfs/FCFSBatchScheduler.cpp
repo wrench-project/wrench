@@ -40,8 +40,6 @@ namespace wrench {
     std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> FCFSBatchScheduler::scheduleOnHosts(
             unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
 
-        std::cerr << "IN SCHEDULE ON HOST\n";
-
         if (ram_per_node == ComputeService::ALL_RAM) {
             ram_per_node = S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
         }
