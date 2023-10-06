@@ -41,7 +41,7 @@ WRENCH_LOG_CATEGORY(wrench_core_batch_service, "Log category for Batch Service")
 
 namespace wrench {
     // Do not remove
-    BatchComputeService::~BatchComputeService() {}
+    BatchComputeService::~BatchComputeService() = default;
 
     /**
      * @brief Constructor
@@ -108,25 +108,25 @@ namespace wrench {
 
         // Check Platform homogeneity
         auto first_host = *(this->compute_hosts.begin());
-        double num_cores_available = (double) (first_host->get_core_count());
+        auto num_cores_available = (first_host->get_core_count());
         double speed = first_host->get_speed();
         double ram_available = S4U_Simulation::getHostMemoryCapacity(first_host);
 
-        for (auto const &h: compute_hosts) {
+        for (auto const &h: this->compute_hosts) {
             // Compute speed
-            if (std::abs(speed - Simulation::getHostFlopRate(h)) > DBL_EPSILON) {
+            if (std::abs(speed - h->get_speed()) > DBL_EPSILON) {
                 throw std::invalid_argument(
                         "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different flop rates detected)");
             }
             // RAM
-            if (std::abs(ram_available - Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
+            if (std::abs(ram_available - S4U_Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
                 throw std::invalid_argument(
                         "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different RAM capacities detected)");
             }
             // Num cores
-            if ((double) (Simulation::getHostNumCores(h)) != num_cores_available) {
+            if ((double)(h->get_core_count()) != num_cores_available) {
                 throw std::invalid_argument(
                         "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different RAM capacities detected)");
