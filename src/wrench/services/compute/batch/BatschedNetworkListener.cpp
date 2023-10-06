@@ -127,7 +127,7 @@ namespace wrench {
 
         zmq::message_t request(strlen(this->data_to_send.c_str()));
         memcpy(request.data(), this->data_to_send.c_str(), strlen(this->data_to_send.c_str()));
-        socket.send(request);
+        socket.send(request, zmq::send_flags::none);
 
         //  Get the reply.
         zmq::message_t reply;
@@ -137,7 +137,8 @@ namespace wrench {
         useconds_t trials;
         for (trials = 0; trials < max_num_trials; trials++) {
             usleep(100 + 100 * trials * trials);
-            int ret = socket.recv(&reply, ZMQ_DONTWAIT);
+            //            int ret = socket.recv(&reply, ZMQ_DONTWAIT);
+            zmq::recv_result_t ret = socket.recv(reply, zmq::recv_flags::dontwait);
             if (ret > 0) {
                 break;
             }

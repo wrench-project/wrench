@@ -33,8 +33,8 @@ namespace wrench {
         unsigned long getRequestedNumNodes() const;
         std::shared_ptr<CompoundJob> getCompoundJob();
         void setEndingTimestamp(double time_stamp);
-        std::map<std::string, std::tuple<unsigned long, double>> getResourcesAllocated();
-        void setAllocatedResources(const std::map<std::string, std::tuple<unsigned long, double>> &resources);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> getResourcesAllocated();
+        void setAllocatedResources(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &resources);
 
         /** 
          * @brief Set the indices of the allocated nodes
@@ -68,7 +68,7 @@ namespace wrench {
         double begin_time_stamp;
         double ending_time_stamp;
         double arrival_time_stamp;
-        std::map<std::string, std::tuple<unsigned long, double>> resources_allocated;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources_allocated;
 
         std::vector<int> allocated_node_indices;
 

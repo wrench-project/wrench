@@ -258,8 +258,7 @@ namespace wrench {
                                                                                                                                  scratch_space_mount_point) {
         std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
         for (const auto &h: compute_hosts) {
-            specified_compute_resources.insert(
-                    std::make_pair(h, std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM)));
+            specified_compute_resources[h] = std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM);
         }
 
         initiateInstance(hostname,
