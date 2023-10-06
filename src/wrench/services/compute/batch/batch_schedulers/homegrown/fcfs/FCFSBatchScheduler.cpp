@@ -50,13 +50,13 @@ namespace wrench {
         }
 
         if (ram_per_node > S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
-            throw std::runtime_error("FCFSBatchScheduler::findNextJobToSchedule(): Asking for too much RAM per host");
+            throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too much RAM per host");
         }
         if (num_nodes > cs->available_nodes_to_cores.size()) {
-            throw std::runtime_error("FCFSBatchScheduler::findNextJobToSchedule(): Asking for too many hosts");
+            throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
         if (cores_per_node > cs->available_nodes_to_cores.begin()->first->get_core_count()) {
-            throw std::runtime_error("FCFSBatchScheduler::findNextJobToSchedule(): Asking for too many cores per host");
+            throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too many cores per host");
         }
 
         std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources = {};
@@ -150,8 +150,16 @@ namespace wrench {
             }
         } else {
             throw std::invalid_argument(
-                    "FCFSBatchScheduler::findNextJobToSchedule(): We don't support " + host_selection_algorithm +
+                    "FCFSBatchScheduler::scheduleOnHosts(): We don't support " + host_selection_algorithm +
                     " as host selection algorithm");
+        }
+
+        /** ADDED THIS CODE, WHICH SEEMS LIKE IT SHOULD HE HERE **/
+        if (resources.size() < num_nodes) {
+            resources = {};
+            for (auto const &h: hosts_assigned) {
+                cs->available_nodes_to_cores[h] += cores_per_node;
+            }
         }
 
         return resources;

@@ -238,13 +238,13 @@ namespace wrench {
         }
 
         if (ram_per_node > S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too much RAM per host");
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too much RAM per host");
         }
         if (num_nodes > cs->available_nodes_to_cores.size()) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too many hosts");
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
         if (cores_per_node > cs->available_nodes_to_cores.begin()->first->get_core_count()) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too many cores per host (asking  for " +
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many cores per host (asking  for " +
                                      std::to_string(cores_per_node) + " but hosts have " +
                                      std::to_string(cs->available_nodes_to_cores.begin()->first->get_core_count()) + "cores)");
         }
