@@ -106,6 +106,10 @@ namespace wrench {
             this->compute_hosts.push_back(S4U_Simulation::get_host_or_vm_by_name(h));
         }
 
+//        for (const auto &h : this->compute_hosts) {
+//            std::cerr << "==> " << h->get_name() << "\n";
+//        }
+
         // Check Platform homogeneity
         auto first_host = *(this->compute_hosts.begin());
         auto num_cores_available = (first_host->get_core_count());
