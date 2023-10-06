@@ -290,7 +290,7 @@ namespace wrench {
 
         //  Get the reply.
         zmq::message_t reply;
-        socket.recv(&reply);
+        auto ret = socket.recv(reply, zmq::recv_flags::none);
 
         // Process the reply
         std::string reply_data;
