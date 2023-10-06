@@ -50,7 +50,7 @@ namespace wrench {
          * @param ram_per_node: amount of RAM
          * @return a host:<core,RAM> map
          */
-        virtual std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) = 0;
+        virtual std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) = 0;
     };
 
     /***********************/
