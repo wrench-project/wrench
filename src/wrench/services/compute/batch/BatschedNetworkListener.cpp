@@ -137,7 +137,7 @@ namespace wrench {
         useconds_t trials;
         for (trials = 0; trials < max_num_trials; trials++) {
             usleep(100 + 100 * trials * trials);
-//            int ret = socket.recv(&reply, ZMQ_DONTWAIT);
+            //            int ret = socket.recv(&reply, ZMQ_DONTWAIT);
             zmq::recv_result_t ret = socket.recv(reply, zmq::recv_flags::dontwait);
             if (ret > 0) {
                 break;

@@ -270,7 +270,7 @@ namespace wrench {
         if (resources.size() < num_nodes) {
             resources = {};
             // undo!
-            for (auto const &h : hosts_assigned) {
+            for (auto const &h: hosts_assigned) {
                 cs->available_nodes_to_cores[h] += cores_per_node;
             }
         }
