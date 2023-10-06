@@ -80,7 +80,7 @@ namespace wrench {
             }
             if (resources.size() < num_nodes) {
                 resources = {};
-                for (auto const &h : hosts_assigned) {
+                for (auto const &h: hosts_assigned) {
                     cs->available_nodes_to_cores[h] += cores_per_node;
                 }
             }
@@ -112,7 +112,7 @@ namespace wrench {
                 if (target_host == nullptr) {
                     WRENCH_INFO("Didn't find a suitable host");
                     resources = {};
-                    for (auto const &h : hosts_assigned) {
+                    for (auto const &h: hosts_assigned) {
                         cs->available_nodes_to_cores[h] += cores_per_node;
                     }
                     break;
@@ -142,7 +142,7 @@ namespace wrench {
             } while (cur_host_idx != round_robin_host_selector_idx);
             if (resources.size() < num_nodes) {
                 resources = {};
-                for (auto const &h : hosts_assigned) {
+                for (auto const &h: hosts_assigned) {
                     cs->available_nodes_to_cores[h] += cores_per_node;
                 }
             } else {
@@ -169,7 +169,7 @@ namespace wrench {
         // Set the available time of each node to zero (i.e., now)
         // (invariant: for each host, core availabilities are sorted by
         //             non-decreasing available time)
-        std::map<simgrid::s4u::Host*, std::vector<double>> core_available_times;
+        std::map<simgrid::s4u::Host *, std::vector<double>> core_available_times;
         for (auto h: cs->nodes_to_cores_map) {
             auto host = h.first;
             unsigned long num_cores = h.second;
@@ -185,7 +185,7 @@ namespace wrench {
         for (auto const &job: cs->running_jobs) {
             auto batch_job = job.second;
             double time_to_finish = std::max<double>(0, batch_job->getBeginTimestamp() +
-                                                                (double)batch_job->getRequestedTime() -
+                                                                (double) batch_job->getRequestedTime() -
                                                                 wrench::Simulation::getCurrentSimulatedDate());
             for (auto resource: batch_job->getResourcesAllocated()) {
                 auto host = resource.first;
@@ -214,7 +214,7 @@ namespace wrench {
 
         // Go through the pending jobs and update core availabilities
         for (auto const &job: this->cs->batch_queue) {
-            double duration = (double)job->getRequestedTime();
+            double duration = (double) job->getRequestedTime();
             unsigned long num_hosts = job->getRequestedNumNodes();
             unsigned long num_cores_per_host = job->getRequestedCoresPerNode();
 
