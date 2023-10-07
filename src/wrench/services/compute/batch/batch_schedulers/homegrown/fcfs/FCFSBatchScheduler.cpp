@@ -60,13 +60,13 @@ namespace wrench {
         auto host_selection_algorithm = this->cs->getPropertyValueAsString(BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM);
 
         if (host_selection_algorithm == "FIRSTFIT") {
-            return  HomegrownBatchScheduler::selectHostsFirstFit(cs, num_nodes, cores_per_node, ram_per_node);
+            return HomegrownBatchScheduler::selectHostsFirstFit(cs, num_nodes, cores_per_node, ram_per_node);
         } else if (host_selection_algorithm == "BESTFIT") {
-            return  HomegrownBatchScheduler::selectHostsBestFit(cs, num_nodes, cores_per_node, ram_per_node);
+            return HomegrownBatchScheduler::selectHostsBestFit(cs, num_nodes, cores_per_node, ram_per_node);
 
         } else if (host_selection_algorithm == "ROUNDROBIN") {
             static unsigned long round_robin_host_selector_idx = -1;
-            return  HomegrownBatchScheduler::selectHostsRoundRobin(cs, &round_robin_host_selector_idx, num_nodes, cores_per_node, ram_per_node);
+            return HomegrownBatchScheduler::selectHostsRoundRobin(cs, &round_robin_host_selector_idx, num_nodes, cores_per_node, ram_per_node);
         } else {
             throw std::invalid_argument(
                     "FCFSBatchScheduler::scheduleOnHosts(): We don't support " + host_selection_algorithm +
