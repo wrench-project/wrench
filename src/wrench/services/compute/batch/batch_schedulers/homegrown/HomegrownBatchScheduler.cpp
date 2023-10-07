@@ -13,16 +13,16 @@
 namespace wrench {
 
     std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> HomegrownBatchScheduler::selectHostsFirstFit(BatchComputeService *cs,
-                                                      unsigned long num_nodes,
-                                                      unsigned long cores_per_node,
-                                                      double ram_per_node) {
+                                                                                                                   unsigned long num_nodes,
+                                                                                                                   unsigned long cores_per_node,
+                                                                                                                   double ram_per_node) {
 
         std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources;
         unsigned long host_count = 0;
         for (auto &available_nodes_to_core: cs->available_nodes_to_cores) {
             if (available_nodes_to_core.second >= cores_per_node) {
                 //Remove that many cores from the available_nodes_to_core
-//                available_nodes_to_core.second -= cores_per_node;
+                //                available_nodes_to_core.second -= cores_per_node;
                 resources[available_nodes_to_core.first] = std::make_tuple(cores_per_node, ram_per_node);
                 if (++host_count >= num_nodes) {
                     break;
@@ -40,9 +40,9 @@ namespace wrench {
     }
 
     std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> HomegrownBatchScheduler::selectHostsBestFit(BatchComputeService *cs,
-                                                                                                                   unsigned long num_nodes,
-                                                                                                                   unsigned long cores_per_node,
-                                                                                                                   double ram_per_node) {
+                                                                                                                  unsigned long num_nodes,
+                                                                                                                  unsigned long cores_per_node,
+                                                                                                                  double ram_per_node) {
 
         std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources;
 
@@ -74,7 +74,7 @@ namespace wrench {
                 break;
             }
             cs->available_nodes_to_cores[target_host] -= cores_per_node;
-            resources[target_host] =  std::make_tuple(cores_per_node, ComputeService::ALL_RAM);
+            resources[target_host] = std::make_tuple(cores_per_node, ComputeService::ALL_RAM);
         }
 
         if (resources.size() < num_nodes) {
@@ -89,9 +89,9 @@ namespace wrench {
 
     std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> HomegrownBatchScheduler::selectHostsRoundRobin(BatchComputeService *cs,
                                                                                                                      unsigned long *round_robin_host_selector_idx,
-                                                                                                                  unsigned long num_nodes,
-                                                                                                                  unsigned long cores_per_node,
-                                                                                                                  double ram_per_node) {
+                                                                                                                     unsigned long num_nodes,
+                                                                                                                     unsigned long cores_per_node,
+                                                                                                                     double ram_per_node) {
         std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources;
         unsigned long cur_host_idx = *round_robin_host_selector_idx;
         unsigned long host_count = 0;
@@ -111,7 +111,7 @@ namespace wrench {
         } while (cur_host_idx != *round_robin_host_selector_idx);
 
         if (resources.size() < num_nodes) {
-            for (auto const &h : resources) {
+            for (auto const &h: resources) {
                 cs->available_nodes_to_cores[h.first] += cores_per_node;
             }
             return {};
@@ -121,4 +121,4 @@ namespace wrench {
         }
     }
 
-}
+}// namespace wrench
