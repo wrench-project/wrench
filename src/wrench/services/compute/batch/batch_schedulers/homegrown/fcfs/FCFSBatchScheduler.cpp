@@ -57,103 +57,21 @@ namespace wrench {
             throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too many cores per host");
         }
 
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources = {};
-        std::vector<simgrid::s4u::Host *> hosts_assigned = {};
         auto host_selection_algorithm = this->cs->getPropertyValueAsString(BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM);
 
         if (host_selection_algorithm == "FIRSTFIT") {
-            std::map<simgrid::s4u::Host *, unsigned long>::iterator map_it;
-            unsigned long host_count = 0;
-            for (map_it = cs->available_nodes_to_cores.begin();
-                 map_it != cs->available_nodes_to_cores.end(); map_it++) {
-                if ((*map_it).second >= cores_per_node) {
-                    //Remove that many cores from the available_nodes_to_core
-                    (*map_it).second -= cores_per_node;
-                    hosts_assigned.push_back((*map_it).first);
-                    resources.insert(std::make_pair((*map_it).first, std::make_tuple(cores_per_node, ram_per_node)));
-                    if (++host_count >= num_nodes) {
-                        break;
-                    }
-                }
-            }
-            if (resources.size() < num_nodes) {
-                resources = {};
-                for (auto const &h: hosts_assigned) {
-                    cs->available_nodes_to_cores[h] += cores_per_node;
-                }
-            }
-
+            return  HomegrownBatchScheduler::selectHostsFirstFit(cs, num_nodes, cores_per_node, ram_per_node);
         } else if (host_selection_algorithm == "BESTFIT") {
-            while (resources.size() < num_nodes) {
-                unsigned long target_slack = 0;
-                simgrid::s4u::Host *target_host = nullptr;
-                unsigned long target_num_cores = 0;
+            return  HomegrownBatchScheduler::selectHostsBestFit(cs, num_nodes, cores_per_node, ram_per_node);
 
-                for (auto h: cs->available_nodes_to_cores) {
-                    auto host = std::get<0>(h);
-                    unsigned long num_available_cores = std::get<1>(h);
-                    if (num_available_cores < cores_per_node) {
-                        continue;
-                    }
-                    unsigned long tentative_target_num_cores = std::min(num_available_cores, cores_per_node);
-                    unsigned long tentative_target_slack =
-                            num_available_cores - tentative_target_num_cores;
-
-                    if (target_host == nullptr ||
-                        (tentative_target_num_cores > target_num_cores) ||
-                        ((tentative_target_num_cores == target_num_cores) &&
-                         (target_slack > tentative_target_slack))) {
-                        target_host = host;
-                        target_num_cores = tentative_target_num_cores;
-                        target_slack = tentative_target_slack;
-                    }
-                }
-                if (target_host == nullptr) {
-                    WRENCH_INFO("Didn't find a suitable host");
-                    resources = {};
-                    for (auto const &h: hosts_assigned) {
-                        cs->available_nodes_to_cores[h] += cores_per_node;
-                    }
-                    break;
-                }
-                cs->available_nodes_to_cores[target_host] -= cores_per_node;
-                hosts_assigned.push_back(target_host);
-                resources.insert(std::make_pair(target_host, std::make_tuple(cores_per_node, ComputeService::ALL_RAM)));
-            }
         } else if (host_selection_algorithm == "ROUNDROBIN") {
             static unsigned long round_robin_host_selector_idx = -1;
-            unsigned long cur_host_idx = round_robin_host_selector_idx;
-            unsigned long host_count = 0;
-            do {
-                cur_host_idx = (cur_host_idx + 1) % cs->available_nodes_to_cores.size();
-                auto it = cs->compute_hosts.begin();
-                it = it + cur_host_idx;
-                auto cur_host = *it;
-                unsigned long num_available_cores = cs->available_nodes_to_cores[cur_host];
-                if (num_available_cores >= cores_per_node) {
-                    cs->available_nodes_to_cores[cur_host] -= cores_per_node;
-                    hosts_assigned.push_back(cur_host);
-                    resources.insert(std::make_pair(cur_host, std::make_tuple(cores_per_node, ram_per_node)));
-                    if (++host_count >= num_nodes) {
-                        break;
-                    }
-                }
-            } while (cur_host_idx != round_robin_host_selector_idx);
-            if (resources.size() < num_nodes) {
-                resources = {};
-                for (auto const &h: hosts_assigned) {
-                    cs->available_nodes_to_cores[h] += cores_per_node;
-                }
-            } else {
-                round_robin_host_selector_idx = cur_host_idx;
-            }
+            return  HomegrownBatchScheduler::selectHostsRoundRobin(cs, &round_robin_host_selector_idx, num_nodes, cores_per_node, ram_per_node);
         } else {
             throw std::invalid_argument(
                     "FCFSBatchScheduler::scheduleOnHosts(): We don't support " + host_selection_algorithm +
                     " as host selection algorithm");
         }
-
-        return resources;
     }
 
     std::map<std::string, double> FCFSBatchScheduler::getStartTimeEstimates(
