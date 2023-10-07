@@ -82,6 +82,7 @@ namespace wrench {
                     cs->available_nodes_to_cores[h] += cores_per_node;
                 }
             }
+
         } else if (host_selection_algorithm == "BESTFIT") {
             while (resources.size() < num_nodes) {
                 unsigned long target_slack = 0;
@@ -150,14 +151,6 @@ namespace wrench {
             throw std::invalid_argument(
                     "FCFSBatchScheduler::scheduleOnHosts(): We don't support " + host_selection_algorithm +
                     " as host selection algorithm");
-        }
-
-        /** ADDED THIS CODE, WHICH SEEMS LIKE IT SHOULD HE HERE **/
-        if (resources.size() < num_nodes) {
-            resources = {};
-            for (auto const &h: hosts_assigned) {
-                cs->available_nodes_to_cores[h] += cores_per_node;
-            }
         }
 
         return resources;
