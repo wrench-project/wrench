@@ -192,7 +192,6 @@ TEST_F(BatchServiceFCFSTest, SimpleFCFSTest)
 
 void BatchServiceFCFSTest::do_SimpleFCFS_test() {
 
-
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
