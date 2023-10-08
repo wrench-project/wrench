@@ -292,19 +292,9 @@ namespace wrench {
         std::string property_list_string = data["property_list"];
         std::string message_payload_list_string = data["message_payload_list"];
 
-        WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
-        json jsonData = json::parse(property_list_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto property_key = ServiceProperty::translateString(it.key());
-            service_property_list[property_key] = it.value();
-        }
+        PARSE_SERVICE_PROPERTY_LIST()
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;
-        jsonData = json::parse(message_payload_list_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto message_payload_key = ServiceMessagePayload::translateString(it.key());
-            service_message_payload_list[message_payload_key] = it.value();
-        }
+        PARSE_MESSAGE_PAYLOAD_LIST()
 
         map<std::string, std::tuple<unsigned long, double>> resources;
         jsonData = json::parse(resource);
@@ -331,19 +321,9 @@ namespace wrench {
         std::string property_list_string = data["property_list"];
         std::string message_payload_list_string = data["message_payload_list"];
 
-        WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
-        json jsonData = json::parse(property_list_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto property_key = ServiceProperty::translateString(it.key());
-            service_property_list[property_key] = it.value();
-        }
+        PARSE_SERVICE_PROPERTY_LIST()
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;
-        jsonData = json::parse(message_payload_list_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto message_payload_key = ServiceMessagePayload::translateString(it.key());
-            service_message_payload_list[message_payload_key] = it.value();
-        }
+        PARSE_MESSAGE_PAYLOAD_LIST()
 
         // Create the new service
         auto new_service = new CloudComputeService(hostname, resources, scratch_space,
@@ -365,19 +345,9 @@ namespace wrench {
         std::string property_list_string = data["property_list"];
         std::string message_payload_list_string = data["message_payload_list"];
 
-        WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
-        json jsonData = json::parse(property_list_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto property_key = ServiceProperty::translateString(it.key());
-            service_property_list[property_key] = it.value();
-        }
+        PARSE_SERVICE_PROPERTY_LIST()
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;
-        jsonData = json::parse(message_payload_list_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto message_payload_key = ServiceMessagePayload::translateString(it.key());
-            service_message_payload_list[message_payload_key] = it.value();
-        }
+        PARSE_MESSAGE_PAYLOAD_LIST()
 
         // Create the new service
         auto new_service = new BatchComputeService(hostname, resources, scratch_space,
@@ -399,19 +369,9 @@ namespace wrench {
         std::string property_list_string = data["property_list"];
         std::string message_payload_list_string = data["message_payload_list"];
 
-        WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
-        json jsonData = json::parse(property_list_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto property_key = ServiceProperty::translateString(it.key());
-            service_property_list[property_key] = it.value();
-        }
+        PARSE_SERVICE_PROPERTY_LIST()
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;
-        jsonData = json::parse(message_payload_list_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto message_payload_key = ServiceMessagePayload::translateString(it.key());
-            service_message_payload_list[message_payload_key] = it.value();
-        }
+        PARSE_MESSAGE_PAYLOAD_LIST()
 
         // Lookup the cloud compute service
         std::shared_ptr<ComputeService> cs;
