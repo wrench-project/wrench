@@ -20,6 +20,20 @@
 
 WRENCH_LOG_CATEGORY(simulation_controller, "Log category for SimulationController");
 
+#define PARSE_SERVICE_PROPERTY_LIST() WRENCH_PROPERTY_COLLECTION_TYPE service_property_list; \
+json jsonData = json::parse(property_list_string);      \
+for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {        \
+    auto property_key = ServiceProperty::translateString(it.key());     \
+    service_property_list[property_key] = it.value();   \
+}                                                                                            \
+
+#define PARSE_MESSAGE_PAYLOAD_LIST() WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;    \
+jsonData = json::parse(message_payload_list_string);    \
+for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {    \
+    auto message_payload_key = ServiceMessagePayload::translateString(it.key());    \
+    service_message_payload_list[message_payload_key] = it.value(); \
+}
+
 namespace wrench {
 
     /**
@@ -95,17 +109,6 @@ namespace wrench {
 
                 if (this->things_to_do.tryPop(thing_to_do)) {
                     thing_to_do();
-                } else {
-                    break;
-                }
-            }
-
-            // Submit jobs that should be submitted
-            while (true) {
-                std::tuple<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>, std::map<std::string, std::string>> submission_to_do;
-                if (this->submissions_to_do.tryPop(submission_to_do)) {
-                    WRENCH_INFO("Submitting a job...");
-                    this->job_manager->submitJob(std::get<0>(submission_to_do), std::get<1>(submission_to_do), std::get<2>(submission_to_do));
                 } else {
                     break;
                 }
@@ -286,27 +289,27 @@ namespace wrench {
         std::string head_host = data["head_host"];
         std::string resource = data["resources"];
         std::string scratch_space = data["scratch_space"];
-        std::string property_list = data["property_list"];
-        std::string message_payload_list = data["message_payload_list"];
-
-        map<std::string, std::tuple<unsigned long, double>> resources;
-        json jsonData = json::parse(resource);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            resources.emplace(it.key(), it.value());
-        }
+        std::string property_list_string = data["property_list"];
+        std::string message_payload_list_string = data["message_payload_list"];
 
         WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
-        jsonData = json::parse(property_list);
+        json jsonData = json::parse(property_list_string);
         for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
             auto property_key = ServiceProperty::translateString(it.key());
             service_property_list[property_key] = it.value();
         }
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;
-        jsonData = json::parse(message_payload_list);
+        jsonData = json::parse(message_payload_list_string);
         for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
             auto message_payload_key = ServiceMessagePayload::translateString(it.key());
             service_message_payload_list[message_payload_key] = it.value();
+        }
+
+        map<std::string, std::tuple<unsigned long, double>> resources;
+        jsonData = json::parse(resource);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            resources.emplace(it.key(), it.value());
         }
 
         // Create the new service
@@ -740,7 +743,10 @@ namespace wrench {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
-        this->submissions_to_do.push(std::tuple(job, cs, service_specific_args));
+        this->things_to_do.push([this, job, cs, service_specific_args](){
+            WRENCH_INFO("Submitting a job...");
+            this->job_manager->submitJob(job, cs, service_specific_args);
+        });
         return {};
     }
 
