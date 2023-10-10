@@ -254,31 +254,30 @@ namespace wrench {
         if (num_nodes > cs->available_nodes_to_cores.size()) {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
-        if (cores_per_node >cs->available_nodes_to_cores.begin()->first->get_core_count()) {
+        if (cores_per_node > cs->available_nodes_to_cores.begin()->first->get_core_count()) {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many cores per host (asking  for " +
                                      std::to_string(cores_per_node) + " but hosts have " +
                                      std::to_string(cs->available_nodes_to_cores.begin()->first->get_core_count()) + "cores)");
         }
 
 
-//        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources = {};
-//        std::vector<simgrid::s4u::Host *> hosts_assigned = {};
+        //        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources = {};
+        //        std::vector<simgrid::s4u::Host *> hosts_assigned = {};
         auto host_selection_algorithm = this->cs->getPropertyValueAsString(BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM);
 
         if (host_selection_algorithm == "FIRSTFIT") {
-            return  HomegrownBatchScheduler::selectHostsFirstFit(cs, num_nodes, cores_per_node, ram_per_node);
+            return HomegrownBatchScheduler::selectHostsFirstFit(cs, num_nodes, cores_per_node, ram_per_node);
         } else if (host_selection_algorithm == "BESTFIT") {
-            return  HomegrownBatchScheduler::selectHostsBestFit(cs, num_nodes, cores_per_node, ram_per_node);
+            return HomegrownBatchScheduler::selectHostsBestFit(cs, num_nodes, cores_per_node, ram_per_node);
 
         } else if (host_selection_algorithm == "ROUNDROBIN") {
             static unsigned long round_robin_host_selector_idx = -1;
-            return  HomegrownBatchScheduler::selectHostsRoundRobin(cs, &round_robin_host_selector_idx, num_nodes, cores_per_node, ram_per_node);
+            return HomegrownBatchScheduler::selectHostsRoundRobin(cs, &round_robin_host_selector_idx, num_nodes, cores_per_node, ram_per_node);
         } else {
             throw std::invalid_argument(
                     "ConservativeBackfillingBatchSchedulerCoreLevel::scheduleOnHosts(): We don't support " + host_selection_algorithm +
                     " as host selection algorithm");
         }
-
     }
 
     /**
