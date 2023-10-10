@@ -29,9 +29,9 @@ namespace wrench {
         /**
          * @brief The batch scheduling algorithm. Can be:
          *    - If ENABLE_BATSCHED is set to off / not set:
-         *      - "fcfs": First Come First Serve (default)
+         *      - "fcfs": First Come First Serve, which allocates resources at the core level (i.e., two jobs may run on the same node  if that node has enough cores to support both jobs) (default)
          *      - "conservative_bf": a home-grown implementation of FCFS with conservative backfilling, which only allocates resources at the node level (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs)
-         *      - "conservative_bf_core_level": a home-grown implementation of FCFS with conservative backfilling, which only allocates resources at the core level (i.e., two jobs may run on the same node  if that node has enough cores to support both jobs)
+         *      - "conservative_bf_core_level": a home-grown implementation of FCFS with conservative backfilling, which allocates resources at the core level (i.e., two jobs may run on the same node  if that node has enough cores to support both jobs)
          *
          *    - If ENABLE_BATSCHED is set to on:
          *      - whatever scheduling algorithm is supported by Batsched
