@@ -9,14 +9,13 @@
 
 #include <wrench-dev.h>
 #include <wrench/services/storage/storage_helpers/LogicalFileSystem.h>
-#include <wrench/services/storage/storage_helpers/LogicalFileSystemNoCaching.h>
 #include <wrench/services/storage/storage_helpers/LogicalFileSystemLRUCaching.h>
+#include <wrench/services/storage/storage_helpers/LogicalFileSystemNoCaching.h>
 
 #include <limits>
 #include <utility>
 
 WRENCH_LOG_CATEGORY(wrench_core_logical_file_system, "Log category for Logical File System");
-
 
 namespace wrench {
 
@@ -67,7 +66,6 @@ namespace wrench {
         return to_return;
     }
 
-
     /**
      * @brief Constructor
      * @param hostname the host on which this file system runs
@@ -115,15 +113,15 @@ namespace wrench {
     }
 
     /**
- * @brief Checks whether a directory exists
- * @param absolute_path the directory's absolute path
- * @return true if the directory exists
- */
+     * @brief Checks whether a directory exists
+     * @param absolute_path the directory's absolute path
+     * @return true if the directory exists
+     */
     bool LogicalFileSystem::doesDirectoryExist(const std::string &absolute_path) {
         if (devnull) {
             return false;
         }
-        if (absolute_path == "/") {// Common case
+        if (absolute_path == "/") { // Common case
             return true;
         } else {
             auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
@@ -132,12 +130,12 @@ namespace wrench {
     }
 
     /**
- * @brief Checks whether a directory is empty
- * @param absolute_path: the directory's absolute path
- * @return true if the directory is empty
- *
- * @throw std::invalid_argument
- */
+     * @brief Checks whether a directory is empty
+     * @param absolute_path: the directory's absolute path
+     * @return true if the directory is empty
+     *
+     * @throw std::invalid_argument
+     */
     bool LogicalFileSystem::isDirectoryEmpty(const std::string &absolute_path) {
         if (devnull) {
             return true;
@@ -163,16 +161,15 @@ namespace wrench {
         this->content.erase(fixed_path);
     }
 
-
     /**
- * @brief Checks whether a file is in a directory
- * @param file: the file
- * @param absolute_path: the directory's absolute path
- *
- * @return true if the file is present, false if not (or if directory does not exist)
- *
- * @throw std::invalid_argument
- */
+     * @brief Checks whether a file is in a directory
+     * @param file: the file
+     * @param absolute_path: the directory's absolute path
+     *
+     * @return true if the file is present, false if not (or if directory does not exist)
+     *
+     * @throw std::invalid_argument
+     */
     bool LogicalFileSystem::isFileInDirectory(const std::shared_ptr<DataFile> &file, const std::string &absolute_path) {
         if (devnull) {
             return false;
@@ -192,13 +189,13 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the files in a directory as a set
-    * @param absolute_path: the directory's absolute path
-    *
-    * @return a set of files
-    *
-    * @throw std::invalid_argument
-    */
+     * @brief Get the files in a directory as a set
+     * @param absolute_path: the directory's absolute path
+     *
+     * @return a set of files
+     *
+     * @throw std::invalid_argument
+     */
     std::set<std::shared_ptr<DataFile>> LogicalFileSystem::listFilesInDirectory(const std::string &absolute_path) {
         std::set<std::shared_ptr<DataFile>> to_return;
         if (devnull) {
@@ -207,22 +204,22 @@ namespace wrench {
         auto fixed_path = FileLocation::sanitizePath(absolute_path + "/");
 
         assertDirectoryExist(fixed_path);
-        for (auto const &f: this->content[fixed_path]) {
+        for (auto const &f : this->content[fixed_path]) {
             to_return.insert(f.first);
         }
         return to_return;
     }
 
     /**
-    * @brief
-    * @return Total number of files currently stored in Filesytem
-    *
-    */
+     * @brief
+     * @return Total number of files currently stored in Filesytem
+     *
+     */
     double LogicalFileSystem::getTotalNumFiles() const {
 
         double files = 0;
 
-        for (const auto &item: this->content) {
+        for (const auto &item : this->content) {
             files += item.second.size();
         }
 
@@ -230,9 +227,9 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the total capacity
-    * @return the total capacity
-    */
+     * @brief Get the total capacity
+     * @return the total capacity
+     */
     double LogicalFileSystem::getTotalCapacity() const {
         return this->total_capacity;
     }
@@ -246,12 +243,12 @@ namespace wrench {
     }
 
     /**
-    * @brief Reserve space for a file that will be stored
-    * @param file: the file
-    * @param absolute_path: the path where it will be written
-    *
-    * @return true on success, false on failure
-    */
+     * @brief Reserve space for a file that will be stored
+     * @param file: the file
+     * @param absolute_path: the path where it will be written
+     *
+     * @return true on success, false on failure
+     */
     bool LogicalFileSystem::reserveSpace(const std::shared_ptr<DataFile> &file,
                                          const std::string &absolute_path) {
         if (devnull) {
@@ -263,12 +260,12 @@ namespace wrench {
             fixed_path = FileLocation::sanitizePath(absolute_path + "/");
         }
 
-
         std::string key = fixed_path + file->getID();
         if (this->reserved_space.find(key) != this->reserved_space.end()) {
             WRENCH_WARN("LogicalFileSystem::reserveSpace(): Space was already being reserved for storing file %s at path %s:%s. "
                         "This is likely a redundant copy, and nothing needs to be done",
                         file->getID().c_str(), this->hostname.c_str(), fixed_path.c_str());
+            return true;
         }
 
         if (this->free_space < file->getSize()) {
@@ -302,13 +299,14 @@ namespace wrench {
         std::string key = fixed_path + file->getID();
 
         if (this->reserved_space.find(key) == this->reserved_space.end()) {
-            return;// oh well, the transfer was cancelled/terminated/whatever
+            WRENCH_WARN("NOT UNRESERVING SPACE");
+            return; // oh well, the transfer was cancelled/terminated/whatever
         }
 
+        WRENCH_WARN("UNRESERVING SPACE");
         this->reserved_space.erase(key);
         this->free_space += file->getSize();
     }
-
 
     /**
      * @brief Retrieve the file's last write date
@@ -335,7 +333,6 @@ namespace wrench {
         }
     }
 
-
     /**
      * @brief Get the disk on which this file system runs
      * @return The SimGrid disk on which this file system is mounted
@@ -343,7 +340,6 @@ namespace wrench {
     simgrid::s4u::Disk *LogicalFileSystem::getDisk() {
         return this->disk;
     }
-
 
     /**
      * @brief Stage file in directory
@@ -370,4 +366,4 @@ namespace wrench {
         this->storeFileInDirectory(file, fixed_path);
     }
 
-}// namespace wrench
+} // namespace wrench
