@@ -140,6 +140,7 @@ namespace wrench {
 
     private:
         friend class WorkloadTraceFileReplayer;
+        friend class HomegrownBatchScheduler;
         friend class FCFSBatchScheduler;
         friend class ConservativeBackfillingBatchScheduler;
         friend class ConservativeBackfillingBatchSchedulerCoreLevel;

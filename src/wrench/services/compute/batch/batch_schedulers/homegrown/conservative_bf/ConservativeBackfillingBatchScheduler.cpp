@@ -238,13 +238,13 @@ namespace wrench {
         }
 
         if (ram_per_node > S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too much RAM per host");
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too much RAM per host");
         }
         if (num_nodes > cs->available_nodes_to_cores.size()) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too many hosts");
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
         if (cores_per_node > cs->available_nodes_to_cores.begin()->first->get_core_count()) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too many cores per host (asking  for " +
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many cores per host (asking  for " +
                                      std::to_string(cores_per_node) + " but hosts have " +
                                      std::to_string(cs->available_nodes_to_cores.begin()->first->get_core_count()) + "cores)");
         }
@@ -252,30 +252,7 @@ namespace wrench {
         // IMPORTANT: We always give all cores to a job on a node!
         cores_per_node = cs->available_nodes_to_cores.begin()->first->get_core_count();
 
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources = {};
-        std::vector<simgrid::s4u::Host *> hosts_assigned = {};
-
-        unsigned long host_count = 0;
-        for (auto &available_nodes_to_core: cs->available_nodes_to_cores) {
-            if (available_nodes_to_core.second >= cores_per_node) {
-                //Remove that many cores from the available_nodes_to_core
-                available_nodes_to_core.second -= cores_per_node;
-                hosts_assigned.push_back(available_nodes_to_core.first);
-                resources.insert(std::make_pair(available_nodes_to_core.first, std::make_tuple(cores_per_node, ram_per_node)));
-                if (++host_count >= num_nodes) {
-                    break;
-                }
-            }
-        }
-        if (resources.size() < num_nodes) {
-            resources = {};
-            // undo!
-            for (auto const &h: hosts_assigned) {
-                cs->available_nodes_to_cores[h] += cores_per_node;
-            }
-        }
-
-        return resources;
+        return HomegrownBatchScheduler::selectHostsFirstFit(cs, num_nodes, cores_per_node, ram_per_node);
     }
 
     /**
