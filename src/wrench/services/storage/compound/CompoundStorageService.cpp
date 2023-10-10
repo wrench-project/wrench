@@ -197,13 +197,13 @@ namespace wrench {
     }
 
     bool CompoundStorageService::processStorageSelectionMessage(const CompoundStorageAllocationRequestMessage *msg) {
-        WRENCH_INFO("CSS::processStorageSelectionMessage()");
 
         auto file = msg->file;
+        WRENCH_INFO("CSS::processStorageSelectionMessage(): For file %s", file->getID().c_str());
 
         if (this->file_location_mapping.find(file) != this->file_location_mapping.end()) {
 
-            WRENCH_INFO("CSS::lookupOrDesignateStorageService: File %s already known by CSS", file->getID().c_str());
+            WRENCH_INFO("CSS::processStorageSelectionMessage: File %s already known by CSS", file->getID().c_str());
 
             S4U_Mailbox::dputMessage(
                 msg->answer_mailbox,
@@ -220,7 +220,7 @@ namespace wrench {
 
         // Stripping case
         if (file_size > this->max_chunk_size && this->internal_stripping) {
-            WRENCH_INFO("CSS::lookupOrDesignateStorageService(): Stripping file");
+            WRENCH_INFO("CSS::processStorageSelectionMessage(): Stripping file before sending to allocator");
             double remaining = file_size;
             auto part_id = 0;
             while (remaining - this->max_chunk_size > DBL_EPSILON) {
@@ -237,7 +237,7 @@ namespace wrench {
         // Resolve allocations for all parts (possibly only one part)
         std::vector<std::shared_ptr<FileLocation>> designated_locations = {};
         for (const auto &part : parts) {
-            WRENCH_INFO("CSS::lookupOrDesignateStorageService(): File %s NOT already known by CSS", part->getID().c_str());
+            WRENCH_DEBUG("CSS::processStorageSelectionMessage(): File %s NOT already known by CSS", part->getID().c_str());
             auto locations = this->allocate(part, this->storage_services, this->file_location_mapping, designated_locations);
             if (!locations.empty()) {
                 for (auto new_loc : locations) {
@@ -245,7 +245,7 @@ namespace wrench {
                     designated_locations.push_back(new_loc);
                 }
             } else {
-                WRENCH_INFO("CSS::lookupOrDesignateStorageService(): File %s (or parts) could not be placed on any ss", file->getID().c_str());
+                WRENCH_WARN("CSS::processStorageSelectionMessage(): File %s (or parts) could not be placed on any ss", file->getID().c_str());
                 designated_locations = {};
                 break;
             }
@@ -253,7 +253,7 @@ namespace wrench {
 
         if (!designated_locations.empty()) {
             this->file_location_mapping[file] = designated_locations;
-            WRENCH_INFO("CSS::lookupOrDesignateStorageService(): Local mapping updated");
+            WRENCH_INFO("CSS::processStorageSelectionMessage(): Local mapping updated");
         }
         S4U_Mailbox::dputMessage(
             msg->answer_mailbox,
@@ -262,20 +262,18 @@ namespace wrench {
                 this->getMessagePayloadValue(
                     CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
 
-        WRENCH_INFO("CSS::lookupOrDesignateStorageService(): Answer sent, file striped in %lu stripes (roughly %f bytes each)", designated_locations.size(), designated_locations[0]->getFile()->getSize());
+        WRENCH_INFO("CSS::processStorageSelectionMessage(): Answer sent, file striped in %lu stripes (roughly %f bytes each)", designated_locations.size(), designated_locations[0]->getFile()->getSize());
 
         return true;
     }
 
     bool CompoundStorageService::processStorageLookupMessage(const CompoundStorageLookupRequestMessage *msg) {
-        WRENCH_INFO("CSS::processStorageLookupMessage()");
 
         auto file = msg->file;
-
-        WRENCH_INFO("CSS::lookupFileLocation(): For file %s", file->getID().c_str());
+        WRENCH_INFO("CSS::processStorageLookupMessage(): For file %s", file->getID().c_str());
 
         if (this->file_location_mapping.find(file) == this->file_location_mapping.end()) {
-            WRENCH_INFO("CSS::lookupFileLocation(): File %s is not known by this CompoundStorageService", file->getID().c_str());
+            WRENCH_INFO("CSS::processStorageLookupMessage(): File %s is not known by this CompoundStorageService", file->getID().c_str());
 
             S4U_Mailbox::dputMessage(
                 msg->answer_mailbox,
@@ -286,7 +284,7 @@ namespace wrench {
         } else {
             auto mapped_locations = this->file_location_mapping[file];
             for (const auto &loc : mapped_locations) {
-                WRENCH_INFO("CSS::lookupFileLocation(): File stripe %s is known by this CompoundStorageService and associated to storage service %s",
+                WRENCH_INFO("CSS::processStorageLookupMessage(): File stripe %s is known by this CompoundStorageService and associated to storage service %s",
                             loc->getFile()->getID().c_str(),
                             loc->getStorageService()->getName().c_str());
             }
@@ -311,7 +309,7 @@ namespace wrench {
      * @return A vector of shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or empty vector if it's not.
      */
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupFileLocation(const std::shared_ptr<DataFile> &file, simgrid::s4u::Mailbox *answer_mailbox) {
-        WRENCH_INFO("CSS::lookupFileLocation() - DataFile + Mailbox");
+        WRENCH_DEBUG("CSS::lookupFileLocation() - DataFile + Mailbox");
 
         S4U_Mailbox::putMessage(this->mailbox,
                                 new CompoundStorageLookupRequestMessage(
@@ -334,7 +332,7 @@ namespace wrench {
      *  @return A shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or nullptr if it's not.
      */
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupFileLocation(const std::shared_ptr<FileLocation> &location) {
-        WRENCH_INFO("CSS::lookupFileLocation() - FileLocation");
+        WRENCH_DEBUG("CSS::lookupFileLocation() - FileLocation");
         auto temp_mailbox = S4U_Mailbox::getTemporaryMailbox();
 
         auto locations = this->lookupFileLocation(location->getFile(), temp_mailbox);
@@ -579,7 +577,7 @@ namespace wrench {
         auto tmp_mailbox = S4U_Mailbox::getTemporaryMailbox();
 
         while (copy_idx < total_parts) {
-            WRENCH_INFO("CSS::copyFileIamSource(): Running StorageService::copyFile for part %i", copy_idx);
+            WRENCH_DEBUG("CSS::copyFileIamSource(): Running StorageService::copyFile for part %i", copy_idx);
 
             // assertServiceIsUp(src_parts[copy_idx]->getStorageService());
             // assertServiceIsUp(dst_parts[copy_idx]->getStorageService());
@@ -700,19 +698,19 @@ namespace wrench {
         auto tmp_mailbox = S4U_Mailbox::getTemporaryMailbox();
 
         while (copy_idx < total_parts) {
-            WRENCH_INFO("CSS::copyFileIamDestination(): Running StorageService::copyFile for part %i", copy_idx);
-            WRENCH_INFO("CSS::copyFileIamDestination(): Source = %s with size %f at path %s on  %s%s",
-                        src_parts[copy_idx]->getFile()->getID().c_str(),
-                        src_parts[copy_idx]->getFile()->getSize(),
-                        src_parts[copy_idx]->getPath().c_str(),
-                        src_parts[copy_idx]->getStorageService()->getHostname().c_str(),
-                        src_parts[copy_idx]->getStorageService()->getBaseRootPath().c_str());
-            WRENCH_INFO("CSS::copyFileIamDestination(): Dest = %s with size %f at path %s on  %s%s",
-                        dst_parts[copy_idx]->getFile()->getID().c_str(),
-                        dst_parts[copy_idx]->getFile()->getSize(),
-                        dst_parts[copy_idx]->getPath().c_str(),
-                        dst_parts[copy_idx]->getStorageService()->getHostname().c_str(),
-                        dst_parts[copy_idx]->getStorageService()->getBaseRootPath().c_str());
+            WRENCH_DEBUG("CSS::copyFileIamDestination(): Running StorageService::copyFile for part %i", copy_idx);
+            WRENCH_DEBUG("CSS::copyFileIamDestination(): SRC= %s - size %f at %s on  %s%s",
+                         src_parts[copy_idx]->getFile()->getID().c_str(),
+                         src_parts[copy_idx]->getFile()->getSize(),
+                         src_parts[copy_idx]->getPath().c_str(),
+                         src_parts[copy_idx]->getStorageService()->getHostname().c_str(),
+                         src_parts[copy_idx]->getStorageService()->getBaseRootPath().c_str());
+            WRENCH_DEBUG("CSS::copyFileIamDestination(): DST= %s - size %f at %s on  %s%s",
+                         dst_parts[copy_idx]->getFile()->getID().c_str(),
+                         dst_parts[copy_idx]->getFile()->getSize(),
+                         dst_parts[copy_idx]->getPath().c_str(),
+                         dst_parts[copy_idx]->getStorageService()->getHostname().c_str(),
+                         dst_parts[copy_idx]->getStorageService()->getBaseRootPath().c_str());
 
             // Useful ?
             // assertServiceIsUp(src_parts[copy_idx]->getStorageService());
@@ -773,10 +771,9 @@ namespace wrench {
         // Once copy is done, remove links (only if source file was stripped)
         if (total_parts > 1) {
             for (const auto &src_part : src_parts) {
-                WRENCH_INFO("CSS::copyFileIamDestination(): ");
                 auto part_size = src_part->getFile()->getSize();
                 src_part->getFile()->setSize(0); // make our datafile a link once again
-                WRENCH_INFO("CSS::copyFileIamDestination(): Deleting part %s", src_part->getFile()->getID().c_str());
+                WRENCH_DEBUG("CSS::copyFileIamDestination(): Deleting part %s", src_part->getFile()->getID().c_str());
                 StorageService::deleteFileAtLocation(src_part);
                 src_part->getFile()->setSize(part_size);
             }
@@ -808,6 +805,7 @@ namespace wrench {
                                            const std::shared_ptr<FileLocation> &location,
                                            double num_bytes_to_write,
                                            bool wait_for_answer) {
+
         WRENCH_INFO("CSS::writeFile(): Writing  %f b to file %s", num_bytes_to_write, location->getFile()->getID().c_str());
 
         if (location == nullptr) {
@@ -835,17 +833,13 @@ namespace wrench {
         for (auto &dloc : designated_locations) {
 
             if (num_bytes_to_write != dloc->getFile()->getSize()) {
-                WRENCH_INFO("CSS:writeFile(): Sending partial write request %d for <%f> b on file >> %s << (%f b) to %s",
-                            request_count, num_bytes_to_write, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
+                WRENCH_DEBUG("CSS:writeFile(): Sending partial write request %d for <%f> b on file >> %s << (%f b) to %s",
+                             request_count, num_bytes_to_write, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
             } else {
-                WRENCH_INFO("CSS:writeFile(): Sending full write request %d on file %s (<%f> b) to %s",
-                            request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
+                WRENCH_DEBUG("CSS:writeFile(): Sending full write request %d on file %s (<%f> b) to %s",
+                             request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
             }
 
-            // That's quite dirty, but : space is reserved during the call to lookupOrDesignateFileLocation, so that
-            // we keep track of future space usage on various storage nodes while allocating multiple chunks of a given
-            // file. So right before we actually start the copy, we unreserve space.
-            dloc->getStorageService()->unreserveSpace(dloc);
             S4U_Mailbox::dputMessage(
                 dloc->getStorageService()->mailbox,
                 new StorageServiceFileWriteRequestMessage(
@@ -869,7 +863,7 @@ namespace wrench {
             messages.push_back(std::move(msg));
         }
 
-        WRENCH_INFO("CSS::writeFile(): All %u FileWriteRequests sent and validated", recv);
+        WRENCH_DEBUG("CSS::writeFile(): %u FileWriteRequests sent and validated", request_count);
 
         for (const auto &msg : messages) {
 
@@ -894,7 +888,7 @@ namespace wrench {
             }
         }
 
-        WRENCH_INFO("CSS::writeFile(): Waiting for final acks");
+        WRENCH_DEBUG("CSS::writeFile(): Waiting for final acks");
         for (const auto &mailbx_msg : messages) {
             S4U_Mailbox::getMessage<StorageServiceAckMessage>(recv_mailbox, "CSS::writeFile() - Final Acks: ");
         }
@@ -910,7 +904,7 @@ namespace wrench {
         this->traceInternalStorageUse(IOAction::WriteEnd, designated_locations);
 
         for (const auto &loc : designated_locations) {
-            WRENCH_INFO("CSS::writeFile(): For location %s, free space = %f", loc->getStorageService()->getName().c_str(), loc->getStorageService()->getTotalFreeSpace());
+            WRENCH_DEBUG("CSS::writeFile(): For location %s, free space = %f", loc->getStorageService()->getName().c_str(), loc->getStorageService()->getTotalFreeSpace());
         }
 
         WRENCH_INFO("CSS::writeFile(): All writes done and ack");
@@ -942,19 +936,16 @@ namespace wrench {
         }
 
         // Contact every SSS
-        auto left_to_receive = designated_locations.size();
-        std::vector<std::unique_ptr<wrench::StorageServiceFileReadAnswerMessage>> messages = {};
         auto recv_mailbox = S4U_Mailbox::getTemporaryMailbox();
-
         auto request_count = 0;
         for (const auto &dloc : designated_locations) {
-            WRENCH_INFO("CSS::readFile(): Sending read file request for %f bytes on file %s at path %s, to storage service %s",
-                        num_bytes,
-                        dloc->getFile()
-                            ->getID()
-                            .c_str(),
-                        dloc->getPath().c_str(),
-                        dloc->getStorageService()->getName().c_str());
+            WRENCH_DEBUG("CSS::readFile(): Sending read file request for %f bytes on file %s at path %s, to storage service %s",
+                         num_bytes,
+                         dloc->getFile()
+                             ->getID()
+                             .c_str(),
+                         dloc->getPath().c_str(),
+                         dloc->getStorageService()->getName().c_str());
 
             S4U_Mailbox::dputMessage(
                 dloc->getStorageService()->mailbox,
@@ -968,6 +959,7 @@ namespace wrench {
             request_count++;
         }
 
+        std::vector<std::unique_ptr<wrench::StorageServiceFileReadAnswerMessage>> messages = {};
         auto recv = 0;
         while (recv < request_count) {
             // Wait for answer to current reqeust
@@ -979,7 +971,7 @@ namespace wrench {
             recv++;
         }
 
-        WRENCH_INFO("CSS::readFile(): All requests sent and validated");
+        WRENCH_DEBUG("CSS::readFile(): All requests sent and validated");
 
         for (const auto &msg : messages) {
 
@@ -1070,7 +1062,7 @@ namespace wrench {
      *
      */
     double CompoundStorageService::getTotalFreeSpaceAtPath(const std::string &path) {
-        WRENCH_INFO("CSS::getFreeSpace Forwarding request to internal services");
+        WRENCH_DEBUG("CSS::getFreeSpace Forwarding request to internal services");
 
         double free_space = 0.0;
         for (const auto &storage_server : this->storage_services) {
@@ -1097,7 +1089,7 @@ namespace wrench {
      * @return The set of known StorageServices.
      */
     std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &CompoundStorageService::getAllServices() {
-        WRENCH_INFO("CSS::getAllServices");
+        WRENCH_DEBUG("CSS::getAllServices");
         return this->storage_services;
     }
 
