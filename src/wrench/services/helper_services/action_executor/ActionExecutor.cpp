@@ -130,7 +130,6 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
         WRENCH_INFO("New Action Executor started to do action %s", this->action->getName().c_str());
-
         this->action->setStartDate(S4U_Simulation::getClock());
         this->action->setState(Action::State::STARTED);
         try {

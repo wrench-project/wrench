@@ -22,10 +22,8 @@ And, one of the following: - **g++** - version 7.5 or higher - **clang**
 Required Dependencies
 ---------------------
 
--  `Boost <https://www.boost.org/>`__ ??? version 1.75 or higher
--  `SimGrid <https://simgrid.org/>`__ ??? version 3.32
--  `JSON for Modern C++ <https://github.com/nlohmann/json>`__ ??? version
-   3.9.0 or higher
+-  `Boost <https://www.boost.org/>`__ - version 1.75 or higher
+-  `SimGrid <https://simgrid.org/>`__ – version 3.34
 
 (See the :ref:`install-troubleshooting` section below if encountering difficulties
 installing dependencies)
@@ -46,6 +44,7 @@ Optional Dependencies
 -  `Batsched <https://gitlab.inria.fr/batsim/batsched>`__ ??? version 1.4
    - useful for expanded batch-scheduled resource simulation
    capabilities
+-  `Asio <https://github.com/chriskohlhoff/asio/>`__ - tag 1.28.0 or later (only required for building `wrench-daemon`, WRENCH's REST API daemon)
 
 .. _install-source:
 

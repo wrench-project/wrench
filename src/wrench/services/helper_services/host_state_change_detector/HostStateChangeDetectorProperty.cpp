@@ -11,6 +11,4 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(HostStateChangeDetectorProperty, MONITORING_PERIOD);
-
 };

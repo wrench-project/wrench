@@ -11,6 +11,9 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench-dev.h>
+
+#include <memory>
+#include <utility>
 #include "wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
 #include "wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.h"
 
@@ -26,14 +29,14 @@ namespace wrench {
      * @param use_actual_runtimes_as_requested_runtimes: if true, use actual runtimes as requested runtimes
      * @param workload_trace: the workload trace to be replayed
      */
-    WorkloadTraceFileReplayer::WorkloadTraceFileReplayer(std::string hostname,
+    WorkloadTraceFileReplayer::WorkloadTraceFileReplayer(const std::string &hostname,
                                                          std::shared_ptr<BatchComputeService> batch_service,
                                                          unsigned long num_cores_per_node,
                                                          bool use_actual_runtimes_as_requested_runtimes,
                                                          std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> &workload_trace) : ExecutionController(hostname,
                                                                                                                                                                                                 "workload_tracefile_replayer"),
                                                                                                                                                                             workload_trace(workload_trace),
-                                                                                                                                                                            batch_service(batch_service),
+                                                                                                                                                                            batch_service(std::move(batch_service)),
                                                                                                                                                                             num_cores_per_node(num_cores_per_node),
                                                                                                                                                                             use_actual_runtimes_as_requested_runtimes(use_actual_runtimes_as_requested_runtimes) {}
 
@@ -43,14 +46,14 @@ namespace wrench {
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
         // Create the execution controller that will just receive workflow execution events so that I don't have to
-        std::shared_ptr<WorkloadTraceFileReplayerEventReceiver> event_receiver = std::shared_ptr<WorkloadTraceFileReplayerEventReceiver>(
-                new WorkloadTraceFileReplayerEventReceiver(this->hostname, job_manager));
+        std::shared_ptr<WorkloadTraceFileReplayerEventReceiver> event_receiver = std::make_shared<WorkloadTraceFileReplayerEventReceiver>(
+                this->hostname, job_manager);
 
         // Start the WorkloadTraceFileReplayerEventReceiver
         event_receiver->setSimulation(this->simulation);
         event_receiver->start(event_receiver, true, false);// Daemonized, no auto-restart
 
-        double core_flop_rate = (*(this->batch_service->getCoreFlopRate().begin())).second;
+        double core_flop_rate = (*(this->batch_service->getCoreFlopRate(false).begin())).second;
 
         unsigned long job_count = 0;
 

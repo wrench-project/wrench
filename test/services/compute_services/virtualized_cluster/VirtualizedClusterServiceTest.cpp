@@ -778,7 +778,7 @@ private:
         // Create a bunch of VMs
         try {
             auto cs = this->test->compute_service;
-            std::string execution_host = cs->getExecutionHosts()[0];
+            std::string execution_host = cs->getHosts()[0];
 
             auto vm1 = cs->createVM(1, 10);
             cs->startVM(vm1);
@@ -893,7 +893,7 @@ private:
 
         // Create  and start VMs
         try {
-            std::string execution_host = cs->getExecutionHosts()[0];
+            std::string execution_host = cs->getHosts()[0];
             for (int i = 0; i < 4; i++) {
                 auto vm_name = cs->createVM(1, 10);
                 vm_list.push_back(vm_name);
@@ -1133,7 +1133,7 @@ private:
 
         // Create VMs
         try {
-            std::string execution_host = cs->getExecutionHosts()[0];
+            std::string execution_host = cs->getHosts()[0];
 
             for (int i = 0; i < 4; i++) {
                 auto vm_name = cs->createVM(1, 10, execution_host);
@@ -1247,7 +1247,7 @@ private:
 
         // Create some VMs
         try {
-            std::string execution_host = cs->getExecutionHosts()[0];
+            std::string execution_host = cs->getHosts()[0];
 
             for (int i = 0; i < 2; i++) {
                 auto vm_name = cs->createVM(1, 10, execution_host);

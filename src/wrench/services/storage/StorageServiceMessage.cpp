@@ -222,6 +222,7 @@ namespace wrench {
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param requesting_host: the requesting host
     * @param location: the location
+    * @param num_bytes_to_write: the number of bytes to write to the file
     * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
@@ -229,6 +230,7 @@ namespace wrench {
     StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                  simgrid::s4u::Host *requesting_host,
                                                                                  const std::shared_ptr<FileLocation> &location,
+                                                                                 double num_bytes_to_write,
                                                                                  double payload)
         : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -240,6 +242,7 @@ namespace wrench {
         this->answer_mailbox = answer_mailbox;
         this->requesting_host = requesting_host;
         this->location = location;
+        this->num_bytes_to_write = num_bytes_to_write;
     }
 
     /**

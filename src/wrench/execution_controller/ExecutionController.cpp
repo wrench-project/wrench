@@ -131,7 +131,7 @@ namespace wrench {
     }
 
     /**
-     * @brief  Wait for an execution event
+     * @brief  Wait for an execution event with a timeout
      * @param timeout: a timeout value in seconds
      * @return the event
      */

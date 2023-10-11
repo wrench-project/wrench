@@ -70,6 +70,8 @@ namespace wrench {
     private:
         friend class HTCondorComputeService;
 
+        std::map<std::string, double> constructResourceInformation(const std::string &key) override;
+
         int main() override;
 
         bool processNextMessage();

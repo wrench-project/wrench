@@ -110,10 +110,11 @@ namespace wrench {
         static simgrid::s4u::Host *get_host_or_vm_by_name_or_null(const std::string &name);
         static simgrid::s4u::Host *get_host_or_vm_by_name(const std::string &name);
 
+        static double getHostMemoryCapacity(simgrid::s4u::Host *host);
+
     private:
         static void traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string, std::vector<std::string>> &result, bool get_subzones, bool get_clusters, bool get_hosts_from_zones, bool get_hosts_from_clusters);
 
-        static double getHostMemoryCapacity(simgrid::s4u::Host *host);
         simgrid::s4u::Engine *engine;
         bool initialized = false;
         bool platform_setup = false;

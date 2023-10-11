@@ -75,6 +75,7 @@ namespace wrench {
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
+
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
@@ -111,7 +112,7 @@ namespace wrench {
         virtual bool isVMDown(const std::string &vm_name);
 
 
-        std::vector<std::string> getExecutionHosts();
+        //        std::vector<std::string> getExecutionHosts();
 
         /***********************/
         /** \endcond          **/
@@ -179,6 +180,7 @@ namespace wrench {
         virtual void
         processStartVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
 
+
         virtual void processShutdownVM(simgrid::s4u::Mailbox *answer_mailbox,
                                        const std::string &vm_name,
                                        bool send_failure_notifications,
@@ -226,6 +228,7 @@ namespace wrench {
         /***********************/
 
     private:
+        std::map<std::string, double> constructResourceInformation(const std::string &key) override;
         std::string findHost(unsigned long desired_num_cores, double desired_ram, const std::string &desired_host);
     };
 }// namespace wrench

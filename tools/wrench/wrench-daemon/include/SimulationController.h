@@ -44,21 +44,21 @@ namespace wrench {
 
         json advanceTime(json data);
 
-        json createStandardJob(json data);
-
         json getSimulationEvents(json);
 
+        json createStandardJob(json data);
         json submitStandardJob(json data);
-
         json getStandardJobTasks(json data);
+        json addInputFile(json data);
+        json addOutputFile(json data);
 
+        json createTask(json data);
         json getTaskFlops(json data);
-
         json getTaskMinNumCores(json data);
-
         json getTaskMaxNumCores(json data);
-
         json getTaskMemory(json data);
+        json getTaskStartDate(json data);
+        json getTaskEndDate(json data);
 
         json waitForNextSimulationEvent(json data);
 
@@ -66,27 +66,55 @@ namespace wrench {
 
         json addCloudComputeService(json data);
 
+        json addBatchComputeService(json data);
+
         json addSimpleStorageService(json data);
 
         json createFileCopyAtStorageService(json data);
+        json lookupFileAtStorageService(json data);
 
         json addFileRegistryService(json data);
 
-        json createTask(json data);
-
         json addFile(json data);
-
         json getFileSize(json data);
 
-        json addInputFile(json data);
-
-        json addOutputFile(json data);
-
         json getTaskInputFiles(json data);
+
+        json getTaskOutputFiles(json data);
 
         json getInputFiles(json data);
 
         json stageInputFiles(json data);
+
+        json supportsCompoundJobs(json data);
+
+        json supportsPilotJobs(json data);
+
+        json supportsStandardJobs(json data);
+
+        json createVM(json data);
+
+        json startVM(json data);
+
+        json shutdownVM(json data);
+
+        json destroyVM(json data);
+
+        json isVMRunning(json data);
+
+        json isVMDown(json data);
+
+        json suspendVM(json data);
+
+        json resumeVM(json data);
+
+        json isVMSuspended(json data);
+
+        json getExecutionHosts(json data);
+
+        json getVMPhysicalHostname(json data);
+
+        json getVMComputeService(json data);
 
     private:
         // Thread-safe key value stores
@@ -97,10 +125,32 @@ namespace wrench {
 
         // Thread-safe queues for the server thread and the simulation thread to communicate
         BlockingQueue<std::pair<double, std::shared_ptr<wrench::ExecutionEvent>>> event_queue;
+
         BlockingQueue<wrench::ComputeService *> compute_services_to_start;
         BlockingQueue<wrench::StorageService *> storage_services_to_start;
         BlockingQueue<wrench::FileRegistryService *> file_service_to_start;
-        BlockingQueue<std::pair<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>>> submissions_to_do;
+        BlockingQueue<std::tuple<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>, std::map<std::string, std::string>>> submissions_to_do;
+
+        BlockingQueue<std::pair<std::tuple<unsigned long, double, WRENCH_PROPERTY_COLLECTION_TYPE, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE>, std::shared_ptr<ComputeService>>> vm_to_create;
+        BlockingQueue<std::pair<bool, std::string>> vm_created;
+
+        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_start;
+        BlockingQueue<std::pair<bool, std::string>> vm_started;
+
+        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_shutdown;
+        BlockingQueue<std::pair<bool, std::string>> vm_shutdown;
+
+        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_destroy;
+        BlockingQueue<std::pair<bool, std::string>> vm_destroyed;
+
+        BlockingQueue<std::pair<std::shared_ptr<DataFile>, std::shared_ptr<StorageService>>> file_to_lookup;
+        BlockingQueue<std::tuple<bool, bool, std::string>> file_looked_up;
+
+        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_suspend;
+        BlockingQueue<std::pair<bool, std::string>> vm_suspended;
+
+        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_resume;
+        BlockingQueue<std::pair<bool, std::string>> vm_resumed;
 
         // The two managers
         std::shared_ptr<JobManager> job_manager;

@@ -406,10 +406,21 @@ namespace wrench {
         target_cs->validateServiceSpecificArguments(job, stripped_service_specific_args);
     }
 
+
     /**
- * @brief Returns true if the service supports standard jobs
- * @return true or false
- */
+     * @brief Construct a dict for resource information
+     * @param key: the desired key
+     * @return a dictionary
+     */
+    std::map<std::string, double> HTCondorComputeService::constructResourceInformation(const std::string &key) {
+        throw std::runtime_error("HTCondorComputeService::constructResourceInformation(): Not implemented in this service.");
+    }
+
+
+    /**
+     * @brief Returns true if the service supports standard jobs
+     * @return true or false
+     */
     bool HTCondorComputeService::supportsStandardJobs() {
         return true;
     }

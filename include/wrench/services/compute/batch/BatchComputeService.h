@@ -140,6 +140,7 @@ namespace wrench {
 
     private:
         friend class WorkloadTraceFileReplayer;
+        friend class HomegrownBatchScheduler;
         friend class FCFSBatchScheduler;
         friend class ConservativeBackfillingBatchScheduler;
         friend class ConservativeBackfillingBatchSchedulerCoreLevel;
@@ -172,11 +173,12 @@ namespace wrench {
         /* Resources information in batch */
         unsigned long total_num_of_nodes;
         unsigned long num_cores_per_node;
-        std::unordered_map<std::string, unsigned long> nodes_to_cores_map;
+        std::map<simgrid::s4u::Host *, unsigned long> nodes_to_cores_map;
         std::vector<double> timeslots;
-        std::map<std::string, unsigned long> available_nodes_to_cores;
-        std::unordered_map<unsigned long, std::string> host_id_to_names;
-        std::vector<std::string> compute_hosts;
+        std::map<simgrid::s4u::Host *, unsigned long> available_nodes_to_cores;
+        std::map<unsigned long, simgrid::s4u::Host *> host_id_to_names;
+        std::vector<simgrid::s4u::Host *> compute_hosts;
+
         /* End Resources information in batch */
 
         // Vector of one-shot bare-metal compute services
@@ -234,6 +236,8 @@ namespace wrench {
 
         void startBackgroundWorkloadProcess();
 
+        std::map<std::string, double> constructResourceInformation(const std::string &key) override;
+
         void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
 
         void processCompoundJobCompletion(const std::shared_ptr<BareMetalComputeServiceOneShot> &executor, const std::shared_ptr<CompoundJob> &job);
@@ -260,7 +264,7 @@ namespace wrench {
         void processAlarmJobTimeout(const std::shared_ptr<BatchJob> &batch_job);
 
         //free up resources
-        void freeUpResources(const std::map<std::string, std::tuple<unsigned long, double>> &resources);
+        void freeUpResources(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &resources);
 
         //send call back to the pilot job submitters
         void sendPilotJobExpirationNotification(const std::shared_ptr<PilotJob> &job);
@@ -272,7 +276,7 @@ namespace wrench {
         void processJobSubmission(const std::shared_ptr<BatchJob> &job, simgrid::s4u::Mailbox *answer_mailbox);
 
         //start a job
-        void startJob(const std::map<std::string, std::tuple<unsigned long, double>> &, const std::shared_ptr<CompoundJob> &,
+        void startJob(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &, const std::shared_ptr<CompoundJob> &,
                       const std::shared_ptr<BatchJob> &, unsigned long, unsigned long, unsigned long);
 
         // process a resource request

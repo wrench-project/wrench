@@ -99,12 +99,14 @@ namespace wrench {
      *
      * @param answer_mailbox: the mailbox on which to expect the answer
      * @param location: the location
+     * @param num_bytes_to_write: the number of bytes to write to the file
      * @param wait_for_answer: whether to wait for the answer
      *
      * @throw ExecutionException
      */
     void StorageService::writeFile(simgrid::s4u::Mailbox *answer_mailbox,
                                    const std::shared_ptr<FileLocation> &location,
+                                   double num_bytes_to_write,
                                    bool wait_for_answer) {
 
         if (location == nullptr) {
@@ -118,6 +120,7 @@ namespace wrench {
                                         answer_mailbox,
                                         simgrid::s4u::this_actor::get_host(),
                                         location,
+                                        num_bytes_to_write,
                                         this->getMessagePayloadValue(
                                                 StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -213,6 +216,7 @@ namespace wrench {
      */
     bool StorageService::lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
                                     const std::shared_ptr<FileLocation> &location) {
+
         if (!answer_mailbox or !location) {
             throw std::invalid_argument("StorageService::lookupFile(): Invalid nullptr arguments");
         }

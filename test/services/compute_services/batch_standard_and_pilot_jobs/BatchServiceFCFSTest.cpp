@@ -90,7 +90,7 @@ private:
         std::shared_ptr<wrench::WorkflowTask> tasks[8];
         std::shared_ptr<wrench::StandardJob> jobs[8];
         for (int i = 0; i < 8; i++) {
-            tasks[i] = this->test->workflow->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
+            tasks[i] = this->test->workflow->addTask("task" + std::to_string(i), 60, 1, 1, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 
@@ -166,11 +166,11 @@ private:
         for (int i = 0; i < 8; i++) {
             double delta = std::abs(actual_completion_times[i] - expected_completion_times[i]);
             if (delta > EPSILON) {
-                throw std::runtime_error("Unexpected job completion time for the job containing task1 " +
+                throw std::runtime_error("Unexpected job completion time for the job containing task " +
                                          tasks[i]->getID() +
                                          ": " +
                                          std::to_string(actual_completion_times[i]) +
-                                         "(expected: " +
+                                         " (expected: " +
                                          std::to_string(expected_completion_times[i]) +
                                          ")");
             }
@@ -192,12 +192,12 @@ TEST_F(BatchServiceFCFSTest, SimpleFCFSTest)
 
 void BatchServiceFCFSTest::do_SimpleFCFS_test() {
 
-
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -254,7 +254,7 @@ private:
         std::shared_ptr<wrench::WorkflowTask> tasks[9];
         std::shared_ptr<wrench::StandardJob> jobs[9];
         for (int i = 0; i < 9; i++) {
-            tasks[i] = this->test->workflow->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
+            tasks[i] = this->test->workflow->addTask("task" + std::to_string(i), 60, 1, 1, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 

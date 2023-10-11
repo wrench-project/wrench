@@ -228,55 +228,31 @@ namespace wrench {
      * @return a host:<core,RAM> map
      *
      */
-    std::map<std::string, std::tuple<unsigned long, double>>
+    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>>
     ConservativeBackfillingBatchScheduler::scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
         if (ram_per_node == ComputeService::ALL_RAM) {
-            ram_per_node = Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
+            ram_per_node = S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
         }
         if (cores_per_node == ComputeService::ALL_CORES) {
-            cores_per_node = Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first);
+            cores_per_node = cs->available_nodes_to_cores.begin()->first->get_core_count();
         }
 
-        if (ram_per_node > Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too much RAM per host");
+        if (ram_per_node > S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too much RAM per host");
         }
         if (num_nodes > cs->available_nodes_to_cores.size()) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too many hosts");
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
-        if (cores_per_node > Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first)) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too many cores per host (asking  for " +
+        if (cores_per_node > cs->available_nodes_to_cores.begin()->first->get_core_count()) {
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many cores per host (asking  for " +
                                      std::to_string(cores_per_node) + " but hosts have " +
-                                     std::to_string(Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first)) + "cores)");
+                                     std::to_string(cs->available_nodes_to_cores.begin()->first->get_core_count()) + "cores)");
         }
 
         // IMPORTANT: We always give all cores to a job on a node!
-        cores_per_node = Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first);
+        cores_per_node = cs->available_nodes_to_cores.begin()->first->get_core_count();
 
-        std::map<std::string, std::tuple<unsigned long, double>> resources = {};
-        std::vector<std::string> hosts_assigned = {};
-
-        unsigned long host_count = 0;
-        for (auto &available_nodes_to_core: cs->available_nodes_to_cores) {
-            if (available_nodes_to_core.second >= cores_per_node) {
-                //Remove that many cores from the available_nodes_to_core
-                available_nodes_to_core.second -= cores_per_node;
-                hosts_assigned.push_back(available_nodes_to_core.first);
-                resources.insert(std::make_pair(available_nodes_to_core.first, std::make_tuple(cores_per_node, ram_per_node)));
-                if (++host_count >= num_nodes) {
-                    break;
-                }
-            }
-        }
-        if (resources.size() < num_nodes) {
-            resources = {};
-            std::vector<std::string>::iterator vector_it;
-            // undo!
-            for (vector_it = hosts_assigned.begin(); vector_it != hosts_assigned.end(); vector_it++) {
-                cs->available_nodes_to_cores[*vector_it] += cores_per_node;
-            }
-        }
-
-        return resources;
+        return HomegrownBatchScheduler::selectHostsFirstFit(cs, num_nodes, cores_per_node, ram_per_node);
     }
 
     /**

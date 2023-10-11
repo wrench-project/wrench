@@ -42,25 +42,25 @@ namespace wrench {
 
         // Make A COPY of the list of usable hosts
         auto resources_ref = action_executor->getActionExecutionService()->getComputeResources();
-        std::map<std::string, std::tuple<unsigned long, double>> resources(resources_ref.begin(), resources_ref.end());
-        std::vector<std::string> hostnames;
-        hostnames.reserve(resources.size());
-        for (auto const &h: resources) {
-            hostnames.push_back(h.first);
-        }
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources(resources_ref.begin(), resources_ref.end());
+        //        std::vector<std::string> hostnames;
+        //        hostnames.reserve(resources.size());
+        //        for (auto const &h: resources) {
+        //            hostnames.push_back(h.first);
+        //        }
 
         // Determine the host list (using worst fit)
-        std::vector<std::string> hosts;
-        while (hosts.size() != this->num_processes) {
+        std::vector<simgrid::s4u::Host *> simgrid_hosts;
+        while (simgrid_hosts.size() != this->num_processes) {
             bool added_at_least_one_host = false;
-            for (auto const &hostname: hostnames) {
-                auto num_cores = std::get<0>(resources[hostname]);
+            for (auto const &r: resources) {
+                auto num_cores = std::get<0>(r.second);
                 //                std::cerr << hostname << ": " << num_cores << "\n";
                 if (num_cores >= this->num_cores_per_process) {
-                    hosts.push_back(hostname);
-                    resources[hostname] = std::make_tuple(std::get<0>(resources[hostname]) - this->num_cores_per_process, std::get<1>(resources[hostname]));
+                    simgrid_hosts.push_back(r.first);
+                    resources[r.first] = std::make_tuple(std::get<0>(resources[r.first]) - this->num_cores_per_process, std::get<1>(resources[r.first]));
                     added_at_least_one_host = true;
-                    if (hosts.size() == this->num_processes) {
+                    if (simgrid_hosts.size() == this->num_processes) {
                         break;
                     }
                 }
@@ -71,17 +71,23 @@ namespace wrench {
         }
 
         // Transform the list of hosts into a list of simgrid hosts
-        std::vector<simgrid::s4u::Host *> simgrid_hosts;
-        simgrid_hosts.reserve(hosts.size());
-        for (auto const &host: hosts) {
-            simgrid_hosts.push_back(S4U_Simulation::get_host_or_vm_by_name(host));
-        }
+        //        std::vector<simgrid::s4u::Host *> simgrid_hosts;
+        //        simgrid_hosts.reserve(hosts.size());
+        //        for (auto const &host: hosts) {
+        //            simgrid_hosts.push_back(host);
+        //        }
 
         // Do the SMPI thing!!!
         auto barrier = simgrid::s4u::Barrier::create(1 + simgrid_hosts.size());
         // Start actors
+        auto meta_lambda = [this](const std::shared_ptr<ActionExecutor> &action_executor) {
+            S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()] = S4U_Mailbox::generateUniqueMailbox("rmb");
+            this->lambda_mpi(action_executor);
+            S4U_Daemon::map_actor_to_recv_mailbox.erase(simgrid::s4u::this_actor::get_pid());
+        };
+
         SMPI_app_instance_start(("MPI_Action_" + std::to_string(simgrid::s4u::this_actor::get_pid())).c_str(),
-                                MPIProcess(this->lambda_mpi, barrier, action_executor),
+                                MPIProcess(meta_lambda, barrier, action_executor),
                                 simgrid_hosts);
         barrier->wait();
     }

@@ -289,11 +289,11 @@ namespace wrench {
 
         zmq::message_t request(strlen(data_to_send.c_str()));
         memcpy(request.data(), data_to_send.c_str(), strlen(data_to_send.c_str()));
-        socket.send(request);
+        socket.send(request, zmq::send_flags::none);
 
         //  Get the reply.
         zmq::message_t reply;
-        socket.recv(&reply);
+        auto ret = socket.recv(reply, zmq::recv_flags::none);
 
         // Process the reply
         std::string reply_data;
@@ -525,15 +525,13 @@ namespace wrench {
         std::map<std::string, unsigned long>::iterator it;
         int count = 0;
         for (it = this->cs->nodes_to_cores_map.begin(); it != this->cs->nodes_to_cores_map.end(); it++) {
-
             compute_resource_map["events"].as_array()[0].as_object()["data"].as_object()["resources_data"].emplace_array()[count].emplace_object()["id"] = std::to_string(count);
-            compute_resource_map["events"].as_array()[0].as_object()["data"].as_object()["resources_data"].as_erray()[count].as_object()["name"] = it->first;
+            compute_resource_map["events"].as_array()[0].as_object()["data"].as_object()["resources_data"].as_erray()[count].as_object()["name"] = it->first->get_name();
             compute_resource_map["events"].as_array()[0].as_object()["data"].as_object()["resources_data"].as_erray()[count].as_object()["core"] = it->second;
             compute_resource_map["events"].as_array()[0].as_object()["data"].as_object()["resources_data"].as_erray()[count].as_object()["state"] = "idle";
             count++;
         }
         std::string data = compute_resources_map.dump();
-
 
         try {
             std::shared_ptr<BatschedNetworkListener> network_listener =

@@ -138,8 +138,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
                 "Host2", compute_resources, {}, {}));
 
@@ -261,8 +261,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
                 "Host2", compute_resources,
                 {}, {}));
@@ -355,8 +355,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
                 "Host2", compute_resources,
                 {}, {}));
@@ -463,8 +463,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
                 "Host2", compute_resources,
                 {}, {}));
@@ -582,8 +582,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(4, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(4, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources, nullptr,
                                                    {{wrench::ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {}));
@@ -631,12 +631,12 @@ private:
         }
 
         // Is the start-date sensible?
-        if (std::abs<double>(action->getStartDate() - 12.0) > EPSILON) {
+        if (std::abs<double>(action->getStartDate() - 11.0) > EPSILON) {
             throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
-        if (std::abs<double>(action->getEndDate() - 45.333333333333335701810) > EPSILON) {
+        if (std::abs<double>(action->getEndDate() - 44.333333333333335701810) > EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
         }
 
@@ -658,9 +658,9 @@ private:
             throw std::runtime_error("Action history most recent: unexpected physical execution host " + history.top().physical_execution_host);
         if (history.top().failure_cause != nullptr)
             throw std::runtime_error("Action history most recent: unexpected failure cause: " + history.top().failure_cause->toString());
-        if (history.top().start_date < 12.0 - EPSILON or history.top().start_date > 12.0 + EPSILON)
+        if (history.top().start_date < 11.0 - EPSILON or history.top().start_date > 11.0 + EPSILON)
             throw std::runtime_error("Action history most recent: unexpected start date: " + std::to_string(history.top().start_date));
-        if (history.top().end_date + EPSILON < 45.33333333333333570181 or history.top().end_date > 45.33333333333333570181 + EPSILON)
+        if (history.top().end_date + EPSILON < 44.33333333333333570181 or history.top().end_date > 44.33333333333333570181 + EPSILON)
             throw std::runtime_error("Action history most recent: unexpected end date: " + std::to_string(history.top().end_date));
         // Older
         history.pop();
@@ -748,8 +748,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources, this->getSharedPtr<Service>(),
                                                    {{wrench::ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {}));
@@ -874,8 +874,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
                                                    {}, {}));
@@ -1006,8 +1006,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
                                                    {}, {}));
@@ -1110,8 +1110,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
                                                    {}, {}));

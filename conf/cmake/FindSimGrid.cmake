@@ -1,6 +1,6 @@
 # CMake find module to search for the SimGrid library.
 
-# Copyright (c) 2016-2022. The SimGrid Team.
+# Copyright (c) 2016-2023. The SimGrid Team.
 #
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the license (GNU LGPL) which comes with this package.
@@ -13,7 +13,7 @@
 #    CMAKE_PREFIX_PATH="/path/to/FindSimGrid.cmake:$CMAKE_PREFIX_PATH"  cmake .
 #
 # If this file does not find SimGrid, define SimGrid_PATH:
-#    SimGrid_PATH=/path/to/simgrid  cmake .
+#    cmake -DSimGrid_PATH=/path/to/simgrid .
 
 #
 # DEVELOPERS OF PROGRAMS USING SIMGRID
@@ -23,19 +23,11 @@
 #     Either by copying it in your tree, or (recommended) by using the
 #     version automatically installed by SimGrid.
 #
-#  2. Afterward, if you have CMake >= 2.8.12, this will define a
-#     target called 'SimGrid::Simgrid'. Use it as:
+#  2. This will define a target called 'SimGrid::Simgrid'. Use it as:
 #       target_link_libraries(your-simulator SimGrid::SimGrid)
 #
-#    With older CMake (< 2.8.12), it simply defines several variables:
-#       SimGrid_INCLUDE_DIR - the SimGrid include directories
-#       SimGrid_LIBRARY - link your simulator against it to use SimGrid
-#    Use as:
-#      include_directories("${SimGrid_INCLUDE_DIR}" SYSTEM)
-#      target_link_libraries(your-simulator ${SimGrid_LIBRARY})
-#
-#  In both cases, it also define a SimGrid_VERSION macro, that you
-#    can use to deal with API evolutions as follows:
+#  It also defines a SimGrid_VERSION macro, that you can use to deal with API
+#    evolutions as follows:
 #
 #    #if SimGrid_VERSION < 31800
 #      (code to use if the installed version is lower than v3.18)
@@ -45,7 +37,7 @@
 #      (code to use with SimGrid v3.19+)
 #    #endif
 #
-#  Since SimGrid header files require C++14, so we set CMAKE_CXX_STANDARD to 14.
+#  Since SimGrid header files require C++17, so we set CMAKE_CXX_STANDARD to 17.
 #    Change this variable in your own file if you need a later standard.
 
 #
@@ -58,7 +50,7 @@
 
 cmake_minimum_required(VERSION 2.8.12)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_path(SimGrid_INCLUDE_DIR
@@ -110,33 +102,30 @@ find_package_handle_standard_args(SimGrid
   VERSION_VAR SimGrid_VERSION
 )
 
-if (SimGrid_FOUND AND NOT CMAKE_VERSION VERSION_LESS 2.8.12)
+if (SimGrid_FOUND)
   add_library(SimGrid::SimGrid SHARED IMPORTED)
   set_target_properties(SimGrid::SimGrid PROPERTIES
     INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${SimGrid_INCLUDE_DIR}
     INTERFACE_COMPILE_FEATURES cxx_alias_templates
     IMPORTED_LOCATION ${SimGrid_LIBRARY}
   )
-  # We need C++14, so check for it just in case the user removed it since compiling SimGrid
+  # We need C++17, so check for it just in case the user removed it since compiling SimGrid
   if (NOT CMAKE_VERSION VERSION_LESS 3.8)
-    # 3.8+ allows us to simply require C++14 (or higher)
-    set_property(TARGET SimGrid::SimGrid PROPERTY INTERFACE_COMPILE_FEATURES cxx_std_14)
-  elseif (NOT CMAKE_VERSION VERSION_LESS 3.1)
-    # 3.1+ is similar but for certain features. We pick just one
-    set_property(TARGET SimGrid::SimGrid PROPERTY INTERFACE_COMPILE_FEATURES cxx_attribute_deprecated)
+    # 3.8+ allows us to simply require C++17 (or higher)
+    set_property(TARGET SimGrid::SimGrid PROPERTY INTERFACE_COMPILE_FEATURES cxx_std_17)
   else ()
-    # Old CMake can't do much. Just check the CXX_FLAGS and inform the user when a C++14 feature does not work
+    # Old CMake can't do much. Just check the CXX_FLAGS and inform the user when a C++17 feature does not work
     include(CheckCXXSourceCompiles)
     set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX_FLAGS}")
     check_cxx_source_compiles("
-#if __cplusplus < 201402L
+#if __cplusplus < 201703L
 #error
 #else
 int main(){}
 #endif
-" _SIMGRID_CXX14_ENABLED)
-    if (NOT _SIMGRID_CXX14_ENABLED)
-        message(WARNING "C++14 is required to use SimGrid. Enable it with e.g. -std=c++14")
+" _SIMGRID_CXX17_ENABLED)
+    if (NOT _SIMGRID_CXX17_ENABLED)
+        message(WARNING "C++17 is required to use SimGrid. Enable it with e.g. -std=c++17")
     endif ()
     unset(_SIMGRID_CXX14_ENABLED CACHE)
   endif ()

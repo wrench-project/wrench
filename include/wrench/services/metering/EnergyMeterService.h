@@ -15,8 +15,6 @@
 
 namespace wrench {
 
-    class WMS;
-
     /**
      * @brief A service that measures and records energy consumption on a set of hosts at regular time intervals
      */

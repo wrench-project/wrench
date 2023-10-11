@@ -32,11 +32,19 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the Amdahl Law's alpha parameter
-     * @return the alpha parameter
+     * @brief Get the Amdahl Law's alpha parameter, i.e., the fraction of the sequential execution time that is parallelizable
+     * @return the alpha parameter (a value between 0.9 and 1.0)
      */
     double AmdahlParallelModel::getAlpha() const {
         return this->alpha;
+    }
+
+    /**
+     * @brief Set the Amdahl Law's alpha parameter, i.e., the fraction of the sequential execution time that is parallelizable
+     * @param alpha: the alpha parameter (a value between 0.9 and 1.0)
+     */
+    void AmdahlParallelModel::setAlpha(double alpha) {
+        this->alpha = alpha;
     }
 
 

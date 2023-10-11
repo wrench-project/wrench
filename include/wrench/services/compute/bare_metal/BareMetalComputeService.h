@@ -132,6 +132,13 @@ namespace wrench {
                                 std::shared_ptr<PilotJob> pj, const std::string &suffix,
                                 std::shared_ptr<StorageService> scratch_space);// reference to upper level scratch space
 
+        //        BareMetalComputeService(const std::string &hostname,
+        //                                std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources,
+        //                                WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+        //                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+        //                                std::shared_ptr<PilotJob> pj, const std::string &suffix,
+        //                                std::shared_ptr<StorageService> scratch_space);
+
         BareMetalComputeService(const std::string &hostname,
                                 const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list,
@@ -204,6 +211,7 @@ namespace wrench {
 
         void terminateCurrentCompoundJob(const std::shared_ptr<CompoundJob> &job, ComputeService::TerminationCause termination_cause);
 
+
         void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
 
         void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<CompoundJob> &job,
@@ -230,6 +238,9 @@ namespace wrench {
          * @brief The ActionExecutionService that is started by this service
          */
         std::shared_ptr<ActionExecutionService> action_execution_service;
+
+    private:
+        std::map<std::string, double> constructResourceInformation(const std::string &key) override;
 
         /***********************/
         /** \endcond           */

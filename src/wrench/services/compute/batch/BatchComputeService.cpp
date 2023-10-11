@@ -41,7 +41,7 @@ WRENCH_LOG_CATEGORY(wrench_core_batch_service, "Log category for Batch Service")
 
 namespace wrench {
     // Do not remove
-    BatchComputeService::~BatchComputeService() {}
+    BatchComputeService::~BatchComputeService() = default;
 
     /**
      * @brief Constructor
@@ -101,40 +101,50 @@ namespace wrench {
                     "BatchComputeService::BatchComputeService(): at least one compute hosts must be provided");
         }
 
-        // Check Platform homogeneity
-        double num_cores_available = (double) (Simulation::getHostNumCores(*(compute_hosts.begin())));
-        double speed = Simulation::getHostFlopRate(*(compute_hosts.begin()));
-        double ram_available = Simulation::getHostMemoryCapacity(*(compute_hosts.begin()));
+        // Get the hosts
+        for (const auto &h: compute_hosts) {
+            this->compute_hosts.push_back(S4U_Simulation::get_host_or_vm_by_name(h));
+        }
 
-        for (auto const &h: compute_hosts) {
+        //        for (const auto &h : this->compute_hosts) {
+        //            std::cerr << "==> " << h->get_name() << "\n";
+        //        }
+
+        // Check Platform homogeneity
+        auto first_host = *(this->compute_hosts.begin());
+        auto num_cores_available = (first_host->get_core_count());
+        double speed = first_host->get_speed();
+        double ram_available = S4U_Simulation::getHostMemoryCapacity(first_host);
+
+        for (auto const &h: this->compute_hosts) {
             // Compute speed
-            if (std::abs(speed - Simulation::getHostFlopRate(h)) > DBL_EPSILON) {
+            if (std::abs(speed - h->get_speed()) > DBL_EPSILON) {
                 throw std::invalid_argument(
                         "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different flop rates detected)");
             }
             // RAM
-            if (std::abs(ram_available - Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
+            if (std::abs(ram_available - S4U_Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
                 throw std::invalid_argument(
                         "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different RAM capacities detected)");
             }
             // Num cores
-            if ((double) (Simulation::getHostNumCores(h)) != num_cores_available) {
+            if ((double) (h->get_core_count()) != num_cores_available) {
                 throw std::invalid_argument(
                         "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different RAM capacities detected)");
             }
         }
 
+
         //create a map for host to cores
         int i = 0;
-        for (const auto &h: compute_hosts) {
-            this->nodes_to_cores_map.insert({h, num_cores_available});
-            this->available_nodes_to_cores.insert({h, num_cores_available});
+        for (const auto &h: this->compute_hosts) {
+            this->nodes_to_cores_map[h] = num_cores_available;
+            this->available_nodes_to_cores[h] = num_cores_available;
             this->host_id_to_names[i++] = h;
         }
-        this->compute_hosts = compute_hosts;
 
         this->num_cores_per_node = this->nodes_to_cores_map.begin()->second;
         this->total_num_of_nodes = compute_hosts.size();
@@ -480,11 +490,11 @@ namespace wrench {
     /**
      * @brief Increase resource availabilities based on freed resources
      * @param resources: a set of tuples as follows:
-     *              - hostname (string)
+     *              - host
      *              - number of cores (unsigned long)
      *              - bytes of RAM (double)
      */
-    void BatchComputeService::freeUpResources(const std::map<std::string, std::tuple<unsigned long, double>> &resources) {
+    void BatchComputeService::freeUpResources(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &resources) {
         for (auto r: resources) {
             this->available_nodes_to_cores[r.first] += std::get<0>(r.second);
         }
@@ -800,9 +810,9 @@ namespace wrench {
 
         if ((requested_hosts > this->available_nodes_to_cores.size()) or
             (requested_num_cores_per_host >
-             Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first)) or
+             this->available_nodes_to_cores.begin()->first->get_core_count()) or
             (required_ram_per_host >
-             Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first))) {
+             S4U_Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first))) {
             {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox,
@@ -972,7 +982,7 @@ namespace wrench {
      * @param cores_per_node_asked_for
      */
     void BatchComputeService::startJob(
-            const std::map<std::string, std::tuple<unsigned long, double>> &resources,
+            const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &resources,
             const std::shared_ptr<CompoundJob> &compound_job,
             const std::shared_ptr<BatchJob> &batch_job, unsigned long num_nodes_allocated,
             unsigned long allocated_time,
@@ -982,11 +992,16 @@ namespace wrench {
                 num_nodes_allocated, cores_per_node_asked_for);
 
         compound_job->pushCallbackMailbox(this->mailbox);
+
+        std::map<std::string, std::tuple<unsigned long, double>> resources_by_hostname;
+        for (auto const &h: resources) {
+            resources_by_hostname[h.first->get_name()] = h.second;
+        }
         auto executor = std::shared_ptr<BareMetalComputeServiceOneShot>(
                 new BareMetalComputeServiceOneShot(
                         compound_job,
                         this->hostname,
-                        resources,
+                        resources_by_hostname,
                         {{BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD,
                           this->getPropertyValueAsString(
                                   BatchComputeServiceProperty::THREAD_STARTUP_OVERHEAD)}},
@@ -1017,12 +1032,12 @@ namespace wrench {
     }
 
     /**
-    * @brief Process a "get resource description message"
-    * @param answer_mailbox: the mailbox to which the description message should be sent
-    * @param key: the desired resource information (i.e., dictionary key) that's needed)
-    */
-    void BatchComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
-                                                            const std::string &key) {
+     * @brief Construct a dict for resource information
+     * @param key: the desired key
+     * @return a dictionary
+     */
+    std::map<std::string, double> BatchComputeService::constructResourceInformation(const std::string &key) {
+
         // Build a dictionary
         std::map<std::string, double> dict;
 
@@ -1032,39 +1047,51 @@ namespace wrench {
 
         } else if (key == "num_cores") {
             for (const auto &h: this->nodes_to_cores_map) {
-                dict.insert(std::make_pair(h.first, (double) (h.second)));
+                dict.insert(std::make_pair(h.first->get_name(), (double) (h.second)));
             }
 
         } else if (key == "num_idle_cores") {
             // Num idle cores per hosts
             for (const auto &h: this->available_nodes_to_cores) {
-                dict.insert(std::make_pair(h.first, (double) (h.second)));
+                dict.insert(std::make_pair(h.first->get_name(), (double) (h.second)));
             }
 
         } else if (key == "flop_rates") {
             // Flop rate per host
             for (const auto &h: this->nodes_to_cores_map) {
-                dict.insert(std::make_pair(h.first, S4U_Simulation::getHostFlopRate(h.first)));
+                dict.insert(std::make_pair(h.first->get_name(), h.first->get_speed()));
             }
 
         } else if (key == "ram_capacities") {
             // RAM capacity per host
             for (const auto &h: this->nodes_to_cores_map) {
-                dict.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
+                dict.insert(std::make_pair(h.first->get_name(), S4U_Simulation::getHostMemoryCapacity(h.first)));
             }
 
         } else if (key == "ram_availabilities") {
             // RAM availability per host  (0 if something is running, full otherwise)
             for (const auto &h: this->available_nodes_to_cores) {
-                if (h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
-                    dict.insert(std::make_pair(h.first, 0.0));
+                if ((double) h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
+                    dict.insert(std::make_pair(h.first->get_name(), 0.0));
                 } else {
-                    dict.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
+                    dict.insert(std::make_pair(h.first->get_name(), S4U_Simulation::getHostMemoryCapacity(h.first)));
                 }
             }
         } else {
             throw std::runtime_error("BatchComputeService::processGetResourceInformation(): unknown key");
         }
+        return dict;
+    }
+
+    /**
+    * @brief Process a "get resource description message"
+    * @param answer_mailbox: the mailbox to which the description message should be sent
+    * @param key: the desired resource information (i.e., dictionary key) that's needed)
+    */
+    void BatchComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
+                                                            const std::string &key) {
+
+        auto dict = this->constructResourceInformation(key);
 
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(
@@ -1273,9 +1300,9 @@ namespace wrench {
         unsigned long time_in_seconds = batch_job->getRequestedTime();
         unsigned long cores_per_node_asked_for = batch_job->getRequestedCoresPerNode();
 
-        std::map<std::string, std::tuple<unsigned long, double>> resources = {};
-        std::vector<std::string> hosts_assigned = {};
-        std::map<std::string, unsigned long>::iterator it;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources = {};
+        std::vector<simgrid::s4u::Host *> hosts_assigned = {};
+        std::map<simgrid::s4u::Host *, unsigned long>::iterator it;
 
         for (auto node: node_resources) {
             double ram_capacity = S4U_Simulation::getHostMemoryCapacity(
@@ -1376,7 +1403,7 @@ namespace wrench {
         }
 
         // Double check that memory requirements of all tasks can be met
-        if (job->getMinimumRequiredMemory() > Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first)) {
+        if (job->getMinimumRequiredMemory() > S4U_Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first)) {
             throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<ComputeService>()));
         }
     }

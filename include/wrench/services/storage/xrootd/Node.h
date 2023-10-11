@@ -55,6 +55,7 @@ namespace wrench {
 
             virtual void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
                                    const std::shared_ptr<FileLocation> &location,
+                                   double num_bytes_to_write,
                                    bool wait_for_answer) override;
 
             virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;

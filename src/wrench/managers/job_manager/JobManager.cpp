@@ -599,11 +599,16 @@ namespace wrench {
                     // Create a bare-metal compute service and start it
                     auto execution_service = executor->getActionExecutionService();
 
+                    std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
+                    for (const auto &h: execution_service->getComputeResources()) {
+                        specified_compute_resources[h.first->get_name()] = h.second;
+                    }
+
                     // TODO: Deal with Properties!
                     auto bm_cs = std::shared_ptr<BareMetalComputeService>(
                             new BareMetalComputeService(
                                     executor->hostname,
-                                    execution_service->getComputeResources(),
+                                    specified_compute_resources,
                                     {},
                                     {},
                                     nullptr,

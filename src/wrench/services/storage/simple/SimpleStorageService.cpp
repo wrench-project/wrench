@@ -218,12 +218,20 @@ namespace wrench {
      *        for IO tracing purpose.
      * @return total free space in bytes
     */
-    double SimpleStorageService::traceTotalFreeSpace() {
+    double SimpleStorageService::getTotalFreeSpaceZeroTime() {
         double free_space = 0;
         for (auto const &mp: this->file_systems) {
             free_space += mp.second->getFreeSpace();
         }
         return free_space;
+    }
+
+    double SimpleStorageService::getTotalFilesZeroTime() {
+        double files = 0;
+        for (auto const &mp: this->file_systems) {
+            files += mp.second->getTotalNumFiles();
+        }
+        return files;
     }
 
     /**

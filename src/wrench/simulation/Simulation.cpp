@@ -180,7 +180,7 @@ namespace wrench {
         // Register a callback on host state changes to warn users
         // that the --wrench-host-shutdown-simulation flag should have been passed
         // to the simulator if host shutdowns are to be simulated
-        simgrid::s4u::Host::on_state_change.connect(
+        simgrid::s4u::Host::on_onoff.connect(
                 [](simgrid::s4u::Host const &h) {
                     if (not Simulation::host_shutdown_enabled) {
                         throw std::runtime_error(
@@ -192,7 +192,7 @@ namespace wrench {
         // Register a callback on link state changes to warn users
         // that the --wrench-host-shutdown-simulation flag should have been passed
         // to the simulator if host shutdowns are to be simulated
-        simgrid::s4u::Link::on_state_change_cb(
+        simgrid::s4u::Link::on_onoff_cb(
                 [](simgrid::s4u::Link const &l) {
                     if (not Simulation::link_shutdown_enabled) {
                         throw std::runtime_error(

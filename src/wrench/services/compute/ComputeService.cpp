@@ -187,28 +187,33 @@ namespace wrench {
 
     /**
      * @brief Get the number of hosts that the compute service manages
+     * @param simulate_it: if true, simulate a message sent to the service to retrieve the information, otherwise
+     *                     perform this operation in zero simulated time.
      * @return the host count
      *
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    unsigned long ComputeService::getNumHosts() {
+    unsigned long ComputeService::getNumHosts(bool simulate_it) {
         std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("num_hosts");
+        dict = this->getServiceResourceInformation("num_hosts", simulate_it);
 
         return (unsigned long) (*(dict.begin())).second;
     }
 
     /**
       * @brief Get the list of the compute service's compute host
+      * @param simulate_it: if true, simulate a message sent to the service to retrieve the information, otherwise
+      *                     perform this operation in zero simulated time.
       * @return a vector of hostnames
+      *
       *
       * @throw ExecutionException
       * @throw std::runtime_error
       */
-    std::vector<std::string> ComputeService::getHosts() {
+    std::vector<std::string> ComputeService::getHosts(bool simulate_it) {
         std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("num_cores");
+        dict = this->getServiceResourceInformation("num_cores", simulate_it);
 
         std::vector<std::string> to_return;
         to_return.reserve(dict.size());
@@ -223,14 +228,16 @@ namespace wrench {
 
     /**
       * @brief Get core counts for each of the compute service's host
+      * @param simulate_it: if true, simulate a message sent to the service to retrieve the information, otherwise
+      *                     perform this operation in zero simulated time.
       * @return a map of core counts, indexed by hostnames
       *
       * @throw ExecutionException
       * @throw std::runtime_error
       */
-    std::map<std::string, unsigned long> ComputeService::getPerHostNumCores() {
+    std::map<std::string, unsigned long> ComputeService::getPerHostNumCores(bool simulate_it) {
         std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("num_cores");
+        dict = this->getServiceResourceInformation("num_cores", simulate_it);
 
         std::map<std::string, unsigned long> to_return;
 
@@ -243,14 +250,16 @@ namespace wrench {
 
     /**
       * @brief Get the total core counts for all hosts of the compute service
+      * @param simulate_it: if true, simulate a message sent to the service to retrieve the information, otherwise
+      *                     perform this operation in zero simulated time.
       * @return total core counts
       *
       * @throw ExecutionException
       * @throw std::runtime_error
       */
-    unsigned long ComputeService::getTotalNumCores() {
+    unsigned long ComputeService::getTotalNumCores(bool simulate_it) {
         std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("num_cores");
+        dict = this->getServiceResourceInformation("num_cores", simulate_it);
 
         unsigned long count = 0;
         for (auto const &x: dict) {
@@ -262,17 +271,19 @@ namespace wrench {
 
     /**
      * @brief Get idle core counts for each of the compute service's host
+     * @param simulate_it: if true, simulate a message sent to the service to retrieve the information, otherwise
+     *                     perform this operation in zero simulated time.
      * @return the idle core counts (could be empty). Note that this doesn't
-     *        mean that asking for these cores right will mean immediate execution (since
+     *        mean that asking for these cores right now will mean immediate execution (since
      *        jobs may be pending and "ahead" in the queue, e.g., because they depend on current
      *        actions that are not using all available resources).
      *
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    std::map<std::string, unsigned long> ComputeService::getPerHostNumIdleCores() {
+    std::map<std::string, unsigned long> ComputeService::getPerHostNumIdleCores(bool simulate_it) {
         std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("num_idle_cores");
+        dict = this->getServiceResourceInformation("num_idle_cores", simulate_it);
 
         std::map<std::string, unsigned long> to_return;
 
@@ -285,14 +296,16 @@ namespace wrench {
 
     /**
      * @brief Get ram availability for each of the compute service's host
+     * @param simulate_it: if true, simulate a message sent to the service to retrieve the information, otherwise
+     *                     perform this operation in zero simulated time.
      * @return the ram availability map (could be empty)
      *
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    std::map<std::string, double> ComputeService::getPerHostAvailableMemoryCapacity() {
+    std::map<std::string, double> ComputeService::getPerHostAvailableMemoryCapacity(bool simulate_it) {
         std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("ram_availabilities");
+        dict = this->getServiceResourceInformation("ram_availabilities", simulate_it);
 
         std::map<std::string, double> to_return;
 
@@ -308,14 +321,16 @@ namespace wrench {
      *        mean that asking for these cores right will mean immediate execution (since
      *        jobs may be pending and "ahead" in the queue, e.g., because they depend on current
      *        actions that are not using all available resources).
+     * @param simulate_it: if true, simulate a message sent to the service to retrieve the information, otherwise
+     *                     perform this operation in zero simulated time.
      * @return total idle core count.
      *
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    unsigned long ComputeService::getTotalNumIdleCores() {
+    unsigned long ComputeService::getTotalNumIdleCores(bool simulate_it) {
         std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("num_idle_cores");
+        dict = this->getServiceResourceInformation("num_idle_cores", simulate_it);
 
 
         unsigned long count = 0;
@@ -359,13 +374,15 @@ namespace wrench {
 
     /**
     * @brief Get the per-core flop rate of the compute service's hosts
+    * @param simulate_it: if true, simulate a message sent to the service to retrieve the information, otherwise
+    *                     perform this operation in zero simulated time.
     * @return a list of flop rates in flop/sec
     *
     * @throw ExecutionException
     */
-    std::map<std::string, double> ComputeService::getCoreFlopRate() {
+    std::map<std::string, double> ComputeService::getCoreFlopRate(bool simulate_it) {
         std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("flop_rates");
+        dict = this->getServiceResourceInformation("flop_rates", simulate_it);
 
         std::map<std::string, double> to_return;
         for (auto const &x: dict) {
@@ -377,13 +394,15 @@ namespace wrench {
 
     /**
     * @brief Get the RAM capacities for each of the compute service's hosts
+    * @param simulate_it: if true, simulate a message sent to the service to retrieve the information, otherwise
+    *                     perform this operation in zero simulated time.
     * @return a map of RAM capacities, indexed by hostname
     *
     * @throw ExecutionException
     */
-    std::map<std::string, double> ComputeService::getMemoryCapacity() {
+    std::map<std::string, double> ComputeService::getMemoryCapacity(bool simulate_it) {
         std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("ram_capacities");
+        dict = this->getServiceResourceInformation("ram_capacities", simulate_it);
 
         std::map<std::string, double> to_return;
 
@@ -397,29 +416,35 @@ namespace wrench {
     /**
      * @brief Get information about the compute service as a dictionary of vectors
      * @param key: the desired resource information (i.e., dictionary key) that's needed)
+     * @param simulate_it: if true, simulate a message sent to the service to retrieve the information, otherwise
+     *                     perform this operation in zero simulated time.
      * @return service information
      *
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    std::map<std::string, double> ComputeService::getServiceResourceInformation(const std::string &key) {
+    std::map<std::string, double> ComputeService::getServiceResourceInformation(const std::string &key, bool simulate_it) {
         assertServiceIsUp();
 
-        // send an "info request" message to the daemon's mailbox_name
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        if (simulate_it) {
+            // send an "info request" message to the daemon's mailbox_name
+            auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
-                                                       answer_mailbox,
-                                                       key,
-                                                       this->getMessagePayloadValue(
-                                                               ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
+                                                           answer_mailbox,
+                                                           key,
+                                                           this->getMessagePayloadValue(
+                                                                   ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
 
-        // Get the reply
-        auto msg = S4U_Mailbox::getMessage<ComputeServiceResourceInformationAnswerMessage>(
-                answer_mailbox,
-                this->network_timeout,
-                "BareMetalComputeService::getServiceResourceInformation(): received an");
-        return msg->info;
+            // Get the reply
+            auto msg = S4U_Mailbox::getMessage<ComputeServiceResourceInformationAnswerMessage>(
+                    answer_mailbox,
+                    this->network_timeout,
+                    "BareMetalComputeService::getServiceResourceInformation(): received an");
+            return msg->info;
+        } else {
+            return this->constructResourceInformation(key);
+        }
     }
 
     /**

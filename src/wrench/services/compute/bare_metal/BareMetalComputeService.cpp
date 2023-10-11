@@ -130,10 +130,10 @@ namespace wrench {
 
                 parsed_spec = BareMetalComputeService::parseResourceSpec(service_specific_args.at(action->getName()));
 
-                std::string target_host = std::get<0>(parsed_spec);
+                auto target_host = S4U_Simulation::get_host_or_vm_by_name(std::get<0>(parsed_spec));
                 unsigned long target_num_cores = std::get<1>(parsed_spec);
 
-                if (not target_host.empty()) {
+                if (target_host != nullptr) {
                     if (compute_resources.find(target_host) == compute_resources.end()) {
                         throw std::invalid_argument(
                                 "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
@@ -258,8 +258,7 @@ namespace wrench {
                                                                                                                                  scratch_space_mount_point) {
         std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
         for (const auto &h: compute_hosts) {
-            specified_compute_resources.insert(
-                    std::make_pair(h, std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM)));
+            specified_compute_resources[h] = std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM);
         }
 
         initiateInstance(hostname,
@@ -348,10 +347,15 @@ namespace wrench {
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> specified_compute_resources;
+        for (const auto &h: compute_resources) {
+            specified_compute_resources[S4U_Simulation::get_host_or_vm_by_name(h.first)] = h.second;
+        }
+
         // Create an ActionExecutionService
         this->action_execution_service = std::shared_ptr<ActionExecutionService>(new ActionExecutionService(
                 hostname,
-                compute_resources,
+                specified_compute_resources,
                 nullptr,
                 {
                         {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD, this->getPropertyValueAsString(BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
@@ -653,15 +657,24 @@ namespace wrench {
     }
 
     /**
- * @brief Process a "get resource description message"
- * @param answer_mailbox: the mailbox to which the description message should be sent
- * @param key: the desired resource information (i.e., dictionary key) that's needed)
- */
+     * @brief Construct a dict for resource information
+     * @param key: the desired key
+     * @return a dictionary
+     */
+    std::map<std::string, double> BareMetalComputeService::constructResourceInformation(const std::string &key) {
+        return this->action_execution_service->getResourceInformation(key);
+    }
+
+    /**
+     * @brief Process a "get resource description message"
+     * @param answer_mailbox: the mailbox to which the description message should be sent
+     * @param key: the desired resource information (i.e., dictionary key) that's needed)
+     */
     void BareMetalComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
                                                                 const std::string &key) {
         std::map<std::string, double> dict;
 
-        dict = this->action_execution_service->getResourceInformation(key);
+        dict = this->constructResourceInformation(key);
 
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(

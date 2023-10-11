@@ -28,7 +28,7 @@ WRENCH_LOG_CATEGORY(wrench_core_host_state_change_detector, "Log category for Ho
  */
 void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int return_value) {
     // Unregister the callback!
-    simgrid::s4u::Host::on_state_change.disconnect(this->on_state_change_call_back_id);
+    simgrid::s4u::Host::on_onoff.disconnect(this->on_state_change_call_back_id);
     simgrid::s4u::Host::on_speed_change.disconnect(this->on_speed_change_call_back_id);
 }
 
@@ -46,7 +46,7 @@ void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int r
  *
  */
 wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_which_to_run,
-                                                         std::vector<std::string> hosts_to_monitor,
+                                                         std::vector<simgrid::s4u::Host *> hosts_to_monitor,
                                                          bool notify_when_turned_on, bool notify_when_turned_off, bool notify_when_speed_change,
                                                          std::shared_ptr<S4U_Daemon> creator,
                                                          simgrid::s4u::Mailbox *mailbox_to_notify,
@@ -62,32 +62,31 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
     this->setProperties(this->default_property_values, std::move(property_list));
 
     // Connect my member method to the on_state_change signal from SimGrid regarding Hosts
-    this->on_state_change_call_back_id = simgrid::s4u::Host::on_state_change.connect(
+    this->on_state_change_call_back_id = simgrid::s4u::Host::on_onoff.connect(
             [this](simgrid::s4u::Host const &h) {
-                this->hostStateChangeCallback(h.get_name());
+                this->hostStateChangeCallback(&h);
             });
 
     // Connect my member method to the on_speed_change signal from SimGrid regarding Hosts
     this->on_speed_change_call_back_id = simgrid::s4u::Host::on_speed_change.connect(
             [this](simgrid::s4u::Host const &h) {
-                this->hostSpeedChangeCallback(h.get_name());
+                this->hostSpeedChangeCallback(&h);
             });
 }
 
-void wrench::HostStateChangeDetector::hostStateChangeCallback(std::string const &hostname) {
-    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), hostname) !=
+void wrench::HostStateChangeDetector::hostStateChangeCallback(const simgrid::s4u::Host *host) {
+    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), host) !=
         this->hosts_to_monitor.end()) {
-        auto host = S4U_Simulation::get_host_or_vm_by_name(hostname);
-        this->hosts_that_have_recently_changed_state.push_back(std::make_pair(hostname, host->is_on()));
+        this->hosts_that_have_recently_changed_state.emplace_back(host->get_name(), host->is_on());
+        this->s4u_actor->resume();
     }
 }
 
-void wrench::HostStateChangeDetector::hostSpeedChangeCallback(std::string const &hostname) {
-    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), hostname) !=
+void wrench::HostStateChangeDetector::hostSpeedChangeCallback(const simgrid::s4u::Host *host) {
+    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), host) !=
         this->hosts_to_monitor.end()) {
-        auto host = S4U_Simulation::get_host_or_vm_by_name(hostname);
-        double speed = host->get_speed();
-        this->hosts_that_have_recently_changed_speed.push_back(std::make_pair(hostname, speed));
+        this->hosts_that_have_recently_changed_speed.emplace_back(host->get_name(), host->get_speed());
+        this->s4u_actor->resume();
     }
 }
 
@@ -99,8 +98,8 @@ int wrench::HostStateChangeDetector::main() {
             WRENCH_INFO("My Creator has terminated/died, so must I...");
             break;
         }
-        // Sleeping for my monitoring period
-        Simulation::sleep(this->getPropertyValueAsDouble(HostStateChangeDetectorProperty::MONITORING_PERIOD));
+
+        simgrid::s4u::this_actor::suspend();
 
         // State Changes
         while (not this->hosts_that_have_recently_changed_state.empty()) {

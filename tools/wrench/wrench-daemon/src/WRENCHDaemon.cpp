@@ -134,6 +134,7 @@ std::string readStringFromSharedMemorySegment(int shm_segment_id) {
 
 /**
 * @brief REST API Handler
+*
 * @param req HTTP request
 * @param res HTTP response
 *

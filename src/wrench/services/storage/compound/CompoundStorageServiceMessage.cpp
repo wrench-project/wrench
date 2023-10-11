@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-
 #include "wrench/services/storage/compound/CompoundStorageServiceMessage.h"
 
 #include <utility>
@@ -21,12 +20,13 @@ namespace wrench {
     CompoundStorageServiceMessage::CompoundStorageServiceMessage(double payload) : StorageServiceMessage(payload) {}
 
     /**
-    * @brief Constructor
-    * @param answer_mailbox: the mailbox to which to send the answer
-    * @param file: the file for which storage allocation is requested
-    *
-    * @throw std::invalid_argument
-    */
+     * @brief Constructor
+     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param file: the file for which storage allocation is requested
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
     CompoundStorageAllocationRequestMessage::CompoundStorageAllocationRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                      std::shared_ptr<DataFile> file, double payload)
         : CompoundStorageServiceMessage(payload) {
@@ -54,12 +54,13 @@ namespace wrench {
     }
 
     /**
-    * @brief Constructor
-    * @param answer_mailbox: the mailbox to which to send the answer
-    * @param file: the file for which storage allocation is requested
-    *
-    * @throw std::invalid_argument
-    */
+     * @brief Constructor
+     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param file: the file for which storage allocation is requested
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
     CompoundStorageLookupRequestMessage::CompoundStorageLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                              std::shared_ptr<DataFile> file, double payload)
         : CompoundStorageServiceMessage(payload) {

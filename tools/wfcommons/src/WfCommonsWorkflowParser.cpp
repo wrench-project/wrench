@@ -56,6 +56,7 @@ namespace wrench {
      */
     std::shared_ptr<Workflow> WfCommonsWorkflowParser::createWorkflowFromJSON(const std::string &filename,
                                                                               const std::string &reference_flop_rate,
+                                                                              bool ignore_machine_specs,
                                                                               bool redundant_dependencies,
                                                                               bool ignore_cycle_creating_dependencies,
                                                                               unsigned long min_cores_per_task,
@@ -141,8 +142,13 @@ namespace wrench {
                 auto task_specs = it.value().as_array();
 
                 for (auto &task_spec : task_specs) {
+
                     auto task_spec_object = task_spec.as_object();
                     std::string name = task_spec_object.at("name").as_string().c_str();
+		    std::string task_id = "";          // not required, which is terrible
+		    if (task_spec_object.find("id") != task_spec_object.end()) {
+		      name = name + "_" + task_id;// Will break parent/children specifications
+		    }
                     double runtime = task_spec_object.at("runtimeInSeconds").to_number<double>();
 
                     // Scale runtime based on avgCPU unless disabled
@@ -169,7 +175,7 @@ namespace wrench {
                         } else if (avg_cpu < 0) {
                             if (show_warnings) std::cerr << "[WARNING]: Task " + name + " does not specify avgCPU: "
                                                                                         "Assuming 100%.\n";
-                            avg_cpu = 100.0;
+                            avg_cpu = 100.0 * num_cores;
                         } else if (avg_cpu > 100 * num_cores) {
                             if (show_warnings) {
                                 std::cerr << "[WARNING]: Task " << name << " specifies " << (unsigned long) num_cores << " cores and avgCPU " << avg_cpu << "%, "
@@ -178,7 +184,7 @@ namespace wrench {
                             avg_cpu = 100.0 * num_cores;
                         }
 
-                        runtime = runtime * (avg_cpu / (100.0 * num_cores));
+                        runtime = runtime * avg_cpu / (100.0 * num_cores);
                     }
 
                     unsigned long min_num_cores, max_num_cores;
@@ -214,7 +220,7 @@ namespace wrench {
                     }
 
 
-                    if (execution_machine.empty()) {
+                    if (ignore_machine_specs or execution_machine.empty()) {
                         flop_amount = runtime * flop_rate;
                     } else {
                         if (machines.find(execution_machine) == machines.end()) {
@@ -258,6 +264,20 @@ namespace wrench {
                         double size_in_bytes = f_spec.at("sizeInBytes").to_number<double>() * 1000;
                         std::string link = std::string(f_spec.at("link").as_string().c_str());
                         std::string id = std::string(f_spec.at("name").as_string().c_str());
+                        std::string file_path = "";
+			if (f_spec.find("path") != f_spec.end()) {
+                            file_path = f_spec.at("path").as_string().c_str();
+                            // Remove the training "/" if it's there
+                            if (not file_path.empty() and file_path.back() == '/') {
+                                file_path.erase(file_path.length() - 1);
+                            }
+			}
+                        // Prepend the id with the path, if any, to ensure uniqueness
+                        if (not file_path.empty()) {
+                            std::replace(file_path.begin(), file_path.end(), '/', '_');
+                            id = file_path + "_" + id;
+                        }
+
                         std::shared_ptr<wrench::DataFile> workflow_file = nullptr;
                         // Check whether the file already exists
                         try {

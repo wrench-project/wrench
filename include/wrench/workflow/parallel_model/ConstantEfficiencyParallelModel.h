@@ -23,6 +23,7 @@ namespace wrench {
 
     public:
         double getEfficiency() const;
+        void setEfficiency(double efficiency);
 
         /***********************/
         /** \cond INTERNAL    **/
