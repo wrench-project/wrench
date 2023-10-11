@@ -102,10 +102,11 @@ namespace wrench {
 
         double getTotalSpace() override;
 
-        double traceTotalFreeSpace() override;
+        double getTotalFreeSpaceZeroTime() override;
+
+        double getTotalFilesZeroTime() override;
 
         virtual std::string getBaseRootPath() override;
-
 
         /**
          * @brief Reserve space at the storage service
@@ -130,13 +131,12 @@ namespace wrench {
             this->file_systems[mount_point]->unreserveSpace(location->getFile(), path_at_mount_point);
         }
 
-
         /**
-	 * @brief Get the mount point that stores a path
-	 * @param path: path
-	 *
-	 * @return a mount point
-	 */
+        * @brief Get the mount point that stores a path
+        * @param path: path
+        *
+        * @return a mount point
+        */
         std::string getPathMountPoint(const std::string &path) {
             std::string mount_point, path_at_mount_point;
             this->splitPath(path, mount_point, path_at_mount_point);
@@ -234,4 +234,4 @@ namespace wrench {
 
 }// namespace wrench
 
-#endif//WRENCH_SIMPLESTORAGESERVICE_H
+#endif// WRENCH_SIMPLESTORAGESERVICE_H

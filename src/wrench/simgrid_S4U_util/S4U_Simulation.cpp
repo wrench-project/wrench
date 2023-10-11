@@ -1192,12 +1192,13 @@ namespace wrench {
     /**
  * @brief Convenient s4u wrapper to retrieve a Host (which can be a VM) based on a name
  * @param name: the host/vm name
- * @return a SimGrid host
+ * @return a SimGrid host or nullptr if name==""
  */
     simgrid::s4u::Host *S4U_Simulation::get_host_or_vm_by_name(const std::string &name) {
+        if (name.empty()) return nullptr;
         auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(name);
         if (!host) {
-            throw std::invalid_argument("S4U_Simulation::get_host_or_vm_by_name(): Unknown host");
+            throw std::invalid_argument("S4U_Simulation::get_host_or_vm_by_name(): Unknown host '" + name + "'");
         }
         return host;
     }
