@@ -2294,12 +2294,12 @@ private:
 
             auto job4 = job_manager->createStandardJob(task4);
 
-            std::map<std::string, std::string> batch_job_args;
-            batch_job_args["-N"] = "2";
-            batch_job_args["-t"] = "60";//time in seconds
-            batch_job_args["-c"] = "2"; //number of cores per node
+            std::map<std::string, std::string> task1_batch_job_args;
+            task1_batch_job_args["-N"] = "2";
+            task1_batch_job_args["-t"] = "60";//time in seconds
+            task1_batch_job_args["-c"] = "2"; //number of cores per node
             try {
-                job_manager->submitJob(job, this->test->compute_service, batch_job_args);
+                job_manager->submitJob(job, this->test->compute_service, task1_batch_job_args);
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what()));
@@ -2338,7 +2338,7 @@ private:
                         "Exception: " + std::string(e.what()));
             }
 
-            //wait for two standard job completion events
+            //wait for standard job completion events
             int num_events = 0;
             while (num_events < 4) {
                 std::shared_ptr<wrench::ExecutionEvent> event;
@@ -2371,7 +2371,11 @@ private:
                 //however let's check further if the task1 hostname is equal to the task4 hostname
                 if (task1->getExecutionHost() != task4->getExecutionHost()) {
                     throw std::runtime_error(
-                            "BatchServiceTest::ROUNDROBINTEST():: The tasks did not execute on the right hosts");
+                            "BatchServiceTest::ROUNDROBINTEST():: The tasks did not execute on the right hosts: " +
+                            task1->getExecutionHost() + "-" +
+                            task2->getExecutionHost() + "-" +
+                            task3->getExecutionHost() + "-" +
+                            task4->getExecutionHost());
                 }
             }
 
@@ -2447,7 +2451,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

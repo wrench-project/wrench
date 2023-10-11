@@ -286,11 +286,11 @@ namespace wrench {
 
         zmq::message_t request(strlen(data_to_send.c_str()));
         memcpy(request.data(), data_to_send.c_str(), strlen(data_to_send.c_str()));
-        socket.send(request);
+        socket.send(request, zmq::send_flags::none);
 
         //  Get the reply.
         zmq::message_t reply;
-        socket.recv(&reply);
+        auto ret = socket.recv(reply, zmq::recv_flags::none);
 
         // Process the reply
         std::string reply_data;
@@ -515,12 +515,11 @@ namespace wrench {
         int count = 0;
         for (auto it = this->cs->nodes_to_cores_map.begin(); it != this->cs->nodes_to_cores_map.end(); it++) {
             compute_resources_map["events"][0]["data"]["resources_data"][count]["id"] = std::to_string(count);
-            compute_resources_map["events"][0]["data"]["resources_data"][count]["name"] = it->first;
+            compute_resources_map["events"][0]["data"]["resources_data"][count]["name"] = it->first->get_name();
             compute_resources_map["events"][0]["data"]["resources_data"][count]["core"] = it->second;
             compute_resources_map["events"][0]["data"]["resources_data"][count++]["state"] = "idle";
         }
         std::string data = compute_resources_map.dump();
-
 
         try {
             std::shared_ptr<BatschedNetworkListener> network_listener =

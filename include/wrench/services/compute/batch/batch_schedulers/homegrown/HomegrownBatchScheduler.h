@@ -43,6 +43,19 @@ namespace wrench {
             throw std::runtime_error("HomegrownBatchScheduler::processUnknownJobTermination(): this method should not be called since this scheduler is not Batsched");
         }
 
+        static std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> selectHostsFirstFit(BatchComputeService *cs,
+                                                                                                     unsigned long num_nodes,
+                                                                                                     unsigned long cores_per_node,
+                                                                                                     double ram_per_node);
+        static std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> selectHostsBestFit(BatchComputeService *cs,
+                                                                                                    unsigned long num_nodes,
+                                                                                                    unsigned long cores_per_node,
+                                                                                                    double ram_per_node);
+        static std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> selectHostsRoundRobin(BatchComputeService *cs,
+                                                                                                       unsigned long *round_robin_host_selector_idx,
+                                                                                                       unsigned long num_nodes,
+                                                                                                       unsigned long cores_per_node,
+                                                                                                       double ram_per_node);
         /**
          * @brief Virtual method to figure out on which actual resources a job could be scheduled right now
          * @param num_nodes: number of nodes
@@ -50,7 +63,7 @@ namespace wrench {
          * @param ram_per_node: amount of RAM
          * @return a host:<core,RAM> map
          */
-        virtual std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) = 0;
+        virtual std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) = 0;
     };
 
     /***********************/

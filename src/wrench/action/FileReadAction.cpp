@@ -116,6 +116,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Return the number of bytes to read by this action
+     * @return A number of bytes
+     */
+    double FileReadAction::getNumBytesToRead() const {
+        return this->num_bytes_to_read;
+    }
+
+    /**
       * @brief Determine whether the action uses scratch
       * @return true if the action uses scratch, false otherwise
       */
