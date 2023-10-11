@@ -7,16 +7,14 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_COMPOUNDSTORAGESERVICEMESSAGE_H
 #define WRENCH_COMPOUNDSTORAGESERVICEMESSAGE_H
-
 
 #include <memory>
 #include <utility>
 
-#include <wrench/services/storage/StorageServiceMessage.h>
 #include <wrench/data_file/DataFile.h>
+#include <wrench/services/storage/StorageServiceMessage.h>
 
 namespace wrench {
 
@@ -31,7 +29,6 @@ namespace wrench {
     protected:
         CompoundStorageServiceMessage(double payload);
     };
-
 
     /**
      * @brief A message sent to a CompoundStorageService to request a storage allocation for a file
@@ -81,12 +78,9 @@ namespace wrench {
         std::vector<std::shared_ptr<FileLocation>> locations;
     };
 
-
     /***********************/
     /** \endcond INTERNAL     */
     /***********************/
-
 }// namespace wrench
 
-
-#endif//WRENCH_COMPOUNDSTORAGESERVICEMESSAGE_H
+#endif// WRENCH_COMPOUNDSTORAGESERVICEMESSAGE_H

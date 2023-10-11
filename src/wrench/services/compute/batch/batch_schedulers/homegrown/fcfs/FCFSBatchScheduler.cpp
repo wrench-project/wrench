@@ -37,124 +37,41 @@ namespace wrench {
      * @param ram_per_node: the job's ram per node
      * @return A resource list
      */
-    std::map<std::string, std::tuple<unsigned long, double>> FCFSBatchScheduler::scheduleOnHosts(
+    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> FCFSBatchScheduler::scheduleOnHosts(
             unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
+
         if (ram_per_node == ComputeService::ALL_RAM) {
-            ram_per_node = Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
+            ram_per_node = S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
         }
         if (cores_per_node == ComputeService::ALL_CORES) {
-            cores_per_node = Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first);
+            cores_per_node = cs->available_nodes_to_cores.begin()->first->get_core_count();
         }
 
-        if (ram_per_node > Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
-            throw std::runtime_error("FCFSBatchScheduler::findNextJobToSchedule(): Asking for too much RAM per host");
+        if (ram_per_node > S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
+            throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too much RAM per host");
         }
         if (num_nodes > cs->available_nodes_to_cores.size()) {
-            throw std::runtime_error("FCFSBatchScheduler::findNextJobToSchedule(): Asking for too many hosts");
+            throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
-        if (cores_per_node > Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first)) {
-            throw std::runtime_error("FCFSBatchScheduler::findNextJobToSchedule(): Asking for too many cores per host");
+        if (cores_per_node > cs->available_nodes_to_cores.begin()->first->get_core_count()) {
+            throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too many cores per host");
         }
 
-        std::map<std::string, std::tuple<unsigned long, double>> resources = {};
-        std::vector<std::string> hosts_assigned = {};
         auto host_selection_algorithm = this->cs->getPropertyValueAsString(BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM);
 
         if (host_selection_algorithm == "FIRSTFIT") {
-            std::map<std::string, unsigned long>::iterator map_it;
-            unsigned long host_count = 0;
-            for (map_it = cs->available_nodes_to_cores.begin();
-                 map_it != cs->available_nodes_to_cores.end(); map_it++) {
-                if ((*map_it).second >= cores_per_node) {
-                    //Remove that many cores from the available_nodes_to_core
-                    (*map_it).second -= cores_per_node;
-                    hosts_assigned.push_back((*map_it).first);
-                    resources.insert(std::make_pair((*map_it).first, std::make_tuple(cores_per_node, ram_per_node)));
-                    if (++host_count >= num_nodes) {
-                        break;
-                    }
-                }
-            }
-            if (resources.size() < num_nodes) {
-                resources = {};
-                std::vector<std::string>::iterator vector_it;
-                for (vector_it = hosts_assigned.begin(); vector_it != hosts_assigned.end(); vector_it++) {
-                    cs->available_nodes_to_cores[*vector_it] += cores_per_node;
-                }
-            }
+            return HomegrownBatchScheduler::selectHostsFirstFit(cs, num_nodes, cores_per_node, ram_per_node);
         } else if (host_selection_algorithm == "BESTFIT") {
-            while (resources.size() < num_nodes) {
-                unsigned long target_slack = 0;
-                std::string target_host = "";
-                unsigned long target_num_cores = 0;
+            return HomegrownBatchScheduler::selectHostsBestFit(cs, num_nodes, cores_per_node, ram_per_node);
 
-                for (auto h: cs->available_nodes_to_cores) {
-                    std::string hostname = std::get<0>(h);
-                    unsigned long num_available_cores = std::get<1>(h);
-                    if (num_available_cores < cores_per_node) {
-                        continue;
-                    }
-                    unsigned long tentative_target_num_cores = std::min(num_available_cores, cores_per_node);
-                    unsigned long tentative_target_slack =
-                            num_available_cores - tentative_target_num_cores;
-
-                    if (target_host.empty() ||
-                        (tentative_target_num_cores > target_num_cores) ||
-                        ((tentative_target_num_cores == target_num_cores) &&
-                         (target_slack > tentative_target_slack))) {
-                        target_host = hostname;
-                        target_num_cores = tentative_target_num_cores;
-                        target_slack = tentative_target_slack;
-                    }
-                }
-                if (target_host.empty()) {
-                    WRENCH_INFO("Didn't find a suitable host");
-                    resources = {};
-                    std::vector<std::string>::iterator it;
-                    for (it = hosts_assigned.begin(); it != hosts_assigned.end(); it++) {
-                        cs->available_nodes_to_cores[*it] += cores_per_node;
-                    }
-                    break;
-                }
-                cs->available_nodes_to_cores[target_host] -= cores_per_node;
-                hosts_assigned.push_back(target_host);
-                resources.insert(std::make_pair(target_host, std::make_tuple(cores_per_node, ComputeService::ALL_RAM)));
-            }
         } else if (host_selection_algorithm == "ROUNDROBIN") {
-            static unsigned long round_robin_host_selector_idx = 0;
-            unsigned long cur_host_idx = round_robin_host_selector_idx;
-            unsigned long host_count = 0;
-            do {
-                cur_host_idx = (cur_host_idx + 1) % cs->available_nodes_to_cores.size();
-                auto it = cs->compute_hosts.begin();
-                it = it + cur_host_idx;
-                std::string cur_host_name = *it;
-                unsigned long num_available_cores = cs->available_nodes_to_cores[cur_host_name];
-                if (num_available_cores >= cores_per_node) {
-                    cs->available_nodes_to_cores[cur_host_name] -= cores_per_node;
-                    hosts_assigned.push_back(cur_host_name);
-                    resources.insert(std::make_pair(cur_host_name, std::make_tuple(cores_per_node, ram_per_node)));
-                    if (++host_count >= num_nodes) {
-                        break;
-                    }
-                }
-            } while (cur_host_idx != round_robin_host_selector_idx);
-            if (resources.size() < num_nodes) {
-                resources = {};
-                std::vector<std::string>::iterator it;
-                for (it = hosts_assigned.begin(); it != hosts_assigned.end(); it++) {
-                    cs->available_nodes_to_cores[*it] += cores_per_node;
-                }
-            } else {
-                round_robin_host_selector_idx = cur_host_idx;
-            }
+            static unsigned long round_robin_host_selector_idx = -1;
+            return HomegrownBatchScheduler::selectHostsRoundRobin(cs, &round_robin_host_selector_idx, num_nodes, cores_per_node, ram_per_node);
         } else {
             throw std::invalid_argument(
-                    "FCFSBatchScheduler::findNextJobToSchedule(): We don't support " + host_selection_algorithm +
+                    "FCFSBatchScheduler::scheduleOnHosts(): We don't support " + host_selection_algorithm +
                     " as host selection algorithm");
         }
-
-        return resources;
     }
 
     std::map<std::string, double> FCFSBatchScheduler::getStartTimeEstimates(
@@ -169,35 +86,35 @@ namespace wrench {
         // Set the available time of each node to zero (i.e., now)
         // (invariant: for each host, core availabilities are sorted by
         //             non-decreasing available time)
-        std::map<std::string, std::vector<double>> core_available_times;
+        std::map<simgrid::s4u::Host *, std::vector<double>> core_available_times;
         for (auto h: cs->nodes_to_cores_map) {
-            std::string hostname = h.first;
+            auto host = h.first;
             unsigned long num_cores = h.second;
             std::vector<double> zeros;
             for (unsigned int i = 0; i < num_cores; i++) {
                 zeros.push_back(0);
             }
-            core_available_times.insert(std::make_pair(hostname, zeros));
+            core_available_times[host] = zeros;
         }
 
 
         // Update core availabilities for jobs that are currently running
-        for (auto job: cs->running_jobs) {
+        for (auto const &job: cs->running_jobs) {
             auto batch_job = job.second;
             double time_to_finish = std::max<double>(0, batch_job->getBeginTimestamp() +
-                                                                batch_job->getRequestedTime() -
-                                                                cs->simulation->getCurrentSimulatedDate());
+                                                                (double) batch_job->getRequestedTime() -
+                                                                wrench::Simulation::getCurrentSimulatedDate());
             for (auto resource: batch_job->getResourcesAllocated()) {
-                std::string hostname = resource.first;
+                auto host = resource.first;
                 unsigned long num_cores = std::get<0>(resource.second);
                 double ram = std::get<1>(resource.second);
                 // Update available_times
-                double new_available_time = *(core_available_times[hostname].begin() + num_cores - 1) + time_to_finish;
+                double new_available_time = *(core_available_times[host].begin() + num_cores - 1) + time_to_finish;
                 for (unsigned int i = 0; i < num_cores; i++) {
-                    *(core_available_times[hostname].begin() + i) = new_available_time;
+                    *(core_available_times[host].begin() + i) = new_available_time;
                 }
                 // Sort them!
-                std::sort(core_available_times[hostname].begin(), core_available_times[hostname].end());
+                std::sort(core_available_times[host].begin(), core_available_times[host].end());
             }
         }
 
@@ -213,8 +130,8 @@ namespace wrench {
 #endif
 
         // Go through the pending jobs and update core availabilities
-        for (auto job: this->cs->batch_queue) {
-            double duration = job->getRequestedTime();
+        for (auto const &job: this->cs->batch_queue) {
+            double duration = (double) job->getRequestedTime();
             unsigned long num_hosts = job->getRequestedNumNodes();
             unsigned long num_cores_per_host = job->getRequestedCoresPerNode();
 
@@ -224,7 +141,7 @@ namespace wrench {
 #endif
 
             // Compute the  earliest start times on all hosts
-            std::vector<std::pair<std::string, double>> earliest_start_times;
+            std::vector<std::pair<simgrid::s4u::Host *, double>> earliest_start_times;
             for (auto h: core_available_times) {
                 double earliest_start_time = *(h.second.begin() + num_cores_per_host - 1);
                 earliest_start_times.emplace_back(std::make_pair(h.first, earliest_start_time));
@@ -232,7 +149,7 @@ namespace wrench {
 
             // Sort the hosts by earliest start times
             std::sort(earliest_start_times.begin(), earliest_start_times.end(),
-                      [](std::pair<std::string, double> const &a, std::pair<std::string, double> const &b) {
+                      [](std::pair<simgrid::s4u::Host *, double> const &a, std::pair<simgrid::s4u::Host *, double> const &b) {
                           return std::get<1>(a) < std::get<1>(b);
                       });
 
@@ -241,24 +158,24 @@ namespace wrench {
 
             // Update the core available times on each host used for the job
             for (unsigned int i = 0; i < num_hosts; i++) {
-                std::string hostname = (*(earliest_start_times.begin() + i)).first;
+                auto host = (*(earliest_start_times.begin() + i)).first;
                 for (unsigned int j = 0; j < num_cores_per_host; j++) {
-                    *(core_available_times[hostname].begin() + j) = earliest_job_start_time + duration;
+                    *(core_available_times[host].begin() + j) = earliest_job_start_time + duration;
                 }
-                std::sort(core_available_times[hostname].begin(), core_available_times[hostname].end());
+                std::sort(core_available_times[host].begin(), core_available_times[host].end());
             }
 
             // Go through all hosts and make sure that no core is available before earliest_job_start_time
             // since this is a simple fcfs algorithm with no "jumping ahead" of any kind
             for (auto h: cs->nodes_to_cores_map) {
-                std::string hostname = h.first;
+                auto host = h.first;
                 unsigned long num_cores = h.second;
                 for (unsigned int i = 0; i < num_cores; i++) {
-                    if (*(core_available_times[hostname].begin() + i) < earliest_job_start_time) {
-                        *(core_available_times[hostname].begin() + i) = earliest_job_start_time;
+                    if (*(core_available_times[host].begin() + i) < earliest_job_start_time) {
+                        *(core_available_times[host].begin() + i) = earliest_job_start_time;
                     }
                 }
-                std::sort(core_available_times[hostname].begin(), core_available_times[hostname].end());
+                std::sort(core_available_times[host].begin(), core_available_times[host].end());
             }
 
 #if 0
@@ -296,7 +213,7 @@ namespace wrench {
 #endif
 
                 // Compute the earliest start times on all hosts
-                std::vector<std::pair<std::string, double>> earliest_start_times;
+                std::vector<std::pair<simgrid::s4u::Host *, double>> earliest_start_times;
                 for (auto h: core_available_times) {
                     double earliest_start_time = *(h.second.begin() + num_cores_per_host - 1);
                     earliest_start_times.emplace_back(std::make_pair(h.first, earliest_start_time));
@@ -305,7 +222,7 @@ namespace wrench {
 
                 // Sort the hosts by putative start times
                 std::sort(earliest_start_times.begin(), earliest_start_times.end(),
-                          [](std::pair<std::string, double> const &a, std::pair<std::string, double> const &b) {
+                          [](std::pair<simgrid::s4u::Host *, double> const &a, std::pair<simgrid::s4u::Host *, double> const &b) {
                               return std::get<1>(a) < std::get<1>(b);
                           });
 
@@ -315,7 +232,7 @@ namespace wrench {
 
             // Note that below we translate predictions back to actual start dates given the current time
             if (earliest_job_start_time > 0) {
-                earliest_job_start_time = cs->simulation->getCurrentSimulatedDate() + earliest_job_start_time;
+                earliest_job_start_time = wrench::Simulation::getCurrentSimulatedDate() + earliest_job_start_time;
             }
             predictions.insert(std::make_pair(id, earliest_job_start_time));
         }

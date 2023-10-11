@@ -23,6 +23,7 @@ namespace wrench {
 
     public:
         double getAlpha() const;
+        void setAlpha(double alpha);
 
         /***********************/
         /** \cond INTERNAL    **/

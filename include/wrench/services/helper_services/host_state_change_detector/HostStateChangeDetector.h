@@ -26,12 +26,11 @@ namespace wrench {
     class HostStateChangeDetector : public Service {
 
     private:
-        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {HostStateChangeDetectorProperty::MONITORING_PERIOD, "1.0"}};
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {};
 
     public:
         explicit HostStateChangeDetector(std::string host_on_which_to_run,
-                                         std::vector<std::string> hosts_to_monitor,
+                                         std::vector<simgrid::s4u::Host *> hosts_to_monitor,
                                          bool notify_when_turned_on,
                                          bool notify_when_turned_off,
                                          bool notify_when_speed_change,
@@ -44,10 +43,10 @@ namespace wrench {
 
     private:
         void cleanup(bool has_terminated_cleanly, int return_value) override;
-        void hostStateChangeCallback(std::string const &hostname);
-        void hostSpeedChangeCallback(std::string const &hostname);
+        void hostStateChangeCallback(const simgrid::s4u::Host *host);
+        void hostSpeedChangeCallback(const simgrid::s4u::Host *host);
 
-        std::vector<std::string> hosts_to_monitor;
+        std::vector<simgrid::s4u::Host *> hosts_to_monitor;
         bool notify_when_turned_on;
         bool notify_when_turned_off;
         bool notify_when_speed_change;

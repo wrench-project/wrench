@@ -124,15 +124,19 @@ namespace wrench {
         /** @brief a pointer to the simulation object */
         Simulation *simulation;
 
-
         /** @brief The service's state */
         State state;
 
         friend class S4U_DaemonActor;
         void runMainMethod();
 
-        bool killActor();
+        /** @brief The S4U actor */
+        simgrid::s4u::ActorPtr s4u_actor;
 
+        /** @brief The host on which the daemon is running */
+        simgrid::s4u::Host *host;
+
+        bool killActor();
 
         /** @brief The number of time that this daemon has started (i.e., 1 + number of restarts) */
         unsigned int num_starts = 0;
@@ -142,7 +146,6 @@ namespace wrench {
         // while it's in the middle of doing something critical
         simgrid::s4u::MutexPtr daemon_lock;
 
-        simgrid::s4u::ActorPtr s4u_actor;
 
         bool has_returned_from_main = false;// Set to true after main returns
         int return_value = 0;               // Set to the value returned by main
