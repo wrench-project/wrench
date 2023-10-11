@@ -21,17 +21,21 @@
 WRENCH_LOG_CATEGORY(simulation_controller, "Log category for SimulationController");
 
 #define PARSE_SERVICE_PROPERTY_LIST() WRENCH_PROPERTY_COLLECTION_TYPE service_property_list; \
-json jsonData = json::parse(property_list_string);      \
-for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {        \
-    auto property_key = ServiceProperty::translateString(it.key());     \
-    service_property_list[property_key] = it.value();   \
-}                                                                                            \
+{                                                                           \
+    json jsonData = json::parse(property_list_string);                      \
+    for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {        \
+        auto property_key = ServiceProperty::translateString(it.key());     \
+        service_property_list[property_key] = it.value();                   \
+    }                                                                       \
+}
 
 #define PARSE_MESSAGE_PAYLOAD_LIST() WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;    \
-jsonData = json::parse(message_payload_list_string);    \
-for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {    \
-    auto message_payload_key = ServiceMessagePayload::translateString(it.key());    \
-    service_message_payload_list[message_payload_key] = it.value(); \
+{                                                                                       \
+    json jsonData = json::parse(message_payload_list_string);                           \
+    for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {                    \
+        auto message_payload_key = ServiceMessagePayload::translateString(it.key());    \
+        service_message_payload_list[message_payload_key] = it.value();                 \
+    }                                                                                   \
 }
 
 namespace wrench {
@@ -297,7 +301,7 @@ namespace wrench {
         PARSE_MESSAGE_PAYLOAD_LIST()
 
         map<std::string, std::tuple<unsigned long, double>> resources;
-        jsonData = json::parse(resource);
+        json jsonData = json::parse(resource);
         for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
             resources.emplace(it.key(), it.value());
         }
@@ -521,7 +525,7 @@ namespace wrench {
         BlockingQueue<std::pair<bool, std::string>> vm_destroyed;
 
         // Push the request into the blocking queue (will be a single one!)
-        this->things_to_do.push([this, vm_name, cs, &vm_destroyed](){
+        this->things_to_do.push([vm_name, cs, &vm_destroyed](){
           auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
           try {
               if (not cloud_cs->isVMDown(vm_name)) {
@@ -612,7 +616,7 @@ namespace wrench {
         BlockingQueue<std::tuple<bool, bool, std::string>> file_looked_up;
 
         // Push the request into the blocking queue (will be a single one!)
-        this->things_to_do.push([this, file, ss, &file_looked_up](){
+        this->things_to_do.push([file, ss, &file_looked_up](){
           try {
               bool result = ss->lookupFile(file);
               file_looked_up.push(std::tuple(true, result, ""));
@@ -703,11 +707,26 @@ namespace wrench {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
-        this->things_to_do.push([this, job, cs, service_specific_args](){
-            WRENCH_INFO("Submitting a job...");
-            this->job_manager->submitJob(job, cs, service_specific_args);
+        BlockingQueue<std::pair<bool, std::string>> job_submitted;
+        this->things_to_do.push([this, job, cs, service_specific_args, &job_submitted](){
+            try {
+                WRENCH_INFO("Submitting a job...");
+                this->job_manager->submitJob(job, cs, service_specific_args);
+                job_submitted.push(std::make_pair(true, ""));
+            } catch (std::exception &e) {
+                job_submitted.push(std::make_pair(false, e.what()));
+            }
         });
-        return {};
+        // Poll from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        job_submitted.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot submit job: " + error_msg);
+        } else {
+            return {};
+        }
     }
 
     /**
@@ -1017,7 +1036,7 @@ namespace wrench {
         // Push the request into the blocking queue (will be a single one!)
         //this->vm_to_suspend.push(std::pair(vm_name, cs));
         BlockingQueue<std::pair<bool, std::string>> vm_suspended;
-        this->things_to_do.push([this, vm_name, cs, &vm_suspended](){
+        this->things_to_do.push([vm_name, cs, &vm_suspended](){
           auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
           try {
               cloud_cs->suspendVM(vm_name);
@@ -1078,7 +1097,7 @@ namespace wrench {
         BlockingQueue<std::pair<bool, std::string>> vm_resumed;
 
         // Push the request into the blocking queue (will be a single one!)
-        this->things_to_do.push([this, vm_name, cs, &vm_resumed](){
+        this->things_to_do.push([vm_name, cs, &vm_resumed](){
           auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
           try {
               cloud_cs->resumeVM(vm_name);
@@ -1094,7 +1113,7 @@ namespace wrench {
         bool success = std::get<0>(reply);
         if (not success) {
             std::string error_msg = std::get<1>(reply);
-            throw std::runtime_error("Cannot suspend VM: " + error_msg);
+            throw std::runtime_error("Cannot resume VM: " + error_msg);
         } else {
             return {};
         }
