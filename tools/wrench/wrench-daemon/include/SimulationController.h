@@ -117,7 +117,6 @@ namespace wrench {
         json getVMComputeService(json data);
 
     private:
-
         template<class T>
         json startService(T *s);
 
