@@ -269,7 +269,7 @@ namespace wrench {
             WRENCH_WARN("LogicalFileSystem::reserveSpace(): Space was already being reserved for storing file %s at path %s:%s. "
                         "This is likely a redundant copy, and nothing needs to be done",
                         file->getID().c_str(), this->hostname.c_str(), fixed_path.c_str());
-	    return true;
+            return true;
         }
 
         if (this->free_space < file->getSize()) {
