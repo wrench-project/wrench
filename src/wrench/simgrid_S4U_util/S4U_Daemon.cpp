@@ -265,12 +265,10 @@ namespace wrench {
         // until the host has a >0 pstate
         S4U_Simulation::computeZeroFlop();
         this->state = State::UP;
-        auto stuff = this->main();
-        this->return_value = stuff;
+        this->return_value = this->main();
         this->has_returned_from_main = true;
         this->state = State::DOWN;
         S4U_Daemon::map_actor_to_recv_mailbox.erase(simgrid::s4u::this_actor::get_pid());
-
         this->mailbox->set_receiver(nullptr);
         S4U_Mailbox::retireTemporaryMailbox(this->mailbox);
         this->recv_mailbox->set_receiver(nullptr);
