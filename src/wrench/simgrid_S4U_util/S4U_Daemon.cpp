@@ -75,9 +75,14 @@ namespace wrench {
         this->host = S4U_Simulation::get_host_or_vm_by_name(hostname);
         this->simulation = nullptr;
         unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
-        this->mailbox = S4U_Mailbox::generateUniqueMailbox("mb");
-        this->recv_mailbox = S4U_Mailbox::generateUniqueMailbox("rmb");
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
+
+//        this->mailbox = S4U_Mailbox::generateUniqueMailbox("mb");
+//        this->recv_mailbox = S4U_Mailbox::generateUniqueMailbox("rmb");
+
+        this->mailbox = S4U_Mailbox::getTemporaryMailbox();
+        this->recv_mailbox = S4U_Mailbox::getTemporaryMailbox();
+
         this->has_returned_from_main = false;
 
         //        std::cerr << "IN DAEMON CONSTRUCTOR: " << this->process_name << "\n";
@@ -265,8 +270,11 @@ namespace wrench {
         this->has_returned_from_main = true;
         this->state = State::DOWN;
         S4U_Daemon::map_actor_to_recv_mailbox.erase(simgrid::s4u::this_actor::get_pid());
+
         this->mailbox->set_receiver(nullptr);
-        //        this->recv_mailbox->set_receiver(nullptr);
+        S4U_Mailbox::retireTemporaryMailbox(this->mailbox);
+        this->recv_mailbox->set_receiver(nullptr);
+        S4U_Mailbox::retireTemporaryMailbox(this->recv_mailbox);
     }
 
 
