@@ -241,7 +241,7 @@ namespace wrench {
 
         std::string data = batch_submission_data.dump();
 
-        auto batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailbox("batchsched_query_mailbox");
+        auto batchsched_query_mailbox = S4U_Mailbox::getTemporaryMailbox();
 
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(

@@ -7,6 +7,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "simgrid/s4u.hpp"
+#include "smpi/smpi.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_communicator, "Log category for Communicator");
 
@@ -31,6 +32,7 @@ namespace wrench {
         if (size <= 1) {
             throw std::invalid_argument("Communicator::createCommunicator(): invalid argument");
         }
+        S4U_Simulation::enableSMPI();
         return std::shared_ptr<Communicator>(new Communicator(size));
     }
 
@@ -214,6 +216,8 @@ namespace wrench {
                                             int data_size,
                                             const std::string &config) {
 
+
+        S4U_Simulation::enableSMPI();
 
         // Global synchronization
         this->barrier();
