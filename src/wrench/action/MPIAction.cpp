@@ -32,6 +32,7 @@ namespace wrench {
                          unsigned long num_processes,
                          unsigned long num_cores_per_process,
                          std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> lambda_mpi) : Action(name, "mpi_"), num_processes(num_processes), num_cores_per_process(num_cores_per_process), lambda_mpi(lambda_mpi) {
+        S4U_Simulation::enableSMPI();
     }
 
     /**
@@ -88,6 +89,7 @@ namespace wrench {
             S4U_Mailbox::retireTemporaryMailbox(mailbox);
         };
 
+        ;
         SMPI_app_instance_start(("MPI_Action_" + std::to_string(simgrid::s4u::this_actor::get_pid())).c_str(),
                                 MPIProcess(meta_lambda, barrier, action_executor),
                                 simgrid_hosts);
