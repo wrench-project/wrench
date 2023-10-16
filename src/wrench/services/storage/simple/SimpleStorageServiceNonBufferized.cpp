@@ -484,8 +484,8 @@ namespace wrench {
                     src_location->toString().c_str(),
                     dst_location->toString().c_str());
 
-        auto src_host = simgrid::s4u::Host::by_name(src_location->getStorageService()->getHostname());
-        auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
+        auto src_host = src_location->getStorageService()->getHost();
+        auto dst_host = dst_location->getStorageService()->getHost();
 
         auto src_disk = src_location->getDiskOrNull();
         if (src_disk == nullptr) {
@@ -577,8 +577,8 @@ namespace wrench {
                     dst_location->toString().c_str());
 
         // TODO: This code is duplicated with the IAmNotTheSource version of this method
-        auto src_host = simgrid::s4u::Host::by_name(src_location->getStorageService()->getHostname());
-        auto dst_host = simgrid::s4u::Host::by_name(dst_location->getStorageService()->getHostname());
+        auto src_host = src_location->getStorageService()->getHost();
+        auto dst_host = dst_location->getStorageService()->getHost();
 
         auto src_disk = src_location->getDiskOrNull();
         if (src_disk == nullptr) {
