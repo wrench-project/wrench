@@ -810,7 +810,7 @@ namespace wrench {
 
         if ((requested_hosts > this->available_nodes_to_cores.size()) or
             (requested_num_cores_per_host >
-             this->available_nodes_to_cores.begin()->first->get_core_count()) or
+             (unsigned long)this->available_nodes_to_cores.begin()->first->get_core_count()) or
             (required_ram_per_host >
              S4U_Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first))) {
             {
