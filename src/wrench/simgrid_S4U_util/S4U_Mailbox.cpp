@@ -35,6 +35,8 @@ namespace wrench {
     std::set<simgrid::s4u::Mailbox *> S4U_Mailbox::used_mailboxes;
     std::deque<simgrid::s4u::Mailbox *> S4U_Mailbox::mailboxes_to_drain;
     unsigned long S4U_Mailbox::mailbox_pool_size;
+    double S4U_Mailbox::default_control_message_size;
+
 
 
     class WorkflowTask;
