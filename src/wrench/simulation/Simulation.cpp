@@ -115,6 +115,7 @@ namespace wrench {
         bool simulator_help_requested = false;
         bool version_requested = false;
         bool mailbox_pool_size_set = false;
+        bool default_control_message_size_set = false;
 
         // By  default, logs are disabled
         xbt_log_control_set("root.thresh:critical");
@@ -153,6 +154,21 @@ namespace wrench {
                 unsigned long pool_size = strtoul(equal_sign + 1, nullptr, 10);
                 S4U_Mailbox::mailbox_pool_size = pool_size;
                 mailbox_pool_size_set = true;
+            } else if (not strncmp(argv[i], "--wrench-default-control-message-size", strlen("--wrench-default-control-message-size"))) {
+                char *equal_sign = strchr(argv[i], '=');
+                if (!equal_sign) {
+                    throw std::invalid_argument("Invalid ---wrench-default-control-message-size argument value");
+                }
+                // Check that the value is all digits
+                char *ptr = equal_sign + 1;
+                while (*ptr) {
+                    if (*ptr < '0' or *ptr > '9') {
+                        throw std::invalid_argument("Invalid --wrench-default-control-message-size argument value");
+                    }
+                    ptr++;
+                }
+                S4U_Mailbox::default_control_message_size = strtod(equal_sign + 1, nullptr);
+                default_control_message_size_set = true;
             } else if (not strcmp(argv[i], "--wrench-energy-simulation")) {
                 sg_host_energy_plugin_init();
                 Simulation::energy_enabled = true;
@@ -225,6 +241,7 @@ namespace wrench {
             std::cout << "   --wrench-mailbox-pool-size=<integer>: set the number of SimGrid mailboxes used by WRENCH (default: 50000).\n";
             std::cout << "      This value may need to be increased, especially for simulations that simulate many\n";
             std::cout << "      failures, for which WRENCH has a hard time avoiding all mailbox-related memory leaks\n";
+            std::cout << "   --wrench-default-control-message-size=<double>: the default size of control messages in bytes (default: 1024).\n";
             std::cerr << "\n";
         }
 
@@ -285,6 +302,9 @@ namespace wrench {
 
         if (not mailbox_pool_size_set) {
             S4U_Mailbox::createMailboxPool(5000);
+        }
+        if (not default_control_message_size_set) {
+            S4U_Mailbox::default_control_message_size = 1024;
         }
 
 

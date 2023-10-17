@@ -145,6 +145,11 @@ namespace wrench {
         static unsigned long mailbox_pool_size;
 
         /**
+         * @brief The default control message size
+         */
+        static double default_control_message_size;
+
+        /**
          * @brief The "not a mailbox" mailbox, to avoid getting answers back when asked
          *        to prove an "answer mailbox"
          */
