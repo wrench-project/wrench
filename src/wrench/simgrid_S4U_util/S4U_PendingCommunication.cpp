@@ -111,7 +111,7 @@ namespace wrench {
      * @param timeout: timeout value in seconds (-1 means no timeout)
      *
      * @return the index of the comm to which something happened (success or failure), or
-     *         ULONG_MAX if nothing happened before the timeout expired
+     *         ULONG_MAX if nothing happened before the timeout expired.
      *
      * @throw std::invalid_argument
      */
@@ -122,38 +122,46 @@ namespace wrench {
             throw std::invalid_argument("S4U_PendingCommunication::waitForSomethingToHappen(): invalid argument");
         }
 
+#if 0
         std::vector<simgrid::s4u::CommPtr> pending_s4u_comms;
         for (auto it = pending_comms.begin(); it < pending_comms.end(); it++) {
             pending_s4u_comms.push_back((*it)->comm_ptr);
         }
+#else
 
-        ssize_t index = 0;
-        bool one_comm_failed = false;
+        simgrid::s4u::ActivitySet pending_activities;
+        for (auto it = pending_comms.begin(); it < pending_comms.end(); it++) {
+            pending_activities.push((*it)->comm_ptr);
+        }
+#endif
+
+        // Wait one activity to complete
+        simgrid::s4u::ActivityPtr finished_activity = nullptr;
         try {
-            index = simgrid::s4u::Comm::wait_any_for(pending_s4u_comms, timeout);
+            finished_activity = pending_activities.wait_any_for(timeout);
 #ifdef MESSAGE_MANAGER
             MessageManager::removeReceivedMessage(pending_comms[index]->mailbox_name, pending_comms[index]->simulation_message.get());
 #endif
-        } catch (simgrid::NetworkFailureException &e) {
-            one_comm_failed = true;
-        } catch (simgrid::TimeoutException &e) {
-            // This likely doesn't happen, but let's keep it here for now
-            one_comm_failed = true;
-        }
-
-        if (index == -1) {
-            return ULONG_MAX;
-        }
-
-        if (one_comm_failed) {
-            for (auto &pending_s4u_comm: pending_s4u_comms) {
-                if (pending_s4u_comm->get_state() == simgrid::s4u::Activity::State::FAILED) {
-                    break;
+        } catch (simgrid::Exception &e) {
+            auto failed_activity = pending_activities.get_failed_activity();
+            for (unsigned long idx = 0; idx < pending_comms.size(); idx++ ) {
+                if (pending_comms.at(idx)->comm_ptr == failed_activity) {
+                    return idx;
                 }
             }
         }
 
-        return (unsigned long) index;
+        if (finished_activity) {
+            for (unsigned long idx = 0; idx < pending_comms.size(); idx++ ) {
+                if (pending_comms.at(idx)->comm_ptr == finished_activity) {
+                    return idx;
+                }
+            }
+        } else {
+            return -1;
+        }
+
+        throw std::runtime_error("S4U_PendingCommunication::waitForSomethingToHappen(): this should not have happened");
     }
 
 }// namespace wrench
