@@ -83,22 +83,22 @@ namespace wrench {
                     {Property::FILE_NOT_FOUND_TIMEOUT, "30"}};
 
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                    {MessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::UPDATE_CACHE, 1024},
-                    {MessagePayload::CONTINUE_SEARCH, 1024},
-                    {MessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::CACHE_ENTRY, 1024},
-                    {MessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 1024},
-                    {MessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, 1024}};
+                    {MessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::UPDATE_CACHE, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::CONTINUE_SEARCH, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::CACHE_ENTRY, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                    {MessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size}};
 
         public:
             /***********************/
