@@ -198,22 +198,13 @@ namespace wrench {
                      msg->getName().c_str(), msg->payload,
                      mailbox->get_cname());
 
-        simgrid::s4u::CommPtr comm = nullptr;
-
-//        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
-
-//        try {
 #ifdef MESSAGE_MANAGER
         MessageManager::manageMessage(mailbox_name, msg);
 #endif
-        mailbox->put_init(msg, (uint64_t) msg->payload)->detach();
-        //        } catch (simgrid::NetworkFailureException &e) {
-        //            throw std::shared_ptr<NetworkError>(
-        //                    new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
-        //        } catch (simgrid::TimeoutException &e) {
-        //            throw std::shared_ptr<NetworkError>(
-        //                    new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, mailbox_name));
-        //        }
+	if (msg->payload)
+          mailbox->put_init(msg, (uint64_t) msg->payload)->detach();
+	else
+          mailbox->put(msg, 0);
     }
 
     /**
