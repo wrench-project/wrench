@@ -621,7 +621,7 @@ namespace wrench {
             rcv += 1;
 
             if (msg->failure_cause) {
-                WRENCH_DEBUG("%s", msg->failure_cause->toString().c_str());
+                WRENCH_WARN("%s", msg->failure_cause->toString().c_str());
                 throw ExecutionException(std::move(msg->failure_cause));
             }
         }
@@ -630,12 +630,13 @@ namespace wrench {
 
         // Cleanup - Once all the copies are made, we need to delete parts on destination and merge into a single file
         if (total_parts > 1) {
-
+            WRENCH_DEBUG("CSS::copyFileIamSource(): Cleaning up file parts on destination to merge as a single file");
             auto dest_storage_svc = dst_location->getStorageService();
             for (const auto &part : dst_parts) {
                 dest_storage_svc->deleteFileAtLocation(part);
             }
             dest_storage_svc->createFileAtLocation(FileLocation::LOCATION(dest_storage_svc, dst_location->getPath(), dst_location->getFile()));
+            WRENCH_DEBUG("CSS::copyFileIamSource(): All parts on destination replaced by a single file");
         }
 
         // Collect traces
@@ -760,7 +761,7 @@ namespace wrench {
             rcv += 1;
 
             if (msg->failure_cause) {
-                WRENCH_DEBUG("%s", msg->failure_cause->toString().c_str());
+                WRENCH_WARN("%s", msg->failure_cause->toString().c_str());
                 throw ExecutionException(std::move(msg->failure_cause));
             }
         }
@@ -770,6 +771,7 @@ namespace wrench {
 
         // Once copy is done, remove links (only if source file was stripped)
         if (total_parts > 1) {
+            WRENCH_DEBUG("CSS::copyFileIamDestination(): Cleaning up file parts from source");
             for (const auto &src_part : src_parts) {
                 auto part_size = src_part->getFile()->getSize();
                 src_part->getFile()->setSize(0); // make our datafile a link once again
