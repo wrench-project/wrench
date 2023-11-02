@@ -201,10 +201,10 @@ namespace wrench {
 #ifdef MESSAGE_MANAGER
         MessageManager::manageMessage(mailbox_name, msg);
 #endif
-	if (msg->payload)
+	//if (msg->payload)
           mailbox->put_init(msg, (uint64_t) msg->payload)->detach();
-	else
-          mailbox->put(msg, 0);
+	//else
+        //  mailbox->put(msg, 0);
     }
 
     /**

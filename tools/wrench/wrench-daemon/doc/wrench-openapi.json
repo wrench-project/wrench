@@ -2473,7 +2473,7 @@
         "properties": {
           "port_number": {
             "type": "integer",
-            "description": "Port number to which all subsequent HTTP Post requests should be sent"
+            "description": "Port number to which all subsequent HTTP requests should be sent"
           },
           "wrench_api_request_success": {
             "type": "boolean",
