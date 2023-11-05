@@ -470,7 +470,8 @@ namespace wrench {
 
         auto file_parts = this->lookupFileLocation(location);
         if (file_parts.empty()) {
-            WRENCH_WARN("File lookup failed because CSS doesn't know of file");
+            WRENCH_DEBUG("CSS::lookupFile(): CSS doesn't know the file at location %s - %s",
+                         location->getPath().c_str(), location->getFile()->getID().c_str());
             return false;
         }
 
