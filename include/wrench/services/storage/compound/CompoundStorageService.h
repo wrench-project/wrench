@@ -301,6 +301,8 @@ namespace wrench {
 
         std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_location_mapping = {};
 
+        std::map<std::shared_ptr<DataFile>, unsigned int> partial_io_stripe_index;
+
         StorageSelectionStrategyCallback &allocate;
 
         /**
