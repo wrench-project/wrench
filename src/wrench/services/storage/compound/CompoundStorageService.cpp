@@ -419,7 +419,7 @@ namespace wrench {
         // Send a message to the storage service's daemon
         for (const auto &loc : designated_locations) {
 
-            WRENCH_INFO("CSS:deleteFile Issuing delete message to SSS %s", loc->getStorageService()->getName().c_str());
+            WRENCH_DEBUG("CSS:deleteFile Issuing delete message to SSS %s", loc->getStorageService()->getName().c_str());
 
             // assertServiceIsUp(loc->getStorageService());
 
@@ -452,7 +452,7 @@ namespace wrench {
         this->delete_traces[location->getFile()->getID()] = trace;
 
         this->traceInternalStorageUse(IOAction::DeleteEnd, designated_locations);
-        WRENCH_INFO("CSS::deleteFile Done for file %s", location->getFile()->getID().c_str());
+        WRENCH_INFO("CSS::deleteFile done for file %s", location->getFile()->getID().c_str());
     }
 
     /**
@@ -508,7 +508,8 @@ namespace wrench {
      */
     void CompoundStorageService::copyFile(const std::shared_ptr<FileLocation> &src_location,
                                           const std::shared_ptr<FileLocation> &dst_location) {
-        WRENCH_INFO("CSS::copyFile(): Copy %s between %s and %s",
+        WRENCH_INFO("CSS::copyFile() at %f: Copy %s between %s and %s",
+                    S4U_Simulation::getClock(),
                     src_location->getFile()->getID().c_str(),
                     src_location->getStorageService()->getName().c_str(),
                     dst_location->getStorageService()->getName().c_str());
@@ -553,7 +554,7 @@ namespace wrench {
      */
     void CompoundStorageService::copyFileIamSource(const std::shared_ptr<FileLocation> &src_location,
                                                    const std::shared_ptr<FileLocation> &dst_location) {
-        WRENCH_INFO("CSS::copyFileIamSource()");
+        WRENCH_INFO("CSS::copyFileIamSource() - Starting at %f", S4U_Simulation::getClock());
 
         std::vector<std::shared_ptr<FileLocation>> src_parts = {};
         std::vector<std::shared_ptr<FileLocation>> dst_parts = {};
@@ -662,7 +663,7 @@ namespace wrench {
      */
     void CompoundStorageService::copyFileIamDestination(const std::shared_ptr<FileLocation> &src_location,
                                                         const std::shared_ptr<FileLocation> &dst_location) {
-        WRENCH_DEBUG("CSS::copyFileIamDestination() - Starting");
+        WRENCH_DEBUG("CSS::copyFileIamDestination() - Starting at %f", S4U_Simulation::getClock());
 
         // this->traceInternalStorageUse(IOAction::CopyToStart);
 
@@ -812,7 +813,7 @@ namespace wrench {
                                            double num_bytes_to_write,
                                            bool wait_for_answer) {
 
-        WRENCH_INFO("CSS::writeFile(): Writing  %fb to file %s", num_bytes_to_write, location->getFile()->getID().c_str());
+        WRENCH_INFO("CSS::writeFile(): Writing  %fb to file %s - starting at %f", num_bytes_to_write, location->getFile()->getID().c_str(), S4U_Simulation::getClock());
         this->assertServiceIsUp();
 
         if (location == nullptr) {
@@ -959,7 +960,7 @@ namespace wrench {
                                           const std::shared_ptr<FileLocation> &location,
                                           double num_bytes,
                                           bool wait_for_answer) {
-        WRENCH_INFO("CSS::readFile(): Reading file %s", location->getFile()->getID().c_str());
+        WRENCH_INFO("CSS::readFile(): Reading file %s - starting at %f", location->getFile()->getID().c_str(), S4U_Simulation::getClock());
 
         assertServiceIsUp(this->shared_from_this());
 
@@ -1081,7 +1082,7 @@ namespace wrench {
 
         S4U_Mailbox::retireTemporaryMailbox(recv_mailbox);
 
-        WRENCH_INFO("CSS::readFile(): All reads done and ack");
+        WRENCH_INFO("CSS::readFile(): All reads done and ack at %f)", S4U_Simulation::getClock());
 
         // Collect traces
         wrench::AllocationTrace trace;
