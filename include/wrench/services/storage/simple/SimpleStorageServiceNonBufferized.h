@@ -85,7 +85,11 @@ namespace wrench {
                                             dst_location(std::move(dst_location)), dst_host(dst_host), dst_disk(dst_disk),
                                             mailbox(mailbox), transfer_size(transfer_size), stream(nullptr) {
             }
+
         };
+
+        int getNumRunningTransactionsOnDisk(simgrid::s4u::Disk *disk);
+
         /***********************/
         /** \endcond          **/
         /***********************/
