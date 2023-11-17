@@ -33,18 +33,18 @@ namespace wrench {
 
     public:
         static std::shared_ptr<Alarm> createAndStartAlarm(Simulation *simulation, double date, std::string hostname,
-                                                          simgrid::s4u::Mailbox *reply_mailbox_name,
+                                                          S4U_Mailbox *reply_mailbox_name,
                                                           SimulationMessage *msg, std::string suffix);
 
         void kill();
 
     private:
-        Alarm(double date, std::string hostname, simgrid::s4u::Mailbox *reply_mailbox,
+        Alarm(double date, std::string hostname, S4U_Mailbox *reply_mailbox,
               SimulationMessage *msg, std::string suffix);
 
         double date;
         //        std::string reply_mailbox_name;
-        simgrid::s4u::Mailbox *reply_mailbox;
+        S4U_Mailbox *reply_mailbox;
         std::unique_ptr<SimulationMessage> msg;
 
         int main() override;

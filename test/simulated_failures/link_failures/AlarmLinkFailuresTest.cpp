@@ -90,7 +90,7 @@ private:
         // Wait for the message
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(mailbox);
+            message = mailbox->getMessage();
             throw std::runtime_error("Should never have gotten the alarm's message");
         } catch (wrench::ExecutionException &e) {
             e.getCause()->toString();

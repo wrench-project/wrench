@@ -30,7 +30,7 @@ namespace wrench {
      * @param num_bytes: the number of bytes to read
      */
     FileReaderThread::FileReaderThread(std::string hostname,
-                                       simgrid::s4u::Mailbox *creator_mailbox,
+                                       S4U_Mailbox *creator_mailbox,
                                        std::shared_ptr<FileLocation> location,
                                        double num_bytes) : Service(hostname, "file_reader_thread") {
         this->creator_mailbox = creator_mailbox;
@@ -52,7 +52,7 @@ namespace wrench {
         } catch (ExecutionException &e) {
             msg = new DataMovementManagerFileReaderThreadMessage(this->location, this->num_bytes, false, e.getCause());
         }
-        S4U_Mailbox::putMessage(this->creator_mailbox, msg);
+        this->creator_mailbox->putMessage(msg);
 
         return 0;
     }

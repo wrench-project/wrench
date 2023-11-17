@@ -36,7 +36,7 @@ namespace wrench {
          * @param answered: A shared boolean for if the answer has been sent to the client.  This should be the same for all messages searching for this request.  Used to prevent the multiple response problem
          * @param timeToLive: The max number of hops this message can take
          */
-        ContinueSearchMessage::ContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox,
+        ContinueSearchMessage::ContinueSearchMessage(S4U_Mailbox *answer_mailbox,
                                                      std::shared_ptr<StorageServiceFileReadRequestMessage> original,
                                                      std::shared_ptr<DataFile> file,
                                                      Node *node,
@@ -51,7 +51,7 @@ namespace wrench {
          * @param answered: A shared boolean for if the answer has been sent to the client.  This should be the same for all messages searching for this request.  Used to prevent the multiple response problem
 
          */
-        FileNotFoundAlarm::FileNotFoundAlarm(simgrid::s4u::Mailbox *answer_mailbox,
+        FileNotFoundAlarm::FileNotFoundAlarm(S4U_Mailbox *answer_mailbox,
                                              std::shared_ptr<DataFile> file,
                                              bool fileReadRequest,
                                              std::shared_ptr<bool> answered) : Message(0), answer_mailbox(answer_mailbox), file(file), fileReadRequest(fileReadRequest), answered(answered) {}
@@ -71,7 +71,7 @@ namespace wrench {
          * @param payload: The message size in bytes
          * @param answered: A shared boolean for if the answer has been sent to the client.  This should be the same for all messages searching for this request.  Used to prevent the multiple response problem
          */
-        UpdateCacheMessage::UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<StorageServiceFileReadRequestMessage> original, Node *node, std::shared_ptr<DataFile> file, std::set<std::shared_ptr<FileLocation>> locations,
+        UpdateCacheMessage::UpdateCacheMessage(S4U_Mailbox *answer_mailbox, std::shared_ptr<StorageServiceFileReadRequestMessage> original, Node *node, std::shared_ptr<DataFile> file, std::set<std::shared_ptr<FileLocation>> locations,
                                                double payload, std::shared_ptr<bool> answered) : Message(payload), answer_mailbox(answer_mailbox), original(original), file(file), locations(locations), node(node), answered(answered) {}
         /**
         * @brief Pointer Copy Constructor
@@ -114,7 +114,7 @@ namespace wrench {
          * @param timeToLive: The max number of hops this message can take
          * @param search_stack:  The available paths to the file
          */
-        AdvancedContinueSearchMessage::AdvancedContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<StorageServiceFileReadRequestMessage> original,
+        AdvancedContinueSearchMessage::AdvancedContinueSearchMessage(S4U_Mailbox *answer_mailbox, std::shared_ptr<StorageServiceFileReadRequestMessage> original,
                                                                      std::shared_ptr<DataFile> file, Node *node, double payload, std::shared_ptr<bool> answered, int timeToLive, std::vector<std::stack<Node *>> search_stack) : ContinueSearchMessage(answer_mailbox, original, file, node, payload, answered, timeToLive), search_stack(search_stack){};
         /**
         * @brief Pointer Copy Constructor with auxiliary stack

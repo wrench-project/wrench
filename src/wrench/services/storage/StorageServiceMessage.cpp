@@ -36,7 +36,7 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                                  const std::string &path,
                                                                                  double payload)
         : StorageServiceMessage(payload) {
@@ -75,7 +75,7 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                                    const std::shared_ptr<FileLocation> &location,
                                                                                    double payload)
         : StorageServiceMessage(payload) {
@@ -119,7 +119,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                                    const std::shared_ptr<FileLocation> &location,
                                                                                    double payload)
         : StorageServiceMessage(payload) {
@@ -172,7 +172,7 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                                std::shared_ptr<FileLocation> src,
                                                                                std::shared_ptr<FileLocation> dst,
                                                                                double payload) : StorageServiceMessage(payload) {
@@ -227,7 +227,7 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                                  simgrid::s4u::Host *requesting_host,
                                                                                  const std::shared_ptr<FileLocation> &location,
                                                                                  double num_bytes_to_write,
@@ -259,7 +259,7 @@ namespace wrench {
     StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(std::shared_ptr<FileLocation> &location,
                                                                                bool success,
                                                                                std::shared_ptr<FailureCause> failure_cause,
-                                                                               std::map<simgrid::s4u::Mailbox *, double> data_write_mailboxes_and_bytes,
+                                                                               std::map<S4U_Mailbox *, double> data_write_mailboxes_and_bytes,
                                                                                double buffer_size,
                                                                                double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -289,7 +289,7 @@ namespace wrench {
    * @throw std::invalid_argument
    */
 
-    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                                simgrid::s4u::Host *requesting_host,
                                                                                std::shared_ptr<FileLocation> location,
                                                                                double num_bytes_to_read,
@@ -342,7 +342,7 @@ namespace wrench {
     StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(std::shared_ptr<FileLocation> location,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
-                                                                             simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
+                                                                             S4U_Mailbox *mailbox_to_receive_the_file_content,
                                                                              double buffer_size,
                                                                              unsigned long number_of_sources,
                                                                              double payload) : StorageServiceMessage(payload) {

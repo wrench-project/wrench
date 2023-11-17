@@ -377,16 +377,14 @@ namespace wrench {
 
         // Send a "run a BatchComputeService job" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-        S4U_Mailbox::dputMessage(
-                this->mailbox,
+        this->mailbox->dputMessage(
                 new BatchComputeServiceJobRequestMessage(
                         answer_mailbox, batch_job,
                         this->getMessagePayloadValue(
                                 BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        auto msg = S4U_Mailbox::getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(
-                answer_mailbox,
+        auto msg = answer_mailbox->getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(
                 this->network_timeout,
                 "BatchComputeService::submitCompoundJob(): Received an");
         if (!msg->success) {
@@ -404,8 +402,7 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         // Send a "terminate a  job" message to the daemon's mailbox_name
-        S4U_Mailbox::putMessage(
-                this->mailbox,
+        this->mailbox->putMessage(
                 new ComputeServiceTerminateCompoundJobRequestMessage(
                         answer_mailbox,
                         job,
@@ -413,8 +410,7 @@ namespace wrench {
                                 BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        auto msg = S4U_Mailbox::getMessage<ComputeServiceTerminateCompoundJobAnswerMessage>(
-                answer_mailbox,
+        auto msg = answer_mailbox->getMessage<ComputeServiceTerminateCompoundJobAnswerMessage>(
                 this->network_timeout,
                 "BatchComputeService::terminateCompoundJob(): Received an");
 
@@ -456,7 +452,7 @@ namespace wrench {
      * @param job
      */
     void BatchComputeService::sendPilotJobExpirationNotification(const std::shared_ptr<PilotJob> &job) {
-        S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
+        job->popCallbackMailbox()->dputMessage(
                                  new ComputeServicePilotJobExpiredMessage(
                                          job, this->getSharedPtr<BatchComputeService>(),
                                          this->getMessagePayloadValue(
@@ -476,8 +472,7 @@ namespace wrench {
         std::shared_ptr<BatchJob> batch_job = this->all_jobs[job];
 
         try {
-            S4U_Mailbox::putMessage(
-                    job->popCallbackMailbox(),
+            job->popCallbackMailbox()->putMessage(
                     new ComputeServiceCompoundJobFailedMessage(
                             job, this->getSharedPtr<BatchComputeService>(),
                             this->getMessagePayloadValue(
@@ -722,7 +717,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
+            message = this->mailbox->getMessage();
         } catch (ExecutionException &e) {
             return true;
         }
@@ -741,7 +736,7 @@ namespace wrench {
 
             // Send back a synchronous reply!
             try {
-                S4U_Mailbox::putMessage(msg->ack_mailbox,
+                msg->ack_mailbox->putMessage(
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 BatchComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
@@ -796,7 +791,7 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which answer messages should be sent
      */
     void BatchComputeService::processJobSubmission(const std::shared_ptr<BatchJob> &job,
-                                                   simgrid::s4u::Mailbox *answer_mailbox) {
+                                                   S4U_Mailbox *answer_mailbox) {
         WRENCH_INFO("Asked to run a BatchComputeService job with id %ld", job->getJobID());
 
         // Check that the job can be admitted in terms of resources:
@@ -814,8 +809,7 @@ namespace wrench {
             (required_ram_per_host >
              S4U_Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first))) {
             {
-                S4U_Mailbox::dputMessage(
-                        answer_mailbox,
+                answer_mailbox->dputMessage(
                         new ComputeServiceSubmitCompoundJobAnswerMessage(
                                 job->getCompoundJob(),
                                 this->getSharedPtr<BatchComputeService>(),
@@ -831,7 +825,7 @@ namespace wrench {
         }
 
         // SUCCESS!
-        S4U_Mailbox::dputMessage(answer_mailbox,
+        answer_mailbox->dputMessage(
                                  new ComputeServiceSubmitCompoundJobAnswerMessage(
                                          job->getCompoundJob(),
                                          this->getSharedPtr<BatchComputeService>(),
@@ -895,8 +889,7 @@ namespace wrench {
         this->scheduler->processJobCompletion(batch_job);
 
         // Send the callback to the originator
-        S4U_Mailbox::dputMessage(
-                job->popCallbackMailbox(),
+        job->popCallbackMailbox()->dputMessage(
                 new ComputeServiceCompoundJobDoneMessage(
                         job, this->getSharedPtr<BatchComputeService>(),
                         this->getMessagePayloadValue(
@@ -1088,7 +1081,7 @@ namespace wrench {
     * @param answer_mailbox: the mailbox to which the description message should be sent
     * @param key: the desired resource information (i.e., dictionary key) that's needed)
     */
-    void BatchComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
+    void BatchComputeService::processGetResourceInformation(S4U_Mailbox *answer_mailbox,
                                                             const std::string &key) {
 
         auto dict = this->constructResourceInformation(key);
@@ -1098,7 +1091,7 @@ namespace wrench {
                 dict,
                 this->getMessagePayloadValue(
                         ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+        answer_mailbox->dputMessage(answer_message);
     }
 
     /**
@@ -1133,7 +1126,7 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      */
     void BatchComputeService::processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job,
-                                                                   simgrid::s4u::Mailbox *answer_mailbox) {
+                                                                   S4U_Mailbox *answer_mailbox) {
         std::shared_ptr<BatchJob> batch_job = nullptr;
         // Is it running?
         bool is_running = false;
@@ -1185,7 +1178,7 @@ namespace wrench {
                             job, this->getSharedPtr<BatchComputeService>(), false, std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<BatchComputeService>(), msg)),
                             this->getMessagePayloadValue(
                                     BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD));
-            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+            answer_mailbox->dputMessage(answer_message);
             return;
         }
 
@@ -1214,7 +1207,7 @@ namespace wrench {
                         job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD));
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+        answer_mailbox->dputMessage(answer_message);
     }
 
     /**
@@ -1323,7 +1316,7 @@ namespace wrench {
      * @param num_cores: the desired number of cores
      * @param ram: the desired RAM
      */
-    void BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox,
+    void BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(S4U_Mailbox *answer_mailbox,
                                                                                  unsigned long num_cores, double ram) {
         throw std::runtime_error(
                 "BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A BatchComputeService compute service does not support this operation");

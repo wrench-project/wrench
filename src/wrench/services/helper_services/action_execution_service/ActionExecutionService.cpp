@@ -157,14 +157,13 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "run a standard job" message to the daemon's mailbox_name
-        S4U_Mailbox::putMessage(this->mailbox,
+        this->mailbox->putMessage(
                                 new ActionExecutionServiceSubmitActionRequestMessage(
                                         answer_mailbox, action,
                                         0.0));
 
         // Get the answer
-        auto msg = S4U_Mailbox::getMessage<ActionExecutionServiceSubmitActionAnswerMessage>(
-                answer_mailbox,
+        auto msg = answer_mailbox->getMessage<ActionExecutionServiceSubmitActionAnswerMessage>(
                 this->network_timeout,
                 "ActionExecutionService::submitActions(): Received an");
         // If not a success, throw an exception
@@ -527,7 +526,7 @@ namespace wrench {
         // Wait for a message
         std::shared_ptr<SimulationMessage> message;
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
+            message = this->mailbox->getMessage();
         } catch (ExecutionException &e) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
             return true;
@@ -571,7 +570,7 @@ namespace wrench {
 
             // This is Synchronous
             try {
-                S4U_Mailbox::putMessage(msg->ack_mailbox,
+                msg->ack_mailbox->putMessage(
                                         new ServiceDaemonStoppedMessage(0.0));
             } catch (ExecutionException &e) {
                 return false;
@@ -667,8 +666,7 @@ namespace wrench {
                         this->parent_service->mailbox->get_cname());
             // NOTE: This is synchronous so that the process doesn't fall off the end
             try {
-                S4U_Mailbox::putMessage(
-                        this->parent_service->mailbox,
+                this->parent_service->mailbox->putMessage(
                         new ActionExecutionServiceActionDoneMessage(action, 0));
             } catch (ExecutionException &e) {
                 return;
@@ -723,13 +721,12 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "terminate action" message to the daemon's mailbox_name
-        S4U_Mailbox::putMessage(this->mailbox,
+        this->mailbox->putMessage(
                                 new ActionExecutionServiceTerminateActionRequestMessage(
                                         answer_mailbox, std::move(action), termination_cause, 0.0));
 
         // Get the answer
-        auto msg = S4U_Mailbox::getMessage<ActionExecutionServiceTerminateActionAnswerMessage>(
-                answer_mailbox,
+        auto msg = answer_mailbox->getMessage<ActionExecutionServiceTerminateActionAnswerMessage>(
                 this->network_timeout,
                 "ActionExecutionService::terminateAction(): Received an");
         // If no success, throw an exception
@@ -758,8 +755,8 @@ namespace wrench {
         this->action_run_specs.erase(action);
 
         // Send the notification to the originator
-        S4U_Mailbox::dputMessage(
-                this->parent_service->mailbox, new ActionExecutionServiceActionDoneMessage(
+        this->parent_service->mailbox->dputMessage(
+                new ActionExecutionServiceActionDoneMessage(
                                                        action, 0.0));
     }
 
@@ -783,9 +780,7 @@ namespace wrench {
         // NOTE: This is synchronous so that the process doesn't fall off the end
         try {
             auto msg = new ActionExecutionServiceActionDoneMessage(action, 0);
-            S4U_Mailbox::putMessage(
-                    this->parent_service->mailbox,
-                    msg);
+            this->parent_service->mailbox->putMessage(msg);
         } catch (ExecutionException &e) {
             return;
         }
@@ -799,7 +794,7 @@ namespace wrench {
      * @param termination_cause: the termination cause
      */
     void ActionExecutionService::processActionTerminationRequest(const std::shared_ptr<Action> &action,
-                                                                 simgrid::s4u::Mailbox *answer_mailbox,
+                                                                 S4U_Mailbox *answer_mailbox,
                                                                  ComputeService::TerminationCause termination_cause) {
         // If the action doesn't exit, we reply right away
         if (this->all_actions.find(action) == this->all_actions.end()) {
@@ -810,7 +805,7 @@ namespace wrench {
                     false,
                     std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<ActionExecutionService>(), error_message)),
                     0.0);
-            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+            answer_mailbox->dputMessage(answer_message);
             return;
         }
 
@@ -834,7 +829,7 @@ namespace wrench {
         // reply
         auto answer_message = new ActionExecutionServiceTerminateActionAnswerMessage(
                 true, nullptr, 0);
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+        answer_mailbox->dputMessage(answer_message);
     }
 
     /**
@@ -912,15 +907,14 @@ namespace wrench {
      *
      */
     void ActionExecutionService::processSubmitAction(
-            simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<Action> &action) {
+            S4U_Mailbox *answer_mailbox, const std::shared_ptr<Action> &action) {
         WRENCH_INFO("Asked to run action %s", action->getName().c_str());
 
         auto service_specific_arguments = action->getJob()->getServiceSpecificArguments();
 
         // Can we run this action at all in terms of available resources?
         if (not actionCanRun(action)) {
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
+            answer_mailbox->dputMessage(
                     new ActionExecutionServiceSubmitActionAnswerMessage(
                             false,
                             std::shared_ptr<FailureCause>(
@@ -947,8 +941,7 @@ namespace wrench {
             this->ready_actions.push_back(action);
 
         // And send a reply!
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
+        answer_mailbox->dputMessage(
                 new ActionExecutionServiceSubmitActionAnswerMessage(true, nullptr, 0.0));
     }
 
@@ -1097,8 +1090,7 @@ namespace wrench {
             WRENCH_INFO("Sending action failure notification to '%s'", parent_service->mailbox->get_cname());
             // NOTE: This is synchronous so that the process doesn't fall off the end
             try {
-                S4U_Mailbox::putMessage(
-                        this->parent_service->mailbox,
+                this->parent_service->mailbox->putMessage(
                         new ActionExecutionServiceActionDoneMessage(action, 0));
             } catch (ExecutionException &e) {
                 return;

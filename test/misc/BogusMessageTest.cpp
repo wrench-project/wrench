@@ -22,7 +22,7 @@ class BogusMessageTest : public ::testing::Test {
 
 public:
     std::shared_ptr<wrench::Service> service = nullptr;
-    simgrid::s4u::Mailbox *dst_mailbox;
+    wrench::S4U_Mailbox *dst_mailbox;
 
     void do_BogusMessage_Test(std::string service_type);
 
@@ -133,7 +133,7 @@ private:
     int main() override {
         wrench::Simulation::sleep(1000);
         try {
-            wrench::S4U_Mailbox::putMessage(this->test->dst_mailbox, new BogusMessage());
+            this->test->dst_mailbox->putMessage(new BogusMessage());
         } catch (std::runtime_error &e) {
         }
         return 0;

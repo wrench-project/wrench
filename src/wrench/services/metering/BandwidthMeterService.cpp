@@ -80,7 +80,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void BandwidthMeterService::stop() {
-        S4U_Mailbox::putMessage(this->mailbox,
+        this->mailbox->putMessage(
                                 new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
@@ -146,7 +146,7 @@ namespace wrench {
     bool BandwidthMeterService::processNextMessage(double timeout) {
 
         try {
-            auto msg = S4U_Mailbox::getMessage<ServiceStopDaemonMessage>(this->mailbox, timeout, "BandwidthMeter::waitForNextMessage(): Received an");
+            auto msg = this->mailbox->getMessage<ServiceStopDaemonMessage>(timeout, "BandwidthMeter::waitForNextMessage(): Received an");
             return false;
         } catch (ExecutionException &e) {
             return true;

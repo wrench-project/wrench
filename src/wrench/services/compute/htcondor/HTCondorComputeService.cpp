@@ -135,16 +135,14 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "run a standard job" message to the daemon's mailbox_name
-        S4U_Mailbox::putMessage(
-                this->mailbox,
+        this->mailbox->putMessage(
                 new ComputeServiceSubmitCompoundJobRequestMessage(
                         answer_mailbox, job, service_specific_args,
                         this->getMessagePayloadValue(
                                 HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        auto msg = S4U_Mailbox::getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(
-                answer_mailbox,
+        auto msg = answer_mailbox->getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(
                 "HTCondorComputeService::submitCompoundJob(): Received an");
         // If no success, throw an exception
         if (not msg->success) {
@@ -220,7 +218,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
+            message = this->mailbox->getMessage();
         } catch (ExecutionException &e) {
             return true;
         }
@@ -236,7 +234,7 @@ namespace wrench {
             this->terminate();
             // This is Synchronous
             try {
-                S4U_Mailbox::putMessage(msg->ack_mailbox,
+                msg->ack_mailbox->putMessage(
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 HTCondorComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
@@ -262,7 +260,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorComputeService::processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox,
+    void HTCondorComputeService::processSubmitCompoundJob(S4U_Mailbox *answer_mailbox,
                                                           const std::shared_ptr<CompoundJob> &job,
                                                           const std::map<std::string, std::string> &service_specific_args) {
 
@@ -271,8 +269,7 @@ namespace wrench {
         // Check that the job can run on some child service
         auto failure_cause = this->central_manager->jobCanRunSomewhere(job, service_specific_args);
         if (failure_cause) {
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
+            answer_mailbox->dputMessage(
                     new ComputeServiceSubmitCompoundJobAnswerMessage(
                             job, this->getSharedPtr<HTCondorComputeService>(), false, failure_cause,
                             this->getMessagePayloadValue(
@@ -292,8 +289,7 @@ namespace wrench {
 
         if (not service_specific_args_valid) {
             std::string error_message = "Non-grid universe jobs submitted to HTCondor cannot have service-specific arguments";
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
+            answer_mailbox->dputMessage(
                     new ComputeServiceSubmitCompoundJobAnswerMessage(
                             job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<HTCondorComputeService>(), error_message)),
                             this->getMessagePayloadValue(
@@ -304,8 +300,7 @@ namespace wrench {
         this->central_manager->submitCompoundJob(job, service_specific_args);
 
         // send positive answer
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
+        answer_mailbox->dputMessage(
                 new ComputeServiceSubmitCompoundJobAnswerMessage(
                         job,
                         this->getSharedPtr<HTCondorComputeService>(),
@@ -318,7 +313,7 @@ namespace wrench {
       * @param num_cores: the desired number of cores
       * @param ram: the desired RAM
       */
-    void HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram) {
+    void HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(S4U_Mailbox *answer_mailbox, unsigned long num_cores, double ram) {
         throw std::runtime_error("HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A HTCondor service does not support this operation");
     }
 

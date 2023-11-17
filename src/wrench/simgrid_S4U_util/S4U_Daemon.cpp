@@ -29,7 +29,7 @@ std::unordered_map<std::string, unsigned long> num_actors;
 
 namespace wrench {
 
-    std::unordered_map<aid_t, simgrid::s4u::Mailbox *> S4U_Daemon::map_actor_to_recv_mailbox;
+    std::unordered_map<aid_t, S4U_Mailbox *> S4U_Daemon::map_actor_to_recv_mailbox;
     int S4U_Daemon::num_non_daemonized_actors_running = 0;
 
     /**
@@ -210,7 +210,7 @@ namespace wrench {
 
         // Set the mailbox receiver
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
-        this->mailbox->set_receiver(this->s4u_actor);
+        this->mailbox->s4u_mb->set_receiver(this->s4u_actor);
         //        this->recv_mailbox->set_receiver(this->s4u_actor);
     }
 
@@ -270,9 +270,9 @@ namespace wrench {
         this->has_returned_from_main = true;
         this->state = State::DOWN;
         S4U_Daemon::map_actor_to_recv_mailbox.erase(simgrid::s4u::this_actor::get_pid());
-        this->mailbox->set_receiver(nullptr);
+        this->mailbox->s4u_mb->set_receiver(nullptr);
         S4U_Mailbox::retireTemporaryMailbox(this->mailbox);
-        this->recv_mailbox->set_receiver(nullptr);
+        this->recv_mailbox->s4u_mb->set_receiver(nullptr);
         S4U_Mailbox::retireTemporaryMailbox(this->recv_mailbox);
     }
 
@@ -403,7 +403,7 @@ namespace wrench {
      * @brief Return the running actor's recv mailbox
      * @return the mailbox
      */
-    simgrid::s4u::Mailbox *S4U_Daemon::getRunningActorRecvMailbox() {
+    S4U_Mailbox *S4U_Daemon::getRunningActorRecvMailbox() {
 
         return S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()];
     }

@@ -103,8 +103,7 @@ namespace wrench {
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        S4U_Mailbox::putMessage(
-                this->mailbox,
+        this->mailbox->putMessage(
                 new CoordinateLookupRequestMessage(
                         answer_mailbox, requested_host,
                         this->getMessagePayloadValue(
@@ -112,8 +111,7 @@ namespace wrench {
 
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-        auto msg = S4U_Mailbox::getMessage<CoordinateLookupAnswerMessage>(
-                answer_mailbox,
+        auto msg = answer_mailbox->getMessage<CoordinateLookupAnswerMessage>(
                 this->network_timeout,
                 "NetworkProximityService::getCoordinate(): Received an");
         return std::make_pair(msg->xy_coordinate, msg->timestamp);
@@ -145,15 +143,13 @@ namespace wrench {
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        S4U_Mailbox::putMessage(
-                this->mailbox,
+        this->mailbox->putMessage(
                 new NetworkProximityLookupRequestMessage(
                         answer_mailbox, std::move(hosts),
                         this->getMessagePayloadValue(
                                 NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
-        auto msg = S4U_Mailbox::getMessage<NetworkProximityLookupAnswerMessage>(
-                answer_mailbox,
+        auto msg = answer_mailbox->getMessage<NetworkProximityLookupAnswerMessage>(
                 this->network_timeout,
                 "NetworkProximityService::query(): Received an");
         return std::make_pair(msg->proximity_value, msg->timestamp);
@@ -236,7 +232,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
+            message = this->mailbox->getMessage();
         } catch (ExecutionException &e) {
             return true;
         }
@@ -260,8 +256,7 @@ namespace wrench {
                 }
                 this->network_daemons.clear();
                 this->hosts_in_network.clear();
-                S4U_Mailbox::putMessage(
-                        msg->ack_mailbox,
+                msg->ack_mailbox->putMessage(
                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                 NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
@@ -297,8 +292,7 @@ namespace wrench {
             // Overhead
             S4U_Simulation::sleep(this->getPropertyValueAsTimeInSecond(NetworkProximityServiceProperty::LOOKUP_OVERHEAD));
 
-            S4U_Mailbox::dputMessage(
-                    msg->answer_mailbox,
+            msg->answer_mailbox->dputMessage(
                     new NetworkProximityLookupAnswerMessage(
                             msg->hosts, proximity_value, timestamp,
                             this->getMessagePayloadValue(
@@ -319,8 +313,7 @@ namespace wrench {
             std::shared_ptr<NetworkProximityDaemon> chosen_peer = NetworkProximityService::getCommunicationPeer(
                     msg->daemon);
 
-            S4U_Mailbox::dputMessage(
-                    msg->daemon->mailbox,
+            msg->daemon->mailbox->dputMessage(
                     new NextContactDaemonAnswerMessage(
                             chosen_peer->getHostname(),
                             chosen_peer,
@@ -357,7 +350,7 @@ namespace wrench {
             // Overhead
             S4U_Simulation::sleep(this->getPropertyValueAsTimeInSecond(NetworkProximityServiceProperty::LOOKUP_OVERHEAD));
 
-            S4U_Mailbox::dputMessage(msg->answer_mailbox, msg_to_send_back);
+            msg->answer_mailbox->dputMessage(msg_to_send_back);
             return true;
 
         } else {

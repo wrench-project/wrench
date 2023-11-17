@@ -27,7 +27,7 @@ namespace wrench {
      *
      * @throw std::invalid_arguments
      */
-    ServiceStopDaemonMessage::ServiceStopDaemonMessage(simgrid::s4u::Mailbox *ack_mailbox, bool send_failure_notifications,
+    ServiceStopDaemonMessage::ServiceStopDaemonMessage(S4U_Mailbox *ack_mailbox, bool send_failure_notifications,
                                                        ComputeService::TerminationCause termination_cause,
                                                        double payload)
         : ServiceMessage(payload), ack_mailbox(ack_mailbox), send_failure_notifications(send_failure_notifications), termination_cause(termination_cause) {}

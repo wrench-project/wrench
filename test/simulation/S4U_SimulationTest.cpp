@@ -349,7 +349,7 @@ private:
 
     int main() override {
 
-        wrench::S4U_Mailbox::getMessage(this->mailbox);
+        this->mailbox->getMessage();
 
         return 0;
     }

@@ -36,7 +36,7 @@ namespace wrench {
      */
     NetworkProximityDaemon::NetworkProximityDaemon(Simulation *simulation,
                                                    std::string hostname,
-                                                   simgrid::s4u::Mailbox *network_proximity_service_mailbox,
+                                                   S4U_Mailbox *network_proximity_service_mailbox,
                                                    double message_size, double measurement_period,
                                                    double noise,
                                                    int noise_seed,
@@ -62,7 +62,7 @@ namespace wrench {
     NetworkProximityDaemon::NetworkProximityDaemon(
             Simulation *simulation,
             std::string hostname,
-            simgrid::s4u::Mailbox *network_proximity_service_mailbox,
+            S4U_Mailbox *network_proximity_service_mailbox,
             double message_size, double measurement_period,
             double noise,
             int noise_seed,
@@ -112,7 +112,7 @@ namespace wrench {
         double time_for_next_measurement = this->getTimeUntilNextMeasurement();
 
         try {
-            S4U_Mailbox::putMessage(this->network_proximity_service_mailbox,
+            this->network_proximity_service_mailbox->putMessage(
                                     new NextContactDaemonRequestMessage(
                                             this->getSharedPtr<NetworkProximityDaemon>(),
                                             this->getMessagePayloadValue(
@@ -141,7 +141,7 @@ namespace wrench {
                     WRENCH_INFO("Synchronously sending a NetworkProximityTransferMessage  (%lf) to %s",
                                 this->message_size, this->next_mailbox_to_send->get_cname());
                     try {
-                        S4U_Mailbox::putMessage(this->next_mailbox_to_send,
+                        this->next_mailbox_to_send->putMessage(
                                                 new NetworkProximityTransferMessage(
                                                         this->message_size));
                     } catch (ExecutionException &e) {
@@ -155,7 +155,7 @@ namespace wrench {
                     std::pair<std::string, std::string> hosts;
                     hosts = std::make_pair(S4U_Simulation::getHostName(), this->next_host_to_send);
 
-                    S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
+                    this->network_proximity_service_mailbox->dputMessage(
                                              new NetworkProximityComputeAnswerMessage(hosts, proximityValue,
                                                                                       this->getMessagePayloadValue(
                                                                                               NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD)));
@@ -169,7 +169,7 @@ namespace wrench {
                     time_for_next_measurement = this->getTimeUntilNextMeasurement();
 
                     try {
-                        S4U_Mailbox::putMessage(this->network_proximity_service_mailbox,
+                        this->network_proximity_service_mailbox->putMessage(
                                                 new NextContactDaemonRequestMessage(
                                                         this->getSharedPtr<NetworkProximityDaemon>(),
                                                         this->getMessagePayloadValue(
@@ -192,7 +192,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox, timeout);
+            message = this->mailbox->getMessage(timeout);
         } catch (ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<NetworkError>(e.getCause());
             if (not cause->isTimeout()) {
@@ -207,7 +207,7 @@ namespace wrench {
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // This is Synchronous
             try {
-                S4U_Mailbox::putMessage(msg->ack_mailbox,
+                msg->ack_mailbox->putMessage(
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {

@@ -53,7 +53,7 @@ namespace wrench {
             void createFile(const std::shared_ptr<FileLocation> &location) override;
             void removeFile(const std::shared_ptr<FileLocation> &location) override;
 
-            virtual void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+            virtual void writeFile(S4U_Mailbox *answer_mailbox,
                                    const std::shared_ptr<FileLocation> &location,
                                    double num_bytes_to_write,
                                    bool wait_for_answer) override;

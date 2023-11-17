@@ -31,7 +31,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceGetExecutionHostsRequestMessage::CloudComputeServiceGetExecutionHostsRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox, double payload) : CloudComputeServiceMessage(payload) {
+            S4U_Mailbox *answer_mailbox, double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
@@ -67,7 +67,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceCreateVMRequestMessage::CloudComputeServiceCreateVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_Mailbox *answer_mailbox,
             unsigned long num_cores,
             double ram_memory,
             const std::string &physical_host,
@@ -115,7 +115,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceShutdownVMRequestMessage::CloudComputeServiceShutdownVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_Mailbox *answer_mailbox,
             const std::string &vm_name,
             bool send_failure_notifications,
             ComputeService::TerminationCause termination_cause,
@@ -153,7 +153,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceStartVMRequestMessage::CloudComputeServiceStartVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_Mailbox *answer_mailbox,
             const std::string &vm_name,
             double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -190,7 +190,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceSuspendVMRequestMessage::CloudComputeServiceSuspendVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_Mailbox *answer_mailbox,
             const std::string &vm_name,
             double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -224,7 +224,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceResumeVMRequestMessage::CloudComputeServiceResumeVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_Mailbox *answer_mailbox,
             const std::string &vm_name,
             double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -259,7 +259,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceDestroyVMRequestMessage::CloudComputeServiceDestroyVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_Mailbox *answer_mailbox,
             const std::string &vm_name,
             double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS

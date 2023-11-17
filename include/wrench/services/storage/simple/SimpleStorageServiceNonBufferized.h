@@ -54,7 +54,7 @@ namespace wrench {
             /** @brief destination disk */
             simgrid::s4u::Disk *dst_disk;
             /** @brief mailbox to report to */
-            simgrid::s4u::Mailbox *mailbox;
+            S4U_Mailbox *mailbox;
             /** @brief transfer size */
             double transfer_size;
             /** @brief SG IO op */
@@ -80,7 +80,7 @@ namespace wrench {
                     std::shared_ptr<FileLocation> dst_location,
                     simgrid::s4u::Host *dst_host,
                     simgrid::s4u::Disk *dst_disk,
-                    simgrid::s4u::Mailbox *mailbox,
+                    S4U_Mailbox *mailbox,
                     double transfer_size) : src_location(std::move(src_location)), src_host(src_host), src_disk(src_disk),
                                             dst_location(std::move(dst_location)), dst_host(dst_host), dst_disk(dst_disk),
                                             mailbox(mailbox), transfer_size(transfer_size), stream(nullptr) {
@@ -112,29 +112,29 @@ namespace wrench {
 
         bool processFileWriteRequest(std::shared_ptr<FileLocation> &location,
                                      double num_bytes_to_write,
-                                     simgrid::s4u::Mailbox *answer_mailbox,
+                                     S4U_Mailbox *answer_mailbox,
                                      simgrid::s4u::Host *requesting_host);
 
         bool
         processFileReadRequest(const std::shared_ptr<FileLocation> &location,
-                               double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox,
+                               double num_bytes_to_read, S4U_Mailbox *answer_mailbox,
                                simgrid::s4u::Host *requesting_host);
 
 
         bool processFileCopyRequest(
                 std::shared_ptr<FileLocation> &src,
                 std::shared_ptr<FileLocation> &dst,
-                simgrid::s4u::Mailbox *answer_mailbox);
+                S4U_Mailbox *answer_mailbox);
 
         bool processFileCopyRequestIAmTheSource(
                 std::shared_ptr<FileLocation> &src,
                 std::shared_ptr<FileLocation> &dst,
-                simgrid::s4u::Mailbox *answer_mailbox);
+                S4U_Mailbox *answer_mailbox);
 
         bool processFileCopyRequestIAmNotTheSource(
                 std::shared_ptr<FileLocation> &src,
                 std::shared_ptr<FileLocation> &dst,
-                simgrid::s4u::Mailbox *answer_mailbox);
+                S4U_Mailbox *answer_mailbox);
 
 
         void startPendingTransactions();

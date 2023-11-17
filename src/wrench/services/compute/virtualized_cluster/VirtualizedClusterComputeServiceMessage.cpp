@@ -31,7 +31,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     VirtualizedClusterComputeServiceMigrateVMRequestMessage::VirtualizedClusterComputeServiceMigrateVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_Mailbox *answer_mailbox,
             const std::string &vm_name,
             const std::string &dest_pm_hostname,
             double payload) : VirtualizedClusterComputeServiceMessage(payload) {

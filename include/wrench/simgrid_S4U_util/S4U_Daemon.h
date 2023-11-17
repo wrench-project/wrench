@@ -14,6 +14,7 @@
 
 #include <simgrid/s4u.hpp>
 #include <iostream>
+#include "S4U_Mailbox.h"
 
 //#define ACTOR_TRACKING_OUTPUT yes
 
@@ -43,20 +44,20 @@ namespace wrench {
         /**
          * @brief A convenient map between actors and their default receive mailboxes
          */
-        static std::unordered_map<aid_t, simgrid::s4u::Mailbox *> map_actor_to_recv_mailbox;
+        static std::unordered_map<aid_t, S4U_Mailbox *> map_actor_to_recv_mailbox;
 
         /** @brief The name of the daemon */
         std::string process_name;
 
         /** @brief The daemon's mailbox **/
-        simgrid::s4u::Mailbox *mailbox;
+        S4U_Mailbox *mailbox;
         /** @brief The daemon's receive mailbox (to send to another daemon so that that daemon can reply) **/
-        simgrid::s4u::Mailbox *recv_mailbox;
+        S4U_Mailbox *recv_mailbox;
 
         /** @brief The name of the host on which the daemon is running */
         std::string hostname;
 
-        static simgrid::s4u::Mailbox *getRunningActorRecvMailbox();
+        static S4U_Mailbox *getRunningActorRecvMailbox();
 
         S4U_Daemon(const std::string &hostname, const std::string &process_name_prefix);
 

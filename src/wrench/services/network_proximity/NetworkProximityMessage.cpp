@@ -26,7 +26,7 @@ namespace wrench {
      * @param hosts: the pair of hosts to look up
      * @param payload: the message size in bytes
      */
-    NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                                std::pair<std::string, std::string> hosts,
                                                                                double payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -105,7 +105,7 @@ namespace wrench {
      */
     NextContactDaemonAnswerMessage::NextContactDaemonAnswerMessage(std::string next_host_to_send,
                                                                    std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send,
-                                                                   simgrid::s4u::Mailbox *next_mailbox_to_send, double payload) : NetworkProximityMessage(payload) {
+                                                                   S4U_Mailbox *next_mailbox_to_send, double payload) : NetworkProximityMessage(payload) {
         this->next_host_to_send = std::move(next_host_to_send);
         this->next_daemon_to_send = std::move(next_daemon_to_send);
         this->next_mailbox_to_send = next_mailbox_to_send;
@@ -125,7 +125,7 @@ namespace wrench {
      * @param requested_host: the name of the host whose coordinates are being requested
      * @param payload: the message size in bytes
      */
-    CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                    std::string requested_host, double payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_mailbox == nullptr || requested_host.empty()) {
