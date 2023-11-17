@@ -239,7 +239,7 @@ namespace wrench {
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
 
-        void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
+        void processGetResourceInformation(S4U_Mailbox *answer_mailbox, const std::string &key);
 
         void processCompoundJobCompletion(const std::shared_ptr<BareMetalComputeServiceOneShot> &executor, const std::shared_ptr<CompoundJob> &job);
 
@@ -259,7 +259,7 @@ namespace wrench {
         void processCompoundJobTimeout(const std::shared_ptr<CompoundJob> &job);
 
         //process standard job termination request
-        void processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job, simgrid::s4u::Mailbox *answer_mailbox);
+        void processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job, S4U_Mailbox *answer_mailbox);
 
         // process a batch bach_job tiemout event
         void processAlarmJobTimeout(const std::shared_ptr<BatchJob> &batch_job);
@@ -274,14 +274,14 @@ namespace wrench {
         void sendCompoundJobFailureNotification(const std::shared_ptr<CompoundJob> &job, const std::string &job_id, const std::shared_ptr<FailureCause> &cause);
 
         // process a job submission
-        void processJobSubmission(const std::shared_ptr<BatchJob> &job, simgrid::s4u::Mailbox *answer_mailbox);
+        void processJobSubmission(const std::shared_ptr<BatchJob> &job, S4U_Mailbox *answer_mailbox);
 
         //start a job
         void startJob(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &, const std::shared_ptr<CompoundJob> &,
                       const std::shared_ptr<BatchJob> &, unsigned long, unsigned long, unsigned long);
 
         // process a resource request
-        void processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
+        void processIsThereAtLeastOneHostWithAvailableResources(S4U_Mailbox *answer_mailbox, unsigned long num_cores, double ram);
 
 #ifdef ENABLE_BATSCHED
         void processExecuteJobFromBatSched(const std::string &bat_sched_reply);

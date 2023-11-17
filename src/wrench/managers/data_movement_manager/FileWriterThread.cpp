@@ -29,7 +29,7 @@ namespace wrench {
      * @param location: the write location
      */
     FileWriterThread::FileWriterThread(std::string hostname,
-                                       simgrid::s4u::Mailbox *creator_mailbox,
+                                       S4U_Mailbox *creator_mailbox,
                                        std::shared_ptr<FileLocation> location) : Service(hostname, "file_writer_thread") {
         this->creator_mailbox = creator_mailbox;
         this->location = location;
@@ -49,7 +49,7 @@ namespace wrench {
         } catch (ExecutionException &e) {
             msg = new DataMovementManagerFileWriterThreadMessage(this->location, false, e.getCause());
         }
-        S4U_Mailbox::putMessage(this->creator_mailbox, msg);
+        this->creator_mailbox->putMessage(msg);
 
         return 0;
     }

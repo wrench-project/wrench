@@ -28,7 +28,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(S4U_Mailbox *answer_mailbox,
                                                                                      std::string job_args_to_scheduler,
                                                                                      double payload)
             : BatchComputeServiceMessage("BATCH_SIMULATION_BEGINS", payload) {
@@ -71,7 +71,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(S4U_Mailbox *answer_mailbox,
                                                                            std::string batsched_decision_reply,
                                                                            double payload)
         : BatchComputeServiceMessage(payload) {
@@ -154,7 +154,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                                std::shared_ptr<BatchJob> job, double payload)
         : BatchComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS

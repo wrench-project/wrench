@@ -50,7 +50,7 @@ namespace wrench {
             std::set<std::shared_ptr<ComputeService>> &compute_services,
             std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
             std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
-            simgrid::s4u::Mailbox *reply_mailbox)
+            S4U_Mailbox *reply_mailbox)
         : Service(hostname, "htcondor_negotiator"), reply_mailbox(reply_mailbox),
           compute_services(compute_services), running_jobs(running_jobs), pending_jobs(pending_jobs) {
         this->startup_overhead = startup_overhead;
@@ -141,8 +141,8 @@ namespace wrench {
 
         // Send the callback to the originator
         try {
-            S4U_Mailbox::putMessage(
-                    this->reply_mailbox, new NegotiatorCompletionMessage(
+            this->reply_mailbox->putMessage(
+                    new NegotiatorCompletionMessage(
                                                  scheduled_jobs, this->getMessagePayloadValue(
                                                                          HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &e) {

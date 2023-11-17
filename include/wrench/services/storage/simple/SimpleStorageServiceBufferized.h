@@ -80,28 +80,28 @@ namespace wrench {
 
         bool processFileWriteRequest(std::shared_ptr<FileLocation> &location,
                                      double num_bytes_to_write,
-                                     simgrid::s4u::Mailbox *answer_mailbox);
+                                     S4U_Mailbox *answer_mailbox);
 
         bool
         processFileReadRequest(const std::shared_ptr<FileLocation> &location,
-                               double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox);
+                               double num_bytes_to_read, S4U_Mailbox *answer_mailbox);
 
         bool processFileCopyRequest(
                 std::shared_ptr<FileLocation> &src,
                 std::shared_ptr<FileLocation> &dst,
-                simgrid::s4u::Mailbox *answer_mailbox);
+                S4U_Mailbox *answer_mailbox);
 
         bool processFileTransferThreadNotification(
                 const std::shared_ptr<FileTransferThread> &ftt,
-                simgrid::s4u::Mailbox *src_mailbox,
+                S4U_Mailbox *src_mailbox,
                 const std::shared_ptr<FileLocation> &src_location,
-                simgrid::s4u::Mailbox *dst_mailbox,
+                S4U_Mailbox *dst_mailbox,
                 const std::shared_ptr<FileLocation> &dst_location,
                 bool success,
                 std::shared_ptr<FailureCause> failure_cause,
-                simgrid::s4u::Mailbox *answer_mailbox_if_read,
-                simgrid::s4u::Mailbox *answer_mailbox_if_write,
-                simgrid::s4u::Mailbox *answer_mailbox_if_copy);
+                S4U_Mailbox *answer_mailbox_if_read,
+                S4U_Mailbox *answer_mailbox_if_write,
+                S4U_Mailbox *answer_mailbox_if_copy);
 
         void startPendingFileTransferThread();
 

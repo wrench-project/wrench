@@ -203,7 +203,7 @@ namespace wrench {
 
         void processActionDone(const std::shared_ptr<Action> &action);
 
-        void processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job, simgrid::s4u::Mailbox *answer_mailbox);
+        void processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job, S4U_Mailbox *answer_mailbox);
 
         bool processNextMessage();
 
@@ -213,13 +213,13 @@ namespace wrench {
         void terminateCurrentCompoundJob(const std::shared_ptr<CompoundJob> &job, ComputeService::TerminationCause termination_cause);
 
 
-        void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
+        void processGetResourceInformation(S4U_Mailbox *answer_mailbox, const std::string &key);
 
-        void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<CompoundJob> &job,
+        void processSubmitCompoundJob(S4U_Mailbox *answer_mailbox, const std::shared_ptr<CompoundJob> &job,
                                       std::map<std::string, std::string> &service_specific_arguments);
 
         void processIsThereAtLeastOneHostWithAvailableResources(
-                simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
+                S4U_Mailbox *answer_mailbox, unsigned long num_cores, double ram);
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 

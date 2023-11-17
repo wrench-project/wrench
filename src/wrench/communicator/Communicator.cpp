@@ -119,7 +119,7 @@ namespace wrench {
         std::vector<std::shared_ptr<S4U_PendingCommunication>> posted_sends;
         for (auto const &send_operation: sends) {
             auto dst_mailbox = this->rank_to_mailbox[send_operation.first];
-            posted_sends.push_back(S4U_Mailbox::iputMessage(dst_mailbox, new wrench::SimulationMessage(send_operation.second)));
+            posted_sends.push_back(dst_mailbox->iputMessage(new wrench::SimulationMessage(send_operation.second)));
         }
         // Post the computation (if any)
         simgrid::s4u::ExecPtr computation = nullptr;
@@ -129,7 +129,7 @@ namespace wrench {
 
         // Do all the synchronous receives
         for (int i = 0; i < num_receives; i++) {
-            S4U_Mailbox::getMessage(this->rank_to_mailbox[this->actor_to_rank[my_pid]]);
+            this->rank_to_mailbox[this->actor_to_rank[my_pid]]->getMessage();
         }
         // Wait for all the sends
         for (auto const &posted_send: posted_sends) {
@@ -241,7 +241,7 @@ namespace wrench {
             } else if (op_name == "Barrier") {
                 SMPIExecutor::performBarrier(hosts);
             } else {
-                throw std::runtime_error("Communicator::performSMPIOperation(): Internal error - unknown oprations");
+                throw std::runtime_error("Communicator::performSMPIOperation(): Internal error - unknown operation");
             }
 
             // Resume everyone

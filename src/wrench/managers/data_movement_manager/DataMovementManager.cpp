@@ -36,7 +36,7 @@ namespace wrench {
      * @param hostname: the hostname on which the data movement manager is to run
      * @param creator_mailbox: the mailbox of the manager's creator
      */
-    DataMovementManager::DataMovementManager(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox) : Service(hostname, "data_movement_manager") {
+    DataMovementManager::DataMovementManager(std::string hostname, S4U_Mailbox *creator_mailbox) : Service(hostname, "data_movement_manager") {
         this->creator_mailbox = creator_mailbox;
     }
 
@@ -54,7 +54,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void DataMovementManager::stop() {
-        S4U_Mailbox::putMessage(this->mailbox, new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
+        this->mailbox->putMessage(new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**
@@ -225,7 +225,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
+            message = this->mailbox->getMessage();
         } catch (ExecutionException &e) {
             WRENCH_INFO("Oops... somebody tried to send a message, but that failed...");
             return true;
@@ -269,7 +269,7 @@ namespace wrench {
             }
 
             // Replay
-            S4U_Mailbox::dputMessage(this->creator_mailbox,
+            this->creator_mailbox->dputMessage(
                                      new DataManagerFileCopyAnswerMessage(msg->src,
                                                                           msg->dst,
                                                                           msg->success,
@@ -289,7 +289,7 @@ namespace wrench {
             }
 
             // Forward it back
-            S4U_Mailbox::dputMessage(this->creator_mailbox,
+            this->creator_mailbox->dputMessage(
                                      new DataManagerFileReadAnswerMessage(msg->location,
                                                                           msg->num_bytes,
                                                                           msg->success,
@@ -322,7 +322,7 @@ namespace wrench {
             }
 
             // Forward it back
-            S4U_Mailbox::dputMessage(this->creator_mailbox,
+            this->creator_mailbox->dputMessage(
                                      new DataManagerFileWriteAnswerMessage(msg->location,
                                                                            msg->success,
                                                                            std::move(msg->failure_cause)));

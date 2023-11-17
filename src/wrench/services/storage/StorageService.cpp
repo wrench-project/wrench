@@ -104,7 +104,7 @@ namespace wrench {
      *
      * @throw ExecutionException
      */
-    void StorageService::writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+    void StorageService::writeFile(S4U_Mailbox *answer_mailbox,
                                    const std::shared_ptr<FileLocation> &location,
                                    double num_bytes_to_write,
                                    bool wait_for_answer) {
@@ -115,7 +115,7 @@ namespace wrench {
 
         this->assertServiceIsUp();
 
-        S4U_Mailbox::putMessage(this->mailbox,
+        this->mailbox->putMessage(
                                 new StorageServiceFileWriteRequestMessage(
                                         answer_mailbox,
                                         simgrid::s4u::this_actor::get_host(),
@@ -127,7 +127,7 @@ namespace wrench {
         // Wait for a reply
 
         {
-            auto msg = S4U_Mailbox::getMessage<StorageServiceFileWriteAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::writeFile(): Received a totally");
+            auto msg = answer_mailbox->getMessage<StorageServiceFileWriteAnswerMessage>(this->network_timeout, "StorageService::writeFile(): Received a totally");
 
             if (not msg->success) {
                 throw ExecutionException(msg->failure_cause);
@@ -138,7 +138,7 @@ namespace wrench {
 
             if (buffer_size < 1) {
                 // just wait for the final ack (no timeout!)
-                S4U_Mailbox::getMessage<StorageServiceAckMessage>(answer_mailbox, "StorageService::writeFile(): Received an");
+                answer_mailbox->getMessage<StorageServiceAckMessage>("StorageService::writeFile(): Received an");
 
 
             } else {
@@ -147,16 +147,16 @@ namespace wrench {
                     // Bufferized
                     double remaining = dwmb.second;
                     while (remaining - buffer_size > DBL_EPSILON) {
-                        S4U_Mailbox::putMessage(dwmb.first,
+                        dwmb.first->putMessage(
                                                 new StorageServiceFileContentChunkMessage(
                                                         file, buffer_size, false));
                         remaining -= buffer_size;
                     }
-                    S4U_Mailbox::putMessage(dwmb.first, new StorageServiceFileContentChunkMessage(
+                    dwmb.first->putMessage(new StorageServiceFileContentChunkMessage(
                                                                 file, remaining, true));
 
                     //Waiting for the final ack
-                    S4U_Mailbox::getMessage<StorageServiceAckMessage>(answer_mailbox, "StorageService::writeFile(): Received an");
+                    answer_mailbox->getMessage<StorageServiceAckMessage>("StorageService::writeFile(): Received an");
                 }
             }
         }
@@ -194,14 +194,14 @@ namespace wrench {
 
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-        S4U_Mailbox::putMessage(this->mailbox, new StorageServiceFreeSpaceRequestMessage(
+        this->mailbox->putMessage(new StorageServiceFreeSpaceRequestMessage(
                                                        answer_mailbox,
                                                        path,
                                                        this->getMessagePayloadValue(
                                                                StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
-        auto msg = S4U_Mailbox::getMessage<StorageServiceFreeSpaceAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::getTotalFreeSpaceAtPath() Received an");
+        auto msg = answer_mailbox->getMessage<StorageServiceFreeSpaceAnswerMessage>(this->network_timeout, "StorageService::getTotalFreeSpaceAtPath() Received an");
 
         return msg->free_space;
     }
@@ -214,7 +214,7 @@ namespace wrench {
      *
      * @return true if the file is present, false otherwise
      */
-    bool StorageService::lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
+    bool StorageService::lookupFile(S4U_Mailbox *answer_mailbox,
                                     const std::shared_ptr<FileLocation> &location) {
 
         if (!answer_mailbox or !location) {
@@ -224,8 +224,7 @@ namespace wrench {
         assertServiceIsUp(this->shared_from_this());
 
         // Send a message to the daemon
-        S4U_Mailbox::putMessage(
-                this->mailbox,
+        this->mailbox->putMessage(
                 new StorageServiceFileLookupRequestMessage(
                         answer_mailbox,
                         location,
@@ -233,7 +232,7 @@ namespace wrench {
                                 StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
-        auto msg = S4U_Mailbox::getMessage<StorageServiceFileLookupAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::lookupFile():");
+        auto msg = answer_mailbox->getMessage<StorageServiceFileLookupAnswerMessage>(this->network_timeout, "StorageService::lookupFile():");
 
         return msg->file_is_available;
     }
@@ -247,7 +246,7 @@ namespace wrench {
      * @param num_bytes: the number of bytes to read
      * @param wait_for_answer: whether to wait for the answer
      */
-    void StorageService::readFile(simgrid::s4u::Mailbox *answer_mailbox,
+    void StorageService::readFile(S4U_Mailbox *answer_mailbox,
                                   const std::shared_ptr<FileLocation> &location,
                                   double num_bytes,
                                   bool wait_for_answer) {
@@ -258,7 +257,7 @@ namespace wrench {
 
         assertServiceIsUp(this->shared_from_this());
 
-        S4U_Mailbox::putMessage(this->mailbox,
+        this->mailbox->putMessage(
                                 new StorageServiceFileReadRequestMessage(
                                         answer_mailbox,
                                         simgrid::s4u::this_actor::get_host(),
@@ -269,7 +268,7 @@ namespace wrench {
 
         if (wait_for_answer) {
             // Wait for a reply
-            auto msg = S4U_Mailbox::getMessage<StorageServiceFileReadAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::readFile(): Received an");
+            auto msg = answer_mailbox->getMessage<StorageServiceFileReadAnswerMessage>(this->network_timeout, "StorageService::readFile(): Received an");
 
             // If it's not a success, throw an exception
             if (not msg->success) {
@@ -280,7 +279,7 @@ namespace wrench {
             if (msg->buffer_size < 1) {
                 // Non-Bufferized
                 // Just wait for the final ack (no timeout!)
-                S4U_Mailbox::getMessage<StorageServiceAckMessage>(answer_mailbox, "StorageService::readFile(): Received an");
+                answer_mailbox->getMessage<StorageServiceAckMessage>("StorageService::readFile(): Received an");
             } else {
                 unsigned long number_of_sources = msg->number_of_sources;
 
@@ -290,7 +289,7 @@ namespace wrench {
                 while (true) {
                     std::shared_ptr<StorageServiceFileContentChunkMessage> file_content_chunk_msg = nullptr;
                     try {
-                        file_content_chunk_msg = S4U_Mailbox::getMessage<StorageServiceFileContentChunkMessage>(msg->mailbox_to_receive_the_file_content, "StorageService::readFile(): Received an");
+                        file_content_chunk_msg = msg->mailbox_to_receive_the_file_content->getMessage<StorageServiceFileContentChunkMessage>("StorageService::readFile(): Received an");
                     } catch (...) {
                         S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
                         throw;
@@ -307,7 +306,7 @@ namespace wrench {
 
                 //Waiting for all the final acks
                 for (unsigned long source = 0; source < number_of_sources; source++) {
-                    S4U_Mailbox::getMessage<StorageServiceAckMessage>(answer_mailbox, this->network_timeout, "StorageService::readFile(): Received an");
+                    answer_mailbox->getMessage<StorageServiceAckMessage>(this->network_timeout, "StorageService::readFile(): Received an");
                 }
 
                 S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
@@ -393,7 +392,7 @@ namespace wrench {
      * @param location: the location to delete
      * @param wait_for_answer: whether this call should
      */
-    void StorageService::deleteFile(simgrid::s4u::Mailbox *answer_mailbox,
+    void StorageService::deleteFile(S4U_Mailbox *answer_mailbox,
                                     const std::shared_ptr<FileLocation> &location,
                                     bool wait_for_answer) {
         if (!answer_mailbox or !location) {
@@ -407,7 +406,7 @@ namespace wrench {
         assertServiceIsUp(this->shared_from_this());
 
         // Send a message to the storage service's daemon
-        S4U_Mailbox::putMessage(this->mailbox,
+        this->mailbox->putMessage(
                                 new StorageServiceFileDeleteRequestMessage(
                                         answer_mailbox,
                                         location,
@@ -418,7 +417,7 @@ namespace wrench {
             // Wait for a reply
             std::unique_ptr<SimulationMessage> message = nullptr;
 
-            auto msg = S4U_Mailbox::getMessage<StorageServiceFileDeleteAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::deleteFile():");
+            auto msg = answer_mailbox->getMessage<StorageServiceFileDeleteAnswerMessage>(this->network_timeout, "StorageService::deleteFile():");
             // On failure, throw an exception
             if (!msg->success) {
                 throw ExecutionException(std::move(msg->failure_cause));
@@ -463,7 +462,7 @@ namespace wrench {
         //            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
         //        }
 
-        simgrid::s4u::Mailbox *mailbox_to_contact;
+        S4U_Mailbox *mailbox_to_contact;
         if (dst_is_non_bufferized) {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
         } else if (src_is_non_bufferized) {
@@ -478,8 +477,7 @@ namespace wrench {
         src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
                                                                                              src_location,
                                                                                              dst_location);
-        S4U_Mailbox::putMessage(
-                mailbox_to_contact,
+        mailbox_to_contact->putMessage(
                 new StorageServiceFileCopyRequestMessage(
                         answer_mailbox,
                         src_location,
@@ -491,7 +489,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
 
-        auto msg = S4U_Mailbox::getMessage<StorageServiceFileCopyAnswerMessage>(answer_mailbox);
+        auto msg = answer_mailbox->getMessage<StorageServiceFileCopyAnswerMessage>();
 
         if (msg->failure_cause) {
             WRENCH_DEBUG("%s", msg->failure_cause->toString().c_str());
@@ -510,7 +508,7 @@ namespace wrench {
      * @throw std::invalid_argument
      *
      */
-    void StorageService::initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox,
+    void StorageService::initiateFileCopy(S4U_Mailbox *answer_mailbox,
                                           const std::shared_ptr<FileLocation> &src_location,
                                           const std::shared_ptr<FileLocation> &dst_location) {
         if ((src_location == nullptr) || (dst_location == nullptr)) {
@@ -533,7 +531,7 @@ namespace wrench {
         //            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
         //        }
 
-        simgrid::s4u::Mailbox *mailbox_to_contact;
+        S4U_Mailbox *mailbox_to_contact;
         if (dst_is_non_bufferized) {
             mailbox_to_contact = dst_location->getStorageService()->mailbox;
         } else if (src_is_non_bufferized) {
@@ -547,8 +545,7 @@ namespace wrench {
                                                                                              dst_location);
 
         // Send a message to the daemon on the dst location
-        S4U_Mailbox::putMessage(
-                mailbox_to_contact,
+        mailbox_to_contact->putMessage(
                 new StorageServiceFileCopyRequestMessage(
                         answer_mailbox,
                         src_location,

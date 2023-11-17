@@ -27,7 +27,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    CompoundStorageAllocationRequestMessage::CompoundStorageAllocationRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    CompoundStorageAllocationRequestMessage::CompoundStorageAllocationRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                                      std::shared_ptr<DataFile> file, double payload)
         : CompoundStorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -61,7 +61,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    CompoundStorageLookupRequestMessage::CompoundStorageLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    CompoundStorageLookupRequestMessage::CompoundStorageLookupRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                              std::shared_ptr<DataFile> file, double payload)
         : CompoundStorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS

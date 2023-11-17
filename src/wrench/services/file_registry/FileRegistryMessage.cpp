@@ -27,7 +27,7 @@ namespace wrench {
      * @param file: the file to look up
      * @param payload: the message size in bytes
      */
-    FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                                const std::shared_ptr<DataFile> &file, double payload) : FileRegistryMessage(payload), answer_mailbox(answer_mailbox), file(file) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || file == nullptr) {
@@ -62,7 +62,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file, std::string reference_host,
+            S4U_Mailbox *answer_mailbox, std::shared_ptr<DataFile> file, std::string reference_host,
             std::shared_ptr<NetworkProximityService> network_proximity_service, double payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (answer_mailbox == nullptr) || (reference_host == "") ||
@@ -105,7 +105,7 @@ namespace wrench {
      * @param location: the file location of that entry
      * @param payload: the message size in bytes
      */
-    FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                                  std::shared_ptr<FileLocation> location,
                                                                                  double payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -135,7 +135,7 @@ namespace wrench {
      * @param location: the location for the new entry
      * @param payload: the message size in bytes
      */
-    FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(S4U_Mailbox *answer_mailbox,
                                                                            std::shared_ptr<FileLocation> location,
                                                                            double payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS

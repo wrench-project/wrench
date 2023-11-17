@@ -47,7 +47,7 @@ namespace wrench {
 
         // Create the mailbox pool
         S4U_Mailbox::createMailboxPool(S4U_Mailbox::mailbox_pool_size);
-        S4U_Mailbox::NULL_MAILBOX = simgrid::s4u::Mailbox::by_name("NULL_MAILBOX");
+        S4U_Mailbox::NULL_MAILBOX = new S4U_Mailbox();
         this->initialized = true;
 
         //        sg_storage_file_system_init();

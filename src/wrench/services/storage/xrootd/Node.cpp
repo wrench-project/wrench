@@ -127,7 +127,7 @@ namespace wrench {
 
             S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::MESSAGE_OVERHEAD));
             try {
-                message = S4U_Mailbox::getMessage(this->mailbox);
+                message = this->mailbox->getMessage();
             } catch (ExecutionException &e) {
                 WRENCH_INFO(
                         "Got a network error while getting some message... ignoring");
@@ -144,7 +144,7 @@ namespace wrench {
                         WRENCH_DEBUG("File %s found in cache", msg->file->getID().c_str());
 
                         auto cached = getCached(msg->file);
-                        S4U_Mailbox::dputMessage(supervisor->mailbox,
+                        supervisor->mailbox->dputMessage(
                                                  new UpdateCacheMessage(
                                                          msg->answer_mailbox,
                                                          msg->original,
@@ -169,7 +169,7 @@ namespace wrench {
                                         internalStorage->hasFile(msg->file)) {
                                         //File in internal storage
                                         cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
-                                        S4U_Mailbox::dputMessage(supervisor->mailbox,
+                                        supervisor->mailbox->dputMessage(
                                                                  new UpdateCacheMessage(
                                                                          msg->answer_mailbox,
                                                                          msg->original,
@@ -181,7 +181,7 @@ namespace wrench {
                                                                          msg->answered));
                                     }
                                 } else {
-                                    S4U_Mailbox::dputMessage(entry.first->mailbox,
+                                    entry.first->mailbox->dputMessage(
                                                              new AdvancedContinueSearchMessage(
                                                                      msg,
                                                                      entry.second));
@@ -193,7 +193,7 @@ namespace wrench {
                             internalStorage->hasFile(msg->file)) {
                             //File in internal storage
                             cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
-                            S4U_Mailbox::dputMessage(supervisor->mailbox,
+                            supervisor->mailbox->dputMessage(
                                                      new UpdateCacheMessage(
                                                              msg->answer_mailbox,
                                                              msg->original,
@@ -225,7 +225,7 @@ namespace wrench {
                                 this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                         for (auto const &entry: splitStacks) {
                             if (entry.first != this) {
-                                S4U_Mailbox::dputMessage(entry.first->mailbox,
+                                entry.first->mailbox->dputMessage(
                                                          new AdvancedRippleDelete(
                                                                  msg,
                                                                  entry.second));
@@ -237,7 +237,7 @@ namespace wrench {
             }
             if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {//handle all the rest of the messages
                 try {
-                    S4U_Mailbox::dputMessage(msg->ack_mailbox,
+                    msg->ack_mailbox->dputMessage(
                                              new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                      ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
                 } catch (ExecutionException &e) {
@@ -253,7 +253,7 @@ namespace wrench {
                     // WRENCH_INFO("%p %p",msg,msg->answered.get());
                     if (msg->fileReadRequest) {
 
-                        S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                        msg->answer_mailbox->dputMessage(
                                                  new StorageServiceFileReadAnswerMessage(
                                                          FileLocation::LOCATION(getSharedPtr<Node>(), msg->file),
                                                          false,
@@ -265,7 +265,7 @@ namespace wrench {
                                                          getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
 
                     } else {
-                        S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                        msg->answer_mailbox->dputMessage(
                                                  new StorageServiceFileLookupAnswerMessage(
                                                          msg->file,
                                                          false,
@@ -281,7 +281,7 @@ namespace wrench {
                     auto cacheCopies = getCached(file);
                     shared_ptr<FileLocation> best = selectBest(cacheCopies);
 
-                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                    msg->answer_mailbox->dputMessage(
                                              new StorageServiceFileLookupAnswerMessage(
                                                      file,
                                                      true,
@@ -290,7 +290,7 @@ namespace wrench {
                 } else {//File Not Cached
                     if (internalStorage && internalStorage->hasFile(file)) {
 
-                        S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                        msg->answer_mailbox->dputMessage(
                                                  new StorageServiceFileLookupAnswerMessage(
                                                          file,
                                                          true,
@@ -317,7 +317,7 @@ namespace wrench {
                                         //we shouldn't have to worry about this, it should have been handled earlier.
                                         // But just in case, I don't want a rogue search going who knows where
                                     } else {
-                                        S4U_Mailbox::dputMessage(entry.first->mailbox,
+                                        entry.first->mailbox->dputMessage(
                                                                  new AdvancedContinueSearchMessage(
                                                                          msg->answer_mailbox,
                                                                          nullptr,
@@ -335,7 +335,7 @@ namespace wrench {
 
 
                                 for (auto child: children) {
-                                    S4U_Mailbox::dputMessage(child->mailbox,
+                                    child->mailbox->dputMessage(
                                                              new ContinueSearchMessage(
                                                                      msg->answer_mailbox,
                                                                      nullptr,
@@ -348,7 +348,7 @@ namespace wrench {
                                 }
                             }
                         } else {
-                            S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                            msg->answer_mailbox->dputMessage(
                                                      new StorageServiceFileLookupAnswerMessage(
                                                              file,
                                                              false,
@@ -370,7 +370,7 @@ namespace wrench {
                     auto cacheCopies = getCached(file);
                     auto best = selectBest(cacheCopies);
 
-                    S4U_Mailbox::dputMessage(best->getStorageService()->mailbox,
+                    best->getStorageService()->mailbox->dputMessage(
                                              new StorageServiceFileReadRequestMessage(
                                                      msg->answer_mailbox,
                                                      simgrid::s4u::this_actor::get_host(),
@@ -385,7 +385,7 @@ namespace wrench {
                         WRENCH_DEBUG("File %s found in internal Storage", file->getID().c_str());
                         //File in internal storage
                         cache.add(file, FileLocation::LOCATION(internalStorage, file));
-                        S4U_Mailbox::dputMessage(internalStorage->mailbox,
+                        internalStorage->mailbox->dputMessage(
                                                  new StorageServiceFileReadRequestMessage(
                                                          msg->answer_mailbox,
                                                          simgrid::s4u::this_actor::get_host(),
@@ -417,7 +417,7 @@ namespace wrench {
                                         //we shouldn't have to worry about this, it should have been handled earlier.
                                         // But just in case, I don't want a rogue search going who knows where
                                     } else {
-                                        S4U_Mailbox::dputMessage(entry.first->mailbox,
+                                        entry.first->mailbox->dputMessage(
                                                                  new AdvancedContinueSearchMessage(
                                                                          msg->answer_mailbox,
                                                                          make_shared<StorageServiceFileReadRequestMessage>(msg),
@@ -433,7 +433,7 @@ namespace wrench {
                             } else {//shotgun continued search message to all children
                                 WRENCH_DEBUG("Starting basic search for %s", file->getID().c_str());
                                 for (auto child: children) {
-                                    S4U_Mailbox::dputMessage(child->mailbox,
+                                    child->mailbox->dputMessage(
                                                              new ContinueSearchMessage(
                                                                      msg->answer_mailbox,
                                                                      make_shared<StorageServiceFileReadRequestMessage>(
@@ -447,8 +447,7 @@ namespace wrench {
                                 }
                             }
                         } else {// you asked a leaf directly and it didn't have the file
-                            S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                                     new StorageServiceFileReadAnswerMessage(
+                            msg->answer_mailbox->dputMessage(new StorageServiceFileReadAnswerMessage(
                                                              FileLocation::LOCATION(internalStorage, file),
                                                              false,
                                                              std::shared_ptr<FailureCause>(
@@ -470,8 +469,7 @@ namespace wrench {
                 if (cached(msg->file)) {//File Cached
                     WRENCH_DEBUG("Found %s in cache", msg->file->getID().c_str());
                     auto cached = getCached(msg->file);
-                    S4U_Mailbox::dputMessage(supervisor->mailbox,
-                                             new UpdateCacheMessage(
+                    supervisor->mailbox->dputMessage(new UpdateCacheMessage(
                                                      msg->answer_mailbox,
                                                      msg->original,
                                                      msg->node,
@@ -487,7 +485,7 @@ namespace wrench {
                         WRENCH_DEBUG("Found %s in internal storage", msg->file->getID().c_str());
                         //File in internal storage
                         cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
-                        S4U_Mailbox::dputMessage(supervisor->mailbox,
+                        supervisor->mailbox->dputMessage(
                                                  new UpdateCacheMessage(
                                                          msg->answer_mailbox,
                                                          msg->original,
@@ -505,7 +503,7 @@ namespace wrench {
                             S4U_Simulation::compute(
                                     this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                             for (auto child: children) {
-                                S4U_Mailbox::dputMessage(child->mailbox,
+                                child->mailbox->dputMessage(
                                                          new ContinueSearchMessage(msg));
                             }
                         } else {
@@ -520,7 +518,7 @@ namespace wrench {
                 cache.add(msg->file, msg->locations);
                 if (this != msg->node && supervisor) {
                     WRENCH_DEBUG("Forward update to super");
-                    S4U_Mailbox::dputMessage(supervisor->mailbox, new UpdateCacheMessage(msg));
+                    supervisor->mailbox->dputMessage(new UpdateCacheMessage(msg));
                 } else {
                     WRENCH_DEBUG("Update has reached top of subtree");
                     if (!*msg->answered) {
@@ -532,7 +530,7 @@ namespace wrench {
                         if (msg->original) {//this was a file read
                             shared_ptr<FileLocation> best = selectBest(cacheCopies);
                             //msg->original->location=best;
-                            S4U_Mailbox::dputMessage(best->getStorageService()->mailbox,
+                            best->getStorageService()->mailbox->dputMessage(
                                                      new StorageServiceFileReadRequestMessage(
                                                              msg->answer_mailbox,
                                                              simgrid::s4u::this_actor::get_host(),
@@ -541,7 +539,7 @@ namespace wrench {
                                                              getMessagePayloadValue(
                                                                      MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
                         } else {//this was a file lookup
-                            S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                            msg->answer_mailbox->dputMessage(
                                                      new StorageServiceFileLookupAnswerMessage(
                                                              msg->file,
                                                              true,//xrootd silently fails if the file doesn't exist, so if we have gotten here, the file does for sure exist
@@ -566,14 +564,14 @@ namespace wrench {
                             //we shouldn't have to worry about this, it should have been handled earlier.
                             // But just in case, I don't want a rogue search going who knows where
                         } else {
-                            S4U_Mailbox::dputMessage(entry.first->mailbox,
+                            entry.first->mailbox->dputMessage(
                                                      new AdvancedRippleDelete(
                                                              msg,
                                                              metavisor->defaultTimeToLive,
                                                              entry.second));
                         }
                     }
-                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                    msg->answer_mailbox->dputMessage(
                                              new StorageServiceFileDeleteAnswerMessage(
                                                      msg->location->getFile(),
                                                      getSharedPtr<Node>(),
@@ -583,10 +581,10 @@ namespace wrench {
 
                     );
                 } else {
-                    S4U_Mailbox::dputMessage(this->mailbox, new RippleDelete(msg, metavisor->defaultTimeToLive));
+                    this->mailbox->dputMessage(new RippleDelete(msg, metavisor->defaultTimeToLive));
 
 
-                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                    msg->answer_mailbox->dputMessage(
                                              new StorageServiceFileDeleteAnswerMessage(
                                                      msg->location->getFile(),
                                                      this->getSharedPtr<Node>(),
@@ -617,7 +615,7 @@ namespace wrench {
                     shared_ptr<bool> answered = make_shared<bool>(false);
 
                     for (auto child: children) {
-                        S4U_Mailbox::dputMessage(child->mailbox, new RippleDelete(msg));
+                        child->mailbox->dputMessage(new RippleDelete(msg));
                     }
                 }
             } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
@@ -626,7 +624,7 @@ namespace wrench {
                     // Reply this is not allowed
                     std::string error_message = "Cannot write file at non-storage XRootD node";
                     auto location = FileLocation::LOCATION(this->getSharedPtr<Node>(), file);
-                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                    msg->answer_mailbox->dputMessage(
                                              new StorageServiceFileWriteAnswerMessage(
                                                      location,
                                                      false,
@@ -641,7 +639,7 @@ namespace wrench {
                     msg->location = FileLocation::LOCATION(internalStorage, file);
                     //                    msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
                     //                            SimpleStorageServiceProperty::BUFFER_SIZE);
-                    S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
+                    internalStorage->mailbox->dputMessage(message.release());
                 }
 
             } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
@@ -651,7 +649,7 @@ namespace wrench {
                     if (msg->answer_mailbox) {
                         std::string error_message = "Cannot copy file to/from non-storage XRooD node";
                         auto location = FileLocation::LOCATION(getSharedPtr<Node>(), file);
-                        S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                        msg->answer_mailbox->dputMessage(
                                                  new StorageServiceFileCopyAnswerMessage(
                                                          msg->src,
                                                          msg->dst,
@@ -664,7 +662,7 @@ namespace wrench {
                 } else {
                     // Forward the message
                     msg->dst = FileLocation::LOCATION(internalStorage, file);
-                    S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
+                    internalStorage->mailbox->dputMessage(message.release());
                 }
 
             } else if (auto msg = dynamic_cast<StorageServiceMessage *>(message.get())) {//we got a message targeted at a normal storage server
@@ -674,7 +672,7 @@ namespace wrench {
                     throw std::runtime_error("Non-Storage XRooD node received a message it cannot process - internal error");
                 } else {
                     // Forwarding the message as-is to the internal Storage
-                    S4U_Mailbox::dputMessage(internalStorage->mailbox, message.release());
+                    internalStorage->mailbox->dputMessage(message.release());
                 }
             } else {
                 throw std::runtime_error(
@@ -951,7 +949,7 @@ namespace wrench {
         *
         * @throw std::invalid_argument
         */
-        void Node::writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+        void Node::writeFile(S4U_Mailbox *answer_mailbox,
                              const std::shared_ptr<FileLocation> &location,
                              double num_bytes_to_write,
                              bool wait_for_answer) {
