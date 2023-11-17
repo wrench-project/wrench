@@ -53,7 +53,6 @@ namespace wrench {
         } catch (const std::ifstream::failure &e) {
             throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid Json file");
         }
-
     }
 
     /**
