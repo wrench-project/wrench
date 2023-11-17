@@ -119,15 +119,15 @@ namespace wrench {
          */
 
         static std::shared_ptr<Workflow> createWorkflowFromJSONString(const std::string &json_string,
-                                                                const std::string &reference_flop_rate,
-                                                                bool ignore_machine_specs = false,
-                                                                bool redundant_dependencies = false,
-                                                                bool ignore_cycle_creating_dependencies = false,
-                                                                unsigned long min_cores_per_task = 1,
-                                                                unsigned long max_cores_per_task = 1,
-                                                                bool enforce_num_cores = false,
-                                                                bool ignore_avg_cpu = false,
-                                                                bool show_warnings = false);
+                                                                      const std::string &reference_flop_rate,
+                                                                      bool ignore_machine_specs = false,
+                                                                      bool redundant_dependencies = false,
+                                                                      bool ignore_cycle_creating_dependencies = false,
+                                                                      unsigned long min_cores_per_task = 1,
+                                                                      unsigned long max_cores_per_task = 1,
+                                                                      bool enforce_num_cores = false,
+                                                                      bool ignore_avg_cpu = false,
+                                                                      bool show_warnings = false);
     };
 
 }// namespace wrench
