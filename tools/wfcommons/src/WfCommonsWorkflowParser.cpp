@@ -339,7 +339,6 @@ namespace wrench {
                 }
             }
         }
-        file.close();
         workflow->enableTopBottomLevelDynamicUpdates(true);
         workflow->updateAllTopBottomLevels();
 
