@@ -79,14 +79,14 @@ namespace wrench {
         // Send back the relevant ack if this was a read
         if (transaction->dst_location == nullptr) {
             //            WRENCH_INFO("Sending back an ack for a successful file read");
-            S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage(transaction->src_location));
+            transaction->mailbox->dputMessage(new StorageServiceAckMessage(transaction->src_location));
         } else if (transaction->src_location == nullptr) {
             StorageService::createFileAtLocation(transaction->dst_location);
             WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // Maybe no corresponding timestamp.
             //            WRENCH_INFO("Sending back an ack for a successful file read");
-            S4U_Mailbox::dputMessage(transaction->mailbox, new StorageServiceAckMessage(transaction->dst_location));
+            transaction->mailbox->dputMessage(new StorageServiceAckMessage(transaction->dst_location));
         } else {
             if (transaction->dst_location->getStorageService() == shared_from_this()) {
                 this->createFile(transaction->dst_location);
@@ -99,8 +99,7 @@ namespace wrench {
             }
 
             //            WRENCH_INFO("Sending back an ack for a file copy");
-            S4U_Mailbox::dputMessage(
-                    transaction->mailbox,
+            transaction->mailbox->dputMessage(
                     new StorageServiceFileCopyAnswerMessage(
                             transaction->src_location,
                             transaction->dst_location,
@@ -171,7 +170,7 @@ namespace wrench {
 
         /** Main loop **/
         bool comm_ptr_has_been_posted = false;
-        simgrid::s4u::CommPtr comm_ptr;
+        std::shared_ptr<S4U_PendingCommunication> comm_ptr;
         std::unique_ptr<SimulationMessage> simulation_message;
         while (true) {
 
@@ -182,8 +181,9 @@ namespace wrench {
             // Create an async recv if needed
             if (not comm_ptr_has_been_posted) {
                 try {
-                    comm_ptr = this->mailbox->get_async<void>((void **) (&(simulation_message)));
-                } catch (simgrid::NetworkFailureException &e) {
+                    auto comm_ptr = this->mailbox->igetMessage();
+//                    comm_ptr = this->mailbox->get_async<void>((void **) (&(simulation_message)));
+                } catch (wrench::ExecutionException &e) {
                     // oh well
                     continue;
                 }
@@ -199,7 +199,7 @@ namespace wrench {
             }
 #else
             simgrid::s4u::ActivitySet pending_activities;
-            pending_activities.push(comm_ptr);
+            pending_activities.push(comm_ptr->comm_ptr);
             for (auto const &transaction: this->running_transactions) {
                 pending_activities.push(transaction->stream);
             }
@@ -235,7 +235,7 @@ namespace wrench {
                 finished_activity = pending_activities.wait_any();
             } catch (simgrid::Exception &e) {
                 auto failed_activity = pending_activities.get_failed_activity();
-                if (failed_activity == comm_ptr) {
+                if (failed_activity == comm_ptr->comm_ptr) {
                     // the comm failed
                     comm_ptr_has_been_posted = false;
                     continue;// oh well
@@ -249,7 +249,7 @@ namespace wrench {
             }
 #endif
 
-            if (finished_activity == comm_ptr) {
+            if (finished_activity == comm_ptr->comm_ptr) {
                 comm_ptr_has_been_posted = false;
                 if (not processNextMessage(simulation_message.get())) break;
             } else {
@@ -318,7 +318,7 @@ namespace wrench {
      */
     bool SimpleStorageServiceNonBufferized::processFileWriteRequest(std::shared_ptr<FileLocation> &location,
                                                                     double num_bytes_to_write,
-                                                                    simgrid::s4u::Mailbox *answer_mailbox,
+                                                                    S4U_Mailbox *answer_mailbox,
                                                                     simgrid::s4u::Host *requesting_host) {
 
         if (buffer_size >= 1.0) {
@@ -356,8 +356,7 @@ namespace wrench {
 
         if (failure_cause) {
             try {
-                S4U_Mailbox::dputMessage(
-                        answer_mailbox,
+                answer_mailbox->dputMessage(
                         new StorageServiceFileWriteAnswerMessage(
                                 location,
                                 false,
@@ -381,8 +380,7 @@ namespace wrench {
         }
 
         // Reply with a "go ahead, send me the file" message
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
+        answer_mailbox->dputMessage(
                 new StorageServiceFileWriteAnswerMessage(
                         location,
                         true,
@@ -424,7 +422,7 @@ namespace wrench {
     bool SimpleStorageServiceNonBufferized::processFileReadRequest(
             const std::shared_ptr<FileLocation> &location,
             double num_bytes_to_read,
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_Mailbox *answer_mailbox,
             simgrid::s4u::Host *requesting_host) {
 
         // Figure out whether this succeeds or not
@@ -454,8 +452,7 @@ namespace wrench {
         // If a success, create the chunk_receiving mailbox
 
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
+        answer_mailbox->dputMessage(
                 new StorageServiceFileReadAnswerMessage(
                         location,
                         success,
@@ -505,7 +502,7 @@ namespace wrench {
     bool SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(
             std::shared_ptr<FileLocation> &src_location,
             std::shared_ptr<FileLocation> &dst_location,
-            simgrid::s4u::Mailbox *answer_mailbox) {
+            S4U_Mailbox *answer_mailbox) {
 
         WRENCH_INFO("FileCopyRequest: %s -> %s",
                     src_location->toString().c_str(),
@@ -549,8 +546,7 @@ namespace wrench {
         if (failure_cause) {
             this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
             try {
-                S4U_Mailbox::putMessage(
-                        answer_mailbox,
+                answer_mailbox->putMessage(
                         new StorageServiceFileCopyAnswerMessage(
                                 src_location,
                                 dst_location,
@@ -597,7 +593,7 @@ namespace wrench {
     bool SimpleStorageServiceNonBufferized::processFileCopyRequestIAmTheSource(
             std::shared_ptr<FileLocation> &src_location,
             std::shared_ptr<FileLocation> &dst_location,
-            simgrid::s4u::Mailbox *answer_mailbox) {
+            S4U_Mailbox *answer_mailbox) {
 
         WRENCH_INFO("FileCopyRequest: %s -> %s",
                     src_location->toString().c_str(),
@@ -623,8 +619,7 @@ namespace wrench {
 
         if (not this->splitPath(src_location->getPath(), src_mount_point, src_path_at_mount_point)) {
             try {
-                S4U_Mailbox::putMessage(
-                        answer_mailbox,
+                answer_mailbox->putMessage(
                         new StorageServiceFileCopyAnswerMessage(
                                 src_location,
                                 dst_location,
@@ -645,8 +640,7 @@ namespace wrench {
         // Do I have the file
         if (not my_fs->isFileInDirectory(src_location->getFile(), src_path_at_mount_point)) {
             try {
-                S4U_Mailbox::putMessage(
-                        answer_mailbox,
+                answer_mailbox->putMessage(
                         new StorageServiceFileCopyAnswerMessage(
                                 src_location,
                                 dst_location,
@@ -674,8 +668,7 @@ namespace wrench {
         if (not file_already_at_destination) {
             if (not dst_location->getStorageService()->reserveSpace(dst_location)) {
                 try {
-                    S4U_Mailbox::putMessage(
-                            answer_mailbox,
+                    answer_mailbox->putMessage(
                             new StorageServiceFileCopyAnswerMessage(
                                     src_location,
                                     dst_location,
@@ -760,12 +753,11 @@ namespace wrench {
      */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequest(std::shared_ptr<FileLocation> &src,
                                                                    std::shared_ptr<FileLocation> &dst,
-                                                                   simgrid::s4u::Mailbox *answer_mailbox) {
+                                                                   S4U_Mailbox *answer_mailbox) {
 
         // Check that src has the file
         if (not StorageService::hasFileAtLocation(src)) {
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
+            answer_mailbox->dputMessage(
                     new StorageServiceFileCopyAnswerMessage(
                             src,
                             dst,

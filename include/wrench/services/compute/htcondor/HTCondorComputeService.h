@@ -113,7 +113,7 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<CompoundJob> &job,
+        void processSubmitCompoundJob(S4U_Mailbox *answer_mailbox, const std::shared_ptr<CompoundJob> &job,
                                       const std::map<std::string, std::string> &service_specific_args);
 
         //        void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob>job,
@@ -122,7 +122,7 @@ namespace wrench {
         //        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob>job,
         //                                   const std::map<std::string, std::string> &service_specific_args);
 
-        void processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
+        void processIsThereAtLeastOneHostWithAvailableResources(S4U_Mailbox *answer_mailbox, unsigned long num_cores, double ram);
 
         void terminate();
 

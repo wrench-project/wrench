@@ -476,7 +476,7 @@ namespace wrench {
          * @param src_location: a source location
          * @param dst_location: a destination location
          */
-        static void initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox,
+        static void initiateFileCopy(S4U_Mailbox *answer_mailbox,
                                      const std::shared_ptr<FileLocation> &src_location,
                                      const std::shared_ptr<FileLocation> &dst_location);
 
@@ -493,19 +493,19 @@ namespace wrench {
          */
         virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) = 0;
 
-        virtual void deleteFile(simgrid::s4u::Mailbox *answer_mailbox,
+        virtual void deleteFile(S4U_Mailbox *answer_mailbox,
                                 const std::shared_ptr<FileLocation> &location,
                                 bool wait_for_answer);
 
-        virtual bool lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
+        virtual bool lookupFile(S4U_Mailbox *answer_mailbox,
                                 const std::shared_ptr<FileLocation> &location);
 
-        virtual void readFile(simgrid::s4u::Mailbox *answer_mailbox,
+        virtual void readFile(S4U_Mailbox *answer_mailbox,
                               const std::shared_ptr<FileLocation> &location,
                               double num_bytes,
                               bool wait_for_answer);
 
-        virtual void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+        virtual void writeFile(S4U_Mailbox *answer_mailbox,
                                const std::shared_ptr<FileLocation> &location,
                                double num_bytes_to_write,
                                bool wait_for_answer);

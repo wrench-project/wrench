@@ -30,7 +30,7 @@ namespace wrench {
      * @param msg: the message to send
      * @param suffix: a (possibly empty) suffix to append to the daemon name
      */
-    Alarm::Alarm(double date, std::string hostname, simgrid::s4u::Mailbox *reply_mailbox,
+    Alarm::Alarm(double date, std::string hostname, S4U_Mailbox *reply_mailbox,
                  SimulationMessage *msg, std::string suffix) : Service(hostname, "alarm_service_" + suffix) {
         this->date = date;
         this->reply_mailbox = reply_mailbox;
@@ -57,7 +57,7 @@ namespace wrench {
         WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_mailbox->get_cname());
         try {
             auto to_send = this->msg.release();
-            S4U_Mailbox::putMessage(this->reply_mailbox, to_send);
+            this->reply_mailbox->putMessage(to_send);
         } catch (ExecutionException &e) {
             WRENCH_WARN("AlarmService was not able to send its message");
         }
@@ -82,7 +82,7 @@ namespace wrench {
      */
     std::shared_ptr<Alarm>
     Alarm::createAndStartAlarm(Simulation *simulation, double date, std::string hostname,
-                               simgrid::s4u::Mailbox *reply_mailbox,
+                               S4U_Mailbox *reply_mailbox,
                                SimulationMessage *msg, std::string suffix) {
         std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
                 new Alarm(date, hostname, reply_mailbox, msg, suffix));

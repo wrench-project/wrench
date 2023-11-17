@@ -31,7 +31,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     ActionExecutionServiceSubmitActionRequestMessage::ActionExecutionServiceSubmitActionRequestMessage(
-            simgrid::s4u::Mailbox *reply_mailbox,
+            S4U_Mailbox *reply_mailbox,
             std::shared_ptr<Action> action,
             double payload) : ActionExecutionServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -67,7 +67,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     ActionExecutionServiceTerminateActionRequestMessage::ActionExecutionServiceTerminateActionRequestMessage(
-            simgrid::s4u::Mailbox *reply_mailbox,
+            S4U_Mailbox *reply_mailbox,
             std::shared_ptr<Action> action,
             ComputeService::TerminationCause termination_cause,
             double payload) : ActionExecutionServiceMessage(payload) {

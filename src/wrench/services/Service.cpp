@@ -313,8 +313,7 @@ namespace wrench {
         auto ack_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new ServiceStopDaemonMessage(
+            this->mailbox->putMessage(new ServiceStopDaemonMessage(
                                             ack_mailbox,
                                             false,
                                             ComputeService::TerminationCause::TERMINATION_NONE,
@@ -322,8 +321,7 @@ namespace wrench {
                                                     ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
 
             // Wait for the ack
-            message = S4U_Mailbox::getMessage<ServiceDaemonStoppedMessage>(
-                    ack_mailbox,
+            message = ack_mailbox->getMessage<ServiceDaemonStoppedMessage>(
                     this->network_timeout,
                     "Service::stop(): Received an");
 

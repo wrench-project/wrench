@@ -36,11 +36,11 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::shared_ptr<ExecutionEvent>
-    ExecutionEvent::waitForNextExecutionEvent(simgrid::s4u::Mailbox *mailbox, double timeout) {
+    ExecutionEvent::waitForNextExecutionEvent(S4U_Mailbox *mailbox, double timeout) {
         // Get the message from the mailbox_name
         std::shared_ptr<SimulationMessage> message = nullptr;
         try {
-            message = S4U_Mailbox::getMessage<SimulationMessage>(mailbox, timeout);
+            message = mailbox->getMessage<SimulationMessage>(timeout);
         } catch (ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<NetworkError>(e.getCause());
             if (cause->isTimeout()) {

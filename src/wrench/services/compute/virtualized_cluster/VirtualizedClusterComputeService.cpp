@@ -169,7 +169,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
+            message = this->mailbox->getMessage();
         } catch (ExecutionException &e) {
             return true;
         }
@@ -185,7 +185,7 @@ namespace wrench {
             this->stopAllVMs(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
             // This is Synchronous
             try {
-                S4U_Mailbox::putMessage(msg->ack_mailbox,
+                msg->ack_mailbox->putMessage(
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 CloudComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
@@ -254,7 +254,7 @@ namespace wrench {
      *
      */
     void
-    VirtualizedClusterComputeService::processMigrateVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name,
+    VirtualizedClusterComputeService::processMigrateVM(S4U_Mailbox *answer_mailbox, const std::string &vm_name,
                                                        const std::string &dest_pm_hostname) {
         WRENCH_INFO("Asked to migrate the VM %s to PM %s", vm_name.c_str(), dest_pm_hostname.c_str());
 
@@ -288,8 +288,7 @@ namespace wrench {
         }
 
         //        try {
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
+        answer_mailbox->dputMessage(
                 msg_to_send_back);
         //        } catch (ExecutionException &e) {
         //            // ignore

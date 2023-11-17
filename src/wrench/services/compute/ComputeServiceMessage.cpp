@@ -31,7 +31,7 @@ namespace wrench {
    * @throw std::invalid_arguments
    */
     ComputeServiceSubmitCompoundJobRequestMessage::ComputeServiceSubmitCompoundJobRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_Mailbox *answer_mailbox,
             std::shared_ptr<CompoundJob> job,
             std::map<std::string, std::string> service_specific_args,
             double payload) : ComputeServiceMessage(payload) {
@@ -129,7 +129,7 @@ namespace wrench {
     * @throw std::invalid_arguments
     */
     ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_Mailbox *answer_mailbox,
             std::shared_ptr<CompoundJob> job,
             double payload) : ComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -226,7 +226,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_Mailbox *answer_mailbox,
             const std::string &key,
             double payload)
         : ComputeServiceMessage(payload) {
@@ -264,7 +264,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram, double payload) : ComputeServiceMessage(
+            S4U_Mailbox *answer_mailbox, unsigned long num_cores, double ram, double payload) : ComputeServiceMessage(
 
                                                                                                                   payload) {
 

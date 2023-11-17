@@ -40,7 +40,7 @@ namespace wrench {
             double ram_footprint,
             double thread_creation_overhead,
             bool simulate_computation_as_sleep,
-            simgrid::s4u::Mailbox *callback_mailbox,
+            S4U_Mailbox *callback_mailbox,
             std::shared_ptr<Action> action,
             std::shared_ptr<ActionExecutionService> action_execution_service) : ExecutionController(hostname, "action_executor") {
 
@@ -149,7 +149,7 @@ namespace wrench {
         auto msg_to_send_back = new ActionExecutorDoneMessage(this->getSharedPtr<ActionExecutor>());
 
         try {
-            S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
+            this->callback_mailbox->putMessage(msg_to_send_back);
         } catch (ExecutionException &e) {
             WRENCH_INFO("Action executor can't report back due to network error.. oh well!");
         }

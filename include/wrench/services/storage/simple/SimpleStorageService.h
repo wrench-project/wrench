@@ -199,12 +199,12 @@ namespace wrench {
         /** @brief Maximum number of concurrent connections */
         unsigned long num_concurrent_connections;
 
-        bool processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox);
+        bool processStopDaemonRequest(S4U_Mailbox *ack_mailbox);
         bool processFileDeleteRequest(const std::shared_ptr<FileLocation> &location,
-                                      simgrid::s4u::Mailbox *answer_mailbox);
+                                      S4U_Mailbox *answer_mailbox);
         bool processFileLookupRequest(const std::shared_ptr<FileLocation> &location,
-                                      simgrid::s4u::Mailbox *answer_mailbox);
-        bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox,
+                                      S4U_Mailbox *answer_mailbox);
+        bool processFreeSpaceRequest(S4U_Mailbox *answer_mailbox,
                                      const std::string &path);
 
 

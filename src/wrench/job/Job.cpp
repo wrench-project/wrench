@@ -57,7 +57,7 @@ namespace wrench {
      *
      * @return the next callback mailbox
      */
-    simgrid::s4u::Mailbox *Job::getOriginCallbackMailbox() {
+    S4U_Mailbox *Job::getOriginCallbackMailbox() {
         return this->originator_mailbox;
     }
 
@@ -81,7 +81,7 @@ namespace wrench {
      *
      * @return the next callback mailbox
      */
-    simgrid::s4u::Mailbox *Job::popCallbackMailbox() {
+    S4U_Mailbox *Job::popCallbackMailbox() {
         if (this->callback_mailbox_stack.empty()) {
             return this->originator_mailbox;
         }
@@ -94,7 +94,7 @@ namespace wrench {
      * @brief Get the job's "next" callback mailbox, without popping it
      * @return the next callback mailbox
      */
-    simgrid::s4u::Mailbox *Job::getCallbackMailbox() {
+    S4U_Mailbox *Job::getCallbackMailbox() {
         if (this->callback_mailbox_stack.empty()) {
             return this->originator_mailbox;
         }
@@ -106,7 +106,7 @@ namespace wrench {
      *
      * @param mailbox: the mailbox name
      */
-    void Job::pushCallbackMailbox(simgrid::s4u::Mailbox *mailbox) {
+    void Job::pushCallbackMailbox(S4U_Mailbox *mailbox) {
         this->callback_mailbox_stack.push(mailbox);
     }
 

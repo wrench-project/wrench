@@ -82,8 +82,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void EnergyMeterService::stop() {
-        S4U_Mailbox::putMessage(this->mailbox,
-                                new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
+        this->mailbox->putMessage(new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**
@@ -145,8 +144,7 @@ namespace wrench {
     bool EnergyMeterService::processNextMessage(double timeout) {
 
         try {
-            auto msg = S4U_Mailbox::getMessage<ServiceStopDaemonMessage>(
-                    this->mailbox,
+            auto msg = this->mailbox->getMessage<ServiceStopDaemonMessage>(
                     timeout,
                     "EnergyMeter::waitForNextMessage(): Received an");
             WRENCH_INFO("Energy Meter got a %s message", msg->getName().c_str());

@@ -51,8 +51,7 @@ namespace wrench {
         // Send a termination message to the daemon's mailbox_name - SYNCHRONOUSLY
         auto ack_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         try {
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new ServiceStopDaemonMessage(
+            this->mailbox->putMessage(new ServiceStopDaemonMessage(
                                             ack_mailbox,
                                             send_failure_notifications,
                                             termination_cause,
@@ -65,8 +64,7 @@ namespace wrench {
 
         // Wait for the ack
         try {
-            S4U_Mailbox::getMessage<ServiceDaemonStoppedMessage>(
-                    ack_mailbox,
+            ack_mailbox->getMessage<ServiceDaemonStoppedMessage>(
                     this->network_timeout,
                     "ComputeService::stop(): Received an");
         } catch (...) {
@@ -356,7 +354,7 @@ namespace wrench {
         // send an "info request" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-        S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
+        this->mailbox->putMessage(new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
                                                        answer_mailbox,
                                                        num_cores,
                                                        ram,
@@ -364,8 +362,7 @@ namespace wrench {
                                                                ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
-        auto msg = S4U_Mailbox::getMessage<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage>(
-                answer_mailbox,
+        auto msg = answer_mailbox->getMessage<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage>(
                 this->network_timeout,
                 "BareMetalComputeService::isThereAtLeastOneHostWithIdleResources(): received an");
 
@@ -430,15 +427,14 @@ namespace wrench {
             // send an "info request" message to the daemon's mailbox_name
             auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
-            S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
+            this->mailbox->putMessage(new ComputeServiceResourceInformationRequestMessage(
                                                            answer_mailbox,
                                                            key,
                                                            this->getMessagePayloadValue(
                                                                    ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
 
             // Get the reply
-            auto msg = S4U_Mailbox::getMessage<ComputeServiceResourceInformationAnswerMessage>(
-                    answer_mailbox,
+            auto msg = answer_mailbox->getMessage<ComputeServiceResourceInformationAnswerMessage>(
                     this->network_timeout,
                     "BareMetalComputeService::getServiceResourceInformation(): received an");
             return msg->info;

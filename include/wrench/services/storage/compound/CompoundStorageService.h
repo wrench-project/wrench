@@ -188,27 +188,27 @@ namespace wrench {
          */
         std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &getAllServices();
 
-        std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<DataFile> &file, simgrid::s4u::Mailbox *answer_mailbox);
+        std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<DataFile> &file, S4U_Mailbox *answer_mailbox);
 
         std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<FileLocation> &location);
 
         bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
-        void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+        void writeFile(S4U_Mailbox *answer_mailbox,
                        const std::shared_ptr<FileLocation> &location,
                        double num_bytes_to_write,
                        bool wait_for_answer) override;
 
-        void readFile(simgrid::s4u::Mailbox *answer_mailbox,
+        void readFile(S4U_Mailbox *answer_mailbox,
                       const std::shared_ptr<FileLocation> &location,
                       double num_bytes,
                       bool wait_for_answer) override;
 
-        void deleteFile(simgrid::s4u::Mailbox *answer_mailbox,
+        void deleteFile(S4U_Mailbox *answer_mailbox,
                         const std::shared_ptr<FileLocation> &location,
                         bool wait_for_answer) override;
 
-        bool lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
+        bool lookupFile(S4U_Mailbox *answer_mailbox,
                         const std::shared_ptr<FileLocation> &location) override;
 
         /**
@@ -274,7 +274,7 @@ namespace wrench {
 
         static unsigned long getNewUniqueNumber();
 
-        bool processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox);
+        bool processStopDaemonRequest(S4U_Mailbox *ack_mailbox);
 
         /***********************/
         /** \endcond           */
@@ -284,7 +284,7 @@ namespace wrench {
 
         int main() override;
 
-        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location, simgrid::s4u::Mailbox *answer_mailbox);
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location, S4U_Mailbox *answer_mailbox);
 
         std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location);
 

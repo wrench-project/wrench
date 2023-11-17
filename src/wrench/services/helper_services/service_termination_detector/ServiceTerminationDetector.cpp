@@ -27,7 +27,7 @@ WRENCH_LOG_CATEGORY(wrench_core_failure_detector, "Log category for ServiceTermi
  */
 wrench::ServiceTerminationDetector::ServiceTerminationDetector(std::string host_on_which_to_run,
                                                                std::shared_ptr<Service> service_to_monitor,
-                                                               simgrid::s4u::Mailbox *mailbox_to_notify,
+                                                               S4U_Mailbox *mailbox_to_notify,
                                                                bool notify_on_crash,
                                                                bool notify_on_termination) : Service(std::move(host_on_which_to_run), "service_termination_detector_for_" + service_to_monitor->getName()) {
     this->service_to_monitor = std::move(service_to_monitor);
@@ -50,13 +50,13 @@ int wrench::ServiceTerminationDetector::main() {
         // Failure detected!
         WRENCH_INFO("Detected crash of service %s (notifying mailbox %s)", this->service_to_monitor->getName().c_str(),
                     this->mailbox_to_notify->get_cname());
-        S4U_Mailbox::putMessage(this->mailbox_to_notify, new ServiceHasCrashedMessage(this->service_to_monitor));
+        this->mailbox_to_notify->putMessage(new ServiceHasCrashedMessage(this->service_to_monitor));
     }
     if (this->notify_on_termination and (service_has_returned_from_main)) {
         // Failure detected!
         WRENCH_INFO("Detected termination of service %s (notifying mailbox %s)",
                     this->service_to_monitor->getName().c_str(), this->mailbox_to_notify->get_cname());
-        S4U_Mailbox::putMessage(this->mailbox_to_notify,
+        this->mailbox_to_notify->putMessage(
                                 new ServiceHasTerminatedMessage(this->service_to_monitor, return_value_from_main));
     }
 

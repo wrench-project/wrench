@@ -37,7 +37,7 @@ namespace wrench {
      * @param hostname: the name of host on which the job manager will run
      * @param creator_mailbox: the mailbox of the manager's creator
      */
-    JobManager::JobManager(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox) : Service(std::move(hostname), "job_manager") {
+    JobManager::JobManager(std::string hostname, S4U_Mailbox *creator_mailbox) : Service(std::move(hostname), "job_manager") {
         this->creator_mailbox = creator_mailbox;
     }
 
@@ -63,7 +63,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void JobManager::stop() {
-        S4U_Mailbox::putMessage(this->mailbox,
+        this->mailbox->putMessage(
                                 new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
@@ -463,7 +463,7 @@ namespace wrench {
 
         // Send a message to wake up the daemon
         try {
-            S4U_Mailbox::putMessage(this->mailbox, new JobManagerWakeupMessage());
+            this->mailbox->putMessage(new JobManagerWakeupMessage());
         } catch (std::exception &e) {
             throw std::runtime_error("Cannot connect to job manager");
         }
@@ -550,7 +550,7 @@ namespace wrench {
 
         // Send a message to wake up the daemon
         try {
-            S4U_Mailbox::putMessage(this->mailbox, new JobManagerWakeupMessage());
+            this->mailbox->putMessage(new JobManagerWakeupMessage());
         } catch (std::exception &e) {
             throw std::runtime_error("Cannot connect to job manager");
         }
@@ -620,8 +620,7 @@ namespace wrench {
                     job->compute_service = bm_cs;
 
                     // Send a call back
-                    S4U_Mailbox::dputMessage(
-                            callback_mailbox,
+                    callback_mailbox->dputMessage(
                             new ComputeServicePilotJobStartedMessage(
                                     job, compute_service,
                                     compute_service->getMessagePayloadValue(
@@ -676,7 +675,7 @@ namespace wrench {
 
         // Send a message to wake up the daemon
         try {
-            S4U_Mailbox::putMessage(this->mailbox, new JobManagerWakeupMessage());
+            this->mailbox->putMessage(new JobManagerWakeupMessage());
         } catch (std::exception &e) {
             throw std::runtime_error("Cannot connect to job manager");
         }
@@ -876,7 +875,7 @@ namespace wrench {
     bool JobManager::processNextMessage() {
         std::shared_ptr<SimulationMessage> message = nullptr;
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
+            message = this->mailbox->getMessage();
         } catch (ExecutionException &e) {
             WRENCH_INFO("Error while receiving message... ignoring");
             return true;
@@ -962,7 +961,7 @@ namespace wrench {
         if (callback_mailbox) {
             auto augmented_msg = new JobManagerStandardJobCompletedMessage(
                     job, std::move(compute_service), state_changes);
-            S4U_Mailbox::dputMessage(callback_mailbox, augmented_msg);
+            callback_mailbox->dputMessage(augmented_msg);
         }
         //        throw std::runtime_error("PROCESS STANDARD JOB COMPLETION NOT IMPLEMENTED");
     }
@@ -1005,7 +1004,7 @@ namespace wrench {
                                                        state_changes,
                                                        failure_count_increments,
                                                        std::move(job_failure_cause));
-        S4U_Mailbox::dputMessage(job->popCallbackMailbox(), augmented_message);
+        job->popCallbackMailbox()->dputMessage(augmented_message);
     }
 
     /**
@@ -1022,7 +1021,7 @@ namespace wrench {
 
         // Forward the notification to the source
         WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox()->get_cname());
-        S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
+        job->getOriginCallbackMailbox()->dputMessage(
                                  new ComputeServicePilotJobStartedMessage(job, std::move(compute_service), 0.0));
     }
 
@@ -1042,7 +1041,7 @@ namespace wrench {
 
         // Forward the notification to the source
         WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox()->get_cname());
-        S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
+        job->getOriginCallbackMailbox()->dputMessage(
                                  new ComputeServicePilotJobExpiredMessage(job, std::move(compute_service), 0.0));
     }
 
@@ -1108,7 +1107,7 @@ namespace wrench {
                             auto message =
                                     new JobManagerCompoundJobFailedMessage(cjob, cjob->parent_compute_service,
                                                                            e.getCause());
-                            S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
+                            job->popCallbackMailbox()->dputMessage(message);
                         } catch (NetworkError &e) {
                         }
                     } else {
@@ -1126,7 +1125,7 @@ namespace wrench {
                                     new JobManagerStandardJobFailedMessage(sjob, sjob->parent_compute_service,
                                                                            state_changes, failure_count_increments,
                                                                            e.getCause());
-                            S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
+                            job->popCallbackMailbox()->dputMessage(message);
                         } catch (NetworkError &e) {
                         }
                     }
@@ -1186,7 +1185,7 @@ namespace wrench {
         try {
             auto message =
                     new JobManagerCompoundJobCompletedMessage(job, std::move(compute_service));
-            S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
+            job->popCallbackMailbox()->dputMessage(message);
         } catch (NetworkError &e) {
         }
     }
@@ -1209,7 +1208,7 @@ namespace wrench {
             auto message =
                     new JobManagerCompoundJobFailedMessage(job, std::move(compute_service),
                                                            std::make_shared<SomeActionsHaveFailed>());
-            S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
+            job->popCallbackMailbox()->dputMessage(message);
         } catch (NetworkError &e) {
         }
     }
@@ -1219,7 +1218,7 @@ namespace wrench {
      *
      * @return a mailbox
      */
-    simgrid::s4u::Mailbox *JobManager::getCreatorMailbox() {
+    S4U_Mailbox *JobManager::getCreatorMailbox() {
         return this->creator_mailbox;
     }
 

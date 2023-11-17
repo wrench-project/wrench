@@ -59,6 +59,7 @@ namespace wrench {
 
         /** @brief The SimGrid communication handle */
         simgrid::s4u::CommPtr comm_ptr;
+
         /** @brief The message */
         std::unique_ptr<SimulationMessage> simulation_message;
         /** @brief The mailbox */

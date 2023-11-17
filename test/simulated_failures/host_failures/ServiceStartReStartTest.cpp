@@ -187,7 +187,7 @@ private:
         // Waiting for a message
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->mailbox->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
