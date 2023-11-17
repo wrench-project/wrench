@@ -35,6 +35,7 @@ namespace wrench {
 
     public:
         static std::shared_ptr<Workflow> createWorkflow();
+        std::string getName() const;
         void clear();
 
         /**
@@ -117,6 +118,7 @@ namespace wrench {
         friend class Simulation;
         friend class WorkflowTask;
 
+        std::string name;
         bool update_top_bottom_levels_dynamically;
 
         Workflow();
