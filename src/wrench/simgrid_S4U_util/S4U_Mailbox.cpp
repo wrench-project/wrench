@@ -31,6 +31,7 @@ namespace wrench {
 
     S4U_Mailbox *S4U_Mailbox::NULL_MAILBOX;
 
+    std::vector<std::unique_ptr<S4U_Mailbox>> S4U_Mailbox::all_mailboxes;
     std::deque<S4U_Mailbox *> S4U_Mailbox::free_mailboxes;
     std::set<S4U_Mailbox *> S4U_Mailbox::used_mailboxes;
     std::deque<S4U_Mailbox *> S4U_Mailbox::mailboxes_to_drain;
@@ -353,8 +354,11 @@ namespace wrench {
      * @param num_mailboxes: numb mailboxes in pool
      */
     void S4U_Mailbox::createMailboxPool(unsigned long num_mailboxes) {
+        S4U_Mailbox::all_mailboxes.reserve(num_mailboxes);
         for (unsigned long i = 0; i < num_mailboxes; i++) {
-            S4U_Mailbox::free_mailboxes.push_back(new S4U_Mailbox());
+            std::unique_ptr<S4U_Mailbox> mb = std::make_unique<S4U_Mailbox>();
+            S4U_Mailbox::free_mailboxes.push_back(mb.get());
+            S4U_Mailbox::all_mailboxes.push_back(std::move(mb));
         }
     }
 
