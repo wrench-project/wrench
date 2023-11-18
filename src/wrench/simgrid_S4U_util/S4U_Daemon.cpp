@@ -77,9 +77,6 @@ namespace wrench {
         unsigned long seq = S4U_CommPort::generateUniqueSequenceNumber();
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
 
-//        this->commport_name = S4U_CommPort::generateUniqueMailbox("mb");
-//        this->recv_commport = S4U_CommPort::generateUniqueMailbox("rmb");
-
         this->commport = S4U_CommPort::getTemporaryCommPort();
         this->recv_commport = S4U_CommPort::getTemporaryCommPort();
 

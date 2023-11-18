@@ -104,7 +104,7 @@ namespace wrench {
      */
     void BatschedNetworkListener::sendExecuteMessageToBatchComputeService(S4U_CommPort *answer_commport,
                                                                           std::string execute_job_reply_data) {
-        S4U_CommPort::putMessage(this->batch_service_commport,
+        this->batch_service_commport->S4U_CommPort::putMessage(
                                 new BatchExecuteJobFromBatSchedMessage(answer_commport, execute_job_reply_data, 0));
     }
 
@@ -113,7 +113,7 @@ namespace wrench {
      * @param estimated_waiting_time: BatchComputeService queue wait time estimate
      */
     void BatschedNetworkListener::sendQueryAnswerMessageToBatchComputeService(double estimated_waiting_time) {
-        S4U_CommPort::putMessage(this->batch_service_commport,
+        this->batch_service_commport->S4U_CommPort::putMessage(
                                 new BatchQueryAnswerMessage(estimated_waiting_time, 0));
     }
 
