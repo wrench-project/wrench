@@ -234,7 +234,7 @@ namespace wrench {
                                      (dst_location ? dst_location->toString() : "nullptr") + ")");
         }
 
-        // Call retire on all commportes passed, which is pretty brute force but should work
+        // Call retire on all commports passed, which is pretty brute force but should work
         if (this->dst_commport) {
             S4U_CommPort::retireTemporaryCommPort(this->dst_commport);
         }

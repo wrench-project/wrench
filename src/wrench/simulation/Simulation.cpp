@@ -238,7 +238,7 @@ namespace wrench {
             std::cout << "     (use --log=xxx.threshold=info to enable log category xxxx)\n";
             std::cout << "   --help-logs for detailed help on (SimGrid's) logging options/syntax)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
-            std::cout << "   --wrench-commport-pool-size=<integer>: set the number of SimGrid commportes used by WRENCH (default: 50000).\n";
+            std::cout << "   --wrench-commport-pool-size=<integer>: set the number of SimGrid commports used by WRENCH (default: 50000).\n";
             std::cout << "      This value may need to be increased, especially for simulations that simulate many\n";
             std::cout << "      failures, for which WRENCH has a hard time avoiding all commport-related memory leaks\n";
             std::cout << "   --wrench-default-control-message-size=<double>: the default size of control messages in bytes (default: 1024).\n";
@@ -301,7 +301,7 @@ namespace wrench {
         }
 
         if (not commport_pool_size_set) {
-            S4U_CommPort::createCommPortPool(5000);
+            S4U_CommPort::createCommPortPool(50000);
         }
         if (not default_control_message_size_set) {
             S4U_CommPort::default_control_message_size = 1024;
