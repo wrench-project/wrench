@@ -30,7 +30,7 @@ namespace wrench {
 
     public:
         BatschedNetworkListener(std::string hostname, std::shared_ptr<BatchComputeService> batch_service,
-                                S4U_Mailbox *batch_service_commport, std::string sched_port,
+                                S4U_CommPort *batch_service_commport, std::string sched_port,
                                 std::string data_to_send, WRENCH_PROPERTY_COLLECTION_TYPE property_list = {});
 
     private:
@@ -50,7 +50,7 @@ namespace wrench {
         std::shared_ptr<BatchComputeService> batch_service;
         S4U_Commport *batch_service_commport;
 
-        void sendExecuteMessageToBatchComputeService(simgrid::s4u::Mailbox *answer_commport, std::string execute_job_reply_data);
+        void sendExecuteMessageToBatchComputeService(S4U_CommPort *answer_commport, std::string execute_job_reply_data);
         void sendQueryAnswerMessageToBatchComputeService(double estimated_waiting_time);
         void send_receive();
     };

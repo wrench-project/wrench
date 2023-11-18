@@ -154,7 +154,7 @@ namespace wrench {
 
         void processPilotJobFailure(const std::shared_ptr<PilotJob> &job, std::shared_ptr<ComputeService> compute_service, std::shared_ptr<FailureCause> cause);
 
-        // Mailbox of the creator of this job manager
+        // CommPort of the creator of this job manager
         S4U_CommPort *creator_commport;
 
         std::vector<std::shared_ptr<CompoundJob>> jobs_to_dispatch;

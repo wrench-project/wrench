@@ -30,7 +30,7 @@ public:
 
     void do_NoColorArgument_test();
 
-    void do_MailboxPoolSizeArgument_test();
+    void do_CommPortPoolSizeArgument_test();
 
     void do_FullLogArgument_test(std::string arg, int num_log_lines);
 
@@ -293,11 +293,11 @@ void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
 /**           MAILBOX-POOL-SIZE     COMMAND-LINE ARGUMENT            **/
 /**********************************************************************/
 
-TEST_F(SimulationCommandLineArgumentsTest, MailboxPoolSizeArgument) {
-    DO_TEST_WITH_FORK(do_MailboxPoolSizeArgument_test);
+TEST_F(SimulationCommandLineArgumentsTest, CommPortPoolSizeArgument) {
+    DO_TEST_WITH_FORK(do_CommPortPoolSizeArgument_test);
 }
 
-void SimulationCommandLineArgumentsTest::do_MailboxPoolSizeArgument_test() {
+void SimulationCommandLineArgumentsTest::do_CommPortPoolSizeArgument_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;

@@ -309,7 +309,7 @@ namespace wrench {
      * @return A vector of shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or empty vector if it's not.
      */
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupFileLocation(const std::shared_ptr<DataFile> &file, S4U_CommPort *answer_commport) {
-        WRENCH_INFO("CSS::lookupFileLocation() - DataFile + Mailbox");
+        WRENCH_INFO("CSS::lookupFileLocation() - DataFile + CommPort");
 
         this->commport->putMessage(
                 new CompoundStorageLookupRequestMessage(

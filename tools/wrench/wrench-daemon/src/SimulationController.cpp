@@ -100,7 +100,7 @@ namespace wrench {
         // Initial setup
         wrench::TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
-        S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()] = this->recv_mailbox;
+        S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()] = this->recv_commport;
 
         WRENCH_INFO("Starting");
         this->job_manager = this->createJobManager();

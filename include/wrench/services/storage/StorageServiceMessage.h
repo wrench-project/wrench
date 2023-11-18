@@ -43,7 +43,7 @@ namespace wrench {
     public:
         StorageServiceFreeSpaceRequestMessage(S4U_CommPort *answer_commport, const std::string &path, double payload);
 
-        /** @brief Mailbox to which the answer message should be sent */
+        /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
         /** @brief The path */
         std::string path;
@@ -69,7 +69,7 @@ namespace wrench {
                                                const std::shared_ptr<FileLocation> &location,
                                                double payload);
 
-        /** @brief Mailbox to which the answer message should be sent */
+        /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
         /** @brief The location to lookup */
         std::shared_ptr<FileLocation> location;
@@ -98,7 +98,7 @@ namespace wrench {
                                                const std::shared_ptr<FileLocation> &location,
                                                double payload);
 
-        /** @brief Mailbox to which the answer message should be sent */
+        /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
         /** @brief The location to delete  */
         std::shared_ptr<FileLocation> location;
@@ -135,7 +135,7 @@ namespace wrench {
                                              std::shared_ptr<FileLocation> dst,
                                              double payload);
 
-        /** @brief Mailbox to which the answer message should be sent */
+        /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
         /** @brief The source location */
         std::shared_ptr<FileLocation> src;
@@ -175,7 +175,7 @@ namespace wrench {
                                               double num_bytes_to_write,
                                               double payload);
 
-        /** @brief Mailbox to which the answer message should be sent */
+        /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
         /** @brief The requesting host */
         simgrid::s4u::Host *requesting_host;

@@ -181,7 +181,7 @@ void BareMetalComputeServiceActionsThatCommunicateTest::do_TwoCommunicatingActio
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
-    //    argv[2] = strdup("--log=wrench_core_mailbox.threshold:debug");
+    //    argv[2] = strdup("--log=wrench_core_commport.threshold:debug");
 
     simulation->init(&argc, argv);
 
@@ -308,7 +308,7 @@ void BareMetalComputeServiceActionsThatCommunicateTest::do_MPICollectives_test()
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
     //        argv[2] = strdup("--cfg=smpi/host-speed:0.001");
-    //        argv[2] = strdup("--log=wrench_core_mailbox.threshold:debug");
+    //        argv[2] = strdup("--log=wrench_core_commport.threshold:debug");
 
     simulation->init(&argc, argv);
 

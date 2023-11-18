@@ -519,14 +519,6 @@ namespace wrench {
 
         // Send a message to the source
         auto request_answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
-        //        auto commport_that_should_receive_file_content = S4U_CommPort::generateUniqueMailbox("works_by_itself");
-
-        //        S4U_CommPort *commport_that_should_receive_file_content;
-        //        if (src_loc->getStorageService()->buffer_size > DBL_EPSILON) {
-        //            commport_that_should_receive_file_content = S4U_CommPort::getTemporaryCommPort();
-        //        } else {
-        //            commport_that_should_receive_file_content = nullptr;
-        //        }
 
         src_loc->getStorageService()->commport->putMessage(
                 new StorageServiceFileReadRequestMessage(

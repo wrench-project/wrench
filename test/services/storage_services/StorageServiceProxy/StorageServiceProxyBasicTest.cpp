@@ -265,7 +265,7 @@ void StorageServiceProxyBasicTest::do_BasicFunctionality_test(bool arg, std::str
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //   argv[1] = strdup("--wrench-full-log");
-    //argv[2] = strdup("--log=wrench_core_mailbox.threshold=debug");
+    //argv[2] = strdup("--log=wrench_core_commport.threshold=debug");
     //argv[3] = strdup("--log=wrench_core_proxy_file_server.threshold=debug");
     simulation->init(&argc, argv);
 
