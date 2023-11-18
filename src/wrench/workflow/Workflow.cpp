@@ -277,7 +277,17 @@ namespace wrench {
      * @brief  Constructor
      */
     Workflow::Workflow() {
+        static int workflow_number = 0;
         this->update_top_bottom_levels_dynamically = true;
+        this->name = "workflow_" + std::to_string(workflow_number++);
+    }
+
+    /**
+     * @brief Name getter
+     * @return The workflow's name
+     */
+    std::string Workflow::getName() const {
+        return this->name;
     }
 
     /**
