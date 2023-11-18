@@ -35,7 +35,40 @@ namespace wrench {
                                                                               bool ignore_avg_cpu,
                                                                               bool show_warnings) {
         std::ifstream file;
-        nlohmann::json j;
+        // handle exceptions when opening the json file
+        file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+        try {
+            file.open(filename);
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+            return WfCommonsWorkflowParser::createWorkflowFromJSONString(
+                    buffer.str(), reference_flop_rate, ignore_machine_specs,
+                    redundant_dependencies,
+                    ignore_cycle_creating_dependencies,
+                    min_cores_per_task,
+                    max_cores_per_task,
+                    enforce_num_cores,
+                    ignore_avg_cpu,
+                    show_warnings);
+        } catch (const std::ifstream::failure &e) {
+            throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid Json file");
+        }
+    }
+
+    /**
+    * Documentation in .h file
+    */
+    std::shared_ptr<Workflow> WfCommonsWorkflowParser::createWorkflowFromJSONString(const std::string &json_string,
+                                                                                    const std::string &reference_flop_rate,
+                                                                                    bool ignore_machine_specs,
+                                                                                    bool redundant_dependencies,
+                                                                                    bool ignore_cycle_creating_dependencies,
+                                                                                    unsigned long min_cores_per_task,
+                                                                                    unsigned long max_cores_per_task,
+                                                                                    bool enforce_num_cores,
+                                                                                    bool ignore_avg_cpu,
+                                                                                    bool show_warnings) {
+
         std::set<std::string> ignored_auxiliary_jobs;
         std::set<std::string> ignored_transfer_jobs;
 
@@ -50,14 +83,7 @@ namespace wrench {
             throw;
         }
 
-        // handle exceptions when opening the json file
-        file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        try {
-            file.open(filename);
-            file >> j;
-        } catch (const std::ifstream::failure &e) {
-            throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid Json file");
-        }
+        nlohmann::json j = nlohmann::json::parse(json_string);
 
         // Check schema version
         nlohmann::json schema_version;
@@ -313,7 +339,6 @@ namespace wrench {
                 }
             }
         }
-        file.close();
         workflow->enableTopBottomLevelDynamicUpdates(true);
         workflow->updateAllTopBottomLevels();
 
