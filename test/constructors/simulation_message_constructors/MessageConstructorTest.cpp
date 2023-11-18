@@ -114,17 +114,13 @@ private:
     int main() override {
 
         // Create a job manager
-        std::cerr << "HERE_FOO\n";
         auto job_manager = this->createJobManager();
-        std::cerr << "HERE_FAA\n";
         auto compound_job = job_manager->createCompoundJob("name");
         auto network_proximity_service = this->test->network_proximity_service;
         auto compute_service = this->test->compute_service;
         auto storage_service = this->test->storage_service;
         auto failure_cause = std::shared_ptr<wrench::FatalFailure>(new wrench::FatalFailure("msg"));
-        std::cerr << "HERE1\n";
         auto mailbox = wrench::S4U_Mailbox::getTemporaryMailbox();
-        std::cerr << "HERE2\n";
 
         auto network_proximity_daemon = std::shared_ptr<wrench::NetworkProximityDaemon>(
                 new wrench::NetworkProximityDaemon(this->simulation, "Host1",
@@ -388,10 +384,10 @@ void MessageConstructorTest::do_MessageConstruction_test() {
 
 
     // Create and initialize a simulation
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-        argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
