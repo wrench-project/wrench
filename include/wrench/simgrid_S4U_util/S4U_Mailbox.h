@@ -183,6 +183,7 @@ namespace wrench {
         void templateWaitingLog(std::string type, unsigned long long id);
         void templateWaitingLogUpdate(std::string type, unsigned long long id);
 
+        static std::vector<std::unique_ptr<S4U_Mailbox>> all_mailboxes;
         static std::deque<S4U_Mailbox *> free_mailboxes;
         static std::set<S4U_Mailbox *> used_mailboxes;
         static std::deque<S4U_Mailbox *> mailboxes_to_drain;
