@@ -303,14 +303,14 @@ void SimulationCommandLineArgumentsTest::do_CommPortPoolSizeArgument_test() {
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-commport_name-pool-size1000");
+    argv[1] = strdup("--wrench-commport-pool-size1000");
 
     ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
 
-    argv[1] = strdup("--wrench-commport_name-pool-size=-1000");
+    argv[1] = strdup("--wrench-commport-pool-size=-1000");
     ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
 
-    argv[1] = strdup("--wrench-commport_name-pool-size=1000");
+    argv[1] = strdup("--wrench-commport-pool-size=1000");
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     for (int i = 0; i < argc; i++)
