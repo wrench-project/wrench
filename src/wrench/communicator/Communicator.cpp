@@ -4,7 +4,7 @@
 #include "wrench/communicator/Communicator.h"
 #include "wrench/communicator/SMPIExecutor.h"
 #include "wrench/simulation//Simulation.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "simgrid/s4u.hpp"
 #include "smpi/smpi.h"
@@ -18,8 +18,8 @@ namespace wrench {
      * @brief Destructor
      */
     Communicator::~Communicator() {
-        for (auto const &item: this->rank_to_mailbox) {
-            S4U_Mailbox::retireTemporaryMailbox(item.second);
+        for (auto const &item: this->rank_to_commport) {
+            S4U_CommPort::retireTemporaryCommPort(item.second);
         }
     }
 
@@ -41,7 +41,7 @@ namespace wrench {
      * @return a number of processes
      */
     unsigned long Communicator::getNumRanks() {
-        return this->rank_to_mailbox.size();
+        return this->rank_to_commport.size();
     }
 
     /**
@@ -50,7 +50,7 @@ namespace wrench {
      * @return a rank
      */
     unsigned long Communicator::join() {
-        return this->join(this->rank_to_mailbox.size());
+        return this->join(this->rank_to_commport.size());
     }
 
     /**
@@ -65,7 +65,7 @@ namespace wrench {
         if (desired_rank >= this->size) {
             throw std::invalid_argument("Communicator::join(): invalid arguments");
         }
-        if (this->rank_to_mailbox.find(desired_rank) != this->rank_to_mailbox.end()) {
+        if (this->rank_to_commport.find(desired_rank) != this->rank_to_commport.end()) {
             if (this->actor_to_rank.find(my_pid) != this->actor_to_rank.end()) {
                 return this->actor_to_rank[my_pid];
             } else {
@@ -73,12 +73,12 @@ namespace wrench {
             }
         }
 
-        this->rank_to_mailbox[desired_rank] = S4U_Mailbox::getTemporaryMailbox();
+        this->rank_to_commport[desired_rank] = S4U_CommPort::getTemporaryCommPort();
         this->rank_to_host[desired_rank] = simgrid::s4u::this_actor::get_host();
         this->actor_to_rank[my_pid] = desired_rank;
         this->participating_hosts.push_back(simgrid::s4u::this_actor::get_host());
 
-        if (this->size > this->rank_to_mailbox.size()) {
+        if (this->size > this->rank_to_commport.size()) {
             simgrid::s4u::this_actor::suspend();
         } else {
             for (auto const &item: this->actor_to_rank) {
@@ -118,8 +118,8 @@ namespace wrench {
         // Post all the sends
         std::vector<std::shared_ptr<S4U_PendingCommunication>> posted_sends;
         for (auto const &send_operation: sends) {
-            auto dst_mailbox = this->rank_to_mailbox[send_operation.first];
-            posted_sends.push_back(dst_mailbox->iputMessage(new wrench::SimulationMessage(send_operation.second)));
+            auto dst_commport = this->rank_to_commport[send_operation.first];
+            posted_sends.push_back(dst_commport->iputMessage(new wrench::SimulationMessage(send_operation.second)));
         }
         // Post the computation (if any)
         simgrid::s4u::ExecPtr computation = nullptr;
@@ -129,7 +129,7 @@ namespace wrench {
 
         // Do all the synchronous receives
         for (int i = 0; i < num_receives; i++) {
-            this->rank_to_mailbox[this->actor_to_rank[my_pid]]->getMessage();
+            this->rank_to_commport[this->actor_to_rank[my_pid]]->getMessage();
         }
         // Wait for all the sends
         for (auto const &posted_send: posted_sends) {

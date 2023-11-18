@@ -82,11 +82,11 @@ namespace wrench {
         auto barrier = simgrid::s4u::Barrier::create(1 + simgrid_hosts.size());
         // Start actors
         auto meta_lambda = [this](const std::shared_ptr<ActionExecutor> &action_executor) {
-            auto mailbox = S4U_Mailbox::getTemporaryMailbox();
-            S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()] = mailbox;
+            auto commport = S4U_CommPort::getTemporaryCommPort();
+            S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()] = commport;
             this->lambda_mpi(action_executor);
-            S4U_Daemon::map_actor_to_recv_mailbox.erase(simgrid::s4u::this_actor::get_pid());
-            S4U_Mailbox::retireTemporaryMailbox(mailbox);
+            S4U_Daemon::map_actor_to_recv_commport.erase(simgrid::s4u::this_actor::get_pid());
+            S4U_CommPort::retireTemporaryCommPort(commport);
         };
 
         ;

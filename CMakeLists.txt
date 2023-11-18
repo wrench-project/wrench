@@ -133,7 +133,7 @@ set(HEADER_FILES
 #        include/wrench/services/memory/Block.h
 #        include/wrench/services/memory/MemoryManager.h
         include/wrench/simgrid_S4U_util/S4U_Daemon.h
-        include/wrench/simgrid_S4U_util/S4U_Mailbox.h
+	include/wrench/simgrid_S4U_util/S4U_CommPort.h
         include/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
         include/wrench/simgrid_S4U_util/S4U_Simulation.h
         include/wrench/simgrid_S4U_util/S4U_VirtualMachine.h
@@ -336,7 +336,7 @@ set(SOURCE_FILES
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
         include/wrench/simgrid_S4U_util/S4U_DaemonActor.h
-        src/wrench/simgrid_S4U_util/S4U_Mailbox.cpp
+	src/wrench/simgrid_S4U_util/S4U_CommPort.cpp
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
         src/wrench/simgrid_S4U_util/S4U_Simulation.cpp
         src/wrench/simgrid_S4U_util/S4U_VirtualMachine.cpp
@@ -519,7 +519,7 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
-        test/simulation/S4U_MailboxTest.cpp
+	test/simulation/S4U_CommPortTest.cpp
         test/misc/UnitParserTest.cpp
         test/services/storage_services/StorageServiceProxy/StorageServiceProxyBasicTest.cpp
         test/services/storage_services/StorageServiceProxy/StorageServiceProxySequentialTest.cpp

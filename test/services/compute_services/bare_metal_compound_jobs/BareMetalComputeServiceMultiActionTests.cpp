@@ -213,7 +213,7 @@ private:
         }
 
         // Coverage
-        job->getCallbackMailbox();
+        job->getCallbackCommPort();
 
         // Submit the job
         job_manager->submitJob(job, this->test->compute_service, {});
@@ -221,7 +221,7 @@ private:
 
         // Coverage
         wrench::Simulation::sleep(1.0);
-        job->printCallbackMailboxStack();
+        job->printCallbackCommPortStack();
 
         // Coverage
         try {

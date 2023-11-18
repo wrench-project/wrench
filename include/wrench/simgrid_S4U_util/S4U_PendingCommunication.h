@@ -39,10 +39,10 @@ namespace wrench {
         /**
          * @brief Constructor
          *
-         * @param mailbox: the mailbox
+         * @param mailbox: the S4U mailbox
          * @param operation_type: the operation type
          */
-        S4U_PendingCommunication(simgrid::s4u::Mailbox *mailbox, OperationType operation_type) : mailbox(mailbox), operation_type(operation_type) {}
+        S4U_PendingCommunication(simgrid::s4u::Mailbox *mailbox, OperationType operation_type) : s4u_mb(mailbox), operation_type(operation_type) {}
 
         std::unique_ptr<SimulationMessage> wait();
         std::unique_ptr<SimulationMessage> wait(double timeout);
@@ -62,8 +62,8 @@ namespace wrench {
 
         /** @brief The message */
         std::unique_ptr<SimulationMessage> simulation_message;
-        /** @brief The mailbox */
-        simgrid::s4u::Mailbox *mailbox;
+        /** @brief The S4U mailbox */
+        simgrid::s4u::Mailbox *s4u_mb;
         /** @brief The operation type */
         OperationType operation_type;
     };

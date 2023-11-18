@@ -255,7 +255,7 @@ private:
         }
 
         // Check that all file copies worked as intended
-        auto tmp_mailbox = wrench::S4U_Mailbox::getTemporaryMailbox();
+        auto tmp_mailbox = wrench::S4U_CommPort::getTemporaryCommPort();
         auto read_file_copy_1 = test->compound_storage_service->lookupFileLocation(test->file_100, tmp_mailbox);
         if (read_file_copy_1.size() != 1) {
             throw std::runtime_error("Lookup returned an incorrect number of parts for file_100 on CSS");
@@ -285,7 +285,7 @@ private:
         if (external_free_space != 400) {
             throw std::runtime_error("Residual data on external free space not cleaned up after stropped copy");
         }
-        wrench::S4U_Mailbox::retireTemporaryMailbox(tmp_mailbox);
+        wrench::S4U_CommPort::retireTemporaryCommPort(tmp_mailbox);
 
         return 0;
     }
@@ -403,7 +403,7 @@ private:
             throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
         }
 
-        auto tmp_mailbox = wrench::S4U_Mailbox::getTemporaryMailbox();
+        auto tmp_mailbox = wrench::S4U_CommPort::getTemporaryCommPort();
         // Check that all file copies worked as intended
         auto write_file_lookup_1 = test->compound_storage_service->lookupFileLocation(test->file_100, tmp_mailbox);
         if (write_file_lookup_1.size() != 1) {
@@ -424,7 +424,7 @@ private:
             throw std::runtime_error("file_500_part_1 should be on /disk510/");
         }
 
-        wrench::S4U_Mailbox::retireTemporaryMailbox(tmp_mailbox);
+        wrench::S4U_CommPort::retireTemporaryCommPort(tmp_mailbox);
 
         return 0;
     }
@@ -547,7 +547,7 @@ private:
         }
 
         // Check that all file copies worked as intended
-        auto tmp_mailbox = wrench::S4U_Mailbox::getTemporaryMailbox();
+        auto tmp_mailbox = wrench::S4U_CommPort::getTemporaryCommPort();
 
         auto write_file_lookup_1 = test->compound_storage_service->lookupFileLocation(test->file_100, tmp_mailbox);
         if (write_file_lookup_1.size() != 1) {
@@ -578,7 +578,7 @@ private:
             throw std::runtime_error("file_500_part_1 should be on /disk510/");
         }
 
-        wrench::S4U_Mailbox::retireTemporaryMailbox(tmp_mailbox);
+        wrench::S4U_CommPort::retireTemporaryCommPort(tmp_mailbox);
 
         return 0;
     }
@@ -744,13 +744,13 @@ private:
             throw std::runtime_error(exc_msg);
         }
 
-        auto tmp_mailbox = wrench::S4U_Mailbox::getTemporaryMailbox();
+        auto tmp_mailbox = wrench::S4U_CommPort::getTemporaryCommPort();
         auto css_File_500 = test->compound_storage_service->lookupFileLocation(test->file_500, tmp_mailbox);
         if (!css_File_500.empty()) {
             throw std::runtime_error("file_500 is still present on CSS, it shouldn't");
         }
 
-        wrench::S4U_Mailbox::retireTemporaryMailbox(tmp_mailbox);
+        wrench::S4U_CommPort::retireTemporaryCommPort(tmp_mailbox);
 
         return 0;
     }

@@ -14,7 +14,7 @@
 
 #include <simgrid/s4u.hpp>
 #include <iostream>
-#include "S4U_Mailbox.h"
+#include "S4U_CommPort.h"
 
 //#define ACTOR_TRACKING_OUTPUT yes
 
@@ -42,26 +42,26 @@ namespace wrench {
 
     public:
         /**
-         * @brief A convenient map between actors and their default receive mailboxes
+         * @brief A convenient map between actors and their default receive commportes
          */
-        static std::unordered_map<aid_t, S4U_Mailbox *> map_actor_to_recv_mailbox;
+        static std::unordered_map<aid_t, S4U_CommPort *> map_actor_to_recv_commport;
 
         /** @brief The name of the daemon */
         std::string process_name;
 
-        /** @brief The daemon's mailbox **/
-        S4U_Mailbox *mailbox;
-        /** @brief The daemon's receive mailbox (to send to another daemon so that that daemon can reply) **/
-        S4U_Mailbox *recv_mailbox;
+        /** @brief The daemon's commport_name **/
+        S4U_CommPort *commport;
+        /** @brief The daemon's receive commport_name (to send to another daemon so that that daemon can reply) **/
+        S4U_CommPort *recv_commport;
 
         /** @brief The name of the host on which the daemon is running */
         std::string hostname;
 
-        static S4U_Mailbox *getRunningActorRecvMailbox();
+        static S4U_CommPort *getRunningActorRecvCommPort();
 
         S4U_Daemon(const std::string &hostname, const std::string &process_name_prefix);
 
-        // Daemon without a mailbox (not needed?)
+        // Daemon without a commport_name (not needed?)
         //        S4U_Daemon(std::string hostname, std::string process_name_prefix);
 
         virtual ~S4U_Daemon();

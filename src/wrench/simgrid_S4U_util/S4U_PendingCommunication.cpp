@@ -43,10 +43,10 @@ namespace wrench {
         } catch (simgrid::NetworkFailureException &e) {
             if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::SENDING, NetworkError::FAILURE, mailbox->get_name()));
+                        NetworkError::OperationType::SENDING, NetworkError::FAILURE, s4u_mb->get_name()));
             } else {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox->get_name()));
+                        NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, s4u_mb->get_name()));
             }
         }
         return std::move(this->simulation_message);
@@ -68,18 +68,18 @@ namespace wrench {
         } catch (simgrid::NetworkFailureException &e) {
             if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::SENDING, NetworkError::FAILURE, mailbox->get_name()));
+                        NetworkError::OperationType::SENDING, NetworkError::FAILURE, s4u_mb->get_name()));
             } else {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox->get_name()));
+                        NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, s4u_mb->get_name()));
             }
         } catch (simgrid::TimeoutException &e) {
             if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::SENDING, NetworkError::TIMEOUT, mailbox->get_name()));
+                        NetworkError::OperationType::SENDING, NetworkError::TIMEOUT, s4u_mb->get_name()));
             } else {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::RECEIVING, NetworkError::TIMEOUT, mailbox->get_name()));
+                        NetworkError::OperationType::RECEIVING, NetworkError::TIMEOUT, s4u_mb->get_name()));
             }
         }
         return std::move(this->simulation_message);

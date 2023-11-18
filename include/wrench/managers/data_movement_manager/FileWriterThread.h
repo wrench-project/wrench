@@ -31,14 +31,14 @@ namespace wrench {
     class FileWriterThread : public Service {
 
     public:
-        FileWriterThread(std::string hostname, S4U_Mailbox *creator_mailbox,
+        FileWriterThread(std::string hostname, S4U_CommPort *creator_commport,
                          std::shared_ptr<FileLocation> location);
 
     protected:
     private:
         int main() override;
 
-        S4U_Mailbox *creator_mailbox;
+        S4U_CommPort *creator_commport;
         std::shared_ptr<FileLocation> location;
     };
 
