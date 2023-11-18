@@ -388,15 +388,15 @@ private:
     int main() override {
 
         // Coverage
-        wrench::S4U_CommPort::NULL_MAILBOX->putMessage(nullptr);
-        wrench::S4U_CommPort::NULL_MAILBOX->iputMessage(nullptr);
+        wrench::S4U_CommPort::NULL_COMMPORT->putMessage(nullptr);
+        wrench::S4U_CommPort::NULL_COMMPORT->iputMessage(nullptr);
         try {
-            wrench::S4U_CommPort::NULL_MAILBOX->getMessage();
-            throw std::runtime_error("Shouldn't be able to get message from NULL_MAILBOX");
+            wrench::S4U_CommPort::NULL_COMMPORT->getMessage();
+            throw std::runtime_error("Shouldn't be able to get message from NULL_COMMPORT");
         } catch (std::invalid_argument &ignore) {}
         try {
-            wrench::S4U_CommPort::NULL_MAILBOX->igetMessage();
-            throw std::runtime_error("Shouldn't be able to get message from NULL_MAILBOX");
+            wrench::S4U_CommPort::NULL_COMMPORT->igetMessage();
+            throw std::runtime_error("Shouldn't be able to get message from NULL_COMMPORT");
         } catch (std::invalid_argument &ignore) {}
 
         return 0;

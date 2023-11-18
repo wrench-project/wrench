@@ -125,7 +125,7 @@ namespace wrench {
     /**
      * @brief Process a file deletion request
      * @param location: the file location
-     * @param answer_commport: the commport_name to which the notification should be sent
+     * @param answer_commport: the commport to which the notification should be sent
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFileDeleteRequest(
@@ -170,7 +170,7 @@ namespace wrench {
     /**
      * @brief Process a file lookup request
      * @param location: the file location
-     * @param answer_commport: the commport_name to which the notification should be sent
+     * @param answer_commport: the commport to which the notification should be sent
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFileLookupRequest(
@@ -291,7 +291,7 @@ namespace wrench {
 
     /**
      * @brief Process a free space request
-     * @param answer_commport: the commport_name to which the notification should be sent
+     * @param answer_commport: the commport to which the notification should be sent
      * @param path: the path at which free space is requested
      * @return false if the daemon should terminate
      */
@@ -315,7 +315,7 @@ namespace wrench {
 
     /**
      * @brief Process a stop daemon request
-     * @param ack_commport: the commport_name to which the ack should be sent
+     * @param ack_commport: the commport to which the ack should be sent
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processStopDaemonRequest(S4U_CommPort *ack_commport) {

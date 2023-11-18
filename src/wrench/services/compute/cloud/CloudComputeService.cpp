@@ -101,7 +101,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        // send a "create vm" message to the daemon's commport_name
+        // send a "create vm" message to the daemon's commport
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceCreateVMAnswerMessage>(
@@ -150,7 +150,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        // send a "shutdown vm" message to the daemon's commport_name
+        // send a "shutdown vm" message to the daemon's commport
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceShutdownVMAnswerMessage>(
@@ -246,7 +246,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        // send a "shutdown vm" message to the daemon's commport_name
+        // send a "shutdown vm" message to the daemon's commport
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceSuspendVMAnswerMessage>(
@@ -276,7 +276,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        // send a "shutdown vm" message to the daemon's commport_name
+        // send a "shutdown vm" message to the daemon's commport
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceResumeVMAnswerMessage>(
@@ -306,7 +306,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        // send a "shutdown vm" message to the daemon's commport_name
+        // send a "shutdown vm" message to the daemon's commport
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceDestroyVMAnswerMessage>(
@@ -383,7 +383,7 @@ namespace wrench {
     int CloudComputeService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
-        WRENCH_INFO("Cloud Service starting on host %s listening on commport_name %s",
+        WRENCH_INFO("Cloud Service starting on host %s listening on commport %s",
                     this->hostname.c_str(),
                     this->commport->get_cname());
 
@@ -402,7 +402,7 @@ namespace wrench {
     //    /**
     //     * @brief Send a message request
     //     *
-    //     * @param answer_commport: the commport_name to which the answer message should be sent
+    //     * @param answer_commport: the commport to which the answer message should be sent
     //     * @param message: message to be sent
     //     * @return a simulation message
     //     *
@@ -413,7 +413,7 @@ namespace wrench {
     //                                                                                   ComputeServiceMessage *tosend) {
     //        serviceSanityCheck();
     //
-    //        S4U_CommPort::putMessage(this->commport_name, tosend);
+    //        S4U_CommPort::putMessage(this->commport, tosend);
     //
     //        // Wait for a reply
     //        return S4U_CommPort::getMessage<TMessageType>(answer_commport, this->network_timeout, "CloudComputeService::sendRequestAndWaitForAnswer(): received an");
@@ -513,7 +513,7 @@ namespace wrench {
     /**
      * @brief Process a execution host list request
      *
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      */
     void CloudComputeService::processGetExecutionHosts(S4U_CommPort *answer_commport) {
         answer_commport->dputMessage(
@@ -526,7 +526,7 @@ namespace wrench {
     /**
      * @brief Create a BareMetalComputeService VM on a physical machine
      *
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param requested_num_cores: the number of cores the service can use
      * @param requested_ram: the VM's RAM memory_manager_service capacity
      * @param physical_host: the desired physical host ("" means any)
@@ -620,7 +620,7 @@ namespace wrench {
     /**
      * @brief: Process a VM shutdown request
      *
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param vm_name: the name of the VM
      * @param send_failure_notifications: whether to send failure notifications
      * @param termination_cause: termination cause (if failure notifications are sent)
@@ -764,7 +764,7 @@ namespace wrench {
     /**
      * @brief: Process a VM start request by starting a VM on a host (using best fit for RAM first, and then for cores)
      *
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param vm_name: the name of the VM
      */
     void CloudComputeService::
@@ -857,7 +857,7 @@ namespace wrench {
     /**
      * @brief: Process a VM suspend request
      *
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param vm_name: the name of the VM
      */
     void CloudComputeService::processSuspendVM(S4U_CommPort *answer_commport,
@@ -896,7 +896,7 @@ namespace wrench {
     /**
      * @brief: Process a VM resume request
      *
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param vm_name: the name of the VM
      */
     void CloudComputeService::processResumeVM(S4U_CommPort *answer_commport,
@@ -934,7 +934,7 @@ namespace wrench {
     /**
     * @brief: Process a VM destruction request
     *
-    * @param answer_commport: the commport_name to which the answer message should be sent
+    * @param answer_commport: the commport to which the answer message should be sent
     * @param vm_name: the name of the VM
     */
     void CloudComputeService::processDestroyVM(S4U_CommPort *answer_commport,
@@ -1040,7 +1040,7 @@ namespace wrench {
 
     /**
      * @brief Process a "get resource information message"
-     * @param answer_commport: the commport_name to which the description message should be sent
+     * @param answer_commport: the commport to which the description message should be sent
      * @param key: the desired resource information (i.e., dictionary key) that's needed)
      */
     void CloudComputeService::processGetResourceInformation(S4U_CommPort *answer_commport,
@@ -1089,7 +1089,7 @@ namespace wrench {
 
     /**
      * @brief Process a host available resource request
-     * @param answer_commport: the answer commport_name
+     * @param answer_commport: the answer commport
      * @param num_cores: the desired number of cores
      * @param ram: the desired RAM
      */

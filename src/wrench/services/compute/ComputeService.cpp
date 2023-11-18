@@ -48,7 +48,7 @@ namespace wrench {
 
         WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->commport->get_cname());
 
-        // Send a termination message to the daemon's commport_name - SYNCHRONOUSLY
+        // Send a termination message to the daemon's commport - SYNCHRONOUSLY
         auto ack_commport = S4U_Daemon::getRunningActorRecvCommPort();
         try {
             this->commport->putMessage(new ServiceStopDaemonMessage(
@@ -351,7 +351,7 @@ namespace wrench {
     bool ComputeService::isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, double ram) {
         assertServiceIsUp();
 
-        // send an "info request" message to the daemon's commport_name
+        // send an "info request" message to the daemon's commport
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         this->commport->putMessage(new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
@@ -424,7 +424,7 @@ namespace wrench {
         assertServiceIsUp();
 
         if (simulate_it) {
-            // send an "info request" message to the daemon's commport_name
+            // send an "info request" message to the daemon's commport
             auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
             this->commport->putMessage(new ComputeServiceResourceInformationRequestMessage(

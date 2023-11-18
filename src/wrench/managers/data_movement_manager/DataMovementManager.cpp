@@ -34,7 +34,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the hostname on which the data movement manager is to run
-     * @param creator_commport: the commport_name of the manager's creator
+     * @param creator_commport: the commport of the manager's creator
      */
     DataMovementManager::DataMovementManager(std::string hostname, S4U_CommPort *creator_commport) : Service(hostname, "data_movement_manager") {
         this->creator_commport = creator_commport;

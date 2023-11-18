@@ -198,7 +198,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        //  send a "run a standard job" message to the daemon's commport_name
+        //  send a "run a standard job" message to the daemon's commport
         this->commport->putMessage(
                                 new ComputeServiceSubmitCompoundJobRequestMessage(
                                         answer_commport, job, service_specific_args,
@@ -493,7 +493,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        //  send a "terminate a compound job" message to the daemon's commport_name
+        //  send a "terminate a compound job" message to the daemon's commport
         this->commport->putMessage(
                                 new ComputeServiceTerminateCompoundJobRequestMessage(
                                         answer_commport, job, this->getMessagePayloadValue(BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
@@ -509,7 +509,7 @@ namespace wrench {
     /**
     * @brief Process a submit compound job request
     *
-    * @param answer_commport: the commport_name to which the answer message should be sent
+    * @param answer_commport: the commport to which the answer message should be sent
     * @param job: the job
     * @param service_specific_arguments: service specific arguments
     *
@@ -605,7 +605,7 @@ namespace wrench {
  * @brief Process a compound job termination request
  *
  * @param job: the job to terminate
- * @param answer_commport: the commport_name to which the answer message should be sent
+ * @param answer_commport: the commport to which the answer message should be sent
  */
     void BareMetalComputeService::processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job,
                                                                        S4U_CommPort *answer_commport) {
@@ -638,7 +638,7 @@ namespace wrench {
 
     /**
  * @brief Process a host available resource request
- * @param answer_commport: the answer commport_name
+ * @param answer_commport: the answer commport
  * @param num_cores: the desired number of cores
  * @param ram: the desired RAM
  */
@@ -664,7 +664,7 @@ namespace wrench {
 
     /**
      * @brief Process a "get resource description message"
-     * @param answer_commport: the commport_name to which the description message should be sent
+     * @param answer_commport: the commport to which the description message should be sent
      * @param key: the desired resource information (i.e., dictionary key) that's needed)
      */
     void BareMetalComputeService::processGetResourceInformation(S4U_CommPort *answer_commport,

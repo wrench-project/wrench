@@ -175,7 +175,7 @@ namespace wrench {
      *
      * @param location: the location to write the file to
      * @param num_bytes_to_write: the number of bytes to write to the file
-     * @param answer_commport: the commport_name to which the reply should be sent
+     * @param answer_commport: the commport to which the reply should be sent
      * @return true if this process should keep running
      */
     bool SimpleStorageServiceBufferized::processFileWriteRequest(std::shared_ptr<FileLocation> &location,
@@ -219,7 +219,7 @@ namespace wrench {
                 fs->createDirectory(path_at_mount_point);
             }
 
-            // Generate a commport_name name on which to receive the file
+            // Generate a commport name on which to receive the file
             auto file_reception_commport = S4U_CommPort::getTemporaryCommPort();
 
             // Reply with a "go ahead, send me the file" message
@@ -270,7 +270,7 @@ namespace wrench {
      * @brief Handle a file read request
      * @param location: the file's location
      * @param num_bytes_to_read: the number of bytes to read
-     * @param answer_commport: the commport_name to which the answer should be sent
+     * @param answer_commport: the commport to which the answer should be sent
      * @return
      */
     bool SimpleStorageServiceBufferized::processFileReadRequest(
@@ -347,7 +347,7 @@ namespace wrench {
      * @brief Handle a file copy request
      * @param src_location: the source location
      * @param dst_location: the destination location
-     * @param answer_commport: the commport_name to which the answer should be sent
+     * @param answer_commport: the commport to which the answer should be sent
      * @return
      */
     bool SimpleStorageServiceBufferized::processFileCopyRequest(
@@ -448,15 +448,15 @@ namespace wrench {
     /**
      * @brief Process a notification received from a file transfer thread
      * @param ftt: the file transfer thread
-     * @param src_commport: the transfer's source commport_name (or "" if source was not a commport_name)
+     * @param src_commport: the transfer's source commport (or "" if source was not a commport)
      * @param src_location: the transfer's source location (or nullptr if source was not a location)
-     * @param dst_commport: the transfer's destination commport_name (or "" if source was not a commport_name)
+     * @param dst_commport: the transfer's destination commport (or "" if source was not a commport)
      * @param dst_location: the transfer's destination location (or nullptr if destination was not a location)
      * @param success: whether the transfer succeeded or not
      * @param failure_cause: the failure cause (nullptr if success)
-     * @param answer_commport_if_read: the commport_name to send a read notification ("" if not a copy)
-     * @param answer_commport_if_write: the commport_name to send a write notification ("" if not a copy)
-     * @param answer_commport_if_copy: the commport_name to send a copy notification ("" if not a copy)
+     * @param answer_commport_if_read: the commport to send a read notification ("" if not a copy)
+     * @param answer_commport_if_write: the commport to send a write notification ("" if not a copy)
+     * @param answer_commport_if_copy: the commport to send a copy notification ("" if not a copy)
      * @return false if the daemon should terminate
      */
     bool SimpleStorageServiceBufferized::processFileTransferThreadNotification(const std::shared_ptr<FileTransferThread> &ftt,

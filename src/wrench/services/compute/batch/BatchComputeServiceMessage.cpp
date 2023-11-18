@@ -22,7 +22,7 @@ namespace wrench {
 #if 0
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to reply to
+     * @param answer_commport: the commport to reply to
      * @param job_args_to_scheduler: the arguments required by batscheduler of batsim
      * @param payload: the message size in bytes
      *
@@ -38,7 +38,7 @@ namespace wrench {
       }
       if (answer_commport.empty()) {
         throw std::invalid_argument(
-                "BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(): Empty answer commport_name");
+                "BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(): Empty answer commport");
       }
       this->answer_commport = answer_commport;
       this->job_args_to_scheduler = job_args_to_scheduler;
@@ -48,7 +48,7 @@ namespace wrench {
 #if 0
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to reply to
+     * @param answer_commport: the commport to reply to
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -57,7 +57,7 @@ namespace wrench {
             : BatchComputeServiceMessage("BATCH_SCHED_READY", payload) {
       if (answer_commport.empty()) {
         throw std::invalid_argument(
-                "BatchSchedReadyMessage::BatchSchedReadyMessage(): Empty answer commport_name");
+                "BatchSchedReadyMessage::BatchSchedReadyMessage(): Empty answer commport");
       }
       this->answer_commport = answer_commport;
     }
@@ -65,7 +65,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to reply to
+     * @param answer_commport: the commport to reply to
      * @param batsched_decision_reply: the decision reply from Batsched
      * @param payload: the message size in bytes
      *
@@ -78,7 +78,7 @@ namespace wrench {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_commport == nullptr) {
             throw std::invalid_argument(
-                    "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty answer commport_name");
+                    "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty answer commport");
         }
         if (batsched_decision_reply.empty()) {
             throw std::invalid_argument(
@@ -104,7 +104,7 @@ namespace wrench {
 #if 0
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to reply to
+     * @param answer_commport: the commport to reply to
      * @param job: the BatchComputeService job
      * @param job_args_to_scheduler: the arguments required by batscheduler of batsim
      * @param payload: the message size in bytes
@@ -124,7 +124,7 @@ namespace wrench {
         throw std::invalid_argument("BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(): invalid job");
       }
       if (answer_commport.empty()) {
-        throw std::invalid_argument("BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(): invalid answer commport_name");
+        throw std::invalid_argument("BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(): invalid answer commport");
       }
       this->job_args_to_scheduler = job_args_to_scheduler;
       this->answer_commport = answer_commport;
@@ -148,7 +148,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to which the answer should be sent back
+     * @param answer_commport: the commport to which the answer should be sent back
      * @param job: the BatchComputeService job
      * @param payload: the message size in bytes
      *
@@ -164,7 +164,7 @@ namespace wrench {
         }
         if (answer_commport == nullptr) {
             throw std::invalid_argument(
-                    "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Empty answer commport_name");
+                    "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Empty answer commport");
         }
 #endif
         this->answer_commport = answer_commport;

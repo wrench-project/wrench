@@ -35,7 +35,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of host on which the job manager will run
-     * @param creator_commport: the commport_name of the manager's creator
+     * @param creator_commport: the commport of the manager's creator
      */
     JobManager::JobManager(std::string hostname, S4U_CommPort *creator_commport) : Service(std::move(hostname), "job_manager") {
         this->creator_commport = creator_commport;
@@ -1214,9 +1214,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Return the commport_name of the job manager's creator
+     * @brief Return the commport of the job manager's creator
      *
-     * @return a commport_name
+     * @return a CommPort
      */
     S4U_CommPort *JobManager::getCreatorCommPort() {
         return this->creator_commport;

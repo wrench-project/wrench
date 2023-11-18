@@ -97,7 +97,7 @@ namespace wrench {
     /**
      * @brief Synchronously write a file to the storage service
      *
-     * @param answer_commport: the commport_name on which to expect the answer
+     * @param answer_commport: the commport on which to expect the answer
      * @param location: the location
      * @param num_bytes_to_write: the number of bytes to write to the file
      * @param wait_for_answer: whether to wait for the answer
@@ -209,7 +209,7 @@ namespace wrench {
     /**
      * @brief Asks the storage service whether it holds a file
      *
-     * @param answer_commport: the answer commport_name to which the reply from the server should be sent
+     * @param answer_commport: the answer commport to which the reply from the server should be sent
      * @param location: the location to lookup
      *
      * @return true if the file is present, false otherwise
@@ -241,7 +241,7 @@ namespace wrench {
     /**
      * @brief Read a file from the storage service
      *
-     * @param answer_commport: the commport_name on which to expect the answer
+     * @param answer_commport: the commport on which to expect the answer
      * @param location: the location
      * @param num_bytes: the number of bytes to read
      * @param wait_for_answer: whether to wait for the answer
@@ -388,7 +388,7 @@ namespace wrench {
     /**
      * @brief Delete a file on the storage service
      *
-     * @param answer_commport: the answer commport_name to which the reply from the server should be sent
+     * @param answer_commport: the answer commport to which the reply from the server should be sent
      * @param location: the location to delete
      * @param wait_for_answer: whether this call should
      */
@@ -500,7 +500,7 @@ namespace wrench {
     /**
      * @brief Asynchronously ask for a file copy between two storage services
      *
-     * @param answer_commport: the commport_name to which a notification message will be sent
+     * @param answer_commport: the commport to which a notification message will be sent
      * @param src_location: the source location
      * @param dst_location: the destination location
      *

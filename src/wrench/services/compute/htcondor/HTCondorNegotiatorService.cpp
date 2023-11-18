@@ -38,7 +38,7 @@ namespace wrench {
      * @param compute_services: a set of 'child' compute services available to and via the HTCondor pool
      * @param running_jobs: a list of currently running jobs
      * @param pending_jobs: a list of pending jobs
-     * @param reply_commport: the commport_name to which the "done/failed" message should be sent
+     * @param reply_commport: the commport to which the "done/failed" message should be sent
      */
     HTCondorNegotiatorService::HTCondorNegotiatorService(
             std::string &hostname,
@@ -90,7 +90,7 @@ namespace wrench {
     int HTCondorNegotiatorService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
 
-        WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on commport_name %s",
+        WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on commport %s",
                     this->hostname.c_str(), this->commport->get_cname());
 
         std::set<std::shared_ptr<Job>> scheduled_jobs;

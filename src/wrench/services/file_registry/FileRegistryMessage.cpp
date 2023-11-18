@@ -23,7 +23,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param file: the file to look up
      * @param payload: the message size in bytes
      */
@@ -55,7 +55,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param file: the file to look up
      * @param reference_host: the host from which network proximity will be calculated from //
      * @param network_proximity_service: a reference to the network proximity service to be used
@@ -101,7 +101,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param location: the file location of that entry
      * @param payload: the message size in bytes
      */
@@ -131,7 +131,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param location: the location for the new entry
      * @param payload: the message size in bytes
      */

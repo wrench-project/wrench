@@ -20,7 +20,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param ack_commport: commport_name to which the DaemonStoppedMessage ack will be sent. No ack will be sent if ack_commport=""
+     * @param ack_commport: commport to which the DaemonStoppedMessage ack will be sent. No ack will be sent if ack_commport=""
      * @param send_failure_notifications: whether the service should send failure notifications before terminating
      * @param termination_cause: the termination cause (if failure notifications are sent)
      * @param payload: message size in bytes
