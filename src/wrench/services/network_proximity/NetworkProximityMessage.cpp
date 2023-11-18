@@ -22,7 +22,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param hosts: the pair of hosts to look up
      * @param payload: the message size in bytes
      */
@@ -100,7 +100,7 @@ namespace wrench {
      * @brief Constructor
      * @param next_host_to_send: the next host to contact
      * @param next_daemon_to_send: the next daemon to contact
-     * @param next_commport_to_send: the next commport_name to contact
+     * @param next_commport_to_send: the next commport to contact
      * @param payload: the message size in bytes
      */
     NextContactDaemonAnswerMessage::NextContactDaemonAnswerMessage(std::string next_host_to_send,
@@ -121,7 +121,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to return the answer to
+     * @param answer_commport: the commport to return the answer to
      * @param requested_host: the name of the host whose coordinates are being requested
      * @param payload: the message size in bytes
      */

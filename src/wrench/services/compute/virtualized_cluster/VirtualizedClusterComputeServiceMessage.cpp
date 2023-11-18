@@ -23,7 +23,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_commport: the commport_name to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param vm_name: the name of the new VM host
      * @param dest_pm_hostname: the name of the destination physical machine host
      * @param payload: the message size in bytes

@@ -26,7 +26,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param reply_commport: the reply commport_name
+     * @param reply_commport: the reply commport
      * @param action: the action to perform
      * @param payload: the message size in bytes
      */
@@ -61,7 +61,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param reply_commport: the reply commport_name
+     * @param reply_commport: the reply commport
      * @param action: the action to terminate
      * @param termination_cause: the termination cause
      * @param payload: the message size in bytes

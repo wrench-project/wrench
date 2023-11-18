@@ -27,13 +27,13 @@ namespace wrench {
      * @param parent: the parent storage service
      * @param file: the file corresponding to the connection
      * @param num_bytes_to_transfer: number of bytes to transfer
-     * @param src_commport: the a source commport_name to receive data from
+     * @param src_commport: the a source commport to receive data from
      * @param dst_location: a location to write data to
-     * @param answer_commport_if_read: the commport_name to send an answer to in case this was a file read ("" if none). This
+     * @param answer_commport_if_read: the commport to send an answer to in case this was a file read ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
-     * @param answer_commport_if_write: the commport_name to send an answer to in case this was a file write ("" if none). This
+     * @param answer_commport_if_write: the commport to send an answer to in case this was a file write ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
-     * @param answer_commport_if_copy: the commport_name to send an answer to in case this was a file copy ("" if none). This
+     * @param answer_commport_if_copy: the commport to send an answer to in case this was a file copy ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
      */
@@ -67,12 +67,12 @@ namespace wrench {
      * @param file: the file corresponding to the connection
      * @param num_bytes_to_transfer: number of bytes to transfer
      * @param src_location: a location to read data from
-     * @param dst_commport: a commport_name to send data to
-     * @param answer_commport_if_read: the commport_name to send an answer to in case this was a file read ("" if none). This
+     * @param dst_commport: a commport to send data to
+     * @param answer_commport_if_read: the commport to send an answer to in case this was a file read ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
-     * @param answer_commport_if_write: the commport_name to send an answer to in case this was a file write ("" if none). This
+     * @param answer_commport_if_write: the commport to send an answer to in case this was a file write ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
-     * @param answer_commport_if_copy: the commport_name to send an answer to in case this was a file copy ("" if none). This
+     * @param answer_commport_if_copy: the commport to send an answer to in case this was a file copy ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
      */
@@ -107,11 +107,11 @@ namespace wrench {
      * @param num_bytes_to_transfer: number of bytes to transfer
      * @param src_location: a location to read data from
      * @param dst_location: a location to send data to
-     * @param answer_commport_if_read: the commport_name to send an answer to in case this was a file read (nullptr if none). This
+     * @param answer_commport_if_read: the commport to send an answer to in case this was a file read (nullptr if none). This
      *        will simply be reported to the parent service, who may use it as needed
-     * @param answer_commport_if_write: the commport_name to send an answer to in case this was a file write (nullptr if none). This
+     * @param answer_commport_if_write: the commport to send an answer to in case this was a file write (nullptr if none). This
      *        will simply be reported to the parent service, who may use it as needed
-     * @param answer_commport_if_copy: the commport_name to send an answer to in case this was a file copy (nullptr if none). This
+     * @param answer_commport_if_copy: the commport to send an answer to in case this was a file copy (nullptr if none). This
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
      */
@@ -256,7 +256,7 @@ namespace wrench {
     /**
     * @brief Method to received a f from the network onto the local disk
     * @param f: the f
-    * @param commport: the source commport_name
+    * @param commport: the source commport
     * @param location: the destination location
     *
     * @throw shared_ptr<FailureCause>
@@ -369,7 +369,7 @@ namespace wrench {
      * @param f: the f
      * @param location: the source location
      * @param num_bytes: number of bytes to transfer
-     * @param commport: the destination commport_name
+     * @param commport: the destination commport
      *
      * @throw shared_ptr<FailureCause>
      */
@@ -541,7 +541,7 @@ namespace wrench {
                 throw ExecutionException(msg->failure_cause);
             }
             commport_to_receive_the_file_content = msg->commport_to_receive_the_file_content;
-            WRENCH_INFO("Download request accepted (will receive file content on commport_name %s)",
+            WRENCH_INFO("Download request accepted (will receive file content on commport %s)",
                         commport_to_receive_the_file_content->get_cname());
         } else {
             throw std::runtime_error("FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +

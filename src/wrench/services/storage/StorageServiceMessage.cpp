@@ -30,7 +30,7 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    * @param answer_commport: the commport_name to which to send the answer
+    * @param answer_commport: the commport to which to send the answer
     * @param path: the path
     * @param payload: the message size in bytes
     *
@@ -69,7 +69,7 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    * @param answer_commport: the commport_name to which to send the answer
+    * @param answer_commport: the commport to which to send the answer
     * @param location: the file location (hopefully)
     * @param payload: the message size in bytes
     *
@@ -113,7 +113,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param location: the location
      * @param payload: the message size in bytes
      *
@@ -165,7 +165,7 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    * @param answer_commport: the commport_name to which to send the answer (if nullptr, no answer will be sent)
+    * @param answer_commport: the commport to which to send the answer (if nullptr, no answer will be sent)
     * @param src: the source location
     * @param dst: the destination location
     * @param payload: the message size in bytes
@@ -219,7 +219,7 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    * @param answer_commport: the commport_name to which to send the answer
+    * @param answer_commport: the commport to which to send the answer
     * @param requesting_host: the requesting host
     * @param location: the location
     * @param num_bytes_to_write: the number of bytes to write to the file
@@ -280,7 +280,7 @@ namespace wrench {
 
     /**
    * @brief Constructor
-   * @param answer_commport: the commport_name to which to send the answer
+   * @param answer_commport: the commport to which to send the answer
    * @param requesting_host: the requesting host
    * @param location: the location to read
    * @param num_bytes_to_read: the number of bytes to read
@@ -332,7 +332,7 @@ namespace wrench {
      * @param location: the location of the file to read
      * @param success: whether the read operation was successful
      * @param failure_cause: the cause of the failure (or nullptr on success)
-     * @param commport_to_receive_the_file_content: the commport_name to which to send the file content (or nullptr if none)
+     * @param commport_to_receive_the_file_content: the commport to which to send the file content (or nullptr if none)
      * @param buffer_size: the buffer size that will be used
      * @param number_of_sources: the number of sources that will send file chunks over
      * @param payload: the message size in bytes

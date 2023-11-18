@@ -84,7 +84,7 @@ namespace wrench {
             throw std::invalid_argument("Trying to start a VM on an unknown (at least to this service) physical host");
         }
 
-        // send a "create vm" message to the daemon's commport_name
+        // send a "create vm" message to the daemon's commport
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceCreateVMAnswerMessage>(
@@ -116,7 +116,7 @@ namespace wrench {
                     "VirtualizedClusterComputeService::migrateVM(): Unknown VM name '" + vm_name + "'");
         }
 
-        // send a "migrate vm" message to the daemon's commport_name
+        // send a "migrate vm" message to the daemon's commport
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<VirtualizedClusterComputeServiceMigrateVMAnswerMessage>(
@@ -248,7 +248,7 @@ namespace wrench {
     /**
      * @brief Process a VM migration request
      *
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param vm_name: the name of the VM host
      * @param dest_pm_hostname: the name of the destination physical machine host
      *

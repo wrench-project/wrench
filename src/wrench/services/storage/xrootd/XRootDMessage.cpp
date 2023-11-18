@@ -28,7 +28,7 @@ namespace wrench {
         Message::Message(double payload) : StorageServiceMessage(payload) {}
         /**
          * @brief Constructor
-         * @param answer_commport: The commport_name the final answer should be sent to
+         * @param answer_commport: The commport the final answer should be sent to
          * @param original: The original file read request being responded too.  If this is a file locate search, this should be null
          * @param file: The file to search for
          * @param node: The node where the search was initiated
@@ -45,7 +45,7 @@ namespace wrench {
                                                      int timeToLive) : Message(payload), answer_commport(answer_commport), original(original), file(file), node(node), answered(answered), timeToLive(timeToLive) {}
         /**
          * @brief Constructor
-         * @param answer_commport: The commport_name the final answer should be sent to
+         * @param answer_commport: The commport the final answer should be sent to
          * @param file: The file being searched for
          * @param fileReadRequest: Whether this message is in response to a file read request (true) or a file lookup request (false)
          * @param answered: A shared boolean for if the answer has been sent to the client.  This should be the same for all messages searching for this request.  Used to prevent the multiple response problem
@@ -63,7 +63,7 @@ namespace wrench {
 
         /**
          * @brief Constructor
-         * @param answer_commport: The commport_name the final answer should be sent to
+         * @param answer_commport: The commport the final answer should be sent to
          * @param original: The original file read request being responded too.  If this is a file locate search, this should be null
          * @param node: The node where the search was initiated
          * @param file: The file that was found
@@ -105,7 +105,7 @@ namespace wrench {
 
         /**
          * @brief Constructor
-         * @param answer_commport: The commport_name the final answer should be sent to
+         * @param answer_commport: The commport the final answer should be sent to
          * @param original: The original file read request being responded too.  If this is a file locate search, this should be null
          * @param file: The file to search for
          * @param node: The node where the search was initiated

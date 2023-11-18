@@ -53,9 +53,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the "origin" callback commport_name
+     * @brief Get the "origin" callback commport
      *
-     * @return the next callback commport_name
+     * @return the next callback commport
      */
     S4U_CommPort *Job::getOriginCallbackCommPort() {
         return this->originator_commport;
@@ -75,11 +75,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the "next" callback commport_name (returns the
-     *         workflow commport_name if the commport_name stack is empty), and
+     * @brief Get the "next" callback commport (returns the
+     *         workflow commport if the commport stack is empty), and
      *         pops it
      *
-     * @return the next callback commport_name
+     * @return the next callback commport
      */
     S4U_CommPort *Job::popCallbackCommPort() {
         if (this->callback_commport_stack.empty()) {
@@ -91,8 +91,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the job's "next" callback commport_name, without popping it
-     * @return the next callback commport_name
+     * @brief Get the job's "next" callback commport, without popping it
+     * @return the next callback commport
      */
     S4U_CommPort *Job::getCallbackCommPort() {
         if (this->callback_commport_stack.empty()) {
@@ -102,9 +102,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Pushes a callback commport_name
+     * @brief Pushes a callback commport
      *
-     * @param commport: the commport_name name
+     * @param commport: the commport name
      */
     void Job::pushCallbackCommPort(S4U_CommPort *commport) {
         this->callback_commport_stack.push(commport);

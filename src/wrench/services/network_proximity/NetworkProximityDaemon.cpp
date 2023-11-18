@@ -27,7 +27,7 @@ namespace wrench {
      * @brief Constructor
      * @param simulation: a pointer to the simulation object
      * @param hostname: the hostname on which to start the service
-     * @param network_proximity_service_commport the commport_name of the network proximity service
+     * @param network_proximity_service_commport the commport of the network proximity service
      * @param message_size the size of the message to be sent between network daemons to compute proximity
      * @param measurement_period the time-difference between two message transfer to compute proximity
      * @param noise the noise to add to compute the time-difference
@@ -49,14 +49,14 @@ namespace wrench {
      * @brief Constructor
      * @param simulation: a pointer to the simulation object
      * @param hostname: the hostname on which to start the service
-     * @param network_proximity_service_commport: the commport_name of the network proximity service
+     * @param network_proximity_service_commport: the commport of the network proximity service
      * @param message_size: the size of the message to be sent between network daemons to compute proximity
      * @param measurement_period: the time-difference between two message transfer to compute proximity
      * @param noise: the maximum magnitude of random noises added to the measurement_period at each iteration,
      *               so as to avoid idiosyncratic behaviors that occur with perfect synchrony
      * @param noise_seed seed for the noise RNG
      * @param messagepayload_list: a message payload list
-     * @param suffix: suffix to append to the service name and commport_name
+     * @param suffix: suffix to append to the service name and commport
      */
 
     NetworkProximityDaemon::NetworkProximityDaemon(

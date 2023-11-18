@@ -182,7 +182,7 @@ namespace wrench {
             if (not comm_ptr_has_been_posted) {
                 try {
                     comm_ptr = this->commport->igetMessage();
-//                    comm_ptr = this->commport_name->get_async<void>((void **) (&(simulation_message)));
+//                    comm_ptr = this->commport->get_async<void>((void **) (&(simulation_message)));
                 } catch (wrench::ExecutionException &e) {
                     // oh well
                     continue;
@@ -313,7 +313,7 @@ namespace wrench {
      *
      * @param location: the location to write the file to
      * @param num_bytes_to_write: the number of bytes to write to the file
-     * @param answer_commport: the commport_name to which the reply should be sent
+     * @param answer_commport: the commport to which the reply should be sent
      * @param requesting_host: the requesting host
      * @return true if this process should keep running
      */
@@ -416,7 +416,7 @@ namespace wrench {
      * @brief Handle a file read request
      * @param location: the file's location
      * @param num_bytes_to_read: the number of bytes to read
-     * @param answer_commport: the commport_name to which the answer should be sent
+     * @param answer_commport: the commport to which the answer should be sent
      * @param requesting_host: the requesting_host
      * @return
      */
@@ -450,7 +450,7 @@ namespace wrench {
 
         bool success = (failure_cause == nullptr);
 
-        // If a success, create the chunk_receiving commport_name
+        // If a success, create the chunk_receiving commport
 
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
         answer_commport->dputMessage(
@@ -458,7 +458,7 @@ namespace wrench {
                         location,
                         success,
                         failure_cause,
-                        nullptr,// non-bufferized = no chunk-receiving commport_name
+                        nullptr,// non-bufferized = no chunk-receiving commport
                         buffer_size,
                         1,
                         this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
@@ -497,7 +497,7 @@ namespace wrench {
      * @brief Handle a file copy request
      * @param src_location: the source location
      * @param dst_location: the destination location
-     * @param answer_commport: the commport_name to which the answer should be sent
+     * @param answer_commport: the commport to which the answer should be sent
      * @return
      */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(
@@ -588,7 +588,7 @@ namespace wrench {
      * @brief Handle a file copy request
      * @param src_location: the source location
      * @param dst_location: the destination location
-     * @param answer_commport: the commport_name to which the answer should be sent
+     * @param answer_commport: the commport to which the answer should be sent
      * @return
      */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequestIAmTheSource(
@@ -749,7 +749,7 @@ namespace wrench {
      * @brief Process a file copy request
      * @param src: the source location
      * @param dst: the dst location
-     * @param answer_commport: the answer commport_name
+     * @param answer_commport: the answer commport
      * @return true is the service should continue;
      */
     bool SimpleStorageServiceNonBufferized::processFileCopyRequest(std::shared_ptr<FileLocation> &src,

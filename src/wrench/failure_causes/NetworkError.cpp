@@ -25,7 +25,7 @@ namespace wrench {
      * @param operation_type: NetworkError:OperationType::SENDING or NetworkError::OperationType::RECEIVING or
      *        NetworkError::OperationType::UNKNOWN
      * @param error_type: the error type 
-     * @param commport_name: the name of a commport_name (or "" if unknown)
+     * @param commport_name: the name of a commport (or "" if unknown)
      */
     NetworkError::NetworkError(NetworkError::OperationType operation_type,
                                NetworkError::ErrorType error_type,
@@ -64,7 +64,7 @@ namespace wrench {
 
     /**
      * @brief Returns the name of the CommPort on which the error occurred
-     * @return the commport_name name
+     * @return the commport name
      */
     std::string NetworkError::getCommPortName() {
         return this->commport_name;
@@ -87,7 +87,7 @@ namespace wrench {
         } else {
             error = "link failure, or communication peer died";
         }
-        return "Network error (" + error + ") while " + operation + " commport_name " + this->commport_name;
+        return "Network error (" + error + ") while " + operation + " commport " + this->commport_name;
     }
 
 

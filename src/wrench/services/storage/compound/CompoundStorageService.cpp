@@ -130,7 +130,7 @@ namespace wrench {
 //            // Create an async recv if needed
 //            if (not comm_ptr_has_been_posted) {
 //                try {
-//                    comm_ptr = this->commport_name->get_async<void>((void **) (&(simulation_message)));
+//                    comm_ptr = this->commport->get_async<void>((void **) (&(simulation_message)));
 //                } catch (simgrid::NetworkFailureException &e) {
 //                    // oh well
 //                    continue;
@@ -304,7 +304,7 @@ namespace wrench {
      * @brief Lookup for a DataFile in the internal file mapping of the CompoundStorageService (a simplified FileRegistry)
      *
      * @param file: the file of interest
-     * @param answer_commport: the answer commport_name to which the reply from the server should be sent
+     * @param answer_commport: the answer commport to which the reply from the server should be sent
      *
      * @return A vector of shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or empty vector if it's not.
      */
@@ -348,13 +348,13 @@ namespace wrench {
      *         callback.
      *
      *  @param file: the file of interest
-     *  @param answer_commport: the answer commport_name to which the reply from the server should be sent
+     *  @param answer_commport: the answer commport to which the reply from the server should be sent
      *
      *  @return A vector of shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or could be allocated
      *          or empty vector if it's not / could not be allocated.
      */
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<DataFile> file, S4U_CommPort *answer_commport) {
-        WRENCH_INFO("CSS::lookupOrDesignateStorageService() - DataFile + commport_name");
+        WRENCH_INFO("CSS::lookupOrDesignateStorageService() - DataFile + commport");
 
         this->commport->putMessage(new CompoundStorageAllocationRequestMessage(
                 answer_commport,
@@ -391,7 +391,7 @@ namespace wrench {
     /**
      * @brief Delete a file on the storage service
      *
-     * @param answer_commport: the answer commport_name to which the reply from the server should be sent
+     * @param answer_commport: the answer commport to which the reply from the server should be sent
      * @param location: the location to delete
      * @param wait_for_answer: whether this call should
      */
@@ -454,7 +454,7 @@ namespace wrench {
     /**
      * @brief Asks the storage service whether it holds a file
      *
-     * @param answer_commport: the answer commport_name to which the reply from the server should be sent
+     * @param answer_commport: the answer commport to which the reply from the server should be sent
      * @param location: the location to lookup
      *
      * @return true if the file is present, false otherwise
@@ -791,7 +791,7 @@ namespace wrench {
     /**
      * @brief Synchronously write a file to the storage service
      *
-     * @param answer_commport: the answer commport_name to which the reply from the server should be sent
+     * @param answer_commport: the answer commport to which the reply from the server should be sent
      * @param location: the location
      * @param num_bytes_to_write: number of bytes to write to the file
      * @param wait_for_answer: whether to wait for the answer
@@ -899,7 +899,7 @@ namespace wrench {
     /**
      * @brief Read a file from the storage service
      *
-     * @param answer_commport: the answer commport_name to which the reply from the server should be sent
+     * @param answer_commport: the answer commport to which the reply from the server should be sent
      * @param location: the location
      * @param num_bytes: the number of bytes to read
      * @param wait_for_answer: whether to wait for the answer
@@ -1135,7 +1135,7 @@ namespace wrench {
     /**
      * @brief Process a stop daemon request
      *
-     * @param ack_commport: the commport_name to which the ack should be sent
+     * @param ack_commport: the commport to which the ack should be sent
      *
      * @throw wrench::ExecutionException if communication fails.
      *

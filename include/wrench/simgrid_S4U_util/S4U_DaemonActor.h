@@ -61,4 +61,4 @@ namespace wrench {
 }// namespace wrench
 
 
-#endif//WRENCH_SIM4U_DAEMONWITHMAILBOXACTOR_H
+#endif//WRENCH_SIM4U_DAEMONACTOR_H

@@ -134,7 +134,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        //  send a "run a standard job" message to the daemon's commport_name
+        //  send a "run a standard job" message to the daemon's commport
         this->commport->putMessage(
                 new ComputeServiceSubmitCompoundJobRequestMessage(
                         answer_commport, job, service_specific_args,
@@ -254,7 +254,7 @@ namespace wrench {
     /**
      * @brief Process a submit compound job request
      *
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param job: the job
      * @param service_specific_args: service specific arguments
      *
@@ -309,7 +309,7 @@ namespace wrench {
 
     /**
       * @brief Process a host available resource request
-      * @param answer_commport: the answer commport_name
+      * @param answer_commport: the answer commport
       * @param num_cores: the desired number of cores
       * @param ram: the desired RAM
       */

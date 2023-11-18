@@ -30,7 +30,7 @@ namespace wrench {
      * @param ram_footprint: the RAM footprint
      * @param thread_creation_overhead: the thread creation overhead in seconds
      * @param simulate_computation_as_sleep: whether to simulate computation as sleep
-     * @param callback_commport: the callback commport_name to which a "action done" or "action failed" message will be sent
+     * @param callback_commport: the callback commport to which a "action done" or "action failed" message will be sent
      * @param action: the action to perform
      * @param action_execution_service: the parent action execution service
      */

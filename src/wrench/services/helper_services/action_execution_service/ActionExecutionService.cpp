@@ -156,7 +156,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        //  send a "run a standard job" message to the daemon's commport_name
+        //  send a "run a standard job" message to the daemon's commport
         this->commport->putMessage(
                                 new ActionExecutionServiceSubmitActionRequestMessage(
                                         answer_commport, action,
@@ -720,7 +720,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        //  send a "terminate action" message to the daemon's commport_name
+        //  send a "terminate action" message to the daemon's commport
         this->commport->putMessage(
                                 new ActionExecutionServiceTerminateActionRequestMessage(
                                         answer_commport, std::move(action), termination_cause, 0.0));
@@ -790,7 +790,7 @@ namespace wrench {
      * @brief Process an action termination request
      *
      * @param action: the action to terminate
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param termination_cause: the termination cause
      */
     void ActionExecutionService::processActionTerminationRequest(const std::shared_ptr<Action> &action,
@@ -902,7 +902,7 @@ namespace wrench {
     /**
      * @brief Process a submit action request
      *
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param action: the action
      *
      */
