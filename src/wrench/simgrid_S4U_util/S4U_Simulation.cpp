@@ -16,7 +16,7 @@
 #include <simgrid/plugins/file_system.h>
 #include <wrench/failure_causes/FailureCause.h>
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simulation/Simulation.h>
 
@@ -45,9 +45,9 @@ namespace wrench {
         }
 
 
-        // Create the mailbox pool
-        S4U_Mailbox::createMailboxPool(S4U_Mailbox::mailbox_pool_size);
-        S4U_Mailbox::NULL_MAILBOX = new S4U_Mailbox();
+        // Create the commport_name pool
+        S4U_CommPort::createCommPortPool(S4U_CommPort::commport_pool_size);
+        S4U_CommPort::NULL_MAILBOX = new S4U_CommPort();
         this->initialized = true;
 
         //        sg_storage_file_system_init();

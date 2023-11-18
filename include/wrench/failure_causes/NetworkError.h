@@ -45,7 +45,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        NetworkError(NetworkError::OperationType, NetworkError::ErrorType, const std::string &mailbox);
+        NetworkError(NetworkError::OperationType, NetworkError::ErrorType, const std::string &commport_name);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -59,7 +59,7 @@ namespace wrench {
     private:
         NetworkError::OperationType operation_type;
         NetworkError::ErrorType error_type;
-        std::string mailbox = "";
+        std::string commport_name = "";
     };
 
 

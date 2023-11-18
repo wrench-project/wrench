@@ -18,7 +18,7 @@
 #include <vector>
 #include <iostream>
 #include "wrench-dev.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 
 /***********************/

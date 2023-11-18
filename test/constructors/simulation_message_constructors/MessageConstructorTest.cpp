@@ -120,7 +120,7 @@ private:
         auto compute_service = this->test->compute_service;
         auto storage_service = this->test->storage_service;
         auto failure_cause = std::shared_ptr<wrench::FatalFailure>(new wrench::FatalFailure("msg"));
-        auto mailbox = wrench::S4U_Mailbox::getTemporaryMailbox();
+        auto mailbox = wrench::S4U_CommPort::getTemporaryCommPort();
 
         auto network_proximity_daemon = std::shared_ptr<wrench::NetworkProximityDaemon>(
                 new wrench::NetworkProximityDaemon(this->simulation, "Host1",

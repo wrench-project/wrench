@@ -21,17 +21,17 @@ WRENCH_LOG_CATEGORY(wrench_core_failure_detector, "Log category for ServiceTermi
  * @brief Constructor
  * @param host_on_which_to_run: the service's host
  * @param service_to_monitor: which service to monitor
- * @param mailbox_to_notify: which mailbox to notify
+ * @param commport_to_notify: which commport_name to notify
  * @param notify_on_crash: whether to send a crash notification (in case of non-clean termination)
  * @param notify_on_termination: whether to send a termination notification (in case of clean termination)
  */
 wrench::ServiceTerminationDetector::ServiceTerminationDetector(std::string host_on_which_to_run,
                                                                std::shared_ptr<Service> service_to_monitor,
-                                                               S4U_Mailbox *mailbox_to_notify,
+                                                               S4U_CommPort *commport_to_notify,
                                                                bool notify_on_crash,
                                                                bool notify_on_termination) : Service(std::move(host_on_which_to_run), "service_termination_detector_for_" + service_to_monitor->getName()) {
     this->service_to_monitor = std::move(service_to_monitor);
-    this->mailbox_to_notify = mailbox_to_notify;
+    this->commport_to_notify = commport_to_notify;
     this->notify_on_crash = notify_on_crash;
     this->notify_on_termination = notify_on_termination;
 }
@@ -48,15 +48,15 @@ int wrench::ServiceTerminationDetector::main() {
 
     if (this->notify_on_crash and (not service_has_returned_from_main)) {
         // Failure detected!
-        WRENCH_INFO("Detected crash of service %s (notifying mailbox %s)", this->service_to_monitor->getName().c_str(),
-                    this->mailbox_to_notify->get_cname());
-        this->mailbox_to_notify->putMessage(new ServiceHasCrashedMessage(this->service_to_monitor));
+        WRENCH_INFO("Detected crash of service %s (notifying commport_name %s)", this->service_to_monitor->getName().c_str(),
+                    this->commport_to_notify->get_cname());
+        this->commport_to_notify->putMessage(new ServiceHasCrashedMessage(this->service_to_monitor));
     }
     if (this->notify_on_termination and (service_has_returned_from_main)) {
         // Failure detected!
-        WRENCH_INFO("Detected termination of service %s (notifying mailbox %s)",
-                    this->service_to_monitor->getName().c_str(), this->mailbox_to_notify->get_cname());
-        this->mailbox_to_notify->putMessage(
+        WRENCH_INFO("Detected termination of service %s (notifying commport_name %s)",
+                    this->service_to_monitor->getName().c_str(), this->commport_to_notify->get_cname());
+        this->commport_to_notify->putMessage(
                                 new ServiceHasTerminatedMessage(this->service_to_monitor, return_value_from_main));
     }
 

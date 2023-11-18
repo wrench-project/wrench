@@ -25,33 +25,33 @@ namespace wrench {
 
     /**
      * @brief Insert a message in the manager's  "database"
-     * @param mailbox: the name of the relevant mailbox
+     * @param commport_name: the name of the relevant commport_name
      * @param msg: the message
      * @throw std::runtime_error
      */
-    void MessageManager::manageMessage(const std::string &mailbox, SimulationMessage *msg) {
+    void MessageManager::manageMessage(const std::string &commport_name, SimulationMessage *msg) {
         if (msg == nullptr) {
             throw std::runtime_error(
                     "MessageManager::manageMessage()::Null Message cannot be managed by MessageManager");
         }
-        if (mailbox_messages.find(mailbox) == mailbox_messages.end()) {
-            mailbox_messages.insert({mailbox, {}});
+        if (mailbox_messages.find(commport_name) == mailbox_messages.end()) {
+            mailbox_messages.insert({commport_name, {}});
         }
-        mailbox_messages[mailbox].insert(msg);
-        //      WRENCH_INFO("MESSAGE_MANAGER: INSERTING [%s]:%s (%lu)", mailbox.c_str(), msg->getName().c_str(), (unsigned long)msg);
+        mailbox_messages[commport_name].insert(msg);
+        //      WRENCH_INFO("MESSAGE_MANAGER: INSERTING [%s]:%s (%lu)", commport_name.c_str(), msg->getName().c_str(), (unsigned long)msg);
     }
 
     /**
-     * @brief Clean up messages for a given mailbox (so as to free up memory_manager_service)
-     * @param mailbox: the mailbox name
+     * @brief Clean up messages for a given commport_name (so as to free up memory_manager_service)
+     * @param commport_name: the commport_name name
      */
-    void MessageManager::cleanUpMessages(const std::string &mailbox) {
-        if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
-            for (auto msg: mailbox_messages[mailbox]) {
+    void MessageManager::cleanUpMessages(const std::string &commport_name) {
+        if (mailbox_messages.find(commport_name) != mailbox_messages.end()) {
+            for (auto msg: mailbox_messages[commport_name]) {
                 delete msg;
             }
-            mailbox_messages[mailbox].clear();
-            mailbox_messages.erase(mailbox);
+            mailbox_messages[commport_name].clear();
+            mailbox_messages.erase(commport_name);
         }
     }
 
@@ -76,16 +76,16 @@ namespace wrench {
 
     /**
      * @brief Remove a received message from the "database" of messages
-     * @param mailbox: the name of the mailbox from which the message was received
+     * @param commport_name: the name of the commport_name from which the message was received
      * @param msg: the message
      */
-    void MessageManager::removeReceivedMessage(const std::string &mailbox, SimulationMessage *msg) {
-        //      if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
-        //        if (mailbox_messages[mailbox].find(msg) != mailbox_messages[mailbox].end()) {
-        //            WRENCH_INFO("MESSAGE_MANAGER: REMOVING [%s]:%s (%lu)", mailbox.c_str(), msg->getName().c_str(), (unsigned long)msg);
-        mailbox_messages[mailbox].erase(msg);
-        //          if (mailbox_messages[mailbox].empty()) {
-        //              mailbox_messages.erase(mailbox);
+    void MessageManager::removeReceivedMessage(const std::string &commport_name, SimulationMessage *msg) {
+        //      if (mailbox_messages.find(commport_name) != mailbox_messages.end()) {
+        //        if (mailbox_messages[commport_name].find(msg) != mailbox_messages[commport_name].end()) {
+        //            WRENCH_INFO("MESSAGE_MANAGER: REMOVING [%s]:%s (%lu)", commport_name.c_str(), msg->getName().c_str(), (unsigned long)msg);
+        mailbox_messages[commport_name].erase(msg);
+        //          if (mailbox_messages[commport_name].empty()) {
+        //              mailbox_messages.erase(commport_name);
         //          }
         //        }
         //      }
@@ -93,7 +93,7 @@ namespace wrench {
 #if 0
         std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
         for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
-          if ((*msg_itr).first == mailbox) {
+          if ((*msg_itr).first == commport_name) {
             std::vector<SimulationMessage *>::iterator it;
             for (it = (*msg_itr).second.begin(); it != (*msg_itr).second.end(); it++) {
               if ((*it) == msg) {

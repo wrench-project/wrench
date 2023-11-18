@@ -25,17 +25,17 @@ namespace wrench {
      * @param operation_type: NetworkError:OperationType::SENDING or NetworkError::OperationType::RECEIVING or
      *        NetworkError::OperationType::UNKNOWN
      * @param error_type: the error type 
-     * @param mailbox: the name of a mailbox (or "" if unknown)
+     * @param commport_name: the name of a commport_name (or "" if unknown)
      */
     NetworkError::NetworkError(NetworkError::OperationType operation_type,
                                NetworkError::ErrorType error_type,
-                               const std::string &mailbox) {
-        if (mailbox.empty()) {
+                               const std::string &commport_name) {
+        if (commport_name.empty()) {
             throw std::invalid_argument("NetworkError::NetworkError(): invalid arguments");
         }
         this->operation_type = operation_type;
         this->error_type = error_type;
-        this->mailbox = mailbox;
+        this->commport_name = commport_name;
     }
 
     /**
@@ -63,11 +63,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the mailbox name on which the error occurred
-     * @return the mailbox name
+     * @brief Returns the commport_name name on which the error occurred
+     * @return the commport_name name
      */
     std::string NetworkError::getMailbox() {
-        return this->mailbox;
+        return this->commport_name;
     }
 
     /**
@@ -87,7 +87,7 @@ namespace wrench {
         } else {
             error = "link failure, or communication peer died";
         }
-        return "Network error (" + error + ") while " + operation + " mailbox_name " + this->mailbox;
+        return "Network error (" + error + ") while " + operation + " commport_name " + this->commport_name;
     }
 
 

@@ -13,7 +13,7 @@
 #include "wrench/services/storage/StorageServiceMessage.h"
 #include "wrench/services/storage/StorageServiceMessagePayload.h"
 #include "StorageServiceProxyProperty.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 namespace wrench {
     /***********************/
@@ -171,20 +171,20 @@ namespace wrench {
 
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {StorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {StorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {StorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
-                {StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, S4U_Mailbox::default_control_message_size},
+                {ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {StorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {StorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {StorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
 
         };
     };

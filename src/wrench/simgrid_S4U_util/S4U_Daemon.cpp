@@ -10,7 +10,7 @@
 
 #include <wrench/simgrid_S4U_util/S4U_Daemon.h>
 #include "wrench/simgrid_S4U_util/S4U_DaemonActor.h"
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <boost/algorithm/string.hpp>
 #include <memory>
@@ -29,11 +29,11 @@ std::unordered_map<std::string, unsigned long> num_actors;
 
 namespace wrench {
 
-    std::unordered_map<aid_t, S4U_Mailbox *> S4U_Daemon::map_actor_to_recv_mailbox;
+    std::unordered_map<aid_t, S4U_CommPort *> S4U_Daemon::map_actor_to_recv_commport;
     int S4U_Daemon::num_non_daemonized_actors_running = 0;
 
     /**
-     * @brief Constructor (daemon with a mailbox)
+     * @brief Constructor (daemon with a commport_name)
      *
      * @param hostname: the name of the host on which the daemon will run
      * @param process_name_prefix: the prefix of the name of the simulated process/actor
@@ -74,14 +74,14 @@ namespace wrench {
         this->hostname = hostname;
         this->host = S4U_Simulation::get_host_or_vm_by_name(hostname);
         this->simulation = nullptr;
-        unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
+        unsigned long seq = S4U_CommPort::generateUniqueSequenceNumber();
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
 
-//        this->mailbox = S4U_Mailbox::generateUniqueMailbox("mb");
-//        this->recv_mailbox = S4U_Mailbox::generateUniqueMailbox("rmb");
+//        this->commport_name = S4U_CommPort::generateUniqueMailbox("mb");
+//        this->recv_commport = S4U_CommPort::generateUniqueMailbox("rmb");
 
-        this->mailbox = S4U_Mailbox::getTemporaryMailbox();
-        this->recv_mailbox = S4U_Mailbox::getTemporaryMailbox();
+        this->commport = S4U_CommPort::getTemporaryCommPort();
+        this->recv_commport = S4U_CommPort::getTemporaryCommPort();
 
         this->has_returned_from_main = false;
 
@@ -173,7 +173,7 @@ namespace wrench {
         this->daemonized = daemonized;
         this->auto_restart = auto_restart;
         this->has_returned_from_main = false;
-        //        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
+        //        this->commport_name = this->initial_commport_name + "_#" + std::to_string(this->num_starts);
         // Create the s4u_actor
 
         try {
@@ -208,10 +208,10 @@ namespace wrench {
             }
         }
 
-        // Set the mailbox receiver
+        // Set the commport_name receiver
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
-        this->mailbox->s4u_mb->set_receiver(this->s4u_actor);
-        //        this->recv_mailbox->set_receiver(this->s4u_actor);
+        this->commport->s4u_mb->set_receiver(this->s4u_actor);
+        //        this->recv_commport->set_receiver(this->s4u_actor);
     }
 
     /**
@@ -231,7 +231,7 @@ namespace wrench {
             if ((S4U_Daemon::num_non_daemonized_actors_running == 0) or (not this->isSetToAutoRestart())) {
 //                Service::increaseNumCompletedServicesCount();
 #ifdef MESSAGE_MANAGER
-                MessageManager::cleanUpMessages(this->mailbox_name);
+                MessageManager::cleanUpMessages(this->commport_name);
 #endif
                 this->deleteLifeSaver();
             }
@@ -260,7 +260,7 @@ namespace wrench {
  * @brief Method that run's the user-defined main method (that's called by the S4U actor class)
  */
     void S4U_Daemon::runMainMethod() {
-        S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()] = this->recv_mailbox;
+        S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()] = this->recv_commport;
         this->num_starts++;
         // Compute zero flop so that nothing happens
         // until the host has a >0 pstate
@@ -269,11 +269,11 @@ namespace wrench {
         this->return_value = this->main();
         this->has_returned_from_main = true;
         this->state = State::DOWN;
-        S4U_Daemon::map_actor_to_recv_mailbox.erase(simgrid::s4u::this_actor::get_pid());
-        this->mailbox->s4u_mb->set_receiver(nullptr);
-        S4U_Mailbox::retireTemporaryMailbox(this->mailbox);
-        this->recv_mailbox->s4u_mb->set_receiver(nullptr);
-        S4U_Mailbox::retireTemporaryMailbox(this->recv_mailbox);
+        S4U_Daemon::map_actor_to_recv_commport.erase(simgrid::s4u::this_actor::get_pid());
+        this->commport->s4u_mb->set_receiver(nullptr);
+        S4U_CommPort::retireTemporaryCommPort(this->commport);
+        this->recv_commport->s4u_mb->set_receiver(nullptr);
+        S4U_CommPort::retireTemporaryCommPort(this->recv_commport);
     }
 
 
@@ -400,12 +400,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Return the running actor's recv mailbox
-     * @return the mailbox
+     * @brief Return the running actor's recv commport_name
+     * @return the commport_name
      */
-    S4U_Mailbox *S4U_Daemon::getRunningActorRecvMailbox() {
+    S4U_CommPort *S4U_Daemon::getRunningActorRecvCommPort() {
 
-        return S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()];
+        return S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()];
     }
 
 }// namespace wrench

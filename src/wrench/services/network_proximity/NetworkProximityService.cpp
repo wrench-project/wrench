@@ -19,7 +19,7 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/simulation/Simulation.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/services/ServiceMessage.h>
 #include "wrench/services/network_proximity/NetworkProximityMessage.h"
 #include <wrench/exceptions/ExecutionException.h>
@@ -101,17 +101,17 @@ namespace wrench {
 
         WRENCH_INFO("Obtaining current coordinates of network daemon on host %s", requested_host.c_str());
 
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->mailbox->putMessage(
+        this->commport->putMessage(
                 new CoordinateLookupRequestMessage(
-                        answer_mailbox, requested_host,
+                        answer_commport, requested_host,
                         this->getMessagePayloadValue(
                                 NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         std::unique_ptr<SimulationMessage> message = nullptr;
 
-        auto msg = answer_mailbox->getMessage<CoordinateLookupAnswerMessage>(
+        auto msg = answer_commport->getMessage<CoordinateLookupAnswerMessage>(
                 this->network_timeout,
                 "NetworkProximityService::getCoordinate(): Received an");
         return std::make_pair(msg->xy_coordinate, msg->timestamp);
@@ -141,15 +141,15 @@ namespace wrench {
                         hosts.second.c_str());
         }
 
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->mailbox->putMessage(
+        this->commport->putMessage(
                 new NetworkProximityLookupRequestMessage(
-                        answer_mailbox, std::move(hosts),
+                        answer_commport, std::move(hosts),
                         this->getMessagePayloadValue(
                                 NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
-        auto msg = answer_mailbox->getMessage<NetworkProximityLookupAnswerMessage>(
+        auto msg = answer_commport->getMessage<NetworkProximityLookupAnswerMessage>(
                 this->network_timeout,
                 "NetworkProximityService::query(): Received an");
         return std::make_pair(msg->proximity_value, msg->timestamp);
@@ -188,7 +188,7 @@ namespace wrench {
         for (const auto &h: this->hosts_in_network) {
             auto np_daemon = std::make_shared<NetworkProximityDaemon>(
 
-                    this->simulation, h, this->mailbox,
+                    this->simulation, h, this->commport,
                     this->getPropertyValueAsDouble(
                             NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
                     this->getPropertyValueAsTimeInSecond(
@@ -232,7 +232,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = this->mailbox->getMessage();
+            message = this->commport->getMessage();
         } catch (ExecutionException &e) {
             return true;
         }
@@ -256,7 +256,7 @@ namespace wrench {
                 }
                 this->network_daemons.clear();
                 this->hosts_in_network.clear();
-                msg->ack_mailbox->putMessage(
+                msg->ack_commport->putMessage(
                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                 NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
@@ -292,7 +292,7 @@ namespace wrench {
             // Overhead
             S4U_Simulation::sleep(this->getPropertyValueAsTimeInSecond(NetworkProximityServiceProperty::LOOKUP_OVERHEAD));
 
-            msg->answer_mailbox->dputMessage(
+            msg->answer_commport->dputMessage(
                     new NetworkProximityLookupAnswerMessage(
                             msg->hosts, proximity_value, timestamp,
                             this->getMessagePayloadValue(
@@ -313,11 +313,11 @@ namespace wrench {
             std::shared_ptr<NetworkProximityDaemon> chosen_peer = NetworkProximityService::getCommunicationPeer(
                     msg->daemon);
 
-            msg->daemon->mailbox->dputMessage(
+            msg->daemon->commport->dputMessage(
                     new NextContactDaemonAnswerMessage(
                             chosen_peer->getHostname(),
                             chosen_peer,
-                            chosen_peer->mailbox,
+                            chosen_peer->commport,
                             this->getMessagePayloadValue(
                                     NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
             return true;
@@ -350,7 +350,7 @@ namespace wrench {
             // Overhead
             S4U_Simulation::sleep(this->getPropertyValueAsTimeInSecond(NetworkProximityServiceProperty::LOOKUP_OVERHEAD));
 
-            msg->answer_mailbox->dputMessage(msg_to_send_back);
+            msg->answer_commport->dputMessage(msg_to_send_back);
             return true;
 
         } else {
@@ -388,13 +388,12 @@ namespace wrench {
 
         // all the network daemons EXCEPT the sender get pushed into this vector
         for (unsigned long index = 0; index < this->network_daemons.size(); ++index) {
-            if (this->network_daemons[index]->mailbox != sender_daemon->mailbox) {
+            if (this->network_daemons[index]->commport != sender_daemon->commport) {
                 peer_list.push_back(index);
             }
         }
 
         // set the seed unique to the sending daemon
-        //        sender_rng.seed((unsigned long) hash_func(sender_daemon->mailbox_name));
         sender_rng.seed(0);
 
         std::shuffle(peer_list.begin(), peer_list.end(), sender_rng);

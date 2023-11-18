@@ -157,7 +157,7 @@ private:
                                            ram,
                                            0.1,
                                            simulation_computation_as_sleep,
-                                           this->mailbox,
+                                           this->commport,
                                            action,
                                            nullptr));
 
@@ -168,7 +168,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = this->mailbox->getMessage();
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -288,7 +288,7 @@ private:
                                            ram,
                                            0.1,
                                            false,
-                                           this->mailbox,
+                                           this->commport,
                                            action,
                                            nullptr));
 
@@ -299,7 +299,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = this->mailbox->getMessage();
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());

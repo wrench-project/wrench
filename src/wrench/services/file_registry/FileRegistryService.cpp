@@ -13,7 +13,7 @@
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/services/ServiceMessage.h>
 
@@ -63,14 +63,14 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->mailbox->putMessage(new FileRegistryFileLookupRequestMessage(
-                                                       answer_mailbox, file,
+        this->commport->putMessage(new FileRegistryFileLookupRequestMessage(
+                                                       answer_commport, file,
                                                        this->getMessagePayloadValue(
                                                                FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
-        auto msg = answer_mailbox->getMessage<FileRegistryFileLookupAnswerMessage>(
+        auto msg = answer_commport->getMessage<FileRegistryFileLookupAnswerMessage>(
                 this->network_timeout,
                 "FileRegistryService::lookupEntry(): Received in");
         return msg->locations;
@@ -103,17 +103,17 @@ namespace wrench {
                     " does not exist");
         }
 
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->mailbox->putMessage(
+        this->commport->putMessage(
                 new FileRegistryFileLookupByProximityRequestMessage(
-                        answer_mailbox, file,
+                        answer_commport, file,
                         reference_host,
                         network_proximity_service,
                         this->getMessagePayloadValue(
                                 FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
-        auto msg = answer_mailbox->getMessage<FileRegistryFileLookupByProximityAnswerMessage>(
+        auto msg = answer_commport->getMessage<FileRegistryFileLookupByProximityAnswerMessage>(
                 this->network_timeout,
                 "FileRegistryService::lookupEntry(): Received an");
 
@@ -135,15 +135,15 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->mailbox->putMessage(
+        this->commport->putMessage(
                 new FileRegistryAddEntryRequestMessage(
-                        answer_mailbox, location,
+                        answer_commport, location,
                         this->getMessagePayloadValue(
                                 FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
 
-        auto msg = answer_mailbox->getMessage<FileRegistryAddEntryAnswerMessage>(
+        auto msg = answer_commport->getMessage<FileRegistryAddEntryAnswerMessage>(
                 this->network_timeout,
                 "FileRegistryService::addEntry(): Received an");
     }
@@ -163,15 +163,15 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->mailbox->putMessage(
+        this->commport->putMessage(
                 new FileRegistryRemoveEntryRequestMessage(
-                        answer_mailbox, location,
+                        answer_commport, location,
                         this->getMessagePayloadValue(
                                 FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
 
-        auto msg = answer_mailbox->getMessage<FileRegistryRemoveEntryAnswerMessage>(
+        auto msg = answer_commport->getMessage<FileRegistryRemoveEntryAnswerMessage>(
                 this->network_timeout,
                 "FileRegistryService::removeEntry(): Received an");
         if (!msg->success) {
@@ -210,7 +210,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = this->mailbox->getMessage();
+            message = this->commport->getMessage();
         } catch (ExecutionException &e) {
             return true;
         }
@@ -220,7 +220,7 @@ namespace wrench {
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // This is Synchronous
             try {
-                msg->ack_mailbox->putMessage(
+                msg->ack_commport->putMessage(
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
@@ -236,7 +236,7 @@ namespace wrench {
             // Simulate a lookup overhead
             S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_COMPUTE_COST));
 
-            msg->answer_mailbox->dputMessage(
+            msg->answer_commport->dputMessage(
                     new FileRegistryFileLookupAnswerMessage(
                             locations,
                             this->getMessagePayloadValue(
@@ -262,7 +262,7 @@ namespace wrench {
             }
 
             S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_COMPUTE_COST));
-            msg->answer_mailbox->dputMessage(
+            msg->answer_commport->dputMessage(
                     new FileRegistryFileLookupByProximityAnswerMessage(
                             msg->file,
                             msg->reference_host,
@@ -277,7 +277,7 @@ namespace wrench {
             // Simulate an add overhead
             S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST));
 
-            msg->answer_mailbox->dputMessage(
+            msg->answer_commport->dputMessage(
                                      new FileRegistryAddEntryAnswerMessage(this->getMessagePayloadValue(
                                              FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
             return true;
@@ -288,7 +288,7 @@ namespace wrench {
             // Simulate a removal overhead
             S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST));
 
-            msg->answer_mailbox->dputMessage(
+            msg->answer_commport->dputMessage(
                     new FileRegistryRemoveEntryAnswerMessage(
                             success,
                             this->getMessagePayloadValue(

@@ -15,7 +15,7 @@
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
 #include <wrench/failure_causes/NetworkError.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_action_executor, "Log category for  Action Executor");
 
@@ -30,7 +30,7 @@ namespace wrench {
      * @param ram_footprint: the RAM footprint
      * @param thread_creation_overhead: the thread creation overhead in seconds
      * @param simulate_computation_as_sleep: whether to simulate computation as sleep
-     * @param callback_mailbox: the callback mailbox to which a "action done" or "action failed" message will be sent
+     * @param callback_commport: the callback commport_name to which a "action done" or "action failed" message will be sent
      * @param action: the action to perform
      * @param action_execution_service: the parent action execution service
      */
@@ -40,7 +40,7 @@ namespace wrench {
             double ram_footprint,
             double thread_creation_overhead,
             bool simulate_computation_as_sleep,
-            S4U_Mailbox *callback_mailbox,
+            S4U_CommPort *callback_commport,
             std::shared_ptr<Action> action,
             std::shared_ptr<ActionExecutionService> action_execution_service) : ExecutionController(hostname, "action_executor") {
 
@@ -50,7 +50,7 @@ namespace wrench {
         }
 #endif
 
-        this->callback_mailbox = callback_mailbox;
+        this->callback_commport = callback_commport;
         this->action = action;
         this->action_execution_service = action_execution_service;
         this->num_cores = num_cores;
@@ -149,7 +149,7 @@ namespace wrench {
         auto msg_to_send_back = new ActionExecutorDoneMessage(this->getSharedPtr<ActionExecutor>());
 
         try {
-            this->callback_mailbox->putMessage(msg_to_send_back);
+            this->callback_commport->putMessage(msg_to_send_back);
         } catch (ExecutionException &e) {
             WRENCH_INFO("Action executor can't report back due to network error.. oh well!");
         }
