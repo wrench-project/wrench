@@ -349,7 +349,7 @@ private:
 
     int main() override {
 
-        this->mailbox->getMessage();
+        this->commport->getMessage();
 
         return 0;
     }

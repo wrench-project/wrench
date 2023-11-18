@@ -92,7 +92,7 @@ private:
         wrench::Simulation::turnOffHost("Host2");
 
         // Start an alarm
-        auto mailbox = wrench::S4U_Mailbox::getTemporaryMailbox();
+        auto mailbox = wrench::S4U_CommPort::getTemporaryCommPort();
         try {
             wrench::Alarm::createAndStartAlarm(this->simulation, 10.0, "Host2", mailbox,
                                                new wrench::SimulationMessage(1), "bogus");

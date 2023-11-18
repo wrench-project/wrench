@@ -144,7 +144,7 @@ private:
 
         // Create a file read action executor
         auto file_write_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_write_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_write_action, nullptr));
         // Start it
         file_write_action_executor->setSimulation(this->simulation);
         file_write_action_executor->start(file_write_action_executor, true, false);
@@ -152,7 +152,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = this->mailbox->getMessage();
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());

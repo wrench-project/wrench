@@ -37,9 +37,9 @@ namespace wrench {
         static std::unordered_map<std::string, std::unordered_set<SimulationMessage *>> mailbox_messages;
 
     public:
-        static void manageMessage(const std::string &mailbox, SimulationMessage *msg);
-        static void cleanUpMessages(const std::string &mailbox);
-        static void removeReceivedMessage(const std::string &mailbox, SimulationMessage *msg);
+        static void manageMessage(const std::string &commport_name, SimulationMessage *msg);
+        static void cleanUpMessages(const std::string &commport_name);
+        static void removeReceivedMessage(const std::string &commport_name, SimulationMessage *msg);
         static void cleanUpAllMessages();
         static void print();
     };

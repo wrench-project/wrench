@@ -17,7 +17,7 @@
 #include <wrench/services/storage/simple/SimpleStorageServiceBufferized.h>
 #include <wrench/services/ServiceMessage.h>
 #include "wrench/services/storage/StorageServiceMessage.h"
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/data_file/DataFile.h>
@@ -123,7 +123,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = this->mailbox->getMessage();
+            message = this->commport->getMessage();
         } catch (ExecutionException &e) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
             return true;
@@ -132,38 +132,38 @@ namespace wrench {
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-            return processStopDaemonRequest(msg->ack_mailbox);
+            return processStopDaemonRequest(msg->ack_commport);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFreeSpaceRequestMessage>(message)) {
-            return processFreeSpaceRequest(msg->answer_mailbox, msg->path);
+            return processFreeSpaceRequest(msg->answer_commport, msg->path);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileDeleteRequestMessage>(message)) {
-            return processFileDeleteRequest(msg->location, msg->answer_mailbox);
+            return processFileDeleteRequest(msg->location, msg->answer_commport);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileLookupRequestMessage>(message)) {
-            return processFileLookupRequest(msg->location, msg->answer_mailbox);
+            return processFileLookupRequest(msg->location, msg->answer_commport);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileWriteRequestMessage>(message)) {
-            return processFileWriteRequest(msg->location, msg->num_bytes_to_write, msg->answer_mailbox);
+            return processFileWriteRequest(msg->location, msg->num_bytes_to_write, msg->answer_commport);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadRequestMessage>(message)) {
-            return processFileReadRequest(msg->location, msg->num_bytes_to_read, msg->answer_mailbox);
+            return processFileReadRequest(msg->location, msg->num_bytes_to_read, msg->answer_commport);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileCopyRequestMessage>(message)) {
-            return processFileCopyRequest(msg->src, msg->dst, msg->answer_mailbox);
+            return processFileCopyRequest(msg->src, msg->dst, msg->answer_commport);
 
         } else if (auto msg = std::dynamic_pointer_cast<FileTransferThreadNotificationMessage>(message)) {
             return processFileTransferThreadNotification(
                     msg->file_transfer_thread,
-                    msg->src_mailbox,
+                    msg->src_commport,
                     msg->src_location,
-                    msg->dst_mailbox,
+                    msg->dst_commport,
                     msg->dst_location,
                     msg->success,
                     msg->failure_cause,
-                    msg->answer_mailbox_if_read,
-                    msg->answer_mailbox_if_write,
-                    msg->answer_mailbox_if_copy);
+                    msg->answer_commport_if_read,
+                    msg->answer_commport_if_write,
+                    msg->answer_commport_if_copy);
         } else {
             throw std::runtime_error(
                     "SimpleStorageServiceBufferized::processNextMessage(): Unexpected [" + message->getName() + "] message");
@@ -175,12 +175,12 @@ namespace wrench {
      *
      * @param location: the location to write the file to
      * @param num_bytes_to_write: the number of bytes to write to the file
-     * @param answer_mailbox: the mailbox to which the reply should be sent
+     * @param answer_commport: the commport_name to which the reply should be sent
      * @return true if this process should keep running
      */
     bool SimpleStorageServiceBufferized::processFileWriteRequest(std::shared_ptr<FileLocation> &location,
                                                                  double num_bytes_to_write,
-                                                                 S4U_Mailbox *answer_mailbox) {
+                                                                 S4U_CommPort *answer_commport) {
 
         auto file = location->getFile();
         LogicalFileSystem *fs;
@@ -219,17 +219,17 @@ namespace wrench {
                 fs->createDirectory(path_at_mount_point);
             }
 
-            // Generate a mailbox_name name on which to receive the file
-            auto file_reception_mailbox = S4U_Mailbox::getTemporaryMailbox();
-            //            auto file_reception_mailbox = S4U_Mailbox::generateUniqueMailbox("faa_does_not_work");
+            // Generate a commport_name name on which to receive the file
+            auto file_reception_commport = S4U_CommPort::getTemporaryCommPort();
+            //            auto file_reception_commport = S4U_CommPort::generateUniqueMailbox("faa_does_not_work");
 
             // Reply with a "go ahead, send me the file" message
-            answer_mailbox->dputMessage(
+            answer_commport->dputMessage(
                     new StorageServiceFileWriteAnswerMessage(
                             location,
                             true,
                             nullptr,
-                            {{file_reception_mailbox, location->getFile()->getSize()}},
+                            {{file_reception_commport, location->getFile()->getSize()}},
                             this->buffer_size,
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
@@ -240,10 +240,10 @@ namespace wrench {
                     this->getSharedPtr<StorageService>(),
                     file,
                     num_bytes_to_write,
-                    file_reception_mailbox,
+                    file_reception_commport,
                     location,
                     nullptr,
-                    answer_mailbox,
+                    answer_commport,
                     nullptr,
                     this->buffer_size);
             ftt->setSimulation(this->simulation);
@@ -253,7 +253,7 @@ namespace wrench {
 
         } else {
             // Reply with a "failure" message
-            answer_mailbox->dputMessage(
+            answer_commport->dputMessage(
                     new StorageServiceFileWriteAnswerMessage(
                             location,
                             false,
@@ -271,13 +271,13 @@ namespace wrench {
      * @brief Handle a file read request
      * @param location: the file's location
      * @param num_bytes_to_read: the number of bytes to read
-     * @param answer_mailbox: the mailbox to which the answer should be sent
+     * @param answer_commport: the commport_name to which the answer should be sent
      * @return
      */
     bool SimpleStorageServiceBufferized::processFileReadRequest(
             const std::shared_ptr<FileLocation> &location,
             double num_bytes_to_read,
-            S4U_Mailbox *answer_mailbox) {
+            S4U_CommPort *answer_commport) {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
         auto file = location->getFile();
@@ -298,18 +298,18 @@ namespace wrench {
 
 
         bool success = (failure_cause == nullptr);
-        S4U_Mailbox *mailbox_to_receive_the_file_content = nullptr;
+        S4U_CommPort *commport_to_receive_the_file_content = nullptr;
         if (success) {
-            mailbox_to_receive_the_file_content = S4U_Mailbox::getTemporaryMailbox();
+            commport_to_receive_the_file_content = S4U_CommPort::getTemporaryCommPort();
         }
 
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
-        answer_mailbox->dputMessage(
+        answer_commport->dputMessage(
                 new StorageServiceFileReadAnswerMessage(
                         location,
                         success,
                         failure_cause,
-                        mailbox_to_receive_the_file_content,
+                        commport_to_receive_the_file_content,
                         buffer_size,
                         1,
                         this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
@@ -323,8 +323,8 @@ namespace wrench {
                     file,
                     num_bytes_to_read,
                     location,
-                    mailbox_to_receive_the_file_content,
-                    answer_mailbox,
+                    commport_to_receive_the_file_content,
+                    answer_commport,
                     nullptr,
                     nullptr,
                     buffer_size);
@@ -348,13 +348,13 @@ namespace wrench {
      * @brief Handle a file copy request
      * @param src_location: the source location
      * @param dst_location: the destination location
-     * @param answer_mailbox: the mailbox to which the answer should be sent
+     * @param answer_commport: the commport_name to which the answer should be sent
      * @return
      */
     bool SimpleStorageServiceBufferized::processFileCopyRequest(
             std::shared_ptr<FileLocation> &src_location,
             std::shared_ptr<FileLocation> &dst_location,
-            S4U_Mailbox *answer_mailbox) {
+            S4U_CommPort *answer_commport) {
 
 
         auto file = src_location->getFile();
@@ -363,7 +363,7 @@ namespace wrench {
         // Check that the source has it
         if (not StorageService::hasFileAtLocation(src_location)) {
             try {
-                answer_mailbox->putMessage(
+                answer_commport->putMessage(
                         new StorageServiceFileCopyAnswerMessage(
                                 src_location,
                                 dst_location,
@@ -389,7 +389,7 @@ namespace wrench {
             this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
 
             try {
-                answer_mailbox->putMessage(
+                answer_commport->putMessage(
                         new StorageServiceFileCopyAnswerMessage(
                                 src_location,
                                 dst_location,
@@ -422,7 +422,7 @@ namespace wrench {
                 dst_location,
                 nullptr,
                 nullptr,
-                answer_mailbox,
+                answer_commport,
                 this->buffer_size);
         ftt->setSimulation(this->simulation);
         this->pending_file_transfer_threads.push_back(ftt);
@@ -449,27 +449,27 @@ namespace wrench {
     /**
      * @brief Process a notification received from a file transfer thread
      * @param ftt: the file transfer thread
-     * @param src_mailbox: the transfer's source mailbox (or "" if source was not a mailbox)
+     * @param src_commport: the transfer's source commport_name (or "" if source was not a commport_name)
      * @param src_location: the transfer's source location (or nullptr if source was not a location)
-     * @param dst_mailbox: the transfer's destination mailbox (or "" if source was not a mailbox)
+     * @param dst_commport: the transfer's destination commport_name (or "" if source was not a commport_name)
      * @param dst_location: the transfer's destination location (or nullptr if destination was not a location)
      * @param success: whether the transfer succeeded or not
      * @param failure_cause: the failure cause (nullptr if success)
-     * @param answer_mailbox_if_read: the mailbox to send a read notification ("" if not a copy)
-     * @param answer_mailbox_if_write: the mailbox to send a write notification ("" if not a copy)
-     * @param answer_mailbox_if_copy: the mailbox to send a copy notification ("" if not a copy)
+     * @param answer_commport_if_read: the commport_name to send a read notification ("" if not a copy)
+     * @param answer_commport_if_write: the commport_name to send a write notification ("" if not a copy)
+     * @param answer_commport_if_copy: the commport_name to send a copy notification ("" if not a copy)
      * @return false if the daemon should terminate
      */
     bool SimpleStorageServiceBufferized::processFileTransferThreadNotification(const std::shared_ptr<FileTransferThread> &ftt,
-                                                                               S4U_Mailbox *src_mailbox,
+                                                                               S4U_CommPort *src_commport,
                                                                                const std::shared_ptr<FileLocation> &src_location,
-                                                                               S4U_Mailbox *dst_mailbox,
+                                                                               S4U_CommPort *dst_commport,
                                                                                const std::shared_ptr<FileLocation> &dst_location,
                                                                                bool success,
                                                                                std::shared_ptr<FailureCause> failure_cause,
-                                                                               S4U_Mailbox *answer_mailbox_if_read,
-                                                                               S4U_Mailbox *answer_mailbox_if_write,
-                                                                               S4U_Mailbox *answer_mailbox_if_copy) {
+                                                                               S4U_CommPort *answer_commport_if_read,
+                                                                               S4U_CommPort *answer_commport_if_write,
+                                                                               S4U_CommPort *answer_commport_if_copy) {
         // Remove the ftt from the list of running ftt
         if (this->running_file_transfer_threads.find(ftt) == this->running_file_transfer_threads.end()) {
             WRENCH_INFO(
@@ -508,28 +508,28 @@ namespace wrench {
         }
 
         // Send back the relevant ack if this was a read
-        if (answer_mailbox_if_read and success) {
+        if (answer_commport_if_read and success) {
             WRENCH_INFO(
                     "Sending back an ack since this was a file read and some client is waiting for me to say something");
-            answer_mailbox_if_read->dputMessage(new StorageServiceAckMessage(src_location));
+            answer_commport_if_read->dputMessage(new StorageServiceAckMessage(src_location));
         }
 
         // Send back the relevant ack if this was a write operation
-        if (answer_mailbox_if_write and success) {
+        if (answer_commport_if_write and success) {
             WRENCH_INFO(
                     "Sending back an ack since this was a file write and some client is waiting for me to say something");
-            answer_mailbox_if_write->dputMessage(new StorageServiceAckMessage(dst_location));
+            answer_commport_if_write->dputMessage(new StorageServiceAckMessage(dst_location));
         }
 
         // Send back the relevant ack if this was a copy
-        if (answer_mailbox_if_copy) {
+        if (answer_commport_if_copy) {
             WRENCH_INFO(
                     "Sending back an ack since this was a file copy and some client is waiting for me to say something");
             if ((src_location == nullptr) or (dst_location == nullptr)) {
                 throw std::runtime_error("SimpleStorageServiceBufferized::processFileTransferThreadNotification(): "
                                          "src_location and dst_location must be non-null");
             }
-            answer_mailbox_if_copy->dputMessage(
+            answer_commport_if_copy->dputMessage(
                     new StorageServiceFileCopyAnswerMessage(
                             src_location,
                             dst_location,

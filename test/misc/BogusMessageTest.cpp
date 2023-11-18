@@ -22,7 +22,7 @@ class BogusMessageTest : public ::testing::Test {
 
 public:
     std::shared_ptr<wrench::Service> service = nullptr;
-    wrench::S4U_Mailbox *dst_mailbox;
+    wrench::S4U_CommPort *dst_mailbox;
 
     void do_BogusMessage_Test(std::string service_type);
 
@@ -157,7 +157,7 @@ private:
 
         if (this->create_data_movement_manager) {
             auto dmm = this->createDataMovementManager();
-            this->test->dst_mailbox = dmm->mailbox;
+            this->test->dst_mailbox = dmm->commport;
         }
         this->waitForAndProcessNextEvent();
         return 0;
@@ -203,10 +203,10 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     // Create a service
     if (service_type == "file_registry") {
         this->service = simulation->add(new wrench::FileRegistryService(hostname));
-        this->dst_mailbox = this->service->mailbox;
+        this->dst_mailbox = this->service->commport;
     } else if (service_type == "simple_storage") {
         this->service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"}));
-        this->dst_mailbox = this->service->mailbox;
+        this->dst_mailbox = this->service->commport;
     } else if (service_type == "data_movement_manager") {
         auto wms = new NoopWMS(this, hostname, true);
         this->service = simulation->add(wms);

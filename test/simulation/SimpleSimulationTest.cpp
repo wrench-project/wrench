@@ -220,7 +220,7 @@ private:
                 job_manager->submitJob(one_task_jobs[job_index], vm_cs);
 
                 // Coverage
-                one_task_jobs[job_index]->printCallbackMailboxStack();
+                one_task_jobs[job_index]->printCallbackCommPortStack();
 
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(e.what());

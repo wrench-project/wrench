@@ -231,7 +231,7 @@ private:
                                            ram,
                                            thread_overhead,
                                            false,
-                                           this->mailbox,
+                                           this->commport,
                                            action, nullptr));
 
         // Start it
