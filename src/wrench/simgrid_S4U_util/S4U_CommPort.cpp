@@ -296,8 +296,8 @@ namespace wrench {
      */
     S4U_CommPort *S4U_CommPort::getTemporaryCommPort() {
         if (S4U_CommPort::free_commports.empty()) {
-            throw std::runtime_error("S4U_CommPort::getTemporaryCommPort(): Out of commportes! "
-                                     "(Increase the commport pool size with the --wrench-commport-pool-size command-line argument (default is 5000))");
+            throw std::runtime_error("S4U_CommPort::getTemporaryCommPort(): Out of commports! "
+                                     "(Increase the commport pool size with the --wrench-commport-pool-size command-line argument (default is 50000))");
         }
 
         //        std::cerr << "FREE MAILBOX: " << S4U_CommPort::free_commports.size() << "\n";

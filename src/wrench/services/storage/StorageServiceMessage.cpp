@@ -250,7 +250,7 @@ namespace wrench {
      * @param location: the file's location
      * @param success: whether the write operation succeeded
      * @param failure_cause: the cause of the failure (nullptr if success)
-     * @param data_write_commportes_and_bytes: commportes to which bytes need to be sent
+     * @param data_write_commports_and_bytes: commports to which bytes need to be sent
      * @param buffer_size: the buffer size to use
      * @param payload: the message size in bytes
      *
@@ -259,13 +259,13 @@ namespace wrench {
     StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(std::shared_ptr<FileLocation> &location,
                                                                                bool success,
                                                                                std::shared_ptr<FailureCause> failure_cause,
-                                                                               std::map<S4U_CommPort *, double> data_write_commportes_and_bytes,
+                                                                               std::map<S4U_CommPort *, double> data_write_commports_and_bytes,
                                                                                double buffer_size,
                                                                                double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((location == nullptr) ||
             (success && (data_write_commport == nullptr)) ||
-            (success && data_write__commportes_and_bytes.empty()) ||
+            (success && data_write__commports_and_bytes.empty()) ||
             (success && (failure_cause != nullptr)) || (!success && (failure_cause == nullptr))) {
             throw std::invalid_argument(
                     "StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(): Invalid arguments");
@@ -274,7 +274,7 @@ namespace wrench {
         this->location = location;
         this->success = success;
         this->failure_cause = std::move(failure_cause);
-        this->data_write_commport_and_bytes = std::move(data_write_commportes_and_bytes);
+        this->data_write_commport_and_bytes = std::move(data_write_commports_and_bytes);
         this->buffer_size = buffer_size;
     }
 
