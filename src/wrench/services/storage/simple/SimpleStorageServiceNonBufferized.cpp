@@ -181,7 +181,7 @@ namespace wrench {
             // Create an async recv if needed
             if (not comm_ptr_has_been_posted) {
                 try {
-                    auto comm_ptr = this->mailbox->igetMessage();
+                    comm_ptr = this->mailbox->igetMessage();
 //                    comm_ptr = this->mailbox->get_async<void>((void **) (&(simulation_message)));
                 } catch (wrench::ExecutionException &e) {
                     // oh well
@@ -250,6 +250,7 @@ namespace wrench {
 #endif
 
             if (finished_activity == comm_ptr->comm_ptr) {
+                simulation_message = comm_ptr->wait();
                 comm_ptr_has_been_posted = false;
                 if (not processNextMessage(simulation_message.get())) break;
             } else {
