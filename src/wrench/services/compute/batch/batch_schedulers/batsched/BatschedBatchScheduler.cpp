@@ -256,7 +256,7 @@ namespace wrench {
         for (auto job: set_of_jobs) {
             // Get the answer
             std::unique_ptr<SimulationMessage> message = nullptr;
-            auto msg = S4U_CommPort::getMessage<BatchQueryAnswerMessage>(batchsched_query_commport,
+            auto msg = batchsched_query_commport->getMessage<BatchQueryAnswerMessage>(
                                                                         "[This error likely means that the scheduling algorithm that Batsched was configured to use (\"" +
                                                                                 this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
                                                                                 "\") does not support queue waiting time predictions!]. Received an");
@@ -347,7 +347,7 @@ namespace wrench {
         std::string data = batch_submission_data.dump();
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
-                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->commport_name,
+                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->commport,
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->setSimulation(this->cs->getSimulation());
@@ -416,7 +416,7 @@ namespace wrench {
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
                         new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(),
-                                                    this->cs->commport_name,
+                                                    this->cs->commport,
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->setSimulation(this->cs->getSimulation());
@@ -524,7 +524,7 @@ namespace wrench {
         try {
             std::shared_ptr<BatschedNetworkListener> network_listener =
                     std::shared_ptr<BatschedNetworkListener>(
-                            new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->commport_name,
+                            new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->commport,
                                                         std::to_string(this->batsched_port),
                                                         data));
             network_listener->setSimulation(this->cs->getSimulation());

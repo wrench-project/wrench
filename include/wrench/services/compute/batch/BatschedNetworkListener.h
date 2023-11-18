@@ -48,7 +48,7 @@ namespace wrench {
         std::string data_to_send;
         std::string reply_received;
         std::shared_ptr<BatchComputeService> batch_service;
-        S4U_Commport *batch_service_commport;
+        S4U_CommPort *batch_service_commport;
 
         void sendExecuteMessageToBatchComputeService(S4U_CommPort *answer_commport, std::string execute_job_reply_data);
         void sendQueryAnswerMessageToBatchComputeService(double estimated_waiting_time);
