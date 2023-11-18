@@ -369,7 +369,7 @@ void S4U_CommPortTest::do_NetworkTimeout_test() {
 
 
 /**********************************************************************/
-/**  NULL MAILBOX TEST                                               **/
+/**  NULL COMPORT TEST                                               **/
 /**********************************************************************/
 
 class NullCommPortTestWMS : public wrench::ExecutionController {
