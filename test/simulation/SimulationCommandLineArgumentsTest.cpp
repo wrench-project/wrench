@@ -290,7 +290,7 @@ void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
 }
 
 /**********************************************************************/
-/**           MAILBOX-POOL-SIZE     COMMAND-LINE ARGUMENT            **/
+/**           COMMPORT-POOL-SIZE     COMMAND-LINE ARGUMENT           **/
 /**********************************************************************/
 
 TEST_F(SimulationCommandLineArgumentsTest, CommPortPoolSizeArgument) {

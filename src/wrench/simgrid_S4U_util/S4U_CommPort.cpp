@@ -39,13 +39,10 @@ namespace wrench {
     double S4U_CommPort::default_control_message_size;
 
 
-
-    class WorkflowTask;
     /**
-     * @brief Helper method that avoids calling WRENCH_DEBUG from a .h file and do the logging for the templated getMessage() method.  
+     * @brief Helper method that avoids calling WRENCH_DEBUG from a .h file and do the logging for the templated getMessage() method.
      * It also has the added bonus of checking for inheritance
      *
-     * @param commport: the commport so we can get its name
      * @param type: a pointer to the message so we have its type
      * @param id: an integer id
      *
@@ -56,10 +53,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Helper method that avoids calling WRENCH_DEBUG from a .h file and do the logging for the templated getMessage() method.  
+     * @brief Helper method that avoids calling WRENCH_DEBUG from a .h file and do the logging for the templated getMessage() method.
      * It also has the added bonus of checking for inheritance.
      *
-     * @param commport: the commport so we can get its name
      * @param type: a pointer to the message so we have its type
      * @param id: an integer id
      *
