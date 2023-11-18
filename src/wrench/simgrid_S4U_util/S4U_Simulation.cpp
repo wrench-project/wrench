@@ -45,9 +45,9 @@ namespace wrench {
         }
 
 
-        // Create the commport_name pool
+        // Create the commport pool
         S4U_CommPort::createCommPortPool(S4U_CommPort::commport_pool_size);
-        S4U_CommPort::NULL_MAILBOX = new S4U_CommPort();
+        S4U_CommPort::NULL_COMMPORT = new S4U_CommPort();
         this->initialized = true;
 
         //        sg_storage_file_system_init();

@@ -193,13 +193,13 @@ namespace wrench {
             //            }
             //            if (target) {
             //                try{
-            //                    S4U_CommPort::dputMessage(cache->commport_name, message.release());
+            //                    S4U_CommPort::dputMessage(cache->commport, message.release());
             //                    return true;
             //                }catch(...){}
             //
             //            }
             //            if(remote){
-            //                S4U_CommPort::dputMessage(remote->commport_name, message.release());
+            //                S4U_CommPort::dputMessage(remote->commport, message.release());
             //                return true;
             //            }
             //            throw std::runtime_error( "StorageServiceProxy:processNextMessage(): Unexpected [" + message->getName() + "] message that either could not be forwared");
@@ -241,8 +241,8 @@ namespace wrench {
                         target = location->target;
                     }
                     //WRENCH_DEBUG("initiating file copy");
-                    // Initiate File Copy but not wanting to receive an answer, hence the NULL_MAILBOX
-                    initiateFileCopy(S4U_CommPort::NULL_MAILBOX, FileLocation::LOCATION(cache, msg->location->getFile()), FileLocation::LOCATION(target, msg->location->getFile()));
+                    // Initiate File Copy but not wanting to receive an answer, hence the NULL_COMMPORT
+                    initiateFileCopy(S4U_CommPort::NULL_COMMPORT, FileLocation::LOCATION(cache, msg->location->getFile()), FileLocation::LOCATION(target, msg->location->getFile()));
 
                     std::swap(messages[i], messages.back());
                     messages.pop_back();
@@ -581,7 +581,7 @@ namespace wrench {
      */
     bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<ServiceMessage> &message) {
         if (cache->hasFile(msg->location->getFile(), msg->location->getPath())) {//check cache
-            WRENCH_INFO("Forwarding to cache reply commport_name %s", msg->answer_commport->get_name().c_str());
+            WRENCH_INFO("Forwarding to cache reply commport %s", msg->answer_commport->get_name().c_str());
             cache->commport->putMessage(
                     new StorageServiceFileReadRequestMessage(
                             msg->answer_commport,
@@ -758,7 +758,7 @@ namespace wrench {
                 //readthrough:  all block until first read is finished, then all others read
                 //do not spend excessive time on readThrough
                 auto forward = new StorageServiceFileReadRequestMessage(msg);
-                forward->answer_commport = commport;                                                                     //setup intercept commport_name
+                forward->answer_commport = commport;                                                                     //setup intercept commport
                 forward->location = FileLocation::LOCATION(target, msg->location->getPath(), msg->location->getFile());//hyjack locaiton to be on target
                 target->commport->dputMessage(forward);                                                    //send to target
             } else {

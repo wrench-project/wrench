@@ -21,7 +21,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param file: the file for which storage allocation is requested
      * @param payload: the message size in bytes
      *
@@ -55,7 +55,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param file: the file for which storage allocation is requested
      * @param payload: the message size in bytes
      *

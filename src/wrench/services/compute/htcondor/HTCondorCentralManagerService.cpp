@@ -93,7 +93,7 @@ namespace wrench {
      */
     void HTCondorCentralManagerService::addComputeService(std::shared_ptr<ComputeService> compute_service) {
         this->compute_services.insert(compute_service);
-        //  send a "wake up" message to the daemon's commport_name
+        //  send a "wake up" message to the daemon's commport
         this->commport->putMessage(
                 new CentralManagerWakeUpMessage(0));
     }
@@ -114,7 +114,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        //  send a "run a standard job" message to the daemon's commport_name
+        //  send a "run a standard job" message to the daemon's commport
         this->commport->putMessage(
                 new ComputeServiceSubmitCompoundJobRequestMessage(
                         answer_commport, job, service_specific_args,
@@ -137,7 +137,7 @@ namespace wrench {
     int HTCondorCentralManagerService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
-        WRENCH_INFO("HTCondor Service starting on host %s listening on commport_name %s",
+        WRENCH_INFO("HTCondor Service starting on host %s listening on commport %s",
                     this->hostname.c_str(), this->commport->get_cname());
 
         // main loop
@@ -250,7 +250,7 @@ namespace wrench {
     /**
      * @brief Process a submit compound job request
      *
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param job: the job
      * @param service_specific_args: service specific arguments
      *
@@ -272,7 +272,7 @@ namespace wrench {
     //    /**
     //     * @brief Process a submit pilot job request
     //     *
-    //     * @param answer_commport: the commport_name to which the answer message should be sent
+    //     * @param answer_commport: the commport to which the answer message should be sent
     //     * @param job: the job
     //     * @param service_specific_args: service specific arguments
     //     *

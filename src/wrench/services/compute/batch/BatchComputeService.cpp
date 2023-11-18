@@ -75,7 +75,7 @@ namespace wrench {
      * @param scratch_space_mount_point: the mount point og the scratch storage space for the service ("" means "no scratch space")
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     * @param suffix: suffix to append to the service name and commport_name
+     * @param suffix: suffix to append to the service name and commport
      *
      * @throw std::invalid_argument
      */
@@ -375,7 +375,7 @@ namespace wrench {
             batch_job->csv_metadata = "color:" + (*it).second;
         }
 
-        // Send a "run a BatchComputeService job" message to the daemon's commport_name
+        // Send a "run a BatchComputeService job" message to the daemon's commport
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
         this->commport->dputMessage(
                 new BatchComputeServiceJobRequestMessage(
@@ -401,7 +401,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        // Send a "terminate a  job" message to the daemon's commport_name
+        // Send a "terminate a  job" message to the daemon's commport
         this->commport->putMessage(
                 new ComputeServiceTerminateCompoundJobRequestMessage(
                         answer_commport,
@@ -788,7 +788,7 @@ namespace wrench {
      * @brief Process a job submission
      *
      * @param job: the BatchComputeService job object
-     * @param answer_commport: the commport_name to which answer messages should be sent
+     * @param answer_commport: the commport to which answer messages should be sent
      */
     void BatchComputeService::processJobSubmission(const std::shared_ptr<BatchJob> &job,
                                                    S4U_CommPort *answer_commport) {
@@ -1078,7 +1078,7 @@ namespace wrench {
 
     /**
     * @brief Process a "get resource description message"
-    * @param answer_commport: the commport_name to which the description message should be sent
+    * @param answer_commport: the commport to which the description message should be sent
     * @param key: the desired resource information (i.e., dictionary key) that's needed)
     */
     void BatchComputeService::processGetResourceInformation(S4U_CommPort *answer_commport,
@@ -1123,7 +1123,7 @@ namespace wrench {
      * @brief Process a "terminate compound job message"
      *
      * @param job: the job to terminate
-     * @param answer_commport: the commport_name to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      */
     void BatchComputeService::processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job,
                                                                    S4U_CommPort *answer_commport) {
@@ -1312,7 +1312,7 @@ namespace wrench {
 
     /**
      * @brief Process a host available resource request
-     * @param answer_commport: the answer commport_name
+     * @param answer_commport: the answer commport
      * @param num_cores: the desired number of cores
      * @param ram: the desired RAM
      */

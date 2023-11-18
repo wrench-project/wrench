@@ -943,7 +943,7 @@ namespace wrench {
 
         /**
         * @brief write a file on this node.
-	* @param answer_commport: a commport_name on which to send the answer messagej
+	* @param answer_commport: a commport on which to send the answer messagej
         * @param location: a location
 	* @param wait_for_answer: true if this method should wait for the answer, false otherwise
         *

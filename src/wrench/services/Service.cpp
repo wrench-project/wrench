@@ -309,7 +309,7 @@ namespace wrench {
 
         WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->commport->get_cname());
 
-        // Send a termination message to the daemon's commport_name - SYNCHRONOUSLY
+        // Send a termination message to the daemon's commport - SYNCHRONOUSLY
         auto ack_commport = S4U_Daemon::getRunningActorRecvCommPort();
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {

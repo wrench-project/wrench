@@ -33,7 +33,7 @@ namespace wrench {
     int S4U_Daemon::num_non_daemonized_actors_running = 0;
 
     /**
-     * @brief Constructor (daemon with a commport_name)
+     * @brief Constructor (daemon with a commport)
      *
      * @param hostname: the name of the host on which the daemon will run
      * @param process_name_prefix: the prefix of the name of the simulated process/actor
@@ -170,7 +170,7 @@ namespace wrench {
         this->daemonized = daemonized;
         this->auto_restart = auto_restart;
         this->has_returned_from_main = false;
-        //        this->commport_name = this->initial_commport_name + "_#" + std::to_string(this->num_starts);
+        //        this->commport = this->initial_commport + "_#" + std::to_string(this->num_starts);
         // Create the s4u_actor
 
         try {
@@ -205,7 +205,7 @@ namespace wrench {
             }
         }
 
-        // Set the commport_name receiver
+        // Set the commport receiver
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
         this->commport->s4u_mb->set_receiver(this->s4u_actor);
         //        this->recv_commport->set_receiver(this->s4u_actor);
@@ -397,8 +397,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Return the running actor's recv commport_name
-     * @return the commport_name
+     * @brief Return the running actor's recv commport
+     * @return the commport
      */
     S4U_CommPort *S4U_Daemon::getRunningActorRecvCommPort() {
 

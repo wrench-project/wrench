@@ -21,7 +21,7 @@ WRENCH_LOG_CATEGORY(wrench_core_failure_detector, "Log category for ServiceTermi
  * @brief Constructor
  * @param host_on_which_to_run: the service's host
  * @param service_to_monitor: which service to monitor
- * @param commport_to_notify: which commport_name to notify
+ * @param commport_to_notify: which commport to notify
  * @param notify_on_crash: whether to send a crash notification (in case of non-clean termination)
  * @param notify_on_termination: whether to send a termination notification (in case of clean termination)
  */
@@ -48,13 +48,13 @@ int wrench::ServiceTerminationDetector::main() {
 
     if (this->notify_on_crash and (not service_has_returned_from_main)) {
         // Failure detected!
-        WRENCH_INFO("Detected crash of service %s (notifying commport_name %s)", this->service_to_monitor->getName().c_str(),
+        WRENCH_INFO("Detected crash of service %s (notifying commport %s)", this->service_to_monitor->getName().c_str(),
                     this->commport_to_notify->get_cname());
         this->commport_to_notify->putMessage(new ServiceHasCrashedMessage(this->service_to_monitor));
     }
     if (this->notify_on_termination and (service_has_returned_from_main)) {
         // Failure detected!
-        WRENCH_INFO("Detected termination of service %s (notifying commport_name %s)",
+        WRENCH_INFO("Detected termination of service %s (notifying commport %s)",
                     this->service_to_monitor->getName().c_str(), this->commport_to_notify->get_cname());
         this->commport_to_notify->putMessage(
                                 new ServiceHasTerminatedMessage(this->service_to_monitor, return_value_from_main));

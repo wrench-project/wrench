@@ -40,7 +40,7 @@ namespace wrench {
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
     * @param batch_service: the BatchComputeService that this service reports to
-    * @param batch_service_commport: the name of the commport_name of the BatchComputeService
+    * @param batch_service_commport: the name of the commport of the BatchComputeService
     * @param sched_port the port for sending messages to Batsched
     * @param data_to_send: the data to send (as a JSON string)
     * @param property_list: property list ({} means "use all defaults")
@@ -58,7 +58,7 @@ namespace wrench {
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
     * @param batch_service: the BatchComputeService service
-    * @param batch_service_commport: the name of the commport_name of the batch_service
+    * @param batch_service_commport: the name of the commport of the batch_service
     * @param sched_port the port to send messages to Batsched
     * @param data_to_send: data to send
     * @param property_list: property list ({} means "use all defaults")
@@ -99,7 +99,7 @@ namespace wrench {
 
     /**
      * @brief Send an "execute" message to the BatchComputeService service
-     * @param answer_commport: commport_name on which ack will be received
+     * @param answer_commport: commport on which ack will be received
      * @param execute_job_reply_data: message to send
      */
     void BatschedNetworkListener::sendExecuteMessageToBatchComputeService(S4U_CommPort *answer_commport,

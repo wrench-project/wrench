@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef WRENCH_S4U_MAILBOX_H
-#define WRENCH_S4U_MAILBOX_H
+#ifndef WRENCH_S4U_COMMPORT_H
+#define WRENCH_S4U_COMMPORT_H
 
 
 #include <string>
@@ -25,7 +25,6 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
-    //class SimulationMessage;
     class S4U_PendingCommunication;
 
     /**
@@ -35,31 +34,39 @@ namespace wrench {
 
     public:
 
+
+        template<class TMessageType>
+        std::string get_type_name() {
+            char const *type_name = typeid(TMessageType).name();
+            return boost::core::demangle(type_name);
+        }
+
         /**
          * @brief Constructor
          */
         S4U_CommPort() {
-            this->s4u_mb = simgrid::s4u::Mailbox::by_name("tmp" + std::to_string(S4U_CommPort::generateUniqueSequenceNumber()));
-            this->name = this->s4u_mb->get_name();
+            auto number = std::to_string(S4U_CommPort::generateUniqueSequenceNumber());
+            this->s4u_mb = simgrid::s4u::Mailbox::by_name("mb_" + number);
+            this->s4u_mq = simgrid::s4u::MessageQueue::by_name("mq_" + number);
+            this->name = "cp_" + number;
         }
 
         /**
-     * @brief Synchronously receive a message from a commport_name
-     *
-     * @param error_prefix: any string you wish to prefix the error message with
-     * @return the message, in a unique_ptr of the type specified.  Otherwise throws a runtime_error
-     *
-     * @throw std::shared_ptr<NetworkError>
-     */
+         * @brief Synchronously receive a message from a commport_name
+         *
+         * @param error_prefix: any string you wish to prefix the error message with
+         * @return the message, in a unique_ptr of the type specified.  Otherwise throws a runtime_error
+         *
+         * @throw std::shared_ptr<NetworkError>
+         */
         template<class TMessageType>
         std::unique_ptr<TMessageType> getMessage(const std::string &error_prefix = "") {
             auto id = ++messageCounter;
 #ifndef NDEBUG
-            char const *name = typeid(TMessageType).name();
-            std::string tn = boost::core::demangle(name);
-            this->templateWaitingLog(tn, id);
+//            char const *type_name = typeid(TMessageType).name();
+//            std::string tn = boost::core::demangle(type_name);
+            auto tn = this->templateWaitingLog(get_type_name<TMessageType>(), id);
 #endif
-
 
             auto message = this->getMessage(false);
 
@@ -70,27 +77,30 @@ namespace wrench {
                 message.release();
                 return std::unique_ptr<TMessageType>(msg);
             } else {
-                char const *name = typeid(TMessageType).name();
-                std::string tn = boost::core::demangle(name);
-                throw std::runtime_error(error_prefix + " Unexpected [" + message->getName() + "] message while waiting for " + tn.c_str() + ". Request ID: " + std::to_string(id));
+//                char const *type_name = typeid(TMessageType).name();
+//                std::string tn = boost::core::demangle(type_name);
+                throw std::runtime_error(error_prefix + " Unexpected [" + message->getName() + "] message while waiting for " +
+                                         get_type_name<TMessageType>() + ". Request ID: " + std::to_string(id));
             }
         }
+
         /**
-     * @brief Synchronously receive a message from a commport_name
-     *
-     * @param error_prefix: any string you wish to prefix the error message with
-     * @param timeout:  a timeout value in seconds (<0 means never timeout)
-     *
-     * @return the message, in a unique_ptr of the type specified.  Otherwise throws a runtime_error
-     *
-     * @throw std::shared_ptr<NetworkError>
-     */
+         * @brief Synchronously receive a message from a commport
+         *
+         * @param error_prefix: any string you wish to prefix the error message with
+         * @param timeout:  a timeout value in seconds (<0 means never timeout)
+         *
+         * @return the message, in a unique_ptr of the type specified.  Otherwise throws a runtime_error
+         *
+         * @throw std::shared_ptr<NetworkError>
+         */
         template<class TMessageType>
         std::unique_ptr<TMessageType> getMessage(double timeout, const std::string &error_prefix = "") {
             auto id = ++messageCounter;
 #ifndef NDEBUG
-            char const *name = typeid(TMessageType).name();
-            std::string tn = boost::core::demangle(name);
+//            char const *type_name = typeid(TMessageType).name();
+//            std::string tn = boost::core::demangle(type_name);
+            auto tn = get_type_name<TMessageType>();
             this->templateWaitingLog(tn, id);
 #endif
 
@@ -104,32 +114,36 @@ namespace wrench {
 #endif
                 return std::unique_ptr<TMessageType>(msg);
             } else {
-                char const *name = typeid(TMessageType).name();
-                std::string tn = boost::core::demangle(name);
-                throw std::runtime_error(error_prefix + " Unexpected [" + message->getName() + "] message while waiting for " + tn.c_str() + ". Request ID: " + std::to_string(id));
+//                char const *type_name = typeid(TMessageType).name();
+//                std::string tn = boost::core::demangle(type_name);
+                throw std::runtime_error(error_prefix + " Unexpected [" + message->getName() + "] message while waiting for " +
+                                         get_type_name<TMessageType>() + ". Request ID: " + std::to_string(id));
             }
         }
+
         /**
-     * @brief Synchronously receive a message from a commport_name
-     *
-     * @return the message, or nullptr (in which case it's likely a brutal termination)
-     *
-     * @throw std::shared_ptr<NetworkError>
-     */
+         * @brief Synchronously receive a message from a commport_name
+         *
+         * @return the message, or nullptr (in which case it's likely a brutal termination)
+         *
+         * @throw std::shared_ptr<NetworkError>
+         */
         std::unique_ptr<SimulationMessage> getMessage() {
             return getMessage(true);
         }
+
         /**
-     * @brief Synchronously receive a message from a commport_name, with a timeout
-     *
-     * @param timeout:  a timeout value in seconds (<0 means never timeout)
-     * @return the message, or nullptr (in which case it's likely a brutal termination)
-     *
-     * @throw std::shared_ptr<NetworkError>
-     */
+         * @brief Synchronously receive a message from a commport_name, with a timeout
+         *
+         * @param timeout:  a timeout value in seconds (<0 means never timeout)
+         * @return the message, or nullptr (in which case it's likely a brutal termination)
+         *
+         * @throw std::shared_ptr<NetworkError>
+         */
         std::unique_ptr<SimulationMessage> getMessage(double timeout) {
             return this->getMessage(timeout, true);
         }
+
         void putMessage(SimulationMessage *m);
         void dputMessage(SimulationMessage *msg);
         std::shared_ptr<S4U_PendingCommunication> iputMessage(SimulationMessage *msg);
@@ -139,7 +153,6 @@ namespace wrench {
 
         static S4U_CommPort *getTemporaryCommPort();
         static void retireTemporaryCommPort(S4U_CommPort *commport);
-
         static void createCommPortPool(unsigned long num_commports);
 
         /**
@@ -156,13 +169,13 @@ namespace wrench {
          * @brief The "not a commport_name" commport_name, to avoid getting answers back when asked
          *        to prove an "answer commport_name"
          */
-        static S4U_CommPort *NULL_MAILBOX;
+        static S4U_CommPort *NULL_COMMPORT;
 
         const std::string get_name() const {
             return this->name;
         }
 
-        const char *get_cname() const {
+        [[nodiscard]] const char *get_cname() const {
             return this->name.c_str();
         }
 
@@ -171,6 +184,7 @@ namespace wrench {
         friend class S4U_PendingCommunication;
 
         simgrid::s4u::Mailbox *s4u_mb;
+        simgrid::s4u::MessageQueue *s4u_mq;
 
         std::unique_ptr<SimulationMessage> getMessage(bool log);
         std::unique_ptr<SimulationMessage> getMessage(double timeout, bool log);
@@ -194,4 +208,4 @@ namespace wrench {
 }// namespace wrench
 
 
-#endif//WRENCH_S4U_MAILBOX_H
+#endif//WRENCH_S4U_COMMPORT_H

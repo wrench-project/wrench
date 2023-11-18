@@ -138,16 +138,16 @@ namespace wrench {
                        (not strcmp(argv[i], "--wrench-log-full")) or
                        (not strcmp(argv[i], "--wrench-logs-full"))) {
                 xbt_log_control_set("root.thresh:info");
-            } else if (not strncmp(argv[i], "--wrench-commport_name-pool-size", strlen("--wrench-commport_name-pool-size"))) {
+            } else if (not strncmp(argv[i], "--wrench-commport-pool-size", strlen("--wrench-commport-pool-size"))) {
                 char *equal_sign = strchr(argv[i], '=');
                 if (!equal_sign) {
-                    throw std::invalid_argument("Invalid --wrench-commport_name-pool-size argument value");
+                    throw std::invalid_argument("Invalid --wrench-commport-pool-size argument value");
                 }
                 // Check that the value is all digits
                 char *ptr = equal_sign + 1;
                 while (*ptr) {
                     if (*ptr < '0' or *ptr > '9') {
-                        throw std::invalid_argument("Invalid --wrench-commport_name-pool-size argument value");
+                        throw std::invalid_argument("Invalid --wrench-commport-pool-size argument value");
                     }
                     ptr++;
                 }
@@ -238,9 +238,9 @@ namespace wrench {
             std::cout << "     (use --log=xxx.threshold=info to enable log category xxxx)\n";
             std::cout << "   --help-logs for detailed help on (SimGrid's) logging options/syntax)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
-            std::cout << "   --wrench-commport_name-pool-size=<integer>: set the number of SimGrid commportes used by WRENCH (default: 50000).\n";
+            std::cout << "   --wrench-commport-pool-size=<integer>: set the number of SimGrid commportes used by WRENCH (default: 50000).\n";
             std::cout << "      This value may need to be increased, especially for simulations that simulate many\n";
-            std::cout << "      failures, for which WRENCH has a hard time avoiding all commport_name-related memory leaks\n";
+            std::cout << "      failures, for which WRENCH has a hard time avoiding all commport-related memory leaks\n";
             std::cout << "   --wrench-default-control-message-size=<double>: the default size of control messages in bytes (default: 1024).\n";
             std::cerr << "\n";
         }

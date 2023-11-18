@@ -29,7 +29,7 @@ WRENCH_LOG_CATEGORY(wrench_core_commport, "CommPort");
 
 namespace wrench {
 
-    S4U_CommPort *S4U_CommPort::NULL_MAILBOX;
+    S4U_CommPort *S4U_CommPort::NULL_COMMPORT;
 
     std::vector<std::unique_ptr<S4U_CommPort>> S4U_CommPort::all_commports;
     std::deque<S4U_CommPort *> S4U_CommPort::free_commports;
@@ -45,34 +45,34 @@ namespace wrench {
      * @brief Helper method that avoids calling WRENCH_DEBUG from a .h file and do the logging for the templated getMessage() method.  
      * It also has the added bonus of checking for inheritance
      *
-     * @param commport: the commport_name so we can get its name
+     * @param commport: the commport so we can get its name
      * @param type: a pointer to the message so we have its type
      * @param id: an integer id
      *
      */
     void S4U_CommPort::templateWaitingLog(const std::string& type, unsigned long long id) {
 
-        WRENCH_DEBUG("Waiting for message of type <%s> from commport_name '%s'.  Request ID: %llu", type.c_str(), this->s4u_mb->get_cname(), id);
+        WRENCH_DEBUG("Waiting for message of type <%s> from commport '%s'.  Request ID: %llu", type.c_str(), this->s4u_mb->get_cname(), id);
     }
 
     /**
      * @brief Helper method that avoids calling WRENCH_DEBUG from a .h file and do the logging for the templated getMessage() method.  
      * It also has the added bonus of checking for inheritance.
      *
-     * @param commport: the commport_name so we can get its name
+     * @param commport: the commport so we can get its name
      * @param type: a pointer to the message so we have its type
      * @param id: an integer id
      *
      */
     void S4U_CommPort::templateWaitingLogUpdate(const std::string& type, unsigned long long id) {
 
-        WRENCH_DEBUG("Received a message of type <%s> from commport_name '%s'.  Request ID: %llu", type.c_str(), this->s4u_mb->get_cname(), id);
+        WRENCH_DEBUG("Received a message of type <%s> from commport '%s'.  Request ID: %llu", type.c_str(), this->s4u_mb->get_cname(), id);
     }
 
     /**
-     * @brief Synchronously receive a message from a commport_name
+     * @brief Synchronously receive a message from a commport
      *
-     * @param commport: the commport_name
+     * @param commport: the commport
      * @param log: should the log message be printed
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
@@ -80,14 +80,14 @@ namespace wrench {
      *
      */
     std::unique_ptr<SimulationMessage> S4U_CommPort::getMessage(bool log) {
-        if (this == S4U_CommPort::NULL_MAILBOX) {
-            throw std::invalid_argument("S4U_CommPort::getMessage(): Cannot be called with NULL_MAILBOX");
+        if (this == S4U_CommPort::NULL_COMMPORT) {
+            throw std::invalid_argument("S4U_CommPort::getMessage(): Cannot be called with NULL_COMMPORT");
         }
 
-        if (log) WRENCH_DEBUG("Getting a message from commport_name '%s'", this->s4u_mb->get_cname());
+        if (log) WRENCH_DEBUG("Getting a message from commport '%s'", this->s4u_mb->get_cname());
         SimulationMessage *msg;
         try {
-            //            msg = static_cast<SimulationMessage *>(commport_name->get());
+            //            msg = static_cast<SimulationMessage *>(commport->get());
             msg = this->s4u_mb->get<SimulationMessage>();
         } catch (simgrid::NetworkFailureException &e) {
             throw ExecutionException(std::make_shared<NetworkError>(
@@ -98,14 +98,14 @@ namespace wrench {
         MessageManager::removeReceivedMessage(this, msg);
 #endif
 
-        WRENCH_DEBUG("Received a '%s' message from commport_name %s", msg->getName().c_str(), this->s4u_mb->get_cname());
+        WRENCH_DEBUG("Received a '%s' message from commport %s", msg->getName().c_str(), this->s4u_mb->get_cname());
         return std::unique_ptr<SimulationMessage>(msg);
     }
 
     /**
-     * @brief Synchronously receive a message from a commport_name, with a timeout
+     * @brief Synchronously receive a message from a commport, with a timeout
      *
-     * @param commport: the commport_name
+     * @param commport: the commport
      * @param timeout:  a timeout value in seconds (<0 means never timeout)
      * @param log: should the log message be printed
      * @return the message, or nullptr (in which case it's likely a brutal termination)
@@ -113,19 +113,19 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_CommPort::getMessage(double timeout, bool log) {
-        if (this == S4U_CommPort::NULL_MAILBOX) {
-            throw std::invalid_argument("S4U_CommPort::getMessage(): Cannot be called with NULL_MAILBOX");
+        if (this == S4U_CommPort::NULL_COMMPORT) {
+            throw std::invalid_argument("S4U_CommPort::getMessage(): Cannot be called with NULL_COMMPORT");
         }
 
         if (timeout < 0) {
             return this->getMessage();
         }
 
-        if (log) WRENCH_DEBUG("Getting a message from commport_name '%s' with timeout %lf sec", this->s4u_mb->get_cname(), timeout);
+        if (log) WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->s4u_mb->get_cname(), timeout);
         wrench::SimulationMessage *msg;
 
         try {
-            //            data = commport_name->get(timeout);
+            //            data = commport->get(timeout);
             msg = this->s4u_mb->get<SimulationMessage>(timeout);
         } catch (simgrid::NetworkFailureException &e) {
             throw ExecutionException(std::make_shared<NetworkError>(
@@ -142,26 +142,26 @@ namespace wrench {
         MessageManager::removeReceivedMessage(this, msg);
 #endif
 
-        WRENCH_DEBUG("Received a '%s' message from commport_name '%s'", msg->getName().c_str(), this->s4u_mb->get_cname());
+        WRENCH_DEBUG("Received a '%s' message from commport '%s'", msg->getName().c_str(), this->s4u_mb->get_cname());
 
         return std::unique_ptr<SimulationMessage>(msg);
     }
 
     /**
-     * @brief Synchronously send a message to a commport_name
+     * @brief Synchronously send a message to a commport
      *
-     * @param commport: the commport_name
+     * @param commport: the commport
      * @param msg: the SimulationMessage
      *
      * @throw std::shared_ptr<NetworkError>
      */
     void S4U_CommPort::putMessage(SimulationMessage *msg) {
 
-        if (this == S4U_CommPort::NULL_MAILBOX) {
+        if (this == S4U_CommPort::NULL_COMMPORT) {
             return;
         }
 
-        WRENCH_DEBUG("Putting a %s message (%.2lf bytes) to commport_name '%s'",
+        WRENCH_DEBUG("Putting a %s message (%.2lf bytes) to commport '%s'",
                      msg->getName().c_str(), msg->payload,
                      this->s4u_mb->get_cname());
         try {
@@ -180,19 +180,19 @@ namespace wrench {
     }
 
     /**
-     * @brief Asynchronously send a message to a commport_name in a "fire and forget" fashion
+     * @brief Asynchronously send a message to a commport in a "fire and forget" fashion
      *
-     * @param commport: the commport_name
+     * @param commport: the commport
      * @param msg: the SimulationMessage
      *
      */
     void S4U_CommPort::dputMessage(SimulationMessage *msg) {
 
-        if (this == S4U_CommPort::NULL_MAILBOX) {
+        if (this == S4U_CommPort::NULL_COMMPORT) {
             return;
         }
 
-        WRENCH_DEBUG("Dputting a %s message (%.2lf bytes) to commport_name '%s'",
+        WRENCH_DEBUG("Dputting a %s message (%.2lf bytes) to commport '%s'",
                      msg->getName().c_str(), msg->payload,
                      this->s4u_mb->get_cname());
 
@@ -202,13 +202,13 @@ namespace wrench {
 	//if (msg->payload)
         this->s4u_mb->put_init(msg, (uint64_t) msg->payload)->detach();
 	//else
-        //  commport_name->put(msg, 0);
+        //  commport->put(msg, 0);
     }
 
     /**
-    * @brief Asynchronously send a message to a commport_name
+    * @brief Asynchronously send a message to a commport
     *
-    * @param commport: the commport_name
+    * @param commport: the commport
     * @param msg: the SimulationMessage
     *
     * @return a pending communication handle
@@ -218,11 +218,11 @@ namespace wrench {
     std::shared_ptr<S4U_PendingCommunication>
     S4U_CommPort::iputMessage(SimulationMessage *msg) {
 
-        if (this == S4U_CommPort::NULL_MAILBOX) {
+        if (this == S4U_CommPort::NULL_COMMPORT) {
             return nullptr;
         }
 
-        WRENCH_DEBUG("Iputting a %s message (%.2lf bytes) to commport_name '%s'",
+        WRENCH_DEBUG("Iputting a %s message (%.2lf bytes) to commport '%s'",
                      msg->getName().c_str(), msg->payload,
                      this->s4u_mb->get_cname());
 
@@ -246,9 +246,9 @@ namespace wrench {
 
 
     /**
-    * @brief Asynchronously receive a message from a commport_name
+    * @brief Asynchronously receive a message from a commport
     *
-    * @param commport: the commport_name
+    * @param commport: the commport
     *
     * @return a pending communication handle
     *
@@ -256,13 +256,13 @@ namespace wrench {
     */
     std::shared_ptr<S4U_PendingCommunication> S4U_CommPort::igetMessage() {
 
-        if (this == S4U_CommPort::NULL_MAILBOX) {
-            throw std::invalid_argument("S4U_CommPort::igetMessage(): Cannot be called with NULL_MAILBOX");
+        if (this == S4U_CommPort::NULL_COMMPORT) {
+            throw std::invalid_argument("S4U_CommPort::igetMessage(): Cannot be called with NULL_COMMPORT");
         }
 
         simgrid::s4u::CommPtr comm_ptr = nullptr;
 
-        WRENCH_DEBUG("Igetting a message from commport_name '%s'", this->s4u_mb->get_cname());
+        WRENCH_DEBUG("Igetting a message from commport '%s'", this->s4u_mb->get_cname());
 
         std::shared_ptr<S4U_PendingCommunication> pending_communication = std::make_shared<S4U_PendingCommunication>(
                 this, S4U_PendingCommunication::OperationType::RECEIVING);
@@ -290,28 +290,28 @@ namespace wrench {
 
 
     /**
-     * @brief Get a temporary commport_name
+     * @brief Get a temporary commport
      *
-     * @return a temporary commport_name
+     * @return a temporary commport
      */
     S4U_CommPort *S4U_CommPort::getTemporaryCommPort() {
         if (S4U_CommPort::free_commports.empty()) {
             throw std::runtime_error("S4U_CommPort::getTemporaryCommPort(): Out of commportes! "
-                                     "(Increase the commport_name pool size with the --wrench-commport_name-pool-size command-line argument (default is 5000))");
+                                     "(Increase the commport pool size with the --wrench-commport-pool-size command-line argument (default is 5000))");
         }
 
         //        std::cerr << "FREE MAILBOX: " << S4U_CommPort::free_commports.size() << "\n";
 
         auto commport = *(S4U_CommPort::free_commports.end() - 1);
         S4U_CommPort::free_commports.pop_back();
-        //        std::cerr << simgrid::s4u::this_actor::get_pid() << " GOT TEMPORARY MAILBOX " << commport_name->get_name() << "\n";
+        //        std::cerr << simgrid::s4u::this_actor::get_pid() << " GOT TEMPORARY MAILBOX " << commport->get_name() << "\n";
 
         if (not commport->s4u_mb->empty()) {
-            //            std::cerr << "############### WASTING MAILBOX " << commport_name->get_name() << "\n";
+            //            std::cerr << "############### WASTING MAILBOX " << commport->get_name() << "\n";
             S4U_CommPort::commports_to_drain.push_front(commport);
             return S4U_CommPort::getTemporaryCommPort();// Recursive call!
 
-            //            // Drain one commport_name
+            //            // Drain one commport
             //            if (not S4U_CommPort::commports_to_drain.empty()) {
             //                auto to_drain = *(S4U_CommPort::commports_to_drain.end() - 1);
             //                std::cerr << "############ UNWASTING MAILBOX " << to_drain->get_name() << "\n";
@@ -329,17 +329,17 @@ namespace wrench {
 
 
     /**
-     * @brief Retire a temporary commport_name
-     * @param commport: the commport_name to retire
+     * @brief Retire a temporary commport
+     * @param commport: the commport to retire
      */
     void S4U_CommPort::retireTemporaryCommPort(S4U_CommPort *commport) {
-        //        std::cerr << simgrid::s4u::this_actor::get_pid() << " TRYING TO RETIRE MAILBOX " << commport_name->get_name() << "\n";
+        //        std::cerr << simgrid::s4u::this_actor::get_pid() << " TRYING TO RETIRE MAILBOX " << commport->get_name() << "\n";
         if (S4U_CommPort::used_commports.find(commport) == S4U_CommPort::used_commports.end()) {
             return;
         }
         S4U_CommPort::used_commports.erase(commport);
         S4U_CommPort::free_commports.push_front(commport);
-        //        std::cerr << simgrid::s4u::this_actor::get_pid() << " RETIRED MAILBOX " << commport_name->get_name() << "\n";
+        //        std::cerr << simgrid::s4u::this_actor::get_pid() << " RETIRED MAILBOX " << commport->get_name() << "\n";
     }
 
     /**

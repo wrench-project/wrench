@@ -25,7 +25,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the hostname on which the data movement manager is to run
-     * @param creator_commport: the commport_name of the manager's creator
+     * @param creator_commport: the commport of the manager's creator
      * @param location: the write location
      */
     FileWriterThread::FileWriterThread(std::string hostname,

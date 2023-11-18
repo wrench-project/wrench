@@ -25,7 +25,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_commport: the commport_name to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -54,7 +54,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_commport: the commport_name to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
      *                   available on the host)
      * @param ram_memory: the VM's RAM memory_manager_service capacity (use ComputeService::ALL_RAM to use all RAM available on the
@@ -106,7 +106,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_commport: the commport_name to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param vm_name: the name of the VM host
      * @param send_failure_notifications: whether to send job failure notifications
      * @param termination_cause: termination cause (for failure notifications)
@@ -146,7 +146,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_commport: the commport_name to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param vm_name: the name of the VM host
      * @param payload: githe message size in bytes
      *
@@ -183,7 +183,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_commport: the commport_name to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param vm_name: the name of the VM host
      * @param payload: the message size in bytes
      *
@@ -217,7 +217,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_commport: the commport_name to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param vm_name: the name of the VM host
      * @param payload: the message size in bytes
      *
@@ -252,7 +252,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_commport: the commport_name to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param vm_name: the name of the VM host
      * @param payload: the message size in bytes
      *

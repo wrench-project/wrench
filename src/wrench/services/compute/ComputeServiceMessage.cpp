@@ -23,7 +23,7 @@ namespace wrench {
 
     /**
    * @brief Constructor
-   * @param answer_commport: commport_name to which the answer message should be sent
+   * @param answer_commport: commport to which the answer message should be sent
    * @param job: a compound job submitted for execution
    * @param service_specific_args: a map of extra arguments (each specified by a name and value, both strings) required by some services
    * @param payload: message size in bytes
@@ -122,7 +122,7 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    * @param answer_commport: commport_name to which the answer message should be sent
+    * @param answer_commport: commport to which the answer message should be sent
     * @param job: a compound job to terminate
     * @param payload: message size in bytes
     *
@@ -219,7 +219,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_commport: the commport_name to which the answer should be sent
+     * @param answer_commport: the commport to which the answer should be sent
      * @param key: the desired resource information (i.e., dictionary key) that's needed)
      * @param payload: the message size in bytes
      *
@@ -256,7 +256,7 @@ namespace wrench {
     /**
     * @brief Constructor
     *
-    * @param answer_commport: the commport_name to which to send the answer
+    * @param answer_commport: the commport to which to send the answer
     * @param num_cores: the desired number of cores
     * @param ram: the desired RAM
     * @param payload: the message size in bytes

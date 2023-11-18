@@ -41,7 +41,7 @@ void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int r
  * @param notify_when_turned_off: whether to send a notifications when hosts turn off
  * @param notify_when_speed_change: whether to send a notification when hosts change speed
  * @param creator: the service that created this service (when its creator dies, so does this service)
- * @param commport_to_notify: the commport_name to notify
+ * @param commport_to_notify: the commport to notify
  * @param property_list: a property list
  *
  */
@@ -119,7 +119,7 @@ int wrench::HostStateChangeDetector::main() {
                 continue;
             }
 
-            WRENCH_INFO("Notifying commport_name '%s' that host '%s' has changed state", this->commport_to_notify->get_cname(),
+            WRENCH_INFO("Notifying commport '%s' that host '%s' has changed state", this->commport_to_notify->get_cname(),
                         hostname.c_str());
             this->commport_to_notify->dputMessage(msg);
         }
@@ -139,7 +139,7 @@ int wrench::HostStateChangeDetector::main() {
                 continue;
             }
 
-            WRENCH_INFO("Notifying commport_name '%s' that host '%s' has changed speed", this->commport_to_notify->get_cname(),
+            WRENCH_INFO("Notifying commport '%s' that host '%s' has changed speed", this->commport_to_notify->get_cname(),
                         hostname.c_str());
             this->commport_to_notify->dputMessage(msg);
         }
