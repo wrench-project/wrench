@@ -231,7 +231,7 @@ namespace wrench {
             if ((S4U_Daemon::num_non_daemonized_actors_running == 0) or (not this->isSetToAutoRestart())) {
 //                Service::increaseNumCompletedServicesCount();
 #ifdef MESSAGE_MANAGER
-                MessageManager::cleanUpMessages(this->commport_name);
+                MessageManager::cleanUpMessages(this->commport);
 #endif
                 this->deleteLifeSaver();
             }

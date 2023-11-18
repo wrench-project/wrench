@@ -51,7 +51,7 @@ namespace wrench {
                                   std::shared_ptr<bool> answered,
                                   int timeToLive);
             ContinueSearchMessage(ContinueSearchMessage *toCopy);
-            /** @brief Mailbox to which the FINAL answer message should be sent */
+            /** @brief CommPort to which the FINAL answer message should be sent */
             S4U_CommPort *answer_commport;
 
             /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/
@@ -78,7 +78,7 @@ namespace wrench {
                                double payload, std::shared_ptr<bool> answered);
             UpdateCacheMessage(UpdateCacheMessage &other);
             UpdateCacheMessage(UpdateCacheMessage *other);
-            /** @brief Mailbox to which the FINAL answer message should be sent */
+            /** @brief CommPort to which the FINAL answer message should be sent */
             S4U_CommPort *answer_commport;
             /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/
             std::shared_ptr<StorageServiceFileReadRequestMessage> original;
@@ -102,7 +102,7 @@ namespace wrench {
                               bool fileReadRequest,
                               std::shared_ptr<bool> answered);
 
-            /** @brief Mailbox to which the FINAL answer message should be sent */
+            /** @brief CommPort to which the FINAL answer message should be sent */
             S4U_CommPort *answer_commport;
             /** @brief The file being searched for */
             std::shared_ptr<DataFile> file;

@@ -54,12 +54,12 @@ namespace wrench {
         bool whileReceiving();
         bool whileSending();
         bool isTimeout();
-        std::string getMailbox();
+        std::string getCommPortName();
 
     private:
         NetworkError::OperationType operation_type;
         NetworkError::ErrorType error_type;
-        std::string commport_name = "";
+        std::string commport_name;
     };
 
 

@@ -46,7 +46,7 @@ namespace wrench {
     * @param property_list: property list ({} means "use all defaults")
     */
     BatschedNetworkListener::BatschedNetworkListener(std::string hostname, std::shared_ptr<BatchComputeService> batch_service,
-                                                     simgrid::s4u::Mailbox *batch_service_commport,
+                                                     S4U_CommPort *batch_service_commport,
                                                      std::string sched_port,
                                                      std::string data_to_send,
                                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list) : BatschedNetworkListener(hostname, batch_service, batch_service_commport,
@@ -65,7 +65,7 @@ namespace wrench {
     * @param suffix the suffix to append
     */
     BatschedNetworkListener::BatschedNetworkListener(
-            std::string hostname, std::shared_ptr<BatchComputeService> batch_service, simgrid::s4u::Mailbox *batch_service_commport,
+            std::string hostname, std::shared_ptr<BatchComputeService> batch_service, S4U_CommPort *batch_service_commport,
             std::string sched_port,
             std::string data_to_send, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             std::string suffix = "") : Service(hostname, "batch_network_listener" + suffix) {
@@ -102,7 +102,7 @@ namespace wrench {
      * @param answer_commport: commport_name on which ack will be received
      * @param execute_job_reply_data: message to send
      */
-    void BatschedNetworkListener::sendExecuteMessageToBatchComputeService(simgrid::s4u::Mailbox *answer_commport,
+    void BatschedNetworkListener::sendExecuteMessageToBatchComputeService(S4U_CommPort *answer_commport,
                                                                           std::string execute_job_reply_data) {
         S4U_CommPort::putMessage(this->batch_service_commport,
                                 new BatchExecuteJobFromBatSchedMessage(answer_commport, execute_job_reply_data, 0));
@@ -157,7 +157,7 @@ namespace wrench {
         reply_decisions = nlohmann::json::parse(reply_data);
         decision_events = reply_decisions["events"];
 
-        auto answer_commport = S4U_Daemon::getRunningActorRecvMailbox();
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
         for (auto decisions: decision_events) {
             std::string decision_type = decisions["type"];
             double decision_timestamp = decisions["timestamp"];

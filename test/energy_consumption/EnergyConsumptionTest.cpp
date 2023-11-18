@@ -165,7 +165,7 @@ private:
             //sleep for 10 seconds
             wrench::S4U_Simulation::sleep(10);
             //let's execute the job, this should take ~100 sec based on the 100MF speed
-            std::string my_mailbox = "test_callback_mailbox";
+            std::string my_commport = "test_callback_commport";
 
             job_manager->submitJob(job, this->test->compute_service);
             this->waitForAndProcessNextEvent();
@@ -337,7 +337,7 @@ private:
             //sleep for 10 seconds
             wrench::S4U_Simulation::sleep(10);
             //let's execute the job, this should take ~100 sec based on the 100MF speed
-            std::string my_mailbox = "test_callback_mailbox";
+            std::string my_commport = "test_callback_commport";
 
             job_manager->submitJob(job, this->test->compute_service);
             this->waitForAndProcessNextEvent();
@@ -491,7 +491,7 @@ private:
             //sleep for 10 seconds
             wrench::S4U_Simulation::sleep(10);
             //let's execute the job, this should take ~100 sec based on the 100MF speed
-            std::string my_mailbox = "test_callback_mailbox";
+            std::string my_commport = "test_callback_commport";
             double before = wrench::S4U_Simulation::getClock();
 
             job_manager->submitJob(job, this->test->compute_service);
@@ -768,7 +768,7 @@ private:
             double before_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
             //run a new job
             //let's execute the job, this should take ~100 sec based on the 100MF speed
-            std::string my_mailbox = "test_callback_mailbox";
+            std::string my_commport = "test_callback_commport";
 
             job_manager->submitJob(job1, this->test->compute_service);
             this->waitForAndProcessNextEvent();
@@ -792,7 +792,7 @@ private:
             double before_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
             //run a new job
             //let's execute the job, this should take ~100 sec based on the 100MF speed
-            my_mailbox = "test_callback_mailbox";
+            my_commport = "test_callback_commport";
 
             job_manager->submitJob(job2, this->test->compute_service);
             this->waitForAndProcessNextEvent();
