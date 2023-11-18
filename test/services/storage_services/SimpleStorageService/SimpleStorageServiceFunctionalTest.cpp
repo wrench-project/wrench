@@ -1190,7 +1190,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test(dou
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
-    //    argv[2] = strdup("--log=wrench_core_mailbox.t=debug");
+    //    argv[2] = strdup("--log=wrench_core_commport.t=debug");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

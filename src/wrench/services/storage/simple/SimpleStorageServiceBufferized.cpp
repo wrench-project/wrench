@@ -221,7 +221,6 @@ namespace wrench {
 
             // Generate a commport_name name on which to receive the file
             auto file_reception_commport = S4U_CommPort::getTemporaryCommPort();
-            //            auto file_reception_commport = S4U_CommPort::generateUniqueMailbox("faa_does_not_work");
 
             // Reply with a "go ahead, send me the file" message
             answer_commport->dputMessage(

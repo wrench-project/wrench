@@ -37,7 +37,7 @@ namespace wrench {
     public:
         CompoundStorageAllocationRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file, double payload);
 
-        /** @brief Mailbox to which the answer message should be sent */
+        /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
         /** @brief The path */
         std::shared_ptr<DataFile> file;
@@ -61,7 +61,7 @@ namespace wrench {
     public:
         CompoundStorageLookupRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file, double payload);
 
-        /** @brief Mailbox to which the answer message should be sent */
+        /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
         /** @brief The path */
         std::shared_ptr<DataFile> file;

@@ -120,11 +120,11 @@ private:
         auto compute_service = this->test->compute_service;
         auto storage_service = this->test->storage_service;
         auto failure_cause = std::shared_ptr<wrench::FatalFailure>(new wrench::FatalFailure("msg"));
-        auto mailbox = wrench::S4U_CommPort::getTemporaryCommPort();
+        auto commport = wrench::S4U_CommPort::getTemporaryCommPort();
 
         auto network_proximity_daemon = std::shared_ptr<wrench::NetworkProximityDaemon>(
                 new wrench::NetworkProximityDaemon(this->simulation, "Host1",
-                                                   mailbox,
+                                                   commport,
                                                    10.0, 1.0,
                                                    1.0, 0, {}));
         auto batch_job = std::make_shared<wrench::BatchJob>(compound_job, 1, 10, 1,
@@ -143,26 +143,26 @@ private:
         CUSTOM_THROW(new wrench::SimulationMessage(-1), std::invalid_argument);
 
 
-        CUSTOM_NO_THROW(new wrench::FileRegistryFileLookupRequestMessage(mailbox, file, 666));
+        CUSTOM_NO_THROW(new wrench::FileRegistryFileLookupRequestMessage(commport, file, 666));
         CUSTOM_THROW(new wrench::FileRegistryFileLookupRequestMessage(nullptr, file, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::FileRegistryFileLookupRequestMessage(mailbox, nullptr, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::FileRegistryFileLookupRequestMessage(commport, nullptr, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::FileRegistryFileLookupAnswerMessage({location}, 666));
         //        CUSTOM_THROW(new wrench::FileRegistryFileLookupAnswerMessage({}, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::FileRegistryRemoveEntryRequestMessage(mailbox, location, 666));
+        CUSTOM_NO_THROW(new wrench::FileRegistryRemoveEntryRequestMessage(commport, location, 666));
         CUSTOM_THROW(new wrench::FileRegistryRemoveEntryRequestMessage(nullptr, location, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::FileRegistryRemoveEntryRequestMessage(mailbox, nullptr, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::FileRegistryRemoveEntryRequestMessage(commport, nullptr, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::FileRegistryRemoveEntryAnswerMessage(true, 666));
 
-        CUSTOM_NO_THROW(new wrench::FileRegistryAddEntryRequestMessage(mailbox, location, 666));
+        CUSTOM_NO_THROW(new wrench::FileRegistryAddEntryRequestMessage(commport, location, 666));
         CUSTOM_THROW(new wrench::FileRegistryAddEntryRequestMessage(nullptr, location, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::FileRegistryAddEntryRequestMessage(mailbox, nullptr, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::FileRegistryAddEntryRequestMessage(commport, nullptr, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::FileRegistryAddEntryAnswerMessage(666));
 
-        CUSTOM_NO_THROW(new wrench::FileRegistryFileLookupByProximityRequestMessage(mailbox, file, "reference_host",
+        CUSTOM_NO_THROW(new wrench::FileRegistryFileLookupByProximityRequestMessage(commport, file, "reference_host",
                                                                                     this->test->network_proximity_service, 666));
         CUSTOM_THROW(new wrench::FileRegistryFileLookupByProximityRequestMessage(nullptr, file, "reference_host",
                                                                                  network_proximity_service, 666),
@@ -196,9 +196,9 @@ private:
         CUSTOM_THROW(new wrench::ComputeServiceCompoundJobFailedMessage(nullptr, compute_service, 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::ComputeServiceCompoundJobFailedMessage(compound_job, nullptr, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::ComputeServiceTerminateCompoundJobRequestMessage(mailbox, compound_job, 666));
+        CUSTOM_NO_THROW(new wrench::ComputeServiceTerminateCompoundJobRequestMessage(commport, compound_job, 666));
         CUSTOM_THROW(new wrench::ComputeServiceTerminateCompoundJobRequestMessage(nullptr, compound_job, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::ComputeServiceTerminateCompoundJobRequestMessage(mailbox, nullptr, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::ComputeServiceTerminateCompoundJobRequestMessage(commport, nullptr, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::ComputeServiceTerminateCompoundJobAnswerMessage(compound_job, compute_service, true, nullptr, 666));
         CUSTOM_NO_THROW(new wrench::ComputeServiceTerminateCompoundJobAnswerMessage(compound_job, compute_service, false, failure_cause, 666));
@@ -208,14 +208,14 @@ private:
         CUSTOM_THROW(new wrench::ComputeServiceTerminateCompoundJobAnswerMessage(compound_job, compute_service, false, nullptr, 666), std::invalid_argument);
 
 
-        CUSTOM_NO_THROW(new wrench::ComputeServiceResourceInformationRequestMessage(mailbox, "stuff", 666));
+        CUSTOM_NO_THROW(new wrench::ComputeServiceResourceInformationRequestMessage(commport, "stuff", 666));
         CUSTOM_THROW(new wrench::ComputeServiceResourceInformationRequestMessage(nullptr, "stuff", 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::ComputeServiceResourceInformationRequestMessage(mailbox, "", 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::ComputeServiceResourceInformationRequestMessage(commport, "", 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::ComputeServiceResourceInformationAnswerMessage({std::map<std::string, double>({{"aa", 2.3}, {"bb", 4.5}})}, 666));
 
 
-        CUSTOM_NO_THROW(new wrench::CloudComputeServiceGetExecutionHostsRequestMessage(mailbox, 600));
+        CUSTOM_NO_THROW(new wrench::CloudComputeServiceGetExecutionHostsRequestMessage(commport, 600));
         CUSTOM_THROW(new wrench::CloudComputeServiceGetExecutionHostsRequestMessage(nullptr, 666), std::invalid_argument);
 
         std::vector<std::string> arg;
@@ -224,66 +224,66 @@ private:
 
         std::map<std::string, std::string> property_list;
         std::map<std::string, std::string> messagepayload_list;
-        CUSTOM_NO_THROW(new wrench::CloudComputeServiceCreateVMRequestMessage(mailbox, 42, 10, "stuff", {}, {}, 666));
+        CUSTOM_NO_THROW(new wrench::CloudComputeServiceCreateVMRequestMessage(commport, 42, 10, "stuff", {}, {}, 666));
         CUSTOM_THROW(
                 new wrench::CloudComputeServiceCreateVMRequestMessage(nullptr, 42, 0, "stuff", {}, {}, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage(mailbox, "host", "host", 666));
+        CUSTOM_NO_THROW(new wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage(commport, "host", "host", 666));
         CUSTOM_THROW(new wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage(nullptr, "host", "host", 666),
                      std::invalid_argument);
-        CUSTOM_THROW(new wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage(mailbox, "", "host", 666),
+        CUSTOM_THROW(new wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage(commport, "", "host", 666),
                      std::invalid_argument);
-        CUSTOM_THROW(new wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage(mailbox, "host", "", 666),
+        CUSTOM_THROW(new wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage(commport, "host", "", 666),
                      std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::CloudComputeServiceShutdownVMRequestMessage(mailbox, "vm", false, wrench::ComputeService::TerminationCause::TERMINATION_NONE, 666));
+        CUSTOM_NO_THROW(new wrench::CloudComputeServiceShutdownVMRequestMessage(commport, "vm", false, wrench::ComputeService::TerminationCause::TERMINATION_NONE, 666));
         CUSTOM_THROW(new wrench::CloudComputeServiceShutdownVMRequestMessage(nullptr, "vm", false, wrench::ComputeService::TerminationCause::TERMINATION_NONE, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::CloudComputeServiceShutdownVMRequestMessage(mailbox, "", false, wrench::ComputeService::TerminationCause::TERMINATION_NONE, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::CloudComputeServiceShutdownVMRequestMessage(commport, "", false, wrench::ComputeService::TerminationCause::TERMINATION_NONE, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::CloudComputeServiceShutdownVMAnswerMessage(true, nullptr, 666));
 
-        CUSTOM_NO_THROW(new wrench::CloudComputeServiceStartVMRequestMessage(mailbox, "vm", 666));
+        CUSTOM_NO_THROW(new wrench::CloudComputeServiceStartVMRequestMessage(commport, "vm", 666));
         CUSTOM_THROW(new wrench::CloudComputeServiceStartVMRequestMessage(nullptr, "vm", 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::CloudComputeServiceStartVMRequestMessage(mailbox, "", 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::CloudComputeServiceStartVMRequestMessage(commport, "", 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::CloudComputeServiceStartVMAnswerMessage(true, nullptr, nullptr, 666));
 
-        CUSTOM_NO_THROW(new wrench::CloudComputeServiceSuspendVMRequestMessage(mailbox, "vm", 666));
+        CUSTOM_NO_THROW(new wrench::CloudComputeServiceSuspendVMRequestMessage(commport, "vm", 666));
         CUSTOM_THROW(new wrench::CloudComputeServiceSuspendVMRequestMessage(nullptr, "vm", 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::CloudComputeServiceSuspendVMRequestMessage(mailbox, "", 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::CloudComputeServiceSuspendVMRequestMessage(commport, "", 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::CloudComputeServiceSuspendVMAnswerMessage(true, nullptr, 666));
 
-        CUSTOM_NO_THROW(new wrench::CloudComputeServiceResumeVMRequestMessage(mailbox, "vm", 666));
+        CUSTOM_NO_THROW(new wrench::CloudComputeServiceResumeVMRequestMessage(commport, "vm", 666));
         CUSTOM_THROW(new wrench::CloudComputeServiceResumeVMRequestMessage(nullptr, "vm", 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::CloudComputeServiceResumeVMRequestMessage(mailbox, "", 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::CloudComputeServiceResumeVMRequestMessage(commport, "", 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::CloudComputeServiceResumeVMAnswerMessage(true, nullptr, 666));
 
-        CUSTOM_NO_THROW(new wrench::CloudComputeServiceDestroyVMRequestMessage(mailbox, "vm", 666));
+        CUSTOM_NO_THROW(new wrench::CloudComputeServiceDestroyVMRequestMessage(commport, "vm", 666));
         CUSTOM_THROW(new wrench::CloudComputeServiceDestroyVMRequestMessage(nullptr, "vm", 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::CloudComputeServiceDestroyVMRequestMessage(mailbox, "", 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::CloudComputeServiceDestroyVMRequestMessage(commport, "", 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::CloudComputeServiceDestroyVMAnswerMessage(true, nullptr, 666));
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFreeSpaceRequestMessage(mailbox, "/", 666));
-        CUSTOM_NO_THROW(new wrench::StorageServiceFreeSpaceRequestMessage(mailbox, "", 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFreeSpaceRequestMessage(commport, "/", 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFreeSpaceRequestMessage(commport, "", 666));
         CUSTOM_THROW(new wrench::StorageServiceFreeSpaceRequestMessage(nullptr, "/", 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::StorageServiceFreeSpaceAnswerMessage(1000, 666));
         CUSTOM_THROW(new wrench::StorageServiceFreeSpaceAnswerMessage(-10, 666), std::invalid_argument);
 
         std::string root_dir = "/";
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileLookupRequestMessage(mailbox, location, 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileLookupRequestMessage(commport, location, 666));
         CUSTOM_THROW(new wrench::StorageServiceFileLookupRequestMessage(nullptr, location, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileLookupRequestMessage(mailbox, nullptr, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileLookupRequestMessage(commport, nullptr, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::StorageServiceFileLookupAnswerMessage(file, true, 666));
         CUSTOM_THROW(new wrench::StorageServiceFileLookupAnswerMessage(nullptr, true, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileDeleteRequestMessage(mailbox, location, 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileDeleteRequestMessage(commport, location, 666));
         CUSTOM_THROW(new wrench::StorageServiceFileDeleteRequestMessage(nullptr, location, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileDeleteRequestMessage(mailbox, nullptr, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileDeleteRequestMessage(commport, nullptr, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, true, nullptr, 666));
         CUSTOM_NO_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, false, failure_cause, 666));
@@ -296,10 +296,10 @@ private:
         CUSTOM_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, true, failure_cause, 666),
                      std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage(mailbox, location, location, 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage(commport, location, location, 666));
         CUSTOM_THROW(new wrench::StorageServiceFileCopyRequestMessage(nullptr, location, location, nullptr, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileCopyRequestMessage(mailbox, nullptr, location, nullptr, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileCopyRequestMessage(mailbox, location, nullptr, nullptr, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileCopyRequestMessage(commport, nullptr, location, nullptr, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileCopyRequestMessage(commport, location, nullptr, nullptr, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(location, location, true, nullptr, 666));
         CUSTOM_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(location, location, false, failure_cause, 666));
@@ -309,37 +309,37 @@ private:
         CUSTOM_THROW(new wrench::StorageServiceFileCopyAnswerMessage(location, nullptr, nullptr, false, false, nullptr, 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::StorageServiceFileCopyAnswerMessage(location, nullptr, nullptr, false, true, failure_cause, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteRequestMessage(mailbox, (simgrid::s4u::Host *) 666, location, 1024, 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteRequestMessage(commport, (simgrid::s4u::Host *) 666, location, 1024, 666));
         CUSTOM_THROW(new wrench::StorageServiceFileWriteRequestMessage(nullptr, (simgrid::s4u::Host *) 666, location, 10, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileWriteRequestMessage(mailbox, nullptr, location, 10, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileWriteRequestMessage(mailbox, (simgrid::s4u::Host *) 666, nullptr, 10, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileWriteRequestMessage(commport, nullptr, location, 10, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileWriteRequestMessage(commport, (simgrid::s4u::Host *) 666, nullptr, 10, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, true, nullptr, {{mailbox, 0.0}}, 10, 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, true, nullptr, {{commport, 0.0}}, 10, 666));
         CUSTOM_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, false, failure_cause, {{nullptr, 0.0}}, 10, 666));
-        CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(nullptr, true, nullptr, mailbox, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(nullptr, true, nullptr, commport, 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, true, nullptr, nullptr, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, true, failure_cause, mailbox, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, false, nullptr, mailbox, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, true, failure_cause, commport, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(location, false, nullptr, commport, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileReadRequestMessage(mailbox, (simgrid::s4u::Host *) 666, location, 10, 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileReadRequestMessage(commport, (simgrid::s4u::Host *) 666, location, 10, 666));
         CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(nullptr, (simgrid::s4u::Host *) 666, location, 10, 10, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(mailbox, (simgrid::s4u::Host *) 666, location, 10, 10, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(mailbox, (simgrid::s4u::Host *) 666, nullptr, 10, 10, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(mailbox, (simgrid::s4u::Host *) 666, location, -1.0, 10, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(commport, (simgrid::s4u::Host *) 666, location, 10, 10, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(commport, (simgrid::s4u::Host *) 666, nullptr, 10, 10, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage(commport, (simgrid::s4u::Host *) 666, location, -1.0, 10, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileReadAnswerMessage(location, true, nullptr, mailbox, 10, 1, 666));
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileReadAnswerMessage(location, false, failure_cause, mailbox, 0, 1, 666));
-        CUSTOM_THROW(new wrench::StorageServiceFileReadAnswerMessage(nullptr, true, nullptr, mailbox, 10, 1, 1, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileReadAnswerMessage(location, true, failure_cause, mailbox, 10, 1, 1, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileReadAnswerMessage(location, false, nullptr, mailbox, 10, 1, 1, 666), std::invalid_argument);
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileReadAnswerMessage(location, true, nullptr, commport, 10, 1, 666));
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileReadAnswerMessage(location, false, failure_cause, commport, 0, 1, 666));
+        CUSTOM_THROW(new wrench::StorageServiceFileReadAnswerMessage(nullptr, true, nullptr, commport, 10, 1, 1, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadAnswerMessage(location, true, failure_cause, commport, 10, 1, 1, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadAnswerMessage(location, false, nullptr, commport, 10, 1, 1, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::StorageServiceFileContentChunkMessage(file, 666, true));
         CUSTOM_THROW(new wrench::StorageServiceFileContentChunkMessage(nullptr, 666, true), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::NetworkProximityLookupRequestMessage(mailbox, std::make_pair("a", "b"), 666));
+        CUSTOM_NO_THROW(new wrench::NetworkProximityLookupRequestMessage(commport, std::make_pair("a", "b"), 666));
         CUSTOM_THROW(new wrench::NetworkProximityLookupRequestMessage(nullptr, std::make_pair("a", "b"), 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::NetworkProximityLookupRequestMessage(mailbox, std::make_pair("", "b"), 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::NetworkProximityLookupRequestMessage(mailbox, std::make_pair("a", ""), 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::NetworkProximityLookupRequestMessage(commport, std::make_pair("", "b"), 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::NetworkProximityLookupRequestMessage(commport, std::make_pair("a", ""), 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("a", "b"), 1.0, 1.0, 666));
         CUSTOM_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("", "b"), 1.0, 1.0, 666), std::invalid_argument);
@@ -352,21 +352,21 @@ private:
         CUSTOM_NO_THROW(new wrench::NextContactDaemonRequestMessage(network_proximity_daemon, 666));
         CUSTOM_THROW(new wrench::NextContactDaemonRequestMessage(nullptr, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::CoordinateLookupRequestMessage(mailbox, "requested_host", 666));
+        CUSTOM_NO_THROW(new wrench::CoordinateLookupRequestMessage(commport, "requested_host", 666));
         CUSTOM_THROW(new wrench::CoordinateLookupRequestMessage(nullptr, "requested_host", 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::CoordinateLookupRequestMessage(mailbox, "", 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::CoordinateLookupRequestMessage(commport, "", 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::CoordinateLookupAnswerMessage("requested_host", true, std::make_pair(1.0, 1.0), 1.0, 666));
         CUSTOM_THROW(new wrench::CoordinateLookupAnswerMessage("", true, std::make_pair(1.0, 1.0), 1.0, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::BatchExecuteJobFromBatSchedMessage(mailbox, "string", 666));
+        CUSTOM_NO_THROW(new wrench::BatchExecuteJobFromBatSchedMessage(commport, "string", 666));
         CUSTOM_THROW(new wrench::BatchExecuteJobFromBatSchedMessage(nullptr, "string", 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::BatchExecuteJobFromBatSchedMessage(mailbox, "", 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::BatchExecuteJobFromBatSchedMessage(commport, "", 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::BatchQueryAnswerMessage(1.0, 666));
 
-        CUSTOM_NO_THROW(new wrench::BatchComputeServiceJobRequestMessage(mailbox, batch_job, 666));
-        CUSTOM_THROW(new wrench::BatchComputeServiceJobRequestMessage(mailbox, nullptr, 666), std::invalid_argument);
+        CUSTOM_NO_THROW(new wrench::BatchComputeServiceJobRequestMessage(commport, batch_job, 666));
+        CUSTOM_THROW(new wrench::BatchComputeServiceJobRequestMessage(commport, nullptr, 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::BatchComputeServiceJobRequestMessage(nullptr, batch_job, 666), std::invalid_argument);
         CUSTOM_NO_THROW(new wrench::AlarmJobTimeOutMessage(batch_job, 666));
         CUSTOM_THROW(new wrench::AlarmJobTimeOutMessage(nullptr, 666), std::invalid_argument);

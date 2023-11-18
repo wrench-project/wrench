@@ -63,10 +63,10 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the commport_name name on which the error occurred
+     * @brief Returns the name of the CommPort on which the error occurred
      * @return the commport_name name
      */
-    std::string NetworkError::getMailbox() {
+    std::string NetworkError::getCommPortName() {
         return this->commport_name;
     }
 
