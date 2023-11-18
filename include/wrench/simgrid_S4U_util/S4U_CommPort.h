@@ -63,8 +63,6 @@ namespace wrench {
         std::unique_ptr<TMessageType> getMessage(const std::string &error_prefix = "") {
             auto id = ++messageCounter;
 #ifndef NDEBUG
-//            char const *type_name = typeid(TMessageType).name();
-//            std::string tn = boost::core::demangle(type_name);
             auto tn = this->templateWaitingLog(get_type_name<TMessageType>(), id);
 #endif
 
@@ -77,8 +75,6 @@ namespace wrench {
                 message.release();
                 return std::unique_ptr<TMessageType>(msg);
             } else {
-//                char const *type_name = typeid(TMessageType).name();
-//                std::string tn = boost::core::demangle(type_name);
                 throw std::runtime_error(error_prefix + " Unexpected [" + message->getName() + "] message while waiting for " +
                                          get_type_name<TMessageType>() + ". Request ID: " + std::to_string(id));
             }
@@ -98,8 +94,6 @@ namespace wrench {
         std::unique_ptr<TMessageType> getMessage(double timeout, const std::string &error_prefix = "") {
             auto id = ++messageCounter;
 #ifndef NDEBUG
-//            char const *type_name = typeid(TMessageType).name();
-//            std::string tn = boost::core::demangle(type_name);
             auto tn = get_type_name<TMessageType>();
             this->templateWaitingLog(tn, id);
 #endif
@@ -114,8 +108,6 @@ namespace wrench {
 #endif
                 return std::unique_ptr<TMessageType>(msg);
             } else {
-//                char const *type_name = typeid(TMessageType).name();
-//                std::string tn = boost::core::demangle(type_name);
                 throw std::runtime_error(error_prefix + " Unexpected [" + message->getName() + "] message while waiting for " +
                                          get_type_name<TMessageType>() + ". Request ID: " + std::to_string(id));
             }
@@ -144,13 +136,14 @@ namespace wrench {
             return this->getMessage(timeout, true);
         }
 
+
         void putMessage(SimulationMessage *m);
         void dputMessage(SimulationMessage *msg);
         std::shared_ptr<S4U_PendingCommunication> iputMessage(SimulationMessage *msg);
         std::shared_ptr<S4U_PendingCommunication> igetMessage();
 
-        static unsigned long generateUniqueSequenceNumber();
 
+        static unsigned long generateUniqueSequenceNumber();
         static S4U_CommPort *getTemporaryCommPort();
         static void retireTemporaryCommPort(S4U_CommPort *commport);
         static void createCommPortPool(unsigned long num_commports);
@@ -180,6 +173,8 @@ namespace wrench {
         }
 
     private:
+
+
         friend class S4U_Daemon;
         friend class S4U_PendingCommunication;
 
@@ -188,6 +183,7 @@ namespace wrench {
 
         std::unique_ptr<SimulationMessage> getMessage(bool log);
         std::unique_ptr<SimulationMessage> getMessage(double timeout, bool log);
+
 
         void templateWaitingLog(const std::string& type, unsigned long long id);
         void templateWaitingLogUpdate(const std::string& type, unsigned long long id);
