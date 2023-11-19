@@ -76,6 +76,9 @@ namespace wrench {
      *
      */
     std::unique_ptr<SimulationMessage> S4U_CommPort::getMessage(bool log) {
+
+        return this->getMessage(-1, log);
+#if 0
         if (this == S4U_CommPort::NULL_COMMPORT) {
             throw std::invalid_argument("S4U_CommPort::getMessage(): Cannot be called with NULL_COMMPORT");
         }
@@ -84,7 +87,7 @@ namespace wrench {
         SimulationMessage *msg;
         try {
             //            msg = static_cast<SimulationMessage *>(commport->get());
-            msg = this->s4u_mb->get<SimulationMessage>();
+            msg = this->s4u_mb->get<SimulationMessage>(-1);
         } catch (simgrid::NetworkFailureException &e) {
             throw ExecutionException(std::make_shared<NetworkError>(
                     NetworkError::RECEIVING, NetworkError::FAILURE, this->s4u_mb->get_cname()));
@@ -96,6 +99,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Received a '%s' message from commport %s", msg->getName().c_str(), this->s4u_mb->get_cname());
         return std::unique_ptr<SimulationMessage>(msg);
+#endif
     }
 
     /**
@@ -113,15 +117,10 @@ namespace wrench {
             throw std::invalid_argument("S4U_CommPort::getMessage(): Cannot be called with NULL_COMMPORT");
         }
 
-        if (timeout < 0) {
-            return this->getMessage();
-        }
-
         if (log) WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->s4u_mb->get_cname(), timeout);
-        wrench::SimulationMessage *msg;
+        SimulationMessage *msg;
 
         try {
-            //            data = commport->get(timeout);
             msg = this->s4u_mb->get<SimulationMessage>(timeout);
         } catch (simgrid::NetworkFailureException &e) {
             throw ExecutionException(std::make_shared<NetworkError>(
@@ -130,8 +129,6 @@ namespace wrench {
             throw ExecutionException(std::make_shared<NetworkError>(
                     NetworkError::RECEIVING, NetworkError::TIMEOUT, this->s4u_mb->get_name()));
         }
-
-        //        auto msg = static_cast<SimulationMessage *>(data);
 
 
 #ifdef MESSAGE_MANAGER
@@ -195,10 +192,7 @@ namespace wrench {
 #ifdef MESSAGE_MANAGER
         MessageManager::manageMessage(this, msg);
 #endif
-	//if (msg->payload)
         this->s4u_mb->put_init(msg, (uint64_t) msg->payload)->detach();
-	//else
-        //  commport->put(msg, 0);
     }
 
     /**
@@ -222,7 +216,7 @@ namespace wrench {
                      msg->getName().c_str(), msg->payload,
                      this->s4u_mb->get_cname());
 
-        simgrid::s4u::CommPtr comm_ptr = nullptr;
+        simgrid::s4u::CommPtr comm_ptr;
 
         try {
 #ifdef MESSAGE_MANAGER
@@ -256,7 +250,7 @@ namespace wrench {
             throw std::invalid_argument("S4U_CommPort::igetMessage(): Cannot be called with NULL_COMMPORT");
         }
 
-        simgrid::s4u::CommPtr comm_ptr = nullptr;
+        simgrid::s4u::CommPtr comm_ptr;
 
         WRENCH_DEBUG("Igetting a message from commport '%s'", this->s4u_mb->get_cname());
 

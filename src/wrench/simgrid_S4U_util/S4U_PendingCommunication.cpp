@@ -36,23 +36,7 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait() {
-        try {
-            if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
-                this->comm_ptr->wait();
-            }
-        } catch (simgrid::NetworkFailureException &e) {
-            if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
-                throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::SENDING, NetworkError::FAILURE, this->commport->s4u_mb->get_name()));
-            } else {
-                throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, this->commport->s4u_mb->get_name()));
-            }
-        }
-#ifdef MESSAGE_MANAGER
-        MessageManager::removeReceivedMessage(this->commport, this->simulation_message.get());
-#endif
-        return std::move(this->simulation_message);
+        return this->wait(-1);
     }
 
     /**
@@ -66,7 +50,7 @@ namespace wrench {
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait(double timeout) {
         try {
             if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
-                this->comm_ptr->wait_until(Simulation::getCurrentSimulatedDate() + timeout);
+                this->comm_ptr->wait_for(timeout);
             }
         } catch (simgrid::NetworkFailureException &e) {
             if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
