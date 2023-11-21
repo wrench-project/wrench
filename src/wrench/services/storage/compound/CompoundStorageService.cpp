@@ -846,7 +846,7 @@ namespace wrench {
 
         auto recv = 0;
         while (recv < request_count) {
-            // Wait for answer to current reqeust
+            // Wait for answer to current request
             auto msg = recv_commport->getMessage<StorageServiceFileWriteAnswerMessage>(this->network_timeout, "CSS::writeFile(): ");
             if (not msg->success)
                 throw ExecutionException(msg->failure_cause);
@@ -880,7 +880,7 @@ namespace wrench {
         }
 
         WRENCH_INFO("CSS::writeFile(): Waiting for final acks");
-        for (const auto &mailbx_msg: messages) {
+        for (const auto &mailbox_msg: messages) {
             recv_commport->getMessage<StorageServiceAckMessage>("CSS::writeFile(): ");
         }
         S4U_CommPort::retireTemporaryCommPort(recv_commport);
