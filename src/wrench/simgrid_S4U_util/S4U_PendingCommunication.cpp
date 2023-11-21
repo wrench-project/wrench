@@ -10,6 +10,8 @@
 #include <memory>
 #include <iostream>
 #include <wrench/failure_causes/NetworkError.h>
+#include "wrench/failure_causes/FatalFailure.h"
+
 
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
@@ -26,7 +28,6 @@
 WRENCH_LOG_CATEGORY(wrench_core_pending_communication, "Log category for Pending Communication");
 
 namespace wrench {
-
 
     /**
      * @brief Wait for the pending communication to complete
@@ -48,7 +49,10 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait(double timeout) {
+
+#if 0
         try {
+            // IS THIS NECESSARY?
             if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
                 this->comm_ptr->wait_for(timeout);
             }
@@ -73,6 +77,53 @@ namespace wrench {
         MessageManager::removeReceivedMessage(this->commport, this->simulation_message.get());
 #endif
         return std::move(this->simulation_message);
+#endif
+
+
+//        if (log) WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->comm_ptr->get_cname(), timeout);
+        SimulationMessage *msg;
+
+        simgrid::s4u::ActivitySet pending_receives;
+        pending_receives.push(this->comm_ptr);
+        pending_receives.push(this->mess_ptr);
+
+        simgrid::s4u::ActivityPtr finished_recv;
+        try {
+            // Wait for one activity to complete
+            finished_recv = pending_receives.wait_any_for(timeout);
+        } catch (simgrid::TimeoutException &e) {
+            mess_ptr->cancel();
+            comm_ptr->cancel();
+            throw ExecutionException(std::make_shared<NetworkError>(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->commport->get_name(), ""));
+        } catch (simgrid::Exception &e) {
+            auto failed_recv = pending_receives.get_failed_activity();
+            if (failed_recv == comm_ptr) {
+                mess_ptr->cancel();
+                throw ExecutionException(std::make_shared<NetworkError>(
+                        NetworkError::RECEIVING, NetworkError::FAILURE, this->comm_ptr->get_name(), ""));
+            } else {
+                comm_ptr->cancel();
+                throw ExecutionException(std::make_shared<wrench::FatalFailure>("A communication on a MQ should never fail"));
+            }
+        }
+
+        WRENCH_DEBUG("Got the message\n");
+
+        if (finished_recv == comm_ptr) {
+            mess_ptr->cancel();
+            comm_ptr->wait();
+        } else if (finished_recv == mess_ptr) {
+            comm_ptr->cancel();
+            mess_ptr->wait();
+        }
+
+#ifdef MESSAGE_MANAGER
+        MessageManager::removeReceivedMessage(this, msg);
+#endif
+
+        WRENCH_DEBUG("Received a '%s' message from commport '%s'", msg->getName().c_str(), this->commport->get_cname());
+
+        return std::unique_ptr<SimulationMessage>(msg);
     }
 
     /**
