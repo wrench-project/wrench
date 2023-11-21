@@ -356,7 +356,6 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
-    std::cerr << "END OF SIMULATION\n";
 
 
     for (int i = 0; i < argc; i++)
