@@ -63,14 +63,14 @@ namespace wrench {
         std::unique_ptr<TMessageType> getMessage(const std::string &error_prefix = "") {
             auto id = ++messageCounter;
 #ifndef NDEBUG
-            auto tn = this->templateWaitingLog(get_type_name<TMessageType>(), id);
+            this->templateWaitingLog(get_type_name<TMessageType>(), id);
 #endif
 
             auto message = this->getMessage(false);
 
             if (auto msg = dynamic_cast<TMessageType *>(message.get())) {
 #ifndef NDEBUG
-                this->templateWaitingLogUpdate(tn, id);
+                this->templateWaitingLogUpdate(get_type_name<TMessageType>(), id);
 #endif
                 message.release();
                 return std::unique_ptr<TMessageType>(msg);
