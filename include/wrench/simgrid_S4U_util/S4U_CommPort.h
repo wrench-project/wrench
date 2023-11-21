@@ -41,15 +41,7 @@ namespace wrench {
             return boost::core::demangle(type_name);
         }
 
-        /**
-         * @brief Constructor
-         */
-        S4U_CommPort() {
-            auto number = std::to_string(S4U_CommPort::generateUniqueSequenceNumber());
-            this->s4u_mb = simgrid::s4u::Mailbox::by_name("mb_" + number);
-            this->s4u_mq = simgrid::s4u::MessageQueue::by_name("mq_" + number);
-            this->name = "cp_" + number;
-        }
+        S4U_CommPort();
 
         /**
          * @brief Synchronously receive a message from a commport_name

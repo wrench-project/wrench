@@ -51,7 +51,7 @@ namespace wrench {
         // Send a termination message to the daemon's commport - SYNCHRONOUSLY
         auto ack_commport = S4U_Daemon::getRunningActorRecvCommPort();
         try {
-            this->commport->putMessage(new ServiceStopDaemonMessage(
+            this->commport->dputMessage(new ServiceStopDaemonMessage(
                                             ack_commport,
                                             send_failure_notifications,
                                             termination_cause,
@@ -68,8 +68,7 @@ namespace wrench {
                     this->network_timeout,
                     "ComputeService::stop(): Received an");
         } catch (...) {
-            this->shutting_down = false;
-            throw;
+            // If we don't get the ack we assum it's down anyway
         }
 
         // Set the service state to down
