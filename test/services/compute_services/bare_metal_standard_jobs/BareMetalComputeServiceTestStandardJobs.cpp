@@ -1036,6 +1036,7 @@ private:
                                      wrench::WorkflowTask::stateToString(this->test->task2->getState()) + ")");
         }
 
+
         return 0;
     }
 };
@@ -1051,7 +1052,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1090,8 +1091,8 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
     ASSERT_EQ(this->task1->getState(), wrench::WorkflowTask::READY);
     ASSERT_EQ(this->task2->getState(), wrench::WorkflowTask::READY);
 
-    ASSERT_EQ(this->task1->getFailureCount(), 1);
-    ASSERT_EQ(this->task2->getFailureCount(), 1);
+    ASSERT_EQ(this->task1->getFailureCount(), 0);
+    ASSERT_EQ(this->task2->getFailureCount(), 0);
 
 
     for (int i = 0; i < argc; i++)

@@ -55,18 +55,18 @@ namespace wrench {
         } catch (simgrid::NetworkFailureException &e) {
             if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::SENDING, NetworkError::FAILURE, this->commport->s4u_mb->get_name()));
+                        NetworkError::OperationType::SENDING, NetworkError::FAILURE, this->commport->s4u_mb->get_name(), ""));
             } else {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, this->commport->s4u_mb->get_name()));
+                        NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, this->commport->s4u_mb->get_name(), ""));
             }
         } catch (simgrid::TimeoutException &e) {
             if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::SENDING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name()));
+                        NetworkError::OperationType::SENDING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name(), ""));
             } else {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::RECEIVING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name()));
+                        NetworkError::OperationType::RECEIVING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name(), ""));
             }
         }
 #ifdef MESSAGE_MANAGER

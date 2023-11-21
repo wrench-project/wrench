@@ -39,6 +39,16 @@ namespace wrench {
     unsigned long S4U_CommPort::commport_pool_size;
     double S4U_CommPort::default_control_message_size;
 
+    /**
+     * @brief Constructor
+     */
+    S4U_CommPort::S4U_CommPort() {
+        auto number = std::to_string(S4U_CommPort::generateUniqueSequenceNumber());
+        this->s4u_mb = simgrid::s4u::Mailbox::by_name("mb_" + number);
+        this->s4u_mq = simgrid::s4u::MessageQueue::by_name("mq_" + number);
+        this->name = "cp_" + number;
+    }
+
 
     /**
      * @brief Helper method that avoids calling WRENCH_DEBUG from a .h file and do the logging for the templated getMessage() method.
@@ -102,46 +112,40 @@ namespace wrench {
         simgrid::s4u::ActivitySet pending_receives;
         auto mb_comm = this->s4u_mb->get_async<SimulationMessage>(&msg);
         pending_receives.push(mb_comm);
-
         auto mq_comm = this->s4u_mq->get_async<SimulationMessage>(&msg);
+        pending_receives.push(mq_comm);
 
-        simgrid::s4u::ActivityPtr finished_recv = nullptr;
+        simgrid::s4u::ActivityPtr finished_recv;
         try {
             // Wait for one activity to complete
             finished_recv = pending_receives.wait_any_for(timeout);
-            //            msg = this->s4u_mb->get<SimulationMessage>(timeout);
         } catch (simgrid::TimeoutException &e) {
+            mq_comm->cancel();
             mb_comm->cancel();
-//            mq_comm->cancel();
-            throw ExecutionException(std::make_shared<NetworkError>(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->name));
+            throw ExecutionException(std::make_shared<NetworkError>(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->name, ""));
         } catch (simgrid::Exception &e) {
             auto failed_recv = pending_receives.get_failed_activity();
             if (failed_recv == mb_comm) {
-//                    mq_comm->cancel();
-//                mb_comm.reset();
+                  mq_comm->cancel();
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::RECEIVING, NetworkError::FAILURE, this->name));
+                        NetworkError::RECEIVING, NetworkError::FAILURE, this->name, ""));
             } else {
                 mb_comm->cancel();
                 throw ExecutionException(std::make_shared<FatalFailure>("A communication on a MQ should never fail"));
             }
         }
 
+        WRENCH_DEBUG("Got the message\n");
+
         if (finished_recv == mb_comm) {
+            mq_comm->cancel();
             mb_comm->wait();
+        } else if (finished_recv == mq_comm) {
+            mb_comm->cancel();
+            mq_comm->wait();
         } else {
             std::cerr << "WTF\n";
         }
-
-
-//        } catch (simgrid::NetworkFailureException &e) {
-//            throw ExecutionException(std::make_shared<NetworkError>(
-//                    NetworkError::RECEIVING, NetworkError::FAILURE, this->s4u_mb->get_name()));
-//        } catch (simgrid::TimeoutException &e) {
-//            throw ExecutionException(std::make_shared<NetworkError>(
-//                    NetworkError::RECEIVING, NetworkError::TIMEOUT, this->s4u_mb->get_name()));
-//        }
-
 
 #ifdef MESSAGE_MANAGER
             MessageManager::removeReceivedMessage(this, msg);
@@ -176,11 +180,11 @@ namespace wrench {
             this->s4u_mb->put(msg, (uint64_t) msg->payload);
         } catch (simgrid::NetworkFailureException &e) {
             throw ExecutionException(std::make_shared<NetworkError>(
-                    NetworkError::SENDING, NetworkError::FAILURE, this->s4u_mb->get_name()));
+                    NetworkError::SENDING, NetworkError::FAILURE, this->s4u_mb->get_name(), msg->getName()));
         } catch (simgrid::TimeoutException &e) {
             // Can happen if the other side is doing a timeout.... I think
             throw ExecutionException(std::make_shared<NetworkError>(
-                    NetworkError::SENDING, NetworkError::TIMEOUT, this->s4u_mb->get_name()));
+                    NetworkError::SENDING, NetworkError::TIMEOUT, this->s4u_mb->get_name(), msg->getName()));
         }
     }
 
@@ -237,7 +241,7 @@ namespace wrench {
             comm_ptr = this->s4u_mb->put_async(msg, (uint64_t) msg->payload);
         } catch (simgrid::NetworkFailureException &e) {
             throw ExecutionException(std::make_shared<NetworkError>(
-                    NetworkError::SENDING, NetworkError::FAILURE, this->s4u_mb->get_name()));
+                    NetworkError::SENDING, NetworkError::FAILURE, this->s4u_mb->get_name(), msg->getName()));
         }
 
         auto pending_communication = std::make_shared<S4U_PendingCommunication>(
@@ -273,7 +277,7 @@ namespace wrench {
             comm_ptr = this->s4u_mb->get_async<void>((void **) (&(pending_communication->simulation_message)));
         } catch (simgrid::NetworkFailureException &e) {
             throw ExecutionException(std::make_shared<NetworkError>(
-                    NetworkError::RECEIVING, NetworkError::FAILURE, this->s4u_mb->get_name()));
+                    NetworkError::RECEIVING, NetworkError::FAILURE, this->s4u_mb->get_name(), ""));
         }
         pending_communication->comm_ptr = comm_ptr;
         return pending_communication;
@@ -325,7 +329,6 @@ namespace wrench {
         }
 
         S4U_CommPort::used_commports.insert(commport);
-
         return commport;
     }
 
