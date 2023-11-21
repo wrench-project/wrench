@@ -57,7 +57,7 @@ int wrench::ServiceTerminationDetector::main() {
         WRENCH_INFO("Detected termination of service %s (notifying commport %s)",
                     this->service_to_monitor->getName().c_str(), this->commport_to_notify->get_cname());
         this->commport_to_notify->putMessage(
-                                new ServiceHasTerminatedMessage(this->service_to_monitor, return_value_from_main));
+                new ServiceHasTerminatedMessage(this->service_to_monitor, return_value_from_main));
     }
 
     this->service_to_monitor = nullptr;// released, so that it can be freed in case ref-count = 0

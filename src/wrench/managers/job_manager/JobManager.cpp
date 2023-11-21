@@ -716,6 +716,12 @@ namespace wrench {
         if (it != this->jobs_to_dispatch.end()) {
             this->cjob_to_sjob_map.erase(*it);
             this->jobs_to_dispatch.erase(it);
+            job->compound_job->state = CompoundJob::State::DISCONTINUED;
+            job->state = StandardJob::State::TERMINATED;
+            for (auto const &t : job->getTasks()) {
+                t->setInternalState(WorkflowTask::InternalState::TASK_READY);
+                t->setState(WorkflowTask::State::READY);
+            }
             this->releaseDaemonLock();
             return;
         }
