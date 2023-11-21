@@ -805,7 +805,7 @@ private:
         auto em = this->createEnergyMeter(hostnames, TWO_SECOND_PERIOD);
 
         const double MEGAFLOP = 1000.0 * 1000.0;
-        wrench::S4U_Simulation::compute(6.0 * 100.0 * MEGAFLOP);// compute for 6 seconds
+        wrench::S4U_Simulation::compute(6.1 * 100.0 * MEGAFLOP);// compute for 6 seconds
 
 
         return 0;
@@ -989,8 +989,8 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
         std::sort(result_json["energy_consumption"][i]["pstate_trace"].begin(), result_json["energy_consumption"][i]["pstate_trace"].end(), comparePstate);
     }
 
-    //    std::cerr << "EXPECTED: " << expected_json << "\n";
-    //    std::cerr << "RESULT: " << result_json << "\n";
+//        std::cerr << "EXPECTED: " << expected_json << "\n";
+//        std::cerr << "RESULT: " << result_json << "\n";
     EXPECT_TRUE(expected_json == result_json);
 
 
