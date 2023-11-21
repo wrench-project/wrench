@@ -143,8 +143,6 @@ namespace wrench {
         } else if (finished_recv == mq_comm) {
             mb_comm->cancel();
             mq_comm->wait();
-        } else {
-            std::cerr << "WTF\n";
         }
 
 #ifdef MESSAGE_MANAGER
@@ -266,23 +264,23 @@ namespace wrench {
             throw std::invalid_argument("S4U_CommPort::igetMessage(): Cannot be called with NULL_COMMPORT");
         }
 
-        simgrid::s4u::CommPtr comm_ptr;
-
         WRENCH_DEBUG("Igetting a message from commport '%s'", this->s4u_mb->get_cname());
 
         std::shared_ptr<S4U_PendingCommunication> pending_communication = std::make_shared<S4U_PendingCommunication>(
                 this, S4U_PendingCommunication::OperationType::RECEIVING);
 
+
         try {
-            comm_ptr = this->s4u_mb->get_async<void>((void **) (&(pending_communication->simulation_message)));
+            auto comm_ptr = this->s4u_mb->get_async<void>((void **) (&(pending_communication->simulation_message)));
+            pending_communication->comm_ptr = comm_ptr;
         } catch (simgrid::NetworkFailureException &e) {
             throw ExecutionException(std::make_shared<NetworkError>(
                     NetworkError::RECEIVING, NetworkError::FAILURE, this->s4u_mb->get_name(), ""));
         }
-        pending_communication->comm_ptr = comm_ptr;
+        simgrid::s4u::MessPtr mess_ptr = this->s4u_mq->get_async<void>((void **) (&(pending_communication->simulation_message)));
+        pending_communication->mess_ptr = mess_ptr;
         return pending_communication;
     }
-
 
     /**
     * @brief Generate a unique sequence number

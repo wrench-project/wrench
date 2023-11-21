@@ -19,8 +19,6 @@
 
 namespace wrench {
 
-    //    class SimulationMessage;
-
     /*******************/
     /** \cond INTERNAL */
     /*******************/
@@ -57,15 +55,17 @@ namespace wrench {
 
         //        ~S4U_PendingCommunication() default;
 
-        /** @brief The SimGrid communication handle */
-        simgrid::s4u::CommPtr comm_ptr;
-
         /** @brief The message */
         std::unique_ptr<SimulationMessage> simulation_message;
         /** @brief The CommPort */
         S4U_CommPort *commport;
         /** @brief The operation type */
         OperationType operation_type;
+
+        /** @brief The SimGrid Mailbox communication handle */
+        simgrid::s4u::CommPtr comm_ptr;
+        /** @brief The SimGrid MessageQueue communication handle */
+        simgrid::s4u::MessPtr mess_ptr;
     };
 
     /*******************/
