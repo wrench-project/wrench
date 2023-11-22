@@ -194,16 +194,18 @@ namespace wrench {
             const std::map<std::string, std::string> &service_specific_args) {
         assertServiceIsUp();
 
-        WRENCH_INFO("BareMetalComputeService::submitCompoundJob()");
+//        WRENCH_INFO("BareMetalComputeService::submitCompoundJob()");
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
+        std::cerr << "PUTTING MESSAGE TO THE CS\n";
         //  send a "run a standard job" message to the daemon's commport
         this->commport->putMessage(
                                 new ComputeServiceSubmitCompoundJobRequestMessage(
                                         answer_commport, job, service_specific_args,
                                         this->getMessagePayloadValue(
                                                 ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
+        std::cerr << "PUT THE MESSAGE TO THE CS\n";
 
         // Get the answer
         auto msg = answer_commport->getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(this->network_timeout,
