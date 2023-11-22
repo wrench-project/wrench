@@ -1998,8 +1998,9 @@ private:
         std::shared_ptr<wrench::StandardJob> job = nullptr;
 
         // Suspend the service
+        wrench::Simulation::sleep(1);
+        std::cerr << "SUSPENDING THE SERVICE\n";
         test->compute_service->suspend();
-
 
         // Create a job
         job = job_manager->createStandardJob(test->task,
@@ -2011,7 +2012,7 @@ private:
         // Submit the job
         try {
             job_manager->submitJob(job, test->compute_service);
-            throw std::runtime_error("Should not be able to submit a job to a service that is down");
+            throw std::runtime_error("Should not be able to submit a job to a service that is suspended");
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsSuspended>(e.getCause());
             if (not cause) {
@@ -2026,7 +2027,9 @@ private:
         }
 
         // Sleep for 1 sec
-        wrench::Simulation::sleep(1);
+        wrench::Simulation::sleep(10);
+
+        std::cerr << "RESUMING THE SERVICE\n";
 
         // Resume the service
         test->compute_service->resume();
