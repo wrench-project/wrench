@@ -78,52 +78,76 @@ namespace wrench {
 #endif
         return std::move(this->simulation_message);
 #endif
+        if (this->operation_type == S4U_PendingCommunication::OperationType::RECEIVING) {
 
+            //        if (log) WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->comm_ptr->get_cname(), timeout);
 
-//        if (log) WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->comm_ptr->get_cname(), timeout);
-        SimulationMessage *msg;
+            simgrid::s4u::ActivitySet pending_receives;
+            pending_receives.push(this->comm_ptr);
+            pending_receives.push(this->mess_ptr);
 
-        simgrid::s4u::ActivitySet pending_receives;
-        pending_receives.push(this->comm_ptr);
-        pending_receives.push(this->mess_ptr);
-
-        simgrid::s4u::ActivityPtr finished_recv;
-        try {
-            // Wait for one activity to complete
-            finished_recv = pending_receives.wait_any_for(timeout);
-        } catch (simgrid::TimeoutException &e) {
-            mess_ptr->cancel();
-            comm_ptr->cancel();
-            throw ExecutionException(std::make_shared<NetworkError>(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->commport->get_name(), ""));
-        } catch (simgrid::Exception &e) {
-            auto failed_recv = pending_receives.get_failed_activity();
-            if (failed_recv == comm_ptr) {
+            simgrid::s4u::ActivityPtr finished_recv;
+            try {
+                // Wait for one activity to complete
+                finished_recv = pending_receives.wait_any_for(timeout);
+            } catch (simgrid::TimeoutException &e) {
                 mess_ptr->cancel();
-                throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::RECEIVING, NetworkError::FAILURE, this->comm_ptr->get_name(), ""));
-            } else {
                 comm_ptr->cancel();
-                throw ExecutionException(std::make_shared<wrench::FatalFailure>("A communication on a MQ should never fail"));
+                throw ExecutionException(std::make_shared<NetworkError>(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->commport->get_name(), ""));
+            } catch (simgrid::Exception &e) {
+                auto failed_recv = pending_receives.get_failed_activity();
+                if (failed_recv == comm_ptr) {
+                    mess_ptr->cancel();
+                    throw ExecutionException(std::make_shared<NetworkError>(
+                            NetworkError::RECEIVING, NetworkError::FAILURE, this->comm_ptr->get_name(), ""));
+                } else {
+                    comm_ptr->cancel();
+                    throw ExecutionException(std::make_shared<wrench::FatalFailure>("A communication on a MQ should never fail"));
+                }
             }
-        }
 
-        WRENCH_DEBUG("Got the message\n");
-
-        if (finished_recv == comm_ptr) {
-            mess_ptr->cancel();
-            comm_ptr->wait();
-        } else if (finished_recv == mess_ptr) {
-            comm_ptr->cancel();
-            mess_ptr->wait();
-        }
+            if (finished_recv == comm_ptr) {
+                mess_ptr->cancel();
+                comm_ptr->wait();
+            } else if (finished_recv == mess_ptr) {
+                comm_ptr->cancel();
+                mess_ptr->wait();
+            }
 
 #ifdef MESSAGE_MANAGER
-        MessageManager::removeReceivedMessage(this, msg);
+            MessageManager::removeReceivedMessage(this, msg);
 #endif
 
-        WRENCH_DEBUG("Received a '%s' message from commport '%s'", this->simulation_message->getName().c_str(), this->commport->get_cname());
+            WRENCH_DEBUG("Received a '%s' message from commport '%s'", this->simulation_message->getName().c_str(), this->commport->get_cname());
 
-        return std::move(this->simulation_message);
+            return std::move(this->simulation_message);
+        } else {
+            if (this->comm_ptr) {
+                try {
+                    this->comm_ptr->wait_for(timeout);
+                    return nullptr;
+                } catch (simgrid::NetworkFailureException &e) {
+                        if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
+                            throw ExecutionException(std::make_shared<NetworkError>(
+                                    NetworkError::OperationType::SENDING, NetworkError::FAILURE, this->commport->s4u_mb->get_name(), ""));
+                        } else {
+                            throw ExecutionException(std::make_shared<NetworkError>(
+                                    NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, this->commport->s4u_mb->get_name(), ""));
+                        }
+                    } catch (simgrid::TimeoutException &e) {
+                        if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
+                            throw ExecutionException(std::make_shared<NetworkError>(
+                                    NetworkError::OperationType::SENDING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name(), ""));
+                        } else {
+                            throw ExecutionException(std::make_shared<NetworkError>(
+                                    NetworkError::OperationType::RECEIVING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name(), ""));
+                        }
+                    }
+            } else if (this->mess_ptr) {
+                this->mess_ptr->wait_for(timeout);
+                return nullptr;
+            }
+        }
     }
 
     /**

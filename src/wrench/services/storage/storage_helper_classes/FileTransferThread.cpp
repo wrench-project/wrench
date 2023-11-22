@@ -430,7 +430,7 @@ namespace wrench {
                 }
 #endif
                 req->wait();
-                WRENCH_INFO("Bytes sent over the network were received");
+//                WRENCH_INFO("Bytes sent over the network were received");
             } catch (std::shared_ptr<NetworkError> &e) {
                 throw;
             }
