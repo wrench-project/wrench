@@ -121,9 +121,9 @@ namespace wrench {
         MessageManager::removeReceivedMessage(this, msg);
 #endif
 
-        WRENCH_DEBUG("Received a '%s' message from commport '%s'", msg->getName().c_str(), this->commport->get_cname());
+        WRENCH_DEBUG("Received a '%s' message from commport '%s'", this->simulation_message->getName().c_str(), this->commport->get_cname());
 
-        return std::unique_ptr<SimulationMessage>(msg);
+        return std::move(this->simulation_message);
     }
 
     /**
