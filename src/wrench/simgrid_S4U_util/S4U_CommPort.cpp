@@ -109,21 +109,28 @@ namespace wrench {
         if (log) WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->s4u_mb->get_cname(), timeout);
         SimulationMessage *msg;
 
+        WRENCH_INFO("IN GET MESSAGE FOR COMMPORT %p", this);
         simgrid::s4u::ActivitySet pending_receives;
         auto mb_comm = this->s4u_mb->get_async<SimulationMessage>(&msg);
         pending_receives.push(mb_comm);
         auto mq_comm = this->s4u_mq->get_async<SimulationMessage>(&msg);
         pending_receives.push(mq_comm);
 
+        WRENCH_INFO("IN GET MESSAGE: %p   %p", mb_comm.get(), mq_comm.get());
+
         simgrid::s4u::ActivityPtr finished_recv;
         try {
             // Wait for one activity to complete
+            WRENCH_INFO("CALLING WAIT_ANY_FOR");
             finished_recv = pending_receives.wait_any_for(timeout);
+            WRENCH_INFO("CALLED WAIT_ANY_FOR");
         } catch (simgrid::TimeoutException &e) {
+            WRENCH_INFO("IN THIS TRY CATCH");
             mq_comm->cancel();
             mb_comm->cancel();
             throw ExecutionException(std::make_shared<NetworkError>(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->name, ""));
         } catch (simgrid::Exception &e) {
+            WRENCH_INFO("IN THAT TRY CATCH");
             auto failed_recv = pending_receives.get_failed_activity();
             if (failed_recv == mb_comm) {
                   mq_comm->cancel();
@@ -137,8 +144,12 @@ namespace wrench {
 
         WRENCH_DEBUG("Got the message\n");
 
+        WRENCH_INFO("XXX IN GET MESSAGE NBEFIORE CENCEL");
         if (finished_recv == mb_comm) {
+            WRENCH_INFO("IT WAS THE MB_COM");
+           WRENCH_INFO("CANCELING %p", mq_comm.get());
             mq_comm->cancel();
+            WRENCH_INFO("WAITING ON %p", mb_comm.get());
             mb_comm->wait();
         } else if (finished_recv == mq_comm) {
             mb_comm->cancel();
@@ -237,6 +248,7 @@ namespace wrench {
             MessageManager::manageMessage(this, msg);
 #endif
             comm_ptr = this->s4u_mb->put_async(msg, (uint64_t) msg->payload);
+            std::cerr << "IN iPUTMESSAGE: " << comm_ptr.get() << "\n";
         } catch (simgrid::NetworkFailureException &e) {
             throw ExecutionException(std::make_shared<NetworkError>(
                     NetworkError::SENDING, NetworkError::FAILURE, this->s4u_mb->get_name(), msg->getName()));
@@ -272,6 +284,7 @@ namespace wrench {
 
         try {
             auto comm_ptr = this->s4u_mb->get_async<void>((void **) (&(pending_communication->simulation_message)));
+            std::cerr << "in IGETMESSAGE " << comm_ptr.get() << "\n";
             pending_communication->comm_ptr = comm_ptr;
         } catch (simgrid::NetworkFailureException &e) {
             throw ExecutionException(std::make_shared<NetworkError>(
@@ -279,6 +292,7 @@ namespace wrench {
         }
         simgrid::s4u::MessPtr mess_ptr = this->s4u_mq->get_async<void>((void **) (&(pending_communication->simulation_message)));
         pending_communication->mess_ptr = mess_ptr;
+            std::cerr << "in IGETMESSAGE MQ " << mess_ptr.get() << "\n";
         return pending_communication;
     }
 
