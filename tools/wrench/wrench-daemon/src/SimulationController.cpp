@@ -1172,4 +1172,30 @@ namespace wrench {
         return answer;
     }
 
+    json SimulationController::createWorkflowFromJSONString(json data) {
+        std::string cs_name = data["cs_name"];
+        std::shared_ptr<ComputeService> cs;
+        std::string json_string = data["json_string"];
+        std::string reference_flop_rate = data["reference_flop_rate"];
+        bool ignore_machine_specs = data["ignore_machine_specs"];
+        bool redundant_dependencies = data["redundant_dependencies"];
+        bool ignore_cycle_creating_dependencies = data["ignore_cycle_creating_dependencies"];
+        unsigned long min_cores_per_task = data["min_cores_per_task"];
+        unsigned long max_cores_per_task = data["max_cores_per_task"];
+        bool enforce_num_cores = data["enforce_num_cores"];
+        bool ignore_avg_cpu = data["ignore_avg_cpu"];
+        bool show_warnings = data["show_warnings"];
+
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+        std::shared_ptr<Workflow> wf;
+        json answer;
+        answer["result"] = wf->WfCommonsWorkflowParser::createWorkflowFromJSONString(json_string, reference_flop_rate, ignore_machine_specs,
+                                                         redundant_dependencies, ignore_cycle_creating_dependencies,
+                                                         min_cores_per_task, max_cores_per_task, enforce_num_cores,
+                                                         ignore_avg_cpu, show_warnings);
+        return answer;
+    }
+
 }// namespace wrench
