@@ -398,6 +398,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "workflow_name": {
+                    "type": "string",
+                    "description": "The workflow name"
+                  },
                   "file": {
                     "type": "string",
                     "description": "The file's ID"
