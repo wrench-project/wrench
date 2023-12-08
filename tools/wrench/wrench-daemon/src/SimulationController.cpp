@@ -821,7 +821,12 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addFile(json data) {
-        auto file = this->workflow->addFile(data["name"], data["size"]);
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow  " + workflow_name);
+        }
+        auto file = workflow->addFile(data["name"], data["size"]);
         return {};
     }
 
