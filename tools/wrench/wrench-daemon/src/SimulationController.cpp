@@ -735,11 +735,16 @@ namespace wrench {
      */
     json SimulationController::createTask(json data) {
 
-        auto t = this->workflow->addTask(data["name"],
-                                         data["flops"],
-                                         data["min_num_cores"],
-                                         data["max_num_cores"],
-                                         data["memory"]);
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow  " + workflow_name);
+        }
+        auto t = workflow->addTask(data["name"],
+                                   data["flops"],
+                                   data["min_num_cores"],
+                                   data["max_num_cores"],
+                                   data["memory"]);
         return {};
     }
 
