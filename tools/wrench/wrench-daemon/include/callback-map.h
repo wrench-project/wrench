@@ -43,3 +43,4 @@ request_handlers["getVMPhysicalHostname"] = [sc](json data) { return sc->getVMPh
 request_handlers["getVMComputeService"] = [sc](json data) { return sc->getVMComputeService(std::move(data)); };
 request_handlers["getExecutionHosts"] = [sc](json data) { return sc->getExecutionHosts(std::move(data)); };
 request_handlers["createWorkflowFromJSONString"] = [sc](json data) { return sc->createWorkflowFromJSON(std::move(data)); };
+request_handlers["createWorkflow"] = [sc](json data) { return sc->createWorkflow(std::move(data)); };
