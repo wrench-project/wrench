@@ -142,9 +142,6 @@ namespace wrench {
         std::shared_ptr<JobManager> job_manager;
         std::shared_ptr<DataMovementManager> data_movement_manager;
 
-        // The workflow
-        std::shared_ptr<Workflow> workflow;
-
         bool keep_going = true;
         double time_horizon_to_reach = 0;
         unsigned int sleep_us;
