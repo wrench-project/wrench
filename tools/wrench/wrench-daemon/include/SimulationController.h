@@ -116,13 +116,16 @@ namespace wrench {
 
         json getVMComputeService(json data);
 
-        json createWorkflowFromJSONString(json data);
+        json createWorkflow(json data);
+
+        json createWorkflowFromJSON(json data);
 
     private:
         template<class T>
         json startService(T *s);
 
         // Thread-safe key value stores
+        KeyValueStore<std::shared_ptr<wrench::Workflow>> workflow_registry;
         KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;
         KeyValueStore<std::shared_ptr<ComputeService>> compute_service_registry;
         KeyValueStore<std::shared_ptr<StorageService>> storage_service_registry;
