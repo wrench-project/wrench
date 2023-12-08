@@ -2453,7 +2453,7 @@
         "tags": [
           "WRENCH"
         ],
-        "summary": "Simulate workflow from JSON file.",
+        "summary": "Create a workflow from JSON file.",
         "operationId": "createWorkflowFromJSON",
         "parameters": [
           {
@@ -2473,10 +2473,6 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "compute_service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
                   "json_string": {
                     "type": "string",
                     "description": "Workflow file"
@@ -2529,6 +2525,42 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/createWorkflow": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create a blank workflow.",
+        "operationId": "createWorkflow",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowResponse"
                 }
               }
             }
@@ -2653,6 +2685,23 @@
           "service_name": {
             "type": "string",
             "description": "The new service's name (if success)"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "WorkflowResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "workflow_name": {
+            "type": "string",
+            "description": "The new workflow's name (if success)"
           },
           "failure_cause": {
             "type": "string",
