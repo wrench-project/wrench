@@ -2612,6 +2612,10 @@
       "Task": {
         "type": "object",
         "properties": {
+          "workflow_name": {
+            "type": "string",
+            "description": "Name of the workflow to which the task is being added"
+          },
           "name": {
             "type": "string",
             "description": "Task's name"
