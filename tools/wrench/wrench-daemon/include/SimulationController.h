@@ -116,6 +116,8 @@ namespace wrench {
 
         json getVMComputeService(json data);
 
+        json createWorkflowFromJSONString(json data);
+
     private:
         template<class T>
         json startService(T *s);

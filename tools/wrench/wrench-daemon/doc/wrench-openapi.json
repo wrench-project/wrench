@@ -2447,96 +2447,96 @@
           }
         }
       }
-    }
-  },
-  "/simulation/{simid}/createWorkflowFromJSONString": {
-    "post": {
-      "tags": [
-        "WRENCH"
-      ],
-      "summary": "Simulate workflow from JSON file.",
-      "operationId": "createWorkflowFromJSON",
-      "parameters": [
-        {
-          "name": "simid",
-          "in": "path",
-          "description": "ID of the simulation",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "requestBody": {
-        "description": "Input to create workflow from JSON.",
-        "required": true,
-        "content": {
-          "application/json": {
+    },
+    "/simulation/{simid}/createWorkflowFromJSONString": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Simulate workflow from JSON file.",
+        "operationId": "createWorkflowFromJSON",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
             "schema": {
-              "properties": {
-                "compute_service_name": {
-                  "type": "string",
-                  "description": "The cloud service's name"
-                },
-                "json_string": {
-                  "type": "string",
-                  "description": "Workflow file"
-                },
-                "reference_flop_rate": {
-                  "type": "str",
-                  "description": "Reference flop rate"
-                },
-                "ignore_machine_specs": {
-                  "type": "bool",
-                  "description": "Ignore machine specs"
-                },
-                "redundant, dependencies": {
-                  "type": "bool",
-                  "description": "Redundant deendencies"
-                },
-                "ignore_cycle_creating_dependencies": {
-                  "type": "bool",
-                  "description": "Ignore cycle creating dependencies"
-                },
-                "min_cores_per_task": {
-                  "type": "float",
-                  "description": "Min cores per task"
-                },
-                "max_cores_per_task": {
-                  "type": "float",
-                  "description": "Max cores per task"
-                },
-                "enforce_num_cores": {
-                  "type": "bool",
-                  "description": "Enforce num cores"
-                },
-                "ignore_avg_cpu": {
-                  "type": "bool",
-                  "description": "Ignore average cpu"
-                },
-                "show_warnings": {
-                  "type": "bool",
-                  "description": "Show warnings"
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to create workflow from JSON.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "compute_service_name": {
+                    "type": "string",
+                    "description": "The cloud service's name"
+                  },
+                  "json_string": {
+                    "type": "string",
+                    "description": "Workflow file"
+                  },
+                  "reference_flop_rate": {
+                    "type": "str",
+                    "description": "Reference flop rate"
+                  },
+                  "ignore_machine_specs": {
+                    "type": "bool",
+                    "description": "Ignore machine specs"
+                  },
+                  "redundant, dependencies": {
+                    "type": "bool",
+                    "description": "Redundant deendencies"
+                  },
+                  "ignore_cycle_creating_dependencies": {
+                    "type": "bool",
+                    "description": "Ignore cycle creating dependencies"
+                  },
+                  "min_cores_per_task": {
+                    "type": "float",
+                    "description": "Min cores per task"
+                  },
+                  "max_cores_per_task": {
+                    "type": "float",
+                    "description": "Max cores per task"
+                  },
+                  "enforce_num_cores": {
+                    "type": "bool",
+                    "description": "Enforce num cores"
+                  },
+                  "ignore_avg_cpu": {
+                    "type": "bool",
+                    "description": "Ignore average cpu"
+                  },
+                  "show_warnings": {
+                    "type": "bool",
+                    "description": "Show warnings"
+                  }
                 }
               }
             }
           }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "OK",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceResponse"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
               }
             }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
           }
-        },
-        "405": {
-          "description": "Invalid input",
-          "content": {}
         }
       }
     }
