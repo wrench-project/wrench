@@ -426,7 +426,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     argv[2] = strdup("--cfg=contexts/stack-size:100");
-    argv[3] = strdup("--wrench-commport_name-pool-size=20000");
+    argv[3] = strdup("--wrench-commport-pool-size=10000");
     //    argv[2] = strdup("--wrench-full-logs");
 
     simulation->init(&argc, argv);

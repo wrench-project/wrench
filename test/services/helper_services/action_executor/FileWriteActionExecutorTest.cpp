@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "../../../include/TestWithFork.h"
+#include "../../../include/RuntimeAssert.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
 WRENCH_LOG_CATEGORY(file_write_action_executor_test, "Log category for FileWriteActionExecutorTest");
@@ -165,19 +166,13 @@ private:
         }
 
         // Is the start-date sensible?
-        if (file_write_action->getStartDate() < 0.0 or file_write_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_write_action->getStartDate()));
-        }
+        RUNTIME_DBL_EQ(file_write_action->getStartDate(), 0.0, "action start date", EPSILON);
 
         // Is the end-date sensible?
-        if (std::abs<double>(file_write_action->getEndDate() - 10.857443) > EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_write_action->getEndDate()));
-        }
+        RUNTIME_DBL_EQ(file_write_action->getEndDate(), 10.8349, "action end date", EPSILON);
 
         // Is the state sensible?
-        if (file_write_action->getState() != wrench::Action::State::COMPLETED) {
-            throw std::runtime_error("Unexpected action state: " + file_write_action->getStateAsString());
-        }
+        RUNTIME_EQ(file_write_action->getState(), wrench::Action::State::COMPLETED, "action state");
 
         return 0;
     }

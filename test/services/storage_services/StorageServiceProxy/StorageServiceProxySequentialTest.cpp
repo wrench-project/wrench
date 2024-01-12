@@ -129,10 +129,8 @@ void StorageServiceProxySimultaneousTest::do_Simultaneous_test(std::string mode)
 
         {
 
-            simgrid::s4u::Engine::get_instance()->netzone_by_name_or_null("AS0")->add_route(simgrid::s4u::Host::by_name("Remote")->get_netpoint(),
-                                                                                            simgrid::s4u::Host::by_name("Client")->get_netpoint(),
-                                                                                            nullptr,
-                                                                                            nullptr,
+            simgrid::s4u::Engine::get_instance()->netzone_by_name_or_null("AS0")->add_route(simgrid::s4u::Host::by_name("Remote"),
+                                                                                            simgrid::s4u::Host::by_name("Client"),
                                                                                             {simgrid::s4u::LinkInRoute(simgrid::s4u::Link::by_name("link12")), simgrid::s4u::LinkInRoute(simgrid::s4u::Link::by_name("link13"))});
         }
     }

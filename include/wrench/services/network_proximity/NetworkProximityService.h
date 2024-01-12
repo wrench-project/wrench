@@ -15,7 +15,8 @@
 #include <random>
 #include "wrench/services/Service.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
-#include "wrench/services/network_proximity/NetworkProximityDaemon.h"
+#include "wrench/services/network_proximity/NetworkProximitySenderDaemon.h"
+#include "wrench/services/network_proximity/NetworkProximityReceiverDaemon.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 namespace wrench {
@@ -91,7 +92,8 @@ namespace wrench {
     private:
         friend class Simulation;
 
-        std::vector<std::shared_ptr<NetworkProximityDaemon>> network_daemons;
+        std::vector<std::shared_ptr<NetworkProximitySenderDaemon>> network_sender_daemons;
+        std::vector<std::shared_ptr<NetworkProximityReceiverDaemon>> network_receiver_daemons;
         std::vector<std::string> hosts_in_network;
 
         std::default_random_engine master_rng;
@@ -106,8 +108,8 @@ namespace wrench {
 
         std::map<std::string, std::pair<std::complex<double>, double>> coordinate_lookup_table;
 
-        std::shared_ptr<NetworkProximityDaemon>
-        getCommunicationPeer(const std::shared_ptr<NetworkProximityDaemon> sender_daemon);
+        std::shared_ptr<NetworkProximityReceiverDaemon>
+        getCommunicationPeer(std::shared_ptr<NetworkProximitySenderDaemon> sender_daemon);
 
         void vivaldiUpdate(double proximityValue, std::string sender_hostname, std::string peer_hostname);
 

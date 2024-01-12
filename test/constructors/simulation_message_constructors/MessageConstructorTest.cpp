@@ -95,7 +95,7 @@ public:
     std::shared_ptr<wrench::NetworkProximityService> network_proximity_service;
     std::shared_ptr<wrench::FailureCause> failure_cause;
     std::shared_ptr<wrench::BatchJob> batch_job;
-    std::shared_ptr<wrench::NetworkProximityDaemon> network_proximity_daemon;
+    std::shared_ptr<wrench::NetworkProximitySenderDaemon> network_proximity_daemon;
 };
 
 class MessageConstructorTestWMS : public wrench::ExecutionController {
@@ -122,8 +122,8 @@ private:
         auto failure_cause = std::shared_ptr<wrench::FatalFailure>(new wrench::FatalFailure("msg"));
         auto commport = wrench::S4U_CommPort::getTemporaryCommPort();
 
-        auto network_proximity_daemon = std::shared_ptr<wrench::NetworkProximityDaemon>(
-                new wrench::NetworkProximityDaemon(this->simulation, "Host1",
+        auto network_proximity_daemon = std::shared_ptr<wrench::NetworkProximitySenderDaemon>(
+                new wrench::NetworkProximitySenderDaemon(this->simulation, "Host1",
                                                    commport,
                                                    10.0, 1.0,
                                                    1.0, 0, {}));

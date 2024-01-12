@@ -312,11 +312,11 @@ namespace wrench {
             }
 
             if (request.file_registry_service) {
-                WRENCH_INFO("Trying to do a register");
+//                WRENCH_INFO("Trying to do a register");
                 try {
                     request.file_registry_service->addEntry(request.location);
                 } catch (ExecutionException &e) {
-                    WRENCH_INFO("Oops, couldn't do it");
+//                    WRENCH_INFO("Oops, couldn't do it");
                     // don't throw, just keep file_registry_service_update to false
                 }
             }

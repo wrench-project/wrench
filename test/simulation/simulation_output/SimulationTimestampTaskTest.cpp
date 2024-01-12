@@ -172,9 +172,10 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskBasicTest) {
 
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test() {
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-default-control-message-size=1024");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -319,6 +320,7 @@ private:
 
         int num_task1_runs = 2;
 
+#if 1
         for (int i = 0; i < num_task1_runs; ++i) {
             this->test->task1->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
             this->test->task1->setState(wrench::WorkflowTask::State::READY);
@@ -328,21 +330,23 @@ private:
             this->waitForAndProcessNextEvent();
         }
 
+#endif
         this->test->failed_task = this->test->workflow->addTask("failed_task", 10, 1, 1, 0);
         this->test->failed_task->addInputFile(this->test->large_input_file);
         this->test->failed_task->addInputFile(this->test->small_input_file);
 
+#if 1
         auto failed_job = job_manager->createStandardJob(
                 this->test->failed_task,
                 {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->small_input_file)},
                  {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->large_input_file)}});
-
 
         job_manager->submitJob(failed_job, this->test->compute_service);
         wrench::StorageService::deleteFileAtLocation(
                 wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("small_input_file")));
 
         this->waitForAndProcessNextEvent();
+#endif
 
         auto passing_job = job_manager->createStandardJob(
                 this->test->failed_task,
@@ -362,9 +366,12 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskMultipleTest) {
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-default-control-message-size=1024");
+//    argv[2] = strdup("--wrench-full-log");
+
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

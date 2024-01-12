@@ -153,11 +153,10 @@ namespace wrench {
                 }
                 unsigned long pool_size = strtoul(equal_sign + 1, nullptr, 10);
                 S4U_CommPort::commport_pool_size = pool_size;
-                commport_pool_size_set = true;
             } else if (not strncmp(argv[i], "--wrench-default-control-message-size", strlen("--wrench-default-control-message-size"))) {
                 char *equal_sign = strchr(argv[i], '=');
                 if (!equal_sign) {
-                    throw std::invalid_argument("Invalid ---wrench-default-control-message-size argument value");
+                    throw std::invalid_argument("Invalid --wrench-default-control-message-size argument value");
                 }
                 // Check that the value is all digits
                 char *ptr = equal_sign + 1;
@@ -198,11 +197,11 @@ namespace wrench {
         // to the simulator if host shutdowns are to be simulated
         simgrid::s4u::Host::on_onoff.connect(
                 [](simgrid::s4u::Host const &h) {
-                    if (not Simulation::host_shutdown_enabled) {
-                        throw std::runtime_error(
-                                "It looks like you are simulating host failures/shutdowns during the simulated execution."
-                                " Please restart your simulation passing it the --wrench-host-shutdown-simulation command-line flag.");
-                    }
+                  if (not Simulation::host_shutdown_enabled) {
+                      throw std::runtime_error(
+                              "It looks like you are simulating host failures/shutdowns during the simulated execution."
+                              " Please restart your simulation passing it the --wrench-host-shutdown-simulation command-line flag.");
+                  }
                 });
 
         // Register a callback on link state changes to warn users
@@ -210,11 +209,11 @@ namespace wrench {
         // to the simulator if host shutdowns are to be simulated
         simgrid::s4u::Link::on_onoff_cb(
                 [](simgrid::s4u::Link const &l) {
-                    if (not Simulation::link_shutdown_enabled) {
-                        throw std::runtime_error(
-                                "It looks like you are simulating link failures/shutdowns during the simulated execution."
-                                " Please restart your simulation passing it the --wrench-link-shutdown-simulation command-line flag.");
-                    }
+                  if (not Simulation::link_shutdown_enabled) {
+                      throw std::runtime_error(
+                              "It looks like you are simulating link failures/shutdowns during the simulated execution."
+                              " Please restart your simulation passing it the --wrench-link-shutdown-simulation command-line flag.");
+                  }
                 });
 
 
@@ -241,7 +240,7 @@ namespace wrench {
             std::cout << "   --wrench-commport-pool-size=<integer>: set the number of communication ports used by WRENCH (default: 50000).\n";
             std::cout << "      This value may need to be increased, especially for simulations that simulate many\n";
             std::cout << "      failures, for which WRENCH has a hard time avoiding all commport-related memory leaks\n";
-            std::cout << "   --wrench-default-control-message-size=<double>: the default size of control messages in bytes (default: 1024).\n";
+            std::cout << "   --wrench-default-control-message-size=<double>: the default size of control messages in bytes (default: 0). \n";
             std::cerr << "\n";
         }
 
@@ -300,13 +299,9 @@ namespace wrench {
             (*argc)++;
         }
 
-        if (not commport_pool_size_set) {
-            S4U_CommPort::createCommPortPool(50000);
-        }
         if (not default_control_message_size_set) {
-            S4U_CommPort::default_control_message_size = 1024;
+            S4U_CommPort::default_control_message_size = 0;
         }
-
 
         Simulation::initialized = true;
     }

@@ -155,9 +155,13 @@ private:
 
     int main() override {
 
+        wrench::Simulation::sleep(10);
+
         if (this->create_data_movement_manager) {
             auto dmm = this->createDataMovementManager();
             this->test->dst_commport = dmm->commport;
+        } else {
+            this->test->dst_commport = this->test->service->commport;
         }
         this->waitForAndProcessNextEvent();
         return 0;
@@ -210,11 +214,11 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     } else if (service_type == "data_movement_manager") {
         auto wms = new NoopWMS(this, hostname, true);
         this->service = simulation->add(wms);
-        this->dst_commport = nullptr;// Will be set by the WMS on DMM is created
+        this->dst_commport = nullptr; // Will be set by the WMS on DMM is created
     }
 
     // Create the Bogus Message WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms;
 
     ASSERT_NO_THROW(wms = simulation->add(
                             new BogusMessageTestWMS(this, hostname)));

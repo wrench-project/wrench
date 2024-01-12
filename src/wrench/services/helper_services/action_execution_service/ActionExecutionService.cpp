@@ -48,8 +48,8 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void ActionExecutionService::cleanup(bool has_returned_from_main, int return_value) {
-        // Do the default behavior (which will throw as this is not a fault-tolerant service)
-        Service::cleanup(has_returned_from_main, return_value);
+
+//        this->release_held_mutexes();
 
         // Clean up state in case of a restart
         if (this->isSetToAutoRestart()) {
@@ -286,7 +286,6 @@ namespace wrench {
             msg += "  - " + host->get_name() + ": " + std::to_string(num_cores) + " cores; " + std::to_string(ram / 1000000000) +
                    " GB of RAM\n";
         }
-        WRENCH_INFO("%s", msg.c_str());
 
         // Create and start the host state monitor if necessary
         if (Simulation::isEnergySimulationEnabled() or Simulation::isHostShutdownSimulationEnabled()) {
@@ -426,6 +425,11 @@ namespace wrench {
      * @brief: Dispatch ready work units
      */
     void ActionExecutionService::dispatchReadyActions() {
+
+        if (this->ready_actions.empty()) {
+            return;
+        }
+
         // Don't kill me while I am doing this
         this->acquireDaemonLock();
 
@@ -587,8 +591,10 @@ namespace wrench {
 
         } else if (auto msg = std::dynamic_pointer_cast<ActionExecutorDoneMessage>(message)) {
             if (msg->action_executor->getAction()->getState() == Action::State::COMPLETED) {
+                WRENCH_INFO("IT'S A SUCCESS: %s", msg->action_executor->getAction()->getName().c_str());
                 processActionExecutorCompletion(msg->action_executor);
             } else {
+                WRENCH_INFO("IT'S A FAILURE: %s", msg->action_executor->getAction()->getName().c_str());
                 processActionExecutorFailure(msg->action_executor);
             }
             return true;
@@ -616,6 +622,7 @@ namespace wrench {
                     return true;
                 }
 
+                WRENCH_INFO("ALL MY RESOURCES ARE DOWN");
                 this->terminate(false, ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED);
                 this->exit_code = 1;// Exit code to signify that this is, in essence a crash (in case somebody cares)
                 return false;
@@ -637,6 +644,11 @@ namespace wrench {
         WRENCH_INFO("Killing action %s", action->getName().c_str());
 
         bool killed_due_to_job_cancellation = (std::dynamic_pointer_cast<JobKilled>(cause) != nullptr);
+
+        // If action is ready, remove it from ready list
+        if (std::find(this->ready_actions.begin(), this->ready_actions.end(), action) != this->ready_actions.end()) {
+            this->ready_actions.erase(std::find(this->ready_actions.begin(), this->ready_actions.end(), action));
+        }
 
         // If action is running kill the executor
         if (this->action_executors.find(action) != this->action_executors.end()) {
@@ -666,7 +678,7 @@ namespace wrench {
                         this->parent_service->commport->get_cname());
             // NOTE: This is synchronous so that the process doesn't fall off the end
             try {
-                this->parent_service->commport->putMessage(
+                this->parent_service->commport->dputMessage(
                         new ActionExecutionServiceActionDoneMessage(action, 0));
             } catch (ExecutionException &e) {
                 return;
@@ -780,7 +792,7 @@ namespace wrench {
         // NOTE: This is synchronous so that the process doesn't fall off the end
         try {
             auto msg = new ActionExecutionServiceActionDoneMessage(action, 0);
-            this->parent_service->commport->putMessage(msg);
+            this->parent_service->commport->dputMessage(msg);
         } catch (ExecutionException &e) {
             return;
         }
@@ -1083,14 +1095,14 @@ namespace wrench {
             action->newExecution(Action::State::READY);
             //            action->setState(Action::State::READY);
             // Put the action back in the ready list (at the end)
-            WRENCH_INFO("Putting action back in the ready queue");
+            WRENCH_INFO("Putting action %s back in the ready queue", action->getName().c_str());
             this->ready_actions.push_back(action);
         } else {
             // Send the notification
             WRENCH_INFO("Sending action failure notification to '%s'", parent_service->commport->get_cname());
             // NOTE: This is synchronous so that the process doesn't fall off the end
             try {
-                this->parent_service->commport->putMessage(
+                this->parent_service->commport->dputMessage(
                         new ActionExecutionServiceActionDoneMessage(action, 0));
             } catch (ExecutionException &e) {
                 return;

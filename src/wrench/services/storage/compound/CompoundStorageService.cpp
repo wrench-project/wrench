@@ -914,7 +914,7 @@ namespace wrench {
             throw std::invalid_argument("StorageService::readFile(): Invalid nullptr/0 arguments");
         }
 
-        assertServiceIsUp(this->shared_from_this());
+        assertServiceIsUp(this->getSharedPtr<Service>());
 
         auto designated_locations = this->lookupFileLocation(location);
         if (designated_locations.empty()) {

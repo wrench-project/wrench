@@ -82,10 +82,10 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param daemon: the NetworkProximityDaemon to return the request to
+     * @param daemon: the NetworkProximitySenderDaemon to return the request to
      * @param payload: the message size in bytes
      */
-    NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(std::shared_ptr<NetworkProximityDaemon> daemon,
+    NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(std::shared_ptr<NetworkProximitySenderDaemon> daemon,
                                                                      double payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (daemon == nullptr) {
@@ -104,7 +104,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     NextContactDaemonAnswerMessage::NextContactDaemonAnswerMessage(std::string next_host_to_send,
-                                                                   std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send,
+                                                                   std::shared_ptr<NetworkProximityReceiverDaemon> next_daemon_to_send,
                                                                    S4U_CommPort *next_commport_to_send, double payload) : NetworkProximityMessage(payload) {
         this->next_host_to_send = std::move(next_host_to_send);
         this->next_daemon_to_send = std::move(next_daemon_to_send);

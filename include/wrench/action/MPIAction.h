@@ -13,6 +13,7 @@
 #include <string>
 #include <utility>
 
+#include "wrench/execution_controller/ExecutionController.h"
 #include "wrench/action/Action.h"
 
 namespace wrench {
@@ -37,7 +38,7 @@ namespace wrench {
         MPIAction(const std::string &name,
                   unsigned long num_processes,
                   unsigned long num_cores_per_process,
-                  std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> lambda_mpi);
+                  std::function<void(const std::shared_ptr<ExecutionController> &controller)> lambda_mpi);
 
         unsigned long getMinNumCores() const override;
         unsigned long getMaxNumCores() const override;
@@ -50,7 +51,17 @@ namespace wrench {
         unsigned long num_processes;
         unsigned long num_cores_per_process;
 
-        std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> lambda_mpi;
+        std::function<void(const std::shared_ptr<ExecutionController> &controller)> lambda_mpi;
+
+        class MPIPrivateExecutionController : public ExecutionController {
+        public:
+            MPIPrivateExecutionController(const std::string &hostname, const std::string &suffix) : ExecutionController(hostname, suffix) {}
+
+            int main() override {
+                simgrid::s4u::this_actor::suspend();
+                return 0;
+            }
+        };
 
         class MPIProcess {
         public:

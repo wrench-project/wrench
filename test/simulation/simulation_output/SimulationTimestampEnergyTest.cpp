@@ -172,9 +172,9 @@ private:
     int main() override {
         const double MEGAFLOP = 1000.0 * 1000.0;
         wrench::S4U_Simulation::compute(100.0 * MEGAFLOP);                       // compute for 1 second
-        auto c1 = this->simulation->getEnergyConsumed(this->getHostname(), true);// 200 joules
+        this->simulation->getEnergyConsumed(this->getHostname(), true);// 200 joules
         wrench::S4U_Simulation::compute(100.0 * MEGAFLOP);                       // compute for 1 second
-        auto c2 = this->simulation->getEnergyConsumed(this->getHostname(), true);// now 400 joules
+        this->simulation->getEnergyConsumed(this->getHostname(), true);// now 400 joules
 
         // following two calls should not add any timestamps
         this->simulation->getEnergyConsumed(this->getHostname());

@@ -91,8 +91,12 @@ namespace wrench {
                 // Wait for one activity to complete
                 finished_recv = pending_receives.wait_any_for(timeout);
             } catch (simgrid::TimeoutException &e) {
-                mess_ptr->cancel();
-                comm_ptr->cancel();
+                auto failed_recv = pending_receives.get_failed_activity();
+                if (failed_recv == comm_ptr) {
+                    mess_ptr->cancel();
+                } else {
+                    comm_ptr->cancel();
+                }
                 throw ExecutionException(std::make_shared<NetworkError>(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->commport->get_name(), ""));
             } catch (simgrid::Exception &e) {
                 auto failed_recv = pending_receives.get_failed_activity();
@@ -108,10 +112,8 @@ namespace wrench {
 
             if (finished_recv == comm_ptr) {
                 mess_ptr->cancel();
-                comm_ptr->wait();
             } else if (finished_recv == mess_ptr) {
                 comm_ptr->cancel();
-                mess_ptr->wait();
             }
 
 #ifdef MESSAGE_MANAGER
@@ -125,7 +127,6 @@ namespace wrench {
             if (this->comm_ptr) {
                 try {
                     this->comm_ptr->wait_for(timeout);
-                    return nullptr;
                 } catch (simgrid::NetworkFailureException &e) {
                         if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
                             throw ExecutionException(std::make_shared<NetworkError>(
@@ -145,8 +146,8 @@ namespace wrench {
                     }
             } else if (this->mess_ptr) {
                 this->mess_ptr->wait_for(timeout);
-                return nullptr;
             }
+            return nullptr;
         }
     }
 
@@ -196,7 +197,8 @@ namespace wrench {
 
         simgrid::s4u::ActivitySet pending_activities;
         for (auto it = pending_comms.begin(); it < pending_comms.end(); it++) {
-            pending_activities.push((*it)->comm_ptr);
+            if ((*it)->comm_ptr) pending_activities.push((*it)->comm_ptr);
+            if ((*it)->mess_ptr) pending_activities.push((*it)->mess_ptr);
         }
 #endif
 
@@ -204,10 +206,19 @@ namespace wrench {
         simgrid::s4u::ActivityPtr finished_activity = nullptr;
         try {
             finished_activity = pending_activities.wait_any_for(timeout);
+        } catch (simgrid::TimeoutException &e) {
+            for (auto it = pending_comms.begin(); it < pending_comms.end(); it++) {
+                if ((*it)->comm_ptr) (*it)->comm_ptr->cancel();
+                if ((*it)->mess_ptr) (*it)->mess_ptr->cancel();
+            }
+            return ULONG_MAX;
         } catch (simgrid::Exception &e) {
             auto failed_activity = pending_activities.get_failed_activity();
             for (unsigned long idx = 0; idx < pending_comms.size(); idx++ ) {
                 if (pending_comms.at(idx)->comm_ptr == failed_activity) {
+                    return idx;
+                }
+                if (pending_comms.at(idx)->mess_ptr == failed_activity) {
                     return idx;
                 }
             }
@@ -216,6 +227,9 @@ namespace wrench {
         if (finished_activity) {
             for (unsigned long idx = 0; idx < pending_comms.size(); idx++ ) {
                 if (pending_comms.at(idx)->comm_ptr == finished_activity) {
+                    return idx;
+                }
+                if (pending_comms.at(idx)->mess_ptr == finished_activity) {
                     return idx;
                 }
             }

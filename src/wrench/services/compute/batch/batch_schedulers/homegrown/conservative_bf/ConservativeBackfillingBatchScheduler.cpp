@@ -47,7 +47,7 @@ namespace wrench {
         this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
         batch_job->conservative_bf_start_date = est;
         batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
-        WRENCH_INFO("Scheduled BatchComputeService job %lu on %lu from time %u to %u",
+        WRENCH_INFO("Scheduled BatchComputeService job %lu on %lu nodes from time %u to %u",
                     batch_job->getJobID(), batch_job->getRequestedNumNodes(),
                     batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date);
 #ifdef PRINT_SCHEDULE
@@ -116,7 +116,7 @@ namespace wrench {
         WRENCH_INFO("Compacting schedule...");
 
 #ifdef PRINT_SCHEDULE
-        WRENCH_INFO("BEFORE COMPACTING");
+//        WRENCH_INFO("BEFORE COMPACTING");
         this->schedule->print();
 #endif
 
