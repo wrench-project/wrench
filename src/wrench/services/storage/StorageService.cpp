@@ -116,13 +116,13 @@ namespace wrench {
         this->assertServiceIsUp();
 
         this->commport->putMessage(
-                                new StorageServiceFileWriteRequestMessage(
-                                        answer_commport,
-                                        simgrid::s4u::this_actor::get_host(),
-                                        location,
-                                        num_bytes_to_write,
-                                        this->getMessagePayloadValue(
-                                                StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
+                new StorageServiceFileWriteRequestMessage(
+                        answer_commport,
+                        simgrid::s4u::this_actor::get_host(),
+                        location,
+                        num_bytes_to_write,
+                        this->getMessagePayloadValue(
+                                StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
 
@@ -148,12 +148,12 @@ namespace wrench {
                     double remaining = dwmb.second;
                     while (remaining - buffer_size > DBL_EPSILON) {
                         dwmb.first->putMessage(
-                                                new StorageServiceFileContentChunkMessage(
-                                                        file, buffer_size, false));
+                                new StorageServiceFileContentChunkMessage(
+                                        file, buffer_size, false));
                         remaining -= buffer_size;
                     }
                     dwmb.first->putMessage(new StorageServiceFileContentChunkMessage(
-                                                                file, remaining, true));
+                            file, remaining, true));
 
                     //Waiting for the final ack
                     answer_commport->getMessage<StorageServiceAckMessage>("StorageService::writeFile(): Received an");
@@ -195,10 +195,10 @@ namespace wrench {
         // Send a message to the daemon
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
         this->commport->putMessage(new StorageServiceFreeSpaceRequestMessage(
-                                                       answer_commport,
-                                                       path,
-                                                       this->getMessagePayloadValue(
-                                                               StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+                answer_commport,
+                path,
+                this->getMessagePayloadValue(
+                        StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
         auto msg = answer_commport->getMessage<StorageServiceFreeSpaceAnswerMessage>(this->network_timeout, "StorageService::getTotalFreeSpaceAtPath() Received an");
@@ -221,7 +221,7 @@ namespace wrench {
             throw std::invalid_argument("StorageService::lookupFile(): Invalid nullptr arguments");
         }
 
-        assertServiceIsUp(this->shared_from_this());
+        assertServiceIsUp(this->getSharedPtr<Service>());
 
         // Send a message to the daemon
         this->commport->putMessage(
@@ -255,15 +255,15 @@ namespace wrench {
             throw std::invalid_argument("StorageService::readFile(): Invalid nullptr/0 arguments");
         }
 
-        assertServiceIsUp(this->shared_from_this());
+        assertServiceIsUp(this->getSharedPtr<Service>());
 
         this->commport->putMessage(
-                                new StorageServiceFileReadRequestMessage(
-                                        answer_commport,
-                                        simgrid::s4u::this_actor::get_host(),
-                                        location,
-                                        num_bytes,
-                                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+                new StorageServiceFileReadRequestMessage(
+                        answer_commport,
+                        simgrid::s4u::this_actor::get_host(),
+                        location,
+                        num_bytes,
+                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
 
 
         if (wait_for_answer) {
@@ -301,8 +301,6 @@ namespace wrench {
                         }
                     }
                 }
-
-                S4U_CommPort::retireTemporaryCommPort(msg->commport_to_receive_the_file_content);
 
                 //Waiting for all the final acks
                 for (unsigned long source = 0; source < number_of_sources; source++) {
@@ -403,14 +401,14 @@ namespace wrench {
             throw std::invalid_argument("StorageService::deleteFile(): Cannot be called on a SCRATCH location");
         }
 
-        assertServiceIsUp(this->shared_from_this());
+        assertServiceIsUp(this->getSharedPtr<Service>());
 
         // Send a message to the storage service's daemon
         this->commport->putMessage(
-                                new StorageServiceFileDeleteRequestMessage(
-                                        answer_commport,
-                                        location,
-                                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
+                new StorageServiceFileDeleteRequestMessage(
+                        answer_commport,
+                        location,
+                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
 
         if (wait_for_answer) {
 

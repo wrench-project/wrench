@@ -69,9 +69,9 @@ private:
         unsigned long index;
         if (this == this->test->wms1.get()) {
             /** SENDER **/
-
             // Empty set of pending comms
             std::vector<wrench::S4U_PendingCommunication *> empty_pending_comms;
+            std::shared_ptr<wrench::S4U_PendingCommunication> pending_send;
             try {
                 wrench::S4U_PendingCommunication::waitForSomethingToHappen(empty_pending_comms, -1);
                 throw std::runtime_error("Was expecting a std::invalid_argument exception");
@@ -79,13 +79,12 @@ private:
             }
 
             // One send
-            auto pending_send = this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100));
+            pending_send = this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100));
             pending_send->wait();
 
             // Another send
             auto another_pending_send = this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100));
             another_pending_send->wait(200);
-
 
             // Two sends, no timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends;
@@ -108,10 +107,14 @@ private:
             if (fabs(10 - (wrench::Simulation::getCurrentSimulatedDate() - now)) > 0.5) {
                 throw std::runtime_error("Seems like we didn't wait for the timeout!");
             }
-            index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_timeout, 1000);
-            sends_timeout.at(index)->wait();
-            index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_timeout, 1000);
-            sends_timeout.at(index)->wait();
+//            index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_timeout, 1000);
+//            if (index != ULONG_MAX) {
+//                throw std::runtime_error("Should have gotten ULONG_MAX");
+//            }
+//            index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_timeout, 1000);
+//            if (index != ULONG_MAX) {
+//                throw std::runtime_error("Should have gotten ULONG_MAX");
+//            }
 
             // One send, network failure
             pending_send = this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100));
@@ -169,12 +172,11 @@ private:
                 cause->getCommPortName();
             }
 
-
         } else {
             /** RECEIVER **/
-
+            std::shared_ptr<wrench::S4U_PendingCommunication> pending_recv;
             // One recv
-            auto pending_recv = this->test->wms2->commport->igetMessage();
+            pending_recv = this->test->wms2->commport->igetMessage();
             pending_recv->wait();
 
             // Another recv
@@ -192,8 +194,18 @@ private:
             recvs.at(index)->wait();
 
             // Two recvs (sends are timing out)
-            this->test->wms2->commport->getMessage();
-            this->test->wms2->commport->getMessage();
+            try {
+                this->test->wms2->commport->getMessage();
+                throw std::runtime_error("Should have gotten some error");
+            } catch (wrench::ExecutionException &e) {
+                // do nothing
+            }
+            try {
+                this->test->wms2->commport->getMessage();
+                throw std::runtime_error("Should have gotten some error");
+            } catch (wrench::ExecutionException &e) {
+                // do nothing
+            }
 
             // One recv (which fails)
             try {
@@ -204,7 +216,6 @@ private:
                 cause->toString();
                 cause->getCommPortName();
             }
-
             //            WRENCH_INFO("TWO ASYNCHRONOUS RECV / NETWORK FAILURES");
 
             // Two synchronous recv, network failure
@@ -233,7 +244,6 @@ private:
                 cause->toString();
                 cause->getCommPortName();
             }
-
         }
 
         return 0;

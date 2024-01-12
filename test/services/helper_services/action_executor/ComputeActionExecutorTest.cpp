@@ -187,7 +187,7 @@ private:
 
         // Is the end-date sensible?
         if (action->getEndDate() + EPSILON < 10.2 or action->getEndDate() > 10.2 + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
+            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~12.0)");
         }
 
         // Is the state sensible?

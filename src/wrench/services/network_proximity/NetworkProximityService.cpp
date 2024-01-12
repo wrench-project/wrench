@@ -41,7 +41,8 @@ namespace wrench {
         // Do the default behavior (which will throw as this is not a fault-tolerant service)
         Service::cleanup(has_returned_from_main, return_value);
 
-        this->network_daemons.clear();
+        this->network_sender_daemons.clear();
+        this->network_receiver_daemons.clear();
     }
 
 
@@ -186,8 +187,8 @@ namespace wrench {
 
         // Create  and start network daemons
         for (const auto &h: this->hosts_in_network) {
-            auto np_daemon = std::make_shared<NetworkProximityDaemon>(
-
+            // Set up network sender daemons
+            auto np_sender_daemon = std::make_shared<NetworkProximitySenderDaemon>(
                     this->simulation, h, this->commport,
                     this->getPropertyValueAsDouble(
                             NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
@@ -198,7 +199,10 @@ namespace wrench {
                     this->getPropertyValueAsUnsignedLong(
                             NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED),
                     this->messagepayload_list);
-            this->network_daemons.push_back(np_daemon);
+            this->network_sender_daemons.push_back(np_sender_daemon);
+
+            auto np_receiver_daemon = std::make_shared<NetworkProximityReceiverDaemon>(this->simulation, h, this->messagepayload_list);
+            this->network_receiver_daemons.push_back(np_receiver_daemon);
 
             // if this network service type is 'vivaldi', set up the coordinate lookup table
             if (boost::iequals(
@@ -210,8 +214,11 @@ namespace wrench {
         }
 
         // Start all network daemons
-        for (auto &network_daemon: this->network_daemons) {
-            network_daemon->start(network_daemon, true, true);// Daemonized, AUTO RESTART
+        for (auto &network_receiver_daemon: this->network_receiver_daemons) {
+            network_receiver_daemon->start(network_receiver_daemon, true, true);// Daemonized, AUTO RESTART
+        }
+        for (auto &network_sender_daemon: this->network_sender_daemons) {
+            network_sender_daemon->start(network_sender_daemon, true, true);// Daemonized, AUTO RESTART
         }
 
         /** Main loop **/
@@ -248,13 +255,19 @@ namespace wrench {
             // This is Synchronous
             try {
                 //Stop the network daemons
-                std::vector<std::shared_ptr<NetworkProximityDaemon>>::iterator it;
-                for (it = this->network_daemons.begin(); it != this->network_daemons.end(); it++) {
-                    if ((*it)->isUp()) {
-                        (*it)->stop();
+                for (auto const &daemon : this->network_sender_daemons) {
+                    if (daemon->isUp()) {
+                        daemon->stop();
                     }
                 }
-                this->network_daemons.clear();
+                this->network_sender_daemons.clear();
+                for (auto const &daemon : this->network_receiver_daemons) {
+                    if (daemon->isUp()) {
+                        daemon->stop();
+                    }
+                }
+                this->network_receiver_daemons.clear();
+
                 this->hosts_in_network.clear();
                 msg->ack_commport->putMessage(
                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
@@ -310,8 +323,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<NextContactDaemonRequestMessage>(message)) {
-            std::shared_ptr<NetworkProximityDaemon> chosen_peer = NetworkProximityService::getCommunicationPeer(
-                    msg->daemon);
+            auto chosen_peer = NetworkProximityService::getCommunicationPeer(msg->daemon);
 
             msg->daemon->commport->dputMessage(
                     new NextContactDaemonAnswerMessage(
@@ -365,19 +377,18 @@ namespace wrench {
      * @param sender_daemon: the network daemon requesting a peer to communicate with next
      * @return a shared_ptr to the network daemon that is the selected communication peer
      */
-    std::shared_ptr<NetworkProximityDaemon>
-    NetworkProximityService::getCommunicationPeer(const std::shared_ptr<NetworkProximityDaemon> sender_daemon) {
+    std::shared_ptr<NetworkProximityReceiverDaemon>
+    NetworkProximityService::getCommunicationPeer(const std::shared_ptr<NetworkProximitySenderDaemon> sender_daemon) {
         // coverage will be (0 < coverage <= 1.0) if this is a 'vivaldi' network service
         // else if it is an 'alltoall' network service, coverage is set at 1.0
         double coverage = this->getPropertyValueAsDouble(NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE);
-        unsigned long max_pool_size = this->network_daemons.size() - 1;
+        unsigned long max_pool_size = this->network_sender_daemons.size() - 1;
 
         // if the network_service type is 'alltoall', sender_daemon selects from a pool of all other network daemons
         // if the network_service type is 'vivaldi', sender_daemon selects from a subset of the max_pool_size
         auto pool_size = (unsigned long) (std::ceil(coverage * max_pool_size));
 
         std::hash<std::string> hash_func;
-        std::default_random_engine sender_rng;
         // uniform distribution to be used by the sending daemon's rng
         std::uniform_int_distribution<unsigned long> s_udist;
 
@@ -387,20 +398,15 @@ namespace wrench {
         std::vector<unsigned long> peer_list;
 
         // all the network daemons EXCEPT the sender get pushed into this vector
-        for (unsigned long index = 0; index < this->network_daemons.size(); ++index) {
-            if (this->network_daemons[index]->commport != sender_daemon->commport) {
+        for (unsigned long index = 0; index < this->network_sender_daemons.size(); ++index) {
+            if (this->network_sender_daemons[index]->commport != sender_daemon->commport) {
                 peer_list.push_back(index);
             }
         }
 
-        // set the seed unique to the sending daemon
-        sender_rng.seed(0);
-
-        std::shuffle(peer_list.begin(), peer_list.end(), sender_rng);
-
         unsigned long chosen_peer_index = peer_list.at(m_udist(master_rng));
 
-        return std::shared_ptr<NetworkProximityDaemon>(this->network_daemons.at(chosen_peer_index));
+        return this->network_receiver_daemons.at(chosen_peer_index);
     }
 
     /**

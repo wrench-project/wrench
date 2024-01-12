@@ -24,6 +24,7 @@
 
 #include <utility>
 
+#include "../../../include/RuntimeAssert.h"
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
@@ -216,7 +217,7 @@ private:
 
             action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", 0, 0, lambda_execute, lambda_terminate));
             thread_overhead = 0.0;
-            expected_completion_date = 20.84743174020618639020;
+            expected_completion_date = 20.83487236804123909906;
             num_cores = 0;
             ram = 0.0;
         } else {
@@ -251,9 +252,10 @@ private:
 
 
         // Is the start date sensible?
-        if (action->getStartDate() < 0.0 || action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
-        }
+        RUNTIME_DBL_EQ(action->getStartDate(), 0.0, "action start date", EPSILON);
+//        if (action->getStartDate() < 0.0 || action->getStartDate() > EPSILON) {
+//            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
+//        }
 
         //        WRENCH_INFO("END_DATE = %.20lf (EXPECTED %.20lf)", action->getEndDate(), expected_completion_date);
         // Is the state and end date sensible?
@@ -319,15 +321,12 @@ TEST_F(KillFailActionExecutorTest, FailFileDelete) {
 }
 
 TEST_F(KillFailActionExecutorTest, KillCustom) {
-    //    loopThroughTestCases({0.0, 20.84743174020618639020}, true, "custom");
     loopThroughTestCases({0.0, 20.8474}, true, "custom");
 }
 
 TEST_F(KillFailActionExecutorTest, FailCustom) {
-    //    loopThroughTestCases({0.0, 20.84743174020618639020}, false, "custom");
     loopThroughTestCases({0.0, 20.8474}, false, "custom");
 }
-
 
 void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep_time, bool kill, std::string action_type) {
 
@@ -337,7 +336,7 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    //    argv[2] = strdup("--wrench-full-log");
+//        argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 

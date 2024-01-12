@@ -146,7 +146,7 @@ namespace wrench {
         std::shared_ptr<CustomAction> addCustomAction(std::shared_ptr<CustomAction> custom_action);
 
         std::shared_ptr<MPIAction> addMPIAction(const std::string &name,
-                                                const std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> &mpi_code,
+                                                const std::function<void(const std::shared_ptr<ExecutionController> &controller)> &mpi_code,
                                                 unsigned long num_processes,
                                                 unsigned long num_cores_per_process);
 

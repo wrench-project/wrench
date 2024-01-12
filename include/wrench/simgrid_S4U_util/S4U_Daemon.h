@@ -14,7 +14,6 @@
 
 #include <simgrid/s4u.hpp>
 #include <iostream>
-#include "S4U_CommPort.h"
 
 //#define ACTOR_TRACKING_OUTPUT yes
 
@@ -26,11 +25,12 @@ namespace wrench {
     /***********************/
 
     class Simulation;
+    class S4U_CommPort;
 
     /**
      * @brief A generic "running daemon" abstraction that serves as a basis for all simulated processes
      */
-    class S4U_Daemon {
+    class S4U_Daemon : public std::enable_shared_from_this<S4U_Daemon> {
 
         class LifeSaver {
         public:
@@ -42,9 +42,15 @@ namespace wrench {
 
     public:
         /**
-         * @brief A convenient map between actors and their default receive commportes
+         * @brief A convenient map between actors and their default receive commports
          */
         static std::unordered_map<aid_t, S4U_CommPort *> map_actor_to_recv_commport;
+
+        /**
+         * @brief A map of actors to sets of held mutexes
+         */
+        static std::unordered_map<aid_t, std::set<simgrid::s4u::MutexPtr>> map_actor_to_held_mutexes;
+
 
         /** @brief The name of the daemon */
         std::string process_name;
@@ -121,6 +127,8 @@ namespace wrench {
 
         void setSimulation(Simulation *simulation);
 
+        bool killActor();
+
     protected:
         /** @brief a pointer to the simulation object */
         Simulation *simulation;
@@ -137,7 +145,18 @@ namespace wrench {
         /** @brief The host on which the daemon is running */
         simgrid::s4u::Host *host;
 
-        bool killActor();
+//        void release_held_mutexes();
+
+        /**
+         * @brief Method to retrieve the shared_ptr to a S4U_daemon
+         * @tparam T: the class of the daemon (the base class is S4U_Daemon)
+         * @return a shared pointer
+         */
+        template<class T>
+        std::shared_ptr<T> getSharedPtr() {
+            return std::dynamic_pointer_cast<T>(this->shared_from_this());
+        }
+
 
         /** @brief The number of time that this daemon has started (i.e., 1 + number of restarts) */
         unsigned int num_starts = 0;

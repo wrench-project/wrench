@@ -838,6 +838,7 @@ namespace wrench {
         cs->start(cs, true, false);// Daemonized
 
         // Create a failure detector for the service
+//        WRENCH_INFO("CREATING SERVICE TERMINATION DETECTOR THAT WILL REPORT TO COMMPORT %s", this->commport->get_cname());
         auto termination_detector = std::make_shared<ServiceTerminationDetector>(
                 this->hostname, cs,
                 this->commport, false, true);
@@ -1129,8 +1130,8 @@ namespace wrench {
         }
 
         if (vm_name.empty()) {
-            throw std::runtime_error(
-                    "CloudComputeService::processBareMetalComputeServiceTermination(): received a termination notification for an unknown BareMetalComputeService");
+            WRENCH_WARN("CloudComputeService::processBareMetalComputeServiceTermination(): received a termination notification for an unknown BareMetalComputeService - Probably rapid-fire (zero-time) shutdown/restart shenanigans");
+            return;
         }
         auto vm = std::get<0>(this->vm_list[vm_name]);
         unsigned long used_cores = vm->getNumCores();

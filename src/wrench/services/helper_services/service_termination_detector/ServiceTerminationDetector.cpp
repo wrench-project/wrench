@@ -50,13 +50,15 @@ int wrench::ServiceTerminationDetector::main() {
         // Failure detected!
         WRENCH_INFO("Detected crash of service %s (notifying commport %s)", this->service_to_monitor->getName().c_str(),
                     this->commport_to_notify->get_cname());
+        //No dput just before dying!
         this->commport_to_notify->putMessage(new ServiceHasCrashedMessage(this->service_to_monitor));
     }
     if (this->notify_on_termination and (service_has_returned_from_main)) {
         // Failure detected!
         WRENCH_INFO("Detected termination of service %s (notifying commport %s)",
                     this->service_to_monitor->getName().c_str(), this->commport_to_notify->get_cname());
-        this->commport_to_notify->putMessage(
+        // No dput just before dying!
+        this->commport_to_notify->dputMessage(
                 new ServiceHasTerminatedMessage(this->service_to_monitor, return_value_from_main));
     }
 

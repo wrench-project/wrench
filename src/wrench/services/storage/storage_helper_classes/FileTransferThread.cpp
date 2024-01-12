@@ -145,7 +145,9 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void FileTransferThread::cleanup(bool has_returned_from_main, int return_value) {
-        // Do nothing. It's fine to just die
+//        this->release_held_mutexes();
+        // Do nothing
+//        Service::cleanup(has_returned_from_main, return_value);
     }
 
     /**
@@ -160,7 +162,7 @@ namespace wrench {
 
         WRENCH_INFO(
                 "New FileTransferThread (file=%s, bytes_to_transfer=%.2lf, src_commport=%s; src_location=%s; dst_commport=%s; dst_location=%s; "
-                "answer_commport_if_read=%s; answer_commport_if_write=%s; answer_commport_if_copy=%s; buffer size=%.2lf",
+                "answer_commport_if_read=%s; answer_commport_if_write=%s; answer_commport_if_copy=%s; buffer size=%.2lf)",
                 file->getID().c_str(),
                 this->num_bytes_to_transfer,
                 ((src_commport == nullptr) ? "none" : src_commport->get_cname()),
@@ -234,13 +236,6 @@ namespace wrench {
                                      (dst_location ? dst_location->toString() : "nullptr") + ")");
         }
 
-        // Call retire on all commports passed, which is pretty brute force but should work
-        if (this->dst_commport) {
-            S4U_CommPort::retireTemporaryCommPort(this->dst_commport);
-        }
-        if (this->src_commport) {
-            S4U_CommPort::retireTemporaryCommPort(this->src_commport);
-        }
 
         try {
             // Send report back to the service
@@ -250,6 +245,15 @@ namespace wrench {
             // oh well...
         }
 
+        // Call retire on all commports passed, which is pretty brute force but should work since
+        // I synchronized with the parent!
+        // BUT IT SHOULDN'T BE MY JOB!!!!
+//        if (this->dst_commport) {
+//            S4U_CommPort::retireTemporaryCommPort(this->dst_commport);
+//        }
+//        if (this->src_commport) {
+//            S4U_CommPort::retireTemporaryCommPort(this->src_commport);
+//        }
         return 0;
     }
 
@@ -557,7 +561,6 @@ namespace wrench {
                         dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                 done = file_content_chunk_msg->last_chunk;
             } else {
-                S4U_CommPort::retireTemporaryCommPort(commport_to_receive_the_file_content);
                 throw std::runtime_error(
                         "FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
                         msg->getName() + "] message!");
@@ -593,13 +596,11 @@ namespace wrench {
                             dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                     done = file_content_chunk_msg->last_chunk;
                 } else {
-                    S4U_CommPort::retireTemporaryCommPort(commport_to_receive_the_file_content);
                     throw std::runtime_error(
                             "FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
                             msg->getName() + "] message!");
                 }
             }
-            S4U_CommPort::retireTemporaryCommPort(commport_to_receive_the_file_content);
 
             // Do the I/O for the last chunk
 #ifdef PAGE_CACHE_SIMULATION
@@ -615,7 +616,6 @@ namespace wrench {
             }
 #endif
         } catch (ExecutionException &e) {
-            S4U_CommPort::retireTemporaryCommPort(commport_to_receive_the_file_content);
             throw;
         }
     }

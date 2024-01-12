@@ -24,7 +24,7 @@
 #define NUM_STORAGE_SERVICES 10
 #define STORAGE_SERVICE_CAPACITY (0.5 * NUM_FILES * FILE_SIZE)
 
-WRENCH_LOG_CATEGORY(storage_service_link_failures_test, "Log category for StorageServiceLinkFailuresTest");
+WRENCH_LOG_CATEGORY(storage_service_link_failures_test, "Log category for nStorageServiceLinkFailuresTest");
 
 
 class StorageServiceLinkFailuresTest : public ::testing::Test {
@@ -244,9 +244,7 @@ private:
         switcher2->setSimulation(this->simulation);
         switcher2->start(switcher2, true, false);// Daemonized, no auto-restart
 
-
         this->data_movement_manager = this->createDataMovementManager();
-
 
         unsigned long network_failure_1 = 0, network_failure_2 = 0;
         unsigned long network_failure_3 = 0, network_failure_4 = 0;
@@ -330,12 +328,12 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 3;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-link-shutdown-simulation");
-    //    argv[2] = strdup("--wrench-commport_name-pool-size=100000");
-    //    argv[3] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-commport-pool-size=100000");
+        argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 

@@ -36,7 +36,7 @@ namespace wrench {
      * @brief A service that can be added to the simulation and that can be used by a WMS
      *        when executing a workflow
      */
-    class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> {
+    class Service : public S4U_Daemon {
 
     public:
         /***********************/
@@ -135,15 +135,6 @@ namespace wrench {
          */
         double network_timeout = 30.0;
 
-        /**
-         * @brief Method to retrieve the shared_ptr to a service
-         * @tparam T: the class of the service (the base class is Service)
-         * @return a shared pointer
-         */
-        template<class T>
-        std::shared_ptr<T> getSharedPtr() {
-            return std::dynamic_pointer_cast<T>(this->shared_from_this());
-        }
 
 
         /** @brief A boolean that indicates if the service is in the middle of shutting down **/
