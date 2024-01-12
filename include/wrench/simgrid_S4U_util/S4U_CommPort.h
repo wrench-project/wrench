@@ -19,6 +19,8 @@
 #include <boost/core/demangle.hpp>
 #include <simgrid/s4u.hpp>
 #include <wrench/simulation/SimulationMessage.h>
+#include <wrench/simgrid_S4U_util/S4U_Daemon.h>
+
 namespace wrench {
 
     /***********************/
@@ -34,7 +36,6 @@ namespace wrench {
 
     public:
 
-
         template<class TMessageType>
         std::string get_type_name() {
             char const *type_name = typeid(TMessageType).name();
@@ -42,6 +43,8 @@ namespace wrench {
         }
 
         S4U_CommPort();
+
+        ~S4U_CommPort();
 
         /**
          * @brief Synchronously receive a message from a commport_name
@@ -67,7 +70,8 @@ namespace wrench {
                 message.release();
                 return std::unique_ptr<TMessageType>(msg);
             } else {
-                throw std::runtime_error(error_prefix + " Unexpected [" + message->getName() + "] message while waiting for " +
+                std::cerr << "message = " << message.get() << "\n";
+                throw std::runtime_error(error_prefix + " Unexpected [" + ((message.get() != nullptr) ? message->getName() : "null-message") + "] message while waiting for " +
                                          get_type_name<TMessageType>() + ". Request ID: " + std::to_string(id));
             }
         }
@@ -128,7 +132,7 @@ namespace wrench {
             return this->getMessage(timeout, true);
         }
 
-
+        void reset();
         void putMessage(SimulationMessage *m);
         void dputMessage(SimulationMessage *msg);
         std::shared_ptr<S4U_PendingCommunication> iputMessage(SimulationMessage *msg);
@@ -138,7 +142,7 @@ namespace wrench {
         static unsigned long generateUniqueSequenceNumber();
         static S4U_CommPort *getTemporaryCommPort();
         static void retireTemporaryCommPort(S4U_CommPort *commport);
-        static void createCommPortPool(unsigned long num_commports);
+        static void createCommPortPool();
 
         /**
          * @brief The commport_name pool size
@@ -156,7 +160,7 @@ namespace wrench {
          */
         static S4U_CommPort *NULL_COMMPORT;
 
-        const std::string get_name() const {
+        [[nodiscard]] const std::string get_name() const {
             return this->name;
         }
 
@@ -166,12 +170,17 @@ namespace wrench {
 
     private:
 
-
         friend class S4U_Daemon;
         friend class S4U_PendingCommunication;
 
         simgrid::s4u::Mailbox *s4u_mb;
         simgrid::s4u::MessageQueue *s4u_mq;
+        SimulationMessage *msg_mb;
+        SimulationMessage *msg_mq;
+        bool mb_comm_posted = false;
+        simgrid::s4u::CommPtr mb_comm;
+        bool mq_comm_posted = false;
+        simgrid::s4u::MessPtr mq_comm;
 
         std::unique_ptr<SimulationMessage> getMessage(bool log);
         std::unique_ptr<SimulationMessage> getMessage(double timeout, bool log);
@@ -180,11 +189,14 @@ namespace wrench {
         void templateWaitingLog(const std::string& type, unsigned long long id);
         void templateWaitingLogUpdate(const std::string& type, unsigned long long id);
 
+        /** Statics **/
+        friend class S4U_Simulation;
         static std::vector<std::unique_ptr<S4U_CommPort>> all_commports;
         static std::deque<S4U_CommPort *> free_commports;
         static std::set<S4U_CommPort *> used_commports;
         static std::deque<S4U_CommPort *> commports_to_drain;
         static unsigned long long messageCounter;
+
 
         std::string name;
     };

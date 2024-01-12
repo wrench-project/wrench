@@ -108,6 +108,8 @@ namespace wrench {
         std::deque<std::shared_ptr<FileTransferThread>> pending_file_transfer_threads;
         std::set<std::shared_ptr<FileTransferThread>> running_file_transfer_threads;
 
+        std::map<std::shared_ptr<FileTransferThread>, S4U_CommPort *> ongoing_tmp_commports;
+
         std::shared_ptr<MemoryManager> memory_manager;
     };
 

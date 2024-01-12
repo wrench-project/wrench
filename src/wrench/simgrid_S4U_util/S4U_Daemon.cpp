@@ -30,6 +30,8 @@ std::unordered_map<std::string, unsigned long> num_actors;
 namespace wrench {
 
     std::unordered_map<aid_t, S4U_CommPort *> S4U_Daemon::map_actor_to_recv_commport;
+    std::unordered_map<aid_t, std::set<simgrid::s4u::MutexPtr>> S4U_Daemon::map_actor_to_held_mutexes;
+
     int S4U_Daemon::num_non_daemonized_actors_running = 0;
 
     /**
@@ -77,21 +79,33 @@ namespace wrench {
         unsigned long seq = S4U_CommPort::generateUniqueSequenceNumber();
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
 
-        this->commport = S4U_CommPort::getTemporaryCommPort();
-        this->recv_commport = S4U_CommPort::getTemporaryCommPort();
-
         this->has_returned_from_main = false;
 
         //        std::cerr << "IN DAEMON CONSTRUCTOR: " << this->process_name << "\n";
+        this->commport = S4U_CommPort::getTemporaryCommPort();
+        this->recv_commport = S4U_CommPort::getTemporaryCommPort();
     }
 
     S4U_Daemon::~S4U_Daemon() {
-        WRENCH_DEBUG("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
+//        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s, %p)'", this->getName().c_str(), this->s4u_actor.get());
 
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
 #endif
     }
+
+//    /**
+//     * @brief Release all mutexes that the running actor holds, if any
+//     */
+//    void S4U_Daemon::release_held_mutexes() {
+//        if (S4U_Daemon::map_actor_to_held_mutexes.find(simgrid::s4u::this_actor::get_pid()) != S4U_Daemon::map_actor_to_held_mutexes.end()) {
+//            for (auto const &mutex : S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()]) {
+//                mutex->unlock();
+//            }
+//            S4U_Daemon::map_actor_to_held_mutexes.erase(simgrid::s4u::this_actor::get_pid());
+//        }
+//        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].erase(this->daemon_lock);
+//    }
 
     /**
      * @brief Cleanup function called when the daemon terminates (for whatever reason). The
@@ -105,6 +119,11 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void S4U_Daemon::cleanup(bool has_returned_from_main, int return_value) {
+//        WRENCH_INFO("IN S4U_Daemon::cleanup() for %s", this->process_name.c_str());
+
+        // Releasing held mutexes, if any
+//        this->release_held_mutexes();
+
         // Default behavior is to throw in case of any problem
         if ((not has_returned_from_main) and (not S4U_Simulation::isHostOn(hostname))) {
             throw std::runtime_error(
@@ -181,6 +200,8 @@ namespace wrench {
             throw std::runtime_error("S4U_Daemon::startDaemon(): SimGrid actor creation failed... shouldn't happen.");
         }
 
+//        WRENCH_INFO("STARTED ACTOR %p (%s)", this->s4u_actor.get(), this->process_name.c_str());
+
         // nullptr is returned if the host is off (not the current behavior in SimGrid... just paranoid here)
         if (this->s4u_actor == nullptr) {
             throw ExecutionException(std::make_shared<HostError>(hostname));
@@ -205,10 +226,7 @@ namespace wrench {
             }
         }
 
-        // Set the commport receiver
-        // Causes Mailbox::put() to no longer implement a rendez-vous communication.
-        this->commport->s4u_mb->set_receiver(this->s4u_actor);
-        //        this->recv_commport->set_receiver(this->s4u_actor);
+
     }
 
     /**
@@ -257,7 +275,16 @@ namespace wrench {
  * @brief Method that run's the user-defined main method (that's called by the S4U actor class)
  */
     void S4U_Daemon::runMainMethod() {
+//        this->commport = S4U_CommPort::getTemporaryCommPort();
+//        this->recv_commport = S4U_CommPort::getTemporaryCommPort();
+        // Set the commport receiver
+        // Causes Mailbox::put() to no longer implement a rendez-vous communication.
+        this->commport->s4u_mb->set_receiver(this->s4u_actor);
+        //        this->recv_commport->set_receiver(this->s4u_actor);
+
         S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()] = this->recv_commport;
+//        S4U_Daemon::running_actors.insert(this->getSharedPtr<S4U_Daemon>());
+
         this->num_starts++;
         // Compute zero flop so that nothing happens
         // until the host has a >0 pstate
@@ -267,10 +294,13 @@ namespace wrench {
         this->has_returned_from_main = true;
         this->state = State::DOWN;
         S4U_Daemon::map_actor_to_recv_commport.erase(simgrid::s4u::this_actor::get_pid());
+
         this->commport->s4u_mb->set_receiver(nullptr);
         S4U_CommPort::retireTemporaryCommPort(this->commport);
         this->recv_commport->s4u_mb->set_receiver(nullptr);
         S4U_CommPort::retireTemporaryCommPort(this->recv_commport);
+//        S4U_Daemon::running_actors.erase(this->getSharedPtr<S4U_Daemon>());
+
     }
 
 
@@ -371,6 +401,7 @@ namespace wrench {
  */
     void S4U_Daemon::acquireDaemonLock() {
         this->daemon_lock->lock();
+//        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].insert(this->daemon_lock);
     }
 
     /**
@@ -378,6 +409,7 @@ namespace wrench {
  */
     void S4U_Daemon::releaseDaemonLock() {
         this->daemon_lock->unlock();
+//        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].erase(this->daemon_lock);
     }
 
     /**

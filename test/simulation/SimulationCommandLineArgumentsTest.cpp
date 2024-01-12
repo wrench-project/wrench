@@ -32,7 +32,7 @@ public:
 
     void do_CommPortPoolSizeArgument_test();
 
-    void do_FullLogArgument_test(std::string arg, int num_log_lines);
+    void do_FullLogArgument_test(const std::string& arg, int expected_num_log_lines);
 
     void do_ActivateEnergyArgument_test();
 
@@ -395,7 +395,7 @@ TEST_F(SimulationCommandLineArgumentsTest, FullLogArgument) {
     DO_TEST_WITH_FORK_TWO_ARGS(do_FullLogArgument_test, "--wrench-full-log", 3);
 }
 
-void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg, int num_log_lines) {
+void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(const std::string& arg, int expected_num_log_lines) {
     // Undo the SimGrid Logging config for Google Tests
     xbt_log_control_set("root.thresh:info");
 
@@ -434,7 +434,7 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     }
     fclose(stderr_file);
 
-    ASSERT_EQ(linecount, num_log_lines);
+    ASSERT_EQ(linecount, expected_num_log_lines);
 
     // Just in case
     xbt_log_control_set("root.thresh:critical");

@@ -663,7 +663,8 @@ namespace wrench {
         this->scheduler->shutdown();
 
         // Do the default behavior (which will throw as this is not a fault-tolerant service)
-        Service::cleanup(has_returned_from_main, return_value);
+        S4U_Daemon::cleanup(has_returned_from_main, return_value);
+
     }
 
     //    /**

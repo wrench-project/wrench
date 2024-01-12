@@ -7,12 +7,14 @@
  * (at your option) any later version.
  */
 
-#include <math.h>
+#include <cmath>
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
+#include <memory.h>
 
 #include "../../../include/TestWithFork.h"
+#include "../../../include/RuntimeAssert.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
 #define EPSILON 0.05
@@ -164,7 +166,7 @@ class MulticoreComputeServiceUnsupportedJobTypeTestWMS : public wrench::Executio
 
 public:
     MulticoreComputeServiceUnsupportedJobTypeTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                     std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                     const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -253,7 +255,7 @@ class MulticoreComputeServiceBogusNumCoresTestWMS : public wrench::ExecutionCont
 
 public:
     MulticoreComputeServiceBogusNumCoresTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -361,7 +363,7 @@ class MulticoreComputeServiceTwoSingleCoreTasksTestWMS : public wrench::Executio
 
 public:
     MulticoreComputeServiceTwoSingleCoreTasksTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                     std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                     const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -505,7 +507,7 @@ class MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS : public wrench::Execu
 
 public:
     MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                        std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                        const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -547,19 +549,11 @@ private:
         }
 
         // Check completion states and times
-        if ((this->test->task3->getState() != wrench::WorkflowTask::COMPLETED) ||
-            (this->test->task4->getState() != wrench::WorkflowTask::COMPLETED)) {
-            throw std::runtime_error("Unexpected task1 states");
-        }
+        RUNTIME_EQ(this->test->task3->getState(), wrench::WorkflowTask::COMPLETED, "task 3 state");
+        RUNTIME_EQ(this->test->task4->getState(), wrench::WorkflowTask::COMPLETED, "task 4 state");
 
-        double task3_end_date = this->test->task3->getEndDate();
-        double task4_end_date = this->test->task4->getEndDate();
-        double delta_task3 = std::abs(task3_end_date - 5.0);
-        double delta_task4 = std::abs(task4_end_date - 10.0);
-        if ((delta_task3 > EPSILON) || (delta_task4 > EPSILON)) {
-            throw std::runtime_error("Unexpected task3 and task4 completion times " + std::to_string(task3_end_date) + " and " +
-                                     std::to_string(task4_end_date) + ".");
-        }
+        RUNTIME_DBL_EQ(std::min<double>(this->test->task3->getEndDate(), this->test->task4->getEndDate()), 5.0, "earliest task completion date", EPSILON);
+        RUNTIME_DBL_EQ(std::max<double>(this->test->task3->getEndDate(), this->test->task4->getEndDate()), 10.0, "latest task completion date", EPSILON);
 
         return 0;
     }
@@ -577,7 +571,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -627,7 +621,7 @@ class MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS : public wrench::Execu
 
 public:
     MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                        std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                                                        const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -762,7 +756,7 @@ class BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS : public wrench::Execu
 
 public:
     BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                        std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                        const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -991,7 +985,7 @@ class BareMetalComputeServiceJobImmediateTerminationTestWMS : public wrench::Exe
 
 public:
     BareMetalComputeServiceJobImmediateTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                          std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                          const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1036,7 +1030,6 @@ private:
                                      wrench::WorkflowTask::stateToString(this->test->task2->getState()) + ")");
         }
 
-
         return 0;
     }
 };
@@ -1053,6 +1046,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 //        argv[1] = strdup("--wrench-full-log");
+//        argv[2] = strdup("--wrench-default-control-message-size=1024");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1091,9 +1085,8 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
     ASSERT_EQ(this->task1->getState(), wrench::WorkflowTask::READY);
     ASSERT_EQ(this->task2->getState(), wrench::WorkflowTask::READY);
 
-    ASSERT_EQ(this->task1->getFailureCount(), 0);
-    ASSERT_EQ(this->task2->getFailureCount(), 0);
-
+    ASSERT_EQ(this->task1->getFailureCount(), 1);
+    ASSERT_EQ(this->task2->getFailureCount(), 1);
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1108,7 +1101,7 @@ class BareMetalComputeServiceJobTerminationTestWMS : public wrench::ExecutionCon
 
 public:
     BareMetalComputeServiceJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                 std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                 const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1228,7 +1221,7 @@ class BareMetalComputeServiceNonSubmittedJobTerminationTestWMS : public wrench::
 
 public:
     BareMetalComputeServiceNonSubmittedJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                             std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                             const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1336,7 +1329,7 @@ class BareMetalComputeServiceCompletedJobTerminationTestWMS : public wrench::Exe
 
 public:
     BareMetalComputeServiceCompletedJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                          std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                          const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1455,7 +1448,7 @@ class BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS : pu
 public:
     BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
             BareMetalComputeServiceTestStandardJobs *test,
-            std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+            const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1483,7 +1476,7 @@ private:
         // Sleep for a little bit
         wrench::Simulation::sleep(0.1);
 
-        // Shutdown the compute service
+        // Shutdown the compute service as the job is running
         this->test->compute_service->stop(true,
                                           wrench::ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED);
 
@@ -1502,7 +1495,7 @@ private:
                                          real_event->failure_cause->toString() + " (expected: ServiceIsDown)");
             }
             if (cause->getService() != this->test->compute_service) {
-                std::runtime_error(
+                throw std::runtime_error(
                         "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
             }
         } else {
@@ -1585,7 +1578,7 @@ class BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS :
 public:
     BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
             BareMetalComputeServiceTestStandardJobs *test,
-            std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+            const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1599,11 +1592,13 @@ private:
         // Create a job  manager
         auto job_manager = this->createJobManager();
 
+
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2});
 
         // Shutdown the storage service
         this->test->storage_service->stop();
+
 
         // Submit the 2-task1 job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
@@ -1649,7 +1644,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //        argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

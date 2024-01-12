@@ -38,6 +38,10 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void SimpleStorageServiceBufferized::cleanup(bool has_returned_from_main, int return_value) {
+//        this->release_held_mutexes();
+        for (auto const &it : this->ongoing_tmp_commports) {
+            S4U_CommPort::retireTemporaryCommPort(it.second);
+        }
         this->pending_file_transfer_threads.clear();
         this->running_file_transfer_threads.clear();
         // Do nothing. It's fine to die, and we'll just autorestart with our previous state
@@ -98,6 +102,10 @@ namespace wrench {
             //            memory_manager_ptr->log();
         }
 #endif
+
+        // In case this was a restart!
+        this->commport->reset();
+        this->recv_commport->reset();
 
         /** Main loop **/
         while (this->processNextMessage()) {
@@ -221,6 +229,7 @@ namespace wrench {
 
             // Generate a commport name on which to receive the file
             auto file_reception_commport = S4U_CommPort::getTemporaryCommPort();
+//            WRENCH_INFO("1. GOTTEN COMMPORT %s", file_reception_commport->get_cname());
 
             // Reply with a "go ahead, send me the file" message
             answer_commport->dputMessage(
@@ -249,6 +258,8 @@ namespace wrench {
 
             // Add it to the Pool of pending data communications
             this->pending_file_transfer_threads.push_back(ftt);
+            // Keep track of the commport as well
+            this->ongoing_tmp_commports[ftt] = file_reception_commport;
 
         } else {
             // Reply with a "failure" message
@@ -300,18 +311,23 @@ namespace wrench {
         S4U_CommPort *commport_to_receive_the_file_content = nullptr;
         if (success) {
             commport_to_receive_the_file_content = S4U_CommPort::getTemporaryCommPort();
+//            WRENCH_INFO("2. GOTTEN COMMPORT %s", commport_to_receive_the_file_content->get_cname());
         }
 
-        // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
-        answer_commport->dputMessage(
-                new StorageServiceFileReadAnswerMessage(
-                        location,
-                        success,
-                        failure_cause,
-                        commport_to_receive_the_file_content,
-                        buffer_size,
-                        1,
-                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
+        // Send back the corresponding ack
+        try {
+            answer_commport->putMessage(
+                    new StorageServiceFileReadAnswerMessage(
+                            location,
+                            success,
+                            failure_cause,
+                            commport_to_receive_the_file_content,
+                            buffer_size,
+                            1,
+                            this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (ExecutionException &e) {
+            return true; // oh well
+        }
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
@@ -331,6 +347,8 @@ namespace wrench {
 
             // Add it to the Pool of pending data communications
             this->pending_file_transfer_threads.push_front(ftt);
+            // Keep track of the commport as well
+            this->ongoing_tmp_commports[ftt] = commport_to_receive_the_file_content;
 
             // Update the file read date in the file system
             this->file_systems[mount_point]->updateReadDate(file, path_at_mount_point);
@@ -435,6 +453,7 @@ namespace wrench {
      * @brief Start pending file transfer threads if any and if possible
      */
     void SimpleStorageServiceBufferized::startPendingFileTransferThread() {
+        WRENCH_INFO("IN startPendingFileTransferThread()");
         while ((not this->pending_file_transfer_threads.empty()) and
                (this->running_file_transfer_threads.size() < this->num_concurrent_connections)) {
             // Start a communications!
@@ -476,6 +495,16 @@ namespace wrench {
         } else {
             this->running_file_transfer_threads.erase(ftt);
         }
+
+        // Retire the temporary comport associated to the ftt
+        if (this->ongoing_tmp_commports.find(ftt) != this->ongoing_tmp_commports.end()) {
+            S4U_CommPort::retireTemporaryCommPort(this->ongoing_tmp_commports[ftt]);
+            this->ongoing_tmp_commports.erase(ftt);
+        }
+
+        // Retire the commports of the ftt! ( already done elsewhere)
+        // S4U_CommPort::retireTemporaryCommPort(ftt->commport);
+        // S4U_CommPort::retireTemporaryCommPort(ftt->recv_commport);
 
         if (src_location) {
             src_location->getStorageService()->decrementNumRunningOperationsForLocation(src_location);

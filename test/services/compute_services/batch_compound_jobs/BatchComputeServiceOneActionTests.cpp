@@ -1319,7 +1319,7 @@ private:
 
         auto real_failure = std::dynamic_pointer_cast<wrench::FileNotFound>(action->getFailureCause());
         if (not real_failure) {
-            throw std::runtime_error("Unexpected action failure cause");
+            throw std::runtime_error("Unexpected action failure cause: " + action->getFailureCause()->toString());
         }
         if (real_failure->getFile() != this->test->input_file) {
             throw std::runtime_error("Unexpected file in the action failure cause");

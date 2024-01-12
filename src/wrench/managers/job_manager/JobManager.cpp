@@ -539,14 +539,14 @@ namespace wrench {
         }
 
         job->state = CompoundJob::State::SUBMITTED;
-        this->acquireDaemonLock();
-        this->jobs_to_dispatch.push_back(job);
-        this->releaseDaemonLock();
-
         job->already_submitted_to_job_manager = true;
         job->submit_date = Simulation::getCurrentSimulatedDate();
         job->setServiceSpecificArguments(service_specific_args);
         job->setParentComputeService(compute_service);
+
+        this->acquireDaemonLock();
+        this->jobs_to_dispatch.push_back(job);
+        this->releaseDaemonLock();
 
         // Send a message to wake up the daemon
         try {
@@ -650,9 +650,6 @@ namespace wrench {
 
         this->cjob_to_pjob_map[job->compound_job] = job;
 
-        this->acquireDaemonLock();
-        this->jobs_to_dispatch.push_back(job->compound_job);
-        this->releaseDaemonLock();
 
 
         try {
@@ -672,6 +669,10 @@ namespace wrench {
         job->compound_job->setServiceSpecificArguments(service_specific_args);
         job->compound_job->setParentComputeService(compute_service);
         job->setParentComputeService(compute_service);
+
+        this->acquireDaemonLock();
+        this->jobs_to_dispatch.push_back(job->compound_job);
+        this->releaseDaemonLock();
 
         // Send a message to wake up the daemon
         try {
@@ -1139,6 +1140,7 @@ namespace wrench {
             }
         }
         this->releaseDaemonLock();
+
     }
 
 

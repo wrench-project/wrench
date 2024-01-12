@@ -46,7 +46,7 @@ namespace wrench {
 
 
         // Create the commport pool
-        S4U_CommPort::createCommPortPool(S4U_CommPort::commport_pool_size);
+        S4U_CommPort::createCommPortPool();
         S4U_CommPort::NULL_COMMPORT = new S4U_CommPort();
         this->initialized = true;
 
@@ -100,6 +100,7 @@ namespace wrench {
 
         if (this->initialized) {
             this->engine->run();
+            S4U_CommPort::all_commports.clear();
             if (SMPI_is_inited()) {
                 SMPI_finalize();
             }

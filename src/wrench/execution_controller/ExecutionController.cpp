@@ -136,7 +136,8 @@ namespace wrench {
      * @return the event
      */
     std::shared_ptr<ExecutionEvent> ExecutionController::waitForNextEvent(double timeout) {
-        return ExecutionEvent::waitForNextExecutionEvent(this->commport, timeout);
+        auto event = ExecutionEvent::waitForNextExecutionEvent(this->commport, timeout);
+        return event;
     }
 
     /**
@@ -144,7 +145,7 @@ namespace wrench {
      * @return the event
      */
     std::shared_ptr<ExecutionEvent> ExecutionController::waitForNextEvent() {
-        return ExecutionEvent::waitForNextExecutionEvent(this->commport, -1.0);
+        return this->waitForNextEvent(-1.0);
     }
 
     /**

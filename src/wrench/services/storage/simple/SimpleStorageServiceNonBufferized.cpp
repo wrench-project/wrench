@@ -36,6 +36,7 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void SimpleStorageServiceNonBufferized::cleanup(bool has_returned_from_main, int return_value) {
+//        this->release_held_mutexes();
     }
 
     /**
@@ -133,6 +134,8 @@ namespace wrench {
         this->stream_to_transactions.clear();
         this->pending_transactions.clear();
         this->running_transactions.clear();
+        this->commport->reset();
+        this->recv_commport->reset();
 
         for (auto const &fs: this->file_systems) {
             message = "  - mount point " + fs.first + ": " +
@@ -169,8 +172,8 @@ namespace wrench {
 
 
         /** Main loop **/
-        bool comm_ptr_has_been_posted = false;
-        std::shared_ptr<S4U_PendingCommunication> comm_ptr;
+        bool commport_comm_has_been_posted = false;
+        std::shared_ptr<S4U_PendingCommunication> commport_pending_comm;
         std::unique_ptr<SimulationMessage> simulation_message;
         while (true) {
 
@@ -179,27 +182,28 @@ namespace wrench {
             this->startPendingTransactions();
 
             // Create an async recv if needed
-            if (not comm_ptr_has_been_posted) {
+            if (not commport_comm_has_been_posted) {
                 try {
-                    comm_ptr = this->commport->igetMessage();
-//                    comm_ptr = this->commport->get_async<void>((void **) (&(simulation_message)));
+                    commport_pending_comm = this->commport->igetMessage();
+//                    commport_pending_comm = this->commport->get_async<void>((void **) (&(simulation_message)));
                 } catch (wrench::ExecutionException &e) {
                     // oh well
                     continue;
                 }
-                comm_ptr_has_been_posted = true;
+                commport_comm_has_been_posted = true;
             }
 
             // Create all activities to wait on
 #if 0
             std::vector<simgrid::s4u::ActivityPtr> pending_activities;
-            pending_activities.emplace_back(comm_ptr);
+            pending_activities.emplace_back(commport_pending_comm);
             for (auto const &transaction: this->running_transactions) {
                 pending_activities.emplace_back(transaction->stream);
             }
 #else
             simgrid::s4u::ActivitySet pending_activities;
-            pending_activities.push(comm_ptr->comm_ptr);
+            pending_activities.push(commport_pending_comm->comm_ptr);
+            pending_activities.push(commport_pending_comm->mess_ptr);
             for (auto const &transaction: this->running_transactions) {
                 pending_activities.push(transaction->stream);
             }
@@ -212,7 +216,7 @@ namespace wrench {
                 finished_activity_index = (int) simgrid::s4u::Activity::wait_any(pending_activities);
             } catch (simgrid::NetworkFailureException &e) {
                 // the comm failed
-                comm_ptr_has_been_posted = false;
+                commport_comm_has_been_posted = false;
                 continue;// oh well
             } catch (simgrid::Exception &e) {
                 // This likely doesn't happen, but let's keep it here for now
@@ -229,15 +233,28 @@ namespace wrench {
                 continue;
             }
 #else
-            // Wait one activity to complete
+            // Wait for one activity to complete
             simgrid::s4u::ActivityPtr finished_activity;
             try {
                 finished_activity = pending_activities.wait_any();
             } catch (simgrid::Exception &e) {
                 auto failed_activity = pending_activities.get_failed_activity();
-                if (failed_activity == comm_ptr->comm_ptr) {
+                if (failed_activity == commport_pending_comm->comm_ptr) {
                     // the comm failed
-                    comm_ptr_has_been_posted = false;
+                    commport_comm_has_been_posted = false;
+                    commport_pending_comm->mess_ptr->cancel();
+                    commport_pending_comm->mess_ptr = nullptr;
+                    commport_pending_comm->comm_ptr->cancel();
+                    commport_pending_comm->comm_ptr = nullptr;
+                    continue;// oh well
+                }
+                if (failed_activity == commport_pending_comm->mess_ptr) {
+                    // the mess failed
+                    commport_comm_has_been_posted = false;
+                    commport_pending_comm->mess_ptr->cancel();
+                    commport_pending_comm->mess_ptr = nullptr;
+                    commport_pending_comm->comm_ptr->cancel();
+                    commport_pending_comm->comm_ptr = nullptr;
                     continue;// oh well
                 }
 
@@ -249,10 +266,19 @@ namespace wrench {
             }
 #endif
 
-            if (finished_activity == comm_ptr->comm_ptr) {
-                simulation_message = comm_ptr->wait();
-                comm_ptr_has_been_posted = false;
-                if (not processNextMessage(simulation_message.get())) break;
+            if (finished_activity == commport_pending_comm->comm_ptr) {
+//                XXX IS THIS A GOOD IDEA???? SHOULD WE JuSt REPLICATE CODE FROM COMPORT
+                commport_pending_comm->mess_ptr->cancel();
+                auto msg = commport_pending_comm->simulation_message.get();
+//                commport_pending_comm->mess_ptr->cancel();
+                commport_comm_has_been_posted = false;
+                if (not processNextMessage(msg)) break;
+            } else if (finished_activity == commport_pending_comm->mess_ptr) {
+//                simulation_message = commport_pending_comm->wait();
+                auto msg = commport_pending_comm->simulation_message.get();
+                commport_pending_comm->comm_ptr->cancel();
+                commport_comm_has_been_posted = false;
+                if (not processNextMessage(msg)) break;
             } else {
                 auto stream = boost::dynamic_pointer_cast<simgrid::s4u::Io>(finished_activity);
                 auto transaction = this->stream_to_transactions[stream];
@@ -452,16 +478,20 @@ namespace wrench {
 
         // If a success, create the chunk_receiving commport
 
-        // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
-        answer_commport->dputMessage(
-                new StorageServiceFileReadAnswerMessage(
-                        location,
-                        success,
-                        failure_cause,
-                        nullptr,// non-bufferized = no chunk-receiving commport
-                        buffer_size,
-                        1,
-                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
+        // Send back the corresponding ack
+        try {
+            answer_commport->putMessage(
+                    new StorageServiceFileReadAnswerMessage(
+                            location,
+                            success,
+                            failure_cause,
+                            nullptr,// non-bufferized = no chunk-receiving commport
+                            buffer_size,
+                            1,
+                            this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (ExecutionException &e) {
+            return true; // oh well
+        }
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {

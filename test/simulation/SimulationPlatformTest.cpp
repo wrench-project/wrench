@@ -305,26 +305,20 @@ private:
         // Add routes
         {
             simgrid::s4u::LinkInRoute network_link_in_route{network_link};
-            zone->add_route(compute_host->get_netpoint(),
-                            wms_host->get_netpoint(),
-                            nullptr,
-                            nullptr,
+            zone->add_route(compute_host,
+                            wms_host,
                             {network_link_in_route});
         }
         {
             simgrid::s4u::LinkInRoute network_link_in_route{loopback_WMSHost};
-            zone->add_route(wms_host->get_netpoint(),
-                            wms_host->get_netpoint(),
-                            nullptr,
-                            nullptr,
+            zone->add_route(wms_host,
+                            wms_host,
                             {network_link_in_route});
         }
         {
             simgrid::s4u::LinkInRoute network_link_in_route{loopback_ComputeHost};
-            zone->add_route(compute_host->get_netpoint(),
-                            compute_host->get_netpoint(),
-                            nullptr,
-                            nullptr,
+            zone->add_route(compute_host,
+                            compute_host,
                             {network_link_in_route});
         }
 

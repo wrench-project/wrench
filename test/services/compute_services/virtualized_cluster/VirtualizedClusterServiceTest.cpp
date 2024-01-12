@@ -815,7 +815,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -903,7 +903,6 @@ private:
             throw std::runtime_error(e.what());
         }
 
-        wrench::Simulation::sleep(1);
         // shutdown all VMs
         try {
             for (auto &vm: vm_list) {
@@ -1053,7 +1052,8 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
+//        argv[2] = strdup("--wrench-default-control-message-size=0");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

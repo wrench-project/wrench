@@ -162,6 +162,11 @@ private:
             throw std::runtime_error("Invalid failure cause type: " + real_event->failure_cause->toString() + " (expected: HostError)");
         }
 
+        // Without this sleep, due to instantaneous zero-byte messages,
+        // the cloud compute service may not yet "see" the VM as down
+        // even though we got the event that the job has failed
+        wrench::Simulation::sleep(1);
+
         // Check that the VM is down
         if (not cloud_service->isVMDown(vm_name)) {
             throw std::runtime_error("The VM should be down!");
@@ -187,11 +192,11 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 3;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    //        argv[2] = strdup("--wrench-full-log");
+            argv[2] = strdup("--wrench-full-log");
 
 
     simulation->init(&argc, argv);
@@ -293,6 +298,10 @@ private:
             throw std::runtime_error("Invalid failure cause: " + real_event->failure_cause->toString() + " (expected: HostError)");
         }
 
+        // Without this sleep, due to instantaneous zero-byte messages,
+        // the cloud compute service may not yet "see" the VM as down
+        // even though we got the event that the job has failed
+        wrench::Simulation::sleep(1);
 
         // Check that the VM is down
         if (not cloud_service->isVMDown(vm_name)) {

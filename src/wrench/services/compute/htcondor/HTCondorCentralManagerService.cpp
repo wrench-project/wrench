@@ -524,9 +524,9 @@ namespace wrench {
             } else {
                 error_message = "Non-grid universe jobs not supported";
             }
-            return std::make_shared<NotAllowed>(this->shared_from_this(), error_message);
+            return std::make_shared<NotAllowed>(this->getSharedPtr<Service>(), error_message);
         } else if (not found_one) {
-            return std::make_shared<NotEnoughResources>(job, this->shared_from_this());
+            return std::make_shared<NotEnoughResources>(job, this->getSharedPtr<Service>());
         } else {
             return nullptr;
         }

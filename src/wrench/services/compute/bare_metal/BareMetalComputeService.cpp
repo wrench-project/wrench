@@ -46,7 +46,7 @@ namespace wrench {
      */
     void BareMetalComputeService::cleanup(bool has_returned_from_main, int return_value) {
         // Do the default behavior (which will throw as this is not a fault-tolerant service)
-        Service::cleanup(has_returned_from_main, return_value);
+        S4U_Daemon::cleanup(has_returned_from_main, return_value);
 
         this->action_execution_service = nullptr;// to avoid leak due to circular refs
         this->current_jobs.clear();
@@ -198,14 +198,12 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        std::cerr << "PUTTING MESSAGE TO THE CS\n";
         //  send a "run a standard job" message to the daemon's commport
         this->commport->putMessage(
                                 new ComputeServiceSubmitCompoundJobRequestMessage(
                                         answer_commport, job, service_specific_args,
                                         this->getMessagePayloadValue(
                                                 ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        std::cerr << "PUT THE MESSAGE TO THE CS\n";
 
         // Get the answer
         auto msg = answer_commport->getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(this->network_timeout,
@@ -522,6 +520,21 @@ namespace wrench {
             std::map<std::string, std::string> &service_specific_arguments) {
         WRENCH_INFO("Asked to run compound job %s, which has %zu actions", job->getName().c_str(), job->getActions().size());
 
+        // Action execution service may have terminated
+        try {
+            this->action_execution_service->assertServiceIsUp();
+        } catch (ExecutionException &e) {
+            // And send a reply!
+            answer_commport->dputMessage(
+                    new ComputeServiceSubmitCompoundJobAnswerMessage(
+                            job, this->getSharedPtr<BareMetalComputeService>(), false,
+                            std::shared_ptr<FailureCause>(
+                                    new ServiceIsDown(this->getSharedPtr<BareMetalComputeService>())),
+                            this->getMessagePayloadValue(
+                                    ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
+            return;
+        }
+
         // Can we run this job at all in terms of available resources?
         bool can_run = true;
         for (auto const &action: job->getActions()) {
@@ -587,7 +600,7 @@ namespace wrench {
                 auto job = *(this->current_jobs.begin());
                 try {
                     this->current_jobs.erase(job);
-                    job->popCallbackCommPort()->putMessage(
+                    job->popCallbackCommPort()->dputMessage(
                             new ComputeServiceCompoundJobFailedMessage(
                                     job, this->getSharedPtr<BareMetalComputeService>(),
                                     this->getMessagePayloadValue(
@@ -767,6 +780,11 @@ namespace wrench {
                   });
 
         for (auto const &action: this->ready_actions) {
+            if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
+                // The action has been dispatched (but its state it not set to RUNNING yet,
+                // since there can be zero-size, instant communication!
+                break;
+            }
             this->action_execution_service->submitAction(action);
             this->num_dispatched_actions_for_cjob[action->getJob()]++;
             this->dispatched_actions.insert(action);
@@ -788,6 +806,8 @@ namespace wrench {
                         action->getName().c_str());
             return;
         }
+
+        WRENCH_INFO("Processing ActionDone: %s", action->getName().c_str());
 
         this->dispatched_actions.erase(action);
         this->num_dispatched_actions_for_cjob[action->getJob()]--;
@@ -816,7 +836,7 @@ namespace wrench {
             } else if (job->hasFailed() and ((this->num_dispatched_actions_for_cjob[job] == 0))) {
                 this->current_jobs.erase(job);
                 this->num_dispatched_actions_for_cjob.erase(job);
-                job->popCallbackCommPort()->putMessage(
+                job->popCallbackCommPort()->dputMessage(
                         new ComputeServiceCompoundJobFailedMessage(
                                 job, this->getSharedPtr<BareMetalComputeService>(),
                                 this->getMessagePayloadValue(
