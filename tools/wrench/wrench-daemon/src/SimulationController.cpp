@@ -47,9 +47,7 @@ namespace wrench {
      * 
      * @param hostname string containing the name of the host on which this service runs
      */
-    SimulationController::SimulationController(
-            std::shared_ptr<Workflow> workflow,
-            const std::string &hostname, int sleep_us) : ExecutionController(hostname, "SimulationController"), workflow(workflow), sleep_us(sleep_us) {}
+    SimulationController::SimulationController(const std::string &hostname, int sleep_us) : ExecutionController(hostname, "SimulationController"),  sleep_us(sleep_us) {}
 
 
     template<class T>
