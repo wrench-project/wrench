@@ -579,8 +579,13 @@ namespace wrench {
         }
 
         std::shared_ptr<DataFile> file;
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this-> workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
         try {
-            file = this->workflow->getFileByID(filename);
+            file = workflow->getFileByID(filename);
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Unknown file " + filename);
         }
@@ -606,8 +611,14 @@ namespace wrench {
         }
 
         std::shared_ptr<DataFile> file;
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
         try {
-            file = this->workflow->getFileByID(filename);
+            file = workflow->getFileByID(filename);
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Unknown file " + filename);
         }
@@ -659,14 +670,19 @@ namespace wrench {
      */
     json SimulationController::createStandardJob(json data) {
         std::vector<std::shared_ptr<WorkflowTask>> tasks;
+        std::string workflow_name = data["workflow"];
+        std::shared_ptr<Workflow> workflow;
 
+        if(not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
         for (auto const &name: data["tasks"]) {
-            tasks.push_back(this->workflow->getTaskByID(name));
+            tasks.push_back(workflow->getTaskByID(name));
         }
 
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
         for (auto it = data["file_locations"].begin(); it != data["file_locations"].end(); ++it) {
-            auto file = this->workflow->getFileByID(it.key());
+            auto file = workflow->getFileByID(it.key());
             std::shared_ptr<StorageService> storage_service;
             this->storage_service_registry.lookup(it.value(), storage_service);
             file_locations[file] = FileLocation::LOCATION(storage_service, file);
@@ -754,8 +770,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskFlops(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         json answer;
-        answer["flops"] = this->workflow->getTaskByID(data["name"])->getFlops();
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow  " + workflow_name);
+        }
+        answer["flops"] = workflow->getTaskByID(data["name"])->getFlops();
         return answer;
     }
 
@@ -765,8 +786,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskMinNumCores(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         json answer;
-        answer["min_num_cores"] = this->workflow->getTaskByID(data["name"])->getMinNumCores();
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow  " + workflow_name);
+        }
+        answer["min_num_cores"] = workflow->getTaskByID(data["name"])->getMinNumCores();
         return answer;
     }
 
@@ -776,8 +802,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskMaxNumCores(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         json answer;
-        answer["max_num_cores"] = this->workflow->getTaskByID(data["name"])->getMaxNumCores();
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        answer["max_num_cores"] = workflow->getTaskByID(data["name"])->getMaxNumCores();
         return answer;
     }
 
@@ -787,8 +818,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskMemory(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         json answer;
-        answer["memory"] = this->workflow->getTaskByID(data["name"])->getMemoryRequirement();
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        answer["memory"] = workflow->getTaskByID(data["name"])->getMemoryRequirement();
         return answer;
     }
 
@@ -799,8 +835,13 @@ namespace wrench {
 
      */
     json SimulationController::getTaskStartDate(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         json answer;
-        answer["time"] = this->workflow->getTaskByID(data["name"])->getStartDate();
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+                throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        answer["time"] = workflow->getTaskByID(data["name"])->getStartDate();
         return answer;
     }
 
@@ -810,8 +851,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskEndDate(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         json answer;
-        answer["time"] = this->workflow->getTaskByID(data["name"])->getEndDate();
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        answer["time"] = workflow->getTaskByID(data["name"])->getEndDate();
         return answer;
     }
 
@@ -836,7 +882,12 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getFileSize(json data) {
-        auto file = this->workflow->getFileByID(data["file_id"]);
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto file = workflow->getFileByID(data["file_id"]);
         json answer;
         answer["size"] = file->getSize();
         return answer;
@@ -848,8 +899,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addInputFile(json data) {
-        auto task = this->workflow->getTaskByID(data["tid"]);
-        auto file = this->workflow->getFileByID(data["file"]);
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto task = workflow->getTaskByID(data["tid"]);
+        auto file = workflow->getFileByID(data["file"]);
         task->addInputFile(file);
         return {};
     }
@@ -860,8 +916,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addOutputFile(json data) {
-        auto task = this->workflow->getTaskByID(data["tid"]);
-        auto file = this->workflow->getFileByID(data["file"]);
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto task = workflow->getTaskByID(data["tid"]);
+        auto file = workflow->getFileByID(data["file"]);
         task->addOutputFile(file);
         return {};
     }
@@ -872,8 +933,12 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskInputFiles(json data) {
-
-        auto task = this->workflow->getTaskByID(data["tid"]);
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto task = workflow->getTaskByID(data["tid"]);
         auto files = task->getInputFiles();
         json answer;
         std::vector<std::string> file_names;
@@ -890,8 +955,12 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskOutputFiles(json data) {
-
-        auto task = this->workflow->getTaskByID(data["tid"]);
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto task = workflow->getTaskByID(data["tid"]);
         auto files = task->getOutputFiles();
         json answer;
         std::vector<std::string> file_names;
@@ -908,7 +977,12 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getInputFiles(json data) {
-        auto files = this->workflow->getInputFiles();
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto files = workflow->getInputFiles();
         json answer;
         std::vector<std::string> file_names;
         for (const auto &f: files) {
@@ -926,11 +1000,16 @@ namespace wrench {
     json SimulationController::stageInputFiles(json data) {
         std::shared_ptr<StorageService> storage_service;
         std::string service_name = data["storage"];
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         if (not this->storage_service_registry.lookup(service_name, storage_service)) {
             throw std::runtime_error("Unknown storage service " + service_name);
         }
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
 
-        for (auto const &f: this->workflow->getInputFiles()) {
+        for (auto const &f: workflow->getInputFiles()) {
             this->simulation->stageFile(f, storage_service);
         }
         return {};
