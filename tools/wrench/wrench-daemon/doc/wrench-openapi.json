@@ -181,7 +181,13 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Task"
+                "$ref": "#/components/schemas/Task",
+                "properties": {
+                  "workflow_name": {
+                    "type": "string",
+                    "description": "the name of the workflow"
+                  }
+                }
               }
             }
           },
@@ -518,6 +524,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "workflow_name": {
+                    "type": "string",
+                    "description": "the name of the workflow"
+                  },
                   "file": {
                     "type": "string",
                     "description": "The file's ID"
@@ -616,6 +626,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "workflow_name": {
+                    "type": "string",
+                    "description": "the name of the workflow"
+                  },
                   "name": {
                     "type": "string",
                     "description": "name of the file"
@@ -1074,7 +1088,13 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StandardJob"
+                "$ref": "#/components/schemas/StandardJob",
+                "properties": {
+                  "workflow_name": {
+                    "type": "string",
+                    "description": "the name of the workflow"
+                  }
+                }
               }
             }
           },
@@ -1679,6 +1699,10 @@
                   "filename": {
                     "type": "string",
                     "description": "The file name"
+                  },
+                  "workflow_name": {
+                  "type": "string",
+                  "description": "the name of the workflow"
                   }
                 }
               }
@@ -1744,6 +1768,10 @@
                   "filename": {
                     "type": "string",
                     "description": "The file name"
+                  },
+                  "workflow_name": {
+                    "type": "string",
+                    "description": "the name of the workflow"
                   }
                 }
               }
