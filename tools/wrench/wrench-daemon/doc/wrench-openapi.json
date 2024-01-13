@@ -765,7 +765,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetFlops": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetFlops": {
       "get": {
         "tags": [
           "WRENCH"
@@ -778,6 +778,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -1701,8 +1710,8 @@
                     "description": "The file name"
                   },
                   "workflow_name": {
-                  "type": "string",
-                  "description": "the name of the workflow"
+                    "type": "string",
+                    "description": "the name of the workflow"
                   }
                 }
               }
