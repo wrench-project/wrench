@@ -33,7 +33,8 @@ namespace wrench {
         const std::shared_ptr<DataFile> &file,
         const std::map<std::string, std::vector<std::shared_ptr<StorageService>>> &resources,
         const std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &mapping,
-        const std::vector<std::shared_ptr<FileLocation>> &previous_allocations)>;
+        const std::vector<std::shared_ptr<FileLocation>> &previous_allocations,
+        unsigned int stripe_count)>;
 
     /**
      * @brief Enum for IO actions in traces
@@ -194,6 +195,8 @@ namespace wrench {
 
         std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location);
 
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location, unsigned int stripe_count);
+
         bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
         void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
@@ -228,7 +231,7 @@ namespace wrench {
 
         // Publicly accessible traces... (TODO: cleanup access to traces)
         /** @brief File read traces */
-        std::map<std::string, AllocationTrace> read_traces = {};
+        // std::map<std::string, AllocationTrace> read_traces = {};
         /** @brief File write traces */
         std::map<std::string, AllocationTrace> write_traces = {};
         /** @brief File copy traces */
@@ -286,7 +289,9 @@ namespace wrench {
 
         int main() override;
 
-        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location, simgrid::s4u::Mailbox *answer_mailbox);
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location,
+                                                                                   unsigned int stripe_count,
+                                                                                   simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processStorageSelectionMessage(const CompoundStorageAllocationRequestMessage *msg);
 
