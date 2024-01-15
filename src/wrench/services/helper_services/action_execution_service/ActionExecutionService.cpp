@@ -591,10 +591,8 @@ namespace wrench {
 
         } else if (auto msg = std::dynamic_pointer_cast<ActionExecutorDoneMessage>(message)) {
             if (msg->action_executor->getAction()->getState() == Action::State::COMPLETED) {
-                WRENCH_INFO("IT'S A SUCCESS: %s", msg->action_executor->getAction()->getName().c_str());
                 processActionExecutorCompletion(msg->action_executor);
             } else {
-                WRENCH_INFO("IT'S A FAILURE: %s", msg->action_executor->getAction()->getName().c_str());
                 processActionExecutorFailure(msg->action_executor);
             }
             return true;
