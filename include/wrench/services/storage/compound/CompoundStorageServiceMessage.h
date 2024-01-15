@@ -35,12 +35,16 @@ namespace wrench {
      */
     class CompoundStorageAllocationRequestMessage : public CompoundStorageServiceMessage {
     public:
-        CompoundStorageAllocationRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file, double payload);
+        CompoundStorageAllocationRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                                                std::shared_ptr<DataFile> file,
+                                                unsigned int stripe_count, double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The path */
         std::shared_ptr<DataFile> file;
+
+        unsigned int stripe_count;
     };
 
     /**
@@ -81,6 +85,6 @@ namespace wrench {
     /***********************/
     /** \endcond INTERNAL     */
     /***********************/
-}// namespace wrench
+} // namespace wrench
 
-#endif// WRENCH_COMPOUNDSTORAGESERVICEMESSAGE_H
+#endif // WRENCH_COMPOUNDSTORAGESERVICEMESSAGE_H

@@ -28,16 +28,19 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CompoundStorageAllocationRequestMessage::CompoundStorageAllocationRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                                                                     std::shared_ptr<DataFile> file, double payload)
+                                                                                     std::shared_ptr<DataFile> file,
+                                                                                     unsigned int stripe_count,
+                                                                                     double payload)
         : CompoundStorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
-                    "CompoundStorageStorageSelectionRequestMessage::CompoundStorageStorageSelectionRequestMessage(): Invalid arguments");
+                "CompoundStorageStorageSelectionRequestMessage::CompoundStorageStorageSelectionRequestMessage(): Invalid arguments");
         }
 #endif
         this->answer_mailbox = answer_mailbox;
         this->file = file;
+        this->stripe_count = stripe_count;
     }
 
     /**
@@ -48,7 +51,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CompoundStorageAllocationAnswerMessage::CompoundStorageAllocationAnswerMessage(
-            std::vector<std::shared_ptr<FileLocation>> locations, double payload)
+        std::vector<std::shared_ptr<FileLocation>> locations, double payload)
         : CompoundStorageServiceMessage(payload) {
         this->locations = locations;
     }
@@ -67,7 +70,7 @@ namespace wrench {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
-                    "CompoundStorageStorageSelectionRequestMessage::CompoundStorageStorageSelectionRequestMessage(): Invalid arguments");
+                "CompoundStorageStorageSelectionRequestMessage::CompoundStorageStorageSelectionRequestMessage(): Invalid arguments");
         }
 #endif
         this->answer_mailbox = answer_mailbox;
@@ -82,9 +85,9 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CompoundStorageLookupAnswerMessage::CompoundStorageLookupAnswerMessage(
-            std::vector<std::shared_ptr<FileLocation>> locations, double payload)
+        std::vector<std::shared_ptr<FileLocation>> locations, double payload)
         : CompoundStorageServiceMessage(payload) {
         this->locations = locations;
     }
 
-}// namespace wrench
+} // namespace wrench
