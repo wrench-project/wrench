@@ -158,7 +158,7 @@
         }
       }
     },
-    "/simulation/{simid}/createTask": {
+    "/simulation/{simid}/{workflow_name}/createTask": {
       "put": {
         "tags": [
           "WRENCH"
@@ -174,6 +174,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
@@ -181,13 +190,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Task",
-                "properties": {
-                  "workflow_name": {
-                    "type": "string",
-                    "description": "the name of the workflow"
-                  }
-                }
+                "$ref": "#/components/schemas/Task"
               }
             }
           },
@@ -319,7 +322,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{tid}/inputFiles": {
+    "/simulation/{simid}/{workflow_name}/tasks/{tid}/inputFiles": {
       "get": {
         "tags": [
           "WRENCH"
@@ -332,6 +335,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -369,7 +381,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{tid}/addInputFile": {
+    "/simulation/{simid}/{workflow_name}/tasks/{tid}/addInputFile": {
       "put": {
         "tags": [
           "WRENCH"
@@ -382,6 +394,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -404,10 +425,6 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "workflow_name": {
-                    "type": "string",
-                    "description": "The workflow name"
-                  },
                   "file": {
                     "type": "string",
                     "description": "The file's ID"
@@ -439,7 +456,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{tid}/outputFiles": {
+    "/simulation/{simid}/{workflow_name}/tasks/{tid}/outputFiles": {
       "get": {
         "tags": [
           "WRENCH"
@@ -452,6 +469,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -489,7 +515,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{tid}/addOutputFile": {
+    "/simulation/{simid}/{workflow_name}/tasks/{tid}/addOutputFile": {
       "put": {
         "tags": [
           "WRENCH"
@@ -502,6 +528,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -524,10 +559,6 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "workflow_name": {
-                    "type": "string",
-                    "description": "the name of the workflow"
-                  },
                   "file": {
                     "type": "string",
                     "description": "The file's ID"
@@ -559,7 +590,7 @@
         }
       }
     },
-    "/simulation/{simid}/inputFiles": {
+    "/simulation/{simid}/{workflow_name}/inputFiles": {
       "get": {
         "tags": [
           "WRENCH"
@@ -572,6 +603,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -600,7 +640,7 @@
         }
       }
     },
-    "/simulation/{simid}/addFile": {
+    "/simulation/{simid}/{workflow_name{/addFile": {
       "put": {
         "tags": [
           "WRENCH"
@@ -617,6 +657,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
@@ -626,10 +675,6 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "workflow_name": {
-                    "type": "string",
-                    "description": "the name of the workflow"
-                  },
                   "name": {
                     "type": "string",
                     "description": "name of the file"
@@ -665,7 +710,7 @@
         }
       }
     },
-    "/simulation/{simid}/files/{file_id}/size": {
+    "/simulation/{simid}/{workflow_name}/files/{file_id}/size": {
       "get": {
         "tags": [
           "WRENCH"
@@ -678,6 +723,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -765,7 +819,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetFlops": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetFlops": {
       "get": {
         "tags": [
           "WRENCH"
@@ -778,6 +832,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -815,7 +878,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetMinNumCores": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetMinNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -834,6 +897,15 @@
             }
           },
           {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "name",
             "in": "path",
             "description": "ID of the task",
@@ -865,7 +937,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetMaxNumCores": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetMaxNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -884,6 +956,15 @@
             }
           },
           {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "name",
             "in": "path",
             "description": "ID of the task",
@@ -915,7 +996,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetMemory": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetMemory": {
       "get": {
         "tags": [
           "WRENCH"
@@ -928,6 +1009,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -965,7 +1055,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetStartDate": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetStartDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -984,6 +1074,15 @@
             }
           },
           {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "name",
             "in": "path",
             "description": "ID of the task",
@@ -1015,7 +1114,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetEndDate": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetEndDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1034,6 +1133,15 @@
             }
           },
           {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "name",
             "in": "path",
             "description": "ID of the task",
@@ -1065,7 +1173,7 @@
         }
       }
     },
-    "/simulation/{simid}/createStandardJob": {
+    "/simulation/{simid}/{workflow_name}/createStandardJob": {
       "put": {
         "tags": [
           "WRENCH"
@@ -1081,6 +1189,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
@@ -1088,1519 +1205,1523 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StandardJob",
-                "properties": {
-                  "workflow_name": {
-                    "type": "string",
-                    "description": "the name of the workflow"
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JobResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/simulation/{simid}/jobs/{job_name}/submit": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Submit a standard job.",
-        "operationId": "submitStandardJob",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "job_name",
-            "in": "path",
-            "description": "ID of the job",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Job characteristics.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "compute_service_name": {
-                    "type": "string",
-                    "description": "The compute service's name"
-                  },
-                  "service_specific_args": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string"
-                      }
-                    },
-                    "description": "service-specific job arguments ({} means “use all defaults” )"
-                  }
-                }
+                "$ref": "#/components/schemas/StandardJob"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GenericResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/simulation/{simid}/addBareMetalComputeService": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Create and start a bare-metal compute service.",
-        "operationId": "addBareMetalComputeService",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to start a new service.",
-          "required": true,
+        "required": true
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "head_host": {
-                    "type": "string",
-                    "description": "name of the (simulated) host on which the compute service should run"
-                  },
-                  "resources": {
-                    "type": "object",
-                    "description": "compute resources as a dict of hostnames where values are tuples of #cores and ram in bytes"
-                  },
-                  "scratch_space": {
-                    "type": "string",
-                    "description": "the compute service’s scratch space’s mount point (”” means none)"
-                  },
-                  "property_list": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string"
-                      }
-                    },
-                    "description": "a property list ({} means “use all defaults”)"
-                  },
-                  "message_payload_list": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "number"
-                      }
-                    },
-                    "description": "a message payload list ({} means “use all defaults”)"
-                  }
-                }
+                "$ref": "#/components/schemas/JobResponse"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+        "405": {
+          "description": "Invalid input",
+          "content": {}
         }
       }
-    },
-    "/simulation/{simid}/addCloudComputeService": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Create and start a cloud compute service.",
-        "operationId": "addCloudComputeService",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to start a new service.",
+    }
+  },
+  "/simulation/{simid}/jobs/{job_name}/submit": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Submit a standard job.",
+      "operationId": "submitStandardJob",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
           "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "head_host": {
-                    "type": "string",
-                    "description": "name of the (simulated) host on which the compute service should run"
-                  },
-                  "resources": {
-                    "type": "object",
-                    "description": "compute resources as a dict of hostnames where values are tuples of #cores and ram in bytes"
-                  },
-                  "scratch_space": {
-                    "type": "string",
-                    "description": "the compute service’s scratch space’s mount point (”” means none)"
-                  },
-                  "property_list": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string"
-                      }
-                    },
-                    "description": "a property list ({} means “use all defaults”)"
-                  },
-                  "message_payload_list": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "number"
-                      }
-                    },
-                    "description": "a message payload list ({} means “use all defaults”)"
-                  }
-                }
-              }
-            }
+          "schema": {
+            "type": "string"
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/simulation/{simid}/addBatchComputeService": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Create and start a batch compute service.",
-        "operationId": "addBatchComputeService",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to start a new service.",
+        {
+          "name": "job_name",
+          "in": "path",
+          "description": "ID of the job",
           "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "head_host": {
-                    "type": "string",
-                    "description": "name of the (simulated) host on which the compute service should run"
-                  },
-                  "resources": {
-                    "type": "object",
-                    "description": "compute resources as a dict of hostnames where values are tuples of #cores and ram in bytes"
-                  },
-                  "scratch_space": {
-                    "type": "string",
-                    "description": "the compute service’s scratch space’s mount point (”” means none)"
-                  },
-                  "property_list": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string"
-                      }
-                    },
-                    "description": "a property list ({} means “use all defaults”)"
-                  },
-                  "message_payload_list": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "number"
-                      }
-                    },
-                    "description": "a message payload list ({} means “use all defaults”)"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
+          "schema": {
+            "type": "string"
           }
         }
-      }
-    },
-    "/simulation/{simid}/supportsCompoundJobs": {
-      "get": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Returns true if the service supports compound jobs.",
-        "operationId": "supportsCompoundJobs",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
+      ],
+      "requestBody": {
+        "description": "Job characteristics.",
+        "required": true,
+        "content": {
+          "application/json": {
             "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BooleanResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/simulation/{simid}/supportsPilotJobs": {
-      "get": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Returns true if the service supports pilot jobs.",
-        "operationId": "supportsPilotJobs",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BooleanResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/simulation/{simid}/supportsStandardJobs": {
-      "get": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Returns true if the service supports standard jobs.",
-        "operationId": "supportsStandardJobs",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BooleanResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/simulation/{simid}/addSimpleStorageService": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Create and start a simple storage service.",
-        "operationId": "addSimpleStorageService",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to start a new service.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "head_host": {
-                    "type": "string",
-                    "description": "The service's head host"
-                  },
-                  "mount_points": {
-                    "type": "array",
-                    "items": {
+              "properties": {
+                "compute_service_name": {
+                  "type": "string",
+                  "description": "The compute service's name"
+                },
+                "service_specific_args": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
                       "type": "string"
                     },
-                    "description": "The service's mount points"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/simulation/{simid}/addFileRegistryService": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Create and start a file registery service.",
-        "operationId": "addFileRegistryService",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to start a new service.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "head_host": {
-                    "type": "string",
-                    "description": "The service's head host"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/simulation/{simid}/{storage_service_name}/createFileCopy": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Create, ex nihilo, a copy of a file copy at a storage service.",
-        "operationId": "createFileCopyAtStorageService",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "storage_service_name",
-            "in": "path",
-            "description": "The storage service's head host",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to start a new service.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "filename": {
-                    "type": "string",
-                    "description": "The file name"
+                    "value": {
+                      "type": "string"
+                    }
                   },
-                  "workflow_name": {
+                  "description": "service-specific job arguments ({} means “use all defaults” )"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/addBareMetalComputeService": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Create and start a bare-metal compute service.",
+      "operationId": "addBareMetalComputeService",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to start a new service.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "head_host": {
                   "type": "string",
-                  "description": "the name of the workflow"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GenericResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Simulation or storage service not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/simulation/{simid}/{storage_service_name}/lookupFile": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Check if a copy of a file is stored at a storage service.",
-        "operationId": "lookupFileAtStorageService",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "storage_service_name",
-            "in": "path",
-            "description": "The storage service's head host",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to start a new service.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "filename": {
-                    "type": "string",
-                    "description": "The file name"
-                  },
-                  "workflow_name": {
-                    "type": "string",
-                    "description": "the name of the workflow"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BooleanResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Simulation or storage service not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/simulation/{simid}/createVM": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Create a VM on a cloud compute service.",
-        "operationId": "createVM",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to start create a VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service name"
-                  },
-                  "num_cores": {
-                    "type": "integer",
-                    "description": "The required number of cores"
-                  },
-                  "ram_memory": {
-                    "type": "number",
-                    "description": "The required memory in bytes"
-                  },
-                  "property_list": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string"
-                      }
+                  "description": "name of the (simulated) host on which the compute service should run"
+                },
+                "resources": {
+                  "type": "object",
+                  "description": "compute resources as a dict of hostnames where values are tuples of #cores and ram in bytes"
+                },
+                "scratch_space": {
+                  "type": "string",
+                  "description": "the compute service’s scratch space’s mount point (”” means none)"
+                },
+                "property_list": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
                     },
-                    "description": "a property list ({} means “use all defaults”)"
+                    "value": {
+                      "type": "string"
+                    }
                   },
-                  "message_payload_list": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "number"
-                      }
+                  "description": "a property list ({} means “use all defaults”)"
+                },
+                "message_payload_list": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
                     },
-                    "description": "a message payload list ({} means “use all defaults”)"
-                  }
+                    "value": {
+                      "type": "number"
+                    }
+                  },
+                  "description": "a message payload list ({} means “use all defaults”)"
                 }
               }
             }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VMCreationResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
           }
         }
-      }
-    },
-    "/simulation/{simid}/startVM": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Starts a VM and get its associated bare metal compute service.",
-        "operationId": "startVM",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to start a VM.",
-          "required": true,
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM to start"
-                  }
-                }
+                "$ref": "#/components/schemas/ServiceResponse"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/addCloudComputeService": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Create and start a cloud compute service.",
+      "operationId": "addCloudComputeService",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to start a new service.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "head_host": {
+                  "type": "string",
+                  "description": "name of the (simulated) host on which the compute service should run"
+                },
+                "resources": {
+                  "type": "object",
+                  "description": "compute resources as a dict of hostnames where values are tuples of #cores and ram in bytes"
+                },
+                "scratch_space": {
+                  "type": "string",
+                  "description": "the compute service’s scratch space’s mount point (”” means none)"
+                },
+                "property_list": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "description": "a property list ({} means “use all defaults”)"
+                },
+                "message_payload_list": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "number"
+                    }
+                  },
+                  "description": "a message payload list ({} means “use all defaults”)"
                 }
               }
             }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
           }
         }
-      }
-    },
-    "/simulation/{simid}/shutdownVM": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Shutdown a VM.",
-        "operationId": "shutdownVM",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to shutdown a VM.",
-          "required": true,
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM to shutdown"
-                  }
-                }
+                "$ref": "#/components/schemas/ServiceResponse"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/addBatchComputeService": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Create and start a batch compute service.",
+      "operationId": "addBatchComputeService",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to start a new service.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "head_host": {
+                  "type": "string",
+                  "description": "name of the (simulated) host on which the compute service should run"
+                },
+                "resources": {
+                  "type": "object",
+                  "description": "compute resources as a dict of hostnames where values are tuples of #cores and ram in bytes"
+                },
+                "scratch_space": {
+                  "type": "string",
+                  "description": "the compute service’s scratch space’s mount point (”” means none)"
+                },
+                "property_list": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "description": "a property list ({} means “use all defaults”)"
+                },
+                "message_payload_list": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "number"
+                    }
+                  },
+                  "description": "a message payload list ({} means “use all defaults”)"
                 }
               }
             }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
           }
         }
-      }
-    },
-    "/simulation/{simid}/destroyVM": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Destroy a VM.",
-        "operationId": "destroyVM",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to destroy a VM.",
-          "required": true,
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM to destroy"
-                  }
-                }
+                "$ref": "#/components/schemas/ServiceResponse"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GenericResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+        "405": {
+          "description": "Invalid input",
+          "content": {}
         }
       }
-    },
-    "/simulation/{simid}/isVMRunning": {
-      "get": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Method to check whether a VM is currently running.",
-        "operationId": "isVMRunning",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check if VM is running.",
+    }
+  },
+  "/simulation/{simid}/supportsCompoundJobs": {
+    "get": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Returns true if the service supports compound jobs.",
+      "operationId": "supportsCompoundJobs",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
           "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
+                "$ref": "#/components/schemas/BooleanResponse"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+        "405": {
+          "description": "Invalid input",
+          "content": {}
         }
       }
-    },
-    "/simulation/{simid}/isVMDown": {
-      "get": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Method to check whether a VM is currently down.",
-        "operationId": "isVMDown",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check if VM is down.",
+    }
+  },
+  "/simulation/{simid}/supportsPilotJobs": {
+    "get": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Returns true if the service supports pilot jobs.",
+      "operationId": "supportsPilotJobs",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
           "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
+                "$ref": "#/components/schemas/BooleanResponse"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+        "405": {
+          "description": "Invalid input",
+          "content": {}
         }
       }
-    },
-    "/simulation/{simid}/suspendVM": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Suspends a running VM.",
-        "operationId": "suspendVM",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to suspend a VM.",
+    }
+  },
+  "/simulation/{simid}/supportsStandardJobs": {
+    "get": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Returns true if the service supports standard jobs.",
+      "operationId": "supportsStandardJobs",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
           "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "compute_service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
+                "$ref": "#/components/schemas/BooleanResponse"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GenericResponse"
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/addSimpleStorageService": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Create and start a simple storage service.",
+      "operationId": "addSimpleStorageService",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to start a new service.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "head_host": {
+                  "type": "string",
+                  "description": "The service's head host"
+                },
+                "mount_points": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "The service's mount points"
                 }
               }
             }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
           }
         }
-      }
-    },
-    "/simulation/{simid}/resumeVM": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Resume a suspended VM.",
-        "operationId": "resumeVM",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to resume a VM.",
-          "required": true,
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "compute_service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
+                "$ref": "#/components/schemas/ServiceResponse"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GenericResponse"
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/addFileRegistryService": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Create and start a file registery service.",
+      "operationId": "addFileRegistryService",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to start a new service.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "head_host": {
+                  "type": "string",
+                  "description": "The service's head host"
                 }
               }
             }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
           }
         }
-      }
-    },
-    "/simulation/{simid}/isVMSuspended": {
-      "get": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Method to check whether a VM is currently suspended.",
-        "operationId": "isVMSuspended",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check if VM is suspended.",
-          "required": true,
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
+                "$ref": "#/components/schemas/ServiceResponse"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/{workflow_name}/{storage_service_name}/createFileCopy": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Create, ex nihilo, a copy of a file copy at a storage service.",
+      "operationId": "createFileCopyAtStorageService",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "workflow_name",
+          "in": "path",
+          "Description": "Name of the workflow",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "storage_service_name",
+          "in": "path",
+          "description": "The storage service's head host",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to start a new service.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "The file name"
                 }
               }
             }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
           }
         }
-      }
-    },
-    "/simulation/{simid}/getVMPhysicalHostname": {
-      "get": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Get the name of the physical host on which a VM is running.",
-        "operationId": "getVMPhysicalHostname",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check physical hostname.",
-          "required": true,
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "compute_service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
+                "$ref": "#/components/schemas/GenericResponse"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
+        "404": {
+          "description": "Simulation or storage service not found",
+          "content": {}
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/{workflow_name}/{storage_service_name}/lookupFile": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Check if a copy of a file is stored at a storage service.",
+      "operationId": "lookupFileAtStorageService",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "workflow_name",
+          "in": "path",
+          "Description": "Name of the workflow",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "storage_service_name",
+          "in": "path",
+          "description": "The storage service's head host",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to start a new service.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "The file name"
                 }
               }
             }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
           }
         }
-      }
-    },
-    "/simulation/{simid}/getVMComputeService": {
-      "get": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Get the compute service running on a VM, if any.",
-        "operationId": "getVMComputeService",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check compute service of VM.",
-          "required": true,
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
+                "$ref": "#/components/schemas/BooleanResponse"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+        "404": {
+          "description": "Simulation or storage service not found",
+          "content": {}
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
         }
       }
-    },
-    "/simulation/{simid}/getExecutionHosts": {
-      "get": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Get the list of execution hosts available to run VMs.",
-        "operationId": "getExecutionHosts",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HostnameList"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/simulation/{simid}/createWorkflowFromJSONString": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Create a workflow from JSON file.",
-        "operationId": "createWorkflowFromJSON",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to create workflow from JSON.",
+    }
+  },
+  "/simulation/{simid}/createVM": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Create a VM on a cloud compute service.",
+      "operationId": "createVM",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
           "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to start create a VM.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "service_name": {
+                  "type": "string",
+                  "description": "The cloud service name"
+                },
+                "num_cores": {
+                  "type": "integer",
+                  "description": "The required number of cores"
+                },
+                "ram_memory": {
+                  "type": "number",
+                  "description": "The required memory in bytes"
+                },
+                "property_list": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "description": "a property list ({} means “use all defaults”)"
+                },
+                "message_payload_list": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "number"
+                    }
+                  },
+                  "description": "a message payload list ({} means “use all defaults”)"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "json_string": {
-                    "type": "string",
-                    "description": "Workflow file"
-                  },
-                  "reference_flop_rate": {
-                    "type": "str",
-                    "description": "Reference flop rate"
-                  },
-                  "ignore_machine_specs": {
-                    "type": "bool",
-                    "description": "Ignore machine specs"
-                  },
-                  "redundant, dependencies": {
-                    "type": "bool",
-                    "description": "Redundant deendencies"
-                  },
-                  "ignore_cycle_creating_dependencies": {
-                    "type": "bool",
-                    "description": "Ignore cycle creating dependencies"
-                  },
-                  "min_cores_per_task": {
-                    "type": "float",
-                    "description": "Min cores per task"
-                  },
-                  "max_cores_per_task": {
-                    "type": "float",
-                    "description": "Max cores per task"
-                  },
-                  "enforce_num_cores": {
-                    "type": "bool",
-                    "description": "Enforce num cores"
-                  },
-                  "ignore_avg_cpu": {
-                    "type": "bool",
-                    "description": "Ignore average cpu"
-                  },
-                  "show_warnings": {
-                    "type": "bool",
-                    "description": "Show warnings"
-                  }
-                }
+                "$ref": "#/components/schemas/VMCreationResponse"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+        "405": {
+          "description": "Invalid input",
+          "content": {}
         }
       }
-    },
-    "/simulation/{simid}/createWorkflow": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Create a blank workflow.",
-        "operationId": "createWorkflow",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+    }
+  },
+  "/simulation/{simid}/startVM": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Starts a VM and get its associated bare metal compute service.",
+      "operationId": "startVM",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WorkflowResponse"
+        }
+      ],
+      "requestBody": {
+        "description": "Input to start a VM.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM to start"
                 }
               }
             }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
           }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/shutdownVM": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Shutdown a VM.",
+      "operationId": "shutdownVM",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to shutdown a VM.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM to shutdown"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/destroyVM": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Destroy a VM.",
+      "operationId": "destroyVM",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to destroy a VM.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM to destroy"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/isVMRunning": {
+    "get": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Method to check whether a VM is currently running.",
+      "operationId": "isVMRunning",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to check if VM is running.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/isVMDown": {
+    "get": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Method to check whether a VM is currently down.",
+      "operationId": "isVMDown",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to check if VM is down.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/suspendVM": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Suspends a running VM.",
+      "operationId": "suspendVM",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to suspend a VM.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "compute_service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/resumeVM": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Resume a suspended VM.",
+      "operationId": "resumeVM",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to resume a VM.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "compute_service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/isVMSuspended": {
+    "get": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Method to check whether a VM is currently suspended.",
+      "operationId": "isVMSuspended",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to check if VM is suspended.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/getVMPhysicalHostname": {
+    "get": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Get the name of the physical host on which a VM is running.",
+      "operationId": "getVMPhysicalHostname",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to check physical hostname.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "compute_service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/getVMComputeService": {
+    "get": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Get the compute service running on a VM, if any.",
+      "operationId": "getVMComputeService",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to check compute service of VM.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "service_name": {
+                  "type": "string",
+                  "description": "The cloud service's name"
+                },
+                "vm_name": {
+                  "type": "string",
+                  "description": "The name of the VM"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/getExecutionHosts": {
+    "get": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Get the list of execution hosts available to run VMs.",
+      "operationId": "getExecutionHosts",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HostnameList"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/createWorkflowFromJSONString": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Create a workflow from JSON file.",
+      "operationId": "createWorkflowFromJSON",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Input to create workflow from JSON.",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "json_string": {
+                  "type": "string",
+                  "description": "Workflow file"
+                },
+                "reference_flop_rate": {
+                  "type": "str",
+                  "description": "Reference flop rate"
+                },
+                "ignore_machine_specs": {
+                  "type": "bool",
+                  "description": "Ignore machine specs"
+                },
+                "redundant, dependencies": {
+                  "type": "bool",
+                  "description": "Redundant deendencies"
+                },
+                "ignore_cycle_creating_dependencies": {
+                  "type": "bool",
+                  "description": "Ignore cycle creating dependencies"
+                },
+                "min_cores_per_task": {
+                  "type": "float",
+                  "description": "Min cores per task"
+                },
+                "max_cores_per_task": {
+                  "type": "float",
+                  "description": "Max cores per task"
+                },
+                "enforce_num_cores": {
+                  "type": "bool",
+                  "description": "Enforce num cores"
+                },
+                "ignore_avg_cpu": {
+                  "type": "bool",
+                  "description": "Ignore average cpu"
+                },
+                "show_warnings": {
+                  "type": "bool",
+                  "description": "Show warnings"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
+        }
+      }
+    }
+  },
+  "/simulation/{simid}/createWorkflow": {
+    "post": {
+      "tags": [
+        "WRENCH"
+      ],
+      "summary": "Create a blank workflow.",
+      "operationId": "createWorkflow",
+      "parameters": [
+        {
+          "name": "simid",
+          "in": "path",
+          "description": "ID of the simulation",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowResponse"
+              }
+            }
+          }
+        },
+        "405": {
+          "description": "Invalid input",
+          "content": {}
         }
       }
     }
