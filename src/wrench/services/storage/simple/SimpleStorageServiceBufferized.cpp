@@ -453,7 +453,6 @@ namespace wrench {
      * @brief Start pending file transfer threads if any and if possible
      */
     void SimpleStorageServiceBufferized::startPendingFileTransferThread() {
-        WRENCH_INFO("IN startPendingFileTransferThread()");
         while ((not this->pending_file_transfer_threads.empty()) and
                (this->running_file_transfer_threads.size() < this->num_concurrent_connections)) {
             // Start a communications!
@@ -537,22 +536,22 @@ namespace wrench {
 
         // Send back the relevant ack if this was a read
         if (answer_commport_if_read and success) {
-            WRENCH_INFO(
-                    "Sending back an ack since this was a file read and some client is waiting for me to say something");
+//            WRENCH_INFO(
+//                    "Sending back an ack since this was a file read and some client is waiting for me to say something");
             answer_commport_if_read->dputMessage(new StorageServiceAckMessage(src_location));
         }
 
         // Send back the relevant ack if this was a write operation
         if (answer_commport_if_write and success) {
-            WRENCH_INFO(
-                    "Sending back an ack since this was a file write and some client is waiting for me to say something");
+//            WRENCH_INFO(
+//                    "Sending back an ack since this was a file write and some client is waiting for me to say something");
             answer_commport_if_write->dputMessage(new StorageServiceAckMessage(dst_location));
         }
 
         // Send back the relevant ack if this was a copy
         if (answer_commport_if_copy) {
-            WRENCH_INFO(
-                    "Sending back an ack since this was a file copy and some client is waiting for me to say something");
+//            WRENCH_INFO(
+//                    "Sending back an ack since this was a file copy and some client is waiting for me to say something");
             if ((src_location == nullptr) or (dst_location == nullptr)) {
                 throw std::runtime_error("SimpleStorageServiceBufferized::processFileTransferThreadNotification(): "
                                          "src_location and dst_location must be non-null");

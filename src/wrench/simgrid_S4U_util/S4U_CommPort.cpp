@@ -419,11 +419,8 @@ namespace wrench {
 
         auto commport = *(S4U_CommPort::free_commports.end() - 1);
         S4U_CommPort::free_commports.pop_back();
-        //        std::cerr << simgrid::s4u::this_actor::get_pid() << " GOT TEMPORARY MAILBOX " << commport->get_name() << "\n";
 
         if ((not commport->s4u_mb->empty()) or (not commport->s4u_mq->empty())) {
-            // This likely never happens
-
             //            std::cerr << "############### WASTING MAILBOX " << commport->get_name() << "\n";
             S4U_CommPort::commports_to_drain.push_front(commport);
             return S4U_CommPort::getTemporaryCommPort();// Recursive call!
@@ -464,7 +461,7 @@ namespace wrench {
         }
         WRENCH_DEBUG("Retiring commport %s", commport->name.c_str());
         S4U_CommPort::used_commports.erase(commport);
-        S4U_CommPort::free_commports.push_front(commport);
+        S4U_CommPort::free_commports.push_front(commport);  //
     }
 
     /**
