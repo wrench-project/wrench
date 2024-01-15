@@ -143,8 +143,8 @@ namespace wrench {
 
                     double start_time = S4U_Simulation::getClock();
 
-                    WRENCH_INFO("Synchronously sending a NetworkProximityTransferMessage  (%lf) to %s",
-                                this->message_size, this->next_commport_to_send->get_cname());
+//                    WRENCH_INFO("Synchronously sending a NetworkProximityTransferMessage  (%lf) to %s",
+//                                this->message_size, this->next_commport_to_send->get_cname());
                     try {
                         this->next_commport_to_send->putMessage(
                                                 new NetworkProximityTransferMessage(
@@ -160,7 +160,7 @@ namespace wrench {
                     std::pair<std::string, std::string> hosts;
                     hosts = std::make_pair(S4U_Simulation::getHostName(), this->next_host_to_send);
 
-                    WRENCH_INFO("Sending proximity compute answer message: %lf", proximityValue);
+//                    WRENCH_INFO("Sending proximity compute answer message: %lf", proximityValue);
                     this->network_proximity_service_commport->dputMessage(
                                              new NetworkProximityComputeAnswerMessage(hosts, proximityValue,
                                                                                       this->getMessagePayloadValue(

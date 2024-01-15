@@ -608,12 +608,15 @@ namespace wrench {
                 simulation->writebackWithMemoryCache(f, msg->payload, dst_loc, false);
             } else {
 #endif
-                // Write to disk
+                // Write last chunk to disk
                 simulation->writeToDisk(msg->payload,
                                         dst_ss->getHostname(),
                                         dst_ss->getPathMountPoint(dst_loc->getPath()), dst_loc->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
             }
+
+            // Wait for final ack
+            request_answer_commport->getMessage<StorageServiceAckMessage>(10, "StorageService::downloadFileFromStorageService(): Received an");
 #endif
         } catch (ExecutionException &e) {
             throw;
