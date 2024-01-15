@@ -840,11 +840,7 @@
           {
             "name": "workflow_name",
             "in": "path",
-<<<<<<< HEAD
-            "Description": "Name of the workflow",
-=======
             "description": "Name of the workflow",
->>>>>>> ad85bd377ce7bf094b6eba89d1b7d8647f493905
             "required": true,
             "schema": {
               "type": "string"
@@ -1823,13 +1819,6 @@
                   "filename": {
                     "type": "string",
                     "description": "The file name"
-<<<<<<< HEAD
-=======
-                  },
-                  "workflow_name": {
-                    "type": "string",
-                    "description": "the name of the workflow"
->>>>>>> ad85bd377ce7bf094b6eba89d1b7d8647f493905
                   }
                 }
               }
