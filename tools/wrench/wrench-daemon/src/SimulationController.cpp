@@ -676,6 +676,7 @@ namespace wrench {
         }
         for (auto const &name: data["tasks"]) {
             tasks.push_back(workflow->getTaskByID(name));
+            
         }
 
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
