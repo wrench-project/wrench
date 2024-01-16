@@ -667,8 +667,9 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::createStandardJob(json data) {
+
         std::vector<std::shared_ptr<WorkflowTask>> tasks;
-        std::string workflow_name = data["workflow"];
+        std::string workflow_name = data["workflow_name"];
         std::shared_ptr<Workflow> workflow;
 
         if(not this->workflow_registry.lookup(workflow_name, workflow)) {
