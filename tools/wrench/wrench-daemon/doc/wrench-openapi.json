@@ -640,7 +640,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name{/addFile": {
+    "/simulation/{simid}/{workflow_name}/addFile": {
       "put": {
         "tags": [
           "WRENCH"
