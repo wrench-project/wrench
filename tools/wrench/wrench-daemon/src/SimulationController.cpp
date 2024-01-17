@@ -1299,7 +1299,7 @@ namespace wrench {
                                                                             redundant_dependencies, ignore_cycle_creating_dependencies,
                                                                             min_cores_per_task, max_cores_per_task, enforce_num_cores,
                                                                             ignore_avg_cpu, show_warnings);
-            answer["result"] = wf->getName();
+            answer["results"] = wf->getName();
             this->workflow_registry.insert(wf->getName(), wf);
             return answer;
         } catch (std::exception &e) {
