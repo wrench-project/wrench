@@ -45,6 +45,12 @@ jobs:
             COMPILER: gcc10
             batsched: off
 
+          - build: "Debian Bookworm - g++-12"
+            DIST: debian-bookworm
+            COMPILER: gcc12
+            batsched: off
+
+
           - build: "Ubuntu Jammy Jellyfish - clang++-14"
             DIST: ubuntu-jammy
             COMPILER: clang14
