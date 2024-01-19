@@ -568,6 +568,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::createFileCopyAtStorageService(json data) {
+        std::cerr << "DATA " << data << "\n";
         std::string ss_name = data["storage_service_name"];
         std::string filename = data["filename"];
 
@@ -577,13 +578,13 @@ namespace wrench {
         }
 
         std::shared_ptr<DataFile> file;
-        std::string workflow_name = data["workflow_name"];
-        std::shared_ptr<Workflow> workflow;
-        if (not this-> workflow_registry.lookup(workflow_name, workflow)) {
-            throw std::runtime_error("Unknown workflow " + workflow_name);
-        }
+//        std::string workflow_name = data["workflow_name"];
+//        std::shared_ptr<Workflow> workflow;
+//        if (not this-> workflow_registry.lookup(workflow_name, workflow)) {
+//            throw std::runtime_error("Unknown workflow " + workflow_name);
+//        }
         try {
-            file = workflow->getFileByID(filename);
+            file = Simulation::getFileByID(filename);
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Unknown file " + filename);
         }
@@ -609,14 +610,14 @@ namespace wrench {
         }
 
         std::shared_ptr<DataFile> file;
-        std::string workflow_name = data["workflow_name"];
-        std::shared_ptr<Workflow> workflow;
-
-        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
-            throw std::runtime_error("Unknown workflow " + workflow_name);
-        }
+//        std::string workflow_name = data["workflow_name"];
+//        std::shared_ptr<Workflow> workflow;
+//
+//        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+//            throw std::runtime_error("Unknown workflow " + workflow_name);
+//        }
         try {
-            file = workflow->getFileByID(filename);
+            file = Simulation::getFileByID(filename);
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Unknown file " + filename);
         }
@@ -682,7 +683,7 @@ namespace wrench {
 
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
         for (auto it = data["file_locations"].begin(); it != data["file_locations"].end(); ++it) {
-            auto file = workflow->getFileByID(it.key());
+            auto file = Simulation::getFileByID(it.key());
             std::shared_ptr<StorageService> storage_service;
             this->storage_service_registry.lookup(it.value(), storage_service);
             file_locations[file] = FileLocation::LOCATION(storage_service, file);
@@ -907,7 +908,7 @@ namespace wrench {
             throw std::runtime_error("Unknown workflow " + workflow_name);
         }
         auto task = workflow->getTaskByID(data["tid"]);
-        auto file = workflow->getFileByID(data["file"]);
+        auto file = Simulation::getFileByID(data["file"]);
         task->addInputFile(file);
         return {};
     }
@@ -924,7 +925,7 @@ namespace wrench {
             throw std::runtime_error("Unknown workflow " + workflow_name);
         }
         auto task = workflow->getTaskByID(data["tid"]);
-        auto file = workflow->getFileByID(data["file"]);
+        auto file = Simulation::getFileByID(data["file"]);
         task->addOutputFile(file);
         return {};
     }
