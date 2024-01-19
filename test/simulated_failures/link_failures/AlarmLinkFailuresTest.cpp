@@ -30,6 +30,7 @@ public:
 protected:
     ~AlarmLinkFailuresTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     AlarmLinkFailuresTest() {

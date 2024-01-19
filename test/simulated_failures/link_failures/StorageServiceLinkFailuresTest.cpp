@@ -222,7 +222,7 @@ private:
                 0, this->test->storage_services.size() - 1);
 
         auto dest = this->test->storage_services.at(dist_storage(rng));
-        auto file = this->test->workflow->addFile("written_file_" + std::to_string(count++), FILE_SIZE);
+        auto file = wrench::Simulation::addFile("written_file_" + std::to_string(count++), FILE_SIZE);
         wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(dest, file));
         wrench::StorageService::deleteFileAtLocation(wrench::FileLocation::LOCATION(dest, file));
     }
@@ -390,7 +390,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
 
     // Create a bunch of file
     for (unsigned int i = 0; i < NUM_FILES; i++) {
-        files.push_back(workflow->addFile("file_" + std::to_string(i), FILE_SIZE));
+        files.push_back(wrench::Simulation::addFile("file_" + std::to_string(i), FILE_SIZE));
     }
 
     // Stage some files randomly on storage services

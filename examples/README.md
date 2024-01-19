@@ -51,7 +51,7 @@ to analyze action failures.
 
   - `workflow_api/basic-examples/bare-metal-chain-scratch`: Similar to the previous
     simulator, but the compute service now
-    has scratch space to hold intermediate workflow files. Since files
+    has scratch space to hold intermediate files. Since files
     created in the scratch space during a job's execution are erased after
     that job's completion, the workflow is executed as a single multi-task
     job.

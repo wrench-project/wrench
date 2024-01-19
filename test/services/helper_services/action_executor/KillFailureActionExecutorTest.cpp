@@ -352,11 +352,11 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     this->ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file to read
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
     simulation->stageFile(wrench::FileLocation::LOCATION(ss1, file));
 
     // Create a file to write
-    this->file_to_write = this->workflow->addFile("some_file_to_write", 1000000.0);
+    this->file_to_write = wrench::Simulation::addFile("some_file_to_write", 1000000.0);
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -366,6 +366,7 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

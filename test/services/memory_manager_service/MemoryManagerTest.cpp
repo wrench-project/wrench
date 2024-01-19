@@ -33,6 +33,7 @@ public:
 protected:
     ~MemoryManagerTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     MemoryManagerTest() {
@@ -234,11 +235,11 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     // Create a Workflow
     auto workflow = wrench::Workflow::createWorkflow();
-    auto previous_output_file = workflow->addFile("task0_input", FILE_SIZE * GB);
+    auto previous_output_file = wrench::Simulation::addFile("task0_input", FILE_SIZE * GB);
     int num_tasks = 10;
     for (int i = 0; i < num_tasks; i++) {
         auto task = workflow->addTask("task1" + std::to_string(i), 100.0, 1, 1, 0.0);
-        auto output_file = workflow->addFile("task1" + std::to_string(i) + "_output", FILE_SIZE * GB);
+        auto output_file = wrench::Simulation::addFile("task1" + std::to_string(i) + "_output", FILE_SIZE * GB);
         task->addOutputFile(output_file);
         task->addInputFile(previous_output_file);
         previous_output_file = output_file;
@@ -253,12 +254,13 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(workflow->getFileByID("task0_input"), storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(wrench::Simulation::getFileByID("task0_input"), storage_service1));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
