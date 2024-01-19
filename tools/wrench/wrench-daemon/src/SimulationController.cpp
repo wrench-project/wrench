@@ -568,7 +568,6 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::createFileCopyAtStorageService(json data) {
-        std::cerr << "DATA " << data << "\n";
         std::string ss_name = data["storage_service_name"];
         std::string filename = data["filename"];
 
@@ -678,7 +677,7 @@ namespace wrench {
         }
         for (auto const &name: data["tasks"]) {
             tasks.push_back(workflow->getTaskByID(name));
-            
+
         }
 
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
@@ -873,9 +872,7 @@ namespace wrench {
 //        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
 //            throw std::runtime_error("Unknown workflow  " + workflow_name);
 //        }
-        std::cerr << "DATA" << data << "\n";
         auto file = Simulation::addFile(data["name"], data["size"]);
-        std::cerr << "ADDED A FILE: " << file->getID() << "\n";
         return {};
     }
 
