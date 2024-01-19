@@ -25,11 +25,11 @@ namespace wrench {
      */
     void Workflow::clear() {
         this->tasks.clear();
-//        for (auto const &f: this->data_files) {
-//            //            std::cerr << "SIMULATION REMOVING FILE " << f->getID() << "\n";
-//            Simulation::removeFile(f);
-//        }
-//        this->data_files.clear();
+        //        for (auto const &f: this->data_files) {
+        //            //            std::cerr << "SIMULATION REMOVING FILE " << f->getID() << "\n";
+        //            Simulation::removeFile(f);
+        //        }
+        //        this->data_files.clear();
     }
 
     /**
@@ -99,7 +99,7 @@ namespace wrench {
         this->task_output_files.erase(file);
         this->task_input_files.erase(file);
         this->data_files.erase(file->getID());
-//        Simulation::removeFile(file);
+        //        Simulation::removeFile(file);
     }
 
     /**
@@ -713,18 +713,18 @@ namespace wrench {
         return to_return;
     }
 
-//    /**
-//     * @brief Add a file to the workflow
-//     * @param id : file name
-//     * @param size : file size in bytes
-//     * @return a file
-//     */
-//    std::shared_ptr<DataFile> Workflow::addFile(const std::string &id, double size) {
-//        //        std::cerr << "CREATING DATA FILE " << id << "\n";
-//        auto data_file = Simulation::addFile(id, size);
-////        this->data_files.insert(data_file);
-//        return data_file;
-//    }
+    //    /**
+    //     * @brief Add a file to the workflow
+    //     * @param id : file name
+    //     * @param size : file size in bytes
+    //     * @return a file
+    //     */
+    //    std::shared_ptr<DataFile> Workflow::addFile(const std::string &id, double size) {
+    //        //        std::cerr << "CREATING DATA FILE " << id << "\n";
+    //        auto data_file = Simulation::addFile(id, size);
+    ////        this->data_files.insert(data_file);
+    //        return data_file;
+    //    }
 
     /**
       * @brief Get the list of all files in the workflow/simulation
@@ -735,14 +735,14 @@ namespace wrench {
         return Simulation::getFileMap();
     }
 
-//    /**
-//     * @brief Get a file based on its ID
-//     * @param id : file ID
-//     * @return a file
-//     */
-//    std::shared_ptr<DataFile> Workflow::getFileByID(const std::string &id) {
-//        return Simulation::getFileByID(id);
-//    }
+    //    /**
+    //     * @brief Get a file based on its ID
+    //     * @param id : file ID
+    //     * @return a file
+    //     */
+    //    std::shared_ptr<DataFile> Workflow::getFileByID(const std::string &id) {
+    //        return Simulation::getFileByID(id);
+    //    }
 
     /**
      * @brief Create a workflow instance
