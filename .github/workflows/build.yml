@@ -45,16 +45,6 @@ jobs:
             COMPILER: gcc10
             batsched: off
 
-          - build: "Ubuntu Focal - clang++-10"
-            DIST: ubuntu-focal
-            COMPILER: clang10
-            batsched: off
-
-          - build: "Ubuntu Focal - g++-9"
-            DIST: ubuntu-focal
-            COMPILER: gcc9
-            batsched: off
-
           - build: "Ubuntu Jammy Jellyfish - clang++-14"
             DIST: ubuntu-jammy
             COMPILER: clang14
