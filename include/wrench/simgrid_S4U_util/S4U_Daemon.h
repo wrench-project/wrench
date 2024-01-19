@@ -25,11 +25,12 @@ namespace wrench {
     /***********************/
 
     class Simulation;
+    class S4U_CommPort;
 
     /**
      * @brief A generic "running daemon" abstraction that serves as a basis for all simulated processes
      */
-    class S4U_Daemon {
+    class S4U_Daemon : public std::enable_shared_from_this<S4U_Daemon> {
 
         class LifeSaver {
         public:
@@ -41,26 +42,32 @@ namespace wrench {
 
     public:
         /**
-         * @brief A convenient map between actors and their default receive mailboxes
+         * @brief A convenient map between actors and their default receive commports
          */
-        static std::unordered_map<aid_t, simgrid::s4u::Mailbox *> map_actor_to_recv_mailbox;
+        static std::unordered_map<aid_t, S4U_CommPort *> map_actor_to_recv_commport;
+
+        /**
+         * @brief A map of actors to sets of held mutexes
+         */
+        static std::unordered_map<aid_t, std::set<simgrid::s4u::MutexPtr>> map_actor_to_held_mutexes;
+
 
         /** @brief The name of the daemon */
         std::string process_name;
 
-        /** @brief The daemon's mailbox **/
-        simgrid::s4u::Mailbox *mailbox;
-        /** @brief The daemon's receive mailbox (to send to another daemon so that that daemon can reply) **/
-        simgrid::s4u::Mailbox *recv_mailbox;
+        /** @brief The daemon's commport_name **/
+        S4U_CommPort *commport;
+        /** @brief The daemon's receive commport_name (to send to another daemon so that that daemon can reply) **/
+        S4U_CommPort *recv_commport;
 
         /** @brief The name of the host on which the daemon is running */
         std::string hostname;
 
-        static simgrid::s4u::Mailbox *getRunningActorRecvMailbox();
+        static S4U_CommPort *getRunningActorRecvCommPort();
 
         S4U_Daemon(const std::string &hostname, const std::string &process_name_prefix);
 
-        // Daemon without a mailbox (not needed?)
+        // Daemon without a commport_name (not needed?)
         //        S4U_Daemon(std::string hostname, std::string process_name_prefix);
 
         virtual ~S4U_Daemon();
@@ -120,6 +127,8 @@ namespace wrench {
 
         void setSimulation(Simulation *simulation);
 
+        bool killActor();
+
     protected:
         /** @brief a pointer to the simulation object */
         Simulation *simulation;
@@ -136,7 +145,18 @@ namespace wrench {
         /** @brief The host on which the daemon is running */
         simgrid::s4u::Host *host;
 
-        bool killActor();
+//        void release_held_mutexes();
+
+        /**
+         * @brief Method to retrieve the shared_ptr to a S4U_daemon
+         * @tparam T: the class of the daemon (the base class is S4U_Daemon)
+         * @return a shared pointer
+         */
+        template<class T>
+        std::shared_ptr<T> getSharedPtr() {
+            return std::dynamic_pointer_cast<T>(this->shared_from_this());
+        }
+
 
         /** @brief The number of time that this daemon has started (i.e., 1 + number of restarts) */
         unsigned int num_starts = 0;
@@ -166,4 +186,4 @@ namespace wrench {
 }// namespace wrench
 
 
-#endif//WRENCH_SIM4U_DAEMONWITHMAILBOX_H
+#endif//WRENCH_SIM4U_DAEMON_H

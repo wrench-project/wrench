@@ -35,7 +35,7 @@ namespace wrench {
                                          bool notify_when_turned_off,
                                          bool notify_when_speed_change,
                                          std::shared_ptr<S4U_Daemon> creator,
-                                         simgrid::s4u::Mailbox *mailbox_to_notify,
+                                         S4U_CommPort *commport_to_notify,
                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list = {});
 
         void kill();
@@ -50,7 +50,7 @@ namespace wrench {
         bool notify_when_turned_on;
         bool notify_when_turned_off;
         bool notify_when_speed_change;
-        simgrid::s4u::Mailbox *mailbox_to_notify;
+        S4U_CommPort *commport_to_notify;
         int main() override;
 
         std::vector<std::pair<std::string, bool>> hosts_that_have_recently_changed_state;

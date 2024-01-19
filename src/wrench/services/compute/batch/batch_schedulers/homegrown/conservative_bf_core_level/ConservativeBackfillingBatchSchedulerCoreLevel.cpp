@@ -53,7 +53,7 @@ namespace wrench {
         this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
         batch_job->conservative_bf_start_date = est;
         batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
-        WRENCH_INFO("Scheduled BatchComputeService job %lu on %lu from time %u to %u",
+        WRENCH_INFO("Scheduled BatchComputeService job %lu on %lu nodes from time %u to %u",
                     batch_job->getJobID(), batch_job->getRequestedNumNodes(),
                     batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date);
 #ifdef PRINT_SCHEDULE
@@ -125,7 +125,6 @@ namespace wrench {
         WRENCH_INFO("Compacting schedule...");
 
 #ifdef PRINT_SCHEDULE
-        WRENCH_INFO("BEFORE COMPACTING");
         this->schedule->print();
 #endif
 
@@ -254,7 +253,7 @@ namespace wrench {
         if (num_nodes > cs->available_nodes_to_cores.size()) {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
-        if (cores_per_node > cs->available_nodes_to_cores.begin()->first->get_core_count()) {
+        if (cores_per_node > (unsigned long) cs->available_nodes_to_cores.begin()->first->get_core_count()) {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many cores per host (asking  for " +
                                      std::to_string(cores_per_node) + " but hosts have " +
                                      std::to_string(cs->available_nodes_to_cores.begin()->first->get_core_count()) + "cores)");

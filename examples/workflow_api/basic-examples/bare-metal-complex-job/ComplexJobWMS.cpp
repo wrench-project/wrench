@@ -61,10 +61,10 @@ namespace wrench {
 
         /* Get references to the task and files */
         auto task = this->workflow->getTaskByID("task");
-        auto infile_1 = this->workflow->getFileByID("infile_1");
-        auto infile_2 = this->workflow->getFileByID("infile_2");
-        auto outfile_1 = this->workflow->getFileByID("outfile_1");
-        auto outfile_2 = this->workflow->getFileByID("outfile_2");
+        auto infile_1 = wrench::Simulation::getFileByID("infile_1");
+        auto infile_2 = wrench::Simulation::getFileByID("infile_2");
+        auto outfile_1 = wrench::Simulation::getFileByID("outfile_1");
+        auto outfile_2 = wrench::Simulation::getFileByID("outfile_2");
 
         /* Now let's create a map of file locations, stating for each file
          * where it should be read/written while the task executes */

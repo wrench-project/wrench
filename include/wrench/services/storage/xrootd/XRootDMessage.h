@@ -43,7 +43,7 @@ namespace wrench {
          */
         class ContinueSearchMessage : public Message {
         public:
-            ContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox,
+            ContinueSearchMessage(S4U_CommPort *answer_commport,
                                   std::shared_ptr<StorageServiceFileReadRequestMessage> original,
                                   std::shared_ptr<DataFile> file,
                                   Node *node,
@@ -51,8 +51,8 @@ namespace wrench {
                                   std::shared_ptr<bool> answered,
                                   int timeToLive);
             ContinueSearchMessage(ContinueSearchMessage *toCopy);
-            /** @brief Mailbox to which the FINAL answer message should be sent */
-            simgrid::s4u::Mailbox *answer_mailbox;
+            /** @brief CommPort to which the FINAL answer message should be sent */
+            S4U_CommPort *answer_commport;
 
             /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/
             std::shared_ptr<StorageServiceFileReadRequestMessage> original;
@@ -62,7 +62,7 @@ namespace wrench {
 
             /** The node that originally received the FileLookupRequest or FileReadRequest */
             Node *node;
-            /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_mailbox spamming for multiple file hits */
+            /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_commport spamming for multiple file hits */
             std::shared_ptr<bool> answered;
             /** How many more hops this message can live for, to prevent messages living forever in improper configurations with loops.*/
             int timeToLive;
@@ -74,12 +74,12 @@ namespace wrench {
 
         class UpdateCacheMessage : public Message {
         public:
-            UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<StorageServiceFileReadRequestMessage> original, Node *node, std::shared_ptr<DataFile> file, std::set<std::shared_ptr<FileLocation>> locations,
+            UpdateCacheMessage(S4U_CommPort *answer_commport, std::shared_ptr<StorageServiceFileReadRequestMessage> original, Node *node, std::shared_ptr<DataFile> file, std::set<std::shared_ptr<FileLocation>> locations,
                                double payload, std::shared_ptr<bool> answered);
             UpdateCacheMessage(UpdateCacheMessage &other);
             UpdateCacheMessage(UpdateCacheMessage *other);
-            /** @brief Mailbox to which the FINAL answer message should be sent */
-            simgrid::s4u::Mailbox *answer_mailbox;
+            /** @brief CommPort to which the FINAL answer message should be sent */
+            S4U_CommPort *answer_commport;
             /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/
             std::shared_ptr<StorageServiceFileReadRequestMessage> original;
             /** @brief The file found */
@@ -88,7 +88,7 @@ namespace wrench {
             set<std::shared_ptr<FileLocation>> locations;
             /** @brief The highest node in the tree to return to when caching (should be the node the original message was sent) */
             Node *node;
-            /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_mailbox spamming for multiple file hits */
+            /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_commport spamming for multiple file hits */
             std::shared_ptr<bool> answered;
         };
         /**
@@ -97,18 +97,18 @@ namespace wrench {
 
         class FileNotFoundAlarm : public Message {
         public:
-            FileNotFoundAlarm(simgrid::s4u::Mailbox *answer_mailbox,
+            FileNotFoundAlarm(S4U_CommPort *answer_commport,
                               std::shared_ptr<DataFile> file,
                               bool fileReadRequest,
                               std::shared_ptr<bool> answered);
 
-            /** @brief Mailbox to which the FINAL answer message should be sent */
-            simgrid::s4u::Mailbox *answer_mailbox;
+            /** @brief CommPort to which the FINAL answer message should be sent */
+            S4U_CommPort *answer_commport;
             /** @brief The file being searched for */
             std::shared_ptr<DataFile> file;
             /** @brief Whether this message is in response to a file read request (true) or a file lookup request (false) */
             bool fileReadRequest;
-            /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_mailbox spamming for multiple file hits */
+            /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_commport spamming for multiple file hits */
             std::shared_ptr<bool> answered;
         };
         /**
@@ -130,7 +130,7 @@ namespace wrench {
          */
         class AdvancedContinueSearchMessage : public ContinueSearchMessage {
         public:
-            AdvancedContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox,
+            AdvancedContinueSearchMessage(S4U_CommPort *answer_commport,
                                           std::shared_ptr<StorageServiceFileReadRequestMessage> original,
                                           std::shared_ptr<DataFile> file,
                                           Node *node,

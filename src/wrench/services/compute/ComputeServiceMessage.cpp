@@ -23,7 +23,7 @@ namespace wrench {
 
     /**
    * @brief Constructor
-   * @param answer_mailbox: mailbox to which the answer message should be sent
+   * @param answer_commport: commport to which the answer message should be sent
    * @param job: a compound job submitted for execution
    * @param service_specific_args: a map of extra arguments (each specified by a name and value, both strings) required by some services
    * @param payload: message size in bytes
@@ -31,17 +31,17 @@ namespace wrench {
    * @throw std::invalid_arguments
    */
     ComputeServiceSubmitCompoundJobRequestMessage::ComputeServiceSubmitCompoundJobRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_CommPort *answer_commport,
             std::shared_ptr<CompoundJob> job,
             std::map<std::string, std::string> service_specific_args,
             double payload) : ComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || (job == nullptr)) {
+        if ((answer_commport == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceSubmitCompoundJobRequestMessage::ComputeServiceSubmitCompoundJobRequestMessage(): Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->job = std::move(job);
         this->service_specific_args = std::move(service_specific_args);
     }
@@ -122,23 +122,23 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    * @param answer_mailbox: mailbox to which the answer message should be sent
+    * @param answer_commport: commport to which the answer message should be sent
     * @param job: a compound job to terminate
     * @param payload: message size in bytes
     *
     * @throw std::invalid_arguments
     */
     ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_CommPort *answer_commport,
             std::shared_ptr<CompoundJob> job,
             double payload) : ComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || (job == nullptr)) {
+        if ((answer_commport == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(): Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->job = std::move(job);
     }
 
@@ -219,24 +219,24 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_mailbox: the mailbox to which the answer should be sent
+     * @param answer_commport: the commport to which the answer should be sent
      * @param key: the desired resource information (i.e., dictionary key) that's needed)
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
     ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_CommPort *answer_commport,
             const std::string &key,
             double payload)
         : ComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) or key.empty()) {
+        if ((answer_commport == nullptr) or key.empty()) {
             throw std::invalid_argument(
                     "ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(): Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->key = key;
     }
 
@@ -256,7 +256,7 @@ namespace wrench {
     /**
     * @brief Constructor
     *
-    * @param answer_mailbox: the mailbox to which to send the answer
+    * @param answer_commport: the commport to which to send the answer
     * @param num_cores: the desired number of cores
     * @param ram: the desired RAM
     * @param payload: the message size in bytes
@@ -264,18 +264,18 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram, double payload) : ComputeServiceMessage(
+            S4U_CommPort *answer_commport, unsigned long num_cores, double ram, double payload) : ComputeServiceMessage(
 
                                                                                                                   payload) {
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if (not answer_mailbox) {
+        if (not answer_commport) {
             throw std::invalid_argument(
                     "ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(): "
                     "Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->num_cores = num_cores;
         this->ram = ram;
     }

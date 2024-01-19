@@ -25,21 +25,21 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
     CloudComputeServiceGetExecutionHostsRequestMessage::CloudComputeServiceGetExecutionHostsRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox, double payload) : CloudComputeServiceMessage(payload) {
+            S4U_CommPort *answer_commport, double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if (answer_mailbox == nullptr) {
+        if (answer_commport == nullptr) {
             throw std::invalid_argument(
                     "CloudComputeServiceGetExecutionHostsRequestMessage::CloudComputeServiceGetExecutionHostsRequestMessage(): "
                     "Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
     }
 
     /**
@@ -54,7 +54,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
      *                   available on the host)
      * @param ram_memory: the VM's RAM memory_manager_service capacity (use ComputeService::ALL_RAM to use all RAM available on the
@@ -67,7 +67,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceCreateVMRequestMessage::CloudComputeServiceCreateVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_CommPort *answer_commport,
             unsigned long num_cores,
             double ram_memory,
             const std::string &physical_host,
@@ -75,13 +75,13 @@ namespace wrench {
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || (ram_memory < 0.0)) {
-            //        std::cerr << answer_mailbox << " - " << pm_hostname << " - " << vm_name << std::endl;
+        if ((answer_commport == nullptr) || (ram_memory < 0.0)) {
+            //        std::cerr << answer_commport << " - " << pm_hostname << " - " << vm_name << std::endl;
             throw std::invalid_argument(
                     "CloudComputeServiceCreateVMRequestMessage::CloudComputeServiceCreateVMRequestMessage(): Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->num_cores = num_cores;
         this->ram_memory = ram_memory;
         this->physical_host = physical_host;
@@ -106,7 +106,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param vm_name: the name of the VM host
      * @param send_failure_notifications: whether to send job failure notifications
      * @param termination_cause: termination cause (for failure notifications)
@@ -115,18 +115,18 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceShutdownVMRequestMessage::CloudComputeServiceShutdownVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_CommPort *answer_commport,
             const std::string &vm_name,
             bool send_failure_notifications,
             ComputeService::TerminationCause termination_cause,
             double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || vm_name.empty()) {
+        if ((answer_commport == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
                     "CloudComputeServiceShutdownVMRequestMessage::CloudComputeServiceShutdownVMRequestMessage(): Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->vm_name = vm_name;
         this->send_failure_notifications = send_failure_notifications;
         this->termination_cause = termination_cause;
@@ -146,23 +146,23 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param vm_name: the name of the VM host
      * @param payload: githe message size in bytes
      *
      * @throw std::invalid_argument
      */
     CloudComputeServiceStartVMRequestMessage::CloudComputeServiceStartVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_CommPort *answer_commport,
             const std::string &vm_name,
             double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || vm_name.empty()) {
+        if ((answer_commport == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
                     "CloudComputeServiceStartVMRequestMessage::CloudComputeServiceStartVMRequestMessage(): Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->vm_name = vm_name;
     }
 
@@ -183,23 +183,23 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param vm_name: the name of the VM host
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
     CloudComputeServiceSuspendVMRequestMessage::CloudComputeServiceSuspendVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_CommPort *answer_commport,
             const std::string &vm_name,
             double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || vm_name.empty()) {
+        if ((answer_commport == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
                     "CloudComputeServiceSuspendVMRequestMessage::CloudComputeServiceSuspendVMRequestMessage(): Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->vm_name = vm_name;
     }
 
@@ -217,23 +217,23 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param vm_name: the name of the VM host
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
     CloudComputeServiceResumeVMRequestMessage::CloudComputeServiceResumeVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_CommPort *answer_commport,
             const std::string &vm_name,
             double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || vm_name.empty()) {
+        if ((answer_commport == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
                     "CloudComputeServiceResumeVMRequestMessage::CloudComputeServiceResumeVMRequestMessage(): Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->vm_name = vm_name;
     }
 
@@ -252,23 +252,23 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param vm_name: the name of the VM host
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
     CloudComputeServiceDestroyVMRequestMessage::CloudComputeServiceDestroyVMRequestMessage(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_CommPort *answer_commport,
             const std::string &vm_name,
             double payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_mailbox == nullptr) || vm_name.empty()) {
+        if ((answer_commport == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
                     "CloudComputeServiceDestroyVMRequestMessage::CloudComputeServiceDestroyVMRequestMessage(): Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->vm_name = vm_name;
     }
 

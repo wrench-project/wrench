@@ -53,6 +53,7 @@ public:
 protected:
     ~BareMetalComputeServiceTestScheduling() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     BareMetalComputeServiceTestScheduling() {
@@ -215,6 +216,7 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
                             new RAMPressureTestWMS(this, "Host1")));
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -340,6 +342,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
                                     this, "Host1")));
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     ASSERT_NO_THROW(simulation->launch());
 

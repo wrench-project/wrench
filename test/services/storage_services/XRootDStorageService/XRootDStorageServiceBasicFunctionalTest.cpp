@@ -241,7 +241,7 @@ void XRootDServiceBasicFunctionalTest::do_BasicFunctionality_test(std::string ar
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
-    //    argv[2] = strdup("--log=wrench_core_mailbox.t=debug");
+    //    argv[2] = strdup("--log=wrench_core_commport.t=debug");
 
     simulation->init(&argc, argv);
 

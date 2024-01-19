@@ -53,6 +53,7 @@ public:
 protected:
     ~SimpleStorageServiceFunctionalTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimpleStorageServiceFunctionalTest() {
@@ -61,10 +62,10 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
-        file_1 = workflow->addFile("file_1", 1.0);
-        file_10 = workflow->addFile("file_10", 10.0);
-        file_100 = workflow->addFile("file_100", 100.0);
-        file_500 = workflow->addFile("file_500", 500.0);
+        file_1 = wrench::Simulation::addFile("file_1", 1.0);
+        file_10 = wrench::Simulation::addFile("file_10", 10.0);
+        file_100 = wrench::Simulation::addFile("file_100", 100.0);
+        file_500 = wrench::Simulation::addFile("file_500", 500.0);
 
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -1190,7 +1191,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test(dou
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
-    //    argv[2] = strdup("--log=wrench_core_mailbox.t=debug");
+    //    argv[2] = strdup("--log=wrench_core_commport.t=debug");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

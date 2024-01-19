@@ -26,9 +26,9 @@ namespace wrench {
     class HTCondorNegotiatorService : public Service {
     private:
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {HTCondorCentralManagerServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
-                {HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
-                {HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD, 1024},
+                {HTCondorCentralManagerServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
         };
 
     public:
@@ -41,7 +41,7 @@ namespace wrench {
                                   std::set<std::shared_ptr<ComputeService>> &compute_services,
                                   std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
                                   std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
-                                  simgrid::s4u::Mailbox *reply_mailbox);
+                                  S4U_CommPort *reply_commport);
 
         ~HTCondorNegotiatorService() override;
 
@@ -69,8 +69,8 @@ namespace wrench {
         bool fcfs;
 
 
-        /** mailbox to reply **/
-        simgrid::s4u::Mailbox *reply_mailbox;
+        /** commport_name to reply **/
+        S4U_CommPort *reply_commport;
         /** set of compute resources **/
         std::set<std::shared_ptr<ComputeService>> compute_services;
         /**map of ongoing jobs **/

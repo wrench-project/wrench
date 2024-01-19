@@ -8,7 +8,7 @@
  */
 
 #include <wrench-dev.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
@@ -17,6 +17,7 @@
 #include <wrench/job/PilotJob.h>
 #include <unistd.h>
 
+#include "../../../include/RuntimeAssert.h"
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
@@ -256,6 +257,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1633,25 +1635,25 @@ private:
             }
             int num_positive_start_times = 0;
             for (auto const &j: queue_state) {
-                if (std::get<6>(j) > 0) {
+                if (std::get<6>(j) >= 0) {
                     num_positive_start_times++;
                 }
             }
-            if (num_positive_start_times != 1) {
-                throw std::runtime_error("Exactly one job should be shown as having started");
-            }
 
-            //            WRENCH_INFO("QUEUE STATE:");
-            //            for (auto const &j : queue_state) {
-            //                WRENCH_INFO("%s %d %d %d %d %.2lf %.2lf",
-            //                            std::get<0>(j).c_str(),
-            //                            std::get<1>(j),
-            //                            std::get<2>(j),
-            //                            std::get<3>(j),
-            //                            std::get<4>(j),
-            //                            std::get<5>(j),
-            //                            std::get<6>(j));
-            //            }
+//                        WRENCH_INFO("QUEUE STATE:");
+//                        for (auto const &j : queue_state) {
+//                            WRENCH_INFO("%s %s %d %d %d %.2lf %.2lf",
+//                                        std::get<0>(j).c_str(),
+//                                        std::get<1>(j).c_str(),
+//                                        std::get<2>(j),
+//                                        std::get<3>(j),
+//                                        std::get<4>(j),
+//                                        std::get<5>(j),
+//                                        std::get<6>(j));
+//                        }
+
+            RUNTIME_EQ(num_positive_start_times, 1, "number of jobs that have started");
+
         }
 
         {
@@ -1667,9 +1669,8 @@ private:
                     num_positive_start_times++;
                 }
             }
-            if (num_positive_start_times != 2) {
-                throw std::runtime_error("Exactly two jobs should be shown as having started");
-            }
+
+            RUNTIME_EQ(num_positive_start_times, 2, "number of jobs that have started");
 
             //            WRENCH_INFO("QUEUE STATE:");
             //            for (auto const &j : queue_state) {
@@ -1699,7 +1700,7 @@ void BatchServiceTest::do_GetQueueState_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

@@ -39,11 +39,11 @@ namespace wrench {
                            std::shared_ptr<StorageService> parent,
                            std::shared_ptr<DataFile> file,
                            double num_bytes_to_transfer,
-                           simgrid::s4u::Mailbox *src_mailbox,
+                           S4U_CommPort *src_commport,
                            std::shared_ptr<FileLocation> dst_location,
-                           simgrid::s4u::Mailbox *answer_mailbox_if_read,
-                           simgrid::s4u::Mailbox *answer_mailbox_if_write,
-                           simgrid::s4u::Mailbox *answer_mailbox_if_copy,
+                           S4U_CommPort *answer_commport_if_read,
+                           S4U_CommPort *answer_commport_if_write,
+                           S4U_CommPort *answer_commport_if_copy,
                            double buffer_size);
 
         FileTransferThread(std::string hostname,
@@ -51,10 +51,10 @@ namespace wrench {
                            std::shared_ptr<DataFile> file,
                            double num_bytes_to_transfer,
                            std::shared_ptr<FileLocation> src_location,
-                           simgrid::s4u::Mailbox *dst_mailbox,
-                           simgrid::s4u::Mailbox *answer_mailbox_if_read,
-                           simgrid::s4u::Mailbox *answer_mailbox_if_write,
-                           simgrid::s4u::Mailbox *answer_mailbox_if_copy,
+                           S4U_CommPort *dst_commport,
+                           S4U_CommPort *answer_commport_if_read,
+                           S4U_CommPort *answer_commport_if_write,
+                           S4U_CommPort *answer_commport_if_copy,
                            double buffer_size);
 
         FileTransferThread(std::string hostname,
@@ -63,9 +63,9 @@ namespace wrench {
                            double num_bytes_to_transfer,
                            std::shared_ptr<FileLocation> src_location,
                            std::shared_ptr<FileLocation> dsg_location,
-                           simgrid::s4u::Mailbox *answer_mailbox_if_read,
-                           simgrid::s4u::Mailbox *answer_mailbox_if_write,
-                           simgrid::s4u::Mailbox *answer_mailbox_if_copy,
+                           S4U_CommPort *answer_commport_if_read,
+                           S4U_CommPort *answer_commport_if_write,
+                           S4U_CommPort *answer_commport_if_copy,
                            double buffer_size);
 
         int main() override;
@@ -77,22 +77,22 @@ namespace wrench {
         std::shared_ptr<DataFile> file;
 
         // Only one of these two is valid
-        simgrid::s4u::Mailbox *src_mailbox;
+        S4U_CommPort *src_commport;
         std::shared_ptr<FileLocation> src_location;
 
         // Only one of these two is valid
-        simgrid::s4u::Mailbox *dst_mailbox;
+        S4U_CommPort *dst_commport;
         std::shared_ptr<FileLocation> dst_location;
 
         double num_bytes_to_transfer;
 
-        simgrid::s4u::Mailbox *answer_mailbox_if_read;
-        simgrid::s4u::Mailbox *answer_mailbox_if_write;
-        simgrid::s4u::Mailbox *answer_mailbox_if_copy;
+        S4U_CommPort *answer_commport_if_read;
+        S4U_CommPort *answer_commport_if_write;
+        S4U_CommPort *answer_commport_if_copy;
         double buffer_size;
 
-        void receiveFileFromNetwork(const std::shared_ptr<DataFile> &f, simgrid::s4u::Mailbox *mailbox, const std::shared_ptr<FileLocation> &location);
-        void sendLocalFileToNetwork(const std::shared_ptr<DataFile> &f, const std::shared_ptr<FileLocation> &location, double num_bytes, simgrid::s4u::Mailbox *mailbox);
+        void receiveFileFromNetwork(const std::shared_ptr<DataFile> &f, S4U_CommPort *commport, const std::shared_ptr<FileLocation> &location);
+        void sendLocalFileToNetwork(const std::shared_ptr<DataFile> &f, const std::shared_ptr<FileLocation> &location, double num_bytes, S4U_CommPort *commport);
         void downloadFileFromStorageService(const std::shared_ptr<DataFile> &f, const std::shared_ptr<FileLocation> &src_loc, const std::shared_ptr<FileLocation> &dst_loc);
         void copyFileLocally(const std::shared_ptr<DataFile> &f, const std::shared_ptr<FileLocation> &src_loc, const std::shared_ptr<FileLocation> &dst_loc);
     };

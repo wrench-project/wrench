@@ -9,14 +9,16 @@
 
 #include <gtest/gtest.h>
 
+#include <wrench/simulation/Simulation.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/workflow/Workflow.h>
 
 TEST(DataFileTest, FileStructure) {
     auto workflow = wrench::Workflow::createWorkflow();
-    std::shared_ptr<wrench::DataFile> f1 = workflow->addFile("file-01", 100);
+    std::shared_ptr<wrench::DataFile> f1 = wrench::Simulation::addFile("file-01", 100);
 
     ASSERT_EQ(f1->getID(), "file-01");
     ASSERT_EQ(f1->getSize(), 100);
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 }

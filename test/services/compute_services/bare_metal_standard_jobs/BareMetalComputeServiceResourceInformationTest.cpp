@@ -34,6 +34,7 @@ public:
 protected:
     ~BareMetalComputeServiceTestResourceInformation() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     BareMetalComputeServiceTestResourceInformation() {

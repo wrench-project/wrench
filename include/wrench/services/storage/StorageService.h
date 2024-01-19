@@ -75,7 +75,7 @@ namespace wrench {
          * @return true if the file is present, or false
          */
         virtual bool lookupFile(const std::shared_ptr<FileLocation> &location) {
-            return this->lookupFile(S4U_Daemon::getRunningActorRecvMailbox(), location);
+            return this->lookupFile(S4U_Daemon::getRunningActorRecvCommPort(), location);
         }
 
         /** File deletion methods **/
@@ -110,7 +110,7 @@ namespace wrench {
          * @param location a location
          */
         virtual void deleteFile(const std::shared_ptr<FileLocation> &location) {
-            this->deleteFile(S4U_Daemon::getRunningActorRecvMailbox(), location, true);
+            this->deleteFile(S4U_Daemon::getRunningActorRecvCommPort(), location, true);
         }
 
         /** File read methods **/
@@ -172,7 +172,7 @@ namespace wrench {
          * @param location a location
          */
         void readFile(const std::shared_ptr<FileLocation> &location) {
-            this->readFile(S4U_Daemon::getRunningActorRecvMailbox(), location, location->getFile()->getSize(), true);
+            this->readFile(S4U_Daemon::getRunningActorRecvCommPort(), location, location->getFile()->getSize(), true);
         }
         /**
          * @brief Read a file at the storage service (incurs simulated overheads)
@@ -180,7 +180,7 @@ namespace wrench {
          * @param num_bytes a number of bytes to read
          */
         virtual void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
-            this->readFile(S4U_Daemon::getRunningActorRecvMailbox(), location, num_bytes, true);
+            this->readFile(S4U_Daemon::getRunningActorRecvCommPort(), location, num_bytes, true);
         }
 
         /** File write methods **/
@@ -214,7 +214,7 @@ namespace wrench {
          * @param location a location
          */
         virtual void writeFile(const std::shared_ptr<FileLocation> &location) {
-            this->writeFile(S4U_Daemon::getRunningActorRecvMailbox(), location, location->getFile()->getSize(), true);
+            this->writeFile(S4U_Daemon::getRunningActorRecvCommPort(), location, location->getFile()->getSize(), true);
         }
 
         /** Non-Simulation methods **/
@@ -472,11 +472,11 @@ namespace wrench {
 
         /**
          * @brief Initiate a file copy from one location to another
-         * @param answer_mailbox: a mailbox on which to receive completion/failure notification
+         * @param answer_commport: a commport_name on which to receive completion/failure notification
          * @param src_location: a source location
          * @param dst_location: a destination location
          */
-        static void initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox,
+        static void initiateFileCopy(S4U_CommPort *answer_commport,
                                      const std::shared_ptr<FileLocation> &src_location,
                                      const std::shared_ptr<FileLocation> &dst_location);
 
@@ -493,19 +493,19 @@ namespace wrench {
          */
         virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) = 0;
 
-        virtual void deleteFile(simgrid::s4u::Mailbox *answer_mailbox,
+        virtual void deleteFile(S4U_CommPort *answer_commport,
                                 const std::shared_ptr<FileLocation> &location,
                                 bool wait_for_answer);
 
-        virtual bool lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
+        virtual bool lookupFile(S4U_CommPort *answer_commport,
                                 const std::shared_ptr<FileLocation> &location);
 
-        virtual void readFile(simgrid::s4u::Mailbox *answer_mailbox,
+        virtual void readFile(S4U_CommPort *answer_commport,
                               const std::shared_ptr<FileLocation> &location,
                               double num_bytes,
                               bool wait_for_answer);
 
-        virtual void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+        virtual void writeFile(S4U_CommPort *answer_commport,
                                const std::shared_ptr<FileLocation> &location,
                                double num_bytes_to_write,
                                bool wait_for_answer);
@@ -557,7 +557,7 @@ namespace wrench {
 
 
         virtual void writeFilePartial(const std::shared_ptr<FileLocation> &location, double num_bytes_to_write) {
-            this->writeFile(S4U_Daemon::getRunningActorRecvMailbox(), location, num_bytes_to_write, true);
+            this->writeFile(S4U_Daemon::getRunningActorRecvCommPort(), location, num_bytes_to_write, true);
         }
 
         static void writeOrReadFiles(FileOperation action,

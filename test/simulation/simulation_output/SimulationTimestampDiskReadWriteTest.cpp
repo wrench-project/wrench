@@ -25,6 +25,7 @@ public:
 protected:
     ~SimulationTimestampDiskReadWriteTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimulationTimestampDiskReadWriteTest() {
@@ -63,7 +64,7 @@ protected:
 
         workflow = wrench::Workflow::createWorkflow();
 
-        file_1 = workflow->addFile("file_1", 100.0);
+        file_1 = wrench::Simulation::addFile("file_1", 100.0);
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";

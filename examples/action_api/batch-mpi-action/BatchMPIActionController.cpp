@@ -68,7 +68,7 @@ namespace wrench {
 
         /* MPI code to execute as part of the action. Note that there are extra barriers
          * so that the log output is not weirdly interleaved */
-        auto mpi_code = [storage_service, file](const std::shared_ptr<ActionExecutor> &action_executor) {
+        auto mpi_code = [storage_service, file](const std::shared_ptr<ExecutionController> &controller) {
             int num_procs;
             int my_rank;
 
@@ -80,7 +80,7 @@ namespace wrench {
             MPI_Barrier(MPI_COMM_WORLD);
 
             // Create my own data movement manager
-            auto data_manager = action_executor->createDataMovementManager();
+            auto data_manager = controller->createDataMovementManager();
 
             // "Allocate" memory for the data that will be communicated
             int num_comm_bytes = 1000000;
@@ -110,7 +110,7 @@ namespace wrench {
                 MPI_Alltoall(data, num_comm_bytes, MPI_CHAR, data, num_comm_bytes, MPI_CHAR, MPI_COMM_WORLD);
 
                 // Wait for the asynchronous IO read to complete
-                auto event = action_executor->waitForNextEvent();
+                auto event = controller->waitForNextEvent();
                 auto io_event = std::dynamic_pointer_cast<wrench::FileReadCompletedEvent>(event);
                 if (not io_event) {
                     throw std::runtime_error("Custom action: unexpected IO event: " + io_event->toString());

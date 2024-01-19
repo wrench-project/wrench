@@ -8,7 +8,7 @@
  */
 
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/storage/StorageService.h"
@@ -34,10 +34,10 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the hostname on which the data movement manager is to run
-     * @param creator_mailbox: the mailbox of the manager's creator
+     * @param creator_commport: the commport of the manager's creator
      */
-    DataMovementManager::DataMovementManager(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox) : Service(hostname, "data_movement_manager") {
-        this->creator_mailbox = creator_mailbox;
+    DataMovementManager::DataMovementManager(std::string hostname, S4U_CommPort *creator_commport) : Service(hostname, "data_movement_manager") {
+        this->creator_commport = creator_commport;
     }
 
     /**
@@ -54,7 +54,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void DataMovementManager::stop() {
-        S4U_Mailbox::putMessage(this->mailbox, new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
+        this->commport->putMessage(new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**
@@ -87,7 +87,7 @@ namespace wrench {
 
 
         this->pending_file_copies.push_front(std::make_unique<CopyRequestSpecs>(src, dst, file_registry_service));
-        wrench::StorageService::initiateFileCopy(this->mailbox, src, dst);
+        wrench::StorageService::initiateFileCopy(this->commport, src, dst);
     }
 
     /**
@@ -126,7 +126,7 @@ namespace wrench {
 
         this->pending_file_reads.push_front(std::make_unique<ReadRequestSpecs>(location, num_bytes));
         // Initiate the read in a thread
-        auto frt = std::make_shared<FileReaderThread>(this->hostname, this->mailbox, location, num_bytes);
+        auto frt = std::make_shared<FileReaderThread>(this->hostname, this->commport, location, num_bytes);
         frt->setSimulation(this->simulation);
         frt->start(frt, true, false);
     }
@@ -157,7 +157,7 @@ namespace wrench {
         this->pending_file_writes.push_front(std::make_unique<WriteRequestSpecs>(location, file_registry_service));
 
         // Initiate the write in a thread
-        auto fwt = std::make_shared<FileWriterThread>(this->hostname, this->mailbox, location);
+        auto fwt = std::make_shared<FileWriterThread>(this->hostname, this->commport, location);
         fwt->setSimulation(this->simulation);
         fwt->start(fwt, true, false);
     }
@@ -206,7 +206,7 @@ namespace wrench {
     int DataMovementManager::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Data Movement Manager starting (%s)", this->mailbox->get_cname());
+        WRENCH_INFO("New Data Movement Manager starting (%s)", this->commport->get_cname());
 
         while (processNextMessage()) {}
 
@@ -225,7 +225,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (ExecutionException &e) {
             WRENCH_INFO("Oops... somebody tried to send a message, but that failed...");
             return true;
@@ -269,7 +269,7 @@ namespace wrench {
             }
 
             // Replay
-            S4U_Mailbox::dputMessage(this->creator_mailbox,
+            this->creator_commport->dputMessage(
                                      new DataManagerFileCopyAnswerMessage(msg->src,
                                                                           msg->dst,
                                                                           msg->success,
@@ -289,7 +289,7 @@ namespace wrench {
             }
 
             // Forward it back
-            S4U_Mailbox::dputMessage(this->creator_mailbox,
+            this->creator_commport->dputMessage(
                                      new DataManagerFileReadAnswerMessage(msg->location,
                                                                           msg->num_bytes,
                                                                           msg->success,
@@ -312,17 +312,17 @@ namespace wrench {
             }
 
             if (request.file_registry_service) {
-                WRENCH_INFO("Trying to do a register");
+//                WRENCH_INFO("Trying to do a register");
                 try {
                     request.file_registry_service->addEntry(request.location);
                 } catch (ExecutionException &e) {
-                    WRENCH_INFO("Oops, couldn't do it");
+//                    WRENCH_INFO("Oops, couldn't do it");
                     // don't throw, just keep file_registry_service_update to false
                 }
             }
 
             // Forward it back
-            S4U_Mailbox::dputMessage(this->creator_mailbox,
+            this->creator_commport->dputMessage(
                                      new DataManagerFileWriteAnswerMessage(msg->location,
                                                                            msg->success,
                                                                            std::move(msg->failure_cause)));

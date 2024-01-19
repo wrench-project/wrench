@@ -22,7 +22,7 @@ class BogusMessageTest : public ::testing::Test {
 
 public:
     std::shared_ptr<wrench::Service> service = nullptr;
-    simgrid::s4u::Mailbox *dst_mailbox;
+    wrench::S4U_CommPort *dst_commport;
 
     void do_BogusMessage_Test(std::string service_type);
 
@@ -133,7 +133,7 @@ private:
     int main() override {
         wrench::Simulation::sleep(1000);
         try {
-            wrench::S4U_Mailbox::putMessage(this->test->dst_mailbox, new BogusMessage());
+            this->test->dst_commport->putMessage(new BogusMessage());
         } catch (std::runtime_error &e) {
         }
         return 0;
@@ -155,9 +155,13 @@ private:
 
     int main() override {
 
+        wrench::Simulation::sleep(10);
+
         if (this->create_data_movement_manager) {
             auto dmm = this->createDataMovementManager();
-            this->test->dst_mailbox = dmm->mailbox;
+            this->test->dst_commport = dmm->commport;
+        } else {
+            this->test->dst_commport = this->test->service->commport;
         }
         this->waitForAndProcessNextEvent();
         return 0;
@@ -203,18 +207,18 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     // Create a service
     if (service_type == "file_registry") {
         this->service = simulation->add(new wrench::FileRegistryService(hostname));
-        this->dst_mailbox = this->service->mailbox;
+        this->dst_commport = this->service->commport;
     } else if (service_type == "simple_storage") {
         this->service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"}));
-        this->dst_mailbox = this->service->mailbox;
+        this->dst_commport = this->service->commport;
     } else if (service_type == "data_movement_manager") {
         auto wms = new NoopWMS(this, hostname, true);
         this->service = simulation->add(wms);
-        this->dst_mailbox = nullptr;// Will be set by the WMS on DMM is created
+        this->dst_commport = nullptr; // Will be set by the WMS on DMM is created
     }
 
     // Create the Bogus Message WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms;
 
     ASSERT_NO_THROW(wms = simulation->add(
                             new BogusMessageTestWMS(this, hostname)));

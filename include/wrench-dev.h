@@ -86,7 +86,7 @@
 #include "wrench/job/PilotJob.h"
 
 // Simgrid Util
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 
 #endif//WRENCH_WRENCH_DEV_H

@@ -45,7 +45,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        NetworkError(NetworkError::OperationType, NetworkError::ErrorType, const std::string &mailbox);
+        NetworkError(NetworkError::OperationType, NetworkError::ErrorType, const std::string &commport_name, const std::string &message_name);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -54,12 +54,14 @@ namespace wrench {
         bool whileReceiving();
         bool whileSending();
         bool isTimeout();
-        std::string getMailbox();
+        std::string getCommPortName();
+        std::string getMessageName();
 
     private:
         NetworkError::OperationType operation_type;
         NetworkError::ErrorType error_type;
-        std::string mailbox = "";
+        std::string commport_name;
+        std::string message_name;
     };
 
 

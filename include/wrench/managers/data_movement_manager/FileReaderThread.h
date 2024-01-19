@@ -31,7 +31,7 @@ namespace wrench {
     class FileReaderThread : public Service {
 
     public:
-        FileReaderThread(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox,
+        FileReaderThread(std::string hostname, S4U_CommPort *creator_commport,
                          std::shared_ptr<FileLocation> location,
                          double num_bytes);
 
@@ -39,7 +39,7 @@ namespace wrench {
     private:
         int main() override;
 
-        simgrid::s4u::Mailbox *creator_mailbox;
+        S4U_CommPort *creator_commport;
         std::shared_ptr<FileLocation> location;
         double num_bytes;
     };

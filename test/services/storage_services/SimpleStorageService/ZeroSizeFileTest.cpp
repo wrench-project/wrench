@@ -17,6 +17,7 @@ public:
 protected:
     ~SimpleStorageServiceZeroSizeFileTest() override {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimpleStorageServiceZeroSizeFileTest() {
@@ -24,7 +25,7 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // create the files
-        file = workflow->addFile("file_1", 0);
+        file = wrench::Simulation::addFile("file_1", 0);
 
 
         // Create a 2-host platform file

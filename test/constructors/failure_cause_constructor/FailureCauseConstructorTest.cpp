@@ -25,20 +25,20 @@ protected:
 TEST_F(FailureCauseConstructorTest, NetworkError) {
 
     wrench::NetworkError *cause;
-    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::SENDING, wrench::NetworkError::TIMEOUT, "mailbox"));
-    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::TIMEOUT, "mailbox"));
-    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::SENDING, wrench::NetworkError::FAILURE, "mailbox"));
-    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::FAILURE, "mailbox"));
-    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::FAILURE, "mailbox"));
-    ASSERT_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::FAILURE, ""), std::invalid_argument);
+    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::SENDING, wrench::NetworkError::TIMEOUT, "commport_name", "message_name"));
+    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::TIMEOUT, "commport_name", "message_name"));
+    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::SENDING, wrench::NetworkError::FAILURE, "commport_name", "message_name"));
+    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::FAILURE, "commport_name", "message_name"));
+    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::FAILURE, "commport_name", "message_name"));
+    ASSERT_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::FAILURE, "", "message_name"), std::invalid_argument);
 
 
-    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::SENDING, wrench::NetworkError::TIMEOUT, "mailbox"));
+    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::SENDING, wrench::NetworkError::TIMEOUT, "commport_name", "message_name"));
     ASSERT_EQ(cause->isTimeout(), true);
     ASSERT_EQ(cause->whileReceiving(), false);
     ASSERT_EQ(cause->whileSending(), true);
 
-    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::FAILURE, "mailbox"));
+    ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::FAILURE, "commport_name", "message_name"));
     ASSERT_EQ(cause->isTimeout(), false);
     ASSERT_EQ(cause->whileReceiving(), true);
     ASSERT_EQ(cause->whileSending(), false);

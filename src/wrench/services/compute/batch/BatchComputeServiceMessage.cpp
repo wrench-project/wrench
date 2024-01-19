@@ -22,13 +22,13 @@ namespace wrench {
 #if 0
     /**
      * @brief Constructor
-     * @param answer_mailbox: the mailbox to reply to
+     * @param answer_commport: the commport to reply to
      * @param job_args_to_scheduler: the arguments required by batscheduler of batsim
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
-    BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(S4U_CommPort *answer_commport,
                                                                                      std::string job_args_to_scheduler,
                                                                                      double payload)
             : BatchComputeServiceMessage("BATCH_SIMULATION_BEGINS", payload) {
@@ -36,11 +36,11 @@ namespace wrench {
         throw std::invalid_argument(
                 "BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(): Empty job arguments to scheduler");
       }
-      if (answer_mailbox.empty()) {
+      if (answer_commport.empty()) {
         throw std::invalid_argument(
-                "BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(): Empty answer mailbox");
+                "BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(): Empty answer commport");
       }
-      this->answer_mailbox = answer_mailbox;
+      this->answer_commport = answer_commport;
       this->job_args_to_scheduler = job_args_to_scheduler;
     }
 #endif
@@ -48,44 +48,44 @@ namespace wrench {
 #if 0
     /**
      * @brief Constructor
-     * @param answer_mailbox: the mailbox to reply to
+     * @param answer_commport: the commport to reply to
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
-    BatchSchedReadyMessage::BatchSchedReadyMessage(std::string &answer_mailbox, double payload)
+    BatchSchedReadyMessage::BatchSchedReadyMessage(std::string &answer_commport, double payload)
             : BatchComputeServiceMessage("BATCH_SCHED_READY", payload) {
-      if (answer_mailbox.empty()) {
+      if (answer_commport.empty()) {
         throw std::invalid_argument(
-                "BatchSchedReadyMessage::BatchSchedReadyMessage(): Empty answer mailbox");
+                "BatchSchedReadyMessage::BatchSchedReadyMessage(): Empty answer commport");
       }
-      this->answer_mailbox = answer_mailbox;
+      this->answer_commport = answer_commport;
     }
 #endif
 
     /**
      * @brief Constructor
-     * @param answer_mailbox: the mailbox to reply to
+     * @param answer_commport: the commport to reply to
      * @param batsched_decision_reply: the decision reply from Batsched
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
-    BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(S4U_CommPort *answer_commport,
                                                                            std::string batsched_decision_reply,
                                                                            double payload)
         : BatchComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if (answer_mailbox == nullptr) {
+        if (answer_commport == nullptr) {
             throw std::invalid_argument(
-                    "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty answer mailbox");
+                    "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty answer commport");
         }
         if (batsched_decision_reply.empty()) {
             throw std::invalid_argument(
                     "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty batsched decision reply");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->batsched_decision_reply = std::move(batsched_decision_reply);
     }
 
@@ -104,14 +104,14 @@ namespace wrench {
 #if 0
     /**
      * @brief Constructor
-     * @param answer_mailbox: the mailbox to reply to
+     * @param answer_commport: the commport to reply to
      * @param job: the BatchComputeService job
      * @param job_args_to_scheduler: the arguments required by batscheduler of batsim
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
-    BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(std::string &answer_mailbox,
+    BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(std::string &answer_commport,
                                                                                Job *job,
                                                                                std::string job_args_to_scheduler,
                                                                                double payload)
@@ -123,11 +123,11 @@ namespace wrench {
       if (job == nullptr) {
         throw std::invalid_argument("BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(): invalid job");
       }
-      if (answer_mailbox.empty()) {
-        throw std::invalid_argument("BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(): invalid answer mailbox");
+      if (answer_commport.empty()) {
+        throw std::invalid_argument("BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(): invalid answer commport");
       }
       this->job_args_to_scheduler = job_args_to_scheduler;
-      this->answer_mailbox = answer_mailbox;
+      this->answer_commport = answer_commport;
       this->job = job;
     }
 #endif
@@ -148,13 +148,13 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_mailbox: the mailbox to which the answer should be sent back
+     * @param answer_commport: the commport to which the answer should be sent back
      * @param job: the BatchComputeService job
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
-    BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(S4U_CommPort *answer_commport,
                                                                                std::shared_ptr<BatchJob> job, double payload)
         : BatchComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -162,12 +162,12 @@ namespace wrench {
             throw std::invalid_argument(
                     "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Invalid arguments");
         }
-        if (answer_mailbox == nullptr) {
+        if (answer_commport == nullptr) {
             throw std::invalid_argument(
-                    "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Empty answer mailbox");
+                    "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Empty answer commport");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->job = std::move(job);
     }
 

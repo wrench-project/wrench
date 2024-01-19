@@ -26,21 +26,21 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param reply_mailbox: the reply mailbox
+     * @param reply_commport: the reply commport
      * @param action: the action to perform
      * @param payload: the message size in bytes
      */
     ActionExecutionServiceSubmitActionRequestMessage::ActionExecutionServiceSubmitActionRequestMessage(
-            simgrid::s4u::Mailbox *reply_mailbox,
+            S4U_CommPort *reply_commport,
             std::shared_ptr<Action> action,
             double payload) : ActionExecutionServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((reply_mailbox == nullptr) || (action == nullptr)) {
+        if ((reply_commport == nullptr) || (action == nullptr)) {
             throw std::invalid_argument("ActionExecutionServiceSubmitActionRequestMessage::ActionExecutionServiceSubmitActionRequestMessage(): invalid argument");
         }
 #endif
         this->action = std::move(action);
-        this->reply_mailbox = reply_mailbox;
+        this->reply_commport = reply_commport;
     }
 
     /**
@@ -61,22 +61,22 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param reply_mailbox: the reply mailbox
+     * @param reply_commport: the reply commport
      * @param action: the action to terminate
      * @param termination_cause: the termination cause
      * @param payload: the message size in bytes
      */
     ActionExecutionServiceTerminateActionRequestMessage::ActionExecutionServiceTerminateActionRequestMessage(
-            simgrid::s4u::Mailbox *reply_mailbox,
+            S4U_CommPort *reply_commport,
             std::shared_ptr<Action> action,
             ComputeService::TerminationCause termination_cause,
             double payload) : ActionExecutionServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((reply_mailbox == nullptr) || (action == nullptr)) {
+        if ((reply_commport == nullptr) || (action == nullptr)) {
             throw std::invalid_argument("ActionExecutionServiceTerminateActionRequestMessage::ActionExecutionServiceTerminateActionRequestMessage(): invalid argument");
         }
 #endif
-        this->reply_mailbox = reply_mailbox;
+        this->reply_commport = reply_commport;
         this->action = std::move(action);
         this->termination_cause = termination_cause;
     }

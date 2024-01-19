@@ -34,6 +34,7 @@ public:
 protected:
     ~WorkflowTaskTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     WorkflowTaskTest() {
@@ -55,13 +56,13 @@ protected:
         t4 = workflow->addTask("task1-04", 10, 1, 3, 0);
 
 
-        large_input_file = workflow->addFile("large_input_file", 1000000);
+        large_input_file = wrench::Simulation::addFile("large_input_file", 1000000);
         workflow->getTasksThatInput(large_input_file); // coverage
         workflow->getTaskThatOutputs(large_input_file);// coverage
 
 
-        small_input_file = workflow->addFile("zz_small_input_file", 10);
-        t4_output_file = workflow->addFile("t4_output_file", 1000);
+        small_input_file = wrench::Simulation::addFile("zz_small_input_file", 10);
+        t4_output_file = wrench::Simulation::addFile("t4_output_file", 1000);
 
         t4->addInputFile(small_input_file);
         t4->addInputFile(large_input_file);
@@ -225,8 +226,8 @@ TEST_F(WorkflowTaskTest, GetSet) {
 
 TEST_F(WorkflowTaskTest, InputOutputFile) {
 
-    std::shared_ptr<wrench::DataFile> f1 = workflow->addFile("file-01", 10);
-    std::shared_ptr<wrench::DataFile> f2 = workflow->addFile("file-02", 100);
+    std::shared_ptr<wrench::DataFile> f1 = wrench::Simulation::addFile("file-01", 10);
+    std::shared_ptr<wrench::DataFile> f2 = wrench::Simulation::addFile("file-02", 100);
 
     t1->addInputFile(f1);
     t1->addOutputFile(f2);
@@ -292,7 +293,7 @@ private:
 
         // while large_input_file is being read, we delete small_input_file so that the one task job will fail
         wrench::StorageService::deleteFileAtLocation(
-                wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("zz_small_input_file")));
+                wrench::FileLocation::LOCATION(this->test->storage_service, wrench::Simulation::getFileByID("zz_small_input_file")));
 
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
@@ -347,7 +348,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test(double buffer_size) 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

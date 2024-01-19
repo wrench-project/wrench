@@ -30,6 +30,7 @@ public:
 protected:
     ~AlarmLinkFailuresTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     AlarmLinkFailuresTest() {
@@ -76,8 +77,8 @@ private:
     int main() override {
 
         // Create an Alarm service that will go of in 10 seconds
-        auto mailbox = this->mailbox;
-        wrench::Alarm::createAndStartAlarm(this->simulation, 10, "Host2", mailbox,
+        auto commport = this->commport;
+        wrench::Alarm::createAndStartAlarm(this->simulation, 10, "Host2", commport,
                                            new wrench::ExecutionControllerAlarmTimerMessage("hello", 10000), "wms_timer");
 
         // Start the link killer that will turn off link1 in 20 seconds
@@ -90,12 +91,12 @@ private:
         // Wait for the message
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(mailbox);
+            message = commport->getMessage();
             throw std::runtime_error("Should never have gotten the alarm's message");
         } catch (wrench::ExecutionException &e) {
             e.getCause()->toString();
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
-            cause->getMailbox();
+            cause->getCommPortName();
         }
 
         return 0;

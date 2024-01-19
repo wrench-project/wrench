@@ -224,8 +224,8 @@ void WMSTest::do_DefaultHandlerWMS_test() {
             new wrench::FileRegistryService(hostname1)));
 
     // Create two files
-    this->small_file = workflow->addFile("small", 10);
-    this->big_file = workflow->addFile("big", 1000);
+    this->small_file = wrench::Simulation::addFile("small", 10);
+    this->big_file = wrench::Simulation::addFile("big", 1000);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(this->small_file, storage_service1));
@@ -234,6 +234,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -453,8 +454,8 @@ void WMSTest::do_CustomHandlerWMS_test() {
             new wrench::FileRegistryService(hostname1)));
 
     // Create two files
-    this->small_file = workflow->addFile("small", 10);
-    this->big_file = workflow->addFile("big", 1000);
+    this->small_file = wrench::Simulation::addFile("small", 10);
+    this->big_file = wrench::Simulation::addFile("big", 1000);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(this->small_file, storage_service1));
@@ -463,6 +464,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

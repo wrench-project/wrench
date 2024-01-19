@@ -14,6 +14,7 @@
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.h"
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.h"
 #include "wrench/services/compute/cloud/CloudComputeService.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 namespace wrench {
 
@@ -33,22 +34,22 @@ namespace wrench {
                 {VirtualizedClusterComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {VirtualizedClusterComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {VirtualizedClusterComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {VirtualizedClusterComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
         };
 
     public:
@@ -87,7 +88,7 @@ namespace wrench {
 
         bool processNextMessage() override;
 
-        virtual void processMigrateVM(simgrid::s4u::Mailbox *answer_mailbox,
+        virtual void processMigrateVM(S4U_CommPort *answer_commport,
                                       const std::string &vm_name,
                                       const std::string &dest_pm_hostname);
 

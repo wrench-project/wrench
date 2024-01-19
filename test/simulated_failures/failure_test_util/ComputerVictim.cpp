@@ -15,11 +15,11 @@
 WRENCH_LOG_CATEGORY(computer_victim, "Log category for Computer");
 
 
-wrench::ComputerVictim::ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, simgrid::s4u::Mailbox *mailbox_to_notify)
+wrench::ComputerVictim::ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, wrench::S4U_CommPort *commport_to_notify)
     : Service(host_on_which_to_run, "victim") {
     this->flops = flops;
     this->msg = msg;
-    this->mailbox_to_notify = mailbox_to_notify;
+    this->commport_to_notify = commport_to_notify;
 }
 
 
@@ -28,7 +28,7 @@ int wrench::ComputerVictim::main() {
     WRENCH_INFO("Starting  (%u)", this->num_starts);
     WRENCH_INFO("Computing %.3lf flops...", this->flops);
     wrench::Simulation::compute(this->flops);
-    S4U_Mailbox::putMessage(this->mailbox_to_notify, this->msg);
+    this->commport_to_notify->putMessage(this->msg);
     return 0;
 }
 

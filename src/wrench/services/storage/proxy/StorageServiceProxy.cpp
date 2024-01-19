@@ -10,7 +10,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/simulation/SimulationMessage.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/exceptions/ExecutionException.h"
 #include "wrench/services/storage/StorageServiceMessage.h"
 #include "wrench/services/storage/StorageServiceMessagePayload.h"
@@ -86,7 +86,7 @@ namespace wrench {
 
         S4U_Simulation::compute(this->getPropertyValueAsDouble(StorageServiceProxyProperty::MESSAGE_OVERHEAD));
         try {
-            message = S4U_Mailbox::getMessage<ServiceMessage>(this->mailbox);
+            message = this->commport->getMessage<ServiceMessage>();
         } catch (ExecutionException &e) {
             WRENCH_DEBUG(
                     "Got a network error while getting some message... ignoring");
@@ -97,7 +97,7 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {//handle all the rest of the messages
             try {
-                S4U_Mailbox::dputMessage(msg->ack_mailbox,
+                msg->ack_commport->dputMessage(
                                          new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                  ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
@@ -113,20 +113,19 @@ namespace wrench {
             //cerr<<"FILE LOOKUP!!!! "<<remote<<" "<<target<<endl;
             if (cache->hasFile(msg->location)) {//forward request to cache
                 //cerr<<"File cached"<<endl;
-                S4U_Mailbox::dputMessage(msg->answer_mailbox, new StorageServiceFileLookupAnswerMessage(msg->location->getFile(), true, StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
+                msg->answer_commport->dputMessage(new StorageServiceFileLookupAnswerMessage(msg->location->getFile(), true, StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
 
             } else if (target) {
                 pending[msg->location->getFile()].push_back(std::move(message));
                 //message=std::move(pending[msg->location->getFile()][0]);
-                S4U_Mailbox::dputMessage(
-                        target->mailbox,
+                target->commport->dputMessage(
                         new StorageServiceFileLookupRequestMessage(
-                                mailbox,
+                                commport,
                                 FileLocation::LOCATION(target, msg->location->getPath(), msg->location->getFile()),
                                 target->getMessagePayloadValue(
                                         StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
             } else {
-                S4U_Mailbox::dputMessage(msg->answer_mailbox, new StorageServiceFileLookupAnswerMessage(msg->location->getFile(), false, StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
+                msg->answer_commport->dputMessage(new StorageServiceFileLookupAnswerMessage(msg->location->getFile(), false, StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
             }
         } else if ((this->*readMethod)(message)) {
             //no other handling required
@@ -153,9 +152,9 @@ namespace wrench {
                 }
             }
             if (deleted) {
-                S4U_Mailbox::dputMessage(msg->answer_mailbox, new StorageServiceFileDeleteAnswerMessage(msg->location->getFile(), target, true, nullptr, StorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD));
+                msg->answer_commport->dputMessage(new StorageServiceFileDeleteAnswerMessage(msg->location->getFile(), target, true, nullptr, StorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD));
             } else {
-                S4U_Mailbox::dputMessage(msg->answer_mailbox, new StorageServiceFileDeleteAnswerMessage(msg->location->getFile(), target, false, std::make_shared<FileNotFound>(msg->location), StorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD));
+                msg->answer_commport->dputMessage(new StorageServiceFileDeleteAnswerMessage(msg->location->getFile(), target, false, std::make_shared<FileNotFound>(msg->location), StorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD));
             }
         } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
             auto target = remote;
@@ -169,10 +168,10 @@ namespace wrench {
                     pending[msg->location->getFile()].push_back(std::move(message));
                     WRENCH_DEBUG("Adding pending write");
                 }
-                S4U_Mailbox::putMessage(cache->mailbox, new StorageServiceFileWriteRequestMessage(mailbox, msg->requesting_host,
+                cache->commport->putMessage(new StorageServiceFileWriteRequestMessage(commport, msg->requesting_host,
                                                                                                   FileLocation::LOCATION(cache, msg->location->getFile()), msg->location->getFile()->getSize(), 0));
             } else {
-                S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileWriteAnswerMessage(msg->location, false, nullptr, {}, 0, StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD));
+                msg->answer_commport->putMessage(new StorageServiceFileWriteAnswerMessage(msg->location, false, nullptr, {}, 0, StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD));
             }
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
@@ -194,13 +193,13 @@ namespace wrench {
             //            }
             //            if (target) {
             //                try{
-            //                    S4U_Mailbox::dputMessage(cache->mailbox, message.release());
+            //                    S4U_CommPort::dputMessage(cache->commport, message.release());
             //                    return true;
             //                }catch(...){}
             //
             //            }
             //            if(remote){
-            //                S4U_Mailbox::dputMessage(remote->mailbox, message.release());
+            //                S4U_CommPort::dputMessage(remote->commport, message.release());
             //                return true;
             //            }
             //            throw std::runtime_error( "StorageServiceProxy:processNextMessage(): Unexpected [" + message->getName() + "] message that either could not be forwared");
@@ -208,7 +207,7 @@ namespace wrench {
             std::vector<unique_ptr<ServiceMessage>> &messages = pending[msg->file];
             for (unsigned int i = 0; i < messages.size(); i++) {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(messages[i].get())) {
-                    S4U_Mailbox::dputMessage(tmpMsg->answer_mailbox, new StorageServiceFileLookupAnswerMessage(*msg));
+                    tmpMsg->answer_commport->dputMessage(new StorageServiceFileLookupAnswerMessage(*msg));
                     std::swap(messages[i], messages.back());
                     messages.pop_back();
                     i--;
@@ -220,7 +219,7 @@ namespace wrench {
             for (unsigned int i = 0; i < messages.size(); i++) {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(messages[i].get())) {
                     //WRENCH_DEBUG("Forwarding");
-                    S4U_Mailbox::dputMessage(tmpMsg->answer_mailbox, new StorageServiceFileWriteAnswerMessage(*msg));
+                    tmpMsg->answer_commport->dputMessage(new StorageServiceFileWriteAnswerMessage(*msg));
                     if (!msg->success) {//the the file write failed, there will be no ack message
                         //WRENCH_DEBUG("write failed");
                         std::swap(messages[i], messages.back());
@@ -236,14 +235,14 @@ namespace wrench {
             for (unsigned int i = 0; i < messages.size(); i++) {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(messages[i].get())) {
 
-                    S4U_Mailbox::dputMessage(tmpMsg->answer_mailbox, new StorageServiceAckMessage(*msg));//forward ACK
+                    tmpMsg->answer_commport->dputMessage(new StorageServiceAckMessage(*msg));//forward ACK
                     auto target = remote;
                     if (auto location = std::dynamic_pointer_cast<ProxyLocation>(tmpMsg->location)) {
                         target = location->target;
                     }
                     //WRENCH_DEBUG("initiating file copy");
-                    // Initiate File Copy but not wanting to receive an answer, hence the NULL_MAILBOX
-                    initiateFileCopy(S4U_Mailbox::NULL_MAILBOX, FileLocation::LOCATION(cache, msg->location->getFile()), FileLocation::LOCATION(target, msg->location->getFile()));
+                    // Initiate File Copy but not wanting to receive an answer, hence the NULL_COMMPORT
+                    initiateFileCopy(S4U_CommPort::NULL_COMMPORT, FileLocation::LOCATION(cache, msg->location->getFile()), FileLocation::LOCATION(target, msg->location->getFile()));
 
                     std::swap(messages[i], messages.back());
                     messages.pop_back();
@@ -582,12 +581,11 @@ namespace wrench {
      */
     bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<ServiceMessage> &message) {
         if (cache->hasFile(msg->location->getFile(), msg->location->getPath())) {//check cache
-            WRENCH_INFO("Forwarding to cache reply mailbox %s", msg->answer_mailbox->get_name().c_str());
-            S4U_Mailbox::putMessage(
-                    cache->mailbox,
+            WRENCH_INFO("Forwarding to cache reply commport %s", msg->answer_commport->get_name().c_str());
+            cache->commport->putMessage(
                     new StorageServiceFileReadRequestMessage(
-                            msg->answer_mailbox,
-                            msg->requesting_host,//msg->mailbox_to_receive_the_file_content,
+                            msg->answer_commport,
+                            msg->requesting_host,//msg->commport_to_receive_the_file_content,
                             FileLocation::LOCATION(cache, msg->location->getPath(), msg->location->getFile()),
                             msg->num_bytes_to_read, 0));
             return true;
@@ -650,9 +648,9 @@ namespace wrench {
                     return true;
                 }
 
-                StorageService::initiateFileCopy(mailbox, FileLocation::LOCATION(target, msg->location->getFile()), FileLocation::LOCATION(cache, msg->location->getFile()));
+                StorageService::initiateFileCopy(commport, FileLocation::LOCATION(target, msg->location->getFile()), FileLocation::LOCATION(cache, msg->location->getFile()));
             } else {
-                S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
             }
             return true;
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {//Our remote read request has finished
@@ -664,13 +662,13 @@ namespace wrench {
 
                     if (msg->success) {
                         tmpMsg->payload = 0;                      //this message has already been sent, this is a fake resend
-                        S4U_Mailbox::dputMessage(mailbox, tmpMsg);//now that the data is cached, resend the message
+                        commport->dputMessage(tmpMsg);//now that the data is cached, resend the message
                         std::swap(messages[i], messages.back());
                         messages.back().release();
                         messages.pop_back();
                         i--;
                     } else {
-                        S4U_Mailbox::putMessage(tmpMsg->answer_mailbox, new StorageServiceFileReadAnswerMessage(tmpMsg->location, false, msg->failure_cause, nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                        tmpMsg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(tmpMsg->location, false, msg->failure_cause, nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
                         std::swap(messages[i], messages.back());
 
                         messages.pop_back();
@@ -705,9 +703,9 @@ namespace wrench {
                 if (rejectDuplicateRead(msg->location->getFile())) {
                     return true;
                 }
-                StorageService::initiateFileCopy(mailbox, FileLocation::LOCATION(target, msg->location->getFile()), FileLocation::LOCATION(cache, msg->location->getFile()));
+                StorageService::initiateFileCopy(commport, FileLocation::LOCATION(target, msg->location->getFile()), FileLocation::LOCATION(cache, msg->location->getFile()));
             } else {
-                S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
             }
             return true;
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {//Our remote read request has finished
@@ -715,13 +713,13 @@ namespace wrench {
             for (unsigned int i = 0; i < messages.size(); i++) {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
                     if (msg->success) {
-                        S4U_Mailbox::putMessage(tmpMsg->answer_mailbox, new StorageServiceFileReadAnswerMessage(tmpMsg->location, true, nullptr, nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));//magic read, send buffersize 0 and we are assumed to be nonbufferized
-                        S4U_Mailbox::putMessage(tmpMsg->answer_mailbox, new StorageServiceAckMessage(tmpMsg->location));                                                                                                         //emediatly send the expected ack
+                        tmpMsg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(tmpMsg->location, true, nullptr, nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));//magic read, send buffersize 0 and we are assumed to be nonbufferized
+                        tmpMsg->answer_commport->putMessage(new StorageServiceAckMessage(tmpMsg->location));                                                                                                         //emediatly send the expected ack
                         std::swap(messages[i], messages.back());
                         messages.pop_back();
                         i--;
                     } else {
-                        S4U_Mailbox::putMessage(tmpMsg->answer_mailbox, new StorageServiceFileReadAnswerMessage(tmpMsg->location, false, msg->failure_cause, nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                        tmpMsg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(tmpMsg->location, false, msg->failure_cause, nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
                         std::swap(messages[i], messages.back());
                         messages.pop_back();
                         i--;
@@ -760,11 +758,11 @@ namespace wrench {
                 //readthrough:  all block until first read is finished, then all others read
                 //do not spend excessive time on readThrough
                 auto forward = new StorageServiceFileReadRequestMessage(msg);
-                forward->answer_mailbox = mailbox;                                                                     //setup intercept mailbox
+                forward->answer_commport = commport;                                                                     //setup intercept commport
                 forward->location = FileLocation::LOCATION(target, msg->location->getPath(), msg->location->getFile());//hyjack locaiton to be on target
-                S4U_Mailbox::dputMessage(target->mailbox, forward);                                                    //send to target
+                target->commport->dputMessage(forward);                                                    //send to target
             } else {
-                S4U_Mailbox::putMessage(msg->answer_mailbox, new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
             }
             return true;
         } else if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {//Our readthrough is in progress
@@ -775,11 +773,11 @@ namespace wrench {
                     if (msg->success) {
 
                         msg->location = tmpMsg->location;                                   //fix up the location
-                        S4U_Mailbox::dputMessage(tmpMsg->answer_mailbox, message.release());//forward success message to first waiting read host
+                        tmpMsg->answer_commport->dputMessage(message.release());//forward success message to first waiting read host
                         return true;
                     } else {
                         //remote read has failed, notify all waiting
-                        S4U_Mailbox::putMessage(tmpMsg->answer_mailbox, new StorageServiceFileReadAnswerMessage(tmpMsg->location, false, msg->failure_cause, nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
+                        tmpMsg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(tmpMsg->location, false, msg->failure_cause, nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
                         std::swap(messages[i], messages.back());
                         messages.pop_back();
                         i--;
@@ -799,7 +797,7 @@ namespace wrench {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
                     if (first) {//this is the fileread we have been faking
                         cache->createFile(msg->location->getFile());
-                        S4U_Mailbox::dputMessage(tmpMsg->answer_mailbox, new StorageServiceAckMessage(*msg));
+                        tmpMsg->answer_commport->dputMessage(new StorageServiceAckMessage(*msg));
                         std::swap(messages[i], messages.back());
                         messages.back().release();
                         messages.pop_back();
@@ -807,7 +805,7 @@ namespace wrench {
                         first = false;
                     } else {                                      //these are the pending reads
                         tmpMsg->payload = 0;                      //this message has already been sent, this is a fake resend
-                        S4U_Mailbox::dputMessage(mailbox, tmpMsg);//these should now be cached, and should just drop down to the cache automatically
+                        commport->dputMessage(tmpMsg);//these should now be cached, and should just drop down to the cache automatically
                         std::swap(messages[i], messages.back());
                         messages.back().release();
                         messages.pop_back();

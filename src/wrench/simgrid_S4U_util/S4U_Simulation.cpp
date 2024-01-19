@@ -16,7 +16,7 @@
 #include <simgrid/plugins/file_system.h>
 #include <wrench/failure_causes/FailureCause.h>
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simulation/Simulation.h>
 
@@ -43,18 +43,28 @@ namespace wrench {
         if (not Simulation::isSurfPrecisionSetByUser()) {
             simgrid::s4u::Engine::set_config("surf/precision:1e-9");
         }
-        // Set the SMPI options
-        simgrid::s4u::Engine::set_config("smpi/simulate-computation:no");
-        simgrid::s4u::Engine::set_config("smpi/host-speed:1000Gf");
-        simgrid::s4u::Engine::set_config("smpi/init:0");
-        simgrid::s4u::Engine::set_config("smpi/shared-malloc:global");
 
-        // Create the mailbox pool
-        S4U_Mailbox::createMailboxPool(S4U_Mailbox::mailbox_pool_size);
-        S4U_Mailbox::NULL_MAILBOX = simgrid::s4u::Mailbox::by_name("NULL_MAILBOX");
+
+        // Create the commport pool
+        S4U_CommPort::createCommPortPool();
+        S4U_CommPort::NULL_COMMPORT = new S4U_CommPort();
         this->initialized = true;
 
         //        sg_storage_file_system_init();
+    }
+
+    void S4U_Simulation::enableSMPI() {
+        static bool enabled = false;
+
+        if (not enabled) {
+            // Set the SMPI options
+            simgrid::s4u::Engine::set_config("smpi/simulate-computation:no");
+            simgrid::s4u::Engine::set_config("smpi/host-speed:1000Gf");
+            simgrid::s4u::Engine::set_config("smpi/init:0");
+            simgrid::s4u::Engine::set_config("smpi/shared-malloc:global");
+            // Initialize SMPI
+            SMPI_init();
+        }
     }
 
     /**
@@ -89,9 +99,11 @@ namespace wrench {
         });
 
         if (this->initialized) {
-            SMPI_init();
             this->engine->run();
-            SMPI_finalize();
+            S4U_CommPort::all_commports.clear();
+            if (SMPI_is_inited()) {
+                SMPI_finalize();
+            }
         } else {
             throw std::runtime_error("S4U_Simulation::runSimulation(): Simulation has not been initialized");
         }

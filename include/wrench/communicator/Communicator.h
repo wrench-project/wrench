@@ -41,7 +41,7 @@ namespace wrench {
     private:
         unsigned long size;
         std::map<aid_t, unsigned long> actor_to_rank;
-        std::map<unsigned long, simgrid::s4u::Mailbox *> rank_to_mailbox;
+        std::map<unsigned long, S4U_CommPort *> rank_to_commport;
         std::map<unsigned long, simgrid::s4u::Host *> rank_to_host;
         std::vector<simgrid::s4u::Host *> participating_hosts;
 

@@ -12,7 +12,7 @@
 #include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h>
 #include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h>
 #include <wrench/services/compute/htcondor/HTCondorNegotiatorService.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/job/PilotJob.h>
 #include <wrench/job/CompoundJob.h>
@@ -38,7 +38,7 @@ namespace wrench {
      * @param compute_services: a set of 'child' compute services available to and via the HTCondor pool
      * @param running_jobs: a list of currently running jobs
      * @param pending_jobs: a list of pending jobs
-     * @param reply_mailbox: the mailbox to which the "done/failed" message should be sent
+     * @param reply_commport: the commport to which the "done/failed" message should be sent
      */
     HTCondorNegotiatorService::HTCondorNegotiatorService(
             std::string &hostname,
@@ -50,8 +50,8 @@ namespace wrench {
             std::set<std::shared_ptr<ComputeService>> &compute_services,
             std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
             std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
-            simgrid::s4u::Mailbox *reply_mailbox)
-        : Service(hostname, "htcondor_negotiator"), reply_mailbox(reply_mailbox),
+            S4U_CommPort *reply_commport)
+        : Service(hostname, "htcondor_negotiator"), reply_commport(reply_commport),
           compute_services(compute_services), running_jobs(running_jobs), pending_jobs(pending_jobs) {
         this->startup_overhead = startup_overhead;
         this->grid_pre_overhead = grid_pre_overhead;
@@ -90,8 +90,8 @@ namespace wrench {
     int HTCondorNegotiatorService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
 
-        WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on mailbox_name %s",
-                    this->hostname.c_str(), this->mailbox->get_cname());
+        WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on commport %s",
+                    this->hostname.c_str(), this->commport->get_cname());
 
         std::set<std::shared_ptr<Job>> scheduled_jobs;
 
@@ -118,7 +118,7 @@ namespace wrench {
                 auto target_compute_service = pickTargetComputeService(job, service_specific_arguments);
 
                 if (target_compute_service) {
-                    job->pushCallbackMailbox(this->reply_mailbox);
+                    job->pushCallbackCommPort(this->reply_commport);
 
                     if (HTCondorComputeService::isJobGridUniverse(job)) {
                         S4U_Simulation::sleep(this->grid_pre_overhead);
@@ -141,8 +141,8 @@ namespace wrench {
 
         // Send the callback to the originator
         try {
-            S4U_Mailbox::putMessage(
-                    this->reply_mailbox, new NegotiatorCompletionMessage(
+            this->reply_commport->putMessage(
+                    new NegotiatorCompletionMessage(
                                                  scheduled_jobs, this->getMessagePayloadValue(
                                                                          HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &e) {

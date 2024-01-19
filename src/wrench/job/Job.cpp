@@ -36,7 +36,7 @@ namespace wrench {
             this->name = name;
         }
         this->job_manager = std::move(job_manager);
-        this->originator_mailbox = this->job_manager->getCreatorMailbox();
+        this->originator_commport = this->job_manager->getCreatorCommPort();
 
         this->parent_compute_service = nullptr;
         this->submit_date = -1.0;
@@ -53,61 +53,61 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the "origin" callback mailbox
+     * @brief Get the "origin" callback commport
      *
-     * @return the next callback mailbox
+     * @return the next callback commport
      */
-    simgrid::s4u::Mailbox *Job::getOriginCallbackMailbox() {
-        return this->originator_mailbox;
+    S4U_CommPort *Job::getOriginCallbackCommPort() {
+        return this->originator_commport;
     }
 
 
     /**
      * @brief Method to print the call back stack
      */
-    void Job::printCallbackMailboxStack() {
-        auto mystack = this->callback_mailbox_stack;
+    void Job::printCallbackCommPortStack() {
+        auto mystack = this->callback_commport_stack;
         while (not mystack.empty()) {
             WRENCH_INFO("   STACK : %s", mystack.top()->get_cname());
             mystack.pop();
         }
-        WRENCH_INFO("   ORIGINAL : %s", this->originator_mailbox->get_cname());
+        WRENCH_INFO("   ORIGINAL : %s", this->originator_commport->get_cname());
     }
 
     /**
-     * @brief Get the "next" callback mailbox (returns the
-     *         workflow mailbox if the mailbox stack is empty), and
+     * @brief Get the "next" callback commport (returns the
+     *         workflow commport if the commport stack is empty), and
      *         pops it
      *
-     * @return the next callback mailbox
+     * @return the next callback commport
      */
-    simgrid::s4u::Mailbox *Job::popCallbackMailbox() {
-        if (this->callback_mailbox_stack.empty()) {
-            return this->originator_mailbox;
+    S4U_CommPort *Job::popCallbackCommPort() {
+        if (this->callback_commport_stack.empty()) {
+            return this->originator_commport;
         }
-        auto mailbox = this->callback_mailbox_stack.top();
-        this->callback_mailbox_stack.pop();
-        return mailbox;
+        auto commport = this->callback_commport_stack.top();
+        this->callback_commport_stack.pop();
+        return commport;
     }
 
     /**
-     * @brief Get the job's "next" callback mailbox, without popping it
-     * @return the next callback mailbox
+     * @brief Get the job's "next" callback commport, without popping it
+     * @return the next callback commport
      */
-    simgrid::s4u::Mailbox *Job::getCallbackMailbox() {
-        if (this->callback_mailbox_stack.empty()) {
-            return this->originator_mailbox;
+    S4U_CommPort *Job::getCallbackCommPort() {
+        if (this->callback_commport_stack.empty()) {
+            return this->originator_commport;
         }
-        return this->callback_mailbox_stack.top();
+        return this->callback_commport_stack.top();
     }
 
     /**
-     * @brief Pushes a callback mailbox
+     * @brief Pushes a callback commport
      *
-     * @param mailbox: the mailbox name
+     * @param commport: the commport name
      */
-    void Job::pushCallbackMailbox(simgrid::s4u::Mailbox *mailbox) {
-        this->callback_mailbox_stack.push(mailbox);
+    void Job::pushCallbackCommPort(S4U_CommPort *commport) {
+        this->callback_commport_stack.push(commport);
     }
 
     /**
@@ -125,7 +125,7 @@ namespace wrench {
     * @param compute_service: a compute service
     */
     void Job::setParentComputeService(std::shared_ptr<ComputeService> compute_service) {
-        this->parent_compute_service = compute_service;
+        this->parent_compute_service = std::move(compute_service);
     }
 
     /**
@@ -141,7 +141,7 @@ namespace wrench {
      * @brief Get the date at which the job was last submitted (<0 means "never submitted")
      * @return the submit date
      */
-    double Job::getSubmitDate() {
+    double Job::getSubmitDate() const {
         return this->submit_date;
     }
 
@@ -149,7 +149,7 @@ namespace wrench {
     * @brief Get the date at which the job ended (<0 means "never submitted")
     * @return the end date
     */
-    double Job::getEndDate() {
+    double Job::getEndDate() const {
         return this->end_date;
     }
 

@@ -8,7 +8,7 @@
  */
 
 #include <wrench/services/metering/EnergyMeterService.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench-dev.h>
 
 #define EPSILON 0.0001
@@ -82,8 +82,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void EnergyMeterService::stop() {
-        S4U_Mailbox::putMessage(this->mailbox,
-                                new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
+        this->commport->putMessage(new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**
@@ -93,7 +92,7 @@ namespace wrench {
     int EnergyMeterService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Energy Meter Manager starting (%s)", this->mailbox->get_cname());
+        WRENCH_INFO("New Energy Meter Manager starting (%s)", this->commport->get_cname());
 
         /** Main loop **/
         while (true) {
@@ -145,8 +144,7 @@ namespace wrench {
     bool EnergyMeterService::processNextMessage(double timeout) {
 
         try {
-            auto msg = S4U_Mailbox::getMessage<ServiceStopDaemonMessage>(
-                    this->mailbox,
+            auto msg = this->commport->getMessage<ServiceStopDaemonMessage>(
                     timeout,
                     "EnergyMeter::waitForNextMessage(): Received an");
             WRENCH_INFO("Energy Meter got a %s message", msg->getName().c_str());

@@ -140,7 +140,7 @@ private:
 
             // Create a file read action executor
             auto file_read_action_executor = std::make_shared<wrench::ActionExecutor>(
-                    "Host2", 0, 0.0, 0, false, this->mailbox, file_registry_add_entry_action,
+                    "Host2", 0, 0.0, 0, false, this->commport, file_registry_add_entry_action,
                     nullptr);
 
             // Start it
@@ -150,7 +150,7 @@ private:
             // Wait for a message from it
             std::shared_ptr<wrench::SimulationMessage> message;
             try {
-                message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+                message = this->commport->getMessage();
             } catch (wrench::ExecutionException &e) {
                 auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
                 throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -183,7 +183,7 @@ private:
 
             // Create a file read action executor
             auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                    new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_registry_delete_entry_action,
+                    new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_registry_delete_entry_action,
                                                nullptr));
 
             // Start it
@@ -193,7 +193,7 @@ private:
             // Wait for a message from it
             std::shared_ptr<wrench::SimulationMessage> message;
             try {
-                message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+                message = this->commport->getMessage();
             } catch (wrench::ExecutionException &e) {
                 auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
                 throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -242,7 +242,7 @@ void FileRegistryActionExecutorTest::do_FileRegistryActionExecutorSuccessTest_te
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -256,6 +256,7 @@ void FileRegistryActionExecutorTest::do_FileRegistryActionExecutorSuccessTest_te
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

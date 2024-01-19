@@ -43,6 +43,7 @@ public:
 protected:
     ~DataMovementManagerTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     DataMovementManagerTest() {
@@ -51,13 +52,13 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
-        src_file_1 = workflow->addFile("file_1", FILE_SIZE);
-        src_file_2 = workflow->addFile("file_2", FILE_SIZE);
-        src_file_3 = workflow->addFile("file_3", FILE_SIZE);
+        src_file_1 = wrench::Simulation::addFile("file_1", FILE_SIZE);
+        src_file_2 = wrench::Simulation::addFile("file_2", FILE_SIZE);
+        src_file_3 = wrench::Simulation::addFile("file_3", FILE_SIZE);
 
-        src2_file_1 = workflow->addFile("file_4", FILE_SIZE);
-        src2_file_2 = workflow->addFile("file_5", FILE_SIZE);
-        src2_file_3 = workflow->addFile("file_6", FILE_SIZE);
+        src2_file_1 = wrench::Simulation::addFile("file_4", FILE_SIZE);
+        src2_file_2 = wrench::Simulation::addFile("file_5", FILE_SIZE);
+        src2_file_3 = wrench::Simulation::addFile("file_6", FILE_SIZE);
 
         // Create a 3-host platform file
         std::string xml = "<?xml version='1.0'?>"

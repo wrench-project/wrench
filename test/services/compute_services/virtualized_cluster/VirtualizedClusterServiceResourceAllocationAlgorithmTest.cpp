@@ -36,6 +36,7 @@ public:
 protected:
     ~VirtualizedClusterServiceResourceAllocationTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     VirtualizedClusterServiceResourceAllocationTest() {

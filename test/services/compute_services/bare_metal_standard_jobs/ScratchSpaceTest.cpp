@@ -8,7 +8,7 @@
  */
 
 #include <wrench-dev.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
@@ -48,6 +48,7 @@ public:
 protected:
     ~ScratchSpaceTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     ScratchSpaceTest() {
@@ -164,16 +165,16 @@ private:
         {
             // Create a sequential task1 that lasts one min and requires 1 cores
             std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task1", 60, 1, 1, 0);
-            task->addInputFile(this->test->workflow->getFileByID("input_file"));
-            task->addOutputFile(this->test->workflow->getFileByID("output_file"));
+            task->addInputFile(wrench::Simulation::getFileByID("input_file"));
+            task->addOutputFile(wrench::Simulation::getFileByID("output_file"));
 
             // Create a StandardJob with some pre-copies
             auto job = job_manager->createStandardJob(
                     {task},
                     (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                     {std::make_tuple(
-                            wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file")),
-                            wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file")))},
+                            wrench::FileLocation::LOCATION(this->test->storage_service1, wrench::Simulation::getFileByID("input_file")),
+                            wrench::FileLocation::SCRATCH(wrench::Simulation::getFileByID("input_file")))},
                     {},
                     {});
 
@@ -252,9 +253,9 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
                             new SimpleScratchSpaceTestWMS(
                                     this, hostname)));
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 1000.0);
-    std::shared_ptr<wrench::DataFile> output_file = this->workflow->addFile("output_file", 2000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 1000.0);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 2000.0);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -292,19 +293,19 @@ private:
         {
             // Create a sequential task that lasts one min and requires 1 cores
             std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 60, 1, 1, 0);
-            task1->addInputFile(this->test->workflow->getFileByID("input_file1"));
+            task1->addInputFile(wrench::Simulation::getFileByID("input_file1"));
 
             // Create a sequential task that lasts one min and requires 1 cores
             std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 60, 1, 1, 0);
-            task2->addInputFile(this->test->workflow->getFileByID("input_file2"));
+            task2->addInputFile(wrench::Simulation::getFileByID("input_file2"));
 
             // Create a StandardJob with SOME pre-copies from public storage to scratch
             auto job1 = job_manager->createStandardJob(
                     {task1},
                     (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                     {std::make_tuple(
-                            wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file1")),
-                            wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file1")))},
+                            wrench::FileLocation::LOCATION(this->test->storage_service1, wrench::Simulation::getFileByID("input_file1")),
+                            wrench::FileLocation::SCRATCH(wrench::Simulation::getFileByID("input_file1")))},
                     {},
                     {});
 
@@ -314,8 +315,8 @@ private:
                     {task2},
                     (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                     {std::make_tuple(
-                            wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file2")),
-                            wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file2")))},
+                            wrench::FileLocation::LOCATION(this->test->storage_service1, wrench::Simulation::getFileByID("input_file2")),
+                            wrench::FileLocation::SCRATCH(wrench::Simulation::getFileByID("input_file2")))},
                     {},
                     {});
 
@@ -331,8 +332,8 @@ private:
                     {task1},
                     (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                     {std::make_tuple(
-                            wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file1")),
-                            wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file1")))},
+                            wrench::FileLocation::LOCATION(this->test->storage_service1, wrench::Simulation::getFileByID("input_file1")),
+                            wrench::FileLocation::SCRATCH(wrench::Simulation::getFileByID("input_file1")))},
                     {},
                     {});
             job_manager->submitJob(job1, this->test->compute_service1);
@@ -361,8 +362,8 @@ private:
                     {task1},
                     (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                     {std::make_tuple(
-                            wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file1")),
-                            wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file1")))},
+                            wrench::FileLocation::LOCATION(this->test->storage_service1, wrench::Simulation::getFileByID("input_file1")),
+                            wrench::FileLocation::SCRATCH(wrench::Simulation::getFileByID("input_file1")))},
                     {},
                     {});
             job_manager->submitJob(job1, this->test->compute_service2);
@@ -473,9 +474,9 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
                             new SimpleScratchSpaceFailureTestWMS(
                                     this, hostname)));
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file1 = this->workflow->addFile("input_file1", 10000.0);
-    std::shared_ptr<wrench::DataFile> input_file2 = this->workflow->addFile("input_file2", 10000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file1 = wrench::Simulation::addFile("input_file1", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file2 = wrench::Simulation::addFile("input_file2", 10000.0);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file1, storage_service1));
@@ -537,23 +538,23 @@ private:
 
         // Create a sequential task that lasts one min and requires 1 cores
         std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 60, 1, 1, 0);
-        task1->addInputFile(this->test->workflow->getFileByID("input_file1"));
+        task1->addInputFile(wrench::Simulation::getFileByID("input_file1"));
 
         // Create a sequential task that lasts one min and requires 1 cores
         std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 360, 1, 1, 0);
-        task2->addInputFile(this->test->workflow->getFileByID("input_file2"));
+        task2->addInputFile(wrench::Simulation::getFileByID("input_file2"));
 
         // Create a sequential task that lasts one min and requires 1 cores
         std::shared_ptr<wrench::WorkflowTask> task3 = this->test->workflow->addTask("task3", 600, 1, 1, 0);
-        task3->addInputFile(this->test->workflow->getFileByID("input_file3"));
+        task3->addInputFile(wrench::Simulation::getFileByID("input_file3"));
 
         // Create a StandardJob with SOME pre-copies from public storage to scratch
         auto job1 = job_manager->createStandardJob(
                 {task1},
                 (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(
-                        wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file1")),
-                        wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file1")))},
+                        wrench::FileLocation::LOCATION(this->test->storage_service1, wrench::Simulation::getFileByID("input_file1")),
+                        wrench::FileLocation::SCRATCH(wrench::Simulation::getFileByID("input_file1")))},
                 {},
                 {});
 
@@ -562,8 +563,8 @@ private:
                 {task2},
                 (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(
-                        wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file2")),
-                        wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file2")))},
+                        wrench::FileLocation::LOCATION(this->test->storage_service1, wrench::Simulation::getFileByID("input_file2")),
+                        wrench::FileLocation::SCRATCH(wrench::Simulation::getFileByID("input_file2")))},
                 {},
                 {});
 
@@ -572,8 +573,8 @@ private:
                 {task3},
                 (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(
-                        wrench::FileLocation::LOCATION(this->test->storage_service1, this->test->workflow->getFileByID("input_file3")),
-                        wrench::FileLocation::SCRATCH(this->test->workflow->getFileByID("input_file3")))},
+                        wrench::FileLocation::LOCATION(this->test->storage_service1, wrench::Simulation::getFileByID("input_file3")),
+                        wrench::FileLocation::SCRATCH(wrench::Simulation::getFileByID("input_file3")))},
                 {},
                 {});
 
@@ -680,10 +681,10 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
                             new PilotJobScratchSpaceTestWMS(
                                     this, hostname)));
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file1 = this->workflow->addFile("input_file1", 1000.0);
-    std::shared_ptr<wrench::DataFile> input_file2 = this->workflow->addFile("input_file2", 1000.0);
-    std::shared_ptr<wrench::DataFile> input_file3 = this->workflow->addFile("input_file3", 1000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file1 = wrench::Simulation::addFile("input_file1", 1000.0);
+    std::shared_ptr<wrench::DataFile> input_file2 = wrench::Simulation::addFile("input_file2", 1000.0);
+    std::shared_ptr<wrench::DataFile> input_file3 = wrench::Simulation::addFile("input_file3", 1000.0);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file1, storage_service1));
@@ -724,7 +725,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Get a reference to the file
-        std::shared_ptr<wrench::DataFile> file = this->test->workflow->getFileByID("input");
+        std::shared_ptr<wrench::DataFile> file = wrench::Simulation::getFileByID("input");
 
         // Create three tasks
         std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 10, 1, 1, 0);// 10 seconds
@@ -819,7 +820,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
 
     // Create a file
     std::shared_ptr<wrench::DataFile> file = nullptr;
-    ASSERT_NO_THROW(file = workflow->addFile("input", 1));
+    ASSERT_NO_THROW(file = wrench::Simulation::addFile("input", 1));
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(file, storage_service1));
 
@@ -859,9 +860,9 @@ private:
         auto job_manager = this->createJobManager();
 
         // Get a reference to the file
-        std::shared_ptr<wrench::DataFile> file1 = this->test->workflow->getFileByID("input1");
+        std::shared_ptr<wrench::DataFile> file1 = wrench::Simulation::getFileByID("input1");
         // Get a reference to the file
-        std::shared_ptr<wrench::DataFile> file2 = this->test->workflow->getFileByID("input2");
+        std::shared_ptr<wrench::DataFile> file2 = wrench::Simulation::getFileByID("input2");
 
         //check if this file is staged at mount point of non-scratch
         if (not wrench::StorageService::lookupFileAtLocation(
@@ -1022,10 +1023,10 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
 
     // Create a file
     std::shared_ptr<wrench::DataFile> file1 = nullptr;
-    ASSERT_NO_THROW(file1 = workflow->addFile("input1", 1));
+    ASSERT_NO_THROW(file1 = wrench::Simulation::addFile("input1", 1));
     // Create a file
     std::shared_ptr<wrench::DataFile> file2 = nullptr;
-    ASSERT_NO_THROW(file2 = workflow->addFile("input2", 1));
+    ASSERT_NO_THROW(file2 = wrench::Simulation::addFile("input2", 1));
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(file1, storage_service1));
     // Staging the input_file on the storage service

@@ -31,6 +31,7 @@ namespace wrench {
         static constexpr double DEFAULT_RAM = (1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0);// 1 PiB
 
     public:
+        static void enableSMPI();
         void initialize(int *argc, char **argv);
         void setupPlatform(const std::string &filepath);
         void setupPlatform(const std::function<void()> &creation_function);

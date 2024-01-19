@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include <wrench/logging/TerminalOutput.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/action/Action.h>
 #include <wrench/action/MPIAction.h>
@@ -17,7 +18,10 @@
 #include "smpi/smpi.h"
 
 
+#include <memory>
 #include <utility>
+
+WRENCH_LOG_CATEGORY(wrench_core_mpi_action, "Log category for MPIAction");
 
 namespace wrench {
 
@@ -31,7 +35,8 @@ namespace wrench {
     MPIAction::MPIAction(const std::string &name,
                          unsigned long num_processes,
                          unsigned long num_cores_per_process,
-                         std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> lambda_mpi) : Action(name, "mpi_"), num_processes(num_processes), num_cores_per_process(num_cores_per_process), lambda_mpi(lambda_mpi) {
+                         std::function<void(const std::shared_ptr<ExecutionController> &controller)> lambda_mpi) : Action(name, "mpi_"), num_processes(num_processes), num_cores_per_process(num_cores_per_process), lambda_mpi(lambda_mpi) {
+        S4U_Simulation::enableSMPI();
     }
 
     /**
@@ -43,11 +48,6 @@ namespace wrench {
         // Make A COPY of the list of usable hosts
         auto resources_ref = action_executor->getActionExecutionService()->getComputeResources();
         std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources(resources_ref.begin(), resources_ref.end());
-        //        std::vector<std::string> hostnames;
-        //        hostnames.reserve(resources.size());
-        //        for (auto const &h: resources) {
-        //            hostnames.push_back(h.first);
-        //        }
 
         // Determine the host list (using worst fit)
         std::vector<simgrid::s4u::Host *> simgrid_hosts;
@@ -70,20 +70,29 @@ namespace wrench {
             }
         }
 
-        // Transform the list of hosts into a list of simgrid hosts
-        //        std::vector<simgrid::s4u::Host *> simgrid_hosts;
-        //        simgrid_hosts.reserve(hosts.size());
-        //        for (auto const &host: hosts) {
-        //            simgrid_hosts.push_back(host);
-        //        }
 
         // Do the SMPI thing!!!
         auto barrier = simgrid::s4u::Barrier::create(1 + simgrid_hosts.size());
         // Start actors
         auto meta_lambda = [this](const std::shared_ptr<ActionExecutor> &action_executor) {
-            S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()] = S4U_Mailbox::generateUniqueMailbox("rmb");
-            this->lambda_mpi(action_executor);
-            S4U_Daemon::map_actor_to_recv_mailbox.erase(simgrid::s4u::this_actor::get_pid());
+          // Get a commport
+          auto commport = S4U_CommPort::getTemporaryCommPort();
+          S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()] = commport;
+          // Create and start my own Controller
+          auto mpi_private_execution_controller = std::make_shared<MPIPrivateExecutionController>(
+                  action_executor->hostname, "mpi_private");
+          mpi_private_execution_controller->setSimulation(action_executor->getSimulation());
+          mpi_private_execution_controller->start(mpi_private_execution_controller, true, false);// Daemonized, no auto-restart
+
+          // Call the lambda
+          this->lambda_mpi(mpi_private_execution_controller);
+
+          // Kill the controller
+          mpi_private_execution_controller->killActor();
+
+          // Retire commport
+          S4U_Daemon::map_actor_to_recv_commport.erase(simgrid::s4u::this_actor::get_pid());
+          S4U_CommPort::retireTemporaryCommPort(commport);
         };
 
         SMPI_app_instance_start(("MPI_Action_" + std::to_string(simgrid::s4u::this_actor::get_pid())).c_str(),

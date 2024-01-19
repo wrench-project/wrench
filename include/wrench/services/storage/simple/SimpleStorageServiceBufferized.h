@@ -33,20 +33,20 @@ namespace wrench {
 
     private:
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
         };
 
         friend class SimpleStorageService;
@@ -80,33 +80,35 @@ namespace wrench {
 
         bool processFileWriteRequest(std::shared_ptr<FileLocation> &location,
                                      double num_bytes_to_write,
-                                     simgrid::s4u::Mailbox *answer_mailbox);
+                                     S4U_CommPort *answer_commport);
 
         bool
         processFileReadRequest(const std::shared_ptr<FileLocation> &location,
-                               double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox);
+                               double num_bytes_to_read, S4U_CommPort *answer_commport);
 
         bool processFileCopyRequest(
                 std::shared_ptr<FileLocation> &src,
                 std::shared_ptr<FileLocation> &dst,
-                simgrid::s4u::Mailbox *answer_mailbox);
+                S4U_CommPort *answer_commport);
 
         bool processFileTransferThreadNotification(
                 const std::shared_ptr<FileTransferThread> &ftt,
-                simgrid::s4u::Mailbox *src_mailbox,
+                S4U_CommPort *src_commport,
                 const std::shared_ptr<FileLocation> &src_location,
-                simgrid::s4u::Mailbox *dst_mailbox,
+                S4U_CommPort *dst_commportx,
                 const std::shared_ptr<FileLocation> &dst_location,
                 bool success,
                 std::shared_ptr<FailureCause> failure_cause,
-                simgrid::s4u::Mailbox *answer_mailbox_if_read,
-                simgrid::s4u::Mailbox *answer_mailbox_if_write,
-                simgrid::s4u::Mailbox *answer_mailbox_if_copy);
+                S4U_CommPort *answer_commport_if_read,
+                S4U_CommPort *answer_commport_if_write,
+                S4U_CommPort *answer_commport_if_copy);
 
         void startPendingFileTransferThread();
 
         std::deque<std::shared_ptr<FileTransferThread>> pending_file_transfer_threads;
         std::set<std::shared_ptr<FileTransferThread>> running_file_transfer_threads;
+
+        std::map<std::shared_ptr<FileTransferThread>, S4U_CommPort *> ongoing_tmp_commports;
 
         std::shared_ptr<MemoryManager> memory_manager;
     };

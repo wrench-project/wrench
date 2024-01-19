@@ -41,6 +41,7 @@ public:
 protected:
     ~SimpleStorageServiceLimitedConnectionsTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimpleStorageServiceLimitedConnectionsTest() {
@@ -50,7 +51,7 @@ protected:
 
         // Create the files
         for (size_t i = 0; i < NUM_PARALLEL_TRANSFERS; i++) {
-            files[i] = workflow->addFile("file_" + std::to_string(i), FILE_SIZE);
+            files[i] = wrench::Simulation::addFile("file_" + std::to_string(i), FILE_SIZE);
         }
 
         // Create a 3-host platform file

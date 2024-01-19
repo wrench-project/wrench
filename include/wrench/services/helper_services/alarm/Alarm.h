@@ -25,7 +25,7 @@ namespace wrench {
     class Simulation;
 
     /**
-     * @brief A one-shot service that sends a message to a mailbox after some specified amount of time and terminates
+     * @brief A one-shot service that sends a message to a commport_name after some specified amount of time and terminates
      */
     class Alarm : public Service {
 
@@ -33,18 +33,18 @@ namespace wrench {
 
     public:
         static std::shared_ptr<Alarm> createAndStartAlarm(Simulation *simulation, double date, std::string hostname,
-                                                          simgrid::s4u::Mailbox *reply_mailbox_name,
+                                                          S4U_CommPort *reply_commport,
                                                           SimulationMessage *msg, std::string suffix);
 
         void kill();
 
     private:
-        Alarm(double date, std::string hostname, simgrid::s4u::Mailbox *reply_mailbox,
+        Alarm(double date, std::string hostname, S4U_CommPort *reply_commport,
               SimulationMessage *msg, std::string suffix);
 
         double date;
-        //        std::string reply_mailbox_name;
-        simgrid::s4u::Mailbox *reply_mailbox;
+        //        std::string reply_commport_name;
+        S4U_CommPort *reply_commport;
         std::unique_ptr<SimulationMessage> msg;
 
         int main() override;

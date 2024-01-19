@@ -188,27 +188,27 @@ namespace wrench {
          */
         std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &getAllServices();
 
-        std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<DataFile> &file, simgrid::s4u::Mailbox *answer_mailbox);
+        std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<DataFile> &file, S4U_CommPort *answer_commport);
 
         std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<FileLocation> &location);
 
         bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
-        void writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+        void writeFile(S4U_CommPort *answer_commport,
                        const std::shared_ptr<FileLocation> &location,
                        double num_bytes_to_write,
                        bool wait_for_answer) override;
 
-        void readFile(simgrid::s4u::Mailbox *answer_mailbox,
+        void readFile(S4U_CommPort *answer_commport,
                       const std::shared_ptr<FileLocation> &location,
                       double num_bytes,
                       bool wait_for_answer) override;
 
-        void deleteFile(simgrid::s4u::Mailbox *answer_mailbox,
+        void deleteFile(S4U_CommPort *answer_commport,
                         const std::shared_ptr<FileLocation> &location,
                         bool wait_for_answer) override;
 
-        bool lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
+        bool lookupFile(S4U_CommPort *answer_commport,
                         const std::shared_ptr<FileLocation> &location) override;
 
         /**
@@ -257,8 +257,8 @@ namespace wrench {
          *         requests, with minimum cost to the user.
          */
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {CompoundStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
-                {CompoundStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
+                {CompoundStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CompoundStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {CompoundStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, 0},
                 {CompoundStorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, 0},
                 {CompoundStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 0},
@@ -270,11 +270,11 @@ namespace wrench {
                 {CompoundStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 0},
                 {CompoundStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 0},
                 {CompoundStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD, 1024}};
+                {CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD, S4U_CommPort::default_control_message_size}};
 
         static unsigned long getNewUniqueNumber();
 
-        bool processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox);
+        bool processStopDaemonRequest(S4U_CommPort *ack_commport);
 
         /***********************/
         /** \endcond           */
@@ -284,7 +284,7 @@ namespace wrench {
 
         int main() override;
 
-        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location, simgrid::s4u::Mailbox *answer_mailbox);
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location, S4U_CommPort *answer_commport);
 
         std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location);
 

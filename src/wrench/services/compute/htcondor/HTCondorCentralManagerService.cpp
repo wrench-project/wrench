@@ -19,7 +19,7 @@
 #include <wrench/services/compute/htcondor/HTCondorCentralManagerService.h>
 #include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h>
 #include <wrench/services/compute/htcondor/HTCondorNegotiatorService.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/failure_causes/NetworkError.h>
 #include <wrench/failure_causes/NotAllowed.h>
 #include <wrench/failure_causes/NotEnoughResources.h>
@@ -93,9 +93,8 @@ namespace wrench {
      */
     void HTCondorCentralManagerService::addComputeService(std::shared_ptr<ComputeService> compute_service) {
         this->compute_services.insert(compute_service);
-        //  send a "wake up" message to the daemon's mailbox_name
-        S4U_Mailbox::putMessage(
-                this->mailbox,
+        //  send a "wake up" message to the daemon's commport
+        this->commport->putMessage(
                 new CentralManagerWakeUpMessage(0));
     }
 
@@ -113,18 +112,17 @@ namespace wrench {
             const std::map<std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        //  send a "run a standard job" message to the daemon's mailbox_name
-        S4U_Mailbox::putMessage(
-                this->mailbox,
+        //  send a "run a standard job" message to the daemon's commport
+        this->commport->putMessage(
                 new ComputeServiceSubmitCompoundJobRequestMessage(
-                        answer_mailbox, job, service_specific_args,
+                        answer_commport, job, service_specific_args,
                         this->getMessagePayloadValue(
                                 HTCondorCentralManagerServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        auto msg = S4U_Mailbox::getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(answer_mailbox, "HTCondorCentralManagerService::submitCompoundJob(): Received an");
+        auto msg = answer_commport->getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>("HTCondorCentralManagerService::submitCompoundJob(): Received an");
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
         }
@@ -139,8 +137,8 @@ namespace wrench {
     int HTCondorCentralManagerService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
-        WRENCH_INFO("HTCondor Service starting on host %s listening on mailbox_name %s",
-                    this->hostname.c_str(), this->mailbox->get_cname());
+        WRENCH_INFO("HTCondor Service starting on host %s listening on commport %s",
+                    this->hostname.c_str(), this->commport->get_cname());
 
         // main loop
         while (this->processNextMessage()) {
@@ -156,7 +154,7 @@ namespace wrench {
                             this->fast_bmcs_resource_availability,
                             this->fcfs,
                             this->compute_services,
-                            this->running_jobs, this->pending_jobs, this->mailbox);
+                            this->running_jobs, this->pending_jobs, this->commport);
                     negotiator->setSimulation(this->simulation);
                     negotiator->start(negotiator, true, false);// Daemonized, no auto-restart
                 }
@@ -189,7 +187,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (ExecutionException &e) {
             return true;
         }
@@ -205,8 +203,7 @@ namespace wrench {
             this->terminate();
             // This is Synchronous
             try {
-                S4U_Mailbox::putMessage(
-                        msg->ack_mailbox,
+                msg->ack_commport->putMessage(
                         new ServiceDaemonStoppedMessage(
                                 this->getMessagePayloadValue(
                                         HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
@@ -220,7 +217,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitCompoundJobRequestMessage>(message)) {
-            processSubmitCompoundJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
+            processSubmitCompoundJob(msg->answer_commport, msg->job, msg->service_specific_args);
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobDoneMessage>(message)) {
@@ -253,20 +250,19 @@ namespace wrench {
     /**
      * @brief Process a submit compound job request
      *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param job: the job
      * @param service_specific_args: service specific arguments
      *
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processSubmitCompoundJob(
-            simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<CompoundJob> job,
+            S4U_CommPort *answer_commport, std::shared_ptr<CompoundJob> job,
             std::map<std::string, std::string> &service_specific_args) {
         this->pending_jobs.emplace_back(std::make_tuple(job, service_specific_args));
         this->resources_unavailable = false;
 
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
+        answer_commport->dputMessage(
                 new ComputeServiceSubmitCompoundJobAnswerMessage(
                         job, this->getSharedPtr<HTCondorCentralManagerService>(), true, nullptr,
                         this->getMessagePayloadValue(
@@ -276,20 +272,20 @@ namespace wrench {
     //    /**
     //     * @brief Process a submit pilot job request
     //     *
-    //     * @param answer_mailbox: the mailbox to which the answer message should be sent
+    //     * @param answer_commport: the commport to which the answer message should be sent
     //     * @param job: the job
     //     * @param service_specific_args: service specific arguments
     //     *
     //     * @throw std::runtime_error
     //     */
     //    void HTCondorCentralManagerService::processSubmitPilotJob(
-    //            const std::string &answer_mailbox, std::shared_ptr <PilotJob> job,
+    //            const std::string &answer_commport, std::shared_ptr <PilotJob> job,
     //            std::map <std::string, std::string> &service_specific_args) {
     //        this->pending_jobs.push_back(std::make_tuple(job, service_specific_args));
     //        this->resources_unavailable = false;
     //
-    //        S4U_Mailbox::dputMessage(
-    //                answer_mailbox,
+    //        S4U_CommPort::dputMessage(
+    //                answer_commport,
     //                new ComputeServiceSubmitPilotJobAnswerMessage(
     //                        job, this->getSharedPtr<HTCondorCentralManagerService>(), true, nullptr,
     //                        this->getMessagePayloadValue(
@@ -305,8 +301,8 @@ namespace wrench {
     //     */
     //    void HTCondorCentralManagerService::processPilotJobStarted(std::shared_ptr <PilotJob> job) {
     //        // Forward the notification
-    //        S4U_Mailbox::dputMessage(
-    //                job->popCallbackMailbox(),
+    //        S4U_CommPort::dputMessage(
+    //                job->popCallbackCommPort(),
     //                new ComputeServicePilotJobStartedMessage(
     //                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
     //                        this->getMessagePayloadValue(
@@ -322,8 +318,8 @@ namespace wrench {
     //     */
     //    void HTCondorCentralManagerService::processPilotJobCompletion(std::shared_ptr <PilotJob> job) {
     //        // Forward the notification
-    //        S4U_Mailbox::dputMessage(
-    //                job->popCallbackMailbox(),
+    //        S4U_CommPort::dputMessage(
+    //                job->popCallbackCommPort(),
     //                new ComputeServicePilotJobExpiredMessage(
     //                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
     //                        this->getMessagePayloadValue(
@@ -339,11 +335,11 @@ namespace wrench {
      */
     void HTCondorCentralManagerService::processCompoundJobCompletion(const std::shared_ptr<CompoundJob> &job) {
         WRENCH_INFO("A compound job has completed: %s", job->getName().c_str());
-        auto callback_mailbox = job->popCallbackMailbox();
+        auto callback_commport = job->popCallbackCommPort();
 
         // Send the callback to the originator
-        S4U_Mailbox::dputMessage(
-                callback_mailbox, new ComputeServiceCompoundJobDoneMessage(
+        callback_commport->dputMessage(
+                new ComputeServiceCompoundJobDoneMessage(
                                           job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
 
@@ -359,11 +355,11 @@ namespace wrench {
      */
     void HTCondorCentralManagerService::processCompoundJobFailure(const std::shared_ptr<CompoundJob> &job) {
         WRENCH_INFO("A compound job has failed: %s", job->getName().c_str());
-        auto callback_mailbox = job->popCallbackMailbox();
+        auto callback_commport = job->popCallbackCommPort();
 
         // Send the callback to the originator
-        S4U_Mailbox::dputMessage(
-                callback_mailbox, new ComputeServiceCompoundJobFailedMessage(
+        callback_commport->dputMessage(
+                new ComputeServiceCompoundJobFailedMessage(
                                           job, this->getSharedPtr<HTCondorCentralManagerService>(),
                                           this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
@@ -528,9 +524,9 @@ namespace wrench {
             } else {
                 error_message = "Non-grid universe jobs not supported";
             }
-            return std::make_shared<NotAllowed>(this->shared_from_this(), error_message);
+            return std::make_shared<NotAllowed>(this->getSharedPtr<Service>(), error_message);
         } else if (not found_one) {
-            return std::make_shared<NotEnoughResources>(job, this->shared_from_this());
+            return std::make_shared<NotEnoughResources>(job, this->getSharedPtr<Service>());
         } else {
             return nullptr;
         }

@@ -37,6 +37,7 @@ public:
 protected:
     ~BareMetalComputeServiceMultiActionTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     BareMetalComputeServiceMultiActionTest() {
@@ -45,8 +46,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
-        input_file = workflow->addFile("input_file", 10000.0);
-        output_file = workflow->addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000.0);
+        output_file = wrench::Simulation::addFile("output_file", 20000.0);
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -213,7 +214,7 @@ private:
         }
 
         // Coverage
-        job->getCallbackMailbox();
+        job->getCallbackCommPort();
 
         // Submit the job
         job_manager->submitJob(job, this->test->compute_service, {});
@@ -221,7 +222,7 @@ private:
 
         // Coverage
         wrench::Simulation::sleep(1.0);
-        job->printCallbackMailboxStack();
+        job->printCallbackCommPortStack();
 
         // Coverage
         try {

@@ -21,22 +21,22 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param file: the file for which storage allocation is requested
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
-    CompoundStorageAllocationRequestMessage::CompoundStorageAllocationRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    CompoundStorageAllocationRequestMessage::CompoundStorageAllocationRequestMessage(S4U_CommPort *answer_commport,
                                                                                      std::shared_ptr<DataFile> file, double payload)
         : CompoundStorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if (answer_mailbox == nullptr) {
+        if (answer_commport == nullptr) {
             throw std::invalid_argument(
                     "CompoundStorageStorageSelectionRequestMessage::CompoundStorageStorageSelectionRequestMessage(): Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->file = file;
     }
 
@@ -55,22 +55,22 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param answer_commport: the commport to which to send the answer
      * @param file: the file for which storage allocation is requested
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
-    CompoundStorageLookupRequestMessage::CompoundStorageLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+    CompoundStorageLookupRequestMessage::CompoundStorageLookupRequestMessage(S4U_CommPort *answer_commport,
                                                                              std::shared_ptr<DataFile> file, double payload)
         : CompoundStorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if (answer_mailbox == nullptr) {
+        if (answer_commport == nullptr) {
             throw std::invalid_argument(
                     "CompoundStorageStorageSelectionRequestMessage::CompoundStorageStorageSelectionRequestMessage(): Invalid arguments");
         }
 #endif
-        this->answer_mailbox = answer_mailbox;
+        this->answer_commport = answer_commport;
         this->file = file;
     }
 

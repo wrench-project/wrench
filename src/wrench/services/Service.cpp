@@ -8,7 +8,7 @@
  */
 
 
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Daemon.h>
@@ -307,23 +307,21 @@ namespace wrench {
         }
         this->shutting_down = true;// This is to avoid another process calling stop() and being stuck
 
-        WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox->get_cname());
+        WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->commport->get_cname());
 
-        // Send a termination message to the daemon's mailbox_name - SYNCHRONOUSLY
-        auto ack_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        // Send a termination message to the daemon's commport - SYNCHRONOUSLY
+        auto ack_commport = S4U_Daemon::getRunningActorRecvCommPort();
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {
-            S4U_Mailbox::putMessage(this->mailbox,
-                                    new ServiceStopDaemonMessage(
-                                            ack_mailbox,
+            this->commport->putMessage(new ServiceStopDaemonMessage(
+                    ack_commport,
                                             false,
                                             ComputeService::TerminationCause::TERMINATION_NONE,
                                             this->getMessagePayloadValue(
                                                     ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
 
             // Wait for the ack
-            message = S4U_Mailbox::getMessage<ServiceDaemonStoppedMessage>(
-                    ack_mailbox,
+            message = ack_commport->getMessage<ServiceDaemonStoppedMessage>(
                     this->network_timeout,
                     "Service::stop(): Received an");
 

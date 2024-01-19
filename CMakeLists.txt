@@ -9,10 +9,10 @@ add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 
 # Make Release the default build type
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE Release)
 endif()
 
-add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field -Wno-unused-local-typedefs" )
+add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field -Wno-unused-local-typedefs -Wno-deprecated-builtins -Wno-unused-but-set-variable" )
 
 if (ENABLE_BATSCHED)
     add_definitions(-DENABLE_BATSCHED)
@@ -114,7 +114,8 @@ set(HEADER_FILES
         include/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorProperty.h
         include/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h
         include/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h
-        include/wrench/services/network_proximity/NetworkProximityDaemon.h
+        include/wrench/services/network_proximity/NetworkProximitySenderDaemon.h
+        include/wrench/services/network_proximity/NetworkProximityReceiverDaemon.h
         include/wrench/services/network_proximity/NetworkProximityService.h
         include/wrench/services/network_proximity/NetworkProximityServiceMessagePayload.h
         include/wrench/services/network_proximity/NetworkProximityServiceProperty.h
@@ -131,10 +132,10 @@ set(HEADER_FILES
         include/wrench/services/storage/compound/CompoundStorageServiceMessagePayload.h
         include/wrench/services/storage/compound/CompoundStorageServiceMessage.h
         include/wrench/services/storage/storage_helpers/FileLocation.h
-#        include/wrench/services/memory/Block.h
-#        include/wrench/services/memory/MemoryManager.h
+        #        include/wrench/services/memory/Block.h
+        #        include/wrench/services/memory/MemoryManager.h
         include/wrench/simgrid_S4U_util/S4U_Daemon.h
-        include/wrench/simgrid_S4U_util/S4U_Mailbox.h
+        include/wrench/simgrid_S4U_util/S4U_CommPort.h
         include/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
         include/wrench/simgrid_S4U_util/S4U_Simulation.h
         include/wrench/simgrid_S4U_util/S4U_VirtualMachine.h
@@ -308,7 +309,8 @@ set(SOURCE_FILES
         src/wrench/services/file_registry/FileRegistryService.cpp
         src/wrench/services/file_registry/FileRegistryServiceMessagePayload.cpp
         src/wrench/services/file_registry/FileRegistryServiceProperty.cpp
-        src/wrench/services/network_proximity/NetworkProximityDaemon.cpp
+        src/wrench/services/network_proximity/NetworkProximitySenderDaemon.cpp
+        src/wrench/services/network_proximity/NetworkProximityReceiverDaemon.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.cpp
         include/wrench/services/network_proximity/NetworkProximityMessage.h
         src/wrench/services/network_proximity/NetworkProximityService.cpp
@@ -337,7 +339,7 @@ set(SOURCE_FILES
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
         include/wrench/simgrid_S4U_util/S4U_DaemonActor.h
-        src/wrench/simgrid_S4U_util/S4U_Mailbox.cpp
+        src/wrench/simgrid_S4U_util/S4U_CommPort.cpp
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
         src/wrench/simgrid_S4U_util/S4U_Simulation.cpp
         src/wrench/simgrid_S4U_util/S4U_VirtualMachine.cpp
@@ -410,6 +412,7 @@ set(SOURCE_FILES
 set(TEST_FILES
         test/main.cpp
         test/include/TestWithFork.h
+        test/include/RuntimeAssert.h
         test/include/UniqueTmpPathPrefix.h
         test/constructors/simulation_message_constructors/MessageConstructorTest.cpp
         test/constructors/failure_cause_constructor/FailureCauseConstructorTest.cpp
@@ -418,7 +421,7 @@ set(TEST_FILES
         test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowParallelModelTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
-#        test/services/memory_manager_service/MemoryManagerTest.cpp
+        #        test/services/memory_manager_service/MemoryManagerTest.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceOneActionTests.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiActionTests.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiJobTests.cpp
@@ -520,8 +523,8 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
+        test/simulation/S4U_CommPortTest.cpp
         test/misc/UnitParserTest.cpp
-        test/simulation/S4U_MailboxTest.cpp 
         test/include/JSONFromFileUtil.h
         test/services/storage_services/StorageServiceProxy/StorageServiceProxyBasicTest.cpp
         test/services/storage_services/StorageServiceProxy/StorageServiceProxySequentialTest.cpp
@@ -555,7 +558,7 @@ if(GTEST_LIBRARY)
     set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
     add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
 else()
-        add_custom_target(unit_tests echo "ERROR: Cannot build unit_tests because Google Test (libgtest) was not found by cmake." COMMAND echo "       If you have installed Google Test, re-run cmake." VERBATIM)
+    add_custom_target(unit_tests echo "ERROR: Cannot build unit_tests because Google Test (libgtest) was not found by cmake." COMMAND echo "       If you have installed Google Test, re-run cmake." VERBATIM)
 endif()
 
 

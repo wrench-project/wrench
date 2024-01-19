@@ -47,7 +47,7 @@ namespace wrench {
                 double ram_footprint,
                 double thread_creation_overhead,
                 bool simulate_computation_as_sleep,
-                simgrid::s4u::Mailbox *callback_mailbox,
+                S4U_CommPort *callback_commport,
                 std::shared_ptr<Action> action,
                 std::shared_ptr<ActionExecutionService> action_execution_service);
 
@@ -60,7 +60,7 @@ namespace wrench {
     private:
         std::shared_ptr<Action> action;
         std::shared_ptr<ActionExecutionService> action_execution_service;
-        simgrid::s4u::Mailbox *callback_mailbox;
+        S4U_CommPort *callback_commport;
         bool killed_on_purpose;
 
         bool simulation_compute_as_sleep;

@@ -39,6 +39,8 @@ add_executable(wrench-daemon EXCLUDE_FROM_ALL
         include/routes.h)
 
 add_dependencies(wrench-daemon wrench)
+add_dependencies(wrench-daemon wrenchwfcommonsworkflowparser)
+
 
 # Add pthreads
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -48,6 +50,7 @@ if (ENABLE_BATSCHED)
     target_link_libraries(wrench-daemon
             PRIVATE Threads::Threads
             wrench
+            wrenchwfcommonsworkflowparser
             ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
             ${SimGrid_LIBRARY}
             ${PUGIXML_LIBRARY}
@@ -58,6 +61,7 @@ else()
     target_link_libraries(wrench-daemon
             PRIVATE Threads::Threads
             wrench
+            wrenchwfcommonsworkflowparser
             ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
             ${SimGrid_LIBRARY}
             ${PUGIXML_LIBRARY}

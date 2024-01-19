@@ -20,7 +20,7 @@
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
@@ -46,7 +46,7 @@ namespace wrench {
      */
     void BareMetalComputeService::cleanup(bool has_returned_from_main, int return_value) {
         // Do the default behavior (which will throw as this is not a fault-tolerant service)
-        Service::cleanup(has_returned_from_main, return_value);
+        S4U_Daemon::cleanup(has_returned_from_main, return_value);
 
         this->action_execution_service = nullptr;// to avoid leak due to circular refs
         this->current_jobs.clear();
@@ -194,19 +194,19 @@ namespace wrench {
             const std::map<std::string, std::string> &service_specific_args) {
         assertServiceIsUp();
 
-        WRENCH_INFO("BareMetalComputeService::submitCompoundJob()");
+//        WRENCH_INFO("BareMetalComputeService::submitCompoundJob()");
 
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        //  send a "run a standard job" message to the daemon's mailbox_name
-        S4U_Mailbox::putMessage(this->mailbox,
+        //  send a "run a standard job" message to the daemon's commport
+        this->commport->putMessage(
                                 new ComputeServiceSubmitCompoundJobRequestMessage(
-                                        answer_mailbox, job, service_specific_args,
+                                        answer_commport, job, service_specific_args,
                                         this->getMessagePayloadValue(
                                                 ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        auto msg = S4U_Mailbox::getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(answer_mailbox, this->network_timeout,
+        auto msg = answer_commport->getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(this->network_timeout,
                                                                                          "ComputeService::submitCompoundJob(): Received an");
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
@@ -387,7 +387,7 @@ namespace wrench {
             // Set up a service termination detector for the action execution service if necessary
             auto termination_detector = std::make_shared<ServiceTerminationDetector>(
                     this->hostname, this->action_execution_service,
-                    this->mailbox, false, true);
+                    this->commport, false, true);
             termination_detector->setSimulation(this->simulation);
             termination_detector->start(termination_detector, true, false);// Daemonized, no auto-restart
         }
@@ -418,7 +418,7 @@ namespace wrench {
         // Wait for a message
         std::shared_ptr<SimulationMessage> message;
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (ExecutionException &e) {
             WRENCH_INFO(
                     "Got a network error while getting some message... ignoring");
@@ -433,7 +433,7 @@ namespace wrench {
 
             // This is Synchronous
             try {
-                S4U_Mailbox::putMessage(msg->ack_mailbox,
+                msg->ack_commport->putMessage(
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
@@ -442,19 +442,19 @@ namespace wrench {
             return false;
 
         } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitCompoundJobRequestMessage>(message)) {
-            processSubmitCompoundJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
+            processSubmitCompoundJob(msg->answer_commport, msg->job, msg->service_specific_args);
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationRequestMessage>(message)) {
-            processGetResourceInformation(msg->answer_mailbox, msg->key);
+            processGetResourceInformation(msg->answer_commport, msg->key);
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage>(message)) {
-            processIsThereAtLeastOneHostWithAvailableResources(msg->answer_mailbox, msg->num_cores, msg->ram);
+            processIsThereAtLeastOneHostWithAvailableResources(msg->answer_commport, msg->num_cores, msg->ram);
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceTerminateCompoundJobRequestMessage>(message)) {
-            processCompoundJobTerminationRequest(msg->job, msg->answer_mailbox);
+            processCompoundJobTerminationRequest(msg->job, msg->answer_commport);
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<ActionExecutionServiceActionDoneMessage>(message)) {
@@ -491,15 +491,15 @@ namespace wrench {
     void BareMetalComputeService::terminateCompoundJob(std::shared_ptr<CompoundJob> job) {
         assertServiceIsUp();
 
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        //  send a "terminate a compound job" message to the daemon's mailbox_name
-        S4U_Mailbox::putMessage(this->mailbox,
+        //  send a "terminate a compound job" message to the daemon's commport
+        this->commport->putMessage(
                                 new ComputeServiceTerminateCompoundJobRequestMessage(
-                                        answer_mailbox, job, this->getMessagePayloadValue(BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                        answer_commport, job, this->getMessagePayloadValue(BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
-        auto msg = S4U_Mailbox::getMessage<ComputeServiceTerminateCompoundJobAnswerMessage>(answer_mailbox,
+        auto msg = answer_commport->getMessage<ComputeServiceTerminateCompoundJobAnswerMessage>(
                                                                                             "BareMetalComputeService::terminateCompoundJob(): Received an");
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
@@ -509,16 +509,31 @@ namespace wrench {
     /**
     * @brief Process a submit compound job request
     *
-    * @param answer_mailbox: the mailbox to which the answer message should be sent
+    * @param answer_commport: the commport to which the answer message should be sent
     * @param job: the job
     * @param service_specific_arguments: service specific arguments
     *
     */
     void BareMetalComputeService::processSubmitCompoundJob(
-            simgrid::s4u::Mailbox *answer_mailbox,
+            S4U_CommPort *answer_commport,
             const std::shared_ptr<CompoundJob> &job,
             std::map<std::string, std::string> &service_specific_arguments) {
         WRENCH_INFO("Asked to run compound job %s, which has %zu actions", job->getName().c_str(), job->getActions().size());
+
+        // Action execution service may have terminated
+        try {
+            this->action_execution_service->assertServiceIsUp();
+        } catch (ExecutionException &e) {
+            // And send a reply!
+            answer_commport->dputMessage(
+                    new ComputeServiceSubmitCompoundJobAnswerMessage(
+                            job, this->getSharedPtr<BareMetalComputeService>(), false,
+                            std::shared_ptr<FailureCause>(
+                                    new ServiceIsDown(this->getSharedPtr<BareMetalComputeService>())),
+                            this->getMessagePayloadValue(
+                                    ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
+            return;
+        }
 
         // Can we run this job at all in terms of available resources?
         bool can_run = true;
@@ -530,8 +545,7 @@ namespace wrench {
         }
 
         if (not can_run) {
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
+            answer_commport->dputMessage(
                     new ComputeServiceSubmitCompoundJobAnswerMessage(
                             job, this->getSharedPtr<BareMetalComputeService>(), false,
                             std::shared_ptr<FailureCause>(
@@ -556,8 +570,7 @@ namespace wrench {
 
 
         // And send a reply!
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
+        answer_commport->dputMessage(
                 new ComputeServiceSubmitCompoundJobAnswerMessage(
                         job, this->getSharedPtr<BareMetalComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
@@ -587,8 +600,7 @@ namespace wrench {
                 auto job = *(this->current_jobs.begin());
                 try {
                     this->current_jobs.erase(job);
-                    S4U_Mailbox::putMessage(
-                            job->popCallbackMailbox(),
+                    job->popCallbackCommPort()->dputMessage(
                             new ComputeServiceCompoundJobFailedMessage(
                                     job, this->getSharedPtr<BareMetalComputeService>(),
                                     this->getMessagePayloadValue(
@@ -608,10 +620,10 @@ namespace wrench {
  * @brief Process a compound job termination request
  *
  * @param job: the job to terminate
- * @param answer_mailbox: the mailbox to which the answer message should be sent
+ * @param answer_commport: the commport to which the answer message should be sent
  */
     void BareMetalComputeService::processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job,
-                                                                       simgrid::s4u::Mailbox *answer_mailbox) {
+                                                                       S4U_CommPort *answer_commport) {
         // If the job doesn't exit, we reply right away
         if (this->current_jobs.find(job) == this->current_jobs.end()) {
             WRENCH_INFO(
@@ -622,7 +634,7 @@ namespace wrench {
                     std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<BareMetalComputeService>(), msg)),
                     this->getMessagePayloadValue(
                             BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD));
-            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+            answer_commport->dputMessage(answer_message);
             return;
         }
 
@@ -635,22 +647,22 @@ namespace wrench {
                 job, this->getSharedPtr<BareMetalComputeService>(), true, nullptr,
                 this->getMessagePayloadValue(
                         BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD));
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+        answer_commport->dputMessage(answer_message);
     }
 
 
     /**
  * @brief Process a host available resource request
- * @param answer_mailbox: the answer mailbox
+ * @param answer_commport: the answer commport
  * @param num_cores: the desired number of cores
  * @param ram: the desired RAM
  */
-    void BareMetalComputeService::processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox,
+    void BareMetalComputeService::processIsThereAtLeastOneHostWithAvailableResources(S4U_CommPort *answer_commport,
                                                                                      unsigned long num_cores,
                                                                                      double ram) {
         bool answer = this->action_execution_service->IsThereAtLeastOneHostWithAvailableResources(num_cores, ram);
-        S4U_Mailbox::dputMessage(
-                answer_mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
+        answer_commport->dputMessage(
+                new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
                                         answer,
                                         this->getMessagePayloadValue(
                                                 BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
@@ -667,10 +679,10 @@ namespace wrench {
 
     /**
      * @brief Process a "get resource description message"
-     * @param answer_mailbox: the mailbox to which the description message should be sent
+     * @param answer_commport: the commport to which the description message should be sent
      * @param key: the desired resource information (i.e., dictionary key) that's needed)
      */
-    void BareMetalComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
+    void BareMetalComputeService::processGetResourceInformation(S4U_CommPort *answer_commport,
                                                                 const std::string &key) {
         std::map<std::string, double> dict;
 
@@ -681,7 +693,7 @@ namespace wrench {
                 dict,
                 this->getMessagePayloadValue(
                         ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+        answer_commport->dputMessage(answer_message);
     }
 
     /**
@@ -768,6 +780,11 @@ namespace wrench {
                   });
 
         for (auto const &action: this->ready_actions) {
+            if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
+                // The action has been dispatched (but its state it not set to RUNNING yet,
+                // since there can be zero-size, instant communication!
+                break;
+            }
             this->action_execution_service->submitAction(action);
             this->num_dispatched_actions_for_cjob[action->getJob()]++;
             this->dispatched_actions.insert(action);
@@ -790,6 +807,8 @@ namespace wrench {
             return;
         }
 
+        WRENCH_INFO("Processing ActionDone: %s", action->getName().c_str());
+
         this->dispatched_actions.erase(action);
         this->num_dispatched_actions_for_cjob[action->getJob()]--;
 
@@ -808,8 +827,7 @@ namespace wrench {
             if (job->hasSuccessfullyCompleted() and (this->num_dispatched_actions_for_cjob[job] == 0)) {
                 this->current_jobs.erase(job);
                 this->num_dispatched_actions_for_cjob.erase(job);
-                S4U_Mailbox::dputMessage(
-                        job->popCallbackMailbox(),
+                job->popCallbackCommPort()->dputMessage(
                         new ComputeServiceCompoundJobDoneMessage(
                                 job, this->getSharedPtr<BareMetalComputeService>(),
                                 this->getMessagePayloadValue(
@@ -818,8 +836,7 @@ namespace wrench {
             } else if (job->hasFailed() and ((this->num_dispatched_actions_for_cjob[job] == 0))) {
                 this->current_jobs.erase(job);
                 this->num_dispatched_actions_for_cjob.erase(job);
-                S4U_Mailbox::putMessage(
-                        job->popCallbackMailbox(),
+                job->popCallbackCommPort()->dputMessage(
                         new ComputeServiceCompoundJobFailedMessage(
                                 job, this->getSharedPtr<BareMetalComputeService>(),
                                 this->getMessagePayloadValue(

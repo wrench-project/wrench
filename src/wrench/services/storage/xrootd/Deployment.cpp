@@ -163,7 +163,7 @@ namespace wrench {
             if (file == nullptr) {
                 throw std::invalid_argument("XRootD::createFile(): The file can not be null");
             }
-            std::remove(files[file].begin(), files[file].end(), location);
+            auto nowarning = std::remove(files[file].begin(), files[file].end(), location);
         }
 
     }// namespace XRootD

@@ -39,6 +39,7 @@ public:
 protected:
     ~NetworkProximityLinkFailuresTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     NetworkProximityLinkFailuresTest() {

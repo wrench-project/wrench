@@ -87,7 +87,7 @@ private:
             auto job_to_big = job_manager->createCompoundJob("my_mpi_job_too_big");
 
             /* MPI code to execute - noop */
-            auto mpi_code_noop = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
+            auto mpi_code_noop = [](const std::shared_ptr<wrench::ExecutionController> &controller) {
             };
 
             /* Add an action with 100 MPI processes, each of which has 10 cores */
@@ -114,7 +114,7 @@ private:
         auto job = job_manager->createCompoundJob("my_mpi_job");
 
         /* MPI code to execute */
-        auto mpi_code = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
+        auto mpi_code = [](const std::shared_ptr<wrench::ExecutionController> &controller) {
             int num_procs;
             int my_rank;
 
@@ -126,7 +126,7 @@ private:
             MPI_Barrier(MPI_COMM_WORLD);
 
             // Create my own data movement manager
-            auto data_manager = action_executor->createDataMovementManager();
+            auto data_manager = controller->createDataMovementManager();
 
             int num_comm_bytes = 1000000;
             void *data = SMPI_SHARED_MALLOC(num_comm_bytes * num_procs);
@@ -186,10 +186,11 @@ void BatchComputeServiceMPIActionTest::do_MPIAction_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-    //    argv[1] = strdup("--wrench-full-log");
+        argv[1] = strdup("--wrench-commport-pool-size=10000");
+//        argv[2] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

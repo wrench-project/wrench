@@ -24,7 +24,7 @@
 #define NUM_STORAGE_SERVICES 10
 #define STORAGE_SERVICE_CAPACITY (0.5 * NUM_FILES * FILE_SIZE)
 
-WRENCH_LOG_CATEGORY(storage_service_link_failures_test, "Log category for StorageServiceLinkFailuresTest");
+WRENCH_LOG_CATEGORY(storage_service_link_failures_test, "Log category for nStorageServiceLinkFailuresTest");
 
 
 class StorageServiceLinkFailuresTest : public ::testing::Test {
@@ -222,7 +222,7 @@ private:
                 0, this->test->storage_services.size() - 1);
 
         auto dest = this->test->storage_services.at(dist_storage(rng));
-        auto file = this->test->workflow->addFile("written_file_" + std::to_string(count++), FILE_SIZE);
+        auto file = wrench::Simulation::addFile("written_file_" + std::to_string(count++), FILE_SIZE);
         wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(dest, file));
         wrench::StorageService::deleteFileAtLocation(wrench::FileLocation::LOCATION(dest, file));
     }
@@ -244,9 +244,7 @@ private:
         switcher2->setSimulation(this->simulation);
         switcher2->start(switcher2, true, false);// Daemonized, no auto-restart
 
-
         this->data_movement_manager = this->createDataMovementManager();
-
 
         unsigned long network_failure_1 = 0, network_failure_2 = 0;
         unsigned long network_failure_3 = 0, network_failure_4 = 0;
@@ -334,8 +332,8 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-link-shutdown-simulation");
-    //    argv[2] = strdup("--wrench-mailbox-pool-size=100000");
-    //    argv[3] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-commport-pool-size=100000");
+//        argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -390,7 +388,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
 
     // Create a bunch of file
     for (unsigned int i = 0; i < NUM_FILES; i++) {
-        files.push_back(workflow->addFile("file_" + std::to_string(i), FILE_SIZE));
+        files.push_back(wrench::Simulation::addFile("file_" + std::to_string(i), FILE_SIZE));
     }
 
     // Stage some files randomly on storage services

@@ -35,6 +35,7 @@ namespace wrench {
 
     public:
         static std::shared_ptr<Workflow> createWorkflow();
+        std::string getName() const;
         void clear();
 
         /**
@@ -53,8 +54,8 @@ namespace wrench {
 
         void removeFile(const std::shared_ptr<DataFile> &file);
         std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
-        std::shared_ptr<DataFile> addFile(const std::string &id, double size);
-        std::shared_ptr<DataFile> getFileByID(const std::string &id);
+        //        std::shared_ptr<DataFile> addFile(const std::string &id, double size);
+        //        std::shared_ptr<DataFile> getFileByID(const std::string &id);
         std::shared_ptr<WorkflowTask> getTaskByID(const std::string &id);
 
 
@@ -117,6 +118,7 @@ namespace wrench {
         friend class Simulation;
         friend class WorkflowTask;
 
+        std::string name;
         bool update_top_bottom_levels_dynamically;
 
         Workflow();
@@ -139,8 +141,8 @@ namespace wrench {
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<WorkflowTask>> task_output_files;
         std::map<std::shared_ptr<DataFile>, std::set<std::shared_ptr<WorkflowTask>>> task_input_files;
 
-        /* Set of files (also kept track by the simulation!) */
-        std::set<std::shared_ptr<DataFile>> data_files;
+        /* files used in this workflow */
+        std::map<std::string, std::shared_ptr<DataFile>> data_files;
     };
 }// namespace wrench
 

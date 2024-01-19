@@ -37,7 +37,7 @@ namespace wrench {
      */
     class VirtualizedClusterComputeServiceMigrateVMRequestMessage : public VirtualizedClusterComputeServiceMessage {
     public:
-        VirtualizedClusterComputeServiceMigrateVMRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+        VirtualizedClusterComputeServiceMigrateVMRequestMessage(S4U_CommPort *answer_commport,
                                                                 const std::string &vm_name,
                                                                 const std::string &dest_pm_hostname,
                                                                 double payload);
@@ -46,8 +46,8 @@ namespace wrench {
         std::string vm_name;
         /** @brief The name of the host to which the VM should be migrated */
         std::string dest_pm_hostname;
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
     };
 
     /**

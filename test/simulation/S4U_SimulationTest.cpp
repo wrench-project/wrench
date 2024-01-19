@@ -311,6 +311,7 @@ void S4U_SimulationTest::do_basicAPI_Test() {
 
     simulation->init(&argc, argv);
 
+
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
@@ -349,7 +350,7 @@ private:
 
     int main() override {
 
-        wrench::S4U_Mailbox::getMessage(this->mailbox);
+        this->commport->getMessage();
 
         return 0;
     }

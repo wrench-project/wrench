@@ -35,10 +35,10 @@ namespace wrench {
      */
     class CompoundStorageAllocationRequestMessage : public CompoundStorageServiceMessage {
     public:
-        CompoundStorageAllocationRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file, double payload);
+        CompoundStorageAllocationRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file, double payload);
 
-        /** @brief Mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief CommPort to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The path */
         std::shared_ptr<DataFile> file;
     };
@@ -59,10 +59,10 @@ namespace wrench {
      */
     class CompoundStorageLookupRequestMessage : public CompoundStorageServiceMessage {
     public:
-        CompoundStorageLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file, double payload);
+        CompoundStorageLookupRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file, double payload);
 
-        /** @brief Mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief CommPort to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The path */
         std::shared_ptr<DataFile> file;
     };

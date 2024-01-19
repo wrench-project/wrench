@@ -18,6 +18,7 @@ class WorkflowTest : public ::testing::Test {
 protected:
     ~WorkflowTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     WorkflowTest() {
@@ -44,11 +45,11 @@ protected:
             throw std::runtime_error("Creating a dependency cycle in workflow should throw");
         } catch (std::runtime_error &ignore) {}
 
-        f1 = workflow->addFile("file-01", 1);
-        f2 = workflow->addFile("file-02", 1);
-        f3 = workflow->addFile("file-03", 1);
-        f4 = workflow->addFile("file-04", 1);
-        f5 = workflow->addFile("file-05", 1);
+        f1 = wrench::Simulation::addFile("file-01", 1);
+        f2 = wrench::Simulation::addFile("file-02", 1);
+        f3 = wrench::Simulation::addFile("file-03", 1);
+        f4 = wrench::Simulation::addFile("file-04", 1);
+        f5 = wrench::Simulation::addFile("file-05", 1);
 
         t1->addInputFile(f1);
         t2->addInputFile(f2);
@@ -304,16 +305,17 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
     ASSERT_THROW(workflow->getTaskParents(nullptr), std::invalid_argument);
 
     bogus_workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     //  ASSERT_THROW(workflow->updateTaskState(nullptr, wrench::WorkflowTask::State::FAILED), std::invalid_argument);
 }
 
 TEST_F(WorkflowTest, DataFile) {
-    ASSERT_THROW(workflow->addFile("file-error-00", -1), std::invalid_argument);
-    ASSERT_THROW(workflow->addFile("file-01", 10), std::invalid_argument);
+    ASSERT_THROW(wrench::Simulation::addFile("file-error-00", -1), std::invalid_argument);
+    ASSERT_THROW(wrench::Simulation::addFile("file-01", 10), std::invalid_argument);
 
-    ASSERT_THROW(workflow->getFileByID("file-nonexist"), std::invalid_argument);
-    ASSERT_EQ(workflow->getFileByID("file-01")->getID(), "file-01");
+    ASSERT_THROW(wrench::Simulation::getFileByID("file-nonexist"), std::invalid_argument);
+    ASSERT_EQ(wrench::Simulation::getFileByID("file-01")->getID(), "file-01");
 
     ASSERT_EQ(workflow->getInputFiles().size(), 1);
 }
@@ -357,6 +359,7 @@ class AllDependenciesWorkflowTest : public ::testing::Test {
 protected:
     ~AllDependenciesWorkflowTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     AllDependenciesWorkflowTest() {

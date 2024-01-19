@@ -85,26 +85,20 @@ private:
         // Add routes
         {
             sg4::LinkInRoute network_link_in_route{network_link};
-            zone->add_route(compute_host->get_netpoint(),
-                            wms_host->get_netpoint(),
-                            nullptr,
-                            nullptr,
+            zone->add_route(compute_host,
+                            wms_host,
                             {network_link_in_route});
         }
         {
             sg4::LinkInRoute network_link_in_route{loopback_WMSHost};
-            zone->add_route(wms_host->get_netpoint(),
-                            wms_host->get_netpoint(),
-                            nullptr,
-                            nullptr,
+            zone->add_route(wms_host,
+                            wms_host,
                             {network_link_in_route});
         }
         {
             sg4::LinkInRoute network_link_in_route{loopback_ComputeHost};
-            zone->add_route(compute_host->get_netpoint(),
-                            compute_host->get_netpoint(),
-                            nullptr,
-                            nullptr,
+            zone->add_route(compute_host,
+                            compute_host,
                             {network_link_in_route});
         }
 
@@ -171,8 +165,8 @@ int main(int argc, char **argv) {
         /* Create a task: random GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory_manager_service footprint */
         auto task = workflow->addTask("task_" + std::to_string(i), dist(rng), 1, 10, 10000000);
         task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
-        task->addInputFile(workflow->addFile("input_" + std::to_string(i), 10000000));
-        task->addOutputFile(workflow->addFile("output_" + std::to_string(i), 10000000));
+        task->addInputFile(wrench::Simulation::addFile("input_" + std::to_string(i), 10000000));
+        task->addOutputFile(wrench::Simulation::addFile("output_" + std::to_string(i), 10000000));
     }
 
     /* Instantiate a storage service, and add it to the simulation.
@@ -206,13 +200,13 @@ int main(int argc, char **argv) {
 
     /* Instantiate a file registry service to be started on WMSHost. This service is
      * essentially a replica catalog that stores <file , storage service> pairs so that
-     * any service, in particular a WMS, can discover where workflow files are stored. */
+     * any service, in particular a WMS, can discover where files are stored. */
     std::cerr << "Instantiating a FileRegistryService on WMSHost ..." << std::endl;
     auto file_registry_service = new wrench::FileRegistryService("WMSHost");
     simulation->add(file_registry_service);
 
     /* It is necessary to store, or "stage", input files that only input. The getInputFiles()
-     * method of the Workflow class returns the set of all workflow files that are not generated
+     * method of the Workflow class returns the set of all files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
     std::cerr << "Staging task input files..." << std::endl;
     for (auto const &f: workflow->getInputFiles()) {

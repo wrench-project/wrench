@@ -8,7 +8,7 @@
  */
 
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/exceptions/ExecutionException.h"
@@ -25,13 +25,13 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the hostname on which the data movement manager is to run
-     * @param creator_mailbox: the mailbox of the manager's creator
+     * @param creator_commport: the commport of the manager's creator
      * @param location: the write location
      */
     FileWriterThread::FileWriterThread(std::string hostname,
-                                       simgrid::s4u::Mailbox *creator_mailbox,
+                                       S4U_CommPort *creator_commport,
                                        std::shared_ptr<FileLocation> location) : Service(hostname, "file_writer_thread") {
-        this->creator_mailbox = creator_mailbox;
+        this->creator_commport = creator_commport;
         this->location = location;
     }
 
@@ -49,7 +49,7 @@ namespace wrench {
         } catch (ExecutionException &e) {
             msg = new DataMovementManagerFileWriterThreadMessage(this->location, false, e.getCause());
         }
-        S4U_Mailbox::putMessage(this->creator_mailbox, msg);
+        this->creator_commport->putMessage(msg);
 
         return 0;
     }
