@@ -35,7 +35,6 @@ namespace wrench {
     class S4U_CommPort {
 
     public:
-
         template<class TMessageType>
         std::string get_type_name() {
             char const *type_name = typeid(TMessageType).name();
@@ -169,7 +168,6 @@ namespace wrench {
         }
 
     private:
-
         friend class S4U_Daemon;
         friend class S4U_PendingCommunication;
 
@@ -186,8 +184,8 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> getMessage(double timeout, bool log);
 
 
-        void templateWaitingLog(const std::string& type, unsigned long long id);
-        void templateWaitingLogUpdate(const std::string& type, unsigned long long id);
+        void templateWaitingLog(const std::string &type, unsigned long long id);
+        void templateWaitingLogUpdate(const std::string &type, unsigned long long id);
 
         /** Statics **/
         friend class S4U_Simulation;

@@ -145,9 +145,9 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void FileTransferThread::cleanup(bool has_returned_from_main, int return_value) {
-//        this->release_held_mutexes();
+        //        this->release_held_mutexes();
         // Do nothing
-//        Service::cleanup(has_returned_from_main, return_value);
+        //        Service::cleanup(has_returned_from_main, return_value);
     }
 
     /**
@@ -248,12 +248,12 @@ namespace wrench {
         // Call retire on all commports passed, which is pretty brute force but should work since
         // I synchronized with the parent!
         // BUT IT SHOULDN'T BE MY JOB!!!!
-//        if (this->dst_commport) {
-//            S4U_CommPort::retireTemporaryCommPort(this->dst_commport);
-//        }
-//        if (this->src_commport) {
-//            S4U_CommPort::retireTemporaryCommPort(this->src_commport);
-//        }
+        //        if (this->dst_commport) {
+        //            S4U_CommPort::retireTemporaryCommPort(this->dst_commport);
+        //        }
+        //        if (this->src_commport) {
+        //            S4U_CommPort::retireTemporaryCommPort(this->src_commport);
+        //        }
         return 0;
     }
 
@@ -425,8 +425,8 @@ namespace wrench {
                     }
                     //                    WRENCH_INFO("Asynchronously sending %s bytes over the network", std::to_string(chunk_size).c_str());
                     req = commport->iputMessage(new StorageServiceFileContentChunkMessage(
-                                                           this->file,
-                                                           chunk_size, (remaining <= 0)));
+                            this->file,
+                            chunk_size, (remaining <= 0)));
                 }
 #ifdef PAGE_CACHE_SIMULATION
                 if (Simulation::isPageCachingEnabled()) {
@@ -434,7 +434,7 @@ namespace wrench {
                 }
 #endif
                 req->wait();
-//                WRENCH_INFO("Bytes sent over the network were received");
+                //                WRENCH_INFO("Bytes sent over the network were received");
             } catch (std::shared_ptr<NetworkError> &e) {
                 throw;
             }

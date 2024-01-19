@@ -116,7 +116,7 @@ namespace wrench {
         WRENCH_INFO("Compacting schedule...");
 
 #ifdef PRINT_SCHEDULE
-//        WRENCH_INFO("BEFORE COMPACTING");
+        //        WRENCH_INFO("BEFORE COMPACTING");
         this->schedule->print();
 #endif
 

@@ -71,7 +71,7 @@ namespace wrench {
      */
     CloudComputeService::~CloudComputeService() {
     }
-    
+
 
     /**
      * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
@@ -450,8 +450,8 @@ namespace wrench {
             // This is Synchronous
             try {
                 msg->ack_commport->putMessage(
-                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                CloudComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                                CloudComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
                 return false;
             }
@@ -838,7 +838,7 @@ namespace wrench {
         cs->start(cs, true, false);// Daemonized
 
         // Create a failure detector for the service
-//        WRENCH_INFO("CREATING SERVICE TERMINATION DETECTOR THAT WILL REPORT TO COMMPORT %s", this->commport->get_cname());
+        //        WRENCH_INFO("CREATING SERVICE TERMINATION DETECTOR THAT WILL REPORT TO COMMPORT %s", this->commport->get_cname());
         auto termination_detector = std::make_shared<ServiceTerminationDetector>(
                 this->hostname, cs,
                 this->commport, false, true);
@@ -1107,9 +1107,9 @@ namespace wrench {
         }
         answer_commport->dputMessage(
                 new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
-                                        answer,
-                                        this->getMessagePayloadValue(
-                                                CloudComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
+                        answer,
+                        this->getMessagePayloadValue(
+                                CloudComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
     }
 
 

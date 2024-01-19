@@ -12,22 +12,22 @@
 
 // Convenient macros to throw a runtime exception
 
-#define RUNTIME_DBL_EQ(value, expected, message, epsilon) \
-    { \
-        if (((value) < (expected) - (epsilon)) or ((value) > (expected) + (epsilon))) { \
-            std::stringstream ss; \
+#define RUNTIME_DBL_EQ(value, expected, message, epsilon)                                                \
+    {                                                                                                    \
+        if (((value) < (expected) - (epsilon)) or ((value) > (expected) + (epsilon))) {                  \
+            std::stringstream ss;                                                                        \
             ss << "Unexpected " << (message) << ": " << (value) << " (expected: ~" << (expected) << ")"; \
-            throw std::runtime_error(ss.str());  \
-        } \
+            throw std::runtime_error(ss.str());                                                          \
+        }                                                                                                \
     }
 
-#define RUNTIME_EQ(value, expected, message) \
-    {  \
-        if ((value) != (expected)) { \
-            std::stringstream ss; \
+#define RUNTIME_EQ(value, expected, message)                                                            \
+    {                                                                                                   \
+        if ((value) != (expected)) {                                                                    \
+            std::stringstream ss;                                                                       \
             ss << "Unexpected " << (message) << ": " << (value) << " (expected: " << (expected) << ")"; \
-            throw std::runtime_error(ss.str());  \
-        } \
+            throw std::runtime_error(ss.str());                                                         \
+        }                                                                                               \
     }
 
 

@@ -53,7 +53,7 @@ namespace wrench {
         if (num_nodes > cs->available_nodes_to_cores.size()) {
             throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
-        if (cores_per_node > (unsigned long)cs->available_nodes_to_cores.begin()->first->get_core_count()) {
+        if (cores_per_node > (unsigned long) cs->available_nodes_to_cores.begin()->first->get_core_count()) {
             throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too many cores per host");
         }
 
