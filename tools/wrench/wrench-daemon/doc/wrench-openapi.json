@@ -1755,7 +1755,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/{storage_service_name}/createFileCopy": {
+    "/simulation/{simid}/{storage_service_name}/createFileCopy": {
       "post": {
         "tags": [
           "WRENCH"
@@ -1767,15 +1767,6 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "workflow_name",
-            "in": "path",
-            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -1829,7 +1820,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/{storage_service_name}/lookupFile": {
+    "/simulation/{simid}/{storage_service_name}/lookupFile": {
       "post": {
         "tags": [
           "WRENCH"
@@ -1841,15 +1832,6 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "workflow_name",
-            "in": "path",
-            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
