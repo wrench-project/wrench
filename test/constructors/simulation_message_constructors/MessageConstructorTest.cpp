@@ -124,9 +124,9 @@ private:
 
         auto network_proximity_daemon = std::shared_ptr<wrench::NetworkProximitySenderDaemon>(
                 new wrench::NetworkProximitySenderDaemon(this->simulation, "Host1",
-                                                   commport,
-                                                   10.0, 1.0,
-                                                   1.0, 0, {}));
+                                                         commport,
+                                                         10.0, 1.0,
+                                                         1.0, 0, {}));
         auto batch_job = std::make_shared<wrench::BatchJob>(compound_job, 1, 10, 1,
                                                             1, "me", 10.0, 0.0);
 
@@ -387,7 +387,7 @@ void MessageConstructorTest::do_MessageConstruction_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//        argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();

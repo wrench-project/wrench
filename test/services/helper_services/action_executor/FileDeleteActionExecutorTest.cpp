@@ -118,7 +118,7 @@ class FileDeleteActionExecutorSuccessTestWMS : public wrench::ExecutionControlle
 
 public:
     FileDeleteActionExecutorSuccessTestWMS(FileDeleteActionExecutorTest *test,
-                                           const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                           const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:

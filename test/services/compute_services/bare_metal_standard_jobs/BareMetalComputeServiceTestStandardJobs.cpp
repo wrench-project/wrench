@@ -167,7 +167,7 @@ class MulticoreComputeServiceUnsupportedJobTypeTestWMS : public wrench::Executio
 
 public:
     MulticoreComputeServiceUnsupportedJobTypeTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                     const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                     const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -256,7 +256,7 @@ class MulticoreComputeServiceBogusNumCoresTestWMS : public wrench::ExecutionCont
 
 public:
     MulticoreComputeServiceBogusNumCoresTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -364,7 +364,7 @@ class MulticoreComputeServiceTwoSingleCoreTasksTestWMS : public wrench::Executio
 
 public:
     MulticoreComputeServiceTwoSingleCoreTasksTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                     const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                     const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -508,7 +508,7 @@ class MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS : public wrench::Execu
 
 public:
     MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                        const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                        const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -572,7 +572,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//        argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -622,7 +622,7 @@ class MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS : public wrench::Execu
 
 public:
     MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                        const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
+                                                        const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -757,7 +757,7 @@ class BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS : public wrench::Execu
 
 public:
     BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                        const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                        const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -986,7 +986,7 @@ class BareMetalComputeServiceJobImmediateTerminationTestWMS : public wrench::Exe
 
 public:
     BareMetalComputeServiceJobImmediateTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                          const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                          const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1046,8 +1046,8 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//        argv[1] = strdup("--wrench-full-log");
-//        argv[2] = strdup("--wrench-default-control-message-size=1024");
+    //        argv[1] = strdup("--wrench-full-log");
+    //        argv[2] = strdup("--wrench-default-control-message-size=1024");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1102,7 +1102,7 @@ class BareMetalComputeServiceJobTerminationTestWMS : public wrench::ExecutionCon
 
 public:
     BareMetalComputeServiceJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                 const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                 const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1222,7 +1222,7 @@ class BareMetalComputeServiceNonSubmittedJobTerminationTestWMS : public wrench::
 
 public:
     BareMetalComputeServiceNonSubmittedJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                             const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                             const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1330,7 +1330,7 @@ class BareMetalComputeServiceCompletedJobTerminationTestWMS : public wrench::Exe
 
 public:
     BareMetalComputeServiceCompletedJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                          const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                          const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1449,7 +1449,7 @@ class BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS : pu
 public:
     BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
             BareMetalComputeServiceTestStandardJobs *test,
-            const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+            const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1579,7 +1579,7 @@ class BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS :
 public:
     BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
             BareMetalComputeServiceTestStandardJobs *test,
-            const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+            const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1645,7 +1645,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
