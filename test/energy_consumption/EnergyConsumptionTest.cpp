@@ -49,6 +49,7 @@ public:
 protected:
     ~EnergyConsumptionTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     EnergyConsumptionTest() {
@@ -287,8 +288,8 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
                             new EnergyApiAccessExceptionsTestWMS(
                                     this, hostname)));
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -444,8 +445,8 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
                                     this, hostname)));
 
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -560,8 +561,8 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
                             new EnergyConsumptionTestWMS(
                                     this, hostname)));
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -712,8 +713,8 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
                             new EnergyAPICheckTestWMS(
                                     this, hostname)));
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -880,8 +881,8 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
                             new EnergyConsumptionPStateChangeTestWMS(
                                     this, hostname)));
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));

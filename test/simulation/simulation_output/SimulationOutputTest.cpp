@@ -36,6 +36,7 @@ public:
 protected:
     ~SimulationOutputTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimulationOutputTest() {
@@ -43,11 +44,11 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         //      // Create the files
-        //      input_file = workflow->addFile("input_file", 10.0);
-        //      output_file1 = workflow->addFile("output_file1", 10.0);
-        //      output_file2 = workflow->addFile("output_file2", 10.0);
-        //      output_file3 = workflow->addFile("output_file3", 10.0);
-        //      output_file4 = workflow->addFile("output_file4", 10.0);
+        //      input_file = wrench::Simulation::addFile("input_file", 10.0);
+        //      output_file1 = wrench::Simulation::addFile("output_file1", 10.0);
+        //      output_file2 = wrench::Simulation::addFile("output_file2", 10.0);
+        //      output_file3 = wrench::Simulation::addFile("output_file3", 10.0);
+        //      output_file4 = wrench::Simulation::addFile("output_file4", 10.0);
         //
         //      // Create the tasks
         //      task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0.0);

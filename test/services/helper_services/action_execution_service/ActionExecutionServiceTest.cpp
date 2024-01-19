@@ -213,7 +213,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
                                                                                         {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -225,6 +225,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -308,7 +309,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionBogusSpecTest
                                                                                         {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -320,6 +321,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionBogusSpecTest
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -415,7 +417,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceNonReadyActionTest_tes
                                                                                         {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -427,6 +429,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceNonReadyActionTest_tes
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -536,7 +539,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -548,6 +551,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -708,7 +712,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -720,6 +724,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -837,7 +842,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -849,6 +854,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -969,7 +975,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -981,6 +987,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1074,7 +1081,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -1086,6 +1093,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1240,7 +1248,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -1252,6 +1260,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

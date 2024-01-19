@@ -34,6 +34,7 @@ public:
 protected:
     ~BareMetalComputeServiceLinkFailuresTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     BareMetalComputeServiceLinkFailuresTest() {
