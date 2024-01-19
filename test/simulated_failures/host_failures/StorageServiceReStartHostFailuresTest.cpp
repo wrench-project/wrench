@@ -33,6 +33,7 @@ public:
 protected:
     ~StorageServiceReStartHostFailuresTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     StorageServiceReStartHostFailuresTest() {
@@ -123,7 +124,7 @@ private:
         resurector->setSimulation(this->simulation);
         resurector->start(murderer, true, false);// Daemonized, no auto-restart
 
-        auto file = this->test->workflow->getFileByID("file");
+        auto file = wrench::Simulation::getFileByID("file");
         auto storage_service = this->test->storage_service;
         try {
             wrench::StorageService::readFileAtLocation(wrench::FileLocation::LOCATION(storage_service, file));
@@ -201,7 +202,7 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
     ASSERT_NO_THROW(wms = simulation->add(
                             new StorageServiceRestartTestWMS(this, stable_host)));
 
-    auto file = workflow->addFile("file", 10000000);
+    auto file = wrench::Simulation::addFile("file", 10000000);
 
     simulation->add(new wrench::FileRegistryService(stable_host));
 

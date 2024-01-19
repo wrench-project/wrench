@@ -65,9 +65,9 @@ namespace wrench {
         /*  Get references to tasks and files */
         auto task_0 = this->workflow->getTaskByID("task_0");
         auto task_1 = this->workflow->getTaskByID("task_1");
-        auto file_0 = this->workflow->getFileByID("file_0");
-        auto file_1 = this->workflow->getFileByID("file_1");
-        auto file_2 = this->workflow->getFileByID("file_2");
+        auto file_0 = wrench::Simulation::getFileByID("file_0");
+        auto file_1 = wrench::Simulation::getFileByID("file_1");
+        auto file_2 = wrench::Simulation::getFileByID("file_2");
 
         /* For each task, estimate its execution time in seconds */
         std::map<std::shared_ptr<WorkflowTask>, long> execution_times_in_seconds;

@@ -55,6 +55,7 @@ public:
 protected:
     ~CompoundStorageServiceFunctionalTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     CompoundStorageServiceFunctionalTest() {
@@ -62,11 +63,11 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
-        file_1 = workflow->addFile("file_1", 1.0);
-        file_10 = workflow->addFile("file_10", 10.0);
-        file_100 = workflow->addFile("file_100", 100.0);
-        file_500 = workflow->addFile("file_500", 500.0);
-        file_1000 = workflow->addFile("file_1000", 1000.0);
+        file_1 = wrench::Simulation::addFile("file_1", 1.0);
+        file_10 = wrench::Simulation::addFile("file_10", 10.0);
+        file_100 = wrench::Simulation::addFile("file_100", 100.0);
+        file_500 = wrench::Simulation::addFile("file_500", 500.0);
+        file_1000 = wrench::Simulation::addFile("file_1000", 1000.0);
 
         // Create a three-hosts platform file (2 for simple storage, one for Compound Storage)
         std::string xml = "<?xml version='1.0'?>"

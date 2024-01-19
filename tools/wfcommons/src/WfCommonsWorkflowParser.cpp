@@ -291,10 +291,10 @@ namespace wrench {
                         std::shared_ptr<wrench::DataFile> workflow_file = nullptr;
                         // Check whether the file already exists
                         try {
-                            workflow_file = workflow->getFileByID(id);
+                            workflow_file = Simulation::getFileByID(id);
                         } catch (const std::invalid_argument &ia) {
                             // making a new file
-                            workflow_file = workflow->addFile(id, size_in_bytes);
+                            workflow_file = Simulation::addFile(id, size_in_bytes);
                         }
                         if (link == "input") {
                             workflow_task->addInputFile(workflow_file);
