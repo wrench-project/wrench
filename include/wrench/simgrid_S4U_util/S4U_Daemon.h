@@ -145,7 +145,7 @@ namespace wrench {
         /** @brief The host on which the daemon is running */
         simgrid::s4u::Host *host;
 
-//        void release_held_mutexes();
+        //        void release_held_mutexes();
 
         /**
          * @brief Method to retrieve the shared_ptr to a S4U_daemon

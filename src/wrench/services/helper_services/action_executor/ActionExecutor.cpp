@@ -129,11 +129,11 @@ namespace wrench {
         S4U_Simulation::computeZeroFlop();// to block in case pstate speed is 0
 
         // If no action, just hang forever until oyu get killed (HACK!)
-//        if (action == nullptr) {
-//            std::cerr << "ACTION EXECUTOR SUSPENDING ITSELF\n";
-//            simgrid::s4u::this_actor::suspend();
-//            return 0;
-//        }
+        //        if (action == nullptr) {
+        //            std::cerr << "ACTION EXECUTOR SUSPENDING ITSELF\n";
+        //            simgrid::s4u::this_actor::suspend();
+        //            return 0;
+        //        }
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
         WRENCH_INFO("New Action Executor started to do action %s", this->action->getName().c_str());
@@ -156,9 +156,7 @@ namespace wrench {
 
         WRENCH_INFO("Action executor for action %s terminating and action has %s",
                     this->action->getName().c_str(),
-                    (this->action->getState() == Action::State::COMPLETED ?
-                     "succeeded" :
-                     ("failed (" + this->action->getFailureCause()->toString() + ")").c_str()));
+                    (this->action->getState() == Action::State::COMPLETED ? "succeeded" : ("failed (" + this->action->getFailureCause()->toString() + ")").c_str()));
         try {
             this->callback_commport->putMessage(msg_to_send_back);
         } catch (ExecutionException &e) {

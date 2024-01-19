@@ -253,9 +253,9 @@ private:
 
         // Is the start date sensible?
         RUNTIME_DBL_EQ(action->getStartDate(), 0.0, "action start date", EPSILON);
-//        if (action->getStartDate() < 0.0 || action->getStartDate() > EPSILON) {
-//            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
-//        }
+        //        if (action->getStartDate() < 0.0 || action->getStartDate() > EPSILON) {
+        //            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
+        //        }
 
         //        WRENCH_INFO("END_DATE = %.20lf (EXPECTED %.20lf)", action->getEndDate(), expected_completion_date);
         // Is the state and end date sensible?
@@ -336,7 +336,7 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//        argv[2] = strdup("--wrench-full-log");
+    //        argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 

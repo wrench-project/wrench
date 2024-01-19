@@ -64,7 +64,7 @@ namespace wrench {
      */
     void JobManager::stop() {
         this->commport->putMessage(
-                                new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
+                new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**
@@ -651,7 +651,6 @@ namespace wrench {
         this->cjob_to_pjob_map[job->compound_job] = job;
 
 
-
         try {
             compute_service->validateServiceSpecificArguments(job->compound_job, service_specific_args);
         } catch (ExecutionException &e) {
@@ -719,7 +718,7 @@ namespace wrench {
             this->jobs_to_dispatch.erase(it);
             job->compound_job->state = CompoundJob::State::DISCONTINUED;
             job->state = StandardJob::State::TERMINATED;
-            for (auto const &t : job->getTasks()) {
+            for (auto const &t: job->getTasks()) {
                 t->setInternalState(WorkflowTask::InternalState::TASK_READY);
                 t->setState(WorkflowTask::State::READY);
             }
@@ -1029,7 +1028,7 @@ namespace wrench {
         // Forward the notification to the source
         WRENCH_INFO("Forwarding to %s", job->getOriginCallbackCommPort()->get_cname());
         job->getOriginCallbackCommPort()->dputMessage(
-                                 new ComputeServicePilotJobStartedMessage(job, std::move(compute_service), 0.0));
+                new ComputeServicePilotJobStartedMessage(job, std::move(compute_service), 0.0));
     }
 
     /**
@@ -1049,7 +1048,7 @@ namespace wrench {
         // Forward the notification to the source
         WRENCH_INFO("Forwarding to %s", job->getOriginCallbackCommPort()->get_cname());
         job->getOriginCallbackCommPort()->dputMessage(
-                                 new ComputeServicePilotJobExpiredMessage(job, std::move(compute_service), 0.0));
+                new ComputeServicePilotJobExpiredMessage(job, std::move(compute_service), 0.0));
     }
 
     //    /**
@@ -1140,7 +1139,6 @@ namespace wrench {
             }
         }
         this->releaseDaemonLock();
-
     }
 
 

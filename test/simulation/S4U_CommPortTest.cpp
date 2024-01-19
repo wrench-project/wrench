@@ -107,14 +107,14 @@ private:
             if (fabs(10 - (wrench::Simulation::getCurrentSimulatedDate() - now)) > 0.5) {
                 throw std::runtime_error("Seems like we didn't wait for the timeout!");
             }
-//            index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_timeout, 1000);
-//            if (index != ULONG_MAX) {
-//                throw std::runtime_error("Should have gotten ULONG_MAX");
-//            }
-//            index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_timeout, 1000);
-//            if (index != ULONG_MAX) {
-//                throw std::runtime_error("Should have gotten ULONG_MAX");
-//            }
+            //            index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_timeout, 1000);
+            //            if (index != ULONG_MAX) {
+            //                throw std::runtime_error("Should have gotten ULONG_MAX");
+            //            }
+            //            index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_timeout, 1000);
+            //            if (index != ULONG_MAX) {
+            //                throw std::runtime_error("Should have gotten ULONG_MAX");
+            //            }
 
             // One send, network failure
             pending_send = this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100));
@@ -181,7 +181,7 @@ private:
 
             // Another recv
             auto another_pending_recv = this->test->wms2->commport->igetMessage();
-//            another_pending_recv->wait(0.01 - wrench::Simulation::getCurrentSimulatedDate());
+            //            another_pending_recv->wait(0.01 - wrench::Simulation::getCurrentSimulatedDate());
             another_pending_recv->wait(200);
 
             // Two recv, no timeout
@@ -264,7 +264,7 @@ void S4U_CommPortTest::do_AsynchronousCommunication_test() {
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-link-shutdown-simulation");
-//        argv[2] = strdup("--wrench-log-full");
+    //        argv[2] = strdup("--wrench-log-full");
 
     simulation->init(&argc, argv);
 
@@ -386,7 +386,7 @@ class NullCommPortTestWMS : public wrench::ExecutionController {
 
 public:
     NullCommPortTestWMS(S4U_CommPortTest *test,
-                       const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+                        const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
