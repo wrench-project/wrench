@@ -150,7 +150,7 @@ private:
         // Create a file copy action executor
         auto file_copy_action_executor = std::make_shared<wrench::ActionExecutor>(
                 "Host2", 0, 0.0, 0, false,
-                this->mailbox, file_copy_action, nullptr);
+                this->commport, file_copy_action, nullptr);
         // Start it
         file_copy_action_executor->setSimulation(this->simulation);
         file_copy_action_executor->start(file_copy_action_executor, true, false);
@@ -158,7 +158,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -182,7 +182,7 @@ private:
 
         // Is the end-date sensible?
         if (file_copy_action->getEndDate() < 10.8 or file_copy_action->getEndDate() > 10.9) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_copy_action->getEndDate()));
+            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_copy_action->getEndDate()) + " (expected: ~10.9)" );
         }
 
         // Is the state sensible?
@@ -206,7 +206,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -227,7 +227,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     // Put it on ss1
     simulation->stageFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
@@ -239,6 +239,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -275,7 +276,7 @@ private:
 
         // Create a file copy action executor
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_copy_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_copy_action, nullptr));
         // Start it
         file_copy_action_executor->setSimulation(this->simulation);
         file_copy_action_executor->start(file_copy_action_executor, true, false);
@@ -283,7 +284,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -328,7 +329,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessSameHostTest_te
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = workflow->addFile("some_file", 1000000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000000.0);
 
     // Put it on ss1
     simulation->stageFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
@@ -340,6 +341,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessSameHostTest_te
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

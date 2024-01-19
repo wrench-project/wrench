@@ -42,7 +42,7 @@ And, one of the following:
 
 ### Required Dependencies 
 
-- [SimGrid](https://framagit.org/simgrid/simgrid/) - version 3.24
+- [SimGrid](https://framagit.org/simgrid/simgrid/) - commit tag 98331a543f36f7991a92affa966a8f162c240984
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
 
 ### Optional Dependencies

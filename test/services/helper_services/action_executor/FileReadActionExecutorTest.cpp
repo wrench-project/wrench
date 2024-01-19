@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "../../../include/TestWithFork.h"
+#include "../../../include/RuntimeAssert.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
 WRENCH_LOG_CATEGORY(file_read_action_executor_test, "Log category for FileReadActionExecutorTest");
@@ -154,7 +155,7 @@ private:
 
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_read_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_read_action, nullptr));
 
         // Start it
         file_read_action_executor->setSimulation(this->simulation);
@@ -163,7 +164,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -176,20 +177,13 @@ private:
         }
 
         // Is the start-date sensible?
-        if (file_read_action->getStartDate() < 0.0 or file_read_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_read_action->getStartDate()));
-        }
+        RUNTIME_DBL_EQ(file_read_action->getStartDate(), 0.0, "action start date", EPSILON);
 
         // Is the end-date sensible?
-
-        if (std::abs<double>(file_read_action->getEndDate() - 10.847442) > EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_read_action->getEndDate()));
-        }
+        RUNTIME_DBL_EQ(file_read_action->getEndDate(), 10.8349, "action end date", EPSILON);
 
         // Is the state sensible?
-        if (file_read_action->getState() != wrench::Action::State::COMPLETED) {
-            throw std::runtime_error("Unexpected action state: " + file_read_action->getStateAsString());
-        }
+        RUNTIME_EQ(file_read_action->getState(), wrench::Action::State::COMPLETED, "action state");
 
         return 0;
     }
@@ -223,7 +217,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -234,6 +228,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -280,7 +275,7 @@ private:
                                                         wrench::FileLocation::LOCATION(this->test->ss, this->test->file)});
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_read_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_read_action, nullptr));
         // Start it
         file_read_action_executor->setSimulation(this->simulation);
         file_read_action_executor->start(file_read_action_executor, true, false);
@@ -288,7 +283,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -301,9 +296,10 @@ private:
         }
 
         // Is the state sensible?
-        if (file_read_action->getState() != wrench::Action::State::COMPLETED) {
-            throw std::runtime_error("Unexpected action state: " + file_read_action->getStateAsString());
-        }
+        RUNTIME_EQ(file_read_action->getState(), wrench::Action::State::COMPLETED, "action state");
+//        if (file_read_action->getState() != wrench::Action::State::COMPLETED) {
+//            throw std::runtime_error("Unexpected action state: " + file_read_action->getStateAsString());
+//        }
 
         return 0;
     }
@@ -335,7 +331,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -346,6 +342,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -382,7 +379,7 @@ private:
                                                        wrench::FileLocation::LOCATION(this->test->ss, this->test->file));
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_read_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_read_action, nullptr));
         // Start it
         file_read_action_executor->setSimulation(this->simulation);
         file_read_action_executor->start(file_read_action_executor, true, false);
@@ -390,7 +387,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -448,7 +445,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -458,6 +455,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -494,7 +492,7 @@ private:
                                                        wrench::FileLocation::LOCATION(this->test->ss, this->test->file));
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_read_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_read_action, nullptr));
         // Start it
         file_read_action_executor->setSimulation(this->simulation);
         file_read_action_executor->start(file_read_action_executor, true, false);
@@ -508,7 +506,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -569,7 +567,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -581,6 +579,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

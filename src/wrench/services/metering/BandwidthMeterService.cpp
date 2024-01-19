@@ -8,7 +8,7 @@
  */
 
 #include <wrench/services/metering/BandwidthMeterService.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench-dev.h>
 
 #define EPSILON 0.0001
@@ -80,7 +80,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void BandwidthMeterService::stop() {
-        S4U_Mailbox::putMessage(this->mailbox,
+        this->commport->putMessage(
                                 new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
@@ -91,7 +91,7 @@ namespace wrench {
     int BandwidthMeterService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Bandwidth Meter Manager starting (%s) and monitoring links", this->mailbox->get_cname());
+        WRENCH_INFO("New Bandwidth Meter Manager starting (%s) and monitoring links", this->commport->get_cname());
         for (auto const &l: this->measurement_periods) {
             WRENCH_INFO("  - %s", l.first.c_str());
         }
@@ -146,7 +146,7 @@ namespace wrench {
     bool BandwidthMeterService::processNextMessage(double timeout) {
 
         try {
-            auto msg = S4U_Mailbox::getMessage<ServiceStopDaemonMessage>(this->mailbox, timeout, "BandwidthMeter::waitForNextMessage(): Received an");
+            auto msg = this->commport->getMessage<ServiceStopDaemonMessage>(timeout, "BandwidthMeter::waitForNextMessage(): Received an");
             return false;
         } catch (ExecutionException &e) {
             return true;

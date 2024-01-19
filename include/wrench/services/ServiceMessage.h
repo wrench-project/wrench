@@ -36,10 +36,10 @@ namespace wrench {
     public:
         //        ~ServiceStopDaemonMessage(){};
 
-        ServiceStopDaemonMessage(simgrid::s4u::Mailbox *ack_mailbox, bool send_failure_notifications, ComputeService::TerminationCause termination_cause, double payload);
+        ServiceStopDaemonMessage(S4U_CommPort *ack_commport, bool send_failure_notifications, ComputeService::TerminationCause termination_cause, double payload);
 
-        /** @brief the mailbox to which the "I stopped" ack should be sent */
-        simgrid::s4u::Mailbox *ack_mailbox;
+        /** @brief the commport_name to which the "I stopped" ack should be sent */
+        S4U_CommPort *ack_commport;
         /** @brief whether the service should send failure notifications before terminating **/
         bool send_failure_notifications;
         /** @brief The termination cause for the failure notifications, if any **/

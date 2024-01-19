@@ -19,8 +19,6 @@
 
 namespace wrench {
 
-    //    class SimulationMessage;
-
     /*******************/
     /** \cond INTERNAL */
     /*******************/
@@ -39,10 +37,10 @@ namespace wrench {
         /**
          * @brief Constructor
          *
-         * @param mailbox: the mailbox
+         * @param commport: the CommPort
          * @param operation_type: the operation type
          */
-        S4U_PendingCommunication(simgrid::s4u::Mailbox *mailbox, OperationType operation_type) : mailbox(mailbox), operation_type(operation_type) {}
+        S4U_PendingCommunication(S4U_CommPort *commport, OperationType operation_type) : commport(commport), operation_type(operation_type) {}
 
         std::unique_ptr<SimulationMessage> wait();
         std::unique_ptr<SimulationMessage> wait(double timeout);
@@ -57,14 +55,17 @@ namespace wrench {
 
         //        ~S4U_PendingCommunication() default;
 
-        /** @brief The SimGrid communication handle */
-        simgrid::s4u::CommPtr comm_ptr;
         /** @brief The message */
         std::unique_ptr<SimulationMessage> simulation_message;
-        /** @brief The mailbox */
-        simgrid::s4u::Mailbox *mailbox;
+        /** @brief The CommPort */
+        S4U_CommPort *commport;
         /** @brief The operation type */
         OperationType operation_type;
+
+        /** @brief The SimGrid Mailbox communication handle */
+        simgrid::s4u::CommPtr comm_ptr;
+        /** @brief The SimGrid MessageQueue communication handle */
+        simgrid::s4u::MessPtr mess_ptr;
     };
 
     /*******************/

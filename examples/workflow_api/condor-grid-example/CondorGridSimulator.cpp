@@ -45,8 +45,8 @@ int main(int argc, char **argv) {
     auto workflow = wrench::Workflow::createWorkflow();
     for (int i = 0; i < num_tasks; i++) {
         auto task = workflow->addTask("task_" + std::to_string(i), 1000.0 * 1000.0 * 1000.00 * 1000.00, 5, 5, 0);
-        auto input = workflow->addFile("task_" + std::to_string(i) + ".in", 100.0 * 1000 * 1000);
-        auto output = workflow->addFile("task_" + std::to_string(i) + ".out", 100.0 * 1000 * 1000);
+        auto input = wrench::Simulation::addFile("task_" + std::to_string(i) + ".in", 100.0 * 1000 * 1000);
+        auto output = wrench::Simulation::addFile("task_" + std::to_string(i) + ".out", 100.0 * 1000 * 1000);
         task->addInputFile(input);
         task->addOutputFile(output);
     }

@@ -92,7 +92,7 @@ void LogicalFileSystemTest::do_BasicTests() {
     fs1->removeEmptyDirectory("/foo");
 
     ASSERT_DOUBLE_EQ(100, fs1->getTotalCapacity());
-    auto file_80 = workflow->addFile("file_80", 80);
+    auto file_80 = wrench::Simulation::addFile("file_80", 80);
     ASSERT_TRUE(fs1->reserveSpace(file_80, "/files/"));
     fs1->unreserveSpace(file_80, "/files/");
     ASSERT_DOUBLE_EQ(100, fs1->getFreeSpace());
@@ -102,7 +102,7 @@ void LogicalFileSystemTest::do_BasicTests() {
     fs1->incrementNumRunningTransactionsForFileInDirectory(file_80, "/files");// coverage
     fs1->decrementNumRunningTransactionsForFileInDirectory(file_80, "/files");// coverage
 
-    auto file_50 = workflow->addFile("file_50", 50);
+    auto file_50 = wrench::Simulation::addFile("file_50", 50);
     ASSERT_FALSE(fs1->reserveSpace(file_50, "/files/"));
     ASSERT_DOUBLE_EQ(20, fs1->getFreeSpace());
     fs1->removeFileFromDirectory(file_80, "/files/");
@@ -113,6 +113,7 @@ void LogicalFileSystemTest::do_BasicTests() {
 
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -180,6 +181,7 @@ void LogicalFileSystemTest::do_DevNullTests() {
     fs2->getFileLastWriteDate(file, "/foo");
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

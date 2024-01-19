@@ -32,10 +32,10 @@ namespace wrench {
      */
     class BatchComputeServiceJobRequestMessage : public BatchComputeServiceMessage {
     public:
-        BatchComputeServiceJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<BatchJob> job, double payload);
+        BatchComputeServiceJobRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<BatchJob> job, double payload);
 
-        /** @brief The mailbox to answer to */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to answer to */
+        S4U_CommPort *answer_commport;
         /** @brief The batch job */
         std::shared_ptr<BatchJob> job;
     };
@@ -69,10 +69,10 @@ namespace wrench {
      */
     class BatchSimulationBeginsToSchedulerMessage : public BatchComputeServiceMessage {
     public:
-        BatchSimulationBeginsToSchedulerMessage(std::string answer_mailbox, std::string job_args_to_scheduler, double payload);
+        BatchSimulationBeginsToSchedulerMessage(std::string answer_commport, std::string job_args_to_scheduler, double payload);
 
-        /** @brief The mailbox to answer to */
-        std::string answer_mailbox;
+        /** @brief The commport_name to answer to */
+        std::string answer_commport;
         /** @brief JSON data arguments to the scheduler */
         std::string job_args_to_scheduler;
     };
@@ -84,10 +84,10 @@ namespace wrench {
      */
     class BatchSchedReadyMessage : public BatchComputeServiceMessage {
     public:
-        BatchSchedReadyMessage(std::string answer_mailbox, double payload);
+        BatchSchedReadyMessage(std::string answer_commport, double payload);
 
-        /** @brief The mailbox to answer to */
-        std::string answer_mailbox;
+        /** @brief The commport_name to answer to */
+        std::string answer_commport;
     };
 #endif
 
@@ -99,10 +99,10 @@ namespace wrench {
      */
     class BatchExecuteJobFromBatSchedMessage : public BatchComputeServiceMessage {
     public:
-        BatchExecuteJobFromBatSchedMessage(simgrid::s4u::Mailbox *answer_mailbox, std::string batsched_decision_reply, double payload);
+        BatchExecuteJobFromBatSchedMessage(S4U_CommPort *answer_commport, std::string batsched_decision_reply, double payload);
 
-        /** @brief The mailbox to answer to */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to answer to */
+        S4U_CommPort *answer_commport;
 
         /** @brief The decision reply from Batsched */
         std::string batsched_decision_reply;
@@ -140,10 +140,10 @@ namespace wrench {
      */
     class BatchJobSubmissionToSchedulerMessage : public BatchComputeServiceMessage {
     public:
-        BatchJobSubmissionToSchedulerMessage(simgrid::s4u::Mailbox *answer_mailbox, Job* job, std::string job_args_to_scheduler, double payload);
+        BatchJobSubmissionToSchedulerMessage(S4U_CommPort *answer_commport, Job* job, std::string job_args_to_scheduler, double payload);
 
-        /** @brief The mailbox to answer to */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to answer to */
+        S4U_CommPort *answer_commport;
         /** @brief The batch job */
         Job *job;
         /** @brief JSON data arguments to the scheduler */

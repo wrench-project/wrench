@@ -20,6 +20,26 @@
 
 WRENCH_LOG_CATEGORY(simulation_controller, "Log category for SimulationController");
 
+#define PARSE_SERVICE_PROPERTY_LIST()                                       \
+    WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;                  \
+    {                                                                       \
+        json jsonData = json::parse(property_list_string);                  \
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {    \
+            auto property_key = ServiceProperty::translateString(it.key()); \
+            service_property_list[property_key] = it.value();               \
+        }                                                                   \
+    }
+
+#define PARSE_MESSAGE_PAYLOAD_LIST()                                                     \
+    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;                  \
+    {                                                                                    \
+        json jsonData = json::parse(message_payload_list_string);                        \
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {                 \
+            auto message_payload_key = ServiceMessagePayload::translateString(it.key()); \
+            service_message_payload_list[message_payload_key] = it.value();              \
+        }                                                                                \
+    }
+
 namespace wrench {
 
     /**
@@ -27,9 +47,47 @@ namespace wrench {
      * 
      * @param hostname string containing the name of the host on which this service runs
      */
-    SimulationController::SimulationController(
-            std::shared_ptr<Workflow> workflow,
-            const std::string &hostname, int sleep_us) : ExecutionController(hostname, "SimulationController"), workflow(workflow), sleep_us(sleep_us) {}
+    SimulationController::SimulationController(const std::string &hostname, int sleep_us) : ExecutionController(hostname, "SimulationController"), sleep_us(sleep_us) {}
+
+
+    template<class T>
+    json SimulationController::startService(T *s) {
+        BlockingQueue<std::pair<bool, std::string>> s_created;
+
+        this->things_to_do.push([this, s, &s_created]() {
+            try {
+                auto new_service_shared_ptr = this->simulation->startNewService(s);
+                if (auto cs = std::dynamic_pointer_cast<wrench::ComputeService>(new_service_shared_ptr)) {
+                    WRENCH_INFO("Started a new compute service");
+                    this->compute_service_registry.insert(new_service_shared_ptr->getName(), cs);
+                } else if (auto ss = std::dynamic_pointer_cast<wrench::StorageService>(new_service_shared_ptr)) {
+                    WRENCH_INFO("Started a new storage service");
+                    this->storage_service_registry.insert(new_service_shared_ptr->getName(), ss);
+                } else if (auto fs = std::dynamic_pointer_cast<wrench::FileRegistryService>(new_service_shared_ptr)) {
+                    WRENCH_INFO("Started a new storage service");
+                    this->file_service_registry.insert(new_service_shared_ptr->getName(), fs);
+                } else {
+                    throw std::runtime_error("SimulationController::startNewService(): Unknown service type");
+                }
+                s_created.push(std::pair(true, ""));
+            } catch (ExecutionException &e) {
+                s_created.push(std::pair(false, e.getCause()->toString()));
+            }
+        });
+
+        // Poll from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        s_created.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot start Service: " + error_msg);
+        } else {
+            json answer;
+            answer["service_name"] = s->getName();
+            return answer;
+        }
+    }
 
     /**
      * @brief Simulation execution_controller's main method
@@ -40,7 +98,7 @@ namespace wrench {
         // Initial setup
         wrench::TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
-        S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()] = this->recv_mailbox;
+        S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()] = this->recv_commport;
 
         WRENCH_INFO("Starting");
         this->job_manager = this->createJobManager();
@@ -48,143 +106,13 @@ namespace wrench {
 
         // Main control loop
         while (keep_going) {
+
             // Starting compute and storage services that should be started, if any
             while (true) {
-                wrench::ComputeService *new_compute_service = nullptr;
-                wrench::StorageService *new_storage_service = nullptr;
-                wrench::FileRegistryService *new_file_service = nullptr;
-                std::pair<std::tuple<unsigned long, double, WRENCH_PROPERTY_COLLECTION_TYPE, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE>, std::shared_ptr<ComputeService>> spec_vm_to_create;
-                std::pair<std::string, std::shared_ptr<ComputeService>> vm_id;
-                std::pair<std::shared_ptr<DataFile>, std::shared_ptr<StorageService>> file_lookup_request;
+                std::function<void()> thing_to_do;
 
-                if (this->compute_services_to_start.tryPop(new_compute_service)) {
-                    // starting compute service
-                    WRENCH_INFO("Starting a new compute service...");
-                    auto new_service_shared_ptr = this->simulation->startNewService(new_compute_service);
-                    // Add the new service to the registry of existing services, so that later we can look it up by name
-                    this->compute_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
-
-                } else if (this->storage_services_to_start.tryPop(new_storage_service)) {
-                    // starting storage service
-                    WRENCH_INFO("Starting a new storage service...");
-                    auto new_service_shared_ptr = this->simulation->startNewService(new_storage_service);
-                    // Add the new service to the registry of existing services, so that later we can look it up by name
-                    this->storage_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
-
-                } else if (this->file_service_to_start.tryPop(new_file_service)) {
-                    // start file registry service
-                    WRENCH_INFO("Starting a new file registry service...");
-                    auto new_service_shared_ptr = this->simulation->startNewService(new_file_service);
-                    // Add the new service to the registry of existing services, so that later we can look it up by name
-                    this->file_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
-
-                } else if (this->vm_to_create.tryPop(spec_vm_to_create)) {
-                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(spec_vm_to_create.second);
-                    auto num_cores = std::get<0>(spec_vm_to_create.first);
-                    auto ram_size = std::get<1>(spec_vm_to_create.first);
-                    auto properties = std::get<2>(spec_vm_to_create.first);
-                    auto payloads = std::get<3>(spec_vm_to_create.first);
-                    std::string vm_name;
-                    try {
-                        vm_name = cloud_cs->createVM(num_cores, ram_size, properties, payloads);
-                        this->vm_created.push(std::pair(true, vm_name));
-                    } catch (ExecutionException &e) {
-                        this->vm_created.push(std::pair(false, e.getCause()->toString()));
-                    }
-
-                } else if (this->vm_to_start.tryPop(vm_id)) {
-                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
-                    auto vm_name = vm_id.first;
-                    try {
-                        if (not cloud_cs->isVMDown(vm_name)) {
-                            throw std::invalid_argument("Cannot start VM because it's not down");
-                        }
-                        auto bm_cs = cloud_cs->startVM(vm_name);
-                        this->compute_service_registry.insert(bm_cs->getName(), bm_cs);
-                        this->vm_started.push(std::pair(true, bm_cs->getName()));
-                    } catch (ExecutionException &e) {
-                        this->vm_created.push(std::pair(false, e.getCause()->toString()));
-                    } catch (std::invalid_argument &e) {
-                        this->vm_started.push(std::pair(false, e.what()));
-                    }
-
-                } else if (this->vm_to_shutdown.tryPop(vm_id)) {
-
-                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
-                    auto vm_name = vm_id.first;
-                    try {
-                        if (not cloud_cs->isVMRunning(vm_name)) {
-                            throw std::invalid_argument("Cannot shutdown VM because it's not running");
-                        }
-                        auto bm_cs = cloud_cs->getVMComputeService(vm_name);
-
-                        this->compute_service_registry.remove(bm_cs->getName());
-                        cloud_cs->shutdownVM(vm_name);
-                        this->vm_shutdown.push(std::pair(true, vm_name));
-                    } catch (ExecutionException &e) {
-                        this->vm_shutdown.push(std::pair(false, e.what()));
-                    } catch (std::invalid_argument &e) {
-                        this->vm_shutdown.push(std::pair(false, e.what()));
-                    }
-
-                } else if (this->vm_to_destroy.tryPop(vm_id)) {
-
-                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
-                    auto vm_name = vm_id.first;
-                    try {
-                        if (not cloud_cs->isVMDown(vm_name)) {
-                            throw std::invalid_argument("Cannot destroy VM because it's not down");
-                        }
-                        cloud_cs->destroyVM(vm_name);
-                        this->vm_destroyed.push(std::pair(true, vm_name));
-                    } catch (std::invalid_argument &e) {
-                        this->vm_destroyed.push(std::pair(false, e.what()));
-                    }
-
-                } else if (this->file_to_lookup.tryPop(file_lookup_request)) {
-
-                    auto file = file_lookup_request.first;
-                    auto ss = file_lookup_request.second;
-                    try {
-                        bool result = ss->lookupFile(file);
-                        this->file_looked_up.push(std::tuple(true, result, ""));
-                    } catch (std::invalid_argument &e) {
-                        this->file_looked_up.push(std::tuple(false, false, e.what()));
-                    }
-
-                } else if (this->vm_to_suspend.tryPop(vm_id)) {
-
-                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
-                    auto vm_name = vm_id.first;
-                    try {
-                        cloud_cs->suspendVM(vm_name);
-                        this->vm_suspended.push(std::pair(true, vm_name));
-                    } catch (std::invalid_argument &e) {
-                        this->vm_suspended.push(std::pair(false, e.what()));
-                    }
-
-                } else if (this->vm_to_resume.tryPop(vm_id)) {
-
-                    auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(vm_id.second);
-                    auto vm_name = vm_id.first;
-                    try {
-                        cloud_cs->resumeVM(vm_name);
-                        this->vm_resumed.push(std::pair(true, vm_name));
-                    } catch (std::invalid_argument &e) {
-                        this->vm_resumed.push(std::pair(false, e.what()));
-                    }
-
-                } else {
-                    break;
-                }
-            }
-
-            // Submit jobs that should be submitted
-            while (true) {
-                std::pair<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>> submission_to_do;
-                if (this->submissions_to_do.tryPop(submission_to_do)) {
-                    WRENCH_INFO("Submitting a job...");
-                    this->job_manager->submitJob(submission_to_do.first, submission_to_do.second, {});
+                if (this->things_to_do.tryPop(thing_to_do)) {
+                    thing_to_do();
                 } else {
                     break;
                 }
@@ -365,8 +293,12 @@ namespace wrench {
         std::string head_host = data["head_host"];
         std::string resource = data["resources"];
         std::string scratch_space = data["scratch_space"];
-        std::string property_list = data["property_list"];
-        std::string message_payload_list = data["message_payload_list"];
+        std::string property_list_string = data["property_list"];
+        std::string message_payload_list_string = data["message_payload_list"];
+
+        PARSE_SERVICE_PROPERTY_LIST()
+
+        PARSE_MESSAGE_PAYLOAD_LIST()
 
         map<std::string, std::tuple<unsigned long, double>> resources;
         json jsonData = json::parse(resource);
@@ -374,32 +306,11 @@ namespace wrench {
             resources.emplace(it.key(), it.value());
         }
 
-        WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
-        jsonData = json::parse(property_list);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto property_key = ServiceProperty::translateString(it.key());
-            service_property_list[property_key] = it.value();
-        }
-
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;
-        jsonData = json::parse(message_payload_list);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto message_payload_key = ServiceMessagePayload::translateString(it.key());
-            service_message_payload_list[message_payload_key] = it.value();
-        }
-
         // Create the new service
         auto new_service = new BareMetalComputeService(head_host, resources, scratch_space,
                                                        service_property_list, service_message_payload_list);
-        // Put in the list of services to start (this is because this method is called
-        // by the server thread, and therefore, it will segfault horribly if it calls any
-        // SimGrid simulation methods, e.g., to start a service)
-        this->compute_services_to_start.push(new_service);
 
-        // Return the expected answer
-        json answer;
-        answer["service_name"] = new_service->getName();
-        return answer;
+        return this->startService<wrench::ComputeService>(new_service);
     }
 
     /**
@@ -414,32 +325,37 @@ namespace wrench {
         std::string property_list_string = data["property_list"];
         std::string message_payload_list_string = data["message_payload_list"];
 
-        WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
-        json jsonData = json::parse(property_list_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto property_key = ServiceProperty::translateString(it.key());
-            service_property_list[property_key] = it.value();
-        }
+        PARSE_SERVICE_PROPERTY_LIST()
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;
-        jsonData = json::parse(message_payload_list_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto message_payload_key = ServiceMessagePayload::translateString(it.key());
-            service_message_payload_list[message_payload_key] = it.value();
-        }
+        PARSE_MESSAGE_PAYLOAD_LIST()
 
         // Create the new service
         auto new_service = new CloudComputeService(hostname, resources, scratch_space,
                                                    service_property_list, service_message_payload_list);
-        // Put in the list of services to start (this is because this method is called
-        // by the server thread, and therefore, it will segfault horribly if it calls any
-        // SimGrid simulation methods, e.g., to start a service)
-        this->compute_services_to_start.push(new_service);
+        return this->startService<wrench::ComputeService>(new_service);
+    }
 
-        // Return the expected answer
-        json answer;
-        answer["service_name"] = new_service->getName();
-        return answer;
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::addBatchComputeService(json data) {
+        std::string hostname = data["head_host"];
+        std::vector<std::string> resources = data["resources"];
+        std::string scratch_space = data["scratch_space"];
+        std::string property_list_string = data["property_list"];
+        std::string message_payload_list_string = data["message_payload_list"];
+
+        PARSE_SERVICE_PROPERTY_LIST()
+
+        PARSE_MESSAGE_PAYLOAD_LIST()
+
+        // Create the new service
+        auto new_service = new BatchComputeService(hostname, resources, scratch_space,
+                                                   service_property_list, service_message_payload_list);
+        return this->startService<wrench::ComputeService>(new_service);
     }
 
     /**
@@ -455,19 +371,9 @@ namespace wrench {
         std::string property_list_string = data["property_list"];
         std::string message_payload_list_string = data["message_payload_list"];
 
-        WRENCH_PROPERTY_COLLECTION_TYPE service_property_list;
-        json jsonData = json::parse(property_list_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto property_key = ServiceProperty::translateString(it.key());
-            service_property_list[property_key] = it.value();
-        }
+        PARSE_SERVICE_PROPERTY_LIST()
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;
-        jsonData = json::parse(message_payload_list_string);
-        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            auto message_payload_key = ServiceMessagePayload::translateString(it.key());
-            service_message_payload_list[message_payload_key] = it.value();
-        }
+        PARSE_MESSAGE_PAYLOAD_LIST()
 
         // Lookup the cloud compute service
         std::shared_ptr<ComputeService> cs;
@@ -475,18 +381,23 @@ namespace wrench {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
-        // Push the request into the blocking queue (will be a single one!)
-        this->vm_to_create.push(
-                std::pair(
-                        std::tuple(num_cores,
-                                   ram_memory,
-                                   service_property_list,
-                                   service_message_payload_list),
-                        cs));
+        BlockingQueue<std::pair<bool, std::string>> vm_created;
 
-        // Pool from the shared queue (will be a single one!)
+        // Push the request into the blocking queue (will be a single one!)
+        this->things_to_do.push([num_cores, ram_memory, service_property_list, service_message_payload_list, cs, &vm_created]() {
+            auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+            std::string vm_name;
+            try {
+                vm_name = cloud_cs->createVM(num_cores, ram_memory, service_property_list, service_message_payload_list);
+                vm_created.push(std::pair(true, vm_name));
+            } catch (ExecutionException &e) {
+                vm_created.push(std::pair(false, e.getCause()->toString()));
+            }
+        });
+
+        // Poll from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
-        this->vm_created.waitAndPop(reply);
+        vm_created.waitAndPop(reply);
         bool success = std::get<0>(reply);
         if (not success) {
             std::string error_msg = std::get<1>(reply);
@@ -513,12 +424,27 @@ namespace wrench {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
+        BlockingQueue<std::pair<bool, std::string>> vm_started;
         // Push the request into the blocking queue (will be a single one!)
-        this->vm_to_start.push(std::pair(vm_name, cs));
+        this->things_to_do.push([this, vm_name, cs, &vm_started]() {
+            auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+            try {
+                if (not cloud_cs->isVMDown(vm_name)) {
+                    throw std::invalid_argument("Cannot start VM because it's not down");
+                }
+                auto bm_cs = cloud_cs->startVM(vm_name);
+                this->compute_service_registry.insert(bm_cs->getName(), bm_cs);
+                vm_started.push(std::pair(true, bm_cs->getName()));
+            } catch (ExecutionException &e) {
+                vm_started.push(std::pair(false, e.getCause()->toString()));
+            } catch (std::invalid_argument &e) {
+                vm_started.push(std::pair(false, e.what()));
+            }
+        });
 
-        // Pool from the shared queue (will be a single one!)
+        // Poll from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
-        this->vm_started.waitAndPop(reply);
+        vm_started.waitAndPop(reply);
         bool success = std::get<0>(reply);
         if (not success) {
             std::string error_msg = std::get<1>(reply);
@@ -545,12 +471,31 @@ namespace wrench {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
-        // Push the request into the blocking queue (will be a single one!)
-        this->vm_to_shutdown.push(std::pair(vm_name, cs));
+        BlockingQueue<std::pair<bool, std::string>> vm_shutdown;
 
-        // Pool from the shared queue (will be a single one!)
+        // Push the request into the blocking queue (will be a single one!)
+        //this->vm_to_shutdown.push(std::pair(vm_name, cs));
+        this->things_to_do.push([this, vm_name, cs, &vm_shutdown]() {
+            auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+            try {
+                if (not cloud_cs->isVMRunning(vm_name)) {
+                    throw std::invalid_argument("Cannot shutdown VM because it's not running");
+                }
+                auto bm_cs = cloud_cs->getVMComputeService(vm_name);
+
+                this->compute_service_registry.remove(bm_cs->getName());
+                cloud_cs->shutdownVM(vm_name);
+                vm_shutdown.push(std::pair(true, vm_name));
+            } catch (ExecutionException &e) {
+                vm_shutdown.push(std::pair(false, e.what()));
+            } catch (std::invalid_argument &e) {
+                vm_shutdown.push(std::pair(false, e.what()));
+            }
+        });
+
+        // Poll from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
-        this->vm_shutdown.waitAndPop(reply);
+        vm_shutdown.waitAndPop(reply);
         bool success = std::get<0>(reply);
         if (not success) {
             std::string error_msg = std::get<1>(reply);
@@ -575,12 +520,25 @@ namespace wrench {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
-        // Push the request into the blocking queue (will be a single one!)
-        this->vm_to_destroy.push(std::pair(vm_name, cs));
+        BlockingQueue<std::pair<bool, std::string>> vm_destroyed;
 
-        // Pool from the shared queue (will be a single one!)
+        // Push the request into the blocking queue (will be a single one!)
+        this->things_to_do.push([vm_name, cs, &vm_destroyed]() {
+            auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+            try {
+                if (not cloud_cs->isVMDown(vm_name)) {
+                    throw std::invalid_argument("Cannot destroy VM because it's not down");
+                }
+                cloud_cs->destroyVM(vm_name);
+                vm_destroyed.push(std::pair(true, vm_name));
+            } catch (std::invalid_argument &e) {
+                vm_destroyed.push(std::pair(false, e.what()));
+            }
+        });
+
+        // Poll from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
-        this->vm_destroyed.waitAndPop(reply);
+        vm_destroyed.waitAndPop(reply);
         bool success = std::get<0>(reply);
         if (not success) {
             std::string error_msg = std::get<1>(reply);
@@ -601,15 +559,7 @@ namespace wrench {
 
         // Create the new service
         auto new_service = SimpleStorageService::createSimpleStorageService(head_host, mount_points, {}, {});
-        // Put in the list of services to start (this is because this method is called
-        // by the server thread, and therefore, it will segfault horribly if it calls any
-        // SimGrid simulation methods, e.g., to start a service)
-        this->storage_services_to_start.push(new_service);
-
-        // Return the expected answer
-        json answer;
-        answer["service_name"] = new_service->getName();
-        return answer;
+        return this->startService<wrench::StorageService>(new_service);
     }
 
     /**
@@ -627,8 +577,13 @@ namespace wrench {
         }
 
         std::shared_ptr<DataFile> file;
+        //        std::string workflow_name = data["workflow_name"];
+        //        std::shared_ptr<Workflow> workflow;
+        //        if (not this-> workflow_registry.lookup(workflow_name, workflow)) {
+        //            throw std::runtime_error("Unknown workflow " + workflow_name);
+        //        }
         try {
-            file = this->workflow->getFileByID(filename);
+            file = Simulation::getFileByID(filename);
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Unknown file " + filename);
         }
@@ -654,18 +609,33 @@ namespace wrench {
         }
 
         std::shared_ptr<DataFile> file;
+        //        std::string workflow_name = data["workflow_name"];
+        //        std::shared_ptr<Workflow> workflow;
+        //
+        //        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+        //            throw std::runtime_error("Unknown workflow " + workflow_name);
+        //        }
         try {
-            file = this->workflow->getFileByID(filename);
+            file = Simulation::getFileByID(filename);
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Unknown file " + filename);
         }
 
-        // Push the request into the blocking queue (will be a single one!)
-        this->file_to_lookup.push(std::pair(file, ss));
+        BlockingQueue<std::tuple<bool, bool, std::string>> file_looked_up;
 
-        // Pool from the shared queue (will be a single one!)
+        // Push the request into the blocking queue (will be a single one!)
+        this->things_to_do.push([file, ss, &file_looked_up]() {
+            try {
+                bool result = ss->lookupFile(file);
+                file_looked_up.push(std::tuple(true, result, ""));
+            } catch (std::invalid_argument &e) {
+                file_looked_up.push(std::tuple(false, false, e.what()));
+            }
+        });
+
+        // Poll from the shared queue (will be a single one!)
         std::tuple<bool, bool, std::string> reply;
-        this->file_looked_up.waitAndPop(reply);
+        file_looked_up.waitAndPop(reply);
         bool success = std::get<0>(reply);
         if (not success) {
             std::string error_msg = std::get<2>(reply);
@@ -687,15 +657,8 @@ namespace wrench {
 
         // Create the new service
         auto new_service = new FileRegistryService(head_host, {}, {});
-        // Put in the list of services to start (this is because this method is called
-        // by the server thread, and therefore, it will segfault horribly if it calls any
-        // SimGrid simulation methods, e.g., to start a service)
-        this->file_service_to_start.push(new_service);
 
-        // Return the expected answer
-        json answer;
-        answer["service_name"] = new_service->getName();
-        return answer;
+        return this->startService<wrench::FileRegistryService>(new_service);
     }
 
     /**
@@ -704,15 +667,21 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::createStandardJob(json data) {
-        std::vector<std::shared_ptr<WorkflowTask>> tasks;
 
+        std::vector<std::shared_ptr<WorkflowTask>> tasks;
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
         for (auto const &name: data["tasks"]) {
-            tasks.push_back(this->workflow->getTaskByID(name));
+            tasks.push_back(workflow->getTaskByID(name));
         }
 
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
         for (auto it = data["file_locations"].begin(); it != data["file_locations"].end(); ++it) {
-            auto file = this->workflow->getFileByID(it.key());
+            auto file = Simulation::getFileByID(it.key());
             std::shared_ptr<StorageService> storage_service;
             this->storage_service_registry.lookup(it.value(), storage_service);
             file_locations[file] = FileLocation::LOCATION(storage_service, file);
@@ -734,6 +703,13 @@ namespace wrench {
     json SimulationController::submitStandardJob(json data) {
         std::string job_name = data["job_name"];
         std::string cs_name = data["compute_service_name"];
+        std::string service_specific_string = data["service_specific_args"];
+
+        std::map<std::string, std::string> service_specific_args = {};
+        json jsonData = json::parse(service_specific_string);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            service_specific_args[it.key()] = it.value();
+        }
 
         std::shared_ptr<StandardJob> job;
         if (not this->job_registry.lookup(job_name, job)) {
@@ -745,8 +721,26 @@ namespace wrench {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
-        this->submissions_to_do.push(std::make_pair(job, cs));
-        return {};
+        BlockingQueue<std::pair<bool, std::string>> job_submitted;
+        this->things_to_do.push([this, job, cs, service_specific_args, &job_submitted]() {
+            try {
+                WRENCH_INFO("Submitting a job...");
+                this->job_manager->submitJob(job, cs, service_specific_args);
+                job_submitted.push(std::make_pair(true, ""));
+            } catch (std::exception &e) {
+                job_submitted.push(std::make_pair(false, e.what()));
+            }
+        });
+        // Poll from the shared queue (will be a single one!)
+        std::pair<bool, std::string> reply;
+        job_submitted.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot submit job: " + error_msg);
+        } else {
+            return {};
+        }
     }
 
     /**
@@ -756,11 +750,16 @@ namespace wrench {
      */
     json SimulationController::createTask(json data) {
 
-        auto t = this->workflow->addTask(data["name"],
-                                         data["flops"],
-                                         data["min_num_cores"],
-                                         data["max_num_cores"],
-                                         data["memory"]);
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow  " + workflow_name);
+        }
+        auto t = workflow->addTask(data["name"],
+                                   data["flops"],
+                                   data["min_num_cores"],
+                                   data["max_num_cores"],
+                                   data["memory"]);
         return {};
     }
 
@@ -770,8 +769,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskFlops(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         json answer;
-        answer["flops"] = this->workflow->getTaskByID(data["name"])->getFlops();
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow  " + workflow_name);
+        }
+        answer["flops"] = workflow->getTaskByID(data["name"])->getFlops();
         return answer;
     }
 
@@ -781,8 +785,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskMinNumCores(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         json answer;
-        answer["min_num_cores"] = this->workflow->getTaskByID(data["name"])->getMinNumCores();
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow  " + workflow_name);
+        }
+        answer["min_num_cores"] = workflow->getTaskByID(data["name"])->getMinNumCores();
         return answer;
     }
 
@@ -792,8 +801,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskMaxNumCores(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         json answer;
-        answer["max_num_cores"] = this->workflow->getTaskByID(data["name"])->getMaxNumCores();
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        answer["max_num_cores"] = workflow->getTaskByID(data["name"])->getMaxNumCores();
         return answer;
     }
 
@@ -803,8 +817,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskMemory(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         json answer;
-        answer["memory"] = this->workflow->getTaskByID(data["name"])->getMemoryRequirement();
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        answer["memory"] = workflow->getTaskByID(data["name"])->getMemoryRequirement();
         return answer;
     }
 
@@ -812,10 +831,16 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
+
      */
     json SimulationController::getTaskStartDate(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         json answer;
-        answer["time"] = this->workflow->getTaskByID(data["name"])->getStartDate();
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        answer["time"] = workflow->getTaskByID(data["name"])->getStartDate();
         return answer;
     }
 
@@ -825,8 +850,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskEndDate(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         json answer;
-        answer["time"] = this->workflow->getTaskByID(data["name"])->getEndDate();
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        answer["time"] = workflow->getTaskByID(data["name"])->getEndDate();
         return answer;
     }
 
@@ -836,7 +866,12 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addFile(json data) {
-        auto file = this->workflow->addFile(data["name"], data["size"]);
+        //        std::string workflow_name = data["workflow_name"];
+        //        std::shared_ptr<Workflow> workflow;
+        //        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+        //            throw std::runtime_error("Unknown workflow  " + workflow_name);
+        //        }
+        auto file = Simulation::addFile(data["name"], data["size"]);
         return {};
     }
 
@@ -846,7 +881,12 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getFileSize(json data) {
-        auto file = this->workflow->getFileByID(data["file_id"]);
+        //        std::string workflow_name = data["workflow_name"];
+        //        std::shared_ptr<Workflow> workflow;
+        //        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+        //            throw std::runtime_error("Unknown workflow " + workflow_name);
+        //        }
+        auto file = Simulation::getFileByID(data["file_id"]);
         json answer;
         answer["size"] = file->getSize();
         return answer;
@@ -858,8 +898,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addInputFile(json data) {
-        auto task = this->workflow->getTaskByID(data["tid"]);
-        auto file = this->workflow->getFileByID(data["file"]);
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto task = workflow->getTaskByID(data["tid"]);
+        auto file = Simulation::getFileByID(data["file"]);
         task->addInputFile(file);
         return {};
     }
@@ -870,8 +915,13 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addOutputFile(json data) {
-        auto task = this->workflow->getTaskByID(data["tid"]);
-        auto file = this->workflow->getFileByID(data["file"]);
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto task = workflow->getTaskByID(data["tid"]);
+        auto file = Simulation::getFileByID(data["file"]);
         task->addOutputFile(file);
         return {};
     }
@@ -882,8 +932,12 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskInputFiles(json data) {
-
-        auto task = this->workflow->getTaskByID(data["tid"]);
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto task = workflow->getTaskByID(data["tid"]);
         auto files = task->getInputFiles();
         json answer;
         std::vector<std::string> file_names;
@@ -900,8 +954,12 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskOutputFiles(json data) {
-
-        auto task = this->workflow->getTaskByID(data["tid"]);
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto task = workflow->getTaskByID(data["tid"]);
         auto files = task->getOutputFiles();
         json answer;
         std::vector<std::string> file_names;
@@ -918,7 +976,12 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getInputFiles(json data) {
-        auto files = this->workflow->getInputFiles();
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto files = workflow->getInputFiles();
         json answer;
         std::vector<std::string> file_names;
         for (const auto &f: files) {
@@ -936,11 +999,16 @@ namespace wrench {
     json SimulationController::stageInputFiles(json data) {
         std::shared_ptr<StorageService> storage_service;
         std::string service_name = data["storage"];
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
         if (not this->storage_service_registry.lookup(service_name, storage_service)) {
             throw std::runtime_error("Unknown storage service " + service_name);
         }
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
 
-        for (auto const &f: this->workflow->getInputFiles()) {
+        for (auto const &f: workflow->getInputFiles()) {
             this->simulation->stageFile(f, storage_service);
         }
         return {};
@@ -1053,11 +1121,21 @@ namespace wrench {
         }
 
         // Push the request into the blocking queue (will be a single one!)
-        this->vm_to_suspend.push(std::pair(vm_name, cs));
+        //this->vm_to_suspend.push(std::pair(vm_name, cs));
+        BlockingQueue<std::pair<bool, std::string>> vm_suspended;
+        this->things_to_do.push([vm_name, cs, &vm_suspended]() {
+            auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+            try {
+                cloud_cs->suspendVM(vm_name);
+                vm_suspended.push(std::pair(true, vm_name));
+            } catch (std::invalid_argument &e) {
+                vm_suspended.push(std::pair(false, e.what()));
+            }
+        });
 
-        // Pool from the shared queue (will be a single one!)
+        // Poll from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
-        this->vm_suspended.waitAndPop(reply);
+        vm_suspended.waitAndPop(reply);
         bool success = std::get<0>(reply);
         if (not success) {
             std::string error_msg = std::get<1>(reply);
@@ -1103,18 +1181,134 @@ namespace wrench {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
-        // Push the request into the blocking queue (will be a single one!)
-        this->vm_to_resume.push(std::pair(vm_name, cs));
+        BlockingQueue<std::pair<bool, std::string>> vm_resumed;
 
-        // Pool from the shared queue (will be a single one!)
+        // Push the request into the blocking queue (will be a single one!)
+        this->things_to_do.push([vm_name, cs, &vm_resumed]() {
+            auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+            try {
+                cloud_cs->resumeVM(vm_name);
+                vm_resumed.push(std::pair(true, vm_name));
+            } catch (std::invalid_argument &e) {
+                vm_resumed.push(std::pair(false, e.what()));
+            }
+        });
+
+        // Poll from the shared queue (will be a single one!)
         std::pair<bool, std::string> reply;
-        this->vm_resumed.waitAndPop(reply);
+        vm_resumed.waitAndPop(reply);
         bool success = std::get<0>(reply);
         if (not success) {
             std::string error_msg = std::get<1>(reply);
-            throw std::runtime_error("Cannot suspend VM: " + error_msg);
+            throw std::runtime_error("Cannot resume VM: " + error_msg);
         } else {
             return {};
         }
     }
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::getExecutionHosts(json data) {
+        std::string cs_name = data["compute_service_name"];
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+        std::vector<std::string> execution_hosts_list = cloud_cs->getHosts();
+        json answer{};
+        answer["execution_hosts"] = execution_hosts_list;
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::getVMPhysicalHostname(json data) {
+        std::string cs_name = data["compute_service_name"];
+        std::string vm_name = data["vm_name"];
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+        json answer;
+        answer["physical_host"] = cloud_cs->getVMPhysicalHostname(vm_name);
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::getVMComputeService(json data) {
+        std::string cs_name = data["compute_service_name"];
+        std::string vm_name = data["vm_name"];
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
+        json answer;
+        answer["vm_compute_service"] = cloud_cs->getVMComputeService(vm_name)->getName();
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::createWorkflow(json data) {
+
+        auto wf = wrench::Workflow::createWorkflow();
+        json answer;
+        answer["workflow_name"] = wf->getName();
+        this->workflow_registry.insert(wf->getName(), wf);
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::createWorkflowFromJSON(json data) {
+        std::string json_string = data["json_string"];
+        std::string reference_flop_rate = data["reference_flop_rate"];
+        bool ignore_machine_specs = data["ignore_machine_specs"];
+        bool redundant_dependencies = data["redundant_dependencies"];
+        bool ignore_cycle_creating_dependencies = data["ignore_cycle_creating_dependencies"];
+        unsigned long min_cores_per_task = data["min_cores_per_task"];
+        unsigned long max_cores_per_task = data["max_cores_per_task"];
+        bool enforce_num_cores = data["enforce_num_cores"];
+        bool ignore_avg_cpu = data["ignore_avg_cpu"];
+        bool show_warnings = data["show_warnings"];
+
+        json answer;
+        try {
+            auto wf = WfCommonsWorkflowParser::createWorkflowFromJSONString(json_string, reference_flop_rate, ignore_machine_specs,
+                                                                            redundant_dependencies, ignore_cycle_creating_dependencies,
+                                                                            min_cores_per_task, max_cores_per_task, enforce_num_cores,
+                                                                            ignore_avg_cpu, show_warnings);
+            answer["workflow_name"] = wf->getName();
+            std::vector<std::string> task_names;
+            for (const auto &t: wf->getTasks()) {
+                task_names.push_back(t->getID());
+            }
+            answer["tasks"] = task_names;
+            this->workflow_registry.insert(wf->getName(), wf);
+            return answer;
+        } catch (std::exception &e) {
+            throw std::runtime_error("Error while importing workflow from JSON: " + std::string(e.what()));
+        }
+    }
+
 }// namespace wrench

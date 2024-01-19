@@ -18,7 +18,7 @@
 #include <vector>
 #include <iostream>
 #include "wrench-dev.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 
 /***********************/
@@ -61,4 +61,4 @@ namespace wrench {
 }// namespace wrench
 
 
-#endif//WRENCH_SIM4U_DAEMONWITHMAILBOXACTOR_H
+#endif//WRENCH_SIM4U_DAEMONACTOR_H

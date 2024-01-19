@@ -20,7 +20,7 @@
 #include "wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
 #include "wrench/job/PilotJob.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 
 namespace wrench {
@@ -42,30 +42,30 @@ namespace wrench {
                 {CloudComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {CloudComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
         };
 
     public:
@@ -112,7 +112,7 @@ namespace wrench {
         virtual bool isVMDown(const std::string &vm_name);
 
 
-        std::vector<std::string> getExecutionHosts();
+        //        std::vector<std::string> getExecutionHosts();
 
         /***********************/
         /** \endcond          **/
@@ -149,28 +149,28 @@ namespace wrench {
         /**
          * @brief Send a message request
          *
-         * @param answer_mailbox: the mailbox to which the answer message should be sent
+         * @param answer_commport: the commport_name to which the answer message should be sent
          * @param tosend: message to be sent
          * @return a simulation message
          *
          * @throw std::runtime_error
          */
-        std::shared_ptr<TMessageType> sendRequestAndWaitForAnswer(simgrid::s4u::Mailbox *answer_mailbox, ComputeServiceMessage *tosend) {
+        std::shared_ptr<TMessageType> sendRequestAndWaitForAnswer(S4U_CommPort *answer_commport, ComputeServiceMessage *tosend) {
             serviceSanityCheck();
-            S4U_Mailbox::putMessage(this->mailbox, tosend);
+            this->commport->putMessage(tosend);
 
             // Wait for a reply
-            return S4U_Mailbox::getMessage<TMessageType>(answer_mailbox, this->network_timeout, "CloudComputeService::sendRequestAndWaitForAnswer(): received an");
+            return answer_commport->getMessage<TMessageType>(this->network_timeout, "CloudComputeService::sendRequestAndWaitForAnswer(): received an");
         }
 
         virtual bool processNextMessage();
 
-        virtual void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
+        virtual void processGetResourceInformation(S4U_CommPort *answer_commport,
                                                    const std::string &key);
 
-        virtual void processGetExecutionHosts(simgrid::s4u::Mailbox *answer_mailbox);
+        virtual void processGetExecutionHosts(S4U_CommPort *answer_commport);
 
-        virtual void processCreateVM(simgrid::s4u::Mailbox *answer_mailbox,
+        virtual void processCreateVM(S4U_CommPort *answer_commport,
                                      unsigned long requested_num_cores,
                                      double requested_ram,
                                      const std::string &physical_host,
@@ -178,30 +178,31 @@ namespace wrench {
                                      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
 
         virtual void
-        processStartVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
+        processStartVM(S4U_CommPort *answer_commport, const std::string &vm_name);
 
-        virtual void processShutdownVM(simgrid::s4u::Mailbox *answer_mailbox,
+
+        virtual void processShutdownVM(S4U_CommPort *answer_commport,
                                        const std::string &vm_name,
                                        bool send_failure_notifications,
                                        ComputeService::TerminationCause termination_cause);
 
-        virtual void processSuspendVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
+        virtual void processSuspendVM(S4U_CommPort *answer_commport, const std::string &vm_name);
 
-        virtual void processResumeVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
+        virtual void processResumeVM(S4U_CommPort *answer_commport, const std::string &vm_name);
 
-        virtual void processDestroyVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
+        virtual void processDestroyVM(S4U_CommPort *answer_commport, const std::string &vm_name);
 
-        //        virtual void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
+        //        virtual void processSubmitStandardJob(const std::string &answer_commport, std::shared_ptr<StandardJob> job,
         //                                              std::map<std::string, std::string> &service_specific_args);
         //
-        //        virtual void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
+        //        virtual void processSubmitPilotJob(const std::string &answer_commport, std::shared_ptr<PilotJob> job,
         //                                           std::map<std::string, std::string> &service_specific_args);
 
         virtual void
         processBareMetalComputeServiceTermination(const std::shared_ptr<BareMetalComputeService> &cs, int exit_code);
 
         virtual void processIsThereAtLeastOneHostWithAvailableResources(
-                simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
+                S4U_CommPort *answer_commport, unsigned long num_cores, double ram);
 
 
         void stopAllVMs(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
@@ -227,6 +228,7 @@ namespace wrench {
         /***********************/
 
     private:
+        std::map<std::string, double> constructResourceInformation(const std::string &key) override;
         std::string findHost(unsigned long desired_num_cores, double desired_ram, const std::string &desired_host);
     };
 }// namespace wrench

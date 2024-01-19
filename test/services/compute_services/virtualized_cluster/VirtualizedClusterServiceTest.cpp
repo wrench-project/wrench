@@ -70,6 +70,7 @@ public:
 protected:
     ~VirtualizedClusterServiceTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     VirtualizedClusterServiceTest() {
@@ -77,13 +78,13 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
-        input_file = workflow->addFile("input_file", 10.0);
-        output_file1 = workflow->addFile("output_file1", 10.0);
-        output_file2 = workflow->addFile("output_file2", 10.0);
-        output_file3 = workflow->addFile("output_file3", 10.0);
-        output_file4 = workflow->addFile("output_file4", 10.0);
-        output_file5 = workflow->addFile("output_file5", 10.0);
-        output_file6 = workflow->addFile("output_file6", 10.0);
+        input_file = wrench::Simulation::addFile("input_file", 10.0);
+        output_file1 = wrench::Simulation::addFile("output_file1", 10.0);
+        output_file2 = wrench::Simulation::addFile("output_file2", 10.0);
+        output_file3 = wrench::Simulation::addFile("output_file3", 10.0);
+        output_file4 = wrench::Simulation::addFile("output_file4", 10.0);
+        output_file5 = wrench::Simulation::addFile("output_file5", 10.0);
+        output_file6 = wrench::Simulation::addFile("output_file6", 10.0);
 
         // Create the tasks
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
@@ -778,7 +779,7 @@ private:
         // Create a bunch of VMs
         try {
             auto cs = this->test->compute_service;
-            std::string execution_host = cs->getExecutionHosts()[0];
+            std::string execution_host = cs->getHosts()[0];
 
             auto vm1 = cs->createVM(1, 10);
             cs->startVM(vm1);
@@ -798,7 +799,6 @@ private:
         }
 
         wrench::Simulation::sleep(10);
-
         // stop all VMs
         this->test->compute_service->stop();
 
@@ -816,6 +816,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -893,7 +894,7 @@ private:
 
         // Create  and start VMs
         try {
-            std::string execution_host = cs->getExecutionHosts()[0];
+            std::string execution_host = cs->getHosts()[0];
             for (int i = 0; i < 4; i++) {
                 auto vm_name = cs->createVM(1, 10);
                 vm_list.push_back(vm_name);
@@ -903,7 +904,6 @@ private:
             throw std::runtime_error(e.what());
         }
 
-        wrench::Simulation::sleep(1);
         // shutdown all VMs
         try {
             for (auto &vm: vm_list) {
@@ -1053,7 +1053,8 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
+//        argv[2] = strdup("--wrench-default-control-message-size=0");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1133,7 +1134,7 @@ private:
 
         // Create VMs
         try {
-            std::string execution_host = cs->getExecutionHosts()[0];
+            std::string execution_host = cs->getHosts()[0];
 
             for (int i = 0; i < 4; i++) {
                 auto vm_name = cs->createVM(1, 10, execution_host);
@@ -1247,7 +1248,7 @@ private:
 
         // Create some VMs
         try {
-            std::string execution_host = cs->getExecutionHosts()[0];
+            std::string execution_host = cs->getHosts()[0];
 
             for (int i = 0; i < 2; i++) {
                 auto vm_name = cs->createVM(1, 10, execution_host);

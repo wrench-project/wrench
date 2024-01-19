@@ -40,6 +40,7 @@ public:
 protected:
     ~CloudServiceHostFailuresTest() override {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     CloudServiceHostFailuresTest() {
@@ -48,8 +49,8 @@ protected:
 
 
         // Create two files
-        input_file = workflow->addFile("input_file", 10000.0);
-        output_file = workflow->addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000.0);
+        output_file = wrench::Simulation::addFile("output_file", 20000.0);
 
         // Create one task1
         task = workflow->addTask("task1", 3600, 1, 1, 0);
@@ -162,6 +163,11 @@ private:
             throw std::runtime_error("Invalid failure cause type: " + real_event->failure_cause->toString() + " (expected: HostError)");
         }
 
+        // Without this sleep, due to instantaneous zero-byte messages,
+        // the cloud compute service may not yet "see" the VM as down
+        // even though we got the event that the job has failed
+        wrench::Simulation::sleep(1);
+
         // Check that the VM is down
         if (not cloud_service->isVMDown(vm_name)) {
             throw std::runtime_error("The VM should be down!");
@@ -191,7 +197,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    //    argv[2] = strdup("--wrench-full-log");
+//            argv[2] = strdup("--wrench-full-log");
 
 
     simulation->init(&argc, argv);
@@ -292,6 +298,11 @@ private:
         if (not cause) {
             throw std::runtime_error("Invalid failure cause: " + real_event->failure_cause->toString() + " (expected: HostError)");
         }
+
+        // Without this sleep, due to instantaneous zero-byte messages,
+        // the cloud compute service may not yet "see" the VM as down
+        // even though we got the event that the job has failed
+        wrench::Simulation::sleep(1);
 
         // Check that the VM is down
         if (not cloud_service->isVMDown(vm_name)) {
@@ -426,7 +437,7 @@ private:
 
             // Add a task1 to the workflow
             auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 50, 1, 1, 0);
-            auto output_file = this->test->workflow->addFile("output_file_" + std::to_string(trial), 2000);
+            auto output_file = wrench::Simulation::addFile("output_file_" + std::to_string(trial), 2000);
 
             task->addInputFile(this->test->input_file);
             task->addOutputFile(output_file);
@@ -472,8 +483,8 @@ private:
                 completed = (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event) != nullptr);
                 if (completed) {
                     cloud_service->shutdownVM(vm_name);
+                    cloud_service->destroyVM(vm_name);
                 }
-                cloud_service->destroyVM(vm_name);
 
             } while (not completed);
 
@@ -505,7 +516,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     argv[2] = strdup("--cfg=contexts/stack-size:100");
-    //    argv[3] = strdup("--wrench-full-log");
+    //        argv[3] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 

@@ -19,7 +19,7 @@
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
 #include <wrench/services/compute/cloud/CloudComputeService.h>
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 
 
 WRENCH_LOG_CATEGORY(wrench_core_cloud_service, "Log category for Cloud Service");
@@ -71,29 +71,7 @@ namespace wrench {
      */
     CloudComputeService::~CloudComputeService() {
     }
-
-    /**
-     * @brief Get the list of execution hosts available to run VMs
-     *
-     * @return a list of hostnames
-     *
-     * @throw ExecutionException
-     */
-    std::vector<std::string> CloudComputeService::getExecutionHosts() {
-        assertServiceIsUp();
-
-        // send a "get execution hosts" message to the daemon's mailbox_name
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-
-        auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceGetExecutionHostsAnswerMessage>(
-                answer_mailbox,
-                new CloudComputeServiceGetExecutionHostsRequestMessage(
-                        answer_mailbox,
-                        this->getMessagePayloadValue(
-                                CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD)));
-
-        return answer_message->execution_hosts;
-    }
+    
 
     /**
      * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
@@ -123,13 +101,13 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        // send a "create vm" message to the daemon's mailbox_name
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        // send a "create vm" message to the daemon's commport
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceCreateVMAnswerMessage>(
-                answer_mailbox,
+                answer_commport,
                 new CloudComputeServiceCreateVMRequestMessage(
-                        answer_mailbox,
+                        answer_commport,
                         num_cores, ram_memory, "", std::move(property_list), std::move(messagepayload_list),
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
@@ -172,13 +150,13 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        // send a "shutdown vm" message to the daemon's mailbox_name
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        // send a "shutdown vm" message to the daemon's commport
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceShutdownVMAnswerMessage>(
-                answer_mailbox,
+                answer_commport,
                 new CloudComputeServiceShutdownVMRequestMessage(
-                        answer_mailbox, vm_name, send_failure_notifications, termination_cause,
+                        answer_commport, vm_name, send_failure_notifications, termination_cause,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -204,12 +182,12 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceStartVMAnswerMessage>(
-                answer_mailbox,
+                answer_commport,
                 new CloudComputeServiceStartVMRequestMessage(
-                        answer_mailbox, vm_name,
+                        answer_commport, vm_name,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -268,13 +246,13 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        // send a "shutdown vm" message to the daemon's mailbox_name
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        // send a "shutdown vm" message to the daemon's commport
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceSuspendVMAnswerMessage>(
-                answer_mailbox,
+                answer_commport,
                 new CloudComputeServiceSuspendVMRequestMessage(
-                        answer_mailbox, vm_name,
+                        answer_commport, vm_name,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -298,13 +276,13 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        // send a "shutdown vm" message to the daemon's mailbox_name
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        // send a "shutdown vm" message to the daemon's commport
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceResumeVMAnswerMessage>(
-                answer_mailbox,
+                answer_commport,
                 new CloudComputeServiceResumeVMRequestMessage(
-                        answer_mailbox, vm_name,
+                        answer_commport, vm_name,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -328,13 +306,13 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        // send a "shutdown vm" message to the daemon's mailbox_name
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        // send a "shutdown vm" message to the daemon's commport
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         auto answer_message = sendRequestAndWaitForAnswer<CloudComputeServiceDestroyVMAnswerMessage>(
-                answer_mailbox,
+                answer_commport,
                 new CloudComputeServiceDestroyVMRequestMessage(
-                        answer_mailbox, vm_name,
+                        answer_commport, vm_name,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -405,9 +383,9 @@ namespace wrench {
     int CloudComputeService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
-        WRENCH_INFO("Cloud Service starting on host %s listening on mailbox_name %s",
+        WRENCH_INFO("Cloud Service starting on host %s listening on commport %s",
                     this->hostname.c_str(),
-                    this->mailbox->get_cname());
+                    this->commport->get_cname());
 
         // Start the Scratch Storage Service
         this->startScratchStorageService();
@@ -424,21 +402,21 @@ namespace wrench {
     //    /**
     //     * @brief Send a message request
     //     *
-    //     * @param answer_mailbox: the mailbox to which the answer message should be sent
+    //     * @param answer_commport: the commport to which the answer message should be sent
     //     * @param message: message to be sent
     //     * @return a simulation message
     //     *
     //     * @throw std::runtime_error
     //     */
     //    template<class TMessageType>
-    //    std::shared_ptr<TMessageType> CloudComputeService::sendRequestAndWaitForAnswer(simgrid::s4u::Mailbox *answer_mailbox,
+    //    std::shared_ptr<TMessageType> CloudComputeService::sendRequestAndWaitForAnswer(S4U_CommPort *answer_commport,
     //                                                                                   ComputeServiceMessage *tosend) {
     //        serviceSanityCheck();
     //
-    //        S4U_Mailbox::putMessage(this->mailbox, tosend);
+    //        S4U_CommPort::putMessage(this->commport, tosend);
     //
     //        // Wait for a reply
-    //        return S4U_Mailbox::getMessage<TMessageType>(answer_mailbox, this->network_timeout, "CloudComputeService::sendRequestAndWaitForAnswer(): received an");
+    //        return S4U_CommPort::getMessage<TMessageType>(answer_commport, this->network_timeout, "CloudComputeService::sendRequestAndWaitForAnswer(): received an");
     //    }
 
     /**
@@ -455,7 +433,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (ExecutionException &e) {
             return true;
         }
@@ -465,13 +443,13 @@ namespace wrench {
             return false;
         }
 
-        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->stopAllVMs(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
             this->vm_list.clear();
             // This is Synchronous
             try {
-                S4U_Mailbox::putMessage(msg->ack_mailbox,
+                msg->ack_commport->putMessage(
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 CloudComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
@@ -480,41 +458,41 @@ namespace wrench {
             return false;
 
         } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
-            processGetResourceInformation(msg->answer_mailbox, msg->key);
+            processGetResourceInformation(msg->answer_commport, msg->key);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceGetExecutionHostsRequestMessage *>(message.get())) {
-            processGetExecutionHosts(msg->answer_mailbox);
+            processGetExecutionHosts(msg->answer_commport);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceCreateVMRequestMessage *>(message.get())) {
-            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, "",
+            processCreateVM(msg->answer_commport, msg->num_cores, msg->ram_memory, "",
                             msg->property_list,
                             msg->messagepayload_list);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceShutdownVMRequestMessage *>(message.get())) {
-            processShutdownVM(msg->answer_mailbox, msg->vm_name, msg->send_failure_notifications, msg->termination_cause);
+            processShutdownVM(msg->answer_commport, msg->vm_name, msg->send_failure_notifications, msg->termination_cause);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceStartVMRequestMessage *>(message.get())) {
-            processStartVM(msg->answer_mailbox, msg->vm_name);
+            processStartVM(msg->answer_commport, msg->vm_name);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceSuspendVMRequestMessage *>(message.get())) {
-            processSuspendVM(msg->answer_mailbox, msg->vm_name);
+            processSuspendVM(msg->answer_commport, msg->vm_name);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceResumeVMRequestMessage *>(message.get())) {
-            processResumeVM(msg->answer_mailbox, msg->vm_name);
+            processResumeVM(msg->answer_commport, msg->vm_name);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceDestroyVMRequestMessage *>(message.get())) {
-            processDestroyVM(msg->answer_mailbox, msg->vm_name);
+            processDestroyVM(msg->answer_commport, msg->vm_name);
             return true;
 
         } else if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage *>(message.get())) {
-            processIsThereAtLeastOneHostWithAvailableResources(msg->answer_mailbox, msg->num_cores, msg->ram);
+            processIsThereAtLeastOneHostWithAvailableResources(msg->answer_commport, msg->num_cores, msg->ram);
             return true;
 
         } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
@@ -535,11 +513,10 @@ namespace wrench {
     /**
      * @brief Process a execution host list request
      *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      */
-    void CloudComputeService::processGetExecutionHosts(simgrid::s4u::Mailbox *answer_mailbox) {
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
+    void CloudComputeService::processGetExecutionHosts(S4U_CommPort *answer_commport) {
+        answer_commport->dputMessage(
                 new CloudComputeServiceGetExecutionHostsAnswerMessage(
                         this->execution_hosts,
                         this->getMessagePayloadValue(
@@ -549,7 +526,7 @@ namespace wrench {
     /**
      * @brief Create a BareMetalComputeService VM on a physical machine
      *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param requested_num_cores: the number of cores the service can use
      * @param requested_ram: the VM's RAM memory_manager_service capacity
      * @param physical_host: the desired physical host ("" means any)
@@ -557,7 +534,7 @@ namespace wrench {
      * @param messagepayload_list: a message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      *
      */
-    void CloudComputeService::processCreateVM(simgrid::s4u::Mailbox *answer_mailbox,
+    void CloudComputeService::processCreateVM(S4U_CommPort *answer_commport,
                                               unsigned long requested_num_cores,
                                               double requested_ram,
                                               const std::string &physical_host,
@@ -585,7 +562,7 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
 
-            S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+            answer_commport->dputMessage(msg_to_send_back);
             return;
         }
 
@@ -608,7 +585,7 @@ namespace wrench {
         //                            new NotAllowed(this->getSharedPtr<CloudComputeService>(), error_msg)),
         //                    this->getMessagePayloadValue(
         //                            CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
-        //            S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+        //            S4U_CommPort::dputMessage(answer_commport, msg_to_send_back);
         //            return;
         //        }
 
@@ -637,18 +614,18 @@ namespace wrench {
                 this->getMessagePayloadValue(
                         CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
 
-        S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+        answer_commport->dputMessage(msg_to_send_back);
     }
 
     /**
      * @brief: Process a VM shutdown request
      *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param vm_name: the name of the VM
      * @param send_failure_notifications: whether to send failure notifications
      * @param termination_cause: termination cause (if failure notifications are sent)
      */
-    void CloudComputeService::processShutdownVM(simgrid::s4u::Mailbox *answer_mailbox,
+    void CloudComputeService::processShutdownVM(S4U_CommPort *answer_commport,
                                                 const std::string &vm_name,
                                                 bool send_failure_notifications,
                                                 ComputeService::TerminationCause termination_cause) {
@@ -684,7 +661,7 @@ namespace wrench {
                             CloudComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
-        S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+        answer_commport->dputMessage(msg_to_send_back);
     }
 
     /**
@@ -787,11 +764,11 @@ namespace wrench {
     /**
      * @brief: Process a VM start request by starting a VM on a host (using best fit for RAM first, and then for cores)
      *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param vm_name: the name of the VM
      */
     void CloudComputeService::
-            processStartVM(simgrid::s4u::Mailbox *answer_mailbox,
+            processStartVM(S4U_CommPort *answer_commport,
                            const std::string &vm_name) {
         auto vm_tuple = this->vm_list[vm_name];
         auto vm = std::get<0>(vm_tuple);
@@ -810,7 +787,7 @@ namespace wrench {
                             new NotAllowed(this->getSharedPtr<CloudComputeService>(), error_message)),
                     this->getMessagePayloadValue(
                             CloudComputeServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
-            S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+            answer_commport->dputMessage(msg_to_send_back);
             return;
         }
 
@@ -823,7 +800,7 @@ namespace wrench {
                     std::shared_ptr<FailureCause>(new HostError(host)),
                     this->getMessagePayloadValue(
                             CloudComputeServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
-            S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+            answer_commport->dputMessage(msg_to_send_back);
             return;
         }
 
@@ -861,9 +838,10 @@ namespace wrench {
         cs->start(cs, true, false);// Daemonized
 
         // Create a failure detector for the service
+//        WRENCH_INFO("CREATING SERVICE TERMINATION DETECTOR THAT WILL REPORT TO COMMPORT %s", this->commport->get_cname());
         auto termination_detector = std::make_shared<ServiceTerminationDetector>(
                 this->hostname, cs,
-                this->mailbox, false, true);
+                this->commport, false, true);
         termination_detector->setSimulation(this->simulation);
         termination_detector->start(termination_detector, true, false);// Daemonized, no auto-restart
 
@@ -874,16 +852,16 @@ namespace wrench {
                 this->getMessagePayloadValue(
                         CloudComputeServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
 
-        S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+        answer_commport->dputMessage(msg_to_send_back);
     }
 
     /**
      * @brief: Process a VM suspend request
      *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param vm_name: the name of the VM
      */
-    void CloudComputeService::processSuspendVM(simgrid::s4u::Mailbox *answer_mailbox,
+    void CloudComputeService::processSuspendVM(S4U_CommPort *answer_commport,
                                                const std::string &vm_name) {
         auto vm_tuple = this->vm_list[vm_name];
         auto vm = std::get<0>(vm_tuple);
@@ -913,16 +891,16 @@ namespace wrench {
                                     CloudComputeServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
-        S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+        answer_commport->dputMessage(msg_to_send_back);
     }
 
     /**
      * @brief: Process a VM resume request
      *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param answer_commport: the commport to which the answer message should be sent
      * @param vm_name: the name of the VM
      */
-    void CloudComputeService::processResumeVM(simgrid::s4u::Mailbox *answer_mailbox,
+    void CloudComputeService::processResumeVM(S4U_CommPort *answer_commport,
                                               const std::string &vm_name) {
         WRENCH_INFO("Asked to resume VM %s", vm_name.c_str());
         auto vm_tuple = this->vm_list[vm_name];
@@ -951,16 +929,16 @@ namespace wrench {
                             CloudComputeServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
-        S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+        answer_commport->dputMessage(msg_to_send_back);
     }
 
     /**
     * @brief: Process a VM destruction request
     *
-    * @param answer_mailbox: the mailbox to which the answer message should be sent
+    * @param answer_commport: the commport to which the answer message should be sent
     * @param vm_name: the name of the VM
     */
-    void CloudComputeService::processDestroyVM(simgrid::s4u::Mailbox *answer_mailbox,
+    void CloudComputeService::processDestroyVM(S4U_CommPort *answer_commport,
                                                const std::string &vm_name) {
         WRENCH_INFO("Asked to destroy VM %s", vm_name.c_str());
         auto vm_tuple = this->vm_list[vm_name];
@@ -990,17 +968,15 @@ namespace wrench {
                             CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
-        S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+        answer_commport->dputMessage(msg_to_send_back);
     }
 
-
     /**
-     * @brief Process a "get resource information message"
-     * @param answer_mailbox: the mailbox to which the description message should be sent
-     * @param key: the desired resource information (i.e., dictionary key) that's needed)
+     * @brief Construct a dict for resource information
+     * @param key: the desired key
+     * @return a dictionary
      */
-    void CloudComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
-                                                            const std::string &key) {
+    std::map<std::string, double> CloudComputeService::constructResourceInformation(const std::string &key) {
         std::map<std::string, double> dict;
 
         if (key == "num_hosts") {
@@ -1057,15 +1033,27 @@ namespace wrench {
             }
 
         } else {
-            throw std::runtime_error("CloudComputeService::processGetResourceInformation(): unknown key");
+            throw std::runtime_error("CloudComputeService::constructResourceInformation(): unknown key");
         }
+
+        return dict;
+    }
+
+    /**
+     * @brief Process a "get resource information message"
+     * @param answer_commport: the commport to which the description message should be sent
+     * @param key: the desired resource information (i.e., dictionary key) that's needed)
+     */
+    void CloudComputeService::processGetResourceInformation(S4U_CommPort *answer_commport,
+                                                            const std::string &key) {
+        auto dict = this->constructResourceInformation(key);
 
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(
                 dict,
                 this->getMessagePayloadValue(
                         ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+        answer_commport->dputMessage(answer_message);
     }
 
     /**
@@ -1102,12 +1090,12 @@ namespace wrench {
 
     /**
      * @brief Process a host available resource request
-     * @param answer_mailbox: the answer mailbox
+     * @param answer_commport: the answer commport
      * @param num_cores: the desired number of cores
      * @param ram: the desired RAM
      */
     void CloudComputeService::processIsThereAtLeastOneHostWithAvailableResources(
-            simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram) {
+            S4U_CommPort *answer_commport, unsigned long num_cores, double ram) {
         bool answer = false;
         for (auto const &h: this->used_cores_per_execution_host) {
             auto available_num_cores = Simulation::getHostNumCores(h.first) - h.second;
@@ -1117,8 +1105,8 @@ namespace wrench {
                 break;
             }
         }
-        S4U_Mailbox::dputMessage(
-                answer_mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
+        answer_commport->dputMessage(
+                new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
                                         answer,
                                         this->getMessagePayloadValue(
                                                 CloudComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
@@ -1142,8 +1130,8 @@ namespace wrench {
         }
 
         if (vm_name.empty()) {
-            throw std::runtime_error(
-                    "CloudComputeService::processBareMetalComputeServiceTermination(): received a termination notification for an unknown BareMetalComputeService");
+            WRENCH_WARN("CloudComputeService::processBareMetalComputeServiceTermination(): received a termination notification for an unknown BareMetalComputeService - Probably rapid-fire (zero-time) shutdown/restart shenanigans");
+            return;
         }
         auto vm = std::get<0>(this->vm_list[vm_name]);
         unsigned long used_cores = vm->getNumCores();

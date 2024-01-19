@@ -14,10 +14,10 @@
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 #include <wrench/job/CompoundJob.h>
-#include <wrench/failure_causes/HostError.h>
 
 #include <memory>
 
+#include "../../../include/RuntimeAssert.h"
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
@@ -118,7 +118,7 @@ class FileDeleteActionExecutorSuccessTestWMS : public wrench::ExecutionControlle
 
 public:
     FileDeleteActionExecutorSuccessTestWMS(FileDeleteActionExecutorTest *test,
-                                           std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                           const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -142,7 +142,7 @@ private:
 
         // Create a file read action executor
         auto file_delete_action_executor = std::make_shared<wrench::ActionExecutor>(
-                "Host2", 0, 0.0, 0, false, this->mailbox, file_delete_action, nullptr);
+                "Host2", 0, 0.0, 0, false, this->commport, file_delete_action, nullptr);
         // Start it
         file_delete_action_executor->setSimulation(this->simulation);
         file_delete_action_executor->start(file_delete_action_executor, true, false);
@@ -150,7 +150,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -162,20 +162,12 @@ private:
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
 
-        // Is the start-date sensible?
-        if (file_delete_action->getStartDate() < 0.0 or file_delete_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_delete_action->getStartDate()));
-        }
+        // Is the start/end-date sensible?
+        RUNTIME_DBL_EQ(file_delete_action->getStartDate(), 0.0, "action start date", EPSILON);
+        RUNTIME_DBL_EQ(file_delete_action->getEndDate(), 0.216755, "action end date", EPSILON);
 
-        // Is the end-date sensible?
-        if (file_delete_action->getEndDate() + EPSILON < 0.02242927216494845083 or file_delete_action->getEndDate() > 10.84743174020618639020 + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_delete_action->getEndDate()));
-        }
-
-        // Is the state sensible?
-        if (file_delete_action->getState() != wrench::Action::State::COMPLETED) {
-            throw std::runtime_error("Unexpected action state: " + file_delete_action->getStateAsString());
-        }
+        // Is the state sensible
+        RUNTIME_EQ(file_delete_action->getState(), wrench::Action::State::COMPLETED, "action state");
 
         return 0;
     }
@@ -190,9 +182,10 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
 
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-default-control-message-size=10000");
     //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);

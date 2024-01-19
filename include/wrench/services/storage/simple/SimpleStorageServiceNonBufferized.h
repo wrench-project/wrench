@@ -53,8 +53,8 @@ namespace wrench {
             simgrid::s4u::Host *dst_host;
             /** @brief destination disk */
             simgrid::s4u::Disk *dst_disk;
-            /** @brief mailbox to report to */
-            simgrid::s4u::Mailbox *mailbox;
+            /** @brief commport_name to report to */
+            S4U_CommPort *commport;
             /** @brief transfer size */
             double transfer_size;
             /** @brief SG IO op */
@@ -70,7 +70,7 @@ namespace wrench {
              * @param dst_location: destination location
              * @param dst_host: destination host
              * @param dst_disk: destination disk
-             * @param mailbox: mailbox to report to
+             * @param commport: commport to report to
              * @param transfer_size: transfer size
              */
             Transaction(
@@ -80,10 +80,10 @@ namespace wrench {
                     std::shared_ptr<FileLocation> dst_location,
                     simgrid::s4u::Host *dst_host,
                     simgrid::s4u::Disk *dst_disk,
-                    simgrid::s4u::Mailbox *mailbox,
+                    S4U_CommPort *commport,
                     double transfer_size) : src_location(std::move(src_location)), src_host(src_host), src_disk(src_disk),
                                             dst_location(std::move(dst_location)), dst_host(dst_host), dst_disk(dst_disk),
-                                            mailbox(mailbox), transfer_size(transfer_size), stream(nullptr) {
+                                            commport(commport), transfer_size(transfer_size), stream(nullptr) {
             }
         };
         /***********************/
@@ -111,28 +111,30 @@ namespace wrench {
         bool processNextMessage(SimulationMessage *message);
 
         bool processFileWriteRequest(std::shared_ptr<FileLocation> &location,
-                                     simgrid::s4u::Mailbox *answer_mailbox, simgrid::s4u::Host *requesting_host);
+                                     double num_bytes_to_write,
+                                     S4U_CommPort *answer_commport,
+                                     simgrid::s4u::Host *requesting_host);
 
         bool
         processFileReadRequest(const std::shared_ptr<FileLocation> &location,
-                               double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox,
+                               double num_bytes_to_read, S4U_CommPort *answer_commport,
                                simgrid::s4u::Host *requesting_host);
 
 
         bool processFileCopyRequest(
                 std::shared_ptr<FileLocation> &src,
                 std::shared_ptr<FileLocation> &dst,
-                simgrid::s4u::Mailbox *answer_mailbox);
+                S4U_CommPort *answer_commport);
 
         bool processFileCopyRequestIAmTheSource(
                 std::shared_ptr<FileLocation> &src,
                 std::shared_ptr<FileLocation> &dst,
-                simgrid::s4u::Mailbox *answer_mailbox);
+                S4U_CommPort *answer_commport);
 
         bool processFileCopyRequestIAmNotTheSource(
                 std::shared_ptr<FileLocation> &src,
                 std::shared_ptr<FileLocation> &dst,
-                simgrid::s4u::Mailbox *answer_mailbox);
+                S4U_CommPort *answer_commport);
 
 
         void startPendingTransactions();
@@ -144,7 +146,7 @@ namespace wrench {
         std::deque<std::shared_ptr<Transaction>> pending_transactions;
         std::set<std::shared_ptr<Transaction>> running_transactions;
 
-        std::map<simgrid::s4u::IoPtr, std::shared_ptr<Transaction>> stream_to_transactions;
+        std::unordered_map<simgrid::s4u::IoPtr, std::shared_ptr<Transaction>> stream_to_transactions;
 
         std::shared_ptr<MemoryManager> memory_manager;
     };

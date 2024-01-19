@@ -25,17 +25,20 @@ namespace wrench {
      * @param operation_type: NetworkError:OperationType::SENDING or NetworkError::OperationType::RECEIVING or
      *        NetworkError::OperationType::UNKNOWN
      * @param error_type: the error type 
-     * @param mailbox: the name of a mailbox (or "" if unknown)
+     * @param commport_name: the name of a commport (or "" if unknown)
+     * @param message_name: the name of the message (or "" if unknown)
      */
     NetworkError::NetworkError(NetworkError::OperationType operation_type,
                                NetworkError::ErrorType error_type,
-                               const std::string &mailbox) {
-        if (mailbox.empty()) {
+                               const std::string &commport_name,
+                               const std::string &message_name) {
+        if (commport_name.empty()) {
             throw std::invalid_argument("NetworkError::NetworkError(): invalid arguments");
         }
         this->operation_type = operation_type;
         this->error_type = error_type;
-        this->mailbox = mailbox;
+        this->commport_name = commport_name;
+        this->message_name = message_name;
     }
 
     /**
@@ -63,11 +66,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the mailbox name on which the error occurred
-     * @return the mailbox name
+     * @brief Returns the name of the CommPort on which the error occurred
+     * @return the commport name
      */
-    std::string NetworkError::getMailbox() {
-        return this->mailbox;
+    std::string NetworkError::getCommPortName() {
+        return this->commport_name;
     }
 
     /**
@@ -77,9 +80,9 @@ namespace wrench {
     std::string NetworkError::toString() {
         std::string operation;
         if (this->whileSending()) {
-            operation = "sending to";
+            operation = "sending";
         } else {
-            operation = "receiving from";
+            operation = "receiving";
         }
         std::string error;
         if (this->isTimeout()) {
@@ -87,7 +90,7 @@ namespace wrench {
         } else {
             error = "link failure, or communication peer died";
         }
-        return "Network error (" + error + ") while " + operation + " mailbox_name " + this->mailbox;
+        return "Network error (" + error + ") while " + operation + (this->message_name.empty() ? "" : " a message with name " + this->message_name) + " via commport " + this->commport_name;
     }
 
 

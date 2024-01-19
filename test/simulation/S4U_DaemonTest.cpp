@@ -25,6 +25,7 @@ public:
 protected:
     ~S4U_DaemonTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     S4U_DaemonTest() {

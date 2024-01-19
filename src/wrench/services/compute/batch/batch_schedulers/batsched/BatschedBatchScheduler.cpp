@@ -24,7 +24,7 @@
 #include <wrench/logging/TerminalOutput.h>
 #include "wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h"
 #include <wrench/services/compute/batch/BatchComputeService.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
@@ -50,7 +50,7 @@ namespace wrench {
             // The "mod by 1500" below is totally ad-hoc, but not modding seemed
             // to lead to even more weird ZMQ "address already in use" errors...
             this->batsched_port = 28000 + (getpid() % 1500) +
-                                  S4U_Mailbox::generateUniqueSequenceNumber();
+                                  S4U_CommPort::generateUniqueSequenceNumber();
             //            std::cerr << "Thinking of starting Batsched on port " << this->batsched_port << "...\n";
             this->pid = getpid();
             zmq::context_t context(1);
@@ -241,11 +241,11 @@ namespace wrench {
 
         std::string data = batch_submission_data.dump();
 
-        auto batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailbox("batchsched_query_mailbox");
+        auto batchsched_query_commport = S4U_CommPort::getTemporaryCommPort();
 
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
-                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), batchsched_query_mailbox,
+                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), batchsched_query_commport,
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->setSimulation(this->cs->getSimulation());
@@ -256,7 +256,7 @@ namespace wrench {
         for (auto job: set_of_jobs) {
             // Get the answer
             std::unique_ptr<SimulationMessage> message = nullptr;
-            auto msg = S4U_Mailbox::getMessage<BatchQueryAnswerMessage>(batchsched_query_mailbox,
+            auto msg = batchsched_query_commport->getMessage<BatchQueryAnswerMessage>(
                                                                         "[This error likely means that the scheduling algorithm that Batsched was configured to use (\"" +
                                                                                 this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
                                                                                 "\") does not support queue waiting time predictions!]. Received an");
@@ -286,11 +286,11 @@ namespace wrench {
 
         zmq::message_t request(strlen(data_to_send.c_str()));
         memcpy(request.data(), data_to_send.c_str(), strlen(data_to_send.c_str()));
-        socket.send(request);
+        socket.send(request, zmq::send_flags::none);
 
         //  Get the reply.
         zmq::message_t reply;
-        socket.recv(&reply);
+        auto ret = socket.recv(reply, zmq::recv_flags::none);
 
         // Process the reply
         std::string reply_data;
@@ -347,7 +347,7 @@ namespace wrench {
         std::string data = batch_submission_data.dump();
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
-                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->mailbox,
+                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->commport,
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->setSimulation(this->cs->getSimulation());
@@ -416,7 +416,7 @@ namespace wrench {
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
                         new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(),
-                                                    this->cs->mailbox,
+                                                    this->cs->commport,
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->setSimulation(this->cs->getSimulation());
@@ -515,17 +515,16 @@ namespace wrench {
         int count = 0;
         for (auto it = this->cs->nodes_to_cores_map.begin(); it != this->cs->nodes_to_cores_map.end(); it++) {
             compute_resources_map["events"][0]["data"]["resources_data"][count]["id"] = std::to_string(count);
-            compute_resources_map["events"][0]["data"]["resources_data"][count]["name"] = it->first;
+            compute_resources_map["events"][0]["data"]["resources_data"][count]["name"] = it->first->get_name();
             compute_resources_map["events"][0]["data"]["resources_data"][count]["core"] = it->second;
             compute_resources_map["events"][0]["data"]["resources_data"][count++]["state"] = "idle";
         }
         std::string data = compute_resources_map.dump();
 
-
         try {
             std::shared_ptr<BatschedNetworkListener> network_listener =
                     std::shared_ptr<BatschedNetworkListener>(
-                            new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->mailbox,
+                            new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->commport,
                                                         std::to_string(this->batsched_port),
                                                         data));
             network_listener->setSimulation(this->cs->getSimulation());

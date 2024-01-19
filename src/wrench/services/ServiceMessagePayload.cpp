@@ -25,31 +25,40 @@ namespace wrench {
     /**
      * @brief add new message to payload map.  DO NOT CALL THIS FUNCTION DIRECTLY, use SET_MESSAGEPAYLOAD_NAME and DECLARE_MESSAGEPAYLOAD_NAME
      * @param classname: The class to add the message too
-     * @param messagePayload: the name of the message payload to add
+     * @param message_payload: the name of the message payload to add
      * @return a wrench message payload type
      */
-    WRENCH_MESSAGEPAYLOAD_TYPE ServiceMessagePayload::addMessagePayload(std::string classname, std::string messagePayload) {
+    WRENCH_MESSAGEPAYLOAD_TYPE ServiceMessagePayload::addMessagePayload(std::string classname, std::string message_payload) {
         ++WRENCH_MESSAGEPAYLOAD_COUNT;
-        stringToPayloadMap[classname + "::" + messagePayload] = WRENCH_MESSAGEPAYLOAD_COUNT;
-        payloadToString[WRENCH_MESSAGEPAYLOAD_COUNT] = classname + "::" + messagePayload;
+        stringToPayloadMap[classname + "::" + message_payload] = WRENCH_MESSAGEPAYLOAD_COUNT;
+        payloadToString[WRENCH_MESSAGEPAYLOAD_COUNT] = classname + "::" + message_payload;
         //        std::cout<<"["<<WRENCH_MESSAGEPAYLOAD_COUNT<<"] " << classname+"::"+messagePayload<<std::endl;
         return WRENCH_MESSAGEPAYLOAD_COUNT;
     }
+
     /**
      * @brief translate a string key to a message payload id
-     * @param messagePayload: the name of the message payload to get in classname::messagePayload form (Note: the classname must be the parent class that defines the property)
+     * @param message_payload: the name of the message payload to get in classname::messagePayload form (Note: the classname must be the parent class that defines the property)
      * @return a wrench message payload type
      */
-    WRENCH_MESSAGEPAYLOAD_TYPE ServiceMessagePayload::translateString(std::string messagePayload) {
-        return stringToPayloadMap.at(messagePayload);
+    WRENCH_MESSAGEPAYLOAD_TYPE ServiceMessagePayload::translateString(std::string message_payload) {
+        WRENCH_MESSAGEPAYLOAD_TYPE to_return;
+        try {
+            to_return = stringToPayloadMap.at(message_payload);
+        } catch (std::out_of_range &e) {
+            throw std::runtime_error("Unknown message payload specification " + message_payload +
+                                     ". Perhaps you need to use the superclass name?");
+        }
+        return to_return;
     }
+
     /**
      * @brief translate a message payload ID to a string key
-     * @param messagePayload: the ID of the message payload 
+     * @param message_payload: the ID of the message payload
      * @return a wrench message payload type, as a string
      */
-    std::string ServiceMessagePayload::translatePayloadType(WRENCH_MESSAGEPAYLOAD_TYPE messagePayload) {
-        return payloadToString.at(messagePayload);
+    std::string ServiceMessagePayload::translatePayloadType(WRENCH_MESSAGEPAYLOAD_TYPE message_payload) {
+        return payloadToString.at(message_payload);
     }
 
 }// namespace wrench

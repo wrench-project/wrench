@@ -19,6 +19,7 @@
 #include <utility>
 
 #include "../../../include/TestWithFork.h"
+#include "../../../include/RuntimeAssert.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
 WRENCH_LOG_CATEGORY(custom_action_executor_test, "Log category for CustomActionExecutorTest");
@@ -160,7 +161,7 @@ private:
                 ram,
                 0,
                 false,
-                this->mailbox,
+                this->commport,
                 action, nullptr);
 
         // Start it
@@ -170,7 +171,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -183,16 +184,19 @@ private:
         }
 
         // Is the start-date sensible?
-        if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
-        }
+        RUNTIME_DBL_EQ(action->getStartDate(), 0.0, "action start date", EPSILON);
+//        if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
+//            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
+//        }
 
         // Is the end-date sensible?
-        if (std::abs<double>(action->getEndDate() - 20.847443) > EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
-        }
+        RUNTIME_DBL_EQ(action->getEndDate(), 20.8349, "action end date", EPSILON);
+//        if (std::abs<double>(action->getEndDate() - 20.847443) > EPSILON) {
+//            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~20.847443)");
+//        }
 
         // Is the state sensible?
+        RUNTIME_EQ(action->getState(), wrench::Action::State::COMPLETED, "action state");
         if (action->getState() != wrench::Action::State::COMPLETED) {
             throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
         }
@@ -226,7 +230,7 @@ void CustomActionExecutorTest::do_CustomActionExecutorSuccessTest_test() {
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -238,6 +242,7 @@ void CustomActionExecutorTest::do_CustomActionExecutorSuccessTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
