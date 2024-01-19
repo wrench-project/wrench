@@ -75,24 +75,24 @@ namespace wrench {
         auto barrier = simgrid::s4u::Barrier::create(1 + simgrid_hosts.size());
         // Start actors
         auto meta_lambda = [this](const std::shared_ptr<ActionExecutor> &action_executor) {
-          // Get a commport
-          auto commport = S4U_CommPort::getTemporaryCommPort();
-          S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()] = commport;
-          // Create and start my own Controller
-          auto mpi_private_execution_controller = std::make_shared<MPIPrivateExecutionController>(
-                  action_executor->hostname, "mpi_private");
-          mpi_private_execution_controller->setSimulation(action_executor->getSimulation());
-          mpi_private_execution_controller->start(mpi_private_execution_controller, true, false);// Daemonized, no auto-restart
+            // Get a commport
+            auto commport = S4U_CommPort::getTemporaryCommPort();
+            S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()] = commport;
+            // Create and start my own Controller
+            auto mpi_private_execution_controller = std::make_shared<MPIPrivateExecutionController>(
+                    action_executor->hostname, "mpi_private");
+            mpi_private_execution_controller->setSimulation(action_executor->getSimulation());
+            mpi_private_execution_controller->start(mpi_private_execution_controller, true, false);// Daemonized, no auto-restart
 
-          // Call the lambda
-          this->lambda_mpi(mpi_private_execution_controller);
+            // Call the lambda
+            this->lambda_mpi(mpi_private_execution_controller);
 
-          // Kill the controller
-          mpi_private_execution_controller->killActor();
+            // Kill the controller
+            mpi_private_execution_controller->killActor();
 
-          // Retire commport
-          S4U_Daemon::map_actor_to_recv_commport.erase(simgrid::s4u::this_actor::get_pid());
-          S4U_CommPort::retireTemporaryCommPort(commport);
+            // Retire commport
+            S4U_Daemon::map_actor_to_recv_commport.erase(simgrid::s4u::this_actor::get_pid());
+            S4U_CommPort::retireTemporaryCommPort(commport);
         };
 
         SMPI_app_instance_start(("MPI_Action_" + std::to_string(simgrid::s4u::this_actor::get_pid())).c_str(),

@@ -182,7 +182,7 @@ private:
 
         // Is the end-date sensible?
         if (file_copy_action->getEndDate() < 10.8 or file_copy_action->getEndDate() > 10.9) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_copy_action->getEndDate()) + " (expected: ~10.9)" );
+            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_copy_action->getEndDate()) + " (expected: ~10.9)");
         }
 
         // Is the state sensible?
@@ -206,7 +206,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//        argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 

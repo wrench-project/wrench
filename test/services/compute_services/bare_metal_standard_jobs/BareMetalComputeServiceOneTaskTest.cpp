@@ -970,7 +970,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMapMultiple_tes
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-//        argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -1602,7 +1602,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-//        argv[1] = strdup("--wrench-full-log");
+    //        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -2061,7 +2061,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -2114,7 +2114,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
 class ExecutionButDontWaitTestWMS : public wrench::ExecutionController {
 public:
     ExecutionButDontWaitTestWMS(BareMetalComputeServiceOneTaskTest *test,
-                                         std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+                                std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -2127,16 +2127,16 @@ private:
 
         // Create a job
         auto job = job_manager->createStandardJob(test->task,
-                                             {{test->input_file, wrench::FileLocation::LOCATION(
-                                                                         test->storage_service1, test->input_file)},
-                                              {test->output_file, wrench::FileLocation::LOCATION(
-                                                                          test->storage_service1, test->output_file)}});
+                                                  {{test->input_file, wrench::FileLocation::LOCATION(
+                                                                              test->storage_service1, test->input_file)},
+                                                   {test->output_file, wrench::FileLocation::LOCATION(
+                                                                               test->storage_service1, test->output_file)}});
 
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
 
         // Return immediately
-//        wrench::Simulation::sleep(0.001);
+        //        wrench::Simulation::sleep(0.001);
         return 0;
     }
 };
@@ -2151,7 +2151,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionButDontWait_test() {
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 

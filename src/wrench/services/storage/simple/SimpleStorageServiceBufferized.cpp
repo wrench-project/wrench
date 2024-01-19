@@ -38,8 +38,8 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void SimpleStorageServiceBufferized::cleanup(bool has_returned_from_main, int return_value) {
-//        this->release_held_mutexes();
-        for (auto const &it : this->ongoing_tmp_commports) {
+        //        this->release_held_mutexes();
+        for (auto const &it: this->ongoing_tmp_commports) {
             S4U_CommPort::retireTemporaryCommPort(it.second);
         }
         this->pending_file_transfer_threads.clear();
@@ -229,7 +229,7 @@ namespace wrench {
 
             // Generate a commport name on which to receive the file
             auto file_reception_commport = S4U_CommPort::getTemporaryCommPort();
-//            WRENCH_INFO("1. GOTTEN COMMPORT %s", file_reception_commport->get_cname());
+            //            WRENCH_INFO("1. GOTTEN COMMPORT %s", file_reception_commport->get_cname());
 
             // Reply with a "go ahead, send me the file" message
             answer_commport->dputMessage(
@@ -311,7 +311,7 @@ namespace wrench {
         S4U_CommPort *commport_to_receive_the_file_content = nullptr;
         if (success) {
             commport_to_receive_the_file_content = S4U_CommPort::getTemporaryCommPort();
-//            WRENCH_INFO("2. GOTTEN COMMPORT %s", commport_to_receive_the_file_content->get_cname());
+            //            WRENCH_INFO("2. GOTTEN COMMPORT %s", commport_to_receive_the_file_content->get_cname());
         }
 
         // Send back the corresponding ack
@@ -326,7 +326,7 @@ namespace wrench {
                             1,
                             this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &e) {
-            return true; // oh well
+            return true;// oh well
         }
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
@@ -536,22 +536,22 @@ namespace wrench {
 
         // Send back the relevant ack if this was a read
         if (answer_commport_if_read and success) {
-//            WRENCH_INFO(
-//                    "Sending back an ack since this was a file read and some client is waiting for me to say something");
+            //            WRENCH_INFO(
+            //                    "Sending back an ack since this was a file read and some client is waiting for me to say something");
             answer_commport_if_read->dputMessage(new StorageServiceAckMessage(src_location));
         }
 
         // Send back the relevant ack if this was a write operation
         if (answer_commport_if_write and success) {
-//            WRENCH_INFO(
-//                    "Sending back an ack since this was a file write and some client is waiting for me to say something");
+            //            WRENCH_INFO(
+            //                    "Sending back an ack since this was a file write and some client is waiting for me to say something");
             answer_commport_if_write->dputMessage(new StorageServiceAckMessage(dst_location));
         }
 
         // Send back the relevant ack if this was a copy
         if (answer_commport_if_copy) {
-//            WRENCH_INFO(
-//                    "Sending back an ack since this was a file copy and some client is waiting for me to say something");
+            //            WRENCH_INFO(
+            //                    "Sending back an ack since this was a file copy and some client is waiting for me to say something");
             if ((src_location == nullptr) or (dst_location == nullptr)) {
                 throw std::runtime_error("SimpleStorageServiceBufferized::processFileTransferThreadNotification(): "
                                          "src_location and dst_location must be non-null");

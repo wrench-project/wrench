@@ -214,7 +214,7 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     } else if (service_type == "data_movement_manager") {
         auto wms = new NoopWMS(this, hostname, true);
         this->service = simulation->add(wms);
-        this->dst_commport = nullptr; // Will be set by the WMS on DMM is created
+        this->dst_commport = nullptr;// Will be set by the WMS on DMM is created
     }
 
     // Create the Bogus Message WMS

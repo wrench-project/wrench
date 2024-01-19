@@ -453,10 +453,10 @@ namespace wrench {
      */
     void BatchComputeService::sendPilotJobExpirationNotification(const std::shared_ptr<PilotJob> &job) {
         job->popCallbackCommPort()->dputMessage(
-                                 new ComputeServicePilotJobExpiredMessage(
-                                         job, this->getSharedPtr<BatchComputeService>(),
-                                         this->getMessagePayloadValue(
-                                                 BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
+                new ComputeServicePilotJobExpiredMessage(
+                        job, this->getSharedPtr<BatchComputeService>(),
+                        this->getMessagePayloadValue(
+                                BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
     }
 
     /**
@@ -664,7 +664,6 @@ namespace wrench {
 
         // Do the default behavior (which will throw as this is not a fault-tolerant service)
         S4U_Daemon::cleanup(has_returned_from_main, return_value);
-
     }
 
     //    /**
@@ -738,8 +737,8 @@ namespace wrench {
             // Send back a synchronous reply!
             try {
                 msg->ack_commport->putMessage(
-                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                BatchComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                                BatchComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
                 return false;
             }
@@ -806,7 +805,7 @@ namespace wrench {
 
         if ((requested_hosts > this->available_nodes_to_cores.size()) or
             (requested_num_cores_per_host >
-             (unsigned long)this->available_nodes_to_cores.begin()->first->get_core_count()) or
+             (unsigned long) this->available_nodes_to_cores.begin()->first->get_core_count()) or
             (required_ram_per_host >
              S4U_Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first))) {
             {
@@ -827,13 +826,13 @@ namespace wrench {
 
         // SUCCESS!
         answer_commport->dputMessage(
-                                 new ComputeServiceSubmitCompoundJobAnswerMessage(
-                                         job->getCompoundJob(),
-                                         this->getSharedPtr<BatchComputeService>(),
-                                         true,
-                                         nullptr,
-                                         this->getMessagePayloadValue(
-                                                 BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                new ComputeServiceSubmitCompoundJobAnswerMessage(
+                        job->getCompoundJob(),
+                        this->getSharedPtr<BatchComputeService>(),
+                        true,
+                        nullptr,
+                        this->getMessagePayloadValue(
+                                BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
 
         // Add the RJMS delay to the job's requested time
         job->setRequestedTime(job->getRequestedTime() +

@@ -36,7 +36,7 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void SimpleStorageServiceNonBufferized::cleanup(bool has_returned_from_main, int return_value) {
-//        this->release_held_mutexes();
+        //        this->release_held_mutexes();
     }
 
     /**
@@ -185,7 +185,7 @@ namespace wrench {
             if (not commport_comm_has_been_posted) {
                 try {
                     commport_pending_comm = this->commport->igetMessage();
-//                    commport_pending_comm = this->commport->get_async<void>((void **) (&(simulation_message)));
+                    //                    commport_pending_comm = this->commport->get_async<void>((void **) (&(simulation_message)));
                 } catch (wrench::ExecutionException &e) {
                     // oh well
                     continue;
@@ -267,14 +267,14 @@ namespace wrench {
 #endif
 
             if (finished_activity == commport_pending_comm->comm_ptr) {
-//                XXX IS THIS A GOOD IDEA???? SHOULD WE JuSt REPLICATE CODE FROM COMPORT
+                //                XXX IS THIS A GOOD IDEA???? SHOULD WE JuSt REPLICATE CODE FROM COMPORT
                 commport_pending_comm->mess_ptr->cancel();
                 auto msg = commport_pending_comm->simulation_message.get();
-//                commport_pending_comm->mess_ptr->cancel();
+                //                commport_pending_comm->mess_ptr->cancel();
                 commport_comm_has_been_posted = false;
                 if (not processNextMessage(msg)) break;
             } else if (finished_activity == commport_pending_comm->mess_ptr) {
-//                simulation_message = commport_pending_comm->wait();
+                //                simulation_message = commport_pending_comm->wait();
                 auto msg = commport_pending_comm->simulation_message.get();
                 commport_pending_comm->comm_ptr->cancel();
                 commport_comm_has_been_posted = false;
@@ -490,7 +490,7 @@ namespace wrench {
                             1,
                             this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &e) {
-            return true; // oh well
+            return true;// oh well
         }
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)

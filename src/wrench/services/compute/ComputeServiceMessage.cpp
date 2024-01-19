@@ -266,7 +266,7 @@ namespace wrench {
     ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
             S4U_CommPort *answer_commport, unsigned long num_cores, double ram, double payload) : ComputeServiceMessage(
 
-                                                                                                                  payload) {
+                                                                                                          payload) {
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (not answer_commport) {

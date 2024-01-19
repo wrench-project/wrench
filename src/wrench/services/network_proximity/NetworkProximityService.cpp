@@ -94,8 +94,8 @@ namespace wrench {
         assertServiceIsUp();
 
         if (boost::iequals(
-                this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                "alltoall")) {
+                    this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                    "alltoall")) {
             throw std::runtime_error(
                     "NetworkProximityService::getCoordinate() cannot be called with NETWORK_PROXIMITY_SERVICE_TYPE of ALLTOALL");
         }
@@ -163,7 +163,7 @@ namespace wrench {
      */
     void NetworkProximityService::addEntryToDatabase(const std::pair<std::string, std::string> &pair_hosts,
                                                      double proximity_value) {
-//        WRENCH_INFO("Received new measurement: %s-%s prox=%lf", pair_hosts.first.c_str(), pair_hosts.second.c_str(), proximity_value);
+        //        WRENCH_INFO("Received new measurement: %s-%s prox=%lf", pair_hosts.first.c_str(), pair_hosts.second.c_str(), proximity_value);
 
         if (this->entries.find(pair_hosts) == this->entries.end()) {
             std::pair<std::pair<std::string, std::string>, std::pair<double, double>> value = std::make_pair(
@@ -206,8 +206,8 @@ namespace wrench {
 
             // if this network service type is 'vivaldi', set up the coordinate lookup table
             if (boost::iequals(
-                    this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                    "vivaldi")) {
+                        this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                        "vivaldi")) {
                 this->coordinate_lookup_table.insert(
                         std::make_pair(h, std::make_pair((0.0), Simulation::getCurrentSimulatedDate())));
             }
@@ -255,13 +255,13 @@ namespace wrench {
             // This is Synchronous
             try {
                 //Stop the network daemons
-                for (auto const &daemon : this->network_sender_daemons) {
+                for (auto const &daemon: this->network_sender_daemons) {
                     if (daemon->isUp()) {
                         daemon->stop();
                     }
                 }
                 this->network_sender_daemons.clear();
-                for (auto const &daemon : this->network_receiver_daemons) {
+                for (auto const &daemon: this->network_receiver_daemons) {
                     if (daemon->isUp()) {
                         daemon->stop();
                     }
@@ -316,8 +316,8 @@ namespace wrench {
             this->addEntryToDatabase(msg->hosts, msg->proximity_value);
 
             if (boost::iequals(
-                    this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                    "vivaldi")) {
+                        this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                        "vivaldi")) {
                 vivaldiUpdate(msg->proximity_value, msg->hosts.first, msg->hosts.second);
             }
             return true;
@@ -529,7 +529,7 @@ namespace wrench {
         }
 
         if (this->getPropertyValueAsDouble(
-                NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE) < 0) {
+                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE) < 0) {
             throw std::invalid_argument(error_prefix + "Invalid NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE value " +
                                         this->getPropertyValueAsString(
                                                 NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE));

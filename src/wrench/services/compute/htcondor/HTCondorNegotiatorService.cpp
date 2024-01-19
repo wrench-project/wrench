@@ -143,8 +143,8 @@ namespace wrench {
         try {
             this->reply_commport->putMessage(
                     new NegotiatorCompletionMessage(
-                                                 scheduled_jobs, this->getMessagePayloadValue(
-                                                                         HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
+                            scheduled_jobs, this->getMessagePayloadValue(
+                                                    HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &e) {
             return 1;
         }

@@ -98,8 +98,8 @@ namespace wrench {
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {//handle all the rest of the messages
             try {
                 msg->ack_commport->dputMessage(
-                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                 ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                                ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
                 return false;
             }
@@ -169,7 +169,7 @@ namespace wrench {
                     WRENCH_DEBUG("Adding pending write");
                 }
                 cache->commport->putMessage(new StorageServiceFileWriteRequestMessage(commport, msg->requesting_host,
-                                                                                                  FileLocation::LOCATION(cache, msg->location->getFile()), msg->location->getFile()->getSize(), 0));
+                                                                                      FileLocation::LOCATION(cache, msg->location->getFile()), msg->location->getFile()->getSize(), 0));
             } else {
                 msg->answer_commport->putMessage(new StorageServiceFileWriteAnswerMessage(msg->location, false, nullptr, {}, 0, StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD));
             }
@@ -661,7 +661,7 @@ namespace wrench {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
 
                     if (msg->success) {
-                        tmpMsg->payload = 0;                      //this message has already been sent, this is a fake resend
+                        tmpMsg->payload = 0;          //this message has already been sent, this is a fake resend
                         commport->dputMessage(tmpMsg);//now that the data is cached, resend the message
                         std::swap(messages[i], messages.back());
                         messages.back().release();
@@ -758,9 +758,9 @@ namespace wrench {
                 //readthrough:  all block until first read is finished, then all others read
                 //do not spend excessive time on readThrough
                 auto forward = new StorageServiceFileReadRequestMessage(msg);
-                forward->answer_commport = commport;                                                                     //setup intercept commport
+                forward->answer_commport = commport;                                                                   //setup intercept commport
                 forward->location = FileLocation::LOCATION(target, msg->location->getPath(), msg->location->getFile());//hyjack locaiton to be on target
-                target->commport->dputMessage(forward);                                                    //send to target
+                target->commport->dputMessage(forward);                                                                //send to target
             } else {
                 msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
             }
@@ -772,7 +772,7 @@ namespace wrench {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
                     if (msg->success) {
 
-                        msg->location = tmpMsg->location;                                   //fix up the location
+                        msg->location = tmpMsg->location;                       //fix up the location
                         tmpMsg->answer_commport->dputMessage(message.release());//forward success message to first waiting read host
                         return true;
                     } else {
@@ -803,8 +803,8 @@ namespace wrench {
                         messages.pop_back();
                         i--;
                         first = false;
-                    } else {                                      //these are the pending reads
-                        tmpMsg->payload = 0;                      //this message has already been sent, this is a fake resend
+                    } else {                          //these are the pending reads
+                        tmpMsg->payload = 0;          //this message has already been sent, this is a fake resend
                         commport->dputMessage(tmpMsg);//these should now be cached, and should just drop down to the cache automatically
                         std::swap(messages[i], messages.back());
                         messages.back().release();
