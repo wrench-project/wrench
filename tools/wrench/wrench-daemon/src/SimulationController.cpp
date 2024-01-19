@@ -568,6 +568,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::createFileCopyAtStorageService(json data) {
+        std::cerr << "DATA " << data << "\n";
         std::string ss_name = data["storage_service_name"];
         std::string filename = data["filename"];
 
