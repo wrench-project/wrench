@@ -640,12 +640,12 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/addFile": {
+    "/simulation/{simid}/addFile": {
       "put": {
         "tags": [
           "WRENCH"
         ],
-        "summary": "Add a file to the workflow.",
+        "summary": "Add a file to the simulation.",
         "deprecated": false,
         "operationId": "addFile",
         "parameters": [
@@ -653,15 +653,6 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "workflow_name",
-            "in": "path",
-            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -710,7 +701,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/files/{file_id}/size": {
+    "/simulation/{simid}/files/{file_id}/size": {
       "get": {
         "tags": [
           "WRENCH"
@@ -723,15 +714,6 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "workflow_name",
-            "in": "path",
-            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -2601,12 +2583,12 @@
         }
       }
     },
-    "/simulation/{simid}/createWorkflowFromJSONString": {
+    "/simulation/{simid}/createWorkflowFromJSON": {
       "post": {
         "tags": [
           "WRENCH"
         ],
-        "summary": "Create a workflow from JSON file.",
+        "summary": "Create a workflow from a WfCommons JSON object.",
         "operationId": "createWorkflowFromJSON",
         "parameters": [
           {
@@ -2627,8 +2609,8 @@
               "schema": {
                 "properties": {
                   "json_string": {
-                    "type": "string",
-                    "description": "Workflow file"
+                    "type": "str",
+                    "description": "Workflow JSON string"
                   },
                   "reference_flop_rate": {
                     "type": "str",
@@ -2647,11 +2629,11 @@
                     "description": "Ignore cycle creating dependencies"
                   },
                   "min_cores_per_task": {
-                    "type": "float",
+                    "type": "integer",
                     "description": "Min cores per task"
                   },
                   "max_cores_per_task": {
-                    "type": "float",
+                    "type": "integer",
                     "description": "Max cores per task"
                   },
                   "enforce_num_cores": {
@@ -2677,7 +2659,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
+                  "$ref": "#/components/schemas/WorkflowResponseWithTaskList"
                 }
               }
             }
@@ -2724,385 +2706,409 @@
           }
         }
       }
-      }
-    },
-    "components": {
-      "schemas": {
-        "SimulationInput": {
-          "type": "object",
-          "properties": {
-            "platform_xml": {
-              "type": "string",
-              "description": "XML description of the simulated platform (using the SimGrid DTD)"
-            },
-            "controller_hostname": {
-              "type": "string",
-              "description": "Name of the host in the simulated platform that runs the simulation execution_controller"
-            }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SimulationInput": {
+        "type": "object",
+        "properties": {
+          "platform_xml": {
+            "type": "string",
+            "description": "XML description of the simulated platform (using the SimGrid DTD)"
           },
-          "required": [
-            "platform_xml",
-            "controller_hostname"
-          ]
-        },
-        "SimulationReturn": {
-          "type": "object",
-          "properties": {
-            "port_number": {
-              "type": "integer",
-              "description": "Port number to which all subsequent HTTP Post requests should be sent"
-            },
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
+          "controller_hostname": {
+            "type": "string",
+            "description": "Name of the host in the simulated platform that runs the simulation execution_controller"
           }
         },
-        "Task": {
-          "type": "object",
-          "properties": {
-            "workflow_name": {
-              "type": "string",
-              "description": "Name of the workflow to which the task is being added"
-            },
-            "name": {
-              "type": "string",
-              "description": "Task's name"
-            },
-            "flops": {
-              "type": "number",
-              "format": "number",
-              "description": "The task's floating operations per second"
-            },
-            "min_num_cores": {
-              "type": "number",
-              "format": "unsigned long",
-              "description": "The task's minimum number of cores"
-            },
-            "max_num_cores": {
-              "type": "number",
-              "format": "unsigned long",
-              "description": "The task's maximum number of cores"
-            },
-            "memory": {
-              "type": "number",
-              "format": "number",
-              "description": "The task's memory requirement"
-            }
+        "required": [
+          "platform_xml",
+          "controller_hostname"
+        ]
+      },
+      "SimulationReturn": {
+        "type": "object",
+        "properties": {
+          "port_number": {
+            "type": "integer",
+            "description": "Port number to which all subsequent HTTP Post requests should be sent"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
           }
-        },
-        "StandardJob": {
-          "type": "object",
-          "properties": {
-            "workflow_name": {
-              "type": "string",
-              "description": "Name of the workflow to which the task is being added"
+        }
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "workflow_name": {
+            "type": "string",
+            "description": "Name of the workflow to which the task is being added"
+          },
+          "name": {
+            "type": "string",
+            "description": "Task's name"
+          },
+          "flops": {
+            "type": "number",
+            "format": "number",
+            "description": "The task's floating operations per second"
+          },
+          "min_num_cores": {
+            "type": "number",
+            "format": "unsigned long",
+            "description": "The task's minimum number of cores"
+          },
+          "max_num_cores": {
+            "type": "number",
+            "format": "unsigned long",
+            "description": "The task's maximum number of cores"
+          },
+          "memory": {
+            "type": "number",
+            "format": "number",
+            "description": "The task's memory requirement"
+          }
+        }
+      },
+      "StandardJob": {
+        "type": "object",
+        "properties": {
+          "workflow_name": {
+            "type": "string",
+            "description": "Name of the workflow to which the task is being added"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "string"
             },
-            "tasks": {
-              "type": "array",
-              "items": {
+            "description": "List of names of tasks in the job"
+          },
+          "file_locations": {
+            "type": "object",
+            "properties": {
+              "file": {
                 "type": "string"
               },
-              "description": "List of IDs of tasks in the job"
-            },
-            "file_locations": {
-              "type": "object",
-              "properties": {
-                "file": {
-                  "type": "string"
-                },
-                "storage_service": {
-                  "type": "string"
-                }
-              },
-              "description": "Map of file IDs to storage service names (aka the list of file locations)."
-            }
-          }
-        },
-        "GenericResponse": {
-          "type": "object",
-          "properties": {
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
-          }
-        },
-        "ServiceResponse": {
-          "type": "object",
-          "properties": {
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "service_name": {
-              "type": "string",
-              "description": "The new service's name (if success)"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
-          }
-        },
-        "WorkflowResponse": {
-          "type": "object",
-          "properties": {
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "workflow_name": {
-              "type": "string",
-              "description": "The new workflow's name (if success)"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
-          }
-        },
-        "TimeResponse": {
-          "type": "object",
-          "properties": {
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "time": {
-              "type": "number",
-              "description": "A simulated date"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
-          }
-        },
-        "BooleanResponse": {
-          "type": "object",
-          "properties": {
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "result": {
-              "type": "boolean",
-              "description": "true or false"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
-          }
-        },
-        "VMCreationResponse": {
-          "type": "object",
-          "properties": {
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "vm_name": {
-              "type": "string",
-              "description": "The new VM's name (if success)"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
-          }
-        },
-        "Event": {
-          "type": "object",
-          "properties": {
-            "event": {
-              "type": "string",
-              "description": "JSON event description"
-            },
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
-          }
-        },
-        "EventList": {
-          "type": "object",
-          "properties": {
-            "events": {
-              "type": "array",
-              "items": {
+              "storage_service": {
                 "type": "string"
-              },
-              "description": "List of JSON event descriptions"
+              }
             },
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
+            "description": "Map of file IDs to storage service names (aka the list of file locations)."
           }
-        },
-        "HostnameList": {
-          "type": "object",
-          "properties": {
-            "hostnames": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": "List of host names"
-            },
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
+        }
+      },
+      "GenericResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
           }
-        },
-        "TaskList": {
-          "type": "object",
-          "properties": {
-            "tasks": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": "List of task names"
-            },
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
+        }
+      },
+      "ServiceResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "service_name": {
+            "type": "string",
+            "description": "The new service's name (if success)"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
           }
-        },
-        "FileList": {
-          "type": "object",
-          "properties": {
-            "files": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": "List of file names"
-            },
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
+        }
+      },
+      "WorkflowResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "workflow_name": {
+            "type": "string",
+            "description": "The new workflow's name (if success)"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
           }
-        },
-        "JobResponse": {
-          "type": "object",
-          "properties": {
-            "job_name": {
-              "type": "string",
-              "description": "The new job's name."
+        }
+      },
+      "WorkflowResponseWithTaskList": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "workflow_name": {
+            "type": "string",
+            "description": "The new workflow's name (if success)"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "string"
             },
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
+            "description": "The names of the workflow's tasks"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
           }
-        },
-        "FileSizeResponse": {
-          "type": "object",
-          "properties": {
-            "size": {
-              "type": "number",
-              "description": "The file's size in bytes."
-            },
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
+        }
+      },
+      "TimeResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "time": {
+            "type": "number",
+            "description": "A simulated date"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
           }
-        },
-        "TaskFlops": {
-          "type": "object",
-          "properties": {
-            "flops": {
-              "type": "number",
-              "description": "The task's flops."
-            },
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
+        }
+      },
+      "BooleanResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "result": {
+            "type": "boolean",
+            "description": "true or false"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
           }
-        },
-        "TaskCores": {
-          "type": "object",
-          "properties": {
-            "cores": {
-              "type": "number",
-              "description": "The task's minimum/maximum number of cores."
-            },
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
-            },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
+        }
+      },
+      "VMCreationResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "vm_name": {
+            "type": "string",
+            "description": "The new VM's name (if success)"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
           }
-        },
-        "TaskMem": {
-          "type": "object",
-          "properties": {
-            "memory": {
-              "type": "number",
-              "description": "The task's memory requirement in bytes."
+        }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "description": "JSON event description"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "EventList": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "string"
             },
-            "wrench_api_request_success": {
-              "type": "boolean",
-              "description": "true if success, false if failure"
+            "description": "List of JSON event descriptions"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "HostnameList": {
+        "type": "object",
+        "properties": {
+          "hostnames": {
+            "type": "array",
+            "items": {
+              "type": "string"
             },
-            "failure_cause": {
-              "type": "string",
-              "description": "human-readable error message (if failure)"
-            }
+            "description": "List of host names"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "TaskList": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of task names"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "FileList": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of file names"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "JobResponse": {
+        "type": "object",
+        "properties": {
+          "job_name": {
+            "type": "string",
+            "description": "The new job's name."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "FileSizeResponse": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "number",
+            "description": "The file's size in bytes."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "TaskFlops": {
+        "type": "object",
+        "properties": {
+          "flops": {
+            "type": "number",
+            "description": "The task's flops."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "TaskCores": {
+        "type": "object",
+        "properties": {
+          "cores": {
+            "type": "number",
+            "description": "The task's minimum/maximum number of cores."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "TaskMem": {
+        "type": "object",
+        "properties": {
+          "memory": {
+            "type": "number",
+            "description": "The task's memory requirement in bytes."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
           }
         }
       }
     }
   }
+}

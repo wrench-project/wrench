@@ -84,6 +84,7 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
+//        this->removeAllFiles();
         this->s4u_simulation->shutdown();
     }
 

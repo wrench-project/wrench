@@ -867,12 +867,14 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addFile(json data) {
-        std::string workflow_name = data["workflow_name"];
-        std::shared_ptr<Workflow> workflow;
-        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
-            throw std::runtime_error("Unknown workflow  " + workflow_name);
-        }
-        auto file = workflow->addFile(data["name"], data["size"]);
+//        std::string workflow_name = data["workflow_name"];
+//        std::shared_ptr<Workflow> workflow;
+//        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+//            throw std::runtime_error("Unknown workflow  " + workflow_name);
+//        }
+        std::cerr << "DATA" << data << "\n";
+        auto file = Simulation::addFile(data["name"], data["size"]);
+        std::cerr << "ADDED A FILE: " << file->getID() << "\n";
         return {};
     }
 
@@ -882,12 +884,12 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getFileSize(json data) {
-        std::string workflow_name = data["workflow_name"];
-        std::shared_ptr<Workflow> workflow;
-        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
-            throw std::runtime_error("Unknown workflow " + workflow_name);
-        }
-        auto file = workflow->getFileByID(data["file_id"]);
+//        std::string workflow_name = data["workflow_name"];
+//        std::shared_ptr<Workflow> workflow;
+//        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+//            throw std::runtime_error("Unknown workflow " + workflow_name);
+//        }
+        auto file = Simulation::getFileByID(data["file_id"]);
         json answer;
         answer["size"] = file->getSize();
         return answer;
@@ -1271,7 +1273,7 @@ namespace wrench {
 
         auto wf = wrench::Workflow::createWorkflow();
         json answer;
-        answer["result"] = wf->getName();
+        answer["workflow_name"] = wf->getName();
         this->workflow_registry.insert(wf->getName(), wf);
         return answer;
     }
@@ -1299,7 +1301,12 @@ namespace wrench {
                                                                             redundant_dependencies, ignore_cycle_creating_dependencies,
                                                                             min_cores_per_task, max_cores_per_task, enforce_num_cores,
                                                                             ignore_avg_cpu, show_warnings);
-            answer["results"] = wf->getName();
+            answer["workflow_name"] = wf->getName();
+            std::vector<std::string> task_names;
+            for (const auto &t: wf->getTasks()) {
+                task_names.push_back(t->getID());
+            }
+            answer["tasks"] = task_names;
             this->workflow_registry.insert(wf->getName(), wf);
             return answer;
         } catch (std::exception &e) {

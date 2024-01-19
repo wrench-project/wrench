@@ -23,6 +23,7 @@ public:
 protected:
     ~S4U_VirtualMachineTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     S4U_VirtualMachineTest() {
