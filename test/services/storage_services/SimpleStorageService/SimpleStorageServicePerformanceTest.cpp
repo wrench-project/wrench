@@ -77,6 +77,7 @@ public:
 protected:
     ~SimpleStorageServicePerformanceTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimpleStorageServicePerformanceTest() {
@@ -85,9 +86,9 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
-        file_1 = workflow->addFile("file_1", FILE_SIZE);
-        file_2 = workflow->addFile("file_2", FILE_SIZE);
-        file_3 = workflow->addFile("file_3", FILE_SIZE);
+        file_1 = wrench::Simulation::addFile("file_1", FILE_SIZE);
+        file_2 = wrench::Simulation::addFile("file_2", FILE_SIZE);
+        file_3 = wrench::Simulation::addFile("file_3", FILE_SIZE);
 
         // Create a 3-host platform file (network bandwidth == disk bandwidth)
         std::string xml = "<?xml version='1.0'?>"

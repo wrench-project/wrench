@@ -19,6 +19,7 @@ public:
 protected:
     ~SimpleStorageServiceChunkingTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimpleStorageServiceChunkingTest() {
@@ -26,8 +27,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // create the files
-        file_size_0 = workflow->addFile("file_size_0", 0);
-        file_size_100 = workflow->addFile("file_size_100", 100);
+        file_size_0 = wrench::Simulation::addFile("file_size_0", 0);
+        file_size_100 = wrench::Simulation::addFile("file_size_100", 100);
 
 
         // Create a 2-host platform file

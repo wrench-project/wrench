@@ -36,6 +36,7 @@ public:
 protected:
     ~SimulationTimestampTaskTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimulationTimestampTaskTest() {
@@ -148,7 +149,7 @@ private:
         job_manager->submitJob(failed_job, this->test->compute_service);
 
         wrench::StorageService::deleteFileAtLocation(
-                wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("small_input_file")));
+                wrench::FileLocation::LOCATION(this->test->storage_service, wrench::Simulation::getFileByID("small_input_file")));
 
 
         std::shared_ptr<wrench::ExecutionEvent> workflow_execution_event;
@@ -200,8 +201,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test() {
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
-    small_input_file = this->workflow->addFile("small_input_file", 10);
-    large_input_file = this->workflow->addFile("large_input_file", 1000000);
+    small_input_file = wrench::Simulation::addFile("small_input_file", 10);
+    large_input_file = wrench::Simulation::addFile("large_input_file", 1000000);
 
     ASSERT_NO_THROW(simulation->stageFile(large_input_file, storage_service));
     ASSERT_NO_THROW(simulation->stageFile(small_input_file, storage_service));
@@ -343,7 +344,7 @@ private:
 
         job_manager->submitJob(failed_job, this->test->compute_service);
         wrench::StorageService::deleteFileAtLocation(
-                wrench::FileLocation::LOCATION(this->test->storage_service, this->test->workflow->getFileByID("small_input_file")));
+                wrench::FileLocation::LOCATION(this->test->storage_service, wrench::Simulation::getFileByID("small_input_file")));
 
         this->waitForAndProcessNextEvent();
 #endif
@@ -398,8 +399,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
-    small_input_file = this->workflow->addFile("small_input_file", 10);
-    large_input_file = this->workflow->addFile("large_input_file", 1000000);
+    small_input_file = wrench::Simulation::addFile("small_input_file", 10);
+    large_input_file = wrench::Simulation::addFile("large_input_file", 1000000);
 
     ASSERT_NO_THROW(simulation->stageFile(large_input_file, storage_service));
     ASSERT_NO_THROW(simulation->stageFile(small_input_file, storage_service));

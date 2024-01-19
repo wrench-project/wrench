@@ -25,6 +25,7 @@ public:
 protected:
     ~AlarmTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     AlarmTest() {

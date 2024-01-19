@@ -23,6 +23,7 @@ public:
 protected:
     ~SimulationTimestampEnergyTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimulationTimestampEnergyTest() : workflow(wrench::Workflow::createWorkflow()) {
