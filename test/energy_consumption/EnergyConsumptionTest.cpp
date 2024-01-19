@@ -679,7 +679,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 

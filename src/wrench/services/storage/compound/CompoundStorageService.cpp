@@ -23,7 +23,7 @@ namespace wrench {
                                                         const std::map<std::string, std::vector<std::shared_ptr<StorageService>>> &resources,
                                                         const std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &mapping,
                                                         const std::vector<std::shared_ptr<FileLocation>> &previous_allocations) {
-      return std::vector<std::shared_ptr<FileLocation>>();
+        return std::vector<std::shared_ptr<FileLocation>>();
     };
 
     /**
@@ -127,41 +127,41 @@ namespace wrench {
             S4U_Simulation::computeZeroFlop();
 
             simulation_message = this->commport->getMessage<SimulationMessage>();
-//            // Create an async recv if needed
-//            if (not comm_ptr_has_been_posted) {
-//                try {
-//                    comm_ptr = this->commport->get_async<void>((void **) (&(simulation_message)));
-//                } catch (simgrid::NetworkFailureException &e) {
-//                    // oh well
-//                    continue;
-//                }
-//                comm_ptr_has_been_posted = true;
-//            }
-//
-//            // Create all activities to wait on (only emplace the communicator)
-////            std::vector<simgrid::s4u::ActivityPtr> pending_activities;
-////            pending_activities.emplace_back(comm_ptr);
-//
-//            // Wait one activity (communication in this case) to complete
-////            int finished_activity_index;
-//            try {
-////                finished_activity_index = (int) simgrid::s4u::Activity::wait_any(pending_activities);
-//                  comm_ptr->wait();
-//            } catch (simgrid::NetworkFailureException &e) {
-//                comm_ptr_has_been_posted = false;
-//                continue;
-//            } catch (std::exception &e) {
-//                continue;
-//            }
+            //            // Create an async recv if needed
+            //            if (not comm_ptr_has_been_posted) {
+            //                try {
+            //                    comm_ptr = this->commport->get_async<void>((void **) (&(simulation_message)));
+            //                } catch (simgrid::NetworkFailureException &e) {
+            //                    // oh well
+            //                    continue;
+            //                }
+            //                comm_ptr_has_been_posted = true;
+            //            }
+            //
+            //            // Create all activities to wait on (only emplace the communicator)
+            ////            std::vector<simgrid::s4u::ActivityPtr> pending_activities;
+            ////            pending_activities.emplace_back(comm_ptr);
+            //
+            //            // Wait one activity (communication in this case) to complete
+            ////            int finished_activity_index;
+            //            try {
+            ////                finished_activity_index = (int) simgrid::s4u::Activity::wait_any(pending_activities);
+            //                  comm_ptr->wait();
+            //            } catch (simgrid::NetworkFailureException &e) {
+            //                comm_ptr_has_been_posted = false;
+            //                continue;
+            //            } catch (std::exception &e) {
+            //                continue;
+            //            }
 
             // It's a communication
-//            if (finished_activity_index == 0) {
-//                comm_ptr_has_been_posted = false;
+            //            if (finished_activity_index == 0) {
+            //                comm_ptr_has_been_posted = false;
             if (not processNextMessage(simulation_message.get()))
                 break;
-//            } else if (finished_activity_index == -1) {
-//                throw std::runtime_error("wait_any() returned -1. Not sure what to do with this. ");
-//            }
+            //            } else if (finished_activity_index == -1) {
+            //                throw std::runtime_error("wait_any() returned -1. Not sure what to do with this. ");
+            //            }
         }
 
         WRENCH_INFO("Compound Storage Service %s on host %s cleanly terminating!",
@@ -870,7 +870,7 @@ namespace wrench {
                     double remaining = dwmb.second;
                     while (remaining - buffer_size > DBL_EPSILON) {
                         dwmb.first->dputMessage(new StorageServiceFileContentChunkMessage(
-                                                         file, buffer_size, false));
+                                file, buffer_size, false));
                         remaining -= buffer_size;
                     }
                     dwmb.first->dputMessage(new StorageServiceFileContentChunkMessage(
@@ -1144,7 +1144,7 @@ namespace wrench {
     bool CompoundStorageService::processStopDaemonRequest(S4U_CommPort *ack_commport) {
         try {
             ack_commport->putMessage(new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                            CompoundStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                    CompoundStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &e) {
             return false;
         }

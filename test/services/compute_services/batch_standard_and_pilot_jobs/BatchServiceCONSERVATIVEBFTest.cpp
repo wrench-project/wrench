@@ -354,7 +354,7 @@ TEST_F(BatchServiceCONSERVATIVE_BFTest, LargeCONSERVATIVE_BFTest)
 {
     //    DO_TEST_WITH_FORK(do_LargeCONSERVATIVE_BF_test);
     for (int seed = 0; seed < 3; seed++) {
-//        std::cerr <<  "SEED = " << seed << "\n";
+        //        std::cerr <<  "SEED = " << seed << "\n";
         DO_TEST_WITH_FORK_ONE_ARG(do_LargeCONSERVATIVE_BF_test, seed);
     }
 }
@@ -368,8 +368,8 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_test(int seed) {
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--cfg=contexts/stack-size:100");
-//    argv[2] = strdup("--wrench-full-log");
-//    argv[3] = strdup("--wrench-default-control-message-size=1024");
+    //    argv[2] = strdup("--wrench-full-log");
+    //    argv[3] = strdup("--wrench-default-control-message-size=1024");
 
     this->seed = seed;
 
@@ -388,7 +388,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_test(int seed) {
                                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
                                                             })));
 
-//    simulation->add(new wrench::FileRegistryService(hostname));
+    //    simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

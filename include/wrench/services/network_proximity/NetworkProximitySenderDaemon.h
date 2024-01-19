@@ -30,19 +30,19 @@ namespace wrench {
     class NetworkProximitySenderDaemon : public Service {
     public:
         NetworkProximitySenderDaemon(Simulation *simulation, std::string hostname,
-                               S4U_CommPort *network_proximity_service_commport,
-                               double message_size, double measurement_period,
-                               double noise, int noise_seed, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
+                                     S4U_CommPort *network_proximity_service_commport,
+                                     double message_size, double measurement_period,
+                                     double noise, int noise_seed, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
 
     private:
         friend class Simulation;
 
         std::default_random_engine rng;
 
-//        NetworkProximitySenderDaemon(Simulation *simulation, std::string hostname,
-//                               S4U_CommPort *network_proximity_service_commport,
-//                               double message_size, double measurement_period,
-//                               double noise, int noise_seed, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list, std::string suffix);
+        //        NetworkProximitySenderDaemon(Simulation *simulation, std::string hostname,
+        //                               S4U_CommPort *network_proximity_service_commport,
+        //                               double message_size, double measurement_period,
+        //                               double noise, int noise_seed, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list, std::string suffix);
 
 
         double message_size;

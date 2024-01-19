@@ -21,7 +21,7 @@ namespace wrench {
 
 
     SimulationMessage::~SimulationMessage() {
-//                WRENCH_INFO("DELETE: %s (%p)", this->getName().c_str(), this);
+        //                WRENCH_INFO("DELETE: %s (%p)", this->getName().c_str(), this);
     }
 
 
