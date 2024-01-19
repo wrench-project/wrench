@@ -81,7 +81,7 @@ namespace wrench {
      */
     void BandwidthMeterService::stop() {
         this->commport->putMessage(
-                                new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
+                new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**

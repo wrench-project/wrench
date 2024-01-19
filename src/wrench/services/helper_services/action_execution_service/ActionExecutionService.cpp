@@ -49,7 +49,7 @@ namespace wrench {
      */
     void ActionExecutionService::cleanup(bool has_returned_from_main, int return_value) {
 
-//        this->release_held_mutexes();
+        //        this->release_held_mutexes();
 
         // Clean up state in case of a restart
         if (this->isSetToAutoRestart()) {
@@ -158,9 +158,9 @@ namespace wrench {
 
         //  send a "run a standard job" message to the daemon's commport
         this->commport->putMessage(
-                                new ActionExecutionServiceSubmitActionRequestMessage(
-                                        answer_commport, action,
-                                        0.0));
+                new ActionExecutionServiceSubmitActionRequestMessage(
+                        answer_commport, action,
+                        0.0));
 
         // Get the answer
         auto msg = answer_commport->getMessage<ActionExecutionServiceSubmitActionAnswerMessage>(
@@ -575,7 +575,7 @@ namespace wrench {
             // This is Synchronous
             try {
                 msg->ack_commport->putMessage(
-                                        new ServiceDaemonStoppedMessage(0.0));
+                        new ServiceDaemonStoppedMessage(0.0));
             } catch (ExecutionException &e) {
                 return false;
             }
@@ -732,8 +732,8 @@ namespace wrench {
 
         //  send a "terminate action" message to the daemon's commport
         this->commport->putMessage(
-                                new ActionExecutionServiceTerminateActionRequestMessage(
-                                        answer_commport, std::move(action), termination_cause, 0.0));
+                new ActionExecutionServiceTerminateActionRequestMessage(
+                        answer_commport, std::move(action), termination_cause, 0.0));
 
         // Get the answer
         auto msg = answer_commport->getMessage<ActionExecutionServiceTerminateActionAnswerMessage>(
@@ -767,7 +767,7 @@ namespace wrench {
         // Send the notification to the originator
         this->parent_service->commport->dputMessage(
                 new ActionExecutionServiceActionDoneMessage(
-                                                       action, 0.0));
+                        action, 0.0));
     }
 
     /**

@@ -128,22 +128,22 @@ namespace wrench {
                 try {
                     this->comm_ptr->wait_for(timeout);
                 } catch (simgrid::NetworkFailureException &e) {
-                        if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
-                            throw ExecutionException(std::make_shared<NetworkError>(
-                                    NetworkError::OperationType::SENDING, NetworkError::FAILURE, this->commport->s4u_mb->get_name(), ""));
-                        } else {
-                            throw ExecutionException(std::make_shared<NetworkError>(
-                                    NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, this->commport->s4u_mb->get_name(), ""));
-                        }
-                    } catch (simgrid::TimeoutException &e) {
-                        if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
-                            throw ExecutionException(std::make_shared<NetworkError>(
-                                    NetworkError::OperationType::SENDING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name(), ""));
-                        } else {
-                            throw ExecutionException(std::make_shared<NetworkError>(
-                                    NetworkError::OperationType::RECEIVING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name(), ""));
-                        }
+                    if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
+                        throw ExecutionException(std::make_shared<NetworkError>(
+                                NetworkError::OperationType::SENDING, NetworkError::FAILURE, this->commport->s4u_mb->get_name(), ""));
+                    } else {
+                        throw ExecutionException(std::make_shared<NetworkError>(
+                                NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, this->commport->s4u_mb->get_name(), ""));
                     }
+                } catch (simgrid::TimeoutException &e) {
+                    if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
+                        throw ExecutionException(std::make_shared<NetworkError>(
+                                NetworkError::OperationType::SENDING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name(), ""));
+                    } else {
+                        throw ExecutionException(std::make_shared<NetworkError>(
+                                NetworkError::OperationType::RECEIVING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name(), ""));
+                    }
+                }
             } else if (this->mess_ptr) {
                 this->mess_ptr->wait_for(timeout);
             }
@@ -214,7 +214,7 @@ namespace wrench {
             return ULONG_MAX;
         } catch (simgrid::Exception &e) {
             auto failed_activity = pending_activities.get_failed_activity();
-            for (unsigned long idx = 0; idx < pending_comms.size(); idx++ ) {
+            for (unsigned long idx = 0; idx < pending_comms.size(); idx++) {
                 if (pending_comms.at(idx)->comm_ptr == failed_activity) {
                     return idx;
                 }
@@ -225,7 +225,7 @@ namespace wrench {
         }
 
         if (finished_activity) {
-            for (unsigned long idx = 0; idx < pending_comms.size(); idx++ ) {
+            for (unsigned long idx = 0; idx < pending_comms.size(); idx++) {
                 if (pending_comms.at(idx)->comm_ptr == finished_activity) {
                     return idx;
                 }

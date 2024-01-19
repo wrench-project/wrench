@@ -76,7 +76,6 @@ namespace wrench {
             MPI_Barrier(MPI_COMM_WORLD);
             MPI_Finalize();
         }
-
     };
 
 
@@ -141,7 +140,6 @@ namespace wrench {
                                 MPI_Bcast_partipant(data_size),
                                 hosts);
         SMPI_app_instance_join(instance_id.c_str());
-
     }
 
 }// namespace wrench
