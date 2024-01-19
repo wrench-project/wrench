@@ -19,6 +19,7 @@
 #include <utility>
 
 #include "../../../include/TestWithFork.h"
+#include "../../../include/RuntimeAssert.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
 WRENCH_LOG_CATEGORY(action_scheduler_test, "Log category for ActionExecutionServiceTest");
@@ -138,8 +139,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
                 "Host2", compute_resources, {}, {}));
 
@@ -161,7 +162,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -174,19 +175,10 @@ private:
         }
 
         // Is the start-date sensible?
-        if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
-        }
+        RUNTIME_DBL_EQ(action->getEndDate(), 10.0, "action end date", 0.01);
 
         // Is the end-date sensible?
-        if (action->getEndDate() + EPSILON < 10.0 or action->getEndDate() > 10.0 + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
-        }
-
-        // Is the state sensible?
-        if (action->getState() != wrench::Action::State::COMPLETED) {
-            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
-        }
+        RUNTIME_EQ(action->getState(), wrench::Action::State::COMPLETED, "action state");
 
         // Shutdown the service for coverage
         action_execution_service->stop();
@@ -221,7 +213,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
                                                                                         {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -233,6 +225,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -261,8 +254,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
                 "Host2", compute_resources,
                 {}, {}));
@@ -316,7 +309,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionBogusSpecTest
                                                                                         {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -328,6 +321,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionBogusSpecTest
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -355,8 +349,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
                 "Host2", compute_resources,
                 {}, {}));
@@ -423,7 +417,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceNonReadyActionTest_tes
                                                                                         {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -435,6 +429,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceNonReadyActionTest_tes
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -463,8 +458,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
                 "Host2", compute_resources,
                 {}, {}));
@@ -498,19 +493,22 @@ private:
         action_execution_service->terminateAction(action, wrench::ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
 
         // Is the start-date sensible?
-        if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
-        }
+        RUNTIME_DBL_EQ(action->getStartDate(), 0, "action start date", EPSILON);
+//        if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
+//            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
+//        }
 
         // Is the end-date sensible?
-        if (action->getEndDate() + EPSILON < 5.0 or action->getEndDate() > 5.0 + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
-        }
+        RUNTIME_DBL_EQ(action->getEndDate(), 5.0, "action end date", EPSILON);
+//        if (action->getEndDate() + EPSILON < 5.0 or action->getEndDate() > 5.0 + EPSILON) {
+//            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~5.0)");
+//        }
 
         // Is the state sensible?
-        if (action->getState() != wrench::Action::State::KILLED) {
-            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
-        }
+        RUNTIME_EQ(action->getState(), wrench::Action::State::KILLED, "action state");
+//        if (action->getState() != wrench::Action::State::KILLED) {
+//            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
+//        }
 
         return 0;
     }
@@ -541,7 +539,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -553,6 +551,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -582,8 +581,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(4, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(4, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources, nullptr,
                                                    {{wrench::ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {}));
@@ -618,7 +617,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -631,19 +630,24 @@ private:
         }
 
         // Is the start-date sensible?
-        if (std::abs<double>(action->getStartDate() - 12.0) > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
-        }
+        RUNTIME_DBL_EQ(action->getStartDate(), 11.0, "action start date", EPSILON);
+//        if (std::abs<double>(action->getStartDate() - 11.0) > EPSILON) {
+//            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
+//        }
 
         // Is the end-date sensible?
-        if (std::abs<double>(action->getEndDate() - 45.333333333333335701810) > EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
-        }
+        RUNTIME_DBL_EQ(action->getEndDate(), 44.333333333333335701810, "action end date", EPSILON);
+//        double expected = 44.333333333333335701810;
+//        if (std::abs<double>(action->getEndDate() - expected) > EPSILON) {
+//            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) +
+//                                     " (expected: " + std::to_string(expected) + ")");
+//        }
 
         // Is the state sensible?
-        if (action->getState() != wrench::Action::State::COMPLETED) {
-            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
-        }
+        RUNTIME_EQ(action->getState(), wrench::Action::State::COMPLETED, "action state");
+//        if (action->getState() != wrench::Action::State::COMPLETED) {
+//            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
+//        }
 
         // Check out the history
         auto history = action->getExecutionHistory();
@@ -658,9 +662,9 @@ private:
             throw std::runtime_error("Action history most recent: unexpected physical execution host " + history.top().physical_execution_host);
         if (history.top().failure_cause != nullptr)
             throw std::runtime_error("Action history most recent: unexpected failure cause: " + history.top().failure_cause->toString());
-        if (history.top().start_date < 12.0 - EPSILON or history.top().start_date > 12.0 + EPSILON)
+        if (history.top().start_date < 11.0 - EPSILON or history.top().start_date > 11.0 + EPSILON)
             throw std::runtime_error("Action history most recent: unexpected start date: " + std::to_string(history.top().start_date));
-        if (history.top().end_date + EPSILON < 45.33333333333333570181 or history.top().end_date > 45.33333333333333570181 + EPSILON)
+        if (history.top().end_date + EPSILON < 44.33333333333333570181 or history.top().end_date > 44.33333333333333570181 + EPSILON)
             throw std::runtime_error("Action history most recent: unexpected end date: " + std::to_string(history.top().end_date));
         // Older
         history.pop();
@@ -708,7 +712,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -720,6 +724,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -748,8 +753,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources, this->getSharedPtr<Service>(),
                                                    {{wrench::ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {}));
@@ -778,7 +783,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -791,19 +796,22 @@ private:
         }
 
         // Is the start-date sensible?
-        if (action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
-        }
+        RUNTIME_DBL_EQ(action->getStartDate(), 0.0, "action start date", EPSILON);
+//        if (action->getStartDate() > EPSILON) {
+//            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
+//        }
 
         // Is the end-date sensible?
-        if (action->getEndDate() + EPSILON < 1.0 or action->getEndDate() > 1.0 + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
-        }
+        RUNTIME_DBL_EQ(action->getEndDate(), 1.0, "action end date", EPSILON);
+//        if (action->getEndDate() + EPSILON < 1.0 or action->getEndDate() > 1.0 + EPSILON) {
+//            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~1.0)");
+//        }
 
         // Is the state sensible?
-        if (action->getState() != wrench::Action::State::FAILED) {
-            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
-        }
+        RUNTIME_EQ(action->getState(), wrench::Action::State::FAILED, "action state");
+//        if (action->getState() != wrench::Action::State::FAILED) {
+//            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
+//        }
 
         return 0;
     }
@@ -834,7 +842,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -846,6 +854,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -874,8 +883,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
                                                    {}, {}));
@@ -903,7 +912,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -922,7 +931,7 @@ private:
 
         // Is the end-date sensible?
         if (action->getEndDate() + EPSILON < action->getStartDate() + 1.0 or action->getEndDate() > action->getStartDate() + 1.0 + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
+            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~1.0)");
         }
 
         // Is the state sensible?
@@ -966,7 +975,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -978,6 +987,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1006,8 +1016,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
                                                    {}, {}));
@@ -1071,7 +1081,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -1083,6 +1093,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1110,8 +1121,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
                                                    {}, {}));
@@ -1141,7 +1152,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -1159,7 +1170,7 @@ private:
 
         // Wait for a message from it
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -1177,7 +1188,7 @@ private:
 
         // Wait for a message from it
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -1237,7 +1248,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -1249,6 +1260,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

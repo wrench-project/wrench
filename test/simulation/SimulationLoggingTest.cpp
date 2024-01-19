@@ -28,6 +28,7 @@ public:
 protected:
     ~SimulationLoggingTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimulationLoggingTest() {

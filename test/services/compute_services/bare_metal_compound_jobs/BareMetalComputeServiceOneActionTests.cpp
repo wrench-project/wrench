@@ -46,6 +46,7 @@ public:
 protected:
     ~BareMetalComputeServiceOneActionTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     BareMetalComputeServiceOneActionTest() {
@@ -54,8 +55,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
-        input_file = workflow->addFile("input_file", 10000.0);
-        output_file = workflow->addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000.0);
+        output_file = wrench::Simulation::addFile("output_file", 20000.0);
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -180,18 +181,18 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
 
     // Empty resource list
     ASSERT_THROW(compute_service = simulation->add(
-                         new wrench::BareMetalComputeService("Host1",
-                                                             (std::map<std::string, std::tuple<unsigned long, double>>){},
-                                                             {})),
+            new wrench::BareMetalComputeService("Host1",
+                                                (std::map<std::string, std::tuple<unsigned long, double>>){},
+                                                {})),
                  std::invalid_argument);
 
     // Bad hostname
     ASSERT_THROW(compute_service = simulation->add(
-                         new wrench::BareMetalComputeService("bogus",
-                                                             {std::make_pair("Host1",
-                                                                             std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             wrench::ComputeService::ALL_RAM))},
-                                                             {})),
+            new wrench::BareMetalComputeService("bogus",
+                                                {std::make_pair("Host1",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {})),
                  std::invalid_argument);
 
     // Get a hostname
@@ -199,63 +200,63 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
 
     // Bad resource hostname
     ASSERT_THROW(compute_service = simulation->add(
-                         new wrench::BareMetalComputeService(hostname,
-                                                             {std::make_pair("bogus",
-                                                                             std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             wrench::ComputeService::ALL_RAM))},
-                                                             "",
-                                                             {})),
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair("bogus",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                "",
+                                                {})),
                  std::invalid_argument);
 
     // Bad number of cores
     ASSERT_THROW(compute_service = simulation->add(
-                         new wrench::BareMetalComputeService(hostname,
-                                                             {std::make_pair(hostname,
-                                                                             std::make_tuple(0,
-                                                                                             wrench::ComputeService::ALL_RAM))},
-                                                             "",
-                                                             {})),
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname,
+                                                                std::make_tuple(0,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                "",
+                                                {})),
                  std::invalid_argument);
 
     // Bad number of cores
     ASSERT_THROW(compute_service = simulation->add(
-                         new wrench::BareMetalComputeService(hostname,
-                                                             {std::make_pair(hostname,
-                                                                             std::make_tuple(100,
-                                                                                             wrench::ComputeService::ALL_RAM))},
-                                                             {})),
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname,
+                                                                std::make_tuple(100,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {})),
                  std::invalid_argument);
 
 
     // Bad RAM
     ASSERT_THROW(compute_service = simulation->add(
-                         new wrench::BareMetalComputeService(hostname,
-                                                             {std::make_pair("RAMHost",
-                                                                             std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             -1.0))},
-                                                             {})),
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair("RAMHost",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                -1.0))},
+                                                {})),
                  std::invalid_argument);
 
     // Bad RAM
     ASSERT_THROW(compute_service = simulation->add(
-                         new wrench::BareMetalComputeService(hostname,
-                                                             {std::make_pair("RAMHost",
-                                                                             std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             100000.0))},
-                                                             {})),
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair("RAMHost",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                100000.0))},
+                                                {})),
                  std::invalid_argument);
 
     // Bad PROPERTIES
     ASSERT_THROW(compute_service = simulation->add(
-                         new wrench::BareMetalComputeService(hostname,
-                                                             {std::make_pair("RAMHost",
-                                                                             std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             100000.0))},
-                                                             "",
-                                                             {std::make_pair(
-                                                                     wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD,
-                                                                     "-1.0")},
-                                                             {})),
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair("RAMHost",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                100000.0))},
+                                                "",
+                                                {std::make_pair(
+                                                        wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD,
+                                                        "-1.0")},
+                                                {})),
                  std::invalid_argument);
 
     // Create an Execution Controller
@@ -320,7 +321,7 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-    //        argv[1] = strdup("--wrench-full-log");
+//            argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -334,25 +335,25 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService("Host3",
-                                                                {std::make_pair("Host4",
-                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                wrench::ComputeService::ALL_RAM))},
-                                                                {"/scratch"},
-                                                                {})));
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"},
+                                                {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-                            new BareMetalNoopTestWMS(
-                                    this, hostname)));
+            new BareMetalNoopTestWMS(
+                    this, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -478,27 +479,27 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService("Host3",
-                                                                {std::make_pair("Host4",
-                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                wrench::ComputeService::ALL_RAM))},
-                                                                {"/scratch"},
-                                                                {})));
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"},
+                                                {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-                            new BareMetalOneSleepActionTestWMS(
-                                    this,
-                                    workflow,
-                                    {compute_service}, {storage_service1}, hostname)));
+            new BareMetalOneSleepActionTestWMS(
+                    this,
+                    workflow,
+                    {compute_service}, {storage_service1}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -615,26 +616,26 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService("Host3",
-                                                                {std::make_pair("Host4",
-                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                100.0))},
-                                                                {"/scratch"},
-                                                                {})));
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                100.0))},
+                                                {"/scratch"},
+                                                {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-                            new BareMetalOneComputeActionNotEnoughResourcesTestWMS(
-                                    this,
-                                    hostname)));
+            new BareMetalOneComputeActionNotEnoughResourcesTestWMS(
+                    this,
+                    hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -747,27 +748,27 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService("Host3",
-                                                                {std::make_pair("Host4",
-                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                100.0))},
-                                                                {"/scratch"},
-                                                                {})));
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                100.0))},
+                                                {"/scratch"},
+                                                {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-                            new BareMetalOneComputeActionBogusServiceSpecificArgsTestWMS(
-                                    this,
-                                    workflow,
-                                    {compute_service}, {storage_service1}, hostname)));
+            new BareMetalOneComputeActionBogusServiceSpecificArgsTestWMS(
+                    this,
+                    workflow,
+                    {compute_service}, {storage_service1}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -896,26 +897,26 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService("Host3",
-                                                                {std::make_pair("Host4",
-                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                wrench::ComputeService::ALL_RAM))},
-                                                                {"/scratch"},
-                                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {})));
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"},
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"},
-                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
+            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-                            new BareMetalServiceCrashedTestWMS(
-                                    this, hostname)));
+            new BareMetalServiceCrashedTestWMS(
+                    this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1019,25 +1020,25 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService("Host3",
-                                                                {std::make_pair("Host4",
-                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                wrench::ComputeService::ALL_RAM))},
-                                                                {"/scratch"},
-                                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {})));
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"},
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-                            new BareMetalJobTerminationTestWMS(
-                                    this, hostname)));
+            new BareMetalJobTerminationTestWMS(
+                    this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1191,26 +1192,26 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService("Host3",
-                                                                {std::make_pair("Host4",
-                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                wrench::ComputeService::ALL_RAM))},
-                                                                {"/scratch"},
-                                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"},
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"},
-                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
+            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-                            new BareMetalServiceCrashedRestartedTestWMS(
-                                    this, hostname)));
+            new BareMetalServiceCrashedRestartedTestWMS(
+                    this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1280,14 +1281,14 @@ private:
             throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
         }
 
-        // Chek action stuff
+        // Check action stuff
         if (action->getState() != wrench::Action::State::FAILED) {
             throw std::runtime_error("Unexpected action state " + action->getStateAsString());
         }
 
         auto real_failure = std::dynamic_pointer_cast<wrench::FileNotFound>(action->getFailureCause());
         if (not real_failure) {
-            throw std::runtime_error("Unexpected action failure cause");
+            throw std::runtime_error("Unexpected action failure cause: " + action->getFailureCause()->toString());
         }
         if (real_failure->getFile() != this->test->input_file) {
             throw std::runtime_error("Unexpected file in the action failure cause");
@@ -1322,8 +1323,7 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-    //    argv[1] = strdup("--wrench-host-shutdown-simulation");
-    //    argv[2] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1337,25 +1337,25 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService("Host3",
-                                                                {std::make_pair("Host4",
-                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                wrench::ComputeService::ALL_RAM))},
-                                                                {"/scratch"},
-                                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"},
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-                            new BareMetalServiceFileNotThereTestWMS(
-                                    this, hostname)));
+            new BareMetalServiceFileNotThereTestWMS(
+                    this, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1444,25 +1444,25 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService("Host3",
-                                                                {std::make_pair("Host4",
-                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                wrench::ComputeService::ALL_RAM))},
-                                                                {"/scratch"},
-                                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"},
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-                            new BareMetalServiceServiceDownTestWMS(
-                                    this, hostname)));
+            new BareMetalServiceServiceDownTestWMS(
+                    this, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1551,25 +1551,25 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService("Host3",
-                                                                {std::make_pair("Host4",
-                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                wrench::ComputeService::ALL_RAM))},
-                                                                {"/scratch"},
-                                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"},
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-                            new BareMetalServiceServiceSuspendedTestWMS(
-                                    this, hostname)));
+            new BareMetalServiceServiceSuspendedTestWMS(
+                    this, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1645,25 +1645,25 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService("Host3",
-                                                                {std::make_pair("Host4",
-                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                wrench::ComputeService::ALL_RAM))},
-                                                                {""},
-                                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {""},
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-                            new BareMetalServiceBadScratchTestWMS(
-                                    this, hostname)));
+            new BareMetalServiceBadScratchTestWMS(
+                    this, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1733,7 +1733,7 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, FileRegistryActiona) {
+TEST_F(BareMetalComputeServiceOneActionTest, FileRegistryAction) {
     DO_TEST_WITH_FORK(do_FileRegistryActions_test);
 }
 
@@ -1744,7 +1744,7 @@ void BareMetalComputeServiceOneActionTest::do_FileRegistryActions_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1758,25 +1758,25 @@ void BareMetalComputeServiceOneActionTest::do_FileRegistryActions_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService("Host3",
-                                                                {std::make_pair("Host4",
-                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                wrench::ComputeService::ALL_RAM))},
-                                                                {""},
-                                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {""},
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-                            new FileRegistryActionTestWMS(
-                                    this, hostname)));
+            new FileRegistryActionTestWMS(
+                    this, hostname)));
 
     // Creat a File Registry Service
     file_registry_service = simulation->add(new wrench::FileRegistryService(hostname));

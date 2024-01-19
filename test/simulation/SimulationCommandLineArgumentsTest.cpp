@@ -30,9 +30,9 @@ public:
 
     void do_NoColorArgument_test();
 
-    void do_MailboxPoolSizeArgument_test();
+    void do_CommPortPoolSizeArgument_test();
 
-    void do_FullLogArgument_test(std::string arg, int num_log_lines);
+    void do_FullLogArgument_test(const std::string& arg, int expected_num_log_lines);
 
     void do_ActivateEnergyArgument_test();
 
@@ -290,27 +290,27 @@ void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
 }
 
 /**********************************************************************/
-/**           MAILBOX-POOL-SIZE     COMMAND-LINE ARGUMENT            **/
+/**           COMMPORT-POOL-SIZE     COMMAND-LINE ARGUMENT           **/
 /**********************************************************************/
 
-TEST_F(SimulationCommandLineArgumentsTest, MailboxPoolSizeArgument) {
-    DO_TEST_WITH_FORK(do_MailboxPoolSizeArgument_test);
+TEST_F(SimulationCommandLineArgumentsTest, CommPortPoolSizeArgument) {
+    DO_TEST_WITH_FORK(do_CommPortPoolSizeArgument_test);
 }
 
-void SimulationCommandLineArgumentsTest::do_MailboxPoolSizeArgument_test() {
+void SimulationCommandLineArgumentsTest::do_CommPortPoolSizeArgument_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-mailbox-pool-size1000");
+    argv[1] = strdup("--wrench-commport-pool-size1000");
 
     ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
 
-    argv[1] = strdup("--wrench-mailbox-pool-size=-1000");
+    argv[1] = strdup("--wrench-commport-pool-size=-1000");
     ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
 
-    argv[1] = strdup("--wrench-mailbox-pool-size=1000");
+    argv[1] = strdup("--wrench-commport-pool-size=1000");
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     for (int i = 0; i < argc; i++)
@@ -395,7 +395,7 @@ TEST_F(SimulationCommandLineArgumentsTest, FullLogArgument) {
     DO_TEST_WITH_FORK_TWO_ARGS(do_FullLogArgument_test, "--wrench-full-log", 3);
 }
 
-void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg, int num_log_lines) {
+void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(const std::string& arg, int expected_num_log_lines) {
     // Undo the SimGrid Logging config for Google Tests
     xbt_log_control_set("root.thresh:info");
 
@@ -434,7 +434,7 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     }
     fclose(stderr_file);
 
-    ASSERT_EQ(linecount, num_log_lines);
+    ASSERT_EQ(linecount, expected_num_log_lines);
 
     // Just in case
     xbt_log_control_set("root.thresh:critical");

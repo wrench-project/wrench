@@ -16,6 +16,7 @@
 #include "SimpleStorageServiceMessagePayload.h"
 #include "wrench/services/memory/MemoryManager.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 namespace wrench {
 
@@ -52,20 +53,20 @@ namespace wrench {
 
         /** @brief Default message payload values */
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
         };
 
 
@@ -102,10 +103,11 @@ namespace wrench {
 
         double getTotalSpace() override;
 
-        double traceTotalFreeSpace() override;
+        double getTotalFreeSpaceZeroTime() override;
+
+        double getTotalFilesZeroTime() override;
 
         virtual std::string getBaseRootPath() override;
-
 
         /**
          * @brief Reserve space at the storage service
@@ -130,13 +132,12 @@ namespace wrench {
             this->file_systems[mount_point]->unreserveSpace(location->getFile(), path_at_mount_point);
         }
 
-
         /**
-	 * @brief Get the mount point that stores a path
-	 * @param path: path
-	 *
-	 * @return a mount point
-	 */
+        * @brief Get the mount point that stores a path
+        * @param path: path
+        *
+        * @return a mount point
+        */
         std::string getPathMountPoint(const std::string &path) {
             std::string mount_point, path_at_mount_point;
             this->splitPath(path, mount_point, path_at_mount_point);
@@ -198,12 +199,12 @@ namespace wrench {
         /** @brief Maximum number of concurrent connections */
         unsigned long num_concurrent_connections;
 
-        bool processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox);
+        bool processStopDaemonRequest(S4U_CommPort *ack_commport);
         bool processFileDeleteRequest(const std::shared_ptr<FileLocation> &location,
-                                      simgrid::s4u::Mailbox *answer_mailbox);
+                                      S4U_CommPort *answer_commport);
         bool processFileLookupRequest(const std::shared_ptr<FileLocation> &location,
-                                      simgrid::s4u::Mailbox *answer_mailbox);
-        bool processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox,
+                                      S4U_CommPort *answer_commport);
+        bool processFreeSpaceRequest(S4U_CommPort *answer_commport,
                                      const std::string &path);
 
 
@@ -234,4 +235,4 @@ namespace wrench {
 
 }// namespace wrench
 
-#endif//WRENCH_SIMPLESTORAGESERVICE_H
+#endif// WRENCH_SIMPLESTORAGESERVICE_H

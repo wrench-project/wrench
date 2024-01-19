@@ -37,10 +37,10 @@ namespace wrench {
      */
     class FileRegistryFileLookupRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<DataFile> &file, double payload);
+        FileRegistryFileLookupRequestMessage(S4U_CommPort *answer_commport, const std::shared_ptr<DataFile> &file, double payload);
 
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The file to lookup */
         std::shared_ptr<DataFile> file;
     };
@@ -63,13 +63,13 @@ namespace wrench {
      */
     class FileRegistryFileLookupByProximityRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupByProximityRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file,
+        FileRegistryFileLookupByProximityRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file,
                                                         std::string reference_host,
                                                         std::shared_ptr<NetworkProximityService> network_proximity_service,
                                                         double payload);
 
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The file to lookup */
         std::shared_ptr<DataFile> file;
         /**
@@ -120,11 +120,11 @@ namespace wrench {
      */
     class FileRegistryRemoveEntryRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryRemoveEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+        FileRegistryRemoveEntryRequestMessage(S4U_CommPort *answer_commport,
                                               std::shared_ptr<FileLocation> location, double payload);
 
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The location to remove */
         std::shared_ptr<FileLocation> location;
     };
@@ -145,11 +145,11 @@ namespace wrench {
      */
     class FileRegistryAddEntryRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryAddEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+        FileRegistryAddEntryRequestMessage(S4U_CommPort *answer_commport,
                                            std::shared_ptr<FileLocation> location, double payload);
 
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The location in that entry */
         std::shared_ptr<FileLocation> location;
     };

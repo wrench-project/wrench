@@ -15,7 +15,7 @@
 #include <wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h>
 #include <wrench/services/ServiceMessage.h>
 #include "wrench/services/storage/StorageServiceMessage.h"
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/exceptions/ExecutionException.h>
@@ -125,12 +125,12 @@ namespace wrench {
     /**
      * @brief Process a file deletion request
      * @param location: the file location
-     * @param answer_mailbox: the mailbox to which the notification should be sent
+     * @param answer_commport: the commport to which the notification should be sent
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFileDeleteRequest(
             const std::shared_ptr<FileLocation> &location,
-            simgrid::s4u::Mailbox *answer_mailbox) {
+            S4U_CommPort *answer_commport) {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
         std::string mount_point;
@@ -155,8 +155,7 @@ namespace wrench {
             }
         }
 
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
+        answer_commport->dputMessage(
                 new StorageServiceFileDeleteAnswerMessage(
                         location->getFile(),
                         this->getSharedPtr<SimpleStorageService>(),
@@ -171,12 +170,12 @@ namespace wrench {
     /**
      * @brief Process a file lookup request
      * @param location: the file location
-     * @param answer_mailbox: the mailbox to which the notification should be sent
+     * @param answer_commport: the commport to which the notification should be sent
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFileLookupRequest(
             const std::shared_ptr<FileLocation> &location,
-            simgrid::s4u::Mailbox *answer_mailbox) {
+            S4U_CommPort *answer_commport) {
 
         bool file_found;
 
@@ -191,8 +190,7 @@ namespace wrench {
             file_found = fs->isFileInDirectory(file, path_at_mount_point);
         }
 
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
+        answer_commport->dputMessage(
                 new StorageServiceFileLookupAnswerMessage(
                         location->getFile(),
                         file_found,
@@ -218,12 +216,20 @@ namespace wrench {
      *        for IO tracing purpose.
      * @return total free space in bytes
     */
-    double SimpleStorageService::traceTotalFreeSpace() {
+    double SimpleStorageService::getTotalFreeSpaceZeroTime() {
         double free_space = 0;
         for (auto const &mp: this->file_systems) {
             free_space += mp.second->getFreeSpace();
         }
         return free_space;
+    }
+
+    double SimpleStorageService::getTotalFilesZeroTime() {
+        double files = 0;
+        for (auto const &mp: this->file_systems) {
+            files += mp.second->getTotalNumFiles();
+        }
+        return files;
     }
 
     /**
@@ -285,11 +291,11 @@ namespace wrench {
 
     /**
      * @brief Process a free space request
-     * @param answer_mailbox: the mailbox to which the notification should be sent
+     * @param answer_commport: the commport to which the notification should be sent
      * @param path: the path at which free space is requested
      * @return false if the daemon should terminate
      */
-    bool SimpleStorageService::processFreeSpaceRequest(simgrid::s4u::Mailbox *answer_mailbox, const std::string &path) {
+    bool SimpleStorageService::processFreeSpaceRequest(S4U_CommPort *answer_commport, const std::string &path) {
         double free_space = 0;
 
         auto sanitized_path = FileLocation::sanitizePath(path);
@@ -299,8 +305,7 @@ namespace wrench {
             }
         }
 
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
+        answer_commport->dputMessage(
                 new StorageServiceFreeSpaceAnswerMessage(
                         free_space,
                         this->getMessagePayloadValue(
@@ -310,12 +315,12 @@ namespace wrench {
 
     /**
      * @brief Process a stop daemon request
-     * @param ack_mailbox: the mailbox to which the ack should be sent
+     * @param ack_commport: the commport to which the ack should be sent
      * @return false if the daemon should terminate
      */
-    bool SimpleStorageService::processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox) {
+    bool SimpleStorageService::processStopDaemonRequest(S4U_CommPort *ack_commport) {
         try {
-            S4U_Mailbox::putMessage(ack_mailbox,
+            ack_commport->putMessage(
                                     new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                             SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &ignore) {}

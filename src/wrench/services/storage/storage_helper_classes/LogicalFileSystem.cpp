@@ -192,13 +192,13 @@ namespace wrench {
     }
 
     /**
- * @brief Get the files in a directory as a set
- * @param absolute_path: the directory's absolute path
- *
- * @return a set of files
- *
- * @throw std::invalid_argument
- */
+    * @brief Get the files in a directory as a set
+    * @param absolute_path: the directory's absolute path
+    *
+    * @return a set of files
+    *
+    * @throw std::invalid_argument
+    */
     std::set<std::shared_ptr<DataFile>> LogicalFileSystem::listFilesInDirectory(const std::string &absolute_path) {
         std::set<std::shared_ptr<DataFile>> to_return;
         if (devnull) {
@@ -214,9 +214,25 @@ namespace wrench {
     }
 
     /**
- * @brief Get the total capacity
- * @return the total capacity
- */
+    * @brief
+    * @return Total number of files currently stored in Filesytem
+    *
+    */
+    double LogicalFileSystem::getTotalNumFiles() const {
+
+        double files = 0;
+
+        for (const auto &item: this->content) {
+            files += item.second.size();
+        }
+
+        return files;
+    }
+
+    /**
+    * @brief Get the total capacity
+    * @return the total capacity
+    */
     double LogicalFileSystem::getTotalCapacity() const {
         return this->total_capacity;
     }
@@ -253,6 +269,7 @@ namespace wrench {
             WRENCH_WARN("LogicalFileSystem::reserveSpace(): Space was already being reserved for storing file %s at path %s:%s. "
                         "This is likely a redundant copy, and nothing needs to be done",
                         file->getID().c_str(), this->hostname.c_str(), fixed_path.c_str());
+            return true;
         }
 
         if (this->free_space < file->getSize()) {

@@ -53,7 +53,7 @@ namespace wrench {
         this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
         batch_job->conservative_bf_start_date = est;
         batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
-        WRENCH_INFO("Scheduled BatchComputeService job %lu on %lu from time %u to %u",
+        WRENCH_INFO("Scheduled BatchComputeService job %lu on %lu nodes from time %u to %u",
                     batch_job->getJobID(), batch_job->getRequestedNumNodes(),
                     batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date);
 #ifdef PRINT_SCHEDULE
@@ -125,7 +125,6 @@ namespace wrench {
         WRENCH_INFO("Compacting schedule...");
 
 #ifdef PRINT_SCHEDULE
-        WRENCH_INFO("BEFORE COMPACTING");
         this->schedule->print();
 #endif
 
@@ -239,55 +238,45 @@ namespace wrench {
      * @param ram_per_node: amount of RAM
      * @return a host:<core,RAM> map
      */
-    std::map<std::string, std::tuple<unsigned long, double>>
+    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>>
     ConservativeBackfillingBatchSchedulerCoreLevel::scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
         if (ram_per_node == ComputeService::ALL_RAM) {
-            ram_per_node = Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
+            ram_per_node = S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
         }
         if (cores_per_node == ComputeService::ALL_CORES) {
-            cores_per_node = Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first);
+            cores_per_node = cs->available_nodes_to_cores.begin()->first->get_core_count();
         }
 
-        if (ram_per_node > Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too much RAM per host");
+        if (ram_per_node > S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too much RAM per host");
         }
         if (num_nodes > cs->available_nodes_to_cores.size()) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too many hosts");
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
-        if (cores_per_node > Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first)) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too many cores per host (asking  for " +
+        if (cores_per_node > (unsigned long) cs->available_nodes_to_cores.begin()->first->get_core_count()) {
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many cores per host (asking  for " +
                                      std::to_string(cores_per_node) + " but hosts have " +
-                                     std::to_string(Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first)) + "cores)");
+                                     std::to_string(cs->available_nodes_to_cores.begin()->first->get_core_count()) + "cores)");
         }
 
-        //        // IMPORTANT: We always give all cores to a job on a node!
-        //        cores_per_node = Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first);
 
-        std::map<std::string, std::tuple<unsigned long, double>> resources = {};
-        std::vector<std::string> hosts_assigned = {};
+        //        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources = {};
+        //        std::vector<simgrid::s4u::Host *> hosts_assigned = {};
+        auto host_selection_algorithm = this->cs->getPropertyValueAsString(BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM);
 
-        unsigned long host_count = 0;
-        for (auto &available_nodes_to_core: cs->available_nodes_to_cores) {
-            if (available_nodes_to_core.second >= cores_per_node) {
-                //Remove that many cores from the available_nodes_to_core
-                available_nodes_to_core.second -= cores_per_node;
-                hosts_assigned.push_back(available_nodes_to_core.first);
-                resources.insert(std::make_pair(available_nodes_to_core.first, std::make_tuple(cores_per_node, ram_per_node)));
-                if (++host_count >= num_nodes) {
-                    break;
-                }
-            }
+        if (host_selection_algorithm == "FIRSTFIT") {
+            return HomegrownBatchScheduler::selectHostsFirstFit(cs, num_nodes, cores_per_node, ram_per_node);
+        } else if (host_selection_algorithm == "BESTFIT") {
+            return HomegrownBatchScheduler::selectHostsBestFit(cs, num_nodes, cores_per_node, ram_per_node);
+
+        } else if (host_selection_algorithm == "ROUNDROBIN") {
+            static unsigned long round_robin_host_selector_idx = -1;
+            return HomegrownBatchScheduler::selectHostsRoundRobin(cs, &round_robin_host_selector_idx, num_nodes, cores_per_node, ram_per_node);
+        } else {
+            throw std::invalid_argument(
+                    "ConservativeBackfillingBatchSchedulerCoreLevel::scheduleOnHosts(): We don't support " + host_selection_algorithm +
+                    " as host selection algorithm");
         }
-        if (resources.size() < num_nodes) {
-            resources = {};
-            std::vector<std::string>::iterator vector_it;
-            // undo!
-            for (vector_it = hosts_assigned.begin(); vector_it != hosts_assigned.end(); vector_it++) {
-                cs->available_nodes_to_cores[*vector_it] += cores_per_node;
-            }
-        }
-
-        return resources;
     }
 
     /**

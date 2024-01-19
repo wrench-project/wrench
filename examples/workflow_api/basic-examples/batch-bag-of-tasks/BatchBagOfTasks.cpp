@@ -87,8 +87,8 @@ int main(int argc, char **argv) {
         auto task = workflow->addTask("task_" + std::to_string(i), (100 + i * 500) * TFLOP,
                                       1, 10, 1000);
         task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
-        task->addInputFile(workflow->addFile("input_" + std::to_string(i), 10000000));
-        task->addOutputFile(workflow->addFile("output_" + std::to_string(i), 10000000));
+        task->addInputFile(wrench::Simulation::addFile("input_" + std::to_string(i), 10000000));
+        task->addOutputFile(wrench::Simulation::addFile("output_" + std::to_string(i), 10000000));
     }
 
     /* Instantiate a storage service, and add it to the simulation.
@@ -124,13 +124,13 @@ int main(int argc, char **argv) {
 
     /* Instantiate a file registry service to be started on WMSHost. This service is
      * essentially a replica catalog that stores <file , storage service> pairs so that
-     * any service, in particular a WMS, can discover where workflow files are stored. */
+     * any service, in particular a WMS, can discover where files are stored. */
     std::cerr << "Instantiating a FileRegistryService on WMSHost ..." << std::endl;
     auto file_registry_service = new wrench::FileRegistryService("WMSHost");
     simulation->add(file_registry_service);
 
     /* It is necessary to store, or "stage", input files that only input. The getInputFiles()
-     * method of the Workflow class returns the set of all workflow files that are not generated
+     * method of the Workflow class returns the set of all files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
     std::cerr << "Staging task input files..." << std::endl;
     for (auto const &f: workflow->getInputFiles()) {

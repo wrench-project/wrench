@@ -157,7 +157,7 @@ private:
                                            ram,
                                            0.1,
                                            simulation_computation_as_sleep,
-                                           this->mailbox,
+                                           this->commport,
                                            action,
                                            nullptr));
 
@@ -168,7 +168,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -187,7 +187,7 @@ private:
 
         // Is the end-date sensible?
         if (action->getEndDate() + EPSILON < 10.2 or action->getEndDate() > 10.2 + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
+            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~12.0)");
         }
 
         // Is the state sensible?
@@ -225,7 +225,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test(bool si
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -237,6 +237,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test(bool si
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -288,7 +289,7 @@ private:
                                            ram,
                                            0.1,
                                            false,
-                                           this->mailbox,
+                                           this->commport,
                                            action,
                                            nullptr));
 
@@ -299,7 +300,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+            message = this->commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -348,7 +349,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorFailureTest_test() {
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -360,6 +361,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorFailureTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

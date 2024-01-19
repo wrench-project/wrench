@@ -29,7 +29,7 @@ namespace wrench {
     class WorkloadTraceFileReplayer : public ExecutionController {
 
     public:
-        WorkloadTraceFileReplayer(std::string hostname,
+        WorkloadTraceFileReplayer(const std::string &hostname,
                                   std::shared_ptr<BatchComputeService> batch_service,
                                   unsigned long num_cores_per_node,
                                   bool use_actual_runtimes_as_requested_runtimes,

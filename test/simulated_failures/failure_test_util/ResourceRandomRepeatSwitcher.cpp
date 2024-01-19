@@ -49,31 +49,31 @@ int wrench::ResourceRandomRepeatSwitcher::main() {
 
     while (true) {
         double sleep_before_off_time = dist_off(rng);
-        WRENCH_INFO("Sleeping for %.3lf seconds...", sleep_before_off_time);
+        WRENCH_INFO("CHAOS MONKEY: Sleeping for %.3lf seconds...", sleep_before_off_time);
         wrench::Simulation::sleep(sleep_before_off_time);
         switch (this->resource_type) {
             case ResourceType::HOST: {
-                WRENCH_INFO("Turning OFF host %s", this->resource_to_switch.c_str());
+                WRENCH_INFO("CHAOS MONKEY: Turning OFF host %s", this->resource_to_switch.c_str());
                 wrench::Simulation::turnOffHost(this->resource_to_switch);
                 break;
             }
             case ResourceType::LINK: {
-                WRENCH_INFO("Turning OFF link %s", this->resource_to_switch.c_str());
+                WRENCH_INFO("CHAOS MONKEY: Turning OFF link %s", this->resource_to_switch.c_str());
                 wrench::Simulation::turnOffLink(this->resource_to_switch);
                 break;
             }
         }
         double sleep_before_on_time = dist_on(rng);
-        WRENCH_INFO("Sleeping for %.3lf seconds...", sleep_before_on_time);
+        WRENCH_INFO("CHAOS MONKEY: Sleeping for %.3lf seconds...", sleep_before_on_time);
         wrench::Simulation::sleep(sleep_before_on_time);
         switch (this->resource_type) {
             case ResourceType::HOST: {
-                WRENCH_INFO("Turning ON host %s", this->resource_to_switch.c_str());
+                WRENCH_INFO("CHAOS MONKEY: Turning ON host %s", this->resource_to_switch.c_str());
                 wrench::Simulation::turnOnHost(this->resource_to_switch);
                 break;
             }
             case ResourceType::LINK: {
-                WRENCH_INFO("Turning ON link %s", this->resource_to_switch.c_str());
+                WRENCH_INFO("CHAOS MONKEY: Turning ON link %s", this->resource_to_switch.c_str());
                 wrench::Simulation::turnOnLink(this->resource_to_switch);
                 break;
             }

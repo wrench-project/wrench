@@ -54,6 +54,7 @@ protected:
     ~SimulationDumpJSONTest() {
         //        std::cerr << "WORKFLOW = " << workflow.get() << "\n";
         if (workflow.get()) workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimulationDumpJSONTest() {
@@ -502,6 +503,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     EXPECT_TRUE(compareObjects(result_json1, expected_json1));
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     workflow = wrench::Workflow::createWorkflow();
 
@@ -540,6 +542,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     EXPECT_TRUE(compareObjects(result_json2, expected_json2));
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     workflow = wrench::Workflow::createWorkflow();
 
@@ -596,6 +599,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     EXPECT_TRUE(compareObjects(result_json3, expected_json3));
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     workflow = wrench::Workflow::createWorkflow();
 
@@ -618,6 +622,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     //EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow, execution_data_json_file_path, true), std::runtime_error);
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -651,12 +656,12 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     auto independent_tasks_workflow = wrench::Workflow::createWorkflow();
 
     t1 = independent_tasks_workflow->addTask("task1", 1.0, 1, 1, 0);
-    t1->addInputFile(independent_tasks_workflow->addFile("task1_input", 1.0));
-    t1->addOutputFile(independent_tasks_workflow->addFile("task1_output", 1.0));
+    t1->addInputFile(wrench::Simulation::addFile("task1_input", 1.0));
+    t1->addOutputFile(wrench::Simulation::addFile("task1_output", 1.0));
 
     t2 = independent_tasks_workflow->addTask("task2", 1.0, 1, 1, 0);
-    t2->addInputFile(independent_tasks_workflow->addFile("task2_input", 1.0));
-    t2->addOutputFile(independent_tasks_workflow->addFile("task2_output", 1.0));
+    t2->addInputFile(wrench::Simulation::addFile("task2_input", 1.0));
+    t2->addOutputFile(wrench::Simulation::addFile("task2_output", 1.0));
 
     EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowGraphJSON(independent_tasks_workflow, workflow_graph_json_file_path));
 
@@ -681,23 +686,24 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     EXPECT_TRUE(result_json1 == expected_json1);
 
     independent_tasks_workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     // Generate a workflow with two tasks, two input files, and four output files. Both tasks use both input files and produce two output files each.
     auto two_tasks_use_all_files_workflow = wrench::Workflow::createWorkflow();
 
     t1 = two_tasks_use_all_files_workflow->addTask("task1", 1.0, 1, 1, 0);
-    t1->addInputFile(two_tasks_use_all_files_workflow->addFile("input_file1", 1));
-    t1->addInputFile(two_tasks_use_all_files_workflow->addFile("input_file2", 2));
-    t1->addOutputFile(two_tasks_use_all_files_workflow->addFile("output_file1", 1));
-    t1->addOutputFile(two_tasks_use_all_files_workflow->addFile("output_file2", 2));
+    t1->addInputFile(wrench::Simulation::addFile("input_file1", 1));
+    t1->addInputFile(wrench::Simulation::addFile("input_file2", 2));
+    t1->addOutputFile(wrench::Simulation::addFile("output_file1", 1));
+    t1->addOutputFile(wrench::Simulation::addFile("output_file2", 2));
 
     t2 = two_tasks_use_all_files_workflow->addTask("task2", 1.0, 1, 1, 0);
     for (auto &file: t1->getInputFiles()) {
         t2->addInputFile(file);
     }
 
-    t2->addOutputFile(two_tasks_use_all_files_workflow->addFile("output_file3", 1));
-    t2->addOutputFile(two_tasks_use_all_files_workflow->addFile("output_file4", 1));
+    t2->addOutputFile(wrench::Simulation::addFile("output_file3", 1));
+    t2->addOutputFile(wrench::Simulation::addFile("output_file4", 1));
 
     EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowGraphJSON(two_tasks_use_all_files_workflow, workflow_graph_json_file_path));
 
@@ -722,29 +728,31 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     EXPECT_TRUE(result_json2 == expected_json2);
 
     two_tasks_use_all_files_workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     // Generate a workflow where one task1 forks into two tasks, then those two tasks join into one.
     auto fork_join_workflow = wrench::Workflow::createWorkflow();
 
     t1 = fork_join_workflow->addTask("task1", 1.0, 1, 1, 0);
-    t1->addInputFile(fork_join_workflow->addFile("task1_input", 1.0));
-    t1->addOutputFile(fork_join_workflow->addFile("task1_output1", 1.0));
-    t1->addOutputFile(fork_join_workflow->addFile("task1_output2", 1.0));
+    t1->addInputFile(wrench::Simulation::addFile("task1_input", 1.0));
+    t1->addOutputFile(wrench::Simulation::addFile("task1_output1", 1.0));
+    t1->addOutputFile(wrench::Simulation::addFile("task1_output2", 1.0));
 
     t2 = fork_join_workflow->addTask("task2", 1.0, 1, 1, 0);
-    t2->addInputFile(fork_join_workflow->getFileByID("task1_output1"));
-    t2->addOutputFile(fork_join_workflow->addFile("task2_output1", 1.0));
+    t2->addInputFile(wrench::Simulation::getFileByID("task1_output1"));
+    t2->addOutputFile(wrench::Simulation::addFile("task2_output1", 1.0));
     fork_join_workflow->addControlDependency(t1, t2);
 
     t3 = fork_join_workflow->addTask("task3", 1.0, 1, 1, 0);
-    t3->addInputFile(fork_join_workflow->getFileByID("task1_output2"));
-    t3->addOutputFile(fork_join_workflow->addFile("task3_output1", 1.0));
+    t3->addInputFile(wrench::Simulation::getFileByID("task1_output2"));
+    t3->addOutputFile(wrench::Simulation::addFile("task3_output1", 1.0));
     fork_join_workflow->addControlDependency(t1, t3);
 
     t4 = fork_join_workflow->addTask("task4", 1.0, 1, 1, 0);
-    t4->addInputFile(fork_join_workflow->getFileByID("task2_output1"));
-    t4->addInputFile(fork_join_workflow->getFileByID("task3_output1"));
-    t4->addOutputFile(fork_join_workflow->addFile("task4_output1", 1.0));
+    t4->addInputFile(wrench::Simulation::getFileByID("task2_output1"));
+    t4->addInputFile(wrench::Simulation::
+                             getFileByID("task3_output1"));
+    t4->addOutputFile(wrench::Simulation::addFile("task4_output1", 1.0));
     fork_join_workflow->addControlDependency(t2, t4);
     fork_join_workflow->addControlDependency(t3, t4);
 
@@ -772,6 +780,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     EXPECT_TRUE(result_json3 == expected_json3);
 
     fork_join_workflow->clear();
+    wrench::Simulation::removeAllFiles();
 }
 
 TEST_F(SimulationDumpJSONTest, SimulationDumpWorkflowGraphJSONTest) {
@@ -805,7 +814,7 @@ private:
         auto em = this->createEnergyMeter(hostnames, TWO_SECOND_PERIOD);
 
         const double MEGAFLOP = 1000.0 * 1000.0;
-        wrench::S4U_Simulation::compute(6.0 * 100.0 * MEGAFLOP);// compute for 6 seconds
+        wrench::S4U_Simulation::compute(6.1 * 100.0 * MEGAFLOP);// compute for 6 seconds
 
 
         return 0;
@@ -989,8 +998,8 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
         std::sort(result_json["energy_consumption"][i]["pstate_trace"].begin(), result_json["energy_consumption"][i]["pstate_trace"].end(), comparePstate);
     }
 
-    //    std::cerr << "EXPECTED: " << expected_json << "\n";
-    //    std::cerr << "RESULT: " << result_json << "\n";
+//        std::cerr << "EXPECTED: " << expected_json << "\n";
+//        std::cerr << "RESULT: " << result_json << "\n";
     EXPECT_TRUE(expected_json == result_json);
 
 
@@ -1075,7 +1084,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     auto link_usage_workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::WorkflowTask> single_task;
     single_task = link_usage_workflow->addTask("dummy_task", 1, 1, 1, 8 * GB);
-    single_task->addInputFile(link_usage_workflow->addFile("test_file", 10 * GB));
+    single_task->addInputFile(wrench::Simulation::addFile("test_file", 10 * GB));
 
     EXPECT_NO_THROW(wms = simulation->add(
                             new SimulationOutputDumpLinkUsageTestWMS(
@@ -1187,6 +1196,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     EXPECT_TRUE((expected_json_link_usage_version1 == result_json) or (expected_json_link_usage_version2 == result_json));
 
     link_usage_workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1216,7 +1226,7 @@ private:
 
     int main() override {
 
-        auto file_1 = this->test->workflow->addFile("file_1", 1.00 * 1000 * 1000);
+        auto file_1 = wrench::Simulation::addFile("file_1", 1.00 * 1000 * 1000);
 
         wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
         wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss2, file_1));
@@ -1298,6 +1308,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     }
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

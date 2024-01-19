@@ -15,7 +15,9 @@
 #include <random>
 #include "wrench/services/Service.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
-#include "wrench/services/network_proximity/NetworkProximityDaemon.h"
+#include "wrench/services/network_proximity/NetworkProximitySenderDaemon.h"
+#include "wrench/services/network_proximity/NetworkProximityReceiverDaemon.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 namespace wrench {
 
@@ -37,13 +39,13 @@ namespace wrench {
                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED, "1"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
-                {NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
-                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD, 1024},
-                {NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD, 1024},
-                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, 1024},
+                {NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, S4U_CommPort::default_control_message_size},
         };
 
     public:
@@ -90,7 +92,8 @@ namespace wrench {
     private:
         friend class Simulation;
 
-        std::vector<std::shared_ptr<NetworkProximityDaemon>> network_daemons;
+        std::vector<std::shared_ptr<NetworkProximitySenderDaemon>> network_sender_daemons;
+        std::vector<std::shared_ptr<NetworkProximityReceiverDaemon>> network_receiver_daemons;
         std::vector<std::string> hosts_in_network;
 
         std::default_random_engine master_rng;
@@ -105,8 +108,8 @@ namespace wrench {
 
         std::map<std::string, std::pair<std::complex<double>, double>> coordinate_lookup_table;
 
-        std::shared_ptr<NetworkProximityDaemon>
-        getCommunicationPeer(const std::shared_ptr<NetworkProximityDaemon> sender_daemon);
+        std::shared_ptr<NetworkProximityReceiverDaemon>
+        getCommunicationPeer(std::shared_ptr<NetworkProximitySenderDaemon> sender_daemon);
 
         void vivaldiUpdate(double proximityValue, std::string sender_hostname, std::string peer_hostname);
 

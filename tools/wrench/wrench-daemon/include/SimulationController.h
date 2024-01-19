@@ -34,7 +34,7 @@ namespace wrench {
     class SimulationController : public ExecutionController {
 
     public:
-        SimulationController(std::shared_ptr<Workflow> workflow, const std::string &hostname, int sleep_us);
+        SimulationController(const std::string &hostname, int sleep_us);
 
         void stopSimulation();
 
@@ -65,6 +65,8 @@ namespace wrench {
         json addBareMetalComputeService(json data);
 
         json addCloudComputeService(json data);
+
+        json addBatchComputeService(json data);
 
         json addSimpleStorageService(json data);
 
@@ -108,8 +110,22 @@ namespace wrench {
 
         json isVMSuspended(json data);
 
+        json getExecutionHosts(json data);
+
+        json getVMPhysicalHostname(json data);
+
+        json getVMComputeService(json data);
+
+        json createWorkflow(json data);
+
+        json createWorkflowFromJSON(json data);
+
     private:
+        template<class T>
+        json startService(T *s);
+
         // Thread-safe key value stores
+        KeyValueStore<std::shared_ptr<wrench::Workflow>> workflow_registry;
         KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;
         KeyValueStore<std::shared_ptr<ComputeService>> compute_service_registry;
         KeyValueStore<std::shared_ptr<StorageService>> storage_service_registry;
@@ -118,38 +134,13 @@ namespace wrench {
         // Thread-safe queues for the server thread and the simulation thread to communicate
         BlockingQueue<std::pair<double, std::shared_ptr<wrench::ExecutionEvent>>> event_queue;
 
-        BlockingQueue<wrench::ComputeService *> compute_services_to_start;
-        BlockingQueue<wrench::StorageService *> storage_services_to_start;
-        BlockingQueue<wrench::FileRegistryService *> file_service_to_start;
-        BlockingQueue<std::pair<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>>> submissions_to_do;
+        BlockingQueue<std::tuple<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>, std::map<std::string, std::string>>> submissions_to_do;
 
-        BlockingQueue<std::pair<std::tuple<unsigned long, double, WRENCH_PROPERTY_COLLECTION_TYPE, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE>, std::shared_ptr<ComputeService>>> vm_to_create;
-        BlockingQueue<std::pair<bool, std::string>> vm_created;
-
-        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_start;
-        BlockingQueue<std::pair<bool, std::string>> vm_started;
-
-        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_shutdown;
-        BlockingQueue<std::pair<bool, std::string>> vm_shutdown;
-
-        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_destroy;
-        BlockingQueue<std::pair<bool, std::string>> vm_destroyed;
-
-        BlockingQueue<std::pair<std::shared_ptr<DataFile>, std::shared_ptr<StorageService>>> file_to_lookup;
-        BlockingQueue<std::tuple<bool, bool, std::string>> file_looked_up;
-
-        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_suspend;
-        BlockingQueue<std::pair<bool, std::string>> vm_suspended;
-
-        BlockingQueue<std::pair<std::string, std::shared_ptr<ComputeService>>> vm_to_resume;
-        BlockingQueue<std::pair<bool, std::string>> vm_resumed;
+        BlockingQueue<std::function<void()>> things_to_do;
 
         // The two managers
         std::shared_ptr<JobManager> job_manager;
         std::shared_ptr<DataMovementManager> data_movement_manager;
-
-        // The workflow
-        std::shared_ptr<Workflow> workflow;
 
         bool keep_going = true;
         double time_horizon_to_reach = 0;

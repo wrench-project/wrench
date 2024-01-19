@@ -27,12 +27,12 @@ namespace wrench {
 
     public:
         explicit ServiceTerminationDetector(std::string host_on_which_to_run, std::shared_ptr<Service> service_to_monitor,
-                                            simgrid::s4u::Mailbox *mailbox_to_notify, bool notify_on_crash, bool notify_on_termination);
+                                            S4U_CommPort *commport_to_notify, bool notify_on_crash, bool notify_on_termination);
 
 
     private:
         std::shared_ptr<Service> service_to_monitor;
-        simgrid::s4u::Mailbox *mailbox_to_notify;
+        S4U_CommPort *commport_to_notify;
         int main() override;
         bool notify_on_crash;
         bool notify_on_termination;

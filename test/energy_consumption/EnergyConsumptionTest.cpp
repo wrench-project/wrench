@@ -8,7 +8,7 @@
  */
 
 #include <wrench-dev.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
@@ -49,6 +49,7 @@ public:
 protected:
     ~EnergyConsumptionTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     EnergyConsumptionTest() {
@@ -165,7 +166,7 @@ private:
             //sleep for 10 seconds
             wrench::S4U_Simulation::sleep(10);
             //let's execute the job, this should take ~100 sec based on the 100MF speed
-            std::string my_mailbox = "test_callback_mailbox";
+            std::string my_commport = "test_callback_commport";
 
             job_manager->submitJob(job, this->test->compute_service);
             this->waitForAndProcessNextEvent();
@@ -185,7 +186,7 @@ private:
             }
 
             try {
-                double value = this->simulation->getNumberofPstates("dummy_unavailable_host");
+                this->simulation->getNumberofPstates("dummy_unavailable_host");
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
@@ -200,7 +201,7 @@ private:
 
 
             try {
-                double value = this->simulation->getMinPowerConsumption("dummy_unavailable_host");
+                this->simulation->getMinPowerConsumption("dummy_unavailable_host");
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
@@ -287,8 +288,8 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
                             new EnergyApiAccessExceptionsTestWMS(
                                     this, hostname)));
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -337,7 +338,7 @@ private:
             //sleep for 10 seconds
             wrench::S4U_Simulation::sleep(10);
             //let's execute the job, this should take ~100 sec based on the 100MF speed
-            std::string my_mailbox = "test_callback_mailbox";
+            std::string my_commport = "test_callback_commport";
 
             job_manager->submitJob(job, this->test->compute_service);
             this->waitForAndProcessNextEvent();
@@ -444,8 +445,8 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
                                     this, hostname)));
 
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -491,7 +492,7 @@ private:
             //sleep for 10 seconds
             wrench::S4U_Simulation::sleep(10);
             //let's execute the job, this should take ~100 sec based on the 100MF speed
-            std::string my_mailbox = "test_callback_mailbox";
+            std::string my_commport = "test_callback_commport";
             double before = wrench::S4U_Simulation::getClock();
 
             job_manager->submitJob(job, this->test->compute_service);
@@ -560,8 +561,8 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
                             new EnergyConsumptionTestWMS(
                                     this, hostname)));
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -600,8 +601,8 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             int cur_pstate = this->simulation->getCurrentPstate(simulation_hosts[1]);
-            double cur_max_possible = this->simulation->getMaxPowerConsumption(simulation_hosts[1]);
-            double cur_min_possible = this->simulation->getMinPowerConsumption(simulation_hosts[1]);
+            this->simulation->getMaxPowerConsumption(simulation_hosts[1]);
+            this->simulation->getMinPowerConsumption(simulation_hosts[1]);
             //switch pstates right off the bat
 
             // coverage
@@ -609,6 +610,9 @@ private:
                 wrench::Simulation::getListOfPstates("bogus");
                 throw std::runtime_error("Shouldn't be able to get list of pstate for a bogus host");
             } catch (std::invalid_argument &ignore) {}
+
+            // TODO: Investigate whey removing the sleep causes a valgrind warning
+            wrench::Simulation::sleep(1);
 
             std::vector<int> list_of_pstates = wrench::Simulation::getListOfPstates(simulation_hosts[1]);
             int max_num_pstate = list_of_pstates.size();
@@ -675,6 +679,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
+//    argv[2] = strdup("--wrench-full-log");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -708,8 +713,8 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
                             new EnergyAPICheckTestWMS(
                                     this, hostname)));
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -768,7 +773,7 @@ private:
             double before_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
             //run a new job
             //let's execute the job, this should take ~100 sec based on the 100MF speed
-            std::string my_mailbox = "test_callback_mailbox";
+            std::string my_commport = "test_callback_commport";
 
             job_manager->submitJob(job1, this->test->compute_service);
             this->waitForAndProcessNextEvent();
@@ -792,7 +797,7 @@ private:
             double before_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
             //run a new job
             //let's execute the job, this should take ~100 sec based on the 100MF speed
-            my_mailbox = "test_callback_mailbox";
+            my_commport = "test_callback_commport";
 
             job_manager->submitJob(job2, this->test->compute_service);
             this->waitForAndProcessNextEvent();
@@ -876,8 +881,8 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
                             new EnergyConsumptionPStateChangeTestWMS(
                                     this, hostname)));
 
-    // Create two workflow files
-    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    // Create two files
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));

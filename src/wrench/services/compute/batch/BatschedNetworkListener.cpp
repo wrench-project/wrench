@@ -14,7 +14,7 @@
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include <wrench/services/compute/batch/BatchComputeServiceProperty.h>
 #include <wrench/services/compute/batch/BatschedNetworkListener.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/failure_causes/NetworkError.h>
 
@@ -40,16 +40,16 @@ namespace wrench {
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
     * @param batch_service: the BatchComputeService that this service reports to
-    * @param batch_service_mailbox: the name of the mailbox of the BatchComputeService
+    * @param batch_service_commport: the name of the commport of the BatchComputeService
     * @param sched_port the port for sending messages to Batsched
     * @param data_to_send: the data to send (as a JSON string)
     * @param property_list: property list ({} means "use all defaults")
     */
     BatschedNetworkListener::BatschedNetworkListener(std::string hostname, std::shared_ptr<BatchComputeService> batch_service,
-                                                     simgrid::s4u::Mailbox *batch_service_mailbox,
+                                                     S4U_CommPort *batch_service_commport,
                                                      std::string sched_port,
                                                      std::string data_to_send,
-                                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list) : BatschedNetworkListener(hostname, batch_service, batch_service_mailbox,
+                                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list) : BatschedNetworkListener(hostname, batch_service, batch_service_commport,
                                                                                                                               sched_port, data_to_send, property_list, "") {
     }
 
@@ -58,14 +58,14 @@ namespace wrench {
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
     * @param batch_service: the BatchComputeService service
-    * @param batch_service_mailbox: the name of the mailbox of the batch_service
+    * @param batch_service_commport: the name of the commport of the batch_service
     * @param sched_port the port to send messages to Batsched
     * @param data_to_send: data to send
     * @param property_list: property list ({} means "use all defaults")
     * @param suffix the suffix to append
     */
     BatschedNetworkListener::BatschedNetworkListener(
-            std::string hostname, std::shared_ptr<BatchComputeService> batch_service, simgrid::s4u::Mailbox *batch_service_mailbox,
+            std::string hostname, std::shared_ptr<BatchComputeService> batch_service, S4U_CommPort *batch_service_commport,
             std::string sched_port,
             std::string data_to_send, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             std::string suffix = "") : Service(hostname, "batch_network_listener" + suffix) {
@@ -73,7 +73,7 @@ namespace wrench {
         this->sched_port = sched_port;
         this->data_to_send = data_to_send;
         this->batch_service = batch_service;
-        this->batch_service_mailbox = batch_service_mailbox;
+        this->batch_service_commport = batch_service_commport;
         // Set default and specified properties
         this->setProperties(this->default_property_values, property_list);
     }
@@ -99,13 +99,13 @@ namespace wrench {
 
     /**
      * @brief Send an "execute" message to the BatchComputeService service
-     * @param answer_mailbox: mailbox on which ack will be received
+     * @param answer_commport: commport on which ack will be received
      * @param execute_job_reply_data: message to send
      */
-    void BatschedNetworkListener::sendExecuteMessageToBatchComputeService(simgrid::s4u::Mailbox *answer_mailbox,
+    void BatschedNetworkListener::sendExecuteMessageToBatchComputeService(S4U_CommPort *answer_commport,
                                                                           std::string execute_job_reply_data) {
-        S4U_Mailbox::putMessage(this->batch_service_mailbox,
-                                new BatchExecuteJobFromBatSchedMessage(answer_mailbox, execute_job_reply_data, 0));
+        this->batch_service_commport->S4U_CommPort::putMessage(
+                                new BatchExecuteJobFromBatSchedMessage(answer_commport, execute_job_reply_data, 0));
     }
 
     /**
@@ -113,7 +113,7 @@ namespace wrench {
      * @param estimated_waiting_time: BatchComputeService queue wait time estimate
      */
     void BatschedNetworkListener::sendQueryAnswerMessageToBatchComputeService(double estimated_waiting_time) {
-        S4U_Mailbox::putMessage(this->batch_service_mailbox,
+        this->batch_service_commport->S4U_CommPort::putMessage(
                                 new BatchQueryAnswerMessage(estimated_waiting_time, 0));
     }
 
@@ -127,7 +127,7 @@ namespace wrench {
 
         zmq::message_t request(strlen(this->data_to_send.c_str()));
         memcpy(request.data(), this->data_to_send.c_str(), strlen(this->data_to_send.c_str()));
-        socket.send(request);
+        socket.send(request, zmq::send_flags::none);
 
         //  Get the reply.
         zmq::message_t reply;
@@ -137,7 +137,8 @@ namespace wrench {
         useconds_t trials;
         for (trials = 0; trials < max_num_trials; trials++) {
             usleep(100 + 100 * trials * trials);
-            int ret = socket.recv(&reply, ZMQ_DONTWAIT);
+            //            int ret = socket.recv(&reply, ZMQ_DONTWAIT);
+            zmq::recv_result_t ret = socket.recv(reply, zmq::recv_flags::dontwait);
             if (ret > 0) {
                 break;
             }
@@ -156,7 +157,7 @@ namespace wrench {
         reply_decisions = nlohmann::json::parse(reply_data);
         decision_events = reply_decisions["events"];
 
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
         for (auto decisions: decision_events) {
             std::string decision_type = decisions["type"];
             double decision_timestamp = decisions["timestamp"];
@@ -168,7 +169,7 @@ namespace wrench {
                 if (time_to_sleep > 0) {
                     S4U_Simulation::sleep(time_to_sleep);
                 }
-                sendExecuteMessageToBatchComputeService(answer_mailbox, job_reply_data);
+                sendExecuteMessageToBatchComputeService(answer_commport, job_reply_data);
             } else if (strcmp(decision_type.c_str(), "ANSWER") == 0) {
                 double estimated_waiting_time = execute_json_data["estimate_waiting_time"]["estimated_waiting_time"];
                 sendQueryAnswerMessageToBatchComputeService(estimated_waiting_time);

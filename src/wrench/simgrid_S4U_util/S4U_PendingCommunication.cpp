@@ -10,6 +10,8 @@
 #include <memory>
 #include <iostream>
 #include <wrench/failure_causes/NetworkError.h>
+#include "wrench/failure_causes/FatalFailure.h"
+
 
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
@@ -27,7 +29,6 @@ WRENCH_LOG_CATEGORY(wrench_core_pending_communication, "Log category for Pending
 
 namespace wrench {
 
-
     /**
      * @brief Wait for the pending communication to complete
      *
@@ -36,20 +37,7 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait() {
-        try {
-            if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
-                this->comm_ptr->wait();
-            }
-        } catch (simgrid::NetworkFailureException &e) {
-            if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
-                throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::SENDING, NetworkError::FAILURE, mailbox->get_name()));
-            } else {
-                throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox->get_name()));
-            }
-        }
-        return std::move(this->simulation_message);
+        return this->wait(-1);
     }
 
     /**
@@ -61,28 +49,106 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait(double timeout) {
+
+#if 0
         try {
+            // IS THIS NECESSARY?
             if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
-                this->comm_ptr->wait_until(Simulation::getCurrentSimulatedDate() + timeout);
+                this->comm_ptr->wait_for(timeout);
             }
         } catch (simgrid::NetworkFailureException &e) {
             if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::SENDING, NetworkError::FAILURE, mailbox->get_name()));
+                        NetworkError::OperationType::SENDING, NetworkError::FAILURE, this->commport->s4u_mb->get_name(), ""));
             } else {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox->get_name()));
+                        NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, this->commport->s4u_mb->get_name(), ""));
             }
         } catch (simgrid::TimeoutException &e) {
             if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::SENDING, NetworkError::TIMEOUT, mailbox->get_name()));
+                        NetworkError::OperationType::SENDING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name(), ""));
             } else {
                 throw ExecutionException(std::make_shared<NetworkError>(
-                        NetworkError::OperationType::RECEIVING, NetworkError::TIMEOUT, mailbox->get_name()));
+                        NetworkError::OperationType::RECEIVING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name(), ""));
             }
         }
+#ifdef MESSAGE_MANAGER
+        MessageManager::removeReceivedMessage(this->commport, this->simulation_message.get());
+#endif
         return std::move(this->simulation_message);
+#endif
+        if (this->operation_type == S4U_PendingCommunication::OperationType::RECEIVING) {
+
+            //        if (log) WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->comm_ptr->get_cname(), timeout);
+
+            simgrid::s4u::ActivitySet pending_receives;
+            pending_receives.push(this->comm_ptr);
+            pending_receives.push(this->mess_ptr);
+
+            simgrid::s4u::ActivityPtr finished_recv;
+            try {
+                // Wait for one activity to complete
+                finished_recv = pending_receives.wait_any_for(timeout);
+            } catch (simgrid::TimeoutException &e) {
+                auto failed_recv = pending_receives.get_failed_activity();
+                if (failed_recv == comm_ptr) {
+                    mess_ptr->cancel();
+                } else {
+                    comm_ptr->cancel();
+                }
+                throw ExecutionException(std::make_shared<NetworkError>(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->commport->get_name(), ""));
+            } catch (simgrid::Exception &e) {
+                auto failed_recv = pending_receives.get_failed_activity();
+                if (failed_recv == comm_ptr) {
+                    mess_ptr->cancel();
+                    throw ExecutionException(std::make_shared<NetworkError>(
+                            NetworkError::RECEIVING, NetworkError::FAILURE, this->comm_ptr->get_name(), ""));
+                } else {
+                    comm_ptr->cancel();
+                    throw ExecutionException(std::make_shared<wrench::FatalFailure>("A communication on a MQ should never fail"));
+                }
+            }
+
+            if (finished_recv == comm_ptr) {
+                mess_ptr->cancel();
+            } else if (finished_recv == mess_ptr) {
+                comm_ptr->cancel();
+            }
+
+#ifdef MESSAGE_MANAGER
+            MessageManager::removeReceivedMessage(this, msg);
+#endif
+
+            WRENCH_DEBUG("Received a '%s' message from commport '%s'", this->simulation_message->getName().c_str(), this->commport->get_cname());
+
+            return std::move(this->simulation_message);
+        } else {
+            if (this->comm_ptr) {
+                try {
+                    this->comm_ptr->wait_for(timeout);
+                } catch (simgrid::NetworkFailureException &e) {
+                        if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
+                            throw ExecutionException(std::make_shared<NetworkError>(
+                                    NetworkError::OperationType::SENDING, NetworkError::FAILURE, this->commport->s4u_mb->get_name(), ""));
+                        } else {
+                            throw ExecutionException(std::make_shared<NetworkError>(
+                                    NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, this->commport->s4u_mb->get_name(), ""));
+                        }
+                    } catch (simgrid::TimeoutException &e) {
+                        if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
+                            throw ExecutionException(std::make_shared<NetworkError>(
+                                    NetworkError::OperationType::SENDING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name(), ""));
+                        } else {
+                            throw ExecutionException(std::make_shared<NetworkError>(
+                                    NetworkError::OperationType::RECEIVING, NetworkError::TIMEOUT, this->commport->s4u_mb->get_name(), ""));
+                        }
+                    }
+            } else if (this->mess_ptr) {
+                this->mess_ptr->wait_for(timeout);
+            }
+            return nullptr;
+        }
     }
 
     /**
@@ -111,7 +177,7 @@ namespace wrench {
      * @param timeout: timeout value in seconds (-1 means no timeout)
      *
      * @return the index of the comm to which something happened (success or failure), or
-     *         ULONG_MAX if nothing happened before the timeout expired
+     *         ULONG_MAX if nothing happened before the timeout expired.
      *
      * @throw std::invalid_argument
      */
@@ -122,38 +188,56 @@ namespace wrench {
             throw std::invalid_argument("S4U_PendingCommunication::waitForSomethingToHappen(): invalid argument");
         }
 
+#if 0
         std::vector<simgrid::s4u::CommPtr> pending_s4u_comms;
         for (auto it = pending_comms.begin(); it < pending_comms.end(); it++) {
             pending_s4u_comms.push_back((*it)->comm_ptr);
         }
+#else
 
-        ssize_t index = 0;
-        bool one_comm_failed = false;
-        try {
-            index = simgrid::s4u::Comm::wait_any_for(pending_s4u_comms, timeout);
-#ifdef MESSAGE_MANAGER
-            MessageManager::removeReceivedMessage(pending_comms[index]->mailbox_name, pending_comms[index]->simulation_message.get());
+        simgrid::s4u::ActivitySet pending_activities;
+        for (auto it = pending_comms.begin(); it < pending_comms.end(); it++) {
+            if ((*it)->comm_ptr) pending_activities.push((*it)->comm_ptr);
+            if ((*it)->mess_ptr) pending_activities.push((*it)->mess_ptr);
+        }
 #endif
-        } catch (simgrid::NetworkFailureException &e) {
-            one_comm_failed = true;
+
+        // Wait one activity to complete
+        simgrid::s4u::ActivityPtr finished_activity = nullptr;
+        try {
+            finished_activity = pending_activities.wait_any_for(timeout);
         } catch (simgrid::TimeoutException &e) {
-            // This likely doesn't happen, but let's keep it here for now
-            one_comm_failed = true;
-        }
-
-        if (index == -1) {
+            for (auto it = pending_comms.begin(); it < pending_comms.end(); it++) {
+                if ((*it)->comm_ptr) (*it)->comm_ptr->cancel();
+                if ((*it)->mess_ptr) (*it)->mess_ptr->cancel();
+            }
             return ULONG_MAX;
-        }
-
-        if (one_comm_failed) {
-            for (auto &pending_s4u_comm: pending_s4u_comms) {
-                if (pending_s4u_comm->get_state() == simgrid::s4u::Activity::State::FAILED) {
-                    break;
+        } catch (simgrid::Exception &e) {
+            auto failed_activity = pending_activities.get_failed_activity();
+            for (unsigned long idx = 0; idx < pending_comms.size(); idx++ ) {
+                if (pending_comms.at(idx)->comm_ptr == failed_activity) {
+                    return idx;
+                }
+                if (pending_comms.at(idx)->mess_ptr == failed_activity) {
+                    return idx;
                 }
             }
         }
 
-        return (unsigned long) index;
+        if (finished_activity) {
+            for (unsigned long idx = 0; idx < pending_comms.size(); idx++ ) {
+                if (pending_comms.at(idx)->comm_ptr == finished_activity) {
+                    return idx;
+                }
+                if (pending_comms.at(idx)->mess_ptr == finished_activity) {
+                    return idx;
+                }
+            }
+        } else {
+            return -1;
+        }
+
+        throw std::runtime_error("S4U_PendingCommunication::waitForSomethingToHappen(): this should not have happened");
     }
 
 }// namespace wrench

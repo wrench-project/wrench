@@ -72,7 +72,7 @@ void SimulationLauncher::createSimulation(bool full_log,
 
         // Create a execution_controller and add it to the simulation
         this->controller = simulation->add(
-                new wrench::SimulationController(wrench::Workflow::createWorkflow(), controller_host, sleep_us));
+                new wrench::SimulationController(controller_host, sleep_us));
 
     } catch (std::exception &e) {
         // Set error flag and error message
