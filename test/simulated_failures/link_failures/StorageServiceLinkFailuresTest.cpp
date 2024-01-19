@@ -251,7 +251,8 @@ private:
         unsigned long network_failure_5 = 0;
 
         // Do a bunch of operations
-        unsigned long NUM_TRIALS = 5000;
+//        unsigned long NUM_TRIALS = 5000;  to high and it breaks on some CI containers
+        unsigned long NUM_TRIALS = 500;
         for (unsigned long i = 0; i < NUM_TRIALS; i++) {
 
             // Do a random synchronous file copy
@@ -332,7 +333,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-link-shutdown-simulation");
-     argv[2] = strdup("--cfg=contexts/stack-size:2000");
+     argv[2] = strdup("--cfg=contexts/stack-size:50");
     //    argv[2] = strdup("--wrench-commport-pool-size=100000");
     //        argv[2] = strdup("--wrench-full-log");
 
