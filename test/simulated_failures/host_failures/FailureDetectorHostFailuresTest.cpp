@@ -32,6 +32,7 @@ public:
 protected:
     ~FailureDetectorHostFailuresTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     FailureDetectorHostFailuresTest() {

@@ -62,6 +62,7 @@ public:
 protected:
     ~BareMetalComputeServiceOneTaskTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     BareMetalComputeServiceOneTaskTest() {
@@ -70,8 +71,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
-        input_file = workflow->addFile("input_file", 10000.0);
-        output_file = workflow->addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000.0);
+        output_file = wrench::Simulation::addFile("output_file", 20000.0);
 
         // Create one task1
         task = workflow->addTask("task1", 3600, 1, 1, 0);

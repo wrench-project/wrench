@@ -242,7 +242,7 @@ void FileRegistryActionExecutorTest::do_FileRegistryActionExecutorSuccessTest_te
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
 
@@ -256,6 +256,7 @@ void FileRegistryActionExecutorTest::do_FileRegistryActionExecutorSuccessTest_te
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

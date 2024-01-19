@@ -140,6 +140,7 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
     real_parallel_model->setAlpha(0.5);// coverage
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -206,6 +207,7 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
     }
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -275,6 +277,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
     }
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

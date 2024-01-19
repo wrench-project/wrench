@@ -30,6 +30,7 @@ public:
 protected:
     ~ServiceReStartHostFailuresTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     ServiceReStartHostFailuresTest() {

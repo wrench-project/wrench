@@ -40,6 +40,7 @@ public:
 protected:
     ~BatchServiceOutputCSVFileTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     BatchServiceOutputCSVFileTest() {

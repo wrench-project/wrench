@@ -37,6 +37,7 @@ public:
 protected:
     ~FileRegistryLinkFailuresTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     FileRegistryLinkFailuresTest() {
@@ -106,7 +107,7 @@ private:
         // Create a bunch of files
         std::vector<std::shared_ptr<wrench::DataFile>> files;
         for (unsigned int i = 0; i < NUM_FILES; i++) {
-            files.push_back(this->test->workflow->addFile("file_" + std::to_string(i), 100.0));
+            files.push_back(wrench::Simulation::addFile("file_" + std::to_string(i), 100.0));
         }
 
         // Create a link switcher on/off er

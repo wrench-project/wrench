@@ -134,7 +134,7 @@ private:
             throw std::runtime_error(std::string("Throwing a ") + __FILE__ + ":" + std::to_string(__LINE__));
         }
 
-        auto file = this->test->workflow->addFile("some_file", 100);
+        auto file = wrench::Simulation::addFile("some_file", 100);
         auto location = wrench::FileLocation::LOCATION(this->test->storage_service, file);
 
         //CUSTOM_THROW(new wrench::SimulationMessage("", 666), std:invalid_argument);//names are no longer a thing

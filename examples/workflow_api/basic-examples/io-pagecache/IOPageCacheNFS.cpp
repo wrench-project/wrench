@@ -47,9 +47,9 @@ std::shared_ptr<wrench::Workflow> workflow_multithread(int num_pipes, int num_ta
                                           flops, 1, core_per_task, mem_required);
         }
 
-        /* Add workflow files */
+        /* Add files */
         for (int j = 0; j < num_tasks + 1; j++) {
-            workflow->addFile("file_" + std::to_string(i) + "_" + std::to_string(j), file_size);
+            wrench::Simulation::addFile("file_" + std::to_string(i) + "_" + std::to_string(j), file_size);
         }
 
         /* Create tasks and set input/output files for each task */
@@ -57,8 +57,8 @@ std::shared_ptr<wrench::Workflow> workflow_multithread(int num_pipes, int num_ta
 
             auto task = workflow->getTaskByID("task_" + std::to_string(i) + "_" + std::to_string(j));
 
-            task->addInputFile(workflow->getFileByID("file_" + std::to_string(i) + "_" + std::to_string(j)));
-            task->addOutputFile(workflow->getFileByID("file_" + std::to_string(i) + "_" + std::to_string(j + 1)));
+            task->addInputFile(wrench::Simulation::getFileByID("file_" + std::to_string(i) + "_" + std::to_string(j)));
+            task->addOutputFile(wrench::Simulation::getFileByID("file_" + std::to_string(i) + "_" + std::to_string(j + 1)));
         }
     }
 

@@ -41,6 +41,7 @@ public:
 protected:
     ~BatchServiceCONSERVATIVE_BFTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     BatchServiceCONSERVATIVE_BFTest() {

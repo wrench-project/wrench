@@ -40,6 +40,7 @@ public:
 protected:
     ~CloudServiceHostFailuresTest() override {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     CloudServiceHostFailuresTest() {
@@ -48,8 +49,8 @@ protected:
 
 
         // Create two files
-        input_file = workflow->addFile("input_file", 10000.0);
-        output_file = workflow->addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000.0);
+        output_file = wrench::Simulation::addFile("output_file", 20000.0);
 
         // Create one task1
         task = workflow->addTask("task1", 3600, 1, 1, 0);
@@ -427,7 +428,7 @@ private:
 
             // Add a task1 to the workflow
             auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 50, 1, 1, 0);
-            auto output_file = this->test->workflow->addFile("output_file_" + std::to_string(trial), 2000);
+            auto output_file = wrench::Simulation::addFile("output_file_" + std::to_string(trial), 2000);
 
             task->addInputFile(this->test->input_file);
             task->addOutputFile(output_file);

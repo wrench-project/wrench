@@ -85,17 +85,17 @@ int main(int argc, char **argv) {
         task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
     }
 
-    /* Add workflow files */
+    /* Create files */
     for (int i = 0; i < num_tasks + 1; i++) {
         /* Create a 10MB file */
-        workflow->addFile("file_" + std::to_string(i), 10000000);
+        wrench::Simulation::addFile("file_" + std::to_string(i), 10000000);
     }
 
     /* Set input/output files for each task */
     for (int i = 0; i < num_tasks; i++) {
         auto task = workflow->getTaskByID("task_" + std::to_string(i));
-        task->addInputFile(workflow->getFileByID("file_" + std::to_string(i)));
-        task->addOutputFile(workflow->getFileByID("file_" + std::to_string(i + 1)));
+        task->addInputFile(wrench::Simulation::getFileByID("file_" + std::to_string(i)));
+        task->addOutputFile(wrench::Simulation::getFileByID("file_" + std::to_string(i + 1)));
     }
 
     /* Instantiate a storage service, and add it to the simulation.
@@ -129,13 +129,13 @@ int main(int argc, char **argv) {
 
     /* Instantiate a file registry service to be started on WMSHost. This service is
      * essentially a replica catalog that stores <file , storage service> pairs so that
-     * any service, in particular a WMS, can discover where workflow files are stored. */
+     * any service, in particular a WMS, can discover where files are stored. */
     std::cerr << "Instantiating a FileRegistryService on WMSHost ..." << std::endl;
     auto file_registry_service = new wrench::FileRegistryService("WMSHost");
     simulation->add(file_registry_service);
 
     /* It is necessary to store, or "stage", input files that only input. The getInputFiles()
-     * method of the Workflow class returns the set of all workflow files that are not generated
+     * method of the Workflow class returns the set of all files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
     std::cerr << "Staging task input files..." << std::endl;
     for (auto const &f: workflow->getInputFiles()) {

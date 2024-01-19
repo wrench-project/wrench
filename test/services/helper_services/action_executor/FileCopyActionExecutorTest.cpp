@@ -227,7 +227,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = workflow->addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     // Put it on ss1
     simulation->stageFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
@@ -239,6 +239,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -328,7 +329,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessSameHostTest_te
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = workflow->addFile("some_file", 1000000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000000.0);
 
     // Put it on ss1
     simulation->stageFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
@@ -340,6 +341,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessSameHostTest_te
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

@@ -184,7 +184,7 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
 
     std::shared_ptr<wrench::WorkflowTask> single_task;
     single_task = this->workflow->addTask("dummy_task", 1, 1, 1, 8 * GB);
-    this->the_file = this->workflow->addFile("test_file", 10 * GB);
+    this->the_file = wrench::Simulation::addFile("test_file", 10 * GB);
     single_task->addInputFile(the_file);
 
     EXPECT_NO_THROW(wms = simulation->add(
@@ -201,6 +201,7 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
     EXPECT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
+    wrench::Simulation::removeAllFiles();
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

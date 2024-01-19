@@ -28,6 +28,7 @@ public:
 protected:
     ~SimulationTimestampFileCopyTest() override {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimulationTimestampFileCopyTest() {
@@ -66,12 +67,12 @@ protected:
 
         workflow = wrench::Workflow::createWorkflow();
 
-        file_1 = workflow->addFile("file_1", 100.0);
-        file_2 = workflow->addFile("file_2", 100.0);
-        file_3 = workflow->addFile("file_3", 100.0);
+        file_1 = wrench::Simulation::addFile("file_1", 100.0);
+        file_2 = wrench::Simulation::addFile("file_2", 100.0);
+        file_3 = wrench::Simulation::addFile("file_3", 100.0);
 
-        xl_file = workflow->addFile("xl_file", 1000000000.0);
-        too_large_file = workflow->addFile("too_large_file", 10000000000000000000.0);
+        xl_file = wrench::Simulation::addFile("xl_file", 1000000000.0);
+        too_large_file = wrench::Simulation::addFile("too_large_file", 10000000000000000000.0);
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
