@@ -1631,7 +1631,6 @@ namespace wrench {
 
     /**
      * @brief Remove all files from the simulation (use at your own peril if you're using the workflow API)
-     * @param file : file to remove
      */
     void Simulation::removeAllFiles() {
         Simulation::data_files.clear();
