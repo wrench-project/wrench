@@ -35,8 +35,7 @@ namespace wrench {
     class S4U_CommPort {
 
     public:
-
-	/**
+        /**
 	 * @brief Returns a message type name as a string
 	 */
         template<class TMessageType>
@@ -164,7 +163,7 @@ namespace wrench {
         static S4U_CommPort *NULL_COMMPORT;
 
 
-	/**
+        /**
 	 * @brief Return the commport's name (as a C++ string)
 	 * @return the commport's name
 	 */
@@ -172,7 +171,7 @@ namespace wrench {
             return this->name;
         }
 
-	/**
+        /**
 	 * @brief Return the commport's name (as a C-style string)
 	 * @return the commport's name
 	 */
