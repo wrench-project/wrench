@@ -112,7 +112,6 @@ namespace wrench {
     /**
      * @brief Synchronously receive a message from a commport
      *
-     * @param commport: the commport
      * @param log: should the log message be printed
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
@@ -127,7 +126,6 @@ namespace wrench {
     /**
      * @brief Synchronously receive a message from a commport, with a timeout
      *
-     * @param commport: the commport
      * @param timeout:  a timeout value in seconds (<0 means never timeout)
      * @param log: should the log message be printed
      * @return the message, or nullptr (in which case it's likely a brutal termination)
@@ -236,7 +234,6 @@ namespace wrench {
     /**
      * @brief Synchronously send a message to a commport
      *
-     * @param commport: the commport
      * @param msg: the SimulationMessage
      *
      * @throw std::shared_ptr<NetworkError>
@@ -281,7 +278,6 @@ namespace wrench {
     /**
      * @brief Asynchronously send a message to a commport in a "fire and forget" fashion
      *
-     * @param commport: the commport
      * @param msg: the SimulationMessage
      *
      */
@@ -308,7 +304,6 @@ namespace wrench {
     /**
     * @brief Asynchronously send a message to a commport
     *
-    * @param commport: the commport
     * @param msg: the SimulationMessage
     *
     * @return a pending communication handle
@@ -362,8 +357,6 @@ namespace wrench {
 
     /**
     * @brief Asynchronously receive a message from a commport
-    *
-    * @param commport: the commport
     *
     * @return a pending communication handle
     *
@@ -445,6 +438,7 @@ namespace wrench {
 
     /**
      * @brief Retire a temporary commport
+     *
      * @param commport: the commport to retire
      */
     void S4U_CommPort::retireTemporaryCommPort(S4U_CommPort *commport) {
@@ -466,7 +460,6 @@ namespace wrench {
 
     /**
      * @brief Create the pool of commports to use
-     * @param num_commports: numb commports in pool
      */
     void S4U_CommPort::createCommPortPool() {
         S4U_CommPort::all_commports.reserve(S4U_CommPort::commport_pool_size);

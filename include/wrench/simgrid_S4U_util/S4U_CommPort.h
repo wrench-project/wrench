@@ -35,6 +35,10 @@ namespace wrench {
     class S4U_CommPort {
 
     public:
+
+	/**
+	 * @brief Returns a message type name as a string
+	 */
         template<class TMessageType>
         std::string get_type_name() {
             char const *type_name = typeid(TMessageType).name();
@@ -159,10 +163,19 @@ namespace wrench {
          */
         static S4U_CommPort *NULL_COMMPORT;
 
+
+	/**
+	 * @brief Return the commport's name (as a C++ string)
+	 * @return the commport's name
+	 */
         [[nodiscard]] const std::string get_name() const {
             return this->name;
         }
 
+	/**
+	 * @brief Return the commport's name (as a C-style string)
+	 * @return the commport's name
+	 */
         [[nodiscard]] const char *get_cname() const {
             return this->name.c_str();
         }
