@@ -831,7 +831,6 @@ namespace wrench {
      * @brief REST API Handler
      * @param data JSON input
      * @return JSON output
-
      */
     json SimulationController::getTaskStartDate(json data) {
         std::string workflow_name = data["workflow_name"];
