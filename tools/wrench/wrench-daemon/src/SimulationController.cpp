@@ -75,7 +75,7 @@ namespace wrench {
             }
         });
 
-        // Poll from the shared queue (will be a single one!)
+        // Poll from the shared queue
         std::pair<bool, std::string> reply;
         s_created.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -383,7 +383,7 @@ namespace wrench {
 
         BlockingQueue<std::pair<bool, std::string>> vm_created;
 
-        // Push the request into the blocking queue (will be a single one!)
+        // Push the request into the blocking queue
         this->things_to_do.push([num_cores, ram_memory, service_property_list, service_message_payload_list, cs, &vm_created]() {
             auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
             std::string vm_name;
@@ -395,7 +395,7 @@ namespace wrench {
             }
         });
 
-        // Poll from the shared queue (will be a single one!)
+        // Poll from the shared queue
         std::pair<bool, std::string> reply;
         vm_created.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -425,7 +425,7 @@ namespace wrench {
         }
 
         BlockingQueue<std::pair<bool, std::string>> vm_started;
-        // Push the request into the blocking queue (will be a single one!)
+        // Push the request into the blocking queue
         this->things_to_do.push([this, vm_name, cs, &vm_started]() {
             auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
             try {
@@ -442,7 +442,7 @@ namespace wrench {
             }
         });
 
-        // Poll from the shared queue (will be a single one!)
+        // Poll from the shared queue
         std::pair<bool, std::string> reply;
         vm_started.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -473,8 +473,7 @@ namespace wrench {
 
         BlockingQueue<std::pair<bool, std::string>> vm_shutdown;
 
-        // Push the request into the blocking queue (will be a single one!)
-        //this->vm_to_shutdown.push(std::pair(vm_name, cs));
+        // Push the request into the blocking queue
         this->things_to_do.push([this, vm_name, cs, &vm_shutdown]() {
             auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
             try {
@@ -493,7 +492,7 @@ namespace wrench {
             }
         });
 
-        // Poll from the shared queue (will be a single one!)
+        // Poll from the shared queue
         std::pair<bool, std::string> reply;
         vm_shutdown.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -522,7 +521,7 @@ namespace wrench {
 
         BlockingQueue<std::pair<bool, std::string>> vm_destroyed;
 
-        // Push the request into the blocking queue (will be a single one!)
+        // Push the request into the blocking queue
         this->things_to_do.push([vm_name, cs, &vm_destroyed]() {
             auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
             try {
@@ -536,7 +535,7 @@ namespace wrench {
             }
         });
 
-        // Poll from the shared queue (will be a single one!)
+        // Poll from the shared queue
         std::pair<bool, std::string> reply;
         vm_destroyed.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -609,12 +608,6 @@ namespace wrench {
         }
 
         std::shared_ptr<DataFile> file;
-        //        std::string workflow_name = data["workflow_name"];
-        //        std::shared_ptr<Workflow> workflow;
-        //
-        //        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
-        //            throw std::runtime_error("Unknown workflow " + workflow_name);
-        //        }
         try {
             file = Simulation::getFileByID(filename);
         } catch (std::invalid_argument &e) {
@@ -623,7 +616,7 @@ namespace wrench {
 
         BlockingQueue<std::tuple<bool, bool, std::string>> file_looked_up;
 
-        // Push the request into the blocking queue (will be a single one!)
+        // Push the request into the blocking queue
         this->things_to_do.push([file, ss, &file_looked_up]() {
             try {
                 bool result = ss->lookupFile(file);
@@ -633,7 +626,7 @@ namespace wrench {
             }
         });
 
-        // Poll from the shared queue (will be a single one!)
+        // Poll from the shared queue
         std::tuple<bool, bool, std::string> reply;
         file_looked_up.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -731,7 +724,7 @@ namespace wrench {
                 job_submitted.push(std::make_pair(false, e.what()));
             }
         });
-        // Poll from the shared queue (will be a single one!)
+        // Poll from the shared queue
         std::pair<bool, std::string> reply;
         job_submitted.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -1119,8 +1112,7 @@ namespace wrench {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
-        // Push the request into the blocking queue (will be a single one!)
-        //this->vm_to_suspend.push(std::pair(vm_name, cs));
+        // Push the request into the blocking queue
         BlockingQueue<std::pair<bool, std::string>> vm_suspended;
         this->things_to_do.push([vm_name, cs, &vm_suspended]() {
             auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
@@ -1132,7 +1124,7 @@ namespace wrench {
             }
         });
 
-        // Poll from the shared queue (will be a single one!)
+        // Poll from the shared queue
         std::pair<bool, std::string> reply;
         vm_suspended.waitAndPop(reply);
         bool success = std::get<0>(reply);
@@ -1182,7 +1174,7 @@ namespace wrench {
 
         BlockingQueue<std::pair<bool, std::string>> vm_resumed;
 
-        // Push the request into the blocking queue (will be a single one!)
+        // Push the request into the blocking queue
         this->things_to_do.push([vm_name, cs, &vm_resumed]() {
             auto cloud_cs = std::dynamic_pointer_cast<CloudComputeService>(cs);
             try {
@@ -1193,7 +1185,7 @@ namespace wrench {
             }
         });
 
-        // Poll from the shared queue (will be a single one!)
+        // Poll from the shared queue
         std::pair<bool, std::string> reply;
         vm_resumed.waitAndPop(reply);
         bool success = std::get<0>(reply);
