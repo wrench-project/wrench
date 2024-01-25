@@ -22,6 +22,7 @@ public:
 protected:
     ~SimpleStorageServiceDeleteRegisterTest() override {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     SimpleStorageServiceDeleteRegisterTest() {
@@ -29,8 +30,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // create the files
-        file_1 = workflow->addFile("file_1", FILE_SIZE);
-        file_2 = workflow->addFile("file_2", FILE_SIZE);
+        file_1 = wrench::Simulation::addFile("file_1", FILE_SIZE);
+        file_2 = wrench::Simulation::addFile("file_2", FILE_SIZE);
 
 
         // Create a 2-host platform file

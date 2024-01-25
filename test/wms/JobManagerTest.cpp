@@ -8,7 +8,7 @@
  */
 
 #include <wrench-dev.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
@@ -212,7 +212,7 @@ private:
 
         std::shared_ptr<wrench::WorkflowTask> t1 = this->test->workflow->addTask("t1", 1.0, 1, 1, 0.0);
         std::shared_ptr<wrench::WorkflowTask> t2 = this->test->workflow->addTask("t2", 1.0, 1, 1, 0.0);
-        std::shared_ptr<wrench::DataFile> f = this->test->workflow->addFile("f", 100);
+        std::shared_ptr<wrench::DataFile> f = wrench::Simulation::addFile("f", 100);
         t1->addOutputFile(f);
         t2->addInputFile(f);
 

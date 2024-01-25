@@ -36,22 +36,22 @@ namespace wrench {
     public:
         std::string getName();
 
-        double getSubmitDate();
-        double getEndDate();
+        double getSubmitDate() const;
+        double getEndDate() const;
 
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
 
-        simgrid::s4u::Mailbox *popCallbackMailbox();
+        S4U_CommPort *popCallbackCommPort();
 
-        void printCallbackMailboxStack();
+        void printCallbackCommPortStack();
 
-        void pushCallbackMailbox(simgrid::s4u::Mailbox *mailbox);
+        void pushCallbackCommPort(S4U_CommPort *commport);
 
-        simgrid::s4u::Mailbox *getCallbackMailbox();
+        S4U_CommPort *getCallbackCommPort();
 
-        simgrid::s4u::Mailbox *getOriginCallbackMailbox();
+        S4U_CommPort *getOriginCallbackCommPort();
 
         void setParentComputeService(std::shared_ptr<ComputeService> compute_service);
 
@@ -73,17 +73,17 @@ namespace wrench {
 
         void setServiceSpecificArguments(std::map<std::string, std::string> args);
 
-        unsigned long getNewUniqueNumber();
+        static unsigned long getNewUniqueNumber();
 
         /** @brief Service-specific arguments used during job submission **/
         std::map<std::string, std::string> service_specific_args;
 
-        /** @brief Stack of callback mailboxes (to pop notifications) */
-        std::stack<simgrid::s4u::Mailbox *> callback_mailbox_stack;
+        /** @brief Stack of callback commports (to pop notifications) */
+        std::stack<S4U_CommPort *> callback_commport_stack;
         /** @brief The Job Manager in charge of this job **/
         std::shared_ptr<JobManager> job_manager;
-        /** @brief The originator's mailbox */
-        simgrid::s4u::Mailbox *originator_mailbox;
+        /** @brief The originator's commport_name */
+        S4U_CommPort *originator_commport;
 
         /** @brief The job's name */
         std::string name;

@@ -29,17 +29,17 @@ namespace wrench {
      *        a message was sent but never received). That is, if messages are in flight when the receiver daemon fails,
      *        than, because the receiver is the one freeing memory, we have memory leaks.
      *        This takes extra time however, and many simulations never simulate failures anyway, so it's use is only optional
-     *        at compile time. Perhaps woudl be a good idea to make its usage optional at runtime?
+     *        at compile time. Perhaps would be a good idea to make its usage optional at runtime?
      */
 
     class MessageManager {
 
-        static std::unordered_map<std::string, std::unordered_set<SimulationMessage *>> mailbox_messages;
+        static std::unordered_map<const S4U_CommPort *, std::unordered_set<SimulationMessage *>> messages;
 
     public:
-        static void manageMessage(const std::string &mailbox, SimulationMessage *msg);
-        static void cleanUpMessages(const std::string &mailbox);
-        static void removeReceivedMessage(const std::string &mailbox, SimulationMessage *msg);
+        static void manageMessage(const S4U_CommPort *commport, SimulationMessage *msg);
+        static void cleanUpMessages(const S4U_CommPort *commport);
+        static void removeReceivedMessage(const S4U_CommPort *commport, SimulationMessage *msg);
         static void cleanUpAllMessages();
         static void print();
     };

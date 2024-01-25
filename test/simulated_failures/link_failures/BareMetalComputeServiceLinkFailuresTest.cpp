@@ -34,6 +34,7 @@ public:
 protected:
     ~BareMetalComputeServiceLinkFailuresTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     BareMetalComputeServiceLinkFailuresTest() {
@@ -265,7 +266,7 @@ private:
 
         for (const auto &a: job->getActions()) {
             if (a->getState() != wrench::Action::FAILED) {
-                throw std::runtime_error("Invalid action state");
+                throw std::runtime_error("Invalid action state " + a->getStateAsString() + " (expecting FAILED)");
             }
         }
 
@@ -281,11 +282,13 @@ void BareMetalComputeServiceLinkFailuresTest::do_MultiActionJobLinkFailure_test(
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 2;
+    int argc = 3;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("multi_action_test");
-    argv[1] = strdup("--wrench-link-shutdown-simulation");
-    //    argv[2] = strdup("--wrench-full-log");
+    int argi = 0;
+    argv[argi++] = strdup("multi_action_test");
+    argv[argi++] = strdup("--wrench-link-shutdown-simulation");
+    argv[argi++] = strdup("--wrench-default-control-message-size=1024");
+    //    argv[3] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

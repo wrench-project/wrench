@@ -120,7 +120,7 @@ void StorageServiceProxySimultaneousTest::do_Simultaneous_test(std::string mode)
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //argv[3] = strdup("--wrench-full-log");
-    //argv[1] = strdup("--log=wrench_core_mailbox.threshold=debug");
+    //argv[1] = strdup("--log=wrench_core_commport.threshold=debug");
     //argv[2] = strdup("--log=wrench_core_proxy_file_server.threshold=debug");
     simulation->init(&argc, argv);
 
@@ -129,10 +129,8 @@ void StorageServiceProxySimultaneousTest::do_Simultaneous_test(std::string mode)
 
         {
 
-            simgrid::s4u::Engine::get_instance()->netzone_by_name_or_null("AS0")->add_route(simgrid::s4u::Host::by_name("Remote")->get_netpoint(),
-                                                                                            simgrid::s4u::Host::by_name("Client")->get_netpoint(),
-                                                                                            nullptr,
-                                                                                            nullptr,
+            simgrid::s4u::Engine::get_instance()->netzone_by_name_or_null("AS0")->add_route(simgrid::s4u::Host::by_name("Remote"),
+                                                                                            simgrid::s4u::Host::by_name("Client"),
                                                                                             {simgrid::s4u::LinkInRoute(simgrid::s4u::Link::by_name("link12")), simgrid::s4u::LinkInRoute(simgrid::s4u::Link::by_name("link13"))});
         }
     }

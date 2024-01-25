@@ -12,7 +12,7 @@
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/services/storage/StorageServiceMessagePayload.h>
 #include <wrench/services/storage/simple/SimpleStorageService.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_compound_storage_system,
                     "Log category for Compound Storage Service");
@@ -74,8 +74,8 @@ namespace wrench {
 
         /* For now, we do not allow storage services that are simple with more than one mount point */
         if (std::any_of(storage_services.begin(), storage_services.end(), [](const auto &elem) {
-                auto sss = std::dynamic_pointer_cast<SimpleStorageService>(elem);
-                return sss->hasMultipleMountPoints(); })) {
+          auto sss = std::dynamic_pointer_cast<SimpleStorageService>(elem);
+          return sss->hasMultipleMountPoints(); })) {
             throw std::invalid_argument("One of the SimpleStorageServices provided has more than one mount point. "
                                         "In the current state of the implementation this is currently not allowed");
         }
@@ -127,40 +127,10 @@ namespace wrench {
         while (true) {
             S4U_Simulation::computeZeroFlop();
 
-            // Create an async recv if needed
-            if (not comm_ptr_has_been_posted) {
-                try {
-                    comm_ptr = this->mailbox->get_async<void>((void **)(&(simulation_message)));
-                } catch (simgrid::NetworkFailureException &e) {
-                    // oh well
-                    continue;
-                }
-                comm_ptr_has_been_posted = true;
-            }
+            simulation_message = this->commport->getMessage<SimulationMessage>();
 
-            // Create all activities to wait on (only emplace the communicator)
-            std::vector<simgrid::s4u::ActivityPtr> pending_activities;
-            pending_activities.emplace_back(comm_ptr);
-
-            // Wait one activity (communication in this case) to complete
-            int finished_activity_index;
-            try {
-                finished_activity_index = (int)simgrid::s4u::Activity::wait_any(pending_activities);
-            } catch (simgrid::NetworkFailureException &e) {
-                comm_ptr_has_been_posted = false;
-                continue;
-            } catch (std::exception &e) {
-                continue;
-            }
-
-            // It's a communication
-            if (finished_activity_index == 0) {
-                comm_ptr_has_been_posted = false;
-                if (not processNextMessage(simulation_message.get()))
-                    break;
-            } else if (finished_activity_index == -1) {
-                throw std::runtime_error("wait_any() returned -1. Not sure what to do with this. ");
-            }
+            if (not processNextMessage(simulation_message.get()))
+                break;
         }
 
         WRENCH_INFO("Compound Storage Service %s on host %s cleanly terminating!",
@@ -183,7 +153,7 @@ namespace wrench {
         WRENCH_INFO("CSS::Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message)) {
-            return processStopDaemonRequest(msg->ack_mailbox);
+            return processStopDaemonRequest(msg->ack_commport);
         } else if (auto msg = dynamic_cast<CompoundStorageAllocationRequestMessage *>(message)) {
             WRENCH_INFO("Calling processStorageSelectionMessage for file :  %s", msg->file->getID().c_str());
             return processStorageSelectionMessage(msg);
@@ -206,8 +176,7 @@ namespace wrench {
 
             WRENCH_INFO("CSS::processStorageSelectionMessage: File %s already known by CSS", file->getID().c_str());
 
-            S4U_Mailbox::dputMessage(
-                msg->answer_mailbox,
+            msg->answer_commport->dputMessage(
                 new CompoundStorageAllocationAnswerMessage(
                     this->file_location_mapping[file],
                     this->getMessagePayloadValue(
@@ -257,8 +226,7 @@ namespace wrench {
             this->partial_io_stripe_index[file] = 0;
             WRENCH_INFO("CSS::processStorageSelectionMessage(): Local mapping updated for file %s", file->getID().c_str());
         }
-        S4U_Mailbox::dputMessage(
-            msg->answer_mailbox,
+        msg->answer_commport->dputMessage(
             new CompoundStorageAllocationAnswerMessage(
                 designated_locations,
                 this->getMessagePayloadValue(
@@ -277,8 +245,7 @@ namespace wrench {
         if (this->file_location_mapping.find(file) == this->file_location_mapping.end()) {
             WRENCH_INFO("CSS::processStorageLookupMessage(): File %s is not known by this CompoundStorageService", file->getID().c_str());
 
-            S4U_Mailbox::dputMessage(
-                msg->answer_mailbox,
+            msg->answer_commport->dputMessage(
                 new CompoundStorageLookupAnswerMessage(
                     std::vector<std::shared_ptr<FileLocation>>(),
                     this->getMessagePayloadValue(
@@ -292,8 +259,7 @@ namespace wrench {
                              loc->getStorageService()->getName().c_str());
             }
 
-            S4U_Mailbox::dputMessage(
-                msg->answer_mailbox,
+            msg->answer_commport->dputMessage(
                 new CompoundStorageLookupAnswerMessage(
                     mapped_locations,
                     this->getMessagePayloadValue(
@@ -307,21 +273,21 @@ namespace wrench {
      * @brief Lookup for a DataFile in the internal file mapping of the CompoundStorageService (a simplified FileRegistry)
      *
      * @param file: the file of interest
-     * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
+     * @param answer_commport: the answer commport to which the reply from the server should be sent
      *
      * @return A vector of shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or empty vector if it's not.
      */
-    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupFileLocation(const std::shared_ptr<DataFile> &file, simgrid::s4u::Mailbox *answer_mailbox) {
-        WRENCH_DEBUG("CSS::lookupFileLocation() - DataFile + Mailbox");
+    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupFileLocation(const std::shared_ptr<DataFile> &file, S4U_CommPort *answer_commport) {
+        WRENCH_INFO("CSS::lookupFileLocation() - DataFile + CommPort");
 
-        S4U_Mailbox::putMessage(this->mailbox,
-                                new CompoundStorageLookupRequestMessage(
-                                    answer_mailbox,
-                                    file,
-                                    this->getMessagePayloadValue(
-                                        CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
+        this->commport->putMessage(
+            new CompoundStorageLookupRequestMessage(
+                answer_commport,
+                file,
+                this->getMessagePayloadValue(
+                    CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
 
-        auto msg = S4U_Mailbox::getMessage<CompoundStorageLookupAnswerMessage>(answer_mailbox, this->network_timeout, "CSS::lookupFileLocation(): Received a totally");
+        auto msg = answer_commport->getMessage<CompoundStorageLookupAnswerMessage>(this->network_timeout, "CSS::lookupFileLocation(): Received a totally");
 
         return msg->locations;
     }
@@ -335,12 +301,12 @@ namespace wrench {
      *  @return A shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or nullptr if it's not.
      */
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupFileLocation(const std::shared_ptr<FileLocation> &location) {
-        WRENCH_DEBUG("CSS::lookupFileLocation() - FileLocation");
-        auto temp_mailbox = S4U_Mailbox::getTemporaryMailbox();
+        WRENCH_INFO("CSS::lookupFileLocation() - FileLocation");
+        auto temp_commport = S4U_CommPort::getTemporaryCommPort();
 
-        auto locations = this->lookupFileLocation(location->getFile(), temp_mailbox);
+        auto locations = this->lookupFileLocation(location->getFile(), temp_commport);
 
-        S4U_Mailbox::retireTemporaryMailbox(temp_mailbox);
+        S4U_CommPort::retireTemporaryCommPort(temp_commport);
 
         return locations;
     }
@@ -351,23 +317,22 @@ namespace wrench {
      *         callback.
      *
      *  @param file: the file of interest
-     *  @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
+     *  @param answer_commport: the answer commport to which the reply from the server should be sent
      *
      *  @return A vector of shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or could be allocated
      *          or empty vector if it's not / could not be allocated.
      */
-    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<DataFile> file, unsigned int stripe_count, simgrid::s4u::Mailbox *answer_mailbox) {
-        WRENCH_DEBUG("CSS::lookupOrDesignateStorageService() - DataFile + mailbox, for file %s", file->getID().c_str());
+    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<DataFile> file, unsigned int stripe_count, S4U_CommPort *answer_commport) {
+        WRENCH_INFO("CSS::lookupOrDesignateStorageService() - DataFile + commport");
 
-        S4U_Mailbox::putMessage(this->mailbox,
-                                new CompoundStorageAllocationRequestMessage(
-                                    answer_mailbox,
-                                    file,
-                                    stripe_count,
-                                    this->getMessagePayloadValue(
-                                        CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
+        this->commport->putMessage(new CompoundStorageAllocationRequestMessage(
+            answer_commport,
+            file,
+            stripe_count,
+            this->getMessagePayloadValue(
+                CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
 
-        auto msg = S4U_Mailbox::getMessage<CompoundStorageAllocationAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::writeFile(): Received a totally");
+        auto msg = answer_commport->getMessage<CompoundStorageAllocationAnswerMessage>(this->network_timeout, "StorageService::writeFile(): Received a totally");
         return msg->locations;
     }
 
@@ -383,11 +348,11 @@ namespace wrench {
      */
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location) {
 
-        auto temp_mailbox = S4U_Mailbox::getTemporaryMailbox();
+        auto temp_commport = S4U_CommPort::getTemporaryCommPort();
 
-        auto locations = this->lookupOrDesignateStorageService(location->getFile(), 0, temp_mailbox);
+        auto locations = this->lookupOrDesignateStorageService(location->getFile(), 0, temp_commport);
 
-        S4U_Mailbox::retireTemporaryMailbox(temp_mailbox);
+        S4U_CommPort::retireTemporaryCommPort(temp_commport);
 
         return locations;
     }
@@ -405,11 +370,11 @@ namespace wrench {
      */
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location, unsigned int stripe_count) {
 
-        auto temp_mailbox = S4U_Mailbox::getTemporaryMailbox();
+        auto temp_commport = S4U_CommPort::getTemporaryCommPort();
 
-        auto locations = this->lookupOrDesignateStorageService(location->getFile(), stripe_count, temp_mailbox);
+        auto locations = this->lookupOrDesignateStorageService(location->getFile(), stripe_count, temp_commport);
 
-        S4U_Mailbox::retireTemporaryMailbox(temp_mailbox);
+        S4U_CommPort::retireTemporaryCommPort(temp_commport);
 
         return locations;
     }
@@ -417,16 +382,16 @@ namespace wrench {
     /**
      * @brief Delete a file on the storage service
      *
-     * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
+     * @param answer_commport: the answer commport to which the reply from the server should be sent
      * @param location: the location to delete
      * @param wait_for_answer: whether this call should
      */
-    void CompoundStorageService::deleteFile(simgrid::s4u::Mailbox *answer_mailbox,
+    void CompoundStorageService::deleteFile(S4U_CommPort *answer_commport,
                                             const std::shared_ptr<FileLocation> &location,
                                             bool wait_for_answer) {
         WRENCH_INFO("CSS::deleteFile(): Starting for file %s", location->getFile()->getID().c_str());
 
-        if (!answer_mailbox or !location) {
+        if (!answer_commport or !location) {
             throw std::invalid_argument("CSS::deleteFile(): Invalid nullptr arguments");
         }
         if (location->isScratch()) {
@@ -447,17 +412,16 @@ namespace wrench {
 
             // assertServiceIsUp(loc->getStorageService());
 
-            S4U_Mailbox::putMessage(loc->getStorageService()->mailbox,
-                                    new StorageServiceFileDeleteRequestMessage(
-                                        answer_mailbox,
-                                        loc,
-                                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
+            loc->getStorageService()->commport->putMessage(new StorageServiceFileDeleteRequestMessage(
+                answer_commport,
+                loc,
+                this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
 
             if (wait_for_answer) {
 
                 std::unique_ptr<SimulationMessage> message = nullptr;
 
-                auto msg = S4U_Mailbox::getMessage<StorageServiceFileDeleteAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::deleteFile():");
+                auto msg = answer_commport->getMessage<StorageServiceFileDeleteAnswerMessage>(this->network_timeout, "StorageService::deleteFile():");
                 if (!msg->success) {
                     throw ExecutionException(std::move(msg->failure_cause));
                 }
@@ -484,16 +448,16 @@ namespace wrench {
     /**
      * @brief Asks the storage service whether it holds a file
      *
-     * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
+     * @param answer_commport: the answer commport to which the reply from the server should be sent
      * @param location: the location to lookup
      *
      * @return true if the file is present, false otherwise
      */
-    bool CompoundStorageService::lookupFile(simgrid::s4u::Mailbox *answer_mailbox,
+    bool CompoundStorageService::lookupFile(S4U_CommPort *answer_commport,
                                             const std::shared_ptr<FileLocation> &location) {
         WRENCH_INFO("CSS::lookupFile(): Lookup for file %s", location->getFile()->getID().c_str());
 
-        if (!answer_mailbox or !location) {
+        if (!answer_commport or !location) {
             throw std::invalid_argument("CSS::lookupFile(): Invalid nullptr arguments");
         }
 
@@ -511,15 +475,14 @@ namespace wrench {
 
             assertServiceIsUp(loc->getStorageService());
 
-            S4U_Mailbox::putMessage(loc->getStorageService()->mailbox,
-                                    new StorageServiceFileLookupRequestMessage(
-                                        answer_mailbox,
-                                        location,
-                                        this->getMessagePayloadValue(
-                                            StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+            loc->getStorageService()->commport->putMessage(new StorageServiceFileLookupRequestMessage(
+                answer_commport,
+                location,
+                this->getMessagePayloadValue(
+                    StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
             // Wait for a reply
-            auto msg = S4U_Mailbox::getMessage<StorageServiceFileLookupAnswerMessage>(answer_mailbox, this->network_timeout, "StorageService::lookupFile():");
+            auto msg = answer_commport->getMessage<StorageServiceFileLookupAnswerMessage>(this->network_timeout, "StorageService::lookupFile():");
             available &= msg->file_is_available;
         }
 
@@ -605,7 +568,7 @@ namespace wrench {
         auto copy_idx = 0;
         int total_parts = src_parts.size(); // = dst_parts.size()
 
-        auto tmp_mailbox = S4U_Mailbox::getTemporaryMailbox();
+        auto tmp_commport = S4U_CommPort::getTemporaryCommPort();
 
         while (copy_idx < total_parts) {
             WRENCH_DEBUG("CSS::copyFileIamSource(): Running StorageService::copyFile for part %i", copy_idx);
@@ -619,22 +582,21 @@ namespace wrench {
             bool dst_is_bufferized = dst_parts[copy_idx]->getStorageService()->isBufferized();
             bool dst_is_non_bufferized = not dst_is_bufferized;
 
-            simgrid::s4u::Mailbox *mailbox_to_contact;
+            S4U_CommPort *commport_to_contact;
             if (dst_is_non_bufferized) {
-                mailbox_to_contact = dst_parts[copy_idx]->getStorageService()->mailbox;
+                commport_to_contact = dst_parts[copy_idx]->getStorageService()->commport;
             } else if (src_is_non_bufferized) {
-                mailbox_to_contact = src_parts[copy_idx]->getStorageService()->mailbox;
+                commport_to_contact = src_parts[copy_idx]->getStorageService()->commport;
             } else {
-                mailbox_to_contact = dst_parts[copy_idx]->getStorageService()->mailbox;
+                commport_to_contact = dst_parts[copy_idx]->getStorageService()->commport;
             }
 
             this->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
                                                                     src_parts[copy_idx],
                                                                     dst_parts[copy_idx]);
-            S4U_Mailbox::dputMessage(
-                mailbox_to_contact,
+            commport_to_contact->dputMessage(
                 new StorageServiceFileCopyRequestMessage(
-                    tmp_mailbox,
+                    tmp_commport,
                     src_parts[copy_idx],
                     dst_parts[copy_idx],
                     dst_parts[copy_idx]->getStorageService()->getMessagePayloadValue(
@@ -648,7 +610,7 @@ namespace wrench {
         // Wait for all replies
         auto rcv = 0;
         while (rcv < total_parts) {
-            auto msg = S4U_Mailbox::getMessage<StorageServiceFileCopyAnswerMessage>(tmp_mailbox);
+            auto msg = tmp_commport->getMessage<StorageServiceFileCopyAnswerMessage>();
             rcv += 1;
 
             if (msg->failure_cause) {
@@ -656,7 +618,7 @@ namespace wrench {
                 throw ExecutionException(std::move(msg->failure_cause));
             }
         }
-        S4U_Mailbox::retireTemporaryMailbox(tmp_mailbox);
+        S4U_CommPort::retireTemporaryCommPort(tmp_commport);
         WRENCH_INFO("CSS::copyFileIamSource(): Copy/ies started (answers received)");
 
         // Cleanup - Once all the copies are made, we need to delete parts on destination and merge into a single file
@@ -729,7 +691,7 @@ namespace wrench {
         auto copy_idx = 0;
         int total_parts = src_parts.size(); // = dst_parts.size()
 
-        auto tmp_mailbox = S4U_Mailbox::getTemporaryMailbox();
+        auto tmp_commport = S4U_CommPort::getTemporaryCommPort();
 
         while (copy_idx < total_parts) {
             WRENCH_DEBUG("CSS::copyFileIamDestination(): Running StorageService::copyFile for part %i", copy_idx);
@@ -756,13 +718,13 @@ namespace wrench {
             bool dst_is_bufferized = dst_parts[copy_idx]->getStorageService()->isBufferized();
             bool dst_is_non_bufferized = not dst_is_bufferized;
 
-            simgrid::s4u::Mailbox *mailbox_to_contact;
+            S4U_CommPort *commport_to_contact;
             if (dst_is_non_bufferized) {
-                mailbox_to_contact = dst_parts[copy_idx]->getStorageService()->mailbox;
+                commport_to_contact = dst_parts[copy_idx]->getStorageService()->commport;
             } else if (src_is_non_bufferized) {
-                mailbox_to_contact = src_parts[copy_idx]->getStorageService()->mailbox;
+                commport_to_contact = src_parts[copy_idx]->getStorageService()->commport;
             } else {
-                mailbox_to_contact = dst_parts[copy_idx]->getStorageService()->mailbox;
+                commport_to_contact = dst_parts[copy_idx]->getStorageService()->commport;
             }
 
             this->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
@@ -773,10 +735,9 @@ namespace wrench {
             // we keep track of future space usage on various storage nodes while allocating multiple chunks of a given
             // file. So right before we actually start the copy, we unreserve space.
             dst_parts[copy_idx]->getStorageService()->unreserveSpace(dst_parts[copy_idx]);
-            S4U_Mailbox::dputMessage(
-                mailbox_to_contact,
+            commport_to_contact->dputMessage(
                 new StorageServiceFileCopyRequestMessage(
-                    tmp_mailbox,
+                    tmp_commport,
                     src_parts[copy_idx],
                     dst_parts[copy_idx],
                     dst_parts[copy_idx]->getStorageService()->getMessagePayloadValue(
@@ -790,7 +751,7 @@ namespace wrench {
         // Wait for all replies
         auto rcv = 0;
         while (rcv < total_parts) {
-            auto msg = S4U_Mailbox::getMessage<StorageServiceFileCopyAnswerMessage>(tmp_mailbox);
+            auto msg = tmp_commport->getMessage<StorageServiceFileCopyAnswerMessage>();
             rcv += 1;
 
             if (msg->failure_cause) {
@@ -798,7 +759,7 @@ namespace wrench {
                 throw ExecutionException(std::move(msg->failure_cause));
             }
         }
-        S4U_Mailbox::retireTemporaryMailbox(tmp_mailbox);
+        S4U_CommPort::retireTemporaryCommPort(tmp_commport);
 
         WRENCH_INFO("CSS::copyFileIamDestination(): Copy/ies started (answers received)");
 
@@ -831,14 +792,14 @@ namespace wrench {
     /**
      * @brief Synchronously write a file to the storage service
      *
-     * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
+     * @param answer_commport: the answer commport to which the reply from the server should be sent
      * @param location: the location
      * @param num_bytes_to_write: number of bytes to write to the file
      * @param wait_for_answer: whether to wait for the answer
      *
      * @throw ExecutionException
      */
-    void CompoundStorageService::writeFile(simgrid::s4u::Mailbox *answer_mailbox,
+    void CompoundStorageService::writeFile(S4U_CommPort *answer_commport,
                                            const std::shared_ptr<FileLocation> &location,
                                            double num_bytes_to_write,
                                            bool wait_for_answer) {
@@ -857,6 +818,8 @@ namespace wrench {
             WRENCH_WARN("CSS:writeFile(): 'designated_locations' vector empry (error or lack of space from the allocator point of view)");
             throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(location->getFile(), this->getSharedPtr<CompoundStorageService>()));
         }
+        std::vector<std::unique_ptr<wrench::StorageServiceFileWriteAnswerMessage>> messages = {};
+        auto recv_commport = S4U_CommPort::getTemporaryCommPort();
 
         // If num_bytes_to_write > the entire file size, we have a big problem (it should almost always be way smaller, as it represents the bytes only in a subset of all file chunks)
         if (num_bytes_to_write > location->getFile()->getSize()) {
@@ -907,26 +870,20 @@ namespace wrench {
 
         // Contact every SimpleStorageService that we want to use, and request a FileWrite
         unsigned int request_count = 0;
-        auto recv_mailbox = S4U_Mailbox::getTemporaryMailbox();
+        auto recv_commport = S4U_CommPort::getTemporaryCommPort();
         for (auto &dloc : designated_locations_subset) {
             WRENCH_DEBUG("CSS:writeFile(): Sending full write request %d on file %s (<%f> b) to %s",
                          request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
 
-            /*
-               S4U_Mailbox::dputMessage(
-                            dloc->getStorageService()->mailbox,
-                            new StorageServiceFileReadRequestMessage(
-                                recv_mailbox,
-                                simgrid::s4u::this_actor::get_host(),
-                                dloc,
-                                dloc->getFile()->getSize(),
-                                dloc->getStorageService()->getMessagePayloadValue(
-                                    CompoundStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
-            */
-            S4U_Mailbox::dputMessage(
-                dloc->getStorageService()->mailbox,
+            WRENCH_INFO("CSS:writeFile(): Sending write request for part %d to %s", request_count, dloc->getStorageService()->getName().c_str());
+
+            // That's quite dirty, but : space is reserved during the call to lookupOrDesignateFileLocation, so that
+            // we keep track of future space usage on various storage nodes while allocating multiple chunks of a given
+            // file. So right before we actually start the copy, we unreserve space.
+            dloc->getStorageService()->unreserveSpace(dloc);
+            dloc->getStorageService()->commport->dputMessage(
                 new StorageServiceFileWriteRequestMessage(
-                    recv_mailbox,
+                    recv_commport,
                     simgrid::s4u::this_actor::get_host(),
                     dloc,
                     dloc->getFile()->getSize(),
@@ -935,11 +892,10 @@ namespace wrench {
             request_count++;
         }
 
-        std::vector<std::unique_ptr<wrench::StorageServiceFileWriteAnswerMessage>> messages = {};
-        unsigned int recv = 0;
-        while (recv++ < request_count) {
+        auto recv = 0;
+        while (recv < request_count) {
             // Wait for answer to current request
-            auto msg = S4U_Mailbox::getMessage<StorageServiceFileWriteAnswerMessage>(recv_mailbox, this->network_timeout, "CSS::writeFile(): ");
+            auto msg = recv_commport->getMessage<StorageServiceFileWriteAnswerMessage>(this->network_timeout, "CSS::writeFile(): ");
             if (not msg->success)
                 throw ExecutionException(msg->failure_cause);
 
@@ -955,26 +911,25 @@ namespace wrench {
             if (buffer_size >= 1) {
 
                 auto file = location->getFile();
-                for (auto const &dwmb : msg->data_write_mailboxes_and_bytes) {
+                for (auto const &dwmb : msg->data_write_commport_and_bytes) {
                     // Bufferized
                     double remaining = dwmb.second;
                     while (remaining - buffer_size > DBL_EPSILON) {
-                        S4U_Mailbox::dputMessage(dwmb.first,
-                                                 new StorageServiceFileContentChunkMessage(
-                                                     file, buffer_size, false));
+                        dwmb.first->dputMessage(new StorageServiceFileContentChunkMessage(
+                            file, buffer_size, false));
                         remaining -= buffer_size;
                     }
-                    S4U_Mailbox::dputMessage(dwmb.first, new StorageServiceFileContentChunkMessage(
-                                                             file, remaining, true));
+                    dwmb.first->dputMessage(new StorageServiceFileContentChunkMessage(
+                        file, remaining, true));
                 }
             }
         }
 
-        WRENCH_DEBUG("CSS::writeFile(): Waiting for final acks");
-        for (const auto &mailbx_msg : messages) {
-            S4U_Mailbox::getMessage<StorageServiceAckMessage>(recv_mailbox, "CSS::writeFile() - Final Acks: ");
+        WRENCH_INFO("CSS::writeFile(): Waiting for final acks");
+        for (const auto &mailbox_msg : messages) {
+            recv_commport->getMessage<StorageServiceAckMessage>("CSS::writeFile(): ");
         }
-        S4U_Mailbox::retireTemporaryMailbox(recv_mailbox);
+        S4U_CommPort::retireTemporaryCommPort(recv_commport);
 
         // Collect traces
         /*
@@ -997,22 +952,22 @@ namespace wrench {
     /**
      * @brief Read a file from the storage service
      *
-     * @param answer_mailbox: the answer mailbox to which the reply from the server should be sent
+     * @param answer_commport: the answer commport to which the reply from the server should be sent
      * @param location: the location
      * @param num_bytes: the number of bytes to read
      * @param wait_for_answer: whether to wait for the answer
      */
-    void CompoundStorageService::readFile(simgrid::s4u::Mailbox *answer_mailbox,
+    void CompoundStorageService::readFile(S4U_CommPort *answer_commport,
                                           const std::shared_ptr<FileLocation> &location,
                                           double num_bytes,
                                           bool wait_for_answer) {
         WRENCH_INFO("CSS::readFile(): Reading file %s - starting at %f", location->getFile()->getID().c_str(), S4U_Simulation::getClock());
 
-        assertServiceIsUp(this->shared_from_this());
-
-        if (!answer_mailbox or !location or (num_bytes < 0.0)) {
+        if (!answer_commport or !location or (num_bytes < 0.0)) {
             throw std::invalid_argument("StorageService::readFile(): Invalid nullptr/0 arguments");
         }
+
+        assertServiceIsUp(this->getSharedPtr<Service>());
 
         auto designated_locations = this->lookupFileLocation(location);
         if (designated_locations.empty()) {
@@ -1053,7 +1008,7 @@ namespace wrench {
         this->partial_io_stripe_index[location->getFile()] = locations_start;
 
         // Contact every SSS
-        auto recv_mailbox = S4U_Mailbox::getTemporaryMailbox();
+        auto recv_commport = S4U_CommPort::getTemporaryCommPort();
         auto request_count = 0;
         for (const auto &dloc : designated_locations_subset) {
             WRENCH_DEBUG("CSS::readFile(): Sending read file request for %f bytes on file %s at path %s, to storage service %s",
@@ -1064,13 +1019,12 @@ namespace wrench {
                          dloc->getPath().c_str(),
                          dloc->getStorageService()->getName().c_str());
 
-            S4U_Mailbox::dputMessage(
-                dloc->getStorageService()->mailbox,
+            dloc->getStorageService()->commport->dputMessage(
                 new StorageServiceFileReadRequestMessage(
-                    recv_mailbox,
+                    recv_commport,
                     simgrid::s4u::this_actor::get_host(),
                     dloc,
-                    dloc->getFile()->getSize(),
+                    dloc->getFile()->getSize(), // Note : not using num_bytes, because we know how many full stripes to write to amount to the same number of bytes
                     dloc->getStorageService()->getMessagePayloadValue(
                         CompoundStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
             request_count++;
@@ -1082,7 +1036,7 @@ namespace wrench {
         auto recv = 0;
         while (recv < request_count) {
             // Wait for answer to current reqeust
-            auto msg = S4U_Mailbox::getMessage<StorageServiceFileReadAnswerMessage>(recv_mailbox, this->network_timeout, "CSS::readFile(): ");
+            auto msg = recv_commport->getMessage<StorageServiceFileReadAnswerMessage>(this->network_timeout, "CSS::readFile(): ");
             if (not msg->success)
                 throw ExecutionException(msg->failure_cause);
 
@@ -1096,7 +1050,7 @@ namespace wrench {
 
             if (msg->buffer_size < 1) {
                 // Non-Bufferized ; just wait for an ack for this message (note this may not be THE ack to this precise message, but it doesn't matter)
-                S4U_Mailbox::getMessage<StorageServiceAckMessage>(recv_mailbox, "CSS::readFile(): ");
+                recv_commport->getMessage<StorageServiceAckMessage>("CSS::readFile(): ");
             } else {
                 unsigned long number_of_sources = msg->number_of_sources;
 
@@ -1106,9 +1060,9 @@ namespace wrench {
                 while (true) {
                     std::shared_ptr<StorageServiceFileContentChunkMessage> file_content_chunk_msg = nullptr;
                     try {
-                        file_content_chunk_msg = S4U_Mailbox::getMessage<StorageServiceFileContentChunkMessage>(msg->mailbox_to_receive_the_file_content, "StorageService::readFile(): Received an");
+                        file_content_chunk_msg = msg->commport_to_receive_the_file_content->getMessage<StorageServiceFileContentChunkMessage>("StorageService::readFile(): Received an");
                     } catch (...) {
-                        S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
+                        S4U_CommPort::retireTemporaryCommPort(msg->commport_to_receive_the_file_content);
                         throw;
                     }
                     if (file_content_chunk_msg->last_chunk) {
@@ -1119,16 +1073,16 @@ namespace wrench {
                     }
                 }
 
-                S4U_Mailbox::retireTemporaryMailbox(msg->mailbox_to_receive_the_file_content);
+                S4U_CommPort::retireTemporaryCommPort(msg->commport_to_receive_the_file_content);
 
                 // Waiting for all the final acks (same thing as for un buffered sources : we're waiting on N ack messages, not necessarily the ones corresponding to this exact message)
                 for (unsigned long source = 0; source < number_of_sources; source++) {
-                    S4U_Mailbox::getMessage<StorageServiceAckMessage>(recv_mailbox, this->network_timeout, "StorageService::readFile(): Received an");
+                    recv_commport->getMessage<StorageServiceAckMessage>(this->network_timeout, "StorageService::readFile(): Received an");
                 }
             }
         }
 
-        S4U_Mailbox::retireTemporaryMailbox(recv_mailbox);
+        S4U_CommPort::retireTemporaryCommPort(recv_commport);
 
         WRENCH_INFO("CSS::readFile(): All %i reads done and ack at %f)", request_count, S4U_Simulation::getClock());
 
@@ -1272,17 +1226,16 @@ namespace wrench {
     /**
      * @brief Process a stop daemon request
      *
-     * @param ack_mailbox: the mailbox to which the ack should be sent
+     * @param ack_commport: the commport to which the ack should be sent
      *
      * @throw wrench::ExecutionException if communication fails.
      *
      * @return false if the daemon should terminate
      */
-    bool CompoundStorageService::processStopDaemonRequest(simgrid::s4u::Mailbox *ack_mailbox) {
+    bool CompoundStorageService::processStopDaemonRequest(S4U_CommPort *ack_commport) {
         try {
-            S4U_Mailbox::putMessage(ack_mailbox,
-                                    new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                        CompoundStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+            ack_commport->putMessage(new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                CompoundStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &e) {
             return false;
         }

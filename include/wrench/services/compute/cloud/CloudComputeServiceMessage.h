@@ -37,10 +37,10 @@ namespace wrench {
      */
     class CloudComputeServiceGetExecutionHostsRequestMessage : public CloudComputeServiceMessage {
     public:
-        CloudComputeServiceGetExecutionHostsRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, double payload);
+        CloudComputeServiceGetExecutionHostsRequestMessage(S4U_CommPort *answer_commport, double payload);
 
-        /** @brief The mailbox to which a reply should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which a reply should be sent */
+        S4U_CommPort *answer_commport;
     };
 
     /**
@@ -59,7 +59,7 @@ namespace wrench {
      */
     class CloudComputeServiceCreateVMRequestMessage : public CloudComputeServiceMessage {
     public:
-        CloudComputeServiceCreateVMRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+        CloudComputeServiceCreateVMRequestMessage(S4U_CommPort *answer_commport,
                                                   unsigned long num_cores,
                                                   double ram_memory,
                                                   const std::string &physical_host,
@@ -68,8 +68,8 @@ namespace wrench {
                                                   double payload);
 
     public:
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The number of cores the service can use (0 means "use as many as there are cores on the host") */
         unsigned long num_cores;
         /** @brief The VM RAM memory_manager_service capacity (0 means "use all memory_manager_service available on the host", this can be lead to out of memory_manager_service issue) */
@@ -103,15 +103,15 @@ namespace wrench {
      */
     class CloudComputeServiceShutdownVMRequestMessage : public CloudComputeServiceMessage {
     public:
-        CloudComputeServiceShutdownVMRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+        CloudComputeServiceShutdownVMRequestMessage(S4U_CommPort *answer_commport,
                                                     const std::string &vm_name,
                                                     bool send_failure_notifications,
                                                     ComputeService::TerminationCause termination_cause,
                                                     double payload);
 
     public:
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The name of the new VM host */
         std::string vm_name;
         /** @brief Whether to send failure notifications */
@@ -139,13 +139,13 @@ namespace wrench {
      */
     class CloudComputeServiceStartVMRequestMessage : public CloudComputeServiceMessage {
     public:
-        CloudComputeServiceStartVMRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+        CloudComputeServiceStartVMRequestMessage(S4U_CommPort *answer_commport,
                                                  const std::string &vm_name,
                                                  double payload);
 
     public:
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The name of the VM  to start */
         std::string vm_name;
     };
@@ -173,13 +173,13 @@ namespace wrench {
      */
     class CloudComputeServiceSuspendVMRequestMessage : public CloudComputeServiceMessage {
     public:
-        CloudComputeServiceSuspendVMRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+        CloudComputeServiceSuspendVMRequestMessage(S4U_CommPort *answer_commport,
                                                    const std::string &vm_name,
                                                    double payload);
 
     public:
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The name of the new VM host */
         std::string vm_name;
     };
@@ -204,13 +204,13 @@ namespace wrench {
      */
     class CloudComputeServiceResumeVMRequestMessage : public CloudComputeServiceMessage {
     public:
-        CloudComputeServiceResumeVMRequestMessage(simgrid::s4u::Mailbox *mailbox,
+        CloudComputeServiceResumeVMRequestMessage(S4U_CommPort *commport,
                                                   const std::string &vm_name,
                                                   double payload);
 
     public:
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The name of the VM host */
         std::string vm_name;
     };
@@ -236,13 +236,13 @@ namespace wrench {
     */
     class CloudComputeServiceDestroyVMRequestMessage : public CloudComputeServiceMessage {
     public:
-        CloudComputeServiceDestroyVMRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+        CloudComputeServiceDestroyVMRequestMessage(S4U_CommPort *answer_commport,
                                                    const std::string &vm_name,
                                                    double payload);
 
     public:
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The name of the VM host */
         std::string vm_name;
     };
