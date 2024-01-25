@@ -372,7 +372,7 @@ namespace wrench {
      * @return an MPI action
      */
     std::shared_ptr<MPIAction> CompoundJob::addMPIAction(const std::string &name,
-                                                         const std::function<void(const std::shared_ptr<ActionExecutor> &action_executor)> &mpi_code,
+                                                         const std::function<void(const std::shared_ptr<ExecutionController> &controller)> &mpi_code,
                                                          unsigned long num_processes,
                                                          unsigned long num_cores_per_process) {
         auto new_action = std::shared_ptr<MPIAction>(

@@ -20,14 +20,14 @@ namespace wrench {
         : public Service {
 
     public:
-        explicit ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, simgrid::s4u::Mailbox *mailbox_to_notify);
+        explicit ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, wrench::S4U_CommPort *commport_to_notify);
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 
     private:
         double flops;
         SimulationMessage *msg;
-        simgrid::s4u::Mailbox *mailbox_to_notify;
+        wrench::S4U_CommPort *commport_to_notify;
         int main() override;
     };
 

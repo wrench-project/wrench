@@ -50,6 +50,7 @@ public:
 protected:
     ~BatchComputeServiceOneActionTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     BatchComputeServiceOneActionTest() {
@@ -58,8 +59,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
-        input_file = workflow->addFile("input_file", 10000.0);
-        output_file = workflow->addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000.0);
+        output_file = wrench::Simulation::addFile("output_file", 20000.0);
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -1319,7 +1320,7 @@ private:
 
         auto real_failure = std::dynamic_pointer_cast<wrench::FileNotFound>(action->getFailureCause());
         if (not real_failure) {
-            throw std::runtime_error("Unexpected action failure cause");
+            throw std::runtime_error("Unexpected action failure cause: " + action->getFailureCause()->toString());
         }
         if (real_failure->getFile() != this->test->input_file) {
             throw std::runtime_error("Unexpected file in the action failure cause");

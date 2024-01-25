@@ -56,6 +56,7 @@ protected:
 
     ~ComprehensiveIntegrationHostFailuresTest() override {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     ComprehensiveIntegrationHostFailuresTest() {
@@ -224,6 +225,10 @@ private:
 
         while (not this->test->workflow->isDone()) {
 
+            if (wrench::Simulation::getCurrentSimulatedDate() > 17508.33982809935332625173) {
+                break;
+            }
+
             // Try to restart down VMs
             for (auto const &vm: this->vms) {
                 if (this->test->cloud_service->isVMDown(vm)) {
@@ -253,6 +258,7 @@ private:
 
     bool scheduleAReadyTask() {
 
+
         // Find a ready task1
         std::shared_ptr<wrench::WorkflowTask> task = nullptr;
         for (auto const &t: this->test->workflow->getTasks()) {
@@ -262,7 +268,7 @@ private:
             }
         }
         if (not task) {
-            return false;// no ready task1 right now
+            return false;// no ready task right now
         }
 
         // Pick a storage service
@@ -305,6 +311,7 @@ private:
                                                               });
         this->job_manager->submitJob(job, target_cs);
 
+
         //        WRENCH_INFO("Submitted task1 '%s' to '%s' with files to read from '%s",
         //                    task1->getID().c_str(),
         //                    target_cs->getName().c_str(),
@@ -313,7 +320,9 @@ private:
     }
 
     void processEventStandardJobCompletion(std::shared_ptr<wrench::StandardJobCompletedEvent> event) override {
+        static int count = 0;
         auto task = *(event->standard_job->getTasks().begin());
+        count++;
         WRENCH_INFO("Task '%s' has completed", task->getID().c_str());
         if (event->compute_service == this->test->baremetal_service) {
             num_jobs_on_baremetal_cs--;
@@ -328,6 +337,7 @@ private:
 
     void processEventStandardJobFailure(std::shared_ptr<wrench::StandardJobFailedEvent> event) override {
         auto task = *(event->standard_job->getTasks().begin());
+
         WRENCH_INFO("Task '%s' has failed: %s", task->getID().c_str(), event->failure_cause->toString().c_str());
         if (event->compute_service == this->test->baremetal_service) {
             num_jobs_on_baremetal_cs--;
@@ -411,6 +421,8 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     argv[2] = strdup("--cfg=contexts/stack-size:100");
     //    argv[3] = strdup("--wrench-full-log");
+    //    argv[4] = strdup("--wrench-default-control-message-size=0");
+    //        argv[4] = strdup("--wrench-no-color");
 
     this->faulty_map = args;
 
@@ -471,8 +483,8 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     for (int i = 0; i < NUM_TASKS; i++) {
         //        auto task1 = workflow->addTask("task_" + std::to_string(i), 1 + rand() % MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 0);
         auto task = workflow->addTask("task_" + std::to_string(i), MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 40);
-        auto input_file = workflow->addFile(task->getID() + ".input", 1 + rand() % 100);
-        auto output_file = workflow->addFile(task->getID() + ".output", 1 + rand() % 100);
+        auto input_file = wrench::Simulation::addFile(task->getID() + ".input", 1 + rand() % 100);
+        auto output_file = wrench::Simulation::addFile(task->getID() + ".output", 1 + rand() % 100);
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
         if (this->storage_service1) {

@@ -46,6 +46,7 @@ public:
 protected:
     ~BareMetalComputeServiceOneActionTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     BareMetalComputeServiceOneActionTest() {
@@ -54,8 +55,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
-        input_file = workflow->addFile("input_file", 10000.0);
-        output_file = workflow->addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000.0);
+        output_file = wrench::Simulation::addFile("output_file", 20000.0);
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -320,7 +321,7 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-    //        argv[1] = strdup("--wrench-full-log");
+    //            argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1280,14 +1281,14 @@ private:
             throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
         }
 
-        // Chek action stuff
+        // Check action stuff
         if (action->getState() != wrench::Action::State::FAILED) {
             throw std::runtime_error("Unexpected action state " + action->getStateAsString());
         }
 
         auto real_failure = std::dynamic_pointer_cast<wrench::FileNotFound>(action->getFailureCause());
         if (not real_failure) {
-            throw std::runtime_error("Unexpected action failure cause");
+            throw std::runtime_error("Unexpected action failure cause: " + action->getFailureCause()->toString());
         }
         if (real_failure->getFile() != this->test->input_file) {
             throw std::runtime_error("Unexpected file in the action failure cause");
@@ -1322,8 +1323,7 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-    //    argv[1] = strdup("--wrench-host-shutdown-simulation");
-    //    argv[2] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1733,7 +1733,7 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, FileRegistryActiona) {
+TEST_F(BareMetalComputeServiceOneActionTest, FileRegistryAction) {
     DO_TEST_WITH_FORK(do_FileRegistryActions_test);
 }
 

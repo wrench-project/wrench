@@ -69,8 +69,13 @@ namespace wrench {
          * @brief Get a textual description of the event
          * @return a text string
          */
-        std::string toString() override { return "StandardJobFailedEvent (job: " + this->standard_job->getName() + "; cs = " +
-                                                 this->compute_service->getName() + "; cause: " + this->failure_cause->toString() + ")"; }
+        std::string toString() override {
+            return "StandardJobFailedEvent (job: " +
+                   this->standard_job->getName() + "; cs = " +
+
+                   this->compute_service->getName() + "; cause: " +
+                   this->failure_cause->toString() + ")";
+        }
     };
 
 

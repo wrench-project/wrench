@@ -39,7 +39,7 @@ namespace wrench {
      */
     std::shared_ptr<JobManager> ExecutionController::createJobManager() {
         std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(
-                new JobManager(this->hostname, this->mailbox));
+                new JobManager(this->hostname, this->commport));
         job_manager->simulation = this->simulation;
         job_manager->start(job_manager, true, false);// Always daemonize, no auto-restart
 
@@ -52,7 +52,7 @@ namespace wrench {
      */
     std::shared_ptr<DataMovementManager> ExecutionController::createDataMovementManager() {
         auto data_movement_manager = std::shared_ptr<DataMovementManager>(
-                new DataMovementManager(this->hostname, this->mailbox));
+                new DataMovementManager(this->hostname, this->commport));
         data_movement_manager->simulation = this->simulation;
         data_movement_manager->start(data_movement_manager, true, false);// Always daemonize, no auto-restart
 
@@ -126,7 +126,7 @@ namespace wrench {
      * @param message: a string message that will be in the generated TimerEvent
      */
     void ExecutionController::setTimer(double date, std::string message) {
-        Alarm::createAndStartAlarm(this->simulation, date, this->hostname, this->mailbox,
+        Alarm::createAndStartAlarm(this->simulation, date, this->hostname, this->commport,
                                    new ExecutionControllerAlarmTimerMessage(message, 0), "wms_timer");
     }
 
@@ -136,7 +136,8 @@ namespace wrench {
      * @return the event
      */
     std::shared_ptr<ExecutionEvent> ExecutionController::waitForNextEvent(double timeout) {
-        return ExecutionEvent::waitForNextExecutionEvent(this->mailbox, timeout);
+        auto event = ExecutionEvent::waitForNextExecutionEvent(this->commport, timeout);
+        return event;
     }
 
     /**
@@ -144,7 +145,7 @@ namespace wrench {
      * @return the event
      */
     std::shared_ptr<ExecutionEvent> ExecutionController::waitForNextEvent() {
-        return ExecutionEvent::waitForNextExecutionEvent(this->mailbox, -1.0);
+        return this->waitForNextEvent(-1.0);
     }
 
     /**

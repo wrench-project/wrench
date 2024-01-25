@@ -10,7 +10,7 @@
 #ifndef WRENCH_NETWORKPROXIMITYMESSAGE_H
 #define WRENCH_NETWORKPROXIMITYMESSAGE_H
 
-#include "wrench/services/network_proximity/NetworkProximityDaemon.h"
+#include "wrench/services/network_proximity/NetworkProximitySenderDaemon.h"
 #include "wrench/services/ServiceMessage.h"
 
 namespace wrench {
@@ -33,11 +33,11 @@ namespace wrench {
      */
     class NetworkProximityLookupRequestMessage : public NetworkProximityMessage {
     public:
-        NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::pair<std::string, std::string> hosts,
+        NetworkProximityLookupRequestMessage(S4U_CommPort *answer_commport, std::pair<std::string, std::string> hosts,
                                              double payload);
 
-        /** @brief The mailbox to which the answer message should be sent */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer message should be sent */
+        S4U_CommPort *answer_commport;
         /** @brief The hosts between which to calculate a proximity value */
         std::pair<std::string, std::string> hosts;
     };
@@ -75,7 +75,7 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent between NetworkProximityDaemon processes to perform network measurements
+     * @brief A message sent between NetworkProximitySenderDaemon processes to perform network measurements
      */
     class NetworkProximityTransferMessage : public NetworkProximityMessage {
     public:
@@ -83,33 +83,33 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent to a NetworkProximityService by a NetworkProximityDaemon to ask which other NetworkProximityDaemons it should do measurements with next
+     * @brief A message sent to a NetworkProximityService by a NetworkProximitySenderDaemon to ask which other NetworkProximityDaemons it should do measurements with next
      */
     class NextContactDaemonRequestMessage : public NetworkProximityMessage {
     public:
-        NextContactDaemonRequestMessage(std::shared_ptr<NetworkProximityDaemon> daemon, double payload);
+        NextContactDaemonRequestMessage(std::shared_ptr<NetworkProximitySenderDaemon> daemon, double payload);
 
-        /** @brief The NetworkProximityDaemon daemon to return the answer to */
-        std::shared_ptr<NetworkProximityDaemon> daemon;
+        /** @brief The NetworkProximitySenderDaemon daemon to return the answer to */
+        std::shared_ptr<NetworkProximitySenderDaemon> daemon;
     };
 
     /**
-     * @brief A message sent by a NetworkProximityService to a NetworkProximityDaemon to tell it which other NetworkProximityDaemons it should do measurements with next
+     * @brief A message sent by a NetworkProximityService to a NetworkProximitySenderDaemon to tell it which other NetworkProximityDaemons it should do measurements with next
      */
     class NextContactDaemonAnswerMessage : public NetworkProximityMessage {
     public:
         NextContactDaemonAnswerMessage(std::string next_host_to_send,
-                                       std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send,
-                                       simgrid::s4u::Mailbox *next_mailbox_to_send, double payload);
+                                       std::shared_ptr<NetworkProximityReceiverDaemon> next_daemon_to_send,
+                                       S4U_CommPort *next_commport_to_send, double payload);
 
-        /** @brief The next host for the NetworkProximityDaemon to contact */
+        /** @brief The next host for the NetworkProximitySenderDaemon to contact */
         std::string next_host_to_send;
 
-        /** @brief The next NetworkProximityDaemon for the NetworkProximityDaemon to contact */
-        std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send;
+        /** @brief The next NetworkProximitySenderDaemon for the NetworkProximitySenderDaemon to contact */
+        std::shared_ptr<NetworkProximityReceiverDaemon> next_daemon_to_send;
 
-        /** @brief The next mailbox for the network daemon to contact */
-        simgrid::s4u::Mailbox *next_mailbox_to_send;
+        /** @brief The next commport_name for the network daemon to contact */
+        S4U_CommPort *next_commport_to_send;
     };
 
     /**
@@ -117,10 +117,10 @@ namespace wrench {
      */
     class CoordinateLookupRequestMessage : public NetworkProximityMessage {
     public:
-        CoordinateLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::string requested_host, double payload);
+        CoordinateLookupRequestMessage(S4U_CommPort *answer_commport, std::string requested_host, double payload);
 
-        /** @brief The mailbox to which the answer should be sent back */
-        simgrid::s4u::Mailbox *answer_mailbox;
+        /** @brief The commport_name to which the answer should be sent back */
+        S4U_CommPort *answer_commport;
 
         /** @brief The name of the host whose coordinates are being requested */
         std::string requested_host;
