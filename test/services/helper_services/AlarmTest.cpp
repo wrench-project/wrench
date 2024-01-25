@@ -25,6 +25,7 @@ public:
 protected:
     ~AlarmTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     AlarmTest() {
@@ -92,9 +93,9 @@ private:
         wrench::Simulation::turnOffHost("Host2");
 
         // Start an alarm
-        auto mailbox = simgrid::s4u::Mailbox::by_name("mailbox");
+        auto commport = wrench::S4U_CommPort::getTemporaryCommPort();
         try {
-            wrench::Alarm::createAndStartAlarm(this->simulation, 10.0, "Host2", mailbox,
+            wrench::Alarm::createAndStartAlarm(this->simulation, 10.0, "Host2", commport,
                                                new wrench::SimulationMessage(1), "bogus");
             throw std::runtime_error("Should not be able to create an alarm on a down host");
         } catch (wrench::ExecutionException &e) {

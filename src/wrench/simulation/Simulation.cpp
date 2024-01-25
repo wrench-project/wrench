@@ -20,7 +20,7 @@
 #include <wrench/services/storage/compound/CompoundStorageService.h>
 #include <wrench/simulation/Simulation.h>
 #include "simgrid/plugins/energy.h"
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/services/memory/MemoryManager.h>
 #include <wrench/data_file/DataFile.h>
 
@@ -84,6 +84,7 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
+        //        this->removeAllFiles();
         this->s4u_simulation->shutdown();
     }
 
@@ -114,7 +115,8 @@ namespace wrench {
         bool wrench_help_requested = false;
         bool simulator_help_requested = false;
         bool version_requested = false;
-        bool mailbox_pool_size_set = false;
+        bool commport_pool_size_set = false;
+        bool default_control_message_size_set = false;
 
         // By  default, logs are disabled
         xbt_log_control_set("root.thresh:critical");
@@ -137,22 +139,36 @@ namespace wrench {
                        (not strcmp(argv[i], "--wrench-log-full")) or
                        (not strcmp(argv[i], "--wrench-logs-full"))) {
                 xbt_log_control_set("root.thresh:info");
-            } else if (not strncmp(argv[i], "--wrench-mailbox-pool-size", strlen("--wrench-mailbox-pool-size"))) {
+            } else if (not strncmp(argv[i], "--wrench-commport-pool-size", strlen("--wrench-commport-pool-size"))) {
                 char *equal_sign = strchr(argv[i], '=');
                 if (!equal_sign) {
-                    throw std::invalid_argument("Invalid --wrench-mailbox-pool-size argument value");
+                    throw std::invalid_argument("Invalid --wrench-commport-pool-size argument value");
                 }
                 // Check that the value is all digits
                 char *ptr = equal_sign + 1;
                 while (*ptr) {
                     if (*ptr < '0' or *ptr > '9') {
-                        throw std::invalid_argument("Invalid --wrench-mailbox-pool-size argument value");
+                        throw std::invalid_argument("Invalid --wrench-commport-pool-size argument value");
                     }
                     ptr++;
                 }
                 unsigned long pool_size = strtoul(equal_sign + 1, nullptr, 10);
-                S4U_Mailbox::mailbox_pool_size = pool_size;
-                mailbox_pool_size_set = true;
+                S4U_CommPort::commport_pool_size = pool_size;
+            } else if (not strncmp(argv[i], "--wrench-default-control-message-size", strlen("--wrench-default-control-message-size"))) {
+                char *equal_sign = strchr(argv[i], '=');
+                if (!equal_sign) {
+                    throw std::invalid_argument("Invalid --wrench-default-control-message-size argument value");
+                }
+                // Check that the value is all digits
+                char *ptr = equal_sign + 1;
+                while (*ptr) {
+                    if (*ptr < '0' or *ptr > '9') {
+                        throw std::invalid_argument("Invalid --wrench-default-control-message-size argument value");
+                    }
+                    ptr++;
+                }
+                S4U_CommPort::default_control_message_size = strtod(equal_sign + 1, nullptr);
+                default_control_message_size_set = true;
             } else if (not strcmp(argv[i], "--wrench-energy-simulation")) {
                 sg_host_energy_plugin_init();
                 Simulation::energy_enabled = true;
@@ -222,9 +238,10 @@ namespace wrench {
             std::cout << "     (use --log=xxx.threshold=info to enable log category xxxx)\n";
             std::cout << "   --help-logs for detailed help on (SimGrid's) logging options/syntax)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
-            std::cout << "   --wrench-mailbox-pool-size=<integer>: set the number of SimGrid mailboxes used by WRENCH (default: 50000).\n";
+            std::cout << "   --wrench-commport-pool-size=<integer>: set the number of communication ports used by WRENCH (default: 50000).\n";
             std::cout << "      This value may need to be increased, especially for simulations that simulate many\n";
-            std::cout << "      failures, for which WRENCH has a hard time avoiding all mailbox-related memory leaks\n";
+            std::cout << "      failures, for which WRENCH has a hard time avoiding all commport-related memory leaks\n";
+            std::cout << "   --wrench-default-control-message-size=<double>: the default size of control messages in bytes (default: 0). \n";
             std::cerr << "\n";
         }
 
@@ -283,10 +300,9 @@ namespace wrench {
             (*argc)++;
         }
 
-        if (not mailbox_pool_size_set) {
-            S4U_Mailbox::createMailboxPool(5000);
+        if (not default_control_message_size_set) {
+            S4U_CommPort::default_control_message_size = 0;
         }
-
 
         Simulation::initialized = true;
     }
@@ -1615,7 +1631,6 @@ namespace wrench {
 
     /**
      * @brief Remove all files from the simulation (use at your own peril if you're using the workflow API)
-     * @param file : file to remove
      */
     void Simulation::removeAllFiles() {
         Simulation::data_files.clear();

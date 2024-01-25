@@ -17,6 +17,7 @@
 #include "BareMetalComputeServiceProperty.h"
 #include "BareMetalComputeServiceMessagePayload.h"
 #include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 
 namespace wrench {
@@ -58,33 +59,33 @@ namespace wrench {
                 {BareMetalComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {BareMetalComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::PILOT_JOB_FAILED_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::PILOT_JOB_FAILED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
         };
 
     public:
@@ -202,7 +203,7 @@ namespace wrench {
 
         void processActionDone(const std::shared_ptr<Action> &action);
 
-        void processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job, simgrid::s4u::Mailbox *answer_mailbox);
+        void processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job, S4U_CommPort *answer_commport);
 
         bool processNextMessage();
 
@@ -212,13 +213,13 @@ namespace wrench {
         void terminateCurrentCompoundJob(const std::shared_ptr<CompoundJob> &job, ComputeService::TerminationCause termination_cause);
 
 
-        void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
+        void processGetResourceInformation(S4U_CommPort *answer_commport, const std::string &key);
 
-        void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<CompoundJob> &job,
+        void processSubmitCompoundJob(S4U_CommPort *answer_commport, const std::shared_ptr<CompoundJob> &job,
                                       std::map<std::string, std::string> &service_specific_arguments);
 
         void processIsThereAtLeastOneHostWithAvailableResources(
-                simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
+                S4U_CommPort *answer_commport, unsigned long num_cores, double ram);
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 

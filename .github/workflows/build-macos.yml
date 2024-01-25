@@ -44,7 +44,7 @@ jobs:
         run: |
           git clone https://framagit.org/simgrid/simgrid.git
           cd simgrid
-          git checkout 748fabf6540d3b6e2d58a36d0363985f0ddb85d9
+          git checkout 98331a543f36f7991a92affa966a8f162c240984
           cmake .
           make -j4
           make install

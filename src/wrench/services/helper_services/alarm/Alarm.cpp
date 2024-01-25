@@ -10,7 +10,7 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/services/helper_services/alarm/Alarm.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/failure_causes/NetworkError.h>
 #include <wrench/failure_causes/HostError.h>
@@ -26,14 +26,14 @@ namespace wrench {
      * @param date: the date at which the message should be sent. If date is in the past
      *              message will be sent immediately.
      * @param hostname: the name of the host on which the Alarm daemon should run
-     * @param reply_mailbox: the mailbox to which the message should be sent
+     * @param reply_commport: the commport to which the message should be sent
      * @param msg: the message to send
      * @param suffix: a (possibly empty) suffix to append to the daemon name
      */
-    Alarm::Alarm(double date, std::string hostname, simgrid::s4u::Mailbox *reply_mailbox,
+    Alarm::Alarm(double date, std::string hostname, S4U_CommPort *reply_commport,
                  SimulationMessage *msg, std::string suffix) : Service(hostname, "alarm_service_" + suffix) {
         this->date = date;
-        this->reply_mailbox = reply_mailbox;
+        this->reply_commport = reply_commport;
         // Make it unique so that there will be no memory leak in case the
         // alarm never goes off
         this->msg = std::unique_ptr<SimulationMessage>(msg);
@@ -54,10 +54,10 @@ namespace wrench {
             S4U_Simulation::sleep(time_to_sleep);
         }
 
-        WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_mailbox->get_cname());
+        WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_commport->get_cname());
         try {
             auto to_send = this->msg.release();
-            S4U_Mailbox::putMessage(this->reply_mailbox, to_send);
+            this->reply_commport->putMessage(to_send);
         } catch (ExecutionException &e) {
             WRENCH_WARN("AlarmService was not able to send its message");
         }
@@ -72,7 +72,7 @@ namespace wrench {
      * @param date: the date at which the message should be sent (if date is in the past
      *              then the message will be sent immediately)
      * @param hostname: the name of the host on which to start the alarm service
-     * @param reply_mailbox: the mailbox to which the alarm service will send a message
+     * @param reply_commport: the commport to which the alarm service will send a message
      * @param msg: the message to send
      * @param suffix: a (possibly empty) suffix to append to the daemon name (useful in debug output)
      * @return a shared_ptr reference to the alarm service
@@ -82,10 +82,10 @@ namespace wrench {
      */
     std::shared_ptr<Alarm>
     Alarm::createAndStartAlarm(Simulation *simulation, double date, std::string hostname,
-                               simgrid::s4u::Mailbox *reply_mailbox,
+                               S4U_CommPort *reply_commport,
                                SimulationMessage *msg, std::string suffix) {
         std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
-                new Alarm(date, hostname, reply_mailbox, msg, suffix));
+                new Alarm(date, std::move(hostname), reply_commport, msg, suffix));
         alarm_ptr->simulation = simulation;
         alarm_ptr->start(alarm_ptr, true, false);// Daemonized, no auto-restart
         return alarm_ptr;

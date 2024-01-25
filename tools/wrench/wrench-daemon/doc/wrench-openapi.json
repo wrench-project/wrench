@@ -158,7 +158,7 @@
         }
       }
     },
-    "/simulation/{simid}/createTask": {
+    "/simulation/{simid}/{workflow_name}/createTask": {
       "put": {
         "tags": [
           "WRENCH"
@@ -170,6 +170,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -313,7 +322,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{tid}/inputFiles": {
+    "/simulation/{simid}/{workflow_name}/tasks/{tid}/inputFiles": {
       "get": {
         "tags": [
           "WRENCH"
@@ -326,6 +335,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -363,7 +381,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{tid}/addInputFile": {
+    "/simulation/{simid}/{workflow_name}/tasks/{tid}/addInputFile": {
       "put": {
         "tags": [
           "WRENCH"
@@ -376,6 +394,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -429,7 +456,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{tid}/outputFiles": {
+    "/simulation/{simid}/{workflow_name}/tasks/{tid}/outputFiles": {
       "get": {
         "tags": [
           "WRENCH"
@@ -442,6 +469,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -479,7 +515,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{tid}/addOutputFile": {
+    "/simulation/{simid}/{workflow_name}/tasks/{tid}/addOutputFile": {
       "put": {
         "tags": [
           "WRENCH"
@@ -492,6 +528,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -545,7 +590,7 @@
         }
       }
     },
-    "/simulation/{simid}/inputFiles": {
+    "/simulation/{simid}/{workflow_name}/inputFiles": {
       "get": {
         "tags": [
           "WRENCH"
@@ -558,6 +603,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -591,7 +645,7 @@
         "tags": [
           "WRENCH"
         ],
-        "summary": "Add a file to the workflow.",
+        "summary": "Add a file to the simulation.",
         "deprecated": false,
         "operationId": "addFile",
         "parameters": [
@@ -747,7 +801,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetFlops": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetFlops": {
       "get": {
         "tags": [
           "WRENCH"
@@ -760,6 +814,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -797,7 +860,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetMinNumCores": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetMinNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -816,6 +879,15 @@
             }
           },
           {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "name",
             "in": "path",
             "description": "ID of the task",
@@ -847,7 +919,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetMaxNumCores": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetMaxNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -866,6 +938,15 @@
             }
           },
           {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "name",
             "in": "path",
             "description": "ID of the task",
@@ -897,7 +978,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetMemory": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetMemory": {
       "get": {
         "tags": [
           "WRENCH"
@@ -910,6 +991,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -947,7 +1037,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetStartDate": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetStartDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -966,6 +1056,15 @@
             }
           },
           {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "name",
             "in": "path",
             "description": "ID of the task",
@@ -997,7 +1096,7 @@
         }
       }
     },
-    "/simulation/{simid}/tasks/{name}/taskGetEndDate": {
+    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetEndDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1016,6 +1115,15 @@
             }
           },
           {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "name",
             "in": "path",
             "description": "ID of the task",
@@ -1047,7 +1155,7 @@
         }
       }
     },
-    "/simulation/{simid}/createStandardJob": {
+    "/simulation/{simid}/{workflow_name}/createStandardJob": {
       "put": {
         "tags": [
           "WRENCH"
@@ -1059,6 +1167,15 @@
             "name": "simid",
             "in": "path",
             "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
             "required": true,
             "schema": {
               "type": "string"
@@ -2447,6 +2564,130 @@
           }
         }
       }
+    },
+    "/simulation/{simid}/createWorkflowFromJSON": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create a workflow from a WfCommons JSON object.",
+        "operationId": "createWorkflowFromJSON",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to create workflow from JSON.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "json_string": {
+                    "type": "str",
+                    "description": "Workflow JSON string"
+                  },
+                  "reference_flop_rate": {
+                    "type": "str",
+                    "description": "Reference flop rate"
+                  },
+                  "ignore_machine_specs": {
+                    "type": "bool",
+                    "description": "Ignore machine specs"
+                  },
+                  "redundant, dependencies": {
+                    "type": "bool",
+                    "description": "Redundant dependencies"
+                  },
+                  "ignore_cycle_creating_dependencies": {
+                    "type": "bool",
+                    "description": "Ignore cycle creating dependencies"
+                  },
+                  "min_cores_per_task": {
+                    "type": "integer",
+                    "description": "Min cores per task"
+                  },
+                  "max_cores_per_task": {
+                    "type": "integer",
+                    "description": "Max cores per task"
+                  },
+                  "enforce_num_cores": {
+                    "type": "bool",
+                    "description": "Enforce num cores"
+                  },
+                  "ignore_avg_cpu": {
+                    "type": "bool",
+                    "description": "Ignore average cpu"
+                  },
+                  "show_warnings": {
+                    "type": "bool",
+                    "description": "Show warnings"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowResponseWithTaskList"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/createWorkflow": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create a blank workflow.",
+        "operationId": "createWorkflow",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2473,7 +2714,7 @@
         "properties": {
           "port_number": {
             "type": "integer",
-            "description": "Port number to which all subsequent HTTP Post requests should be sent"
+            "description": "Port number to which all subsequent HTTP requests should be sent"
           },
           "wrench_api_request_success": {
             "type": "boolean",
@@ -2488,6 +2729,10 @@
       "Task": {
         "type": "object",
         "properties": {
+          "workflow_name": {
+            "type": "string",
+            "description": "Name of the workflow to which the task is being added"
+          },
           "name": {
             "type": "string",
             "description": "Task's name"
@@ -2517,12 +2762,16 @@
       "StandardJob": {
         "type": "object",
         "properties": {
+          "workflow_name": {
+            "type": "string",
+            "description": "Name of the workflow to which the task is being added"
+          },
           "tasks": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "List of IDs of tasks in the job"
+            "description": "List of names of tasks in the job"
           },
           "file_locations": {
             "type": "object",
@@ -2561,6 +2810,47 @@
           "service_name": {
             "type": "string",
             "description": "The new service's name (if success)"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "WorkflowResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "workflow_name": {
+            "type": "string",
+            "description": "The new workflow's name (if success)"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "WorkflowResponseWithTaskList": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "workflow_name": {
+            "type": "string",
+            "description": "The new workflow's name (if success)"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The names of the workflow's tasks"
           },
           "failure_cause": {
             "type": "string",

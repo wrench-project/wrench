@@ -42,6 +42,7 @@ public:
 protected:
     ~BareMetalComputeServiceHostFailuresTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     BareMetalComputeServiceHostFailuresTest() {
@@ -50,8 +51,8 @@ protected:
 
 
         // Create two files
-        input_file = workflow->addFile("input_file", 10000.0);
-        output_file = workflow->addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000.0);
+        output_file = wrench::Simulation::addFile("output_file", 20000.0);
 
         // Create one task1
         task = workflow->addTask("task1", 3600, 1, 1, 0);
@@ -382,7 +383,7 @@ private:
 
             // Add a task1 to the workflow
             auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 80, 1, 1, 0);
-            auto output_file = this->test->workflow->addFile("output_file_" + std::to_string(trial), 20000.0);
+            auto output_file = wrench::Simulation::addFile("output_file_" + std::to_string(trial), 20000.0);
             task->addInputFile(this->test->input_file);
             task->addOutputFile(output_file);
 
@@ -421,11 +422,12 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 3;
+    int argc = 4;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     argv[2] = strdup("--cfg=contexts/stack-size:100");
+    argv[3] = strdup("--wrench-commport-pool-size=10000");
     //    argv[2] = strdup("--wrench-full-logs");
 
     simulation->init(&argc, argv);

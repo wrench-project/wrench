@@ -39,6 +39,7 @@ public:
 protected:
     ~NetworkProximityTest() {
         workflow->clear();
+        wrench::Simulation::removeAllFiles();
     }
 
     NetworkProximityTest() {
@@ -47,8 +48,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
-        input_file = workflow->addFile("input_file", 10000.0);
-        output_file = workflow->addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000.0);
+        output_file = wrench::Simulation::addFile("output_file", 20000.0);
 
         // Create one task1
         task = workflow->addTask("task1", 3600, 1, 1, 0);
@@ -100,12 +101,12 @@ protected:
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>  "
-                          "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                          "       <link id=\"2\" bandwidth=\"1000GBps\" latency=\"1000us\"/>"
-                          "       <link id=\"3\" bandwidth=\"2000GBps\" latency=\"0us\"/>"
-                          "       <link id=\"4\" bandwidth=\"3000GBps\" latency=\"0us\"/>"
-                          "       <link id=\"5\" bandwidth=\"8000GBps\" latency=\"0us\"/>"
-                          "       <link id=\"6\" bandwidth=\"2900GBps\" latency=\"0us\"/>"
+                          "       <link id=\"1\" bandwidth=\"500MBps\" latency=\"0us\"/>"
+                          "       <link id=\"2\" bandwidth=\"100MBps\" latency=\"1000us\"/>"
+                          "       <link id=\"3\" bandwidth=\"200MBps\" latency=\"0us\"/>"
+                          "       <link id=\"4\" bandwidth=\"300MBps\" latency=\"0us\"/>"
+                          "       <link id=\"5\" bandwidth=\"800MBps\" latency=\"0us\"/>"
+                          "       <link id=\"6\" bandwidth=\"290MBps\" latency=\"0us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\""
                           "/> </route>"
                           "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"3\""
@@ -138,9 +139,7 @@ class ProxTestWMS : public wrench::ExecutionController {
 
 public:
     ProxTestWMS(NetworkProximityTest *test,
-                std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
-        this->test = test;
-    }
+                const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {}
 
 private:
     NetworkProximityTest *test;
@@ -158,6 +157,7 @@ private:
             count++;
             wrench::S4U_Simulation::sleep(20.0);
             proximity = network_proximity_service->getHostPairDistance(hosts_to_compute_proximity).first;
+            WRENCH_INFO("PROXIMITY = %lf", proximity);
         }
 
         if (count == max_count) {
@@ -204,6 +204,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
+    //        argv[2] = strdup("--wrench-default-control-message-size=04");
 
     simulation->init(&argc, argv);
 
@@ -312,7 +313,7 @@ class CompareProxTestWMS : public wrench::ExecutionController {
 
 public:
     CompareProxTestWMS(NetworkProximityTest *test,
-                       std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                       const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:

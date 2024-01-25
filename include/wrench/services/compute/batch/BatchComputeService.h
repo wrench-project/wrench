@@ -20,6 +20,7 @@
 #include "wrench/job/CompoundJob.h"
 #include "wrench/job/Job.h"
 #include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 #include <deque>
 #include <queue>
@@ -76,30 +77,30 @@ namespace wrench {
                 {BatchComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+                {BatchComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
         };
 
     public:
@@ -238,7 +239,7 @@ namespace wrench {
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
 
-        void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
+        void processGetResourceInformation(S4U_CommPort *answer_commport, const std::string &key);
 
         void processCompoundJobCompletion(const std::shared_ptr<BareMetalComputeServiceOneShot> &executor, const std::shared_ptr<CompoundJob> &job);
 
@@ -258,7 +259,7 @@ namespace wrench {
         void processCompoundJobTimeout(const std::shared_ptr<CompoundJob> &job);
 
         //process standard job termination request
-        void processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job, simgrid::s4u::Mailbox *answer_mailbox);
+        void processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job, S4U_CommPort *answer_commport);
 
         // process a batch bach_job tiemout event
         void processAlarmJobTimeout(const std::shared_ptr<BatchJob> &batch_job);
@@ -273,14 +274,14 @@ namespace wrench {
         void sendCompoundJobFailureNotification(const std::shared_ptr<CompoundJob> &job, const std::string &job_id, const std::shared_ptr<FailureCause> &cause);
 
         // process a job submission
-        void processJobSubmission(const std::shared_ptr<BatchJob> &job, simgrid::s4u::Mailbox *answer_mailbox);
+        void processJobSubmission(const std::shared_ptr<BatchJob> &job, S4U_CommPort *answer_commport);
 
         //start a job
         void startJob(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &, const std::shared_ptr<CompoundJob> &,
                       const std::shared_ptr<BatchJob> &, unsigned long, unsigned long, unsigned long);
 
         // process a resource request
-        void processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
+        void processIsThereAtLeastOneHostWithAvailableResources(S4U_CommPort *answer_commport, unsigned long num_cores, double ram);
 
 #ifdef ENABLE_BATSCHED
         void processExecuteJobFromBatSched(const std::string &bat_sched_reply);
