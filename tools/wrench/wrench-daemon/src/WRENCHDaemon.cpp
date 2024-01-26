@@ -345,9 +345,38 @@ void WRENCHDaemon::error_handling(const Request &req, Response &res) {
 * @brief The WRENCH daemon's "main" method
 */
 void WRENCHDaemon::run() {
+    std::vector<std::string> allowed_origins = {
+            "http://localhost:8000"
+    };
+
     // Only set up POST request handler for "/api/startSimulation" since
     // all other API paths will be handled by a simulation daemon instead
-    server.Post("/api/startSimulation", [this](const Request &req, Response &res) { this->startSimulation(req, res); });
+    server.Post("/api/startSimulation", [this, allowed_origins](const Request &req, Response &res) {
+        // Check if the Origin header is present and matches any of the allowed origins
+        auto origin_header = req.get_header_value("Origin");
+        std::cerr << "ORIGIN_HEADER: " << origin_header << "\n";
+        if (!origin_header.empty()) {
+            for (const auto& allowed_origin : allowed_origins) {
+                if (origin_header == allowed_origin) {
+                    // Set appropriate CORS headers
+                    res.set_header("Access-Control-Allow-Origin", origin_header);
+                    res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                    res.set_header("Access-Control-Allow-Headers", "Content-Type");
+                    res.set_header("Access-Control-Max-Age", "86400");  // One day
+                    // Start simulation
+                    this->startSimulation(req, res);
+                    return;
+                }
+            }
+        }
+
+        // If the Origin is not allowed, respond with a 403 Forbidden status
+        res.status = 403;
+        res.set_header("Content-Type", "text/plain");
+        res.set_content("Forbidden", "text/plain");
+
+
+    });
 
     // Set some generic error handler
     server.set_error_handler([](const Request &req, Response &res) { WRENCHDaemon::error_handling(req, res); });
