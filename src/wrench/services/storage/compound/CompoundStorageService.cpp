@@ -799,36 +799,34 @@ namespace wrench {
      *
      * @throw ExecutionException
      */
-    void CompoundStorageService::writeFile(S4U_CommPort *answer_commport,
+    void CompoundStorageService::writeFile(S4U_CommPort *answer_commport /*unused*/,
                                            const std::shared_ptr<FileLocation> &location,
                                            double num_bytes_to_write,
                                            bool wait_for_answer) {
 
         WRENCH_INFO("CSS::writeFile(): Writing  %fb to file %s - starting at %f", num_bytes_to_write, location->getFile()->getID().c_str(), S4U_Simulation::getClock());
-        this->assertServiceIsUp();
 
         if (location == nullptr) {
             throw std::invalid_argument("CSS::writeFile(): Invalid arguments (location is a nullptr)");
         }
 
+        this->assertServiceIsUp();
+
         // Find the file, or allocate file/parts of file onto known SSS
         auto designated_locations = this->lookupOrDesignateStorageService(location);
-
         if (designated_locations.empty()) {
-            WRENCH_WARN("CSS:writeFile(): 'designated_locations' vector empry (error or lack of space from the allocator point of view)");
+            WRENCH_WARN("CSS::writeFile(): 'designated_locations' vector empry (error or lack of space from the allocator point of view)");
             throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(location->getFile(), this->getSharedPtr<CompoundStorageService>()));
         }
-        std::vector<std::unique_ptr<wrench::StorageServiceFileWriteAnswerMessage>> messages = {};
-        auto recv_commport = S4U_CommPort::getTemporaryCommPort();
 
         // If num_bytes_to_write > the entire file size, we have a big problem (it should almost always be way smaller, as it represents the bytes only in a subset of all file chunks)
         if (num_bytes_to_write > location->getFile()->getSize()) {
-            WRENCH_WARN("CSS:writeFile(): 'num_bytes_to_write' is larger than actual file size");
+            WRENCH_WARN("CSS::writeFile(): 'num_bytes_to_write' is larger than actual file size");
             throw std::invalid_argument("'num_bytes_to_write' is larger than actual file size");
         }
 
         // Identify, for current main file, where to start writing (maybe at the begining, maybe somewhere in the file, indicated by a chunk index)
-        WRENCH_INFO("CSS:writeFile(): STARTING TO WORK ON STRIPES FOR FILE %s", location->getFile()->getID().c_str());
+        WRENCH_INFO("CSS::writeFile(): looking for first and last stripes to write for %s", location->getFile()->getID().c_str());
         auto locations_start = this->partial_io_stripe_index[location->getFile()];
         if (locations_start == designated_locations.size()) {
             locations_start = 0;
@@ -849,7 +847,7 @@ namespace wrench {
         locations_start--; // back up one stripe because when writing eg. 1 stripe, we want to write from stripe X to stripe X, not stripe X to X+1
 
         // Writes are now going to take place on these locations only
-        WRENCH_INFO("CSS:writeFile(): Writing file %s from part %s to part %s",
+        WRENCH_INFO("CSS::writeFile(): Writing file %s from part %s to part %s",
                     location->getFile()->getID().c_str(),
                     designated_locations[this->partial_io_stripe_index[location->getFile()]]->getFile()->getID().c_str(),
                     designated_locations[locations_start]->getFile()->getID().c_str());
@@ -858,7 +856,6 @@ namespace wrench {
         std::vector<std::shared_ptr<wrench::FileLocation>> designated_locations_subset(
             designated_locations.begin() + this->partial_io_stripe_index[location->getFile()],
             designated_locations.begin() + (++locations_start));
-
         // UPDATE the next starting location for writing file chunks
         this->partial_io_stripe_index[location->getFile()] = locations_start;
 
@@ -869,18 +866,13 @@ namespace wrench {
                     designated_locations_subset.size());
 
         // Contact every SimpleStorageService that we want to use, and request a FileWrite
-        unsigned int request_count = 0;
         auto recv_commport = S4U_CommPort::getTemporaryCommPort();
+        unsigned int request_count = 0;
+        WRENCH_INFO("CSS::writeFile(): Using commport created : %s", recv_commport->get_name().c_str());
         for (auto &dloc : designated_locations_subset) {
-            WRENCH_DEBUG("CSS:writeFile(): Sending full write request %d on file %s (<%f> b) to %s",
-                         request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
+            WRENCH_INFO("CSS::writeFile(): Sending full write request %d on file %s (<%f> b) to %s",
+                        request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
 
-            WRENCH_INFO("CSS:writeFile(): Sending write request for part %d to %s", request_count, dloc->getStorageService()->getName().c_str());
-
-            // That's quite dirty, but : space is reserved during the call to lookupOrDesignateFileLocation, so that
-            // we keep track of future space usage on various storage nodes while allocating multiple chunks of a given
-            // file. So right before we actually start the copy, we unreserve space.
-            dloc->getStorageService()->unreserveSpace(dloc);
             dloc->getStorageService()->commport->dputMessage(
                 new StorageServiceFileWriteRequestMessage(
                     recv_commport,
@@ -892,17 +884,22 @@ namespace wrench {
             request_count++;
         }
 
-        auto recv = 0;
+        WRENCH_INFO("CSS::writeFile(): %i write requests sent", request_count);
+
+        std::vector<std::unique_ptr<wrench::StorageServiceFileWriteAnswerMessage>> messages = {};
+        unsigned int recv = 0;
         while (recv < request_count) {
             // Wait for answer to current request
             auto msg = recv_commport->getMessage<StorageServiceFileWriteAnswerMessage>(this->network_timeout, "CSS::writeFile(): ");
-            if (not msg->success)
+            if (not msg->success) {
+                WRENCH_WARN("CSS::fileWrite(): Network timeout while waiting for and answer %d", recv);
                 throw ExecutionException(msg->failure_cause);
-
+            }
             messages.push_back(std::move(msg));
+            recv++;
         }
 
-        WRENCH_DEBUG("CSS::writeFile(): %u FileWriteRequests sent and validated", request_count);
+        WRENCH_INFO("CSS::writeFile(): %u FileWriteRequests sent and validated", request_count);
 
         for (const auto &msg : messages) {
             // Update buffer size according to which storage service actually answered.
@@ -957,7 +954,7 @@ namespace wrench {
      * @param num_bytes: the number of bytes to read
      * @param wait_for_answer: whether to wait for the answer
      */
-    void CompoundStorageService::readFile(S4U_CommPort *answer_commport,
+    void CompoundStorageService::readFile(S4U_CommPort *answer_commport /*unused*/,
                                           const std::shared_ptr<FileLocation> &location,
                                           double num_bytes,
                                           bool wait_for_answer) {
@@ -967,14 +964,14 @@ namespace wrench {
             throw std::invalid_argument("StorageService::readFile(): Invalid nullptr/0 arguments");
         }
 
-        assertServiceIsUp(this->getSharedPtr<Service>());
+        this->assertServiceIsUp();
 
         auto designated_locations = this->lookupFileLocation(location);
         if (designated_locations.empty()) {
             throw ExecutionException(std::make_shared<FileNotFound>(location));
         }
 
-        WRENCH_INFO("CSS:readFile(): STARTING TO WORK ON STRIPES FOR FILE %s", location->getFile()->getID().c_str());
+        WRENCH_INFO("CSS::readFile(): looking for first and last stripes to read for %s", location->getFile()->getID().c_str());
         auto locations_start = this->partial_io_stripe_index[location->getFile()];
         if (locations_start == designated_locations.size()) {
             locations_start = 0;
@@ -986,7 +983,7 @@ namespace wrench {
         */
         auto stripe_count = designated_locations.size();
         while (num_bytes > 0 and locations_start != stripe_count) {
-            WRENCH_INFO("CSS:readFile():  - num_bytes = %f and current file (%s) is %f bytes",
+            WRENCH_INFO("CSS::readFile():  - num_bytes = %f and current file (%s) is %f bytes",
                         num_bytes,
                         designated_locations[locations_start]->getFile()->getID().c_str(),
                         designated_locations[locations_start]->getFile()->getSize());
@@ -996,7 +993,7 @@ namespace wrench {
         locations_start--;
 
         // Writes are now going to take place on these locations only
-        WRENCH_INFO("CSS:readFile(): Reading file %s from part %s to part %s",
+        WRENCH_INFO("CSS::readFile(): Reading file %s from part %s to part %s",
                     location->getFile()->getID().c_str(),
                     designated_locations[this->partial_io_stripe_index[location->getFile()]]->getFile()->getID().c_str(),
                     designated_locations[locations_start]->getFile()->getID().c_str());
@@ -1004,20 +1001,15 @@ namespace wrench {
         std::vector<std::shared_ptr<wrench::FileLocation>> designated_locations_subset(
             designated_locations.begin() + this->partial_io_stripe_index[location->getFile()],
             designated_locations.begin() + (++locations_start));
-        // UPDATE the progress on writing the file stripes
+        // UPDATE the progress on reading the file stripes
         this->partial_io_stripe_index[location->getFile()] = locations_start;
 
         // Contact every SSS
         auto recv_commport = S4U_CommPort::getTemporaryCommPort();
-        auto request_count = 0;
+        unsigned int request_count = 0;
         for (const auto &dloc : designated_locations_subset) {
-            WRENCH_DEBUG("CSS::readFile(): Sending read file request for %f bytes on file %s at path %s, to storage service %s",
-                         dloc->getFile()->getSize(),
-                         dloc->getFile()
-                             ->getID()
-                             .c_str(),
-                         dloc->getPath().c_str(),
-                         dloc->getStorageService()->getName().c_str());
+            WRENCH_DEBUG("CSS::readFile(): Sending full read request %d on file %s (<%f> b) to %s",
+                         request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
 
             dloc->getStorageService()->commport->dputMessage(
                 new StorageServiceFileReadRequestMessage(
@@ -1025,7 +1017,7 @@ namespace wrench {
                     simgrid::s4u::this_actor::get_host(),
                     dloc,
                     dloc->getFile()->getSize(), // Note : not using num_bytes, because we know how many full stripes to write to amount to the same number of bytes
-                    dloc->getStorageService()->getMessagePayloadValue(
+                    this->getMessagePayloadValue(
                         CompoundStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
             request_count++;
         }
@@ -1033,7 +1025,7 @@ namespace wrench {
         WRENCH_DEBUG("CSS::readFile(): %i read requests sent", request_count);
 
         std::vector<std::unique_ptr<wrench::StorageServiceFileReadAnswerMessage>> messages = {};
-        auto recv = 0;
+        unsigned int recv = 0;
         while (recv < request_count) {
             // Wait for answer to current reqeust
             auto msg = recv_commport->getMessage<StorageServiceFileReadAnswerMessage>(this->network_timeout, "CSS::readFile(): ");
@@ -1044,7 +1036,7 @@ namespace wrench {
             recv++;
         }
 
-        WRENCH_DEBUG("CSS::readFile(): All requests sent and validated");
+        WRENCH_DEBUG("CSS::readFile(): %u FileReadRequests sent and validated", request_count);
 
         for (const auto &msg : messages) {
 
@@ -1073,7 +1065,7 @@ namespace wrench {
                     }
                 }
 
-                S4U_CommPort::retireTemporaryCommPort(msg->commport_to_receive_the_file_content);
+                // S4U_CommPort::retireTemporaryCommPort(msg->commport_to_receive_the_file_content);
 
                 // Waiting for all the final acks (same thing as for un buffered sources : we're waiting on N ack messages, not necessarily the ones corresponding to this exact message)
                 for (unsigned long source = 0; source < number_of_sources; source++) {
