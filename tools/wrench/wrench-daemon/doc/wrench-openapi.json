@@ -1755,6 +1755,62 @@
         }
       }
     },
+    "/simulation/{simid}/fileRegistryServices/{file_registry_service_name}/addEntry": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add an entry to a file registry service.",
+        "operationId": "fileRegistryServiceAddEntry",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_registry_service_name",
+            "in": "path",
+            "Description": "Name of the file registry service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Entry to add.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileRegistryServiceEntry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
     "/simulation/{simid}/{storage_service_name}/createFileCopy": {
       "post": {
         "tags": [
@@ -2784,6 +2840,19 @@
               }
             },
             "description": "Map of file IDs to storage service names (aka the list of file locations)."
+          }
+        }
+      },
+      "FileRegistryServiceEntry": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string",
+            "description": "The name of the file in the entry"
+          },
+          "storage_service_name": {
+            "type": "string",
+            "description": "The name of the storage service in the entry"
           }
         }
       },

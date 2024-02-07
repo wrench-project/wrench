@@ -65,7 +65,7 @@ namespace wrench {
                     this->storage_service_registry.insert(new_service_shared_ptr->getName(), ss);
                 } else if (auto fs = std::dynamic_pointer_cast<wrench::FileRegistryService>(new_service_shared_ptr)) {
                     WRENCH_INFO("Started a new storage service");
-                    this->file_service_registry.insert(new_service_shared_ptr->getName(), fs);
+                    this->file_registry_service_registry.insert(new_service_shared_ptr->getName(), fs);
                 } else {
                     throw std::runtime_error("SimulationController::startNewService(): Unknown service type");
                 }
@@ -652,6 +652,40 @@ namespace wrench {
         auto new_service = new FileRegistryService(head_host, {}, {});
 
         return this->startService<wrench::FileRegistryService>(new_service);
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::fileRegistryServiceAddEntry(json data) {
+
+        // Does the file registry service exist?
+        std::string frs_name = data["file_registry_service_name"];
+        std::shared_ptr<FileRegistryService> frs;
+        if (not this->file_registry_service_registry.lookup(frs_name, frs)) {
+            throw std::runtime_error("Unknown file registry service " + frs_name);
+        }
+
+        // Does the file exist?
+        std::string file_name = data["file_name"];
+        std::shared_ptr<DataFile> file;
+        try {
+            file = Simulation::getFileByID(file_name);
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Unknown file " + file_name);
+        }
+
+        // Does the storage_service exist?
+        std::string ss_name = data["storage_service_name"];
+        std::shared_ptr<StorageService> ss;
+        if (not this->storage_service_registry.lookup(ss_name, ss)) {
+            throw std::runtime_error("Unknown storage service " + ss_name);
+        }
+
+        frs->addEntry(FileLocation::LOCATION(ss, file));
+        return {};
     }
 
     /**

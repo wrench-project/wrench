@@ -74,6 +74,7 @@ namespace wrench {
         json lookupFileAtStorageService(json data);
 
         json addFileRegistryService(json data);
+        json fileRegistryServiceAddEntry(json data);
 
         json addFile(json data);
         json getFileSize(json data);
@@ -129,7 +130,7 @@ namespace wrench {
         KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;
         KeyValueStore<std::shared_ptr<ComputeService>> compute_service_registry;
         KeyValueStore<std::shared_ptr<StorageService>> storage_service_registry;
-        KeyValueStore<std::shared_ptr<FileRegistryService>> file_service_registry;
+        KeyValueStore<std::shared_ptr<FileRegistryService>> file_registry_service_registry;
 
         // Thread-safe queues for the server thread and the simulation thread to communicate
         BlockingQueue<std::pair<double, std::shared_ptr<wrench::ExecutionEvent>>> event_queue;
