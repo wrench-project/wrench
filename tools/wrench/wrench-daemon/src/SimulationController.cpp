@@ -684,7 +684,30 @@ namespace wrench {
             throw std::runtime_error("Unknown storage service " + ss_name);
         }
 
-        frs->addEntry(FileLocation::LOCATION(ss, file));
+        // Ask the simulation thread to do it!
+//        frs->addEntry(FileLocation::LOCATION(ss, file));
+
+        BlockingQueue<std::tuple<bool, std::string>> entry_added;
+
+        // Push the request into the blocking queue
+        this->things_to_do.push([frs, ss, file, &entry_added]() {
+            try {
+                frs->addEntry(FileLocation::LOCATION(ss, file));
+                entry_added.push(std::tuple(true, ""));
+            } catch (std::invalid_argument &e) {
+                entry_added.push(std::tuple(false, e.what()));
+            }
+        });
+
+        // Poll from the shared queue
+        std::tuple<bool, std::string> reply;
+        entry_added.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot add entry:" + error_msg);
+        }
+
         return {};
     }
 
