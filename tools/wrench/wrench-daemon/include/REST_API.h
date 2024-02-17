@@ -40,7 +40,7 @@ public:
             answer["wrench_api_request_success"] = false;
             answer["failure_cause"] = e.what();
         }
-        res.set_header("access-control-allow-origin", "*");
+        res.set_header("Access-Control-Allow-Origin", "*");
         res.body = to_string(answer);
     }
 
