@@ -322,7 +322,7 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
         }
 
         // Destroy the shared memory segment (important, since there is a limited
-        // number of them we can create, and besides we should clean-up after ourselves)
+        // number of them we can create, and besides we should clean up after ourselves)
         if (shmctl(shm_segment_id, IPC_RMID, nullptr) == -1) {
             perror("WARNING: shmctl()");
         }
