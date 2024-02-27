@@ -1773,7 +1773,7 @@
             }
           },
           {
-            "name": "p",
+            "name": "file_registry_service_name",
             "in": "path",
             "description": "name of the file registry service",
             "required": true,
@@ -1784,6 +1784,62 @@
         ],
         "requestBody": {
           "description": "Entry to add.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileRegistryServiceEntry"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/fileRegistryServices/{file_registry_service_name}/removeEntry": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Remove an entry from a file registry service.",
+        "operationId": "fileRegistryServiceRemoveEntry",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_registry_service_name",
+            "in": "path",
+            "description": "name of the file registry service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Entry to remove.",
           "required": true,
           "content": {
             "application/json": {
