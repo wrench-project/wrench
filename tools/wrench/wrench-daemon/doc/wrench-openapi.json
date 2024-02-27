@@ -1773,7 +1773,7 @@
             }
           },
           {
-            "name": "p",
+            "name": "file_registry_service_name",
             "in": "path",
             "description": "name of the file registry service",
             "required": true,
