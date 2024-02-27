@@ -30,6 +30,7 @@ request_handlers["addSimpleStorageService"] = [sc](json data) { return sc->addSi
 request_handlers["addFileRegistryService"] = [sc](json data) { return sc->addFileRegistryService(std::move(data)); };
 request_handlers["addEntry"] = [sc](json data) { return sc->fileRegistryServiceAddEntry(std::move(data)); };
 request_handlers["lookupEntry"] = [sc](json data) { return sc->fileRegistryServiceLookUpEntry(std::move(data)); };
+request_handlers["removeEntry"] = [sc](json data) { return sc->fileRegistryServiceRemoveEntry(std::move(data)); };
 request_handlers["createFileCopy"] = [sc](json data) { return sc->createFileCopyAtStorageService(std::move(data)); };
 request_handlers["lookupFile"] = [sc](json data) { return sc->lookupFileAtStorageService(std::move(data)); };
 request_handlers["createVM"] = [sc](json data) { return sc->createVM(std::move(data)); };
