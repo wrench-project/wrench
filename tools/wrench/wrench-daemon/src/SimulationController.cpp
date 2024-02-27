@@ -44,7 +44,7 @@ namespace wrench {
 
     /**
      * @brief Construct a new SimulationController object
-     * 
+     *
      * @param hostname string containing the name of the host on which this service runs
      */
     SimulationController::SimulationController(const std::string &hostname, int sleep_us) : ExecutionController(hostname, "SimulationController"), sleep_us(sleep_us) {}
@@ -91,7 +91,7 @@ namespace wrench {
 
     /**
      * @brief Simulation execution_controller's main method
-     * 
+     *
      * @return exit code
      */
     int SimulationController::main() {
@@ -709,6 +709,66 @@ namespace wrench {
         }
 
         return {};
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::fileRegistryServiceLookUpEntry(json data) {
+        // Does the file registry service exist?
+        std::string frs_name = data["file_registry_service_name"];
+        std::shared_ptr<FileRegistryService> frs;
+        if (not this->file_registry_service_registry.lookup(frs_name, frs)) {
+            throw std::runtime_error("Unknown file registry service " + frs_name);
+        }
+
+        // Does the file exist?
+        std::string file_name = data["file_name"];
+        std::shared_ptr<DataFile> file;
+        try {
+            file = Simulation::getFileByID(file_name);
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Unknown file " + file_name);
+        }
+
+       std::set<std::shared_ptr<wrench::FileLocation>> entries;
+
+       BlockingQueue<std::tuple<bool, std::string>> entry_lookup;
+
+       // Push the request into the blocking queue
+       this->things_to_do.push([frs, file, &entries, &entry_lookup]() {
+          try {
+              entries = frs->lookupEntry(file);
+              entry_lookup.push(std::tuple(true, ""));
+          } catch (std::invalid_argument &e) {
+              entry_lookup.push(std::tuple(false, e.what()));
+          }
+       });
+
+       // Poll from the shared queue
+       std::tuple<bool, std::string> reply;
+       entry_lookup.waitAndPop(reply);
+       bool success = std::get<0>(reply);
+       if (not success) {
+          std::string error_msg = std::get<1>(reply);
+          throw std::runtime_error("Cannot lookup entry:" + error_msg);
+       }
+
+       json answer;
+
+       std::vector<std::string> ss_list;
+
+       for (const auto& entry : entries) {
+           // Assuming getStorageService() returns a shared_ptr<wrench::StorageService>
+           auto storage_service = entry->getStorageService();
+
+           // Add the obtained storage service as a string to ss_list
+           ss_list.push_back(storage_service->getName());
+       }
+       answer["storage_services"] = ss_list;
+       return answer;
     }
 
     /**
