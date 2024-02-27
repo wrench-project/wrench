@@ -76,6 +76,7 @@ namespace wrench {
         json addFileRegistryService(json data);
         json fileRegistryServiceAddEntry(json data);
         json fileRegistryServiceLookUpEntry(json data);
+        json fileRegistryServiceRemoveEntry(json data);
 
         json addFile(json data);
         json getFileSize(json data);
