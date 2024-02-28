@@ -759,63 +759,6 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::fileRegistryServiceAddEntry(json data) {
-
-        // Does the file registry service exist?
-        std::string frs_name = data["file_registry_service_name"];
-        std::shared_ptr<FileRegistryService> frs;
-        if (not this->file_registry_service_registry.lookup(frs_name, frs)) {
-            throw std::runtime_error("Unknown file registry service " + frs_name);
-        }
-
-        // Does the file exist?
-        std::string file_name = data["file_name"];
-        std::shared_ptr<DataFile> file;
-        try {
-            file = Simulation::getFileByID(file_name);
-        } catch (std::invalid_argument &e) {
-            throw std::runtime_error("Unknown file " + file_name);
-        }
-
-        // Does the storage_service exist?
-        std::string ss_name = data["storage_service_name"];
-        std::shared_ptr<StorageService> ss;
-        if (not this->storage_service_registry.lookup(ss_name, ss)) {
-            throw std::runtime_error("Unknown storage service " + ss_name);
-        }
-
-        // Ask the simulation thread to do it!
-//        frs->addEntry(FileLocation::LOCATION(ss, file));
-
-        BlockingQueue<std::tuple<bool, std::string>> entry_added;
-
-        // Push the request into the blocking queue
-        this->things_to_do.push([frs, ss, file, &entry_added]() {
-            try {
-                frs->addEntry(FileLocation::LOCATION(ss, file));
-                entry_added.push(std::tuple(true, ""));
-            } catch (std::invalid_argument &e) {
-                entry_added.push(std::tuple(false, e.what()));
-            }
-        });
-
-        // Poll from the shared queue
-        std::tuple<bool, std::string> reply;
-        entry_added.waitAndPop(reply);
-        bool success = std::get<0>(reply);
-        if (not success) {
-            std::string error_msg = std::get<1>(reply);
-            throw std::runtime_error("Cannot add entry:" + error_msg);
-        }
-
-        return {};
-    }
-
-    /**
-     * @brief REST API Handler
-     * @param data JSON input
-     * @return JSON output
-     */
     json SimulationController::fileRegistryServiceLookUpEntry(json data) {
         // Does the file registry service exist?
         std::string frs_name = data["file_registry_service_name"];
