@@ -660,6 +660,10 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::fileRegistryServiceAddEntry(json data) {
+        std::cout << "\033[1;32m";
+        std::cout << "JSON Data Recieved: Performing fileRegistryServiceAddEntry\n";
+        std::cout << "\033[0m";
+
         std::string file_registry_service_name = data["file_registry_service_name"];
         std::shared_ptr<FileRegistryService> frs;
         if (not this->file_registry_service_registry.lookup(file_registry_service_name, frs)) {
@@ -710,6 +714,10 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::fileRegistryServiceRemoveEntry(json data) {
+        std::cout << "\033[1;32m";
+        std::cout << "JSON Data Recieved: Performing fileRegistryServiceRemoveEntry\n";
+        std::cout << "\033[0m";
+
         std::string file_registry_service_name = data["file_registry_service_name"];
         std::shared_ptr<FileRegistryService> frs;
         if (not this->file_registry_service_registry.lookup(file_registry_service_name, frs)) {
@@ -760,6 +768,10 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::fileRegistryServiceLookUpEntry(json data) {
+        std::cout << "\033[1;32m";
+        std::cout << "JSON Data Recieved: Performing fileRegistryServiceLookUpEntry\n";
+        std::cout << "\033[0m";
+
         // Does the file registry service exist?
         std::string frs_name = data["file_registry_service_name"];
         std::shared_ptr<FileRegistryService> frs;
@@ -784,6 +796,11 @@ namespace wrench {
        this->things_to_do.push([frs, file, &entries, &entry_lookup]() {
           try {
               entries = frs->lookupEntry(file);
+              if (entries.empty()) {
+                  std::cout << "\033[1;31m"; // Set color to red
+                  std::cout << "No entries found for file: (%s)\n", file->getID().c_str();
+                  std::cout << "\033[0m";   // Reset color
+              }
               entry_lookup.push(std::tuple(true, ""));
           } catch (std::invalid_argument &e) {
               entry_lookup.push(std::tuple(false, e.what()));
