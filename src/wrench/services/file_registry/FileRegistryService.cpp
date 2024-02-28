@@ -306,8 +306,7 @@ namespace wrench {
      */
     void FileRegistryService::addEntryToDatabase(const std::shared_ptr<FileLocation> &location) {
         auto file = location->getFile();
-        WRENCH_INFO("Adding file (%s) at (%s) to the file registry", file->getID().c_str(),
-                    location->getStorageService()->getHostname().c_str());
+
         if (this->entries.find(file) == this->entries.end()) {
             this->entries[file] = {};
         }
@@ -327,7 +326,7 @@ namespace wrench {
      */
     bool FileRegistryService::removeEntryFromDatabase(const std::shared_ptr<FileLocation> &location) {
         auto file = location->getFile();
-        WRENCH_INFO("Removing file (%s) from the file registry", file->getID().c_str());
+
         if (this->entries.find(file) != this->entries.end()) {
             for (auto const &l: this->entries[file]) {
                 if (FileLocation::equal(l, location)) {
