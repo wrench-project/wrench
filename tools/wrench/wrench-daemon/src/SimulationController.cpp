@@ -695,8 +695,11 @@ namespace wrench {
                 entry_added.push(std::tuple(false, e.what()));
             }
         });
-        WRENCH_INFO("Adding file (%s) at (%s) to the file registry", file->getID().c_str(),
-                    ss->getHostname().c_str());
+
+        std::cout << "\033[1;35m";
+        std::cout << "Adding file " << file->getID().c_str() << " at " << ss->getHostname().c_str() << " to the file registry\n";
+        std::cout << "\033[0m";
+
 
         // Poll from the shared queue
         std::tuple<bool, std::string> reply;
