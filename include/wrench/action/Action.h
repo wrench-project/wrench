@@ -121,7 +121,7 @@ namespace wrench {
         void setRAMAllocated(double ram);
         void setFailureCause(const std::shared_ptr<FailureCause> &failure_cause);
 
-        virtual ~Action() = default;
+        virtual ~Action();
 
         Action(const std::string &name, const std::string &prefix);
 
