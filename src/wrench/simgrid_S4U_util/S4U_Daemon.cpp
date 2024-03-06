@@ -84,14 +84,20 @@ namespace wrench {
         //        std::cerr << "IN DAEMON CONSTRUCTOR: " << this->process_name << "\n";
         this->commport = S4U_CommPort::getTemporaryCommPort();
         this->recv_commport = S4U_CommPort::getTemporaryCommPort();
+        TRACK_OBJECT("actor");
+
     }
 
+    /**
+     * @brief Destructor
+     */
     S4U_Daemon::~S4U_Daemon() {
         //        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s, %p)'", this->getName().c_str(), this->s4u_actor.get());
 
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
 #endif
+        UNTRACK_OBJECT("actor");
     }
 
     //    /**
