@@ -12,7 +12,13 @@
 #include <iostream>
 #include <wrench/logging/TerminalOutput.h>
 
+
 namespace wrench {
+
+#ifdef TRACK_OBJECTS
+    std::map<std::string, unsigned long> TerminalOutput::object_tracker;
+#endif
+
 
     const char *TerminalOutput::color_codes[] = {
             "\033[1;30m",

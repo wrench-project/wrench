@@ -19,7 +19,6 @@
 
 namespace wrench {
 
-
     /* Wrappers around XBT_* macros, using a bit of those macro's internal magic as well
  * to avoid generating useless (but space consuming) color ASCII codes
  */
@@ -94,6 +93,25 @@ namespace wrench {
         static void disableColor();
 
         //        static void disableLog();
+
+//#define TRACK_OBJECTS 1
+
+#ifdef TRACK_OBJECTS
+        static std::map<std::string, unsigned long> object_tracker;
+
+#define TRACK_OBJECT(name) { \
+        TerminalOutput::object_tracker[name]++; \
+        std::cerr << "#" << name<< ": " << TerminalOutput::object_tracker[name] << std::endl; \
+        }
+#define UNTRACK_OBJECT(name) { \
+        TerminalOutput::object_tracker[name]--; \
+        std::cerr << "#" << name << ": " << TerminalOutput::object_tracker[name] << std::endl; \
+        }
+#else
+        #define TRACK_OBJECT(name) {}
+        #define UNTRACK_OBJECT(name) {}
+#endif
+
 
         /***********************/
         /** \endcond           */

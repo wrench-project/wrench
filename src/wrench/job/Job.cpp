@@ -21,6 +21,7 @@ namespace wrench {
      * @brief Destructor
      */
     Job::~Job() {
+        UNTRACK_OBJECT("job");
     }
 
     /**
@@ -41,6 +42,7 @@ namespace wrench {
         this->parent_compute_service = nullptr;
         this->submit_date = -1.0;
         this->end_date = -1.0;
+        TRACK_OBJECT("job");
     }
 
     /**
