@@ -101,11 +101,11 @@ namespace wrench {
 
 #define TRACK_OBJECT(name) { \
         TerminalOutput::object_tracker[name]++; \
-        std::cerr << "#" << name<< ": " << TerminalOutput::object_tracker[name] << std::endl; \
+        std::cerr << "#" << name<< "++: " << TerminalOutput::object_tracker[name] << std::endl; \
         }
 #define UNTRACK_OBJECT(name) { \
         TerminalOutput::object_tracker[name]--; \
-        std::cerr << "#" << name << ": " << TerminalOutput::object_tracker[name] << std::endl; \
+        std::cerr << "#" << name << "--: " << TerminalOutput::object_tracker[name] << std::endl; \
         }
 #else
         #define TRACK_OBJECT(name) {}
