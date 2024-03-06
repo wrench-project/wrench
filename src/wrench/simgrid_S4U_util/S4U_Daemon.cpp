@@ -85,7 +85,6 @@ namespace wrench {
         this->commport = S4U_CommPort::getTemporaryCommPort();
         this->recv_commport = S4U_CommPort::getTemporaryCommPort();
         TRACK_OBJECT("actor");
-
     }
 
     /**
