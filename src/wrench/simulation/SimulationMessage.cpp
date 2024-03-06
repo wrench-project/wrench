@@ -21,7 +21,7 @@ namespace wrench {
 
 
     SimulationMessage::~SimulationMessage() {
-            UNTRACK_OBJECT("message");
+        UNTRACK_OBJECT("message");
         //                WRENCH_INFO("DELETE: %s (%p)", this->getName().c_str(), this);
     }
 
