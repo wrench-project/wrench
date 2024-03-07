@@ -21,10 +21,10 @@
 #define TRACK_OBJECTS 1
 
 #ifdef TRACK_OBJECTS
-    class ObjectTracker {
-    public:
-        std::map<std::string, unsigned long> tracker;
-    };
+class ObjectTracker {
+public:
+    std::map<std::string, unsigned long> tracker;
+};
 
 #define TRACK_OBJECT(name) { \
         object_tracker->tracker[name]++; \
@@ -35,7 +35,6 @@
         object_tracker->tracker[name]--; \
         std::cerr << "#" << (name) << "--: " << object_tracker->tracker[name] << std::endl; \
         }
-
 
     static ObjectTracker *object_tracker = new ObjectTracker(); // WILL cause one memory leak, but that's ok
                                                               // since this is all for debugging purposes
