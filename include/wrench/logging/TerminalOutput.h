@@ -21,20 +21,22 @@
 //#define TRACK_OBJECTS 1
 
 #ifdef TRACK_OBJECTS
-    class ObjectTracker {
-    public:
-        std::map<std::string, unsigned long> tracker;
-    };
+class ObjectTracker {
+public:
+    std::map<std::string, unsigned long> tracker;
+};
 
-#define TRACK_OBJECT(name) { \
-        TerminalOutput::object_tracker->tracker[name]++; \
+#define TRACK_OBJECT(name)                                                                                  \
+    {                                                                                                       \
+        TerminalOutput::object_tracker->tracker[name]++;                                                    \
         std::cerr << "#" << (name) << "++: " << TerminalOutput::object_tracker->tracker[name] << std::endl; \
-        }
+    }
 
-#define UNTRACK_OBJECT(name) { \
-        TerminalOutput::object_tracker->tracker[name]--; \
+#define UNTRACK_OBJECT(name)                                                                                \
+    {                                                                                                       \
+        TerminalOutput::object_tracker->tracker[name]--;                                                    \
         std::cerr << "#" << (name) << "--: " << TerminalOutput::object_tracker->tracker[name] << std::endl; \
-        }
+    }
 
 #else
 #define TRACK_OBJECT(name) \
