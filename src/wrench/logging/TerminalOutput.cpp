@@ -15,7 +15,6 @@
 
 namespace wrench {
 
-
     const char *TerminalOutput::color_codes[] = {
             "\033[1;30m",
             "\033[1;31m",
