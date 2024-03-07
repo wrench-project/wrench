@@ -26,15 +26,17 @@ public:
     std::map<std::string, unsigned long> tracker;
 };
 
-#define TRACK_OBJECT(name) { \
-        object_tracker->tracker[name]++; \
+#define TRACK_OBJECT(name)                                                                  \
+    {                                                                                       \
+        object_tracker->tracker[name]++;                                                    \
         std::cerr << "#" << (name) << "++: " << object_tracker->tracker[name] << std::endl; \
-        }
+    }
 
-#define UNTRACK_OBJECT(name) { \
-        object_tracker->tracker[name]--; \
+#define UNTRACK_OBJECT(name)                                                                \
+    {                                                                                       \
+        object_tracker->tracker[name]--;                                                    \
         std::cerr << "#" << (name) << "--: " << object_tracker->tracker[name] << std::endl; \
-        }
+    }
 
     // The whole point is for the map to not be a static object, but instead be inside a
     // memory-leaked object so that it will not risk being de-allocated before static
