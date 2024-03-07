@@ -15,10 +15,6 @@
 
 namespace wrench {
 
-#ifdef TRACK_OBJECTS
-    auto TerminalOutput::object_tracker = new ObjectTracker(); // WILL cause one memory leak, but that's ok
-                                                        // since this is all for debugging purposes
-#endif
 
     const char *TerminalOutput::color_codes[] = {
             "\033[1;30m",
