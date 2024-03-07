@@ -18,7 +18,7 @@
 #include <iostream>
 
 
-//#define TRACK_OBJECTS 1
+#define TRACK_OBJECTS 1
 
 #ifdef TRACK_OBJECTS
     class ObjectTracker {
@@ -27,15 +27,18 @@
     };
 
 #define TRACK_OBJECT(name) { \
-        TerminalOutput::object_tracker->tracker[name]++; \
-        std::cerr << "#" << (name) << "++: " << TerminalOutput::object_tracker->tracker[name] << std::endl; \
+        object_tracker->tracker[name]++; \
+        std::cerr << "#" << (name) << "++: " << object_tracker->tracker[name] << std::endl; \
         }
 
 #define UNTRACK_OBJECT(name) { \
-        TerminalOutput::object_tracker->tracker[name]--; \
-        std::cerr << "#" << (name) << "--: " << TerminalOutput::object_tracker->tracker[name] << std::endl; \
+        object_tracker->tracker[name]--; \
+        std::cerr << "#" << (name) << "--: " << object_tracker->tracker[name] << std::endl; \
         }
 
+
+    static ObjectTracker *object_tracker = new ObjectTracker(); // WILL cause one memory leak, but that's ok
+                                                              // since this is all for debugging purposes
 #else
 #define TRACK_OBJECT(name) \
     {}
