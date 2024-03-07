@@ -26,18 +26,20 @@ public:
     std::map<std::string, unsigned long> tracker;
 };
 
-#define TRACK_OBJECT(name) { \
-        object_tracker->tracker[name]++; \
+#define TRACK_OBJECT(name)                                                                  \
+    {                                                                                       \
+        object_tracker->tracker[name]++;                                                    \
         std::cerr << "#" << (name) << "++: " << object_tracker->tracker[name] << std::endl; \
-        }
+    }
 
-#define UNTRACK_OBJECT(name) { \
-        object_tracker->tracker[name]--; \
+#define UNTRACK_OBJECT(name)                                                                \
+    {                                                                                       \
+        object_tracker->tracker[name]--;                                                    \
         std::cerr << "#" << (name) << "--: " << object_tracker->tracker[name] << std::endl; \
-        }
+    }
 
-    static ObjectTracker *object_tracker = new ObjectTracker(); // WILL cause one memory leak, but that's ok
-                                                              // since this is all for debugging purposes
+static ObjectTracker *object_tracker = new ObjectTracker();// WILL cause one memory leak, but that's ok
+                                                           // since this is all for debugging purposes
 #else
 #define TRACK_OBJECT(name) \
     {}
