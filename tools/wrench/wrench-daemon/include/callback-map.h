@@ -37,7 +37,6 @@ request_handlers["actionGetParents"] = [sc](json data) { return sc->getTaskFlops
 request_handlers["actionGetChildren"] = [sc](json data) { return sc->getTaskFlops(std::move(data)); };
 request_handlers["actionGetPriority"] = [sc](json data) { return sc->getTaskFlops(std::move(data)); };
 request_handlers["actionSetPriority"] = [sc](json data) { return sc->getTaskFlops(std::move(data)); };
-request_handlers["actionGetSharedPtr"] = [sc](json data) { return sc->getTaskFlops(std::move(data)); };
 request_handlers["actionGetJob"] = [sc](json data) { return sc->getTaskFlops(std::move(data)); };
 request_handlers["actionGetFlops"] = [sc](json data) { return sc->getTaskFlops(std::move(data)); };
 request_handlers["actionGetMinNumCores"] = [sc](json data) { return sc->getTaskMinNumCores(std::move(data)); };
