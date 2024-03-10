@@ -2062,7 +2062,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetParents": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetParents": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2081,7 +2081,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2112,7 +2121,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetChildren": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetChildren": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2131,7 +2140,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2162,7 +2180,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetPriority": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetPriority": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2181,7 +2199,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2212,7 +2239,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionSetPriority": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionSetPriority": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2231,7 +2258,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2262,7 +2298,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetSharedPtr": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetJob": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2281,7 +2317,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2312,7 +2357,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetJob": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetFlops": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2331,7 +2376,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2362,57 +2416,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetFlops": {
-      "get": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Get an action's flops",
-        "deprecated": false,
-        "operationId": "getTaskFlops",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "action_name",
-            "in": "path",
-            "description": "Name of the action",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskFlops"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/simulation/{simid}/actions/{action_name}/actionGetMinNumCores": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetMinNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2431,7 +2435,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2462,7 +2475,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetMaxNumCores": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetMaxNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2481,7 +2494,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2512,7 +2534,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetMinRAMFootprint": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetMinRAMFootprint": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2531,7 +2553,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2562,7 +2593,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetMemory": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetMemory": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2581,7 +2612,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2612,7 +2652,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetState": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetState": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2631,7 +2671,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2662,7 +2711,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetStartDate": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetStartDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2681,7 +2730,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2712,7 +2770,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetEndDate": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetEndDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2731,7 +2789,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2762,7 +2829,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetExecutionHistory": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetExecutionHistory": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2781,7 +2848,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
@@ -2812,7 +2888,7 @@
         }
       }
     },
-    "/simulation/{simid}/actions/{action_name}/actionGetFailureCause": {
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetFailureCause": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2831,7 +2907,16 @@
             }
           },
           {
-            "name": "action_name",
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
             "in": "path",
             "description": "Name of the action",
             "required": true,
