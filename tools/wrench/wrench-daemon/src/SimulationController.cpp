@@ -272,7 +272,7 @@ namespace wrench {
     json SimulationController::getStandardJobTasks(json data) {
         std::shared_ptr<StandardJob> job;
         std::string job_name = data["job_name"];
-        if (not job_registry.lookup(job_name, job)) {
+        if (not standard_job_registry.lookup(job_name, job)) {
             throw std::runtime_error("Unknown job '" + job_name + "'");
         }
         json answer;
@@ -842,7 +842,7 @@ namespace wrench {
 
 
         auto job = this->job_manager->createStandardJob(tasks, file_locations);
-        this->job_registry.insert(job->getName(), job);
+        this->standard_job_registry.insert(job->getName(), job);
         json answer;
         answer["job_name"] = job->getName();
         return answer;
@@ -865,7 +865,7 @@ namespace wrench {
         }
 
         std::shared_ptr<StandardJob> job;
-        if (not this->job_registry.lookup(job_name, job)) {
+        if (not this->standard_job_registry.lookup(job_name, job)) {
             throw std::runtime_error("Unknown job " + job_name);
         }
 

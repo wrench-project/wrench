@@ -129,7 +129,8 @@ namespace wrench {
 
         // Thread-safe key value stores
         KeyValueStore<std::shared_ptr<wrench::Workflow>> workflow_registry;
-        KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;
+        KeyValueStore<std::shared_ptr<wrench::StandardJob>> standard_job_registry;
+        KeyValueStore<std::shared_ptr<wrench::CompoundJob>> compound_job_registry;
         KeyValueStore<std::shared_ptr<ComputeService>> compute_service_registry;
         KeyValueStore<std::shared_ptr<StorageService>> storage_service_registry;
         KeyValueStore<std::shared_ptr<FileRegistryService>> file_registry_service_registry;
