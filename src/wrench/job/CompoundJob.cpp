@@ -310,7 +310,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a file registry add entry action
+     * @brief Add a file registry delete entry action
      * @param name: the action's name
      * @param file_registry: the file registry
      * @param file_location: the file location
