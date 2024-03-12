@@ -1211,7 +1211,7 @@
         }
       }
     },
-    "/simulation/{simid}/jobs/{job_name}/submit": {
+    "/simulation/{simid}/standardJobs/{job_name}/submit": {
       "post": {
         "tags": [
           "WRENCH"
@@ -1260,6 +1260,67 @@
                       }
                     },
                     "description": "service-specific job arguments ({} means “use all defaults” )"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/createCompoundJob": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create a new compound job.",
+        "operationId": "createCompoundJob",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to create a new compound job",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "file_name": {
+                    "type": "string",
+                    "description": "Name of Compound job"
                   }
                 }
               }
@@ -5625,6 +5686,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WorkflowResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/addAction": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create and start an Action.",
+        "operationId": "addAction",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to start a new action.",
+          "content": {
+            "application/json": {
+              "schema": {
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the Action"
+                    },
+                    "prefix": {
+                      "type": "string",
+                      "description": "Prefix to create new name for action if name is not provided"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
                 }
               }
             }
