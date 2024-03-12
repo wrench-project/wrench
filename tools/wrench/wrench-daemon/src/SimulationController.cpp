@@ -901,6 +901,35 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
+json SimulationController::createCompoundJob(json data) {
+    std::string compound_job_name = data["name"];
+
+    if (compound_job_name.empty()) {
+        auto job = this->job_manager->createCompoundJob();
+    } else {
+        auto job = this->job_manager->createCompoundJob(compound_job_name);
+    }
+    this->compound_job_registry.insert(job->getName(), job);
+    json answer;
+    answer["job_name"] = job->getName();
+    return answer;
+}
+
+json SimulationController::addSleepAction(json data) {
+    std::string sleep_action_name = data["name"];
+
+    if (compound_job_name.empty()) {
+        auto job = this->job_manager->createCompoundJob();
+    } else {
+        auto job = this->job_manager->createCompoundJob(compound_job_name);
+    }
+}
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::createTask(json data) {
 
         std::string workflow_name = data["workflow_name"];
@@ -1460,6 +1489,26 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error("Error while importing workflow from JSON: " + std::string(e.what()));
         }
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::addAction(json data) {
+
+        std::string name = data["name"];
+        std::string prefix = data["prefix"];
+
+        // Create the new action
+        auto new_action = new Action();
+
+        json answer;
+
+        answer["action_name"] = new_action;
+
+        return answer;
     }
 
 }// namespace wrench
