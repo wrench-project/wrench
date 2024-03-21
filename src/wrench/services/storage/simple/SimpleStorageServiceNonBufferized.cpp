@@ -268,7 +268,7 @@ namespace wrench {
 
             if (finished_activity == commport_pending_comm->comm_ptr) {
                 //                XXX IS THIS A GOOD IDEA???? SHOULD WE JuSt REPLICATE CODE FROM COMPORT
-                commport_pending_comm->mess_ptr->cancel();
+//                commport_pending_comm->mess_ptr->cancel();
                 auto msg = commport_pending_comm->simulation_message.get();
                 //                commport_pending_comm->mess_ptr->cancel();
                 commport_comm_has_been_posted = false;
@@ -276,7 +276,7 @@ namespace wrench {
             } else if (finished_activity == commport_pending_comm->mess_ptr) {
                 //                simulation_message = commport_pending_comm->wait();
                 auto msg = commport_pending_comm->simulation_message.get();
-                commport_pending_comm->comm_ptr->cancel();
+//                commport_pending_comm->comm_ptr->cancel();
                 commport_comm_has_been_posted = false;
                 if (not processNextMessage(msg)) break;
             } else {
