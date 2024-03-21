@@ -178,6 +178,8 @@ namespace wrench {
         simgrid::s4u::MessPtr mess_ptr;
         std::unique_ptr<SimulationMessage> simulation_message;
 
+        std::cerr << "WTF\n";
+
         while (true) {
 
             S4U_Simulation::computeZeroFlop();
@@ -187,6 +189,7 @@ namespace wrench {
             // Create an async recv on the mailbox if needed
             if (not comm_has_been_posted) {
                 try {
+                    std::cerr << "CREATING COMMPTR\n";
                     comm_ptr = this->commport->s4u_mb->get_async<void>((void **) (&(simulation_message)));
                 } catch (wrench::ExecutionException &e) {
                     // oh well
@@ -196,7 +199,9 @@ namespace wrench {
             }
             // Create an async recv on the message queue if needed
             if (not mess_has_been_posted) {
+                std::cerr << "SimpleStorageServiceNonBufferized::main(): CREATING A MESSPTR\n";
                 mess_ptr = this->commport->s4u_mq->get_async<void>((void **) (&(simulation_message)));
+                std::cerr << "SimpleStorageServiceNonBufferized::main(): CREATED A MESSPTR\n";
                 mess_has_been_posted = true;
             }
 
@@ -239,12 +244,10 @@ namespace wrench {
             if (finished_activity == comm_ptr) {
                 auto msg = simulation_message.get();
                 comm_has_been_posted = false;
-                comm_ptr = nullptr;
                 if (not processNextMessage(msg)) break;
             } else if (finished_activity == mess_ptr) {
                 auto msg = simulation_message.get();
                 mess_has_been_posted = false;
-                mess_ptr = nullptr;
                 if (not processNextMessage(msg)) break;
             } else {
                 auto stream = boost::dynamic_pointer_cast<simgrid::s4u::Io>(finished_activity);
