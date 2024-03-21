@@ -239,10 +239,12 @@ namespace wrench {
             if (finished_activity == comm_ptr) {
                 auto msg = simulation_message.get();
                 comm_has_been_posted = false;
+                comm_ptr = nullptr;
                 if (not processNextMessage(msg)) break;
             } else if (finished_activity == mess_ptr) {
                 auto msg = simulation_message.get();
                 mess_has_been_posted = false;
+                mess_ptr = nullptr;
                 if (not processNextMessage(msg)) break;
             } else {
                 auto stream = boost::dynamic_pointer_cast<simgrid::s4u::Io>(finished_activity);
