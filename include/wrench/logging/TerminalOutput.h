@@ -38,10 +38,10 @@ public:
         std::cerr << "#" << (name) << "--: " << object_tracker->tracker[name] << std::endl; \
     }
 
-// The whole point is for the map to not be a static object, but instead be inside a
-// memory-leaked object so that it will not risk being de-allocated before static
-// objects are deallocated and trigger destructor calls that refer to the map.
-static ObjectTracker *object_tracker = new ObjectTracker();
+    // The whole point is for the map to not be a static object, but instead be inside a
+    // memory-leaked object so that it will not risk being de-allocated before static
+    // objects are deallocated and trigger destructor calls that refer to the map.
+    // static ObjectTracker *object_tracker = new ObjectTracker();
 #else
 #define TRACK_OBJECT(name) \
     {}
