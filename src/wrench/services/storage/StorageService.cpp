@@ -257,7 +257,6 @@ namespace wrench {
 
         assertServiceIsUp(this->getSharedPtr<Service>());
 
-        std::cerr << "CLIENT PUTTING THE REQIUEST MESSAGE\n";
         this->commport->putMessage(
                 new StorageServiceFileReadRequestMessage(
                         answer_commport,
@@ -269,7 +268,6 @@ namespace wrench {
 
         if (wait_for_answer) {
             // Wait for a reply
-            std::cerr << "CLIEN WAITINF GOT EH RESPONTE\n";
             auto msg = answer_commport->getMessage<StorageServiceFileReadAnswerMessage>(this->network_timeout, "StorageService::readFile(): Received an");
 
             // If it's not a success, throw an exception
@@ -281,9 +279,7 @@ namespace wrench {
             if (msg->buffer_size < 1) {
                 // Non-Bufferized
                 // Just wait for the final ack (no timeout!)
-                std::cerr << "CLIENT WAITING FOR THE ACK\n";
                 answer_commport->getMessage<StorageServiceAckMessage>("StorageService::readFile(): Received an");
-                std::cerr << "CLIENT GOT THE ACK!\n";
             } else {
                 unsigned long number_of_sources = msg->number_of_sources;
 
@@ -308,7 +304,7 @@ namespace wrench {
 
                 //Waiting for all the final acks
                 for (unsigned long source = 0; source < number_of_sources; source++) {
-                    answer_commport->getMessage<StorageServiceAckMessage>(this->network_timeout, "StorageService::readreFile(): Received an");
+                    answer_commport->getMessage<StorageServiceAckMessage>(this->network_timeout, "StorageService::readFile(): Received an");
                 }
 
                 S4U_CommPort::retireTemporaryCommPort(msg->commport_to_receive_the_file_content);
