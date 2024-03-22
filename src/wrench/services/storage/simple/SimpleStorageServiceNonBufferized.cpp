@@ -80,14 +80,16 @@ namespace wrench {
         // Send back the relevant ack if this was a read
         if (transaction->dst_location == nullptr) {
             //            WRENCH_INFO("Sending back an ack for a successful file read");
-            transaction->commport->dputMessage(new StorageServiceAckMessage(transaction->src_location));
+            std::cerr << "SENDING BACK AN ACK DUE TO FILE READ!\n";
+            // ARGH::: IF I DO A PUT INSTEAD OF A DPUT, NO LONGER CREEP IN RSS!!!!
+            transaction->commport->putMessage(new StorageServiceAckMessage(transaction->src_location));
         } else if (transaction->src_location == nullptr) {
             StorageService::createFileAtLocation(transaction->dst_location);
             WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // Maybe no corresponding timestamp.
             //            WRENCH_INFO("Sending back an ack for a successful file read");
-            transaction->commport->dputMessage(new StorageServiceAckMessage(transaction->dst_location));
+            transaction->commport->putMessage(new StorageServiceAckMessage(transaction->dst_location));
         } else {
             if (transaction->dst_location->getStorageService() == shared_from_this()) {
                 this->createFile(transaction->dst_location);
@@ -100,7 +102,8 @@ namespace wrench {
             }
 
             //            WRENCH_INFO("Sending back an ack for a file copy");
-            transaction->commport->dputMessage(
+            std::cerr << "SENDING BACK FINAL ACK TO CLIENT\n";
+            transaction->commport->putMessage(
                     new StorageServiceFileCopyAnswerMessage(
                             transaction->src_location,
                             transaction->dst_location,
@@ -184,12 +187,13 @@ namespace wrench {
 
             S4U_Simulation::computeZeroFlop();
 
+            std::cerr << "CALLING START PENDING TRSACTIONS\n";
             this->startPendingTransactions();
 
             // Create an async recv on the mailbox if needed
             if (not comm_has_been_posted) {
+                std::cerr << "POSTING COMM\n";
                 try {
-                    std::cerr << "CREATING COMMPTR\n";
                     comm_ptr = this->commport->s4u_mb->get_async<void>((void **) (&(simulation_message)));
                 } catch (wrench::ExecutionException &e) {
                     // oh well
@@ -199,9 +203,9 @@ namespace wrench {
             }
             // Create an async recv on the message queue if needed
             if (not mess_has_been_posted) {
-                std::cerr << "SimpleStorageServiceNonBufferized::main(): CREATING A MESSPTR\n";
+                WRENCH_INFO("DOING A MESS GET on %s", this->commport->get_cname());
                 mess_ptr = this->commport->s4u_mq->get_async<void>((void **) (&(simulation_message)));
-                std::cerr << "SimpleStorageServiceNonBufferized::main(): CREATED A MESSPTR\n";
+                WRENCH_INFO("ONE A MESS GET on %s", this->commport->get_cname());
                 mess_has_been_posted = true;
             }
 
@@ -229,6 +233,8 @@ namespace wrench {
                 if (failed_activity == mess_ptr) {
                     // the mess failed
                     mess_has_been_posted = false;
+                    std::cerr << "30.CALLING CANCEL ON COMMPORT \n";
+
                     mess_ptr->cancel();
                     mess_ptr = nullptr;
                     continue;// oh well
@@ -246,6 +252,7 @@ namespace wrench {
                 comm_has_been_posted = false;
                 if (not processNextMessage(msg)) break;
             } else if (finished_activity == mess_ptr) {
+                std::cerr << "DOING A MESS GET ON " << this->commport->s4u_mq->get_name() << " HAS WORKED!\n";
                 auto msg = simulation_message.get();
                 mess_has_been_posted = false;
                 if (not processNextMessage(msg)) break;
@@ -254,6 +261,7 @@ namespace wrench {
                 auto transaction = this->stream_to_transactions[stream];
                 this->running_transactions.erase(transaction);
                 this->stream_to_transactions.erase(transaction->stream);
+                std::cerr << "CALLING PROESS TRANSACTION COMPLETION\n";
                 processTransactionCompletion(transaction);
             }
         }
@@ -449,6 +457,7 @@ namespace wrench {
         // If a success, create the chunk_receiving commport
 
         // Send back the corresponding ack
+        std::cerr << "SENDING BACK ACK TO CLIENT\n";
         try {
             answer_commport->putMessage(
                     new StorageServiceFileReadAnswerMessage(
