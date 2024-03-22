@@ -83,14 +83,14 @@ namespace wrench {
         // Send back the relevant ack if this was a read
         if (transaction->dst_location == nullptr) {
             //            WRENCH_INFO("Sending back an ack for a successful file read");
-            transaction->commport->putMessage(new StorageServiceAckMessage(transaction->src_location));
+            transaction->commport->dputMessage(new StorageServiceAckMessage(transaction->src_location));
         } else if (transaction->src_location == nullptr) {
             StorageService::createFileAtLocation(transaction->dst_location);
             WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // Maybe no corresponding timestamp.
             //            WRENCH_INFO("Sending back an ack for a successful file read");
-            transaction->commport->putMessage(new StorageServiceAckMessage(transaction->dst_location));
+            transaction->commport->dputMessage(new StorageServiceAckMessage(transaction->dst_location));
         } else {
             if (transaction->dst_location->getStorageService() == shared_from_this()) {
                 this->createFile(transaction->dst_location);
@@ -103,7 +103,7 @@ namespace wrench {
             }
 
             //            WRENCH_INFO("Sending back an ack for a file copy");
-            transaction->commport->putMessage(
+            transaction->commport->dputMessage(
                     new StorageServiceFileCopyAnswerMessage(
                             transaction->src_location,
                             transaction->dst_location,
