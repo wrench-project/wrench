@@ -143,18 +143,15 @@ namespace wrench {
 
         simgrid::s4u::ActivitySet pending_receives;
         if (not this->mb_comm_posted) {
+            WRENCH_INFO("POSTING GET ASYNC ON MB for %s: %p", this->get_cname(), (this->mb_comm.get()));
             this->mb_comm = this->s4u_mb->get_async<SimulationMessage>(&this->msg_mb);
-            WRENCH_INFO("POSTED GET ASYNC ON MB for %s: %p", this->get_cname(), (this->mb_comm.get()));
             this->mb_comm_posted = true;
         } else {
             WRENCH_INFO("GET ASYNC ON MB ALREADY POSTED FROM BEFORE FOR %s: %p", this->get_cname(), this->mb_comm.get());
         }
         if (not this->mq_comm_posted) {
-            std::cerr << simgrid::s4u::this_actor::get_name() << ": S4U_CommPort::getMessage(): CREATING A MESSPTR\n";
+            WRENCH_INFO("POSTING GET ASYNC ON MQ for %s: %p", this->get_cname(), (this->mq_comm.get()));
             this->mq_comm = this->s4u_mq->get_async<SimulationMessage>(&this->msg_mq);
-            std::cerr << simgrid::s4u::this_actor::get_name() << ": S4U_CommPort::getMessage(): CREATED A MESSPTR\n";
-
-            WRENCH_INFO("POSTED GET ASYNC ON MQ for %s: %p", this->get_cname(), (this->mq_comm.get()));
             this->mq_comm_posted = true;
         } else {
             WRENCH_INFO("GET ASYNC ON MQ ALREADY POSTED FROM BEFORE FOR %s: %p", this->get_cname(), this->mq_comm.get());
@@ -175,6 +172,7 @@ namespace wrench {
             //            WRENCH_INFO("Got A TimeoutException");
             pending_receives.erase(this->mq_comm);
             pending_receives.erase(this->mb_comm);
+            std::cerr << "2.CALLING CANCEL ON COMMPORT \n";
             this->mq_comm->cancel();
             this->mq_comm_posted = false;
             this->mq_comm = nullptr;
@@ -266,7 +264,7 @@ namespace wrench {
             }
         } else {
             try {
-                std::cerr << "SYNCHRONOUS PUT\n";
+                WRENCH_INFO("Putting MSG TO MQ %s", this->get_cname());
                 this->s4u_mq->put(msg);
             } catch (simgrid::TimeoutException &e) {
                 // Can happen if the other side is doing a timeout.... I think
@@ -301,7 +299,7 @@ namespace wrench {
         if (msg->payload != 0) {
             this->s4u_mb->put_init(msg, (uint64_t) msg->payload)->detach();
         } else {
-            std::cerr << simgrid::s4u::this_actor::get_name() << ": DPUT\n";
+            WRENCH_INFO("DPutting MSG TO MQ %s", this->get_cname());
             this->s4u_mq->put_init(msg)->detach();
         }
     }
@@ -347,9 +345,8 @@ namespace wrench {
         } else {
             simgrid::s4u::MessPtr mess_ptr;
             try {
-                std::cerr << simgrid::s4u::this_actor::get_name() << ": S4U_CommPort::iputMessage(): CREATING A MESSPTR\n";
+                WRENCH_INFO("iPutting message to %s", this->get_cname());
                 mess_ptr = this->s4u_mq->put_async(msg);
-                std::cerr << simgrid::s4u::this_actor::get_name() << ": S4U_CommPort::iputMessage(): CREATED A MESSPTR\n";
             } catch (simgrid::NetworkFailureException &e) {
                 throw ExecutionException(std::make_shared<NetworkError>(
                         NetworkError::SENDING, NetworkError::FAILURE, this->s4u_mq->get_name(), msg->getName()));
@@ -387,9 +384,9 @@ namespace wrench {
             throw ExecutionException(std::make_shared<NetworkError>(
                     NetworkError::RECEIVING, NetworkError::FAILURE, this->s4u_mb->get_name(), ""));
         }
-        std::cerr << simgrid::s4u::this_actor::get_name() << ": S4U_CommPort::igetMessage(): CREATING A MESSPTR\n";
+
+        WRENCH_INFO("POSTING MQ get_async on %s", this->get_cname());
         simgrid::s4u::MessPtr mess_ptr = this->s4u_mq->get_async<void>((void **) (&(pending_communication->simulation_message)));
-        std::cerr << simgrid::s4u::this_actor::get_name() << ": S4U_CommPort::igetMessage(): CREATED A MESSPTR\n";
         pending_communication->mess_ptr = mess_ptr;
         return pending_communication;
     }
@@ -456,6 +453,7 @@ namespace wrench {
             commport->mb_comm->cancel();
         }
         if (commport->mq_comm) {
+            std::cerr << "1.CALLING CANCEL ON COMMPORT \n";
             commport->mq_comm->cancel();
         }
         commport->reset();
