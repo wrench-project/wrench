@@ -77,11 +77,12 @@ namespace wrench {
             transaction->dst_location->getStorageService()->createFile(transaction->dst_location);
         }
 
+        // TODO: If below I do dputMessage instead of putMessage, the MessImpl objects accumulate
+        //       and are freed only at the end of the simulation.
+
         // Send back the relevant ack if this was a read
         if (transaction->dst_location == nullptr) {
             //            WRENCH_INFO("Sending back an ack for a successful file read");
-            std::cerr << "SENDING BACK AN ACK DUE TO FILE READ!\n";
-            // ARGH::: IF I DO A PUT INSTEAD OF A DPUT, NO LONGER CREEP IN RSS!!!!
             transaction->commport->putMessage(new StorageServiceAckMessage(transaction->src_location));
         } else if (transaction->src_location == nullptr) {
             StorageService::createFileAtLocation(transaction->dst_location);
@@ -102,7 +103,6 @@ namespace wrench {
             }
 
             //            WRENCH_INFO("Sending back an ack for a file copy");
-            std::cerr << "SENDING BACK FINAL ACK TO CLIENT\n";
             transaction->commport->putMessage(
                     new StorageServiceFileCopyAnswerMessage(
                             transaction->src_location,
@@ -181,18 +181,14 @@ namespace wrench {
         simgrid::s4u::MessPtr mess_ptr;
         std::unique_ptr<SimulationMessage> simulation_message;
 
-        std::cerr << "WTF\n";
-
         while (true) {
 
             S4U_Simulation::computeZeroFlop();
 
-            std::cerr << "CALLING START PENDING TRSACTIONS\n";
             this->startPendingTransactions();
 
             // Create an async recv on the mailbox if needed
             if (not comm_has_been_posted) {
-                std::cerr << "POSTING COMM\n";
                 try {
                     comm_ptr = this->commport->s4u_mb->get_async<void>((void **) (&(simulation_message)));
                 } catch (wrench::ExecutionException &e) {
@@ -203,9 +199,7 @@ namespace wrench {
             }
             // Create an async recv on the message queue if needed
             if (not mess_has_been_posted) {
-                WRENCH_INFO("DOING A MESS GET on %s", this->commport->get_cname());
                 mess_ptr = this->commport->s4u_mq->get_async<void>((void **) (&(simulation_message)));
-                WRENCH_INFO("ONE A MESS GET on %s", this->commport->get_cname());
                 mess_has_been_posted = true;
             }
 
@@ -233,8 +227,6 @@ namespace wrench {
                 if (failed_activity == mess_ptr) {
                     // the mess failed
                     mess_has_been_posted = false;
-                    std::cerr << "30.CALLING CANCEL ON COMMPORT \n";
-
                     mess_ptr->cancel();
                     mess_ptr = nullptr;
                     continue;// oh well
@@ -252,7 +244,6 @@ namespace wrench {
                 comm_has_been_posted = false;
                 if (not processNextMessage(msg)) break;
             } else if (finished_activity == mess_ptr) {
-                std::cerr << "DOING A MESS GET ON " << this->commport->s4u_mq->get_name() << " HAS WORKED!\n";
                 auto msg = simulation_message.get();
                 mess_has_been_posted = false;
                 if (not processNextMessage(msg)) break;
@@ -261,7 +252,6 @@ namespace wrench {
                 auto transaction = this->stream_to_transactions[stream];
                 this->running_transactions.erase(transaction);
                 this->stream_to_transactions.erase(transaction->stream);
-                std::cerr << "CALLING PROESS TRANSACTION COMPLETION\n";
                 processTransactionCompletion(transaction);
             }
         }
@@ -457,7 +447,6 @@ namespace wrench {
         // If a success, create the chunk_receiving commport
 
         // Send back the corresponding ack
-        std::cerr << "SENDING BACK ACK TO CLIENT\n";
         try {
             answer_commport->putMessage(
                     new StorageServiceFileReadAnswerMessage(

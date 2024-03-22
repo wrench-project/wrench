@@ -93,8 +93,6 @@ namespace wrench {
             } catch (simgrid::TimeoutException &e) {
                 auto failed_recv = pending_receives.get_failed_activity();
                 if (failed_recv == comm_ptr) {
-                    std::cerr << "3.CALLING CANCEL ON COMMPORT \n";
-
                     mess_ptr->cancel();
                 } else {
                     comm_ptr->cancel();
@@ -103,8 +101,6 @@ namespace wrench {
             } catch (simgrid::Exception &e) {
                 auto failed_recv = pending_receives.get_failed_activity();
                 if (failed_recv == comm_ptr) {
-                    std::cerr << "4.CALLING CANCEL ON COMMPORT \n";
-
                     mess_ptr->cancel();
                     throw ExecutionException(std::make_shared<NetworkError>(
                             NetworkError::RECEIVING, NetworkError::FAILURE, this->comm_ptr->get_name(), ""));
@@ -115,8 +111,6 @@ namespace wrench {
             }
 
             if (finished_recv == comm_ptr) {
-                std::cerr << "5.CALLING CANCEL ON COMMPORT \n";
-
                 mess_ptr->cancel();
             } else if (finished_recv == mess_ptr) {
                 comm_ptr->cancel();
@@ -215,8 +209,6 @@ namespace wrench {
         } catch (simgrid::TimeoutException &e) {
             for (auto it = pending_comms.begin(); it < pending_comms.end(); it++) {
                 if ((*it)->comm_ptr) (*it)->comm_ptr->cancel();
-                std::cerr << "10.CALLING CANCEL ON COMMPORT \n";
-
                 if ((*it)->mess_ptr) (*it)->mess_ptr->cancel();
             }
             return ULONG_MAX;
