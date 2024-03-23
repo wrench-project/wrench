@@ -84,6 +84,8 @@ namespace wrench {
 
         json getInputFiles(json data);
 
+        json getReadyTasks(json data);
+
         json stageInputFiles(json data);
 
         json supportsCompoundJobs(json data);

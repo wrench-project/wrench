@@ -988,6 +988,27 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
+    json SimulationController::getReadyTasks(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto tasks = workflow->getReadyTasks();
+        json answer;
+        std::vector<std::string> task_names;
+        for (const auto &t: tasks) {
+            task_names.push_back(t->getID());
+        }
+        answer["tasks"] = task_names;
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::stageInputFiles(json data) {
         std::shared_ptr<StorageService> storage_service;
         std::string service_name = data["storage"];
