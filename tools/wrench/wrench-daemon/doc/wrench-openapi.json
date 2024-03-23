@@ -640,6 +640,56 @@
         }
       }
     },
+    "/simulation/{simid}/{workflow_name}/readyTasks": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Return the list of ready tasks in the workflow.",
+        "deprecated": false,
+        "operationId": "getReadyTasks",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
     "/simulation/{simid}/addFile": {
       "put": {
         "tags": [
