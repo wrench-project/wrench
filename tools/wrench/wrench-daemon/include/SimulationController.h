@@ -83,16 +83,16 @@ namespace wrench {
         json getTaskOutputFiles(json data);
 
         json getInputFiles(json data);
-
         json getReadyTasks(json data);
-
         json stageInputFiles(json data);
+        json workflowIsDone(json data);
+
 
         json supportsCompoundJobs(json data);
-
         json supportsPilotJobs(json data);
-
         json supportsStandardJobs(json data);
+        json getCoreFlopRates(json data);
+        json getCoreCounts(json data);
 
         json createVM(json data);
 

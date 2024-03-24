@@ -690,6 +690,56 @@
         }
       }
     },
+    "/simulation/{simid}/{workflow_name}/isDone": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Return whether the workflow has finished executing or not.",
+        "deprecated": false,
+        "operationId": "workflowIsDone",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BooleanResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
     "/simulation/{simid}/addFile": {
       "put": {
         "tags": [
@@ -1683,6 +1733,108 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BooleanResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/coreFlopRates": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Returns the core flop rate for each host managed by the compute service.",
+        "operationId": "getCoreFlopRates",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "hostnames": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "The service's compute hosts"
+                    },
+                    "flop_rates": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "description": "The service's compute hosts' flop rates"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/coreCounts": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Returns the core counts for each host managed by the compute service.",
+        "operationId": "getCoreCounts",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "hostnames": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "The service's compute hosts"
+                    },
+                    "flop_rates": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "description": "The service's compute hosts' core counts"
+                    }
+                  }
                 }
               }
             }
@@ -2691,7 +2843,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkflowResponseWithTaskList"
+                  "$ref": "#/components/schemas/WorkflowResponseWithTaskAndFileList"
                 }
               }
             }
@@ -2884,7 +3036,7 @@
           }
         }
       },
-      "WorkflowResponseWithTaskList": {
+      "WorkflowResponseWithTaskAndFileList": {
         "type": "object",
         "properties": {
           "wrench_api_request_success": {
@@ -2901,6 +3053,13 @@
               "type": "string"
             },
             "description": "The names of the workflow's tasks"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The names of the workflow's files"
           },
           "failure_cause": {
             "type": "string",
