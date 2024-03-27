@@ -2681,7 +2681,7 @@
       }
     },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/addSleepAction": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -2989,7 +2989,7 @@
       }
     },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/addFileReadAction": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -3017,29 +3017,12 @@
           }
         ],
         "requestBody": {
-          "description": "Input to add a file read action.",
+          "description": "File to read.",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "Name of file read action."
-                  },
-                  "file_name": {
-                    "type": "File",
-                    "description": "File object to be deleted."
-                  },
-                  "storage_service_name": {
-                    "type": "StorageService",
-                    "description": "Storage Service the file is deleted from."
-                  },
-                  "num_bytes_to_read": {
-                    "type": "float",
-                    "description": "Number of bytes to read from file"
-                  }
-                }
+                "$ref": "#/components/schemas/FileReadAction"
               }
             }
           }
@@ -3050,13 +3033,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GenericResponse"
+                  "$ref": "#/components/schemas/AddActionResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Job not found",
+            "description": "Compound job not found",
             "content": {}
           },
           "405": {
@@ -5735,6 +5718,27 @@
           }
         }
       },
+      "FileReadAction": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the action"
+          },
+          "file_name": {
+            "type": "string",
+            "description": "Name of the file to read"
+          },
+          "storage_service_name": {
+            "type": "string",
+            "description": "Name of the storage service the file is stored in"
+          },
+          "num_bytes_to_read": {
+            "type": "number",
+            "description": "Number of bytes to read from the file"
+          }
+        }
+      },
       "GenericResponse": {
         "type": "object",
         "properties": {
@@ -5980,6 +5984,23 @@
           "job_name": {
             "type": "string",
             "description": "The new job's name."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "AddActionResponse": {
+        "type": "object",
+        "properties": {
+          "action_name": {
+            "type": "string",
+            "description": "The new action's name."
           },
           "wrench_api_request_success": {
             "type": "boolean",

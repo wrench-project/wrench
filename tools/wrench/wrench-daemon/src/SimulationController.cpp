@@ -578,8 +578,7 @@ namespace wrench {
         std::shared_ptr<DataFile> file;
         //        std::string workflow_name = data["workflow_name"];
         //        std::shared_ptr<Workflow> workflow;
-        //        if (not this->
-        workflow_registry.lookup(workflow_name, workflow)) {
+        //        if (not this-> workflow_registry.lookup(workflow_name, workflow)) {
         //            throw std::runtime_error("Unknown workflow " + workflow_name);
         //        }
         try {
@@ -804,7 +803,7 @@ namespace wrench {
 
        std::vector<std::string> ss_list;
 
-       for (const auto& entry : entries) {
+       for (const auto &entry : entries) {
            // Assuming getStorageService() returns a shared_ptr<wrench::StorageService>
            auto storage_service = entry->getStorageService();
 
@@ -906,11 +905,11 @@ namespace wrench {
         std::string compound_job_name = data["name"];
 
         auto job = this->job_manager->createCompoundJob(compound_job_name);
-        this->compound_job_registry.insert(job->getName(), job);
-        json answer;
-        answer["job_name"] = job->getName();
-        return answer;
-    }
+    this->compound_job_registry.insert(job->getName(), job);
+    json answer;
+    answer["job_name"] = job->getName();
+    return answer;
+}
 
     /**
     * @brief REST API Handler
@@ -920,16 +919,15 @@ namespace wrench {
     json SimulationController::addComputeAction(json data) {
         std::string compound_job_name = data["compound_job_name"];
         std::shared_ptr<CompoundJob> compound_job;
-        json answer;
         if (not this->compound_job_registry.lookup(compound_job_name, compound_job)) {
             throw std::runtime_error("Unknown compound job " + compound_job_name);
         }
 
         std::string compute_action_name = data["name"];
-        std::double flops = data["flops"];
-        std::double ram = data["ram"];
-        std::double min_num_cores = data["min_num_cores"];
-        std::double max_num_cores = data["max_num_cores"];
+        double flops = data["flops"];
+        double ram = data["ram"];
+        double min_num_cores = data["min_num_cores"];
+        double max_num_cores = data["max_num_cores"];
         std::tuple parallel_model = data["parallel_model"];
         std::string model_type = std::get<0>(parallel_model);
         double value = std::get<1>(parallel_model);
@@ -940,7 +938,7 @@ namespace wrench {
             std::shared_ptr<ParallelModel> model = ParallelModel::CONSTANTEFFICIENCY(value);
         }
 
-        auto action = this->compound_job->addComputeAction(compute_action_name, flops, ram, min_num_cores, max_num_cores, model);
+        auto action = compound_job->addComputeAction(compute_action_name, flops, ram, min_num_cores, max_num_cores, model);
 
         json answer;
         answer["name"] = action->getName();
@@ -980,7 +978,7 @@ namespace wrench {
         }
 
         std::string file_copy_action_name = data["name"];
-        auto action = this->compound_job->addFileCopyAction(file_copy_action_name, file, src_ss, dest_ss);
+        auto action = compound_job->addFileCopyAction(file_copy_action_name, file, src_ss, dest_ss);
 
         json answer;
         answer["name"] = action->getName();
@@ -1020,7 +1018,7 @@ namespace wrench {
         }
 
         std::string file_delete_action_name = data["name"];
-        auto action = this->compound_job->addFileDeleteAction(file_delete_action_name, file, ss);
+        auto action = compound_job->addFileDeleteAction(file_delete_action_name, file, ss);
 
         json answer;
         answer["name"] = action->getName();
@@ -1060,7 +1058,7 @@ namespace wrench {
         }
 
         std::string file_write_action_name = data["name"];
-        auto action = this->compound_job->addFileWriteAction(file_write_action_name, file, ss);
+        auto action = compound_job->addFileWriteAction(file_write_action_name, file, ss);
 
         json answer;
         answer["name"] = action->getName();
@@ -1100,12 +1098,12 @@ namespace wrench {
         }
 
         std::string file_read_action_name = data["name"];
-        std::double num_bytes_to_read = data["num_bytes_to_read"];
+        double num_bytes_to_read = data["num_bytes_to_read"];
 
         if (num_bytes_to_read == -1) {
-            auto action = this->compound_job->addFileReadAction(file_write_action_name, file, ss);
+            auto action = compound_job->addFileReadAction(file_write_action_name, file, ss);
         } else {
-            auto action = this->compound_job->addFileReadAction(file_write_action_name, file, ss, num_bytes_to_read);
+            auto action = compound_job->addFileReadAction(file_write_action_name, file, ss, num_bytes_to_read);
         }
 
         json answer;
@@ -1127,7 +1125,7 @@ namespace wrench {
     * @param data JSON input
     * @return JSON output
     */
-    json SimulationController::addSleepAction(json data) {
+json SimulationController::addSleepAction(json data) {
         std::string compound_job_name = data["compound_job_name"];
         std::shared_ptr<CompoundJob> compound_job;
         json answer;
@@ -1136,10 +1134,10 @@ namespace wrench {
             throw std::runtime_error("Unknown compound job " + compound_job_name);
         }
 
-        std::string sleep_action_name = data["name"];
-        std::double sleep_time = data["sleep_time"];
+    std::string sleep_action_name = data["name"];
+        double sleep_time = data["sleep_time"];
 
-        auto action = this->compound_job->addSleepAction(sleep_action_name, sleep_time);
+        auto action = compound_job->addSleepAction(sleep_action_name, sleep_time);
         answer["sleep_action_name"] = action->getName();
         return answer;
     }
@@ -1157,14 +1155,14 @@ namespace wrench {
 
         if (not this->compound_job_registry.lookup(parent_compound_job_name, compound_job)) {
             throw std::runtime_error("Unknown compound job " + parent_compound_job_name);
-        }
+    }
         if (not this->compound_job_registry.lookup(child_compound_job_name, compound_job)) {
             throw std::runtime_error("Unknown compound job " + child_compound_job_name);
         }
 
         child_compound_job_name->addParentJob(parent_compound_job_name);
         return;
-    }
+}
 
     /**
      * @brief REST API Handler
@@ -1730,26 +1728,6 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error("Error while importing workflow from JSON: " + std::string(e.what()));
         }
-    }
-
-    /**
-     * REST API Handler
-     * @param data JSON input
-     * @return JSON output
-     */
-    json SimulationController::addAction(json data) {
-
-        std::string name = data["name"];
-        std::string prefix = data["prefix"];
-
-        // Create the new action
-        auto new_action = new Action();
-
-        json answer;
-
-        answer["action_name"] = new_action;
-
-        return answer;
     }
 
 }// namespace wrench
