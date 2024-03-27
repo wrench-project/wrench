@@ -578,7 +578,8 @@ namespace wrench {
         std::shared_ptr<DataFile> file;
         //        std::string workflow_name = data["workflow_name"];
         //        std::shared_ptr<Workflow> workflow;
-        //        if (not this-> workflow_registry.lookup(workflow_name, workflow)) {
+        //        if (not this->
+        workflow_registry.lookup(workflow_name, workflow)) {
         //            throw std::runtime_error("Unknown workflow " + workflow_name);
         //        }
         try {
@@ -897,33 +898,273 @@ namespace wrench {
     }
 
     /**
-     * @brief REST API Handler
-     * @param data JSON input
-     * @return JSON output
-     */
-json SimulationController::createCompoundJob(json data) {
-    std::string compound_job_name = data["name"];
+    * @brief REST API Handler
+    * @param data JSON input
+    * @return JSON output
+    */
+    json SimulationController::createCompoundJob(json data) {
+        std::string compound_job_name = data["name"];
 
-    if (compound_job_name.empty()) {
-        auto job = this->job_manager->createCompoundJob();
-    } else {
         auto job = this->job_manager->createCompoundJob(compound_job_name);
+        this->compound_job_registry.insert(job->getName(), job);
+        json answer;
+        answer["job_name"] = job->getName();
+        return answer;
     }
-    this->compound_job_registry.insert(job->getName(), job);
-    json answer;
-    answer["job_name"] = job->getName();
-    return answer;
-}
 
-json SimulationController::addSleepAction(json data) {
-    std::string sleep_action_name = data["name"];
+    /**
+    * @brief REST API Handler
+    * @param data JSON input
+    * @return JSON output
+    */
+    json SimulationController::addComputeAction(json data) {
+        std::string compound_job_name = data["compound_job_name"];
+        std::shared_ptr<CompoundJob> compound_job;
+        json answer;
+        if (not this->compound_job_registry.lookup(compound_job_name, compound_job)) {
+            throw std::runtime_error("Unknown compound job " + compound_job_name);
+        }
 
-    if (compound_job_name.empty()) {
-        auto job = this->job_manager->createCompoundJob();
-    } else {
-        auto job = this->job_manager->createCompoundJob(compound_job_name);
+        std::string compute_action_name = data["name"];
+        std::double flops = data["flops"];
+        std::double ram = data["ram"];
+        std::double min_num_cores = data["min_num_cores"];
+        std::double max_num_cores = data["max_num_cores"];
+        std::tuple parallel_model = data["parallel_model"];
+        std::string model_type = std::get<0>(parallel_model);
+        double value = std::get<1>(parallel_model);
+
+        if (model_type == "AMDAHL") {
+            std::shared_ptr<ParallelModel> model = ParallelModel::AMDAHL(value);
+        } else if (model_type == "CONSTANTEFFICIENCY") {
+            std::shared_ptr<ParallelModel> model = ParallelModel::CONSTANTEFFICIENCY(value);
+        }
+
+        auto action = this->compound_job->addComputeAction(compute_action_name, flops, ram, min_num_cores, max_num_cores, model);
+
+        json answer;
+        answer["name"] = action->getName();
+        return answer;
     }
-}
+
+    /**
+    * @brief REST API Handler
+    * @param data JSON input
+    * @return JSON output
+    */
+    json SimulationController::addFileCopyAction(json data) {
+        std::string compound_job_name = data["compound_job_name"]; //lookup compound job in registry
+        std::shared_ptr<CompoundJob> compound_job;
+        if (not this->compound_job_registry.lookup(compound_job_name, compound_job)) {
+            throw std::runtime_error("Unknown compound job " + compound_job_name);
+        }
+
+        std::string file_name = data["file_name"];
+        std::shared_ptr<DataFile> file;
+        try {
+            file = Simulation::getFileByID(file_name);
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Unknown file " + file_name);
+        }
+
+        std::string src_ss_name = data["src_storage_service_name"];
+        std::shared_ptr<StorageService> src_ss;
+        if (not this->storage_service_registry.lookup(src_ss_name, src_ss)) {
+             throw std::runtime_error("Unknown storage service " + src_ss_name);
+        }
+
+        std::string dest_ss_name = data["dest_storage_service_name"];
+        std::shared_ptr<StorageService> dest_ss;
+        if (not this->storage_service_registry.lookup(dest_ss_name, dest_ss)) {
+             throw std::runtime_error("Unknown storage service " + dest_ss_name);
+        }
+
+        std::string file_copy_action_name = data["name"];
+        auto action = this->compound_job->addFileCopyAction(file_copy_action_name, file, src_ss, dest_ss);
+
+        json answer;
+        answer["name"] = action->getName();
+        if (action->usesScratch()) {
+          answer["uses_scratch"] = "1";
+        } else {
+          answer["uses_scratch"] = "0";
+        }
+
+        return answer;
+    }
+
+    /**
+    * @brief REST API Handler
+    * @param data JSON input
+    * @return JSON output
+    */
+    json SimulationController::addFileDeleteAction(json data) {
+        std::string compound_job_name = data["compound_job_name"];
+        std::shared_ptr<CompoundJob> compound_job;
+        if (not this->compound_job_registry.lookup(compound_job_name, compound_job)) {
+            throw std::runtime_error("Unknown compound job " + compound_job_name);
+        }
+
+        std::string file_name = data["file_name"];
+        std::shared_ptr<DataFile> file;
+        try {
+            file = Simulation::getFileByID(file_name);
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Unknown file " + file_name);
+        }
+
+        std::string ss_name = data["storage_service_name"];
+        std::shared_ptr<StorageService> ss;
+        if (not this->storage_service_registry.lookup(ss_name, ss)) {
+            throw std::runtime_error("Unknown storage service " + ss_name);
+        }
+
+        std::string file_delete_action_name = data["name"];
+        auto action = this->compound_job->addFileDeleteAction(file_delete_action_name, file, ss);
+
+        json answer;
+        answer["name"] = action->getName();
+        if (action->usesScratch()) {
+            answer["uses_scratch"] = "1";
+        } else {
+            answer["uses_scratch"] = "0";
+        }
+
+        return answer;
+    }
+
+    /**
+    * @brief REST API Handler
+    * @param data JSON input
+    * @return JSON output
+    */
+    json SimulationController::addFileWriteAction(json data) {
+        std::string compound_job_name = data["compound_job_name"];
+        std::shared_ptr<CompoundJob> compound_job;
+        if (not this->compound_job_registry.lookup(compound_job_name, compound_job)) {
+            throw std::runtime_error("Unknown compound job " + compound_job_name);
+        }
+
+        std::string file_name = data["file_name"];
+        std::shared_ptr<DataFile> file;
+        try {
+            file = Simulation::getFileByID(file_name);
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Unknown file " + file_name);
+        }
+
+        std::string ss_name = data["storage_service_name"];
+        std::shared_ptr<StorageService> ss;
+        if (not this->storage_service_registry.lookup(ss_name, ss)) {
+            throw std::runtime_error("Unknown storage service " + ss_name);
+        }
+
+        std::string file_write_action_name = data["name"];
+        auto action = this->compound_job->addFileWriteAction(file_write_action_name, file, ss);
+
+        json answer;
+        answer["name"] = action->getName();
+        if (action->usesScratch()) {
+            answer["uses_scratch"] = "1";
+        } else {
+            answer["uses_scratch"] = "0";
+        }
+
+        return answer;
+    }
+
+    /**
+    * @brief REST API Handler
+    * @param data JSON input
+    * @return JSON output
+    */
+    json SimulationController::addFileReadAction(json data) {
+        std::string compound_job_name = data["compound_job_name"];
+        std::shared_ptr<CompoundJob> compound_job;
+        if (not this->compound_job_registry.lookup(compound_job_name, compound_job)) {
+            throw std::runtime_error("Unknown compound job " + compound_job_name);
+        }
+
+        std::string file_name = data["file_name"];
+        std::shared_ptr<DataFile> file;
+        try {
+            file = Simulation::getFileByID(file_name);
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Unknown file " + file_name);
+        }
+
+        std::string ss_name = data["storage_service_name"];
+        std::shared_ptr<StorageService> ss;
+        if (not this->storage_service_registry.lookup(ss_name, ss)) {
+            throw std::runtime_error("Unknown storage service " + ss_name);
+        }
+
+        std::string file_read_action_name = data["name"];
+        std::double num_bytes_to_read = data["num_bytes_to_read"];
+
+        if (num_bytes_to_read == -1) {
+            auto action = this->compound_job->addFileReadAction(file_write_action_name, file, ss);
+        } else {
+            auto action = this->compound_job->addFileReadAction(file_write_action_name, file, ss, num_bytes_to_read);
+        }
+
+        json answer;
+        answer["name"] = action->getName();
+        if (action->usesScratch()) {
+            answer["uses_scratch"] = "1";
+        } else {
+            answer["uses_scratch"] = "0";
+        }
+
+        // Question: Does the following function "getNumBytesToRead()" return total number of bytes in file if the
+        //fileReadAction that was created wasn't passed in a NumBytesToRead parameter
+        answer["num_bytes_to_read"] = action->getNumBytesToRead()
+        return answer;
+    }
+
+    /**
+    * @brief REST API Handler
+    * @param data JSON input
+    * @return JSON output
+    */
+    json SimulationController::addSleepAction(json data) {
+        std::string compound_job_name = data["compound_job_name"];
+        std::shared_ptr<CompoundJob> compound_job;
+        json answer;
+
+        if (not this->compound_job_registry.lookup(compound_job_name, compound_job)) {
+            throw std::runtime_error("Unknown compound job " + compound_job_name);
+        }
+
+        std::string sleep_action_name = data["name"];
+        std::double sleep_time = data["sleep_time"];
+
+        auto action = this->compound_job->addSleepAction(sleep_action_name, sleep_time);
+        answer["sleep_action_name"] = action->getName();
+        return answer;
+    }
+
+    /**
+    * @brief REST API Handler
+    * @param data JSON input
+    * @return JSON output
+    */
+    json SimulationController::addParentJob(json data) {
+        std::string child_compound_job_name = data["compound_job"];
+        std::string parent_compound_job_name = data["parent_compound_job"];
+
+        std::shared_ptr<CompoundJob> compound_job;
+
+        if (not this->compound_job_registry.lookup(parent_compound_job_name, compound_job)) {
+            throw std::runtime_error("Unknown compound job " + parent_compound_job_name);
+        }
+        if (not this->compound_job_registry.lookup(child_compound_job_name, compound_job)) {
+            throw std::runtime_error("Unknown compound job " + child_compound_job_name);
+        }
+
+        child_compound_job_name->addParentJob(parent_compound_job_name);
+        return;
+    }
 
     /**
      * @brief REST API Handler
