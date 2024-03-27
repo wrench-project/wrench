@@ -3017,7 +3017,7 @@
           }
         ],
         "requestBody": {
-          "description": "File to read.",
+          "description": "Input to add a file read action.",
           "required": true,
           "content": {
             "application/json": {
