@@ -1,6 +1,15 @@
 ﻿
 set(CMAKE_CXX_STANDARD 17)
 
+
+include_directories(include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
+
+
+find_file(ASIO_HEADER_FOUND asio.hpp QUIET)
+if (NOT ASIO_HEADER_FOUND)
+	message("-- ASIO: Could not find asio.hpp (warning: the asio library is needed to compile the wrench-daemon - sudo apt install libasio-dev)")
+endif()
+
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

@@ -143,15 +143,15 @@ namespace wrench {
 
         simgrid::s4u::ActivitySet pending_receives;
         if (not this->mb_comm_posted) {
+            WRENCH_DEBUG("POSTING GET ASYNC ON MB for %s: %p", this->get_cname(), (this->mb_comm.get()));
             this->mb_comm = this->s4u_mb->get_async<SimulationMessage>(&this->msg_mb);
-            WRENCH_DEBUG("POSTED GET ASYNC ON MB for %s: %p", this->get_cname(), (this->mb_comm.get()));
             this->mb_comm_posted = true;
         } else {
             WRENCH_DEBUG("GET ASYNC ON MB ALREADY POSTED FROM BEFORE FOR %s: %p", this->get_cname(), this->mb_comm.get());
         }
         if (not this->mq_comm_posted) {
+            WRENCH_DEBUG("POSTING GET ASYNC ON MQ for %s: %p", this->get_cname(), (this->mq_comm.get()));
             this->mq_comm = this->s4u_mq->get_async<SimulationMessage>(&this->msg_mq);
-            WRENCH_DEBUG("POSTED GET ASYNC ON MQ for %s: %p", this->get_cname(), (this->mq_comm.get()));
             this->mq_comm_posted = true;
         } else {
             WRENCH_DEBUG("GET ASYNC ON MQ ALREADY POSTED FROM BEFORE FOR %s: %p", this->get_cname(), this->mq_comm.get());
@@ -380,6 +380,7 @@ namespace wrench {
             throw ExecutionException(std::make_shared<NetworkError>(
                     NetworkError::RECEIVING, NetworkError::FAILURE, this->s4u_mb->get_name(), ""));
         }
+
         simgrid::s4u::MessPtr mess_ptr = this->s4u_mq->get_async<void>((void **) (&(pending_communication->simulation_message)));
         pending_communication->mess_ptr = mess_ptr;
         return pending_communication;
