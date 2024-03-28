@@ -17,6 +17,38 @@
 
 #include <iostream>
 
+
+//#define TRACK_OBJECTS 1
+
+#ifdef TRACK_OBJECTS
+class ObjectTracker {
+public:
+    std::map<std::string, unsigned long> tracker;
+};
+
+#define TRACK_OBJECT(name)                                                                  \
+    {                                                                                       \
+        object_tracker->tracker[name]++;                                                    \
+        std::cerr << "#" << (name) << "++: " << object_tracker->tracker[name] << std::endl; \
+    }
+
+#define UNTRACK_OBJECT(name)                                                                \
+    {                                                                                       \
+        object_tracker->tracker[name]--;                                                    \
+        std::cerr << "#" << (name) << "--: " << object_tracker->tracker[name] << std::endl; \
+    }
+
+// The whole point is for the map to not be a static object, but instead be inside a
+// memory-leaked object so that it will not risk being de-allocated before static
+// objects are deallocated and trigger destructor calls that refer to the map.
+// static ObjectTracker *object_tracker = new ObjectTracker();
+#else
+#define TRACK_OBJECT(name) \
+    {}
+#define UNTRACK_OBJECT(name) \
+    {}
+#endif
+
 namespace wrench {
 
 
@@ -94,6 +126,10 @@ namespace wrench {
         static void disableColor();
 
         //        static void disableLog();
+
+#ifdef TRACK_OBJECTS
+        static ObjectTracker *object_tracker;
+#endif
 
         /***********************/
         /** \endcond           */

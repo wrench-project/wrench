@@ -24,6 +24,7 @@ namespace wrench {
         double getSize() const;
         void setSize(double size);
         std::string getID() const;
+        ~DataFile();
 
     protected:
         friend class Simulation;

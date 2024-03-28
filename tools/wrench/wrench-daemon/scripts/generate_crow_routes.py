@@ -86,6 +86,7 @@ if __name__ == "__main__":
     '''
     apps = ""
 
+    index = 0
     for crow in crows.keys():
         route = crows[crow]
         app = '\tCROW_ROUTE(app, "{0}").methods(crow::HTTPMethod::{1})\n'.format(crow, route['method'].capitalize())
@@ -97,7 +98,8 @@ if __name__ == "__main__":
 
         # use last part of the path as the key to find the value
         sep = crow.split('/')
-        key = sep[-1]
+        key = sep[-1] + "_" + str(index)
+        index += 1
 
         parameter_list.append('const crow::request& req')
         for i in range(len(route['parameter_list'])):
@@ -129,11 +131,13 @@ if __name__ == "__main__":
     Create header file with map
     '''
     callback_map = ""
+    index = 0
     for crow in crows.keys():
         route = crows[crow]
-        key = route["path_suffix"]
+        key = route["path_suffix"] + "_" + str(index)
+        index += 1
         value = route["operationId"]
-        if key != "startSimulation": # Exlude this SPECIAL route
+        if key != "startSimulation_0": # Exclude this SPECIAL route
             callback_map += 'request_handlers["{0}"] = [sc](json data) {{ return sc->{1}(std::move(data)); }};\n'.format(key, value)
 
     with open(header_callback_map_path, 'w') as f:
