@@ -110,7 +110,10 @@ if __name__ == "__main__":
         parameter_str = ', '.join(parameter_list)
         app += '([this]({0}){{\n'.format(parameter_str)
 
-        app += '\t\t\tjson req_json = json::parse(req.body);\n'
+        if route['method'].capitalize() == "Get":
+            app += '\t\t\tjson req_json = {};\n'
+        else:
+            app += '\t\t\tjson req_json = json::parse(req.body);\n'
         for parameter_name in route['parameter_list']:
             app += '\t\t\treq_json[toStr({0})] = {0};\n'.format(parameter_name)
 
