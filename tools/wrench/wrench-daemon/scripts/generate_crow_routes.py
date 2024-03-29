@@ -111,8 +111,12 @@ if __name__ == "__main__":
         app += '([this]({0}){{\n'.format(parameter_str)
 
         if route['method'].capitalize() == "Get":
+            # Since Get requests shouldn't have a body, we create a blank json object
+            # that will be populated from data in the URL
             app += '\t\t\tjson req_json = {};\n'
         else:
+            # Since Post/Put requests have a body, we create a json object from that body
+            # and will add to it data in the URL
             app += '\t\t\tjson req_json = json::parse(req.body);\n'
         for parameter_name in route['parameter_list']:
             app += '\t\t\treq_json[toStr({0})] = {0};\n'.format(parameter_name)
