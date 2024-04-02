@@ -53,6 +53,7 @@ namespace wrench {
         json addOutputFile(json data);
 
         json createCompoundJob(json data);
+        json submitCompoundJob(json data);
         json addComputeAction(json data);
         json addFileCopyAction(json data);
         json addFileDeleteAction(json data);
