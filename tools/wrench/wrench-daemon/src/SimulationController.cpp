@@ -916,6 +916,54 @@ namespace wrench {
     * @param data JSON input
     * @return JSON output
     */
+    json SimulationController::submitCompoundJob(json data) {
+        std::string compound_job_name = data["compound_job_name"];
+        std::string cs_name = data["compute_service_name"];
+        std::string service_specific_string = data["service_specific_args"];
+
+        std::map<std::string, std::string> service_specific_args = {};
+        json jsonData = json::parse(service_specific_string);
+        for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
+            service_specific_args[it.key()] = it.value();
+        }
+
+        std::shared_ptr<CompoundJob> job;
+        if (not this->compound_job_registry.lookup(compound_job_name, job)) {
+            throw std::runtime_error("Unknown job " + compound_job_name);
+        }
+
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+
+        BlockingQueue<std::pair<bool, std::string>> job_submitted;
+        this->things_to_do.push([this, job, cs, service_specific_args, &job_submitted]() {
+            try {
+                WRENCH_INFO("Submitting a compound job...");
+                this->job_manager->submitJob(job, cs, service_specific_args);
+                job_submitted.push(std::make_pair(true, ""));
+            } catch (std::exception &e) {
+                job_submitted.push(std::make_pair(false, e.what()));
+            }
+        });
+        // Poll from the shared queue
+        std::pair<bool, std::string> reply;
+        job_submitted.waitAndPop(reply);
+        bool success = std::get<0>(reply);
+        if (not success) {
+            std::string error_msg = std::get<1>(reply);
+            throw std::runtime_error("Cannot submit job: " + error_msg);
+        } else {
+            return {};
+        }
+    }
+
+    /**
+    * @brief REST API Handler
+    * @param data JSON input
+    * @return JSON output
+    */
     json SimulationController::addComputeAction(json data) {
         std::string compound_job_name = data["compound_job_name"];
         std::shared_ptr<CompoundJob> compound_job;
