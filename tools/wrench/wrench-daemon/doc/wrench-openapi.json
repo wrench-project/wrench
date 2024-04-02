@@ -2114,6 +2114,79 @@
         }
       }
     },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/submit": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Submit a compound job.",
+        "operationId": "submitCompoundJob",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Job characteristics.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "compute_service_name": {
+                    "type": "string",
+                    "description": "The compute service's name"
+                  },
+                  "service_specific_args": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "service-specific job arguments ({} means “use all defaults” )"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/setPriority": {
       "get": {
         "tags": [
