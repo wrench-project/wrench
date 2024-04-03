@@ -39,6 +39,7 @@ jobs:
 #          brew install python
       - name: Install boost
         run: |
+          brew install sbt
           brew install boost
       - name: Install Simgrid
         run: |
