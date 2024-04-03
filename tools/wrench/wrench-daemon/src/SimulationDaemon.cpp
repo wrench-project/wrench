@@ -125,11 +125,11 @@ void SimulationDaemon::terminateSimulation(const crow::request &req, crow::respo
     simulation_controller->stopSimulation();
     simulation_thread.join();
 
-    // Create an json answer
+    // Create a json answer
     json answer;
     answer["wrench_api_request_success"] = true;
 
-    res.set_header("access-control-allow-origin", "*");
+    //    res.set_header("access-control-allow-origin", "*");
     res.body = to_string(answer);
 
     app.stop();

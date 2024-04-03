@@ -272,6 +272,11 @@ namespace wrench {
                 enough_idle_resources = bmcs->isThereAtLeastOneHostWithIdleResources(min_required_num_cores,
                                                                                      min_required_memory);
             } else {
+                // This is ABSOLUTELY horrible, but is necessary since now control messages
+                // may be of size zero and take 0 time to transfer. So this call could happen
+                // BEFORE the mbcs has had a chance to update its count of idle cores due to the
+                // previous job submission, because that job submission took zero time.
+                wrench::Simulation::sleep(0.00000001);
                 enough_idle_resources = bmcs->isThereAtLeastOneHostWithIdleResourcesInstant(min_required_num_cores,
                                                                                             min_required_memory);
             }
