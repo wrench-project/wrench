@@ -570,7 +570,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::createFileCopyAtStorageService(json data) {
-        std::string ss_name = data["storage_service_name"];
+        std::string ss_name = data["service_name"];
         std::string filename = data["filename"];
 
         std::shared_ptr<StorageService> ss;
@@ -602,7 +602,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::lookupFileAtStorageService(json data) {
-        std::string ss_name = data["storage_service_name"];
+        std::string ss_name = data["service_name"];
         std::string filename = data["filename"];
 
         std::shared_ptr<StorageService> ss;
@@ -771,7 +771,7 @@ namespace wrench {
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow  " + workflow_name);
         }
-        answer["flops"] = workflow->getTaskByID(data["name"])->getFlops();
+        answer["flops"] = workflow->getTaskByID(data["task_name"])->getFlops();
         return answer;
     }
 
@@ -787,7 +787,7 @@ namespace wrench {
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow  " + workflow_name);
         }
-        answer["min_num_cores"] = workflow->getTaskByID(data["name"])->getMinNumCores();
+        answer["min_num_cores"] = workflow->getTaskByID(data["task_name"])->getMinNumCores();
         return answer;
     }
 
@@ -803,7 +803,7 @@ namespace wrench {
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow " + workflow_name);
         }
-        answer["max_num_cores"] = workflow->getTaskByID(data["name"])->getMaxNumCores();
+        answer["max_num_cores"] = workflow->getTaskByID(data["task_name"])->getMaxNumCores();
         return answer;
     }
 
@@ -819,7 +819,7 @@ namespace wrench {
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow " + workflow_name);
         }
-        answer["memory"] = workflow->getTaskByID(data["name"])->getMemoryRequirement();
+        answer["memory"] = workflow->getTaskByID(data["task_name"])->getMemoryRequirement();
         return answer;
     }
 
@@ -835,7 +835,7 @@ namespace wrench {
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow " + workflow_name);
         }
-        answer["time"] = workflow->getTaskByID(data["name"])->getStartDate();
+        answer["time"] = workflow->getTaskByID(data["task_name"])->getStartDate();
         return answer;
     }
 
@@ -851,7 +851,7 @@ namespace wrench {
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow " + workflow_name);
         }
-        answer["time"] = workflow->getTaskByID(data["name"])->getEndDate();
+        answer["time"] = workflow->getTaskByID(data["task_name"])->getEndDate();
         return answer;
     }
 
