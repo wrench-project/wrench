@@ -1052,14 +1052,16 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::supportsCompoundJobs(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
 
+        std::cerr << "HERE: " <<  data << "\n";
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
         json answer;
         answer["result"] = cs->supportsCompoundJobs();
+        std::cerr << answer << "\n";
         return answer;
     }
 
@@ -1069,7 +1071,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::supportsPilotJobs(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
 
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
@@ -1086,7 +1088,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::supportsStandardJobs(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
 
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
@@ -1103,7 +1105,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getCoreFlopRates(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
 
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
@@ -1128,7 +1130,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getCoreCounts(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
 
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
@@ -1153,7 +1155,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::isVMRunning(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
         std::string vm_name = data["vm_name"];
 
         std::shared_ptr<ComputeService> cs;
@@ -1173,7 +1175,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::isVMDown(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
         std::string vm_name = data["vm_name"];
 
         std::shared_ptr<ComputeService> cs;
@@ -1193,7 +1195,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::suspendVM(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
         std::string vm_name = data["vm_name"];
 
         // Lookup the cloud compute service
@@ -1232,7 +1234,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::isVMSuspended(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
         std::string vm_name = data["vm_name"];
 
         std::shared_ptr<ComputeService> cs;
@@ -1253,7 +1255,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::resumeVM(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
         std::string vm_name = data["vm_name"];
 
         // Lookup the cloud compute service
