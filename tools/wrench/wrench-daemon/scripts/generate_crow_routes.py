@@ -28,6 +28,7 @@ if __name__ == "__main__":
     #Temporary check: how many types are in wrench-openapi.json
     basket = set()
     for path in data["paths"].keys():
+        print(path)
 
         method = list(data["paths"][path].keys())[0]
 
