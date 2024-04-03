@@ -1115,7 +1115,7 @@ namespace wrench {
         auto information = cs->getCoreFlopRate();
         std::vector<std::string> hostnames;
         std::vector<double> flop_rates;
-        for (auto &entry : information) {
+        for (auto &entry: information) {
             hostnames.push_back(entry.first);
             flop_rates.push_back(entry.second);
         }
@@ -1140,7 +1140,7 @@ namespace wrench {
         auto information = cs->getPerHostNumCores();
         std::vector<std::string> hostnames;
         std::vector<unsigned long> core_counts;
-        for (auto &entry : information) {
+        for (auto &entry: information) {
             hostnames.push_back(entry.first);
             core_counts.push_back(entry.second);
         }
@@ -1382,21 +1382,21 @@ namespace wrench {
                                                                             min_cores_per_task, max_cores_per_task, enforce_num_cores,
                                                                             ignore_avg_cpu, show_warnings);
             this->workflow_registry.insert(wf->getName(), wf);
-            
+
             answer["workflow_name"] = wf->getName();
-            
+
             std::vector<std::string> task_names;
             for (const auto &t: wf->getTasks()) {
                 task_names.push_back(t->getID());
             }
             answer["tasks"] = task_names;
-            
+
             std::vector<std::string> file_names;
             for (const auto &t: wf->getFileMap()) {
                 file_names.push_back(t.second->getID());
             }
             answer["files"] = file_names;
-            
+
             return answer;
         } catch (std::exception &e) {
             throw std::runtime_error("Error while importing workflow from JSON: " + std::string(e.what()));
