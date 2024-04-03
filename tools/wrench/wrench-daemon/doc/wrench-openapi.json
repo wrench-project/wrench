@@ -901,7 +901,7 @@
         }
       }
     },
-    "/simulation/{simid}/workflows/{workflow_name}/tasks/{name}/taskGetFlops": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetFlops": {
       "get": {
         "tags": [
           "WRENCH"
@@ -929,9 +929,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -960,7 +960,7 @@
         }
       }
     },
-    "/simulation/{simid}/workflows/{workflow_name}/tasks/{name}/taskGetMinNumCores": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetMinNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -988,9 +988,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -1019,7 +1019,7 @@
         }
       }
     },
-    "/simulation/{simid}/workflows/{workflow_name}/tasks/{name}/taskGetMaxNumCores": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetMaxNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1047,9 +1047,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -1078,7 +1078,7 @@
         }
       }
     },
-    "/simulation/{simid}/workflows/{workflow_name}/tasks/{name}/taskGetMemory": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetMemory": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1106,9 +1106,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -1137,7 +1137,7 @@
         }
       }
     },
-    "/simulation/{simid}/workflows/{workflow_name}/tasks/{name}/taskGetStartDate": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetStartDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1165,9 +1165,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -1196,7 +1196,7 @@
         }
       }
     },
-    "/simulation/{simid}/workflows/{workflow_name}/tasks/{name}/taskGetEndDate": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetEndDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1224,9 +1224,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -2002,7 +2002,7 @@
         }
       }
     },
-    "/simulation/{simid}/{storage_service_name}/createFileCopy": {
+    "/simulation/{simid}/storage_services/{service_name}/createFileCopy": {
       "post": {
         "tags": [
           "WRENCH"
@@ -2020,9 +2020,9 @@
             }
           },
           {
-            "name": "storage_service_name",
+            "name": "service_name",
             "in": "path",
-            "description": "The storage service's head host",
+            "description": "The storage service name",
             "required": true,
             "schema": {
               "type": "string"
@@ -2067,7 +2067,7 @@
         }
       }
     },
-    "/simulation/{simid}/{storage_service_name}/lookupFile": {
+    "/simulation/{simid}/storage_services/{service_name}/lookupFile": {
       "post": {
         "tags": [
           "WRENCH"
@@ -2085,7 +2085,7 @@
             }
           },
           {
-            "name": "storage_service_name",
+            "name": "service_name",
             "in": "path",
             "description": "The storage service's head host",
             "required": true,
@@ -2383,7 +2383,7 @@
         }
       }
     },
-    "/simulation/{simid}/{service_name}/vms/{vm_name}/isVMRunning": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/isVMRunning": {
       "get": {
         "tags": [
           "WRENCH"
