@@ -225,20 +225,20 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
             // do the creation here and the launch in a thread, but it seems that SimGrid
             // does not like that - likely due to the maestro business)
             auto simulation_thread = std::thread([simulation_launcher, this, body, &guard, &signal]() {
-              // Create simulation
-              simulation_launcher->createSimulation(this->simulation_logging,
-                                                    body["platform_xml"],
-                                                    body["controller_hostname"],
-                                                    this->sleep_us);
-              // Signal the parent thread that simulation creation has been done, successfully or not
-              {
-                  std::unique_lock<std::mutex> lock(guard);
-                  signal.notify_one();
-              }
-              // If no failure, then proceed with the launch!
-              if (not simulation_launcher->launchError()) {
-                  simulation_launcher->launchSimulation();
-              }
+                // Create simulation
+                simulation_launcher->createSimulation(this->simulation_logging,
+                                                      body["platform_xml"],
+                                                      body["controller_hostname"],
+                                                      this->sleep_us);
+                // Signal the parent thread that simulation creation has been done, successfully or not
+                {
+                    std::unique_lock<std::mutex> lock(guard);
+                    signal.notify_one();
+                }
+                // If no failure, then proceed with the launch!
+                if (not simulation_launcher->launchError()) {
+                    simulation_launcher->launchSimulation();
+                }
             });
 
             // Waiting for the simulation thread to have created the simulation, successfully or not
@@ -271,7 +271,7 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
                 if (write(fd[1], &success, sizeof(bool)) == -1) {
                     perror("write()");
                     writeStringToSharedMemorySegment(shm_segment_id, "Internal wrench-daemon error: write(): " +
-                                                                     std::string(strerror(errno)));
+                                                                             std::string(strerror(errno)));
                     exit(1);
                 }
 
@@ -346,41 +346,38 @@ void WRENCHDaemon::error_handling(const Request &req, Response &res) {
 */
 void WRENCHDaemon::run() {
     std::vector<std::string> allowed_origins = {
-            "http://localhost:8000"
-    };
+            "http://localhost:8000"};
 
     // Only set up POST request handler for "/api/startSimulation" since
     // all other API paths will be handled by a simulation daemon instead
     server.Post("/api/startSimulation", [this, allowed_origins](const Request &req, Response &res) {
-      // Check if the Origin header is present and matches any of the allowed origins
-      auto origin_header = req.get_header_value("Origin");
-//      std::cerr << "REQ1 = " << req.body << "\n";
-//      std::cerr << "REQ2 = " << req.path << "\n";
-//      std::cerr << "ORIGIN_HEADER: " << origin_header << "\n";
+        // Check if the Origin header is present and matches any of the allowed origins
+        auto origin_header = req.get_header_value("Origin");
+        //      std::cerr << "REQ1 = " << req.body << "\n";
+        //      std::cerr << "REQ2 = " << req.path << "\n";
+        //      std::cerr << "ORIGIN_HEADER: " << origin_header << "\n";
 
-//      std::cerr << "CALLING res.set_header()\n";
-//      res.set_header("access-control-allow-origin", "*");
-//      if (!origin_header.empty()) {
-//          for (const auto &allowed_origin: allowed_origins) {
-//              if (origin_header == allowed_origin) {
-//                  // Set appropriate CORS headers
-////                    res.set_header("access-control-allow-origin", "*");
-////                    res.set_header("Access-Control-Allow-Origin", origin_header);
-//        res.set_header("Access-Control-Allow-Origin", "http://localhost:8000");
-                  // Start simulation
-//                  std::cerr << "STARTING SIMULATION\n";
-//                  this->startSimulation(req, res);
-//                  return;
-//              }
-//          }
-//      }
+        //      std::cerr << "CALLING res.set_header()\n";
+        //      res.set_header("access-control-allow-origin", "*");
+        //      if (!origin_header.empty()) {
+        //          for (const auto &allowed_origin: allowed_origins) {
+        //              if (origin_header == allowed_origin) {
+        //                  // Set appropriate CORS headers
+        ////                    res.set_header("access-control-allow-origin", "*");
+        ////                    res.set_header("Access-Control-Allow-Origin", origin_header);
+        //        res.set_header("Access-Control-Allow-Origin", "http://localhost:8000");
+        // Start simulation
+        //                  std::cerr << "STARTING SIMULATION\n";
+        //                  this->startSimulation(req, res);
+        //                  return;
+        //              }
+        //          }
+        //      }
 
         res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         res.set_header("Access-Control-Allow-Headers", "Content-Type");
         res.set_header("Access-Control-Max-Age", "86400");// One day
-        this->startSimulation(req, res); // Will set the Access-Control-Allow-Origin, which is terribly ugly
-
-
+        this->startSimulation(req, res);                  // Will set the Access-Control-Allow-Origin, which is terribly ugly
     });
 
     // Set some generic error handler
