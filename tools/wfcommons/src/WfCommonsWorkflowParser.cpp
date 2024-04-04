@@ -119,7 +119,7 @@ namespace wrench {
         std::map<std::string, std::pair<unsigned long, double>> machines;
         if (workflow_spec.at("execution").contains("machines")) {
             auto machine_specs = workflow_spec.at("execution").at("machines");
-            for (auto const &machine_spec : machine_specs) {
+            for (auto const &machine_spec: machine_specs) {
                 std::string name = machine_spec.at("nodeName");
                 nlohmann::json core_spec = machine_spec.at("cpu");
                 unsigned long num_cores;
@@ -142,7 +142,7 @@ namespace wrench {
         // Process the files, if any
         if (workflow_spec.at("specification").contains("files")) {
             auto file_specs = workflow_spec.at("specification").at("files");
-            for (auto const &file_spec : file_specs) {
+            for (auto const &file_spec: file_specs) {
                 std::string file_name = file_spec.at("id");
                 std::shared_ptr<DataFile> data_file;
                 try {
@@ -157,32 +157,32 @@ namespace wrench {
 
         // Create the tasks with input/output files
         auto task_specs = workflow_spec.at("specification").at("tasks");
-        for (const auto &task_spec : task_specs) {
+        for (const auto &task_spec: task_specs) {
             auto task_name = task_spec.at("name");
             auto task_id = task_spec.at("id");
             // Create a task with all kinds of default fields for now
-//            std::cerr << "CREATED TASK: " << task_id << "\n";
+            //            std::cerr << "CREATED TASK: " << task_id << "\n";
             auto task = workflow->addTask(task_id, 0.0, 1, 1, 0.0);
 
             if (task_spec.contains("inputFiles")) {
-                for (auto const &f : task_spec.at("inputFiles")) {
+                for (auto const &f: task_spec.at("inputFiles")) {
                     auto file = Simulation::getFileByID(f);
                     task->addInputFile(file);
-//                    std::cerr << "  ADDED INPUT FILE: " << file->getID() << "\n";
+                    //                    std::cerr << "  ADDED INPUT FILE: " << file->getID() << "\n";
                 }
             }
             if (task_spec.contains("outputFiles")) {
-                for (auto const &f : task_spec.at("outputFiles")) {
+                for (auto const &f: task_spec.at("outputFiles")) {
                     auto file = Simulation::getFileByID(f);
                     task->addOutputFile(file);
-//                    std::cerr << "  ADDED OUTPUT FILE: " << file->getID() << "\n";
+                    //                    std::cerr << "  ADDED OUTPUT FILE: " << file->getID() << "\n";
                 }
             }
         }
 
         // Fill in the task specifications based on the execution
         auto task_execs = workflow_spec.at("execution").at("tasks");
-        for (const auto &task_exec : task_execs) {
+        for (const auto &task_exec: task_execs) {
             auto task = workflow->getTaskByID(task_exec.at("id"));
 
             // Deal with the runtime
@@ -297,10 +297,10 @@ namespace wrench {
         }
 
         // Deal with task dependencies
-        for (auto const &task_spec : task_specs) {
+        for (auto const &task_spec: task_specs) {
             auto task = workflow->getTaskByID(task_spec.at("id"));
 
-            for (auto const &parent : task_spec.at("parents")) {
+            for (auto const &parent: task_spec.at("parents")) {
                 try {
                     auto parent_task = workflow->getTaskByID(parent);
                     workflow->addControlDependency(parent_task, task, redundant_dependencies);
@@ -315,7 +315,7 @@ namespace wrench {
                 }
             }
 
-            for (auto const &child : task_spec.at("children")) {
+            for (auto const &child: task_spec.at("children")) {
                 try {
                     auto child_task = workflow->getTaskByID(child);
                     workflow->addControlDependency(task, child_task, redundant_dependencies);
