@@ -43,7 +43,7 @@ TEST_F(WorkflowLoadFromJSONTest, LoadValidJSON) {
     ASSERT_EQ(num_input_files, 2);
     ASSERT_EQ(num_output_files, 1);
 
-//    ASSERT_NEAR(workflow->getTaskByID("individuals_ID0000001")->getFlops(), 588.914, 0.001);
+    //    ASSERT_NEAR(workflow->getTaskByID("individuals_ID0000001")->getFlops(), 588.914, 0.001);
     ASSERT_EQ(workflow->getTaskByID("individuals_ID0000001")->getMinNumCores(), 1);
     ASSERT_EQ(workflow->getTaskByID("individuals_ID0000001")->getMaxNumCores(), 1);
 
