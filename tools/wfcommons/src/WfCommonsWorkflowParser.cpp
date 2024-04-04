@@ -205,7 +205,7 @@ namespace wrench {
             if (not ignore_avg_cpu) {
                 if ((num_cores < 0) and (avg_cpu < 0)) {
                     if (show_warnings) std::cerr << "[WARNING]: Task " << task->getID() << " does not specify a number of cores or an avgCPU: "
-                                                                                  "Assuming 1 core and avgCPU at 100%.\n";
+                                                                                           "Assuming 1 core and avgCPU at 100%.\n";
                     num_cores = 1.0;
                     avg_cpu = 100.0;
                 } else if (num_cores < 0) {
@@ -215,7 +215,7 @@ namespace wrench {
                     num_cores = std::ceil(avg_cpu / 100.0);
                 } else if (avg_cpu < 0) {
                     if (show_warnings) std::cerr << "[WARNING]: Task " + task->getID() + " does not specify avgCPU: "
-                                                                                "Assuming 100%.\n";
+                                                                                         "Assuming 100%.\n";
                     avg_cpu = 100.0 * num_cores;
                 } else if (avg_cpu > 100 * num_cores) {
                     if (show_warnings) {
@@ -224,74 +224,76 @@ namespace wrench {
                     }
                     avg_cpu = 100.0 * num_cores;
                 }
-
-                runtimeInSeconds = runtimeInSeconds * avg_cpu / (100.0 * num_cores);
-
-                // Deal with the number of cores
-                unsigned long min_num_cores, max_num_cores;
-                // Set the default values
-                min_num_cores = min_cores_per_task;
-                max_num_cores = max_cores_per_task;
-                // Overwrite the default is we don't enforce the default values AND the JSON specifies core numbers
-                if ((not enforce_num_cores) and task_exec.contains("coreCount")) {
-                    min_num_cores = task_exec.at("coreCount");
-                    max_num_cores = task_exec.at("coreCount");
-                }
-
-                // Deal with the flop amount
-                double flop_amount;
-                std::string execution_machine;
-                if (task_exec.contains("machine")) {
-                    execution_machine = task_exec.at("machine");
-                }
-                if (ignore_machine_specs or execution_machine.empty()) {
-                    flop_amount = runtimeInSeconds * flop_rate;
-                } else {
-                    if (machines.find(execution_machine) == machines.end()) {
-                        throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJSON(): Task " + task->getID() +
-                                                    " is said to have been executed on machine " + execution_machine +
-                                                    " but no description for that machine is found on the JSON file");
-                    }
-                    if (machines[execution_machine].second >= 0) {
-                        double core_ghz = (machines[execution_machine].second) / 1000.0;
-                        double total_compute_power_used = core_ghz * (double) min_num_cores;
-                        double actual_flop_rate = total_compute_power_used * 1000.0 * 1000.0 * 1000.0;
-                        flop_amount = runtimeInSeconds * actual_flop_rate;
-                    } else {
-                        flop_amount = (double) min_num_cores * runtimeInSeconds * flop_rate;// Assume a min-core execution
-                    }
-                }
-
-                // Deal with RAM, if any
-                double ram_in_bytes = 0.0;
-                if (task_exec.contains("memoryInBytes")) {
-                    ram_in_bytes = task_exec.at("memoryInBytes");
-                }
-
-                // Update the actual task data structure
-                task->setFlops(flop_amount);
-                task->setMinNumCores(min_num_cores);
-                task->setMaxNumCores(max_num_cores);
-                task->setMemoryRequirement(ram_in_bytes);
-
-                // Deal with the priority, if any
-                if (task_exec.contains("priority")) {
-                    long priority = task_exec.at("priority");
-                    task->setPriority(priority);
-                }
-
-                // Deal with written/read bytes, if any
-                if (task_exec.contains("readBytes")) {
-                    unsigned long readBytes =  task_exec.at("readBytes");
-                    task->setBytesRead(readBytes);
-                }
-                if (task_exec.contains("writtenBytes")) {
-                    unsigned long readBytes =  task_exec.at("writtenBytes");
-                    task->setBytesWritten(readBytes);
-                }
-
-
+            } else {
+                avg_cpu = 100.0 * num_cores;
             }
+
+            runtimeInSeconds = runtimeInSeconds * avg_cpu / (100.0 * num_cores);
+
+            // Deal with the number of cores
+            unsigned long min_num_cores, max_num_cores;
+            // Set the default values
+            min_num_cores = min_cores_per_task;
+            max_num_cores = max_cores_per_task;
+            // Overwrite the default is we don't enforce the default values AND the JSON specifies core numbers
+            if ((not enforce_num_cores) and task_exec.contains("coreCount")) {
+                min_num_cores = task_exec.at("coreCount");
+                max_num_cores = task_exec.at("coreCount");
+            }
+
+            // Deal with the flop amount
+            double flop_amount;
+            std::string execution_machine;
+            if (task_exec.contains("machine")) {
+                execution_machine = task_exec.at("machine");
+            }
+            if (ignore_machine_specs or execution_machine.empty()) {
+                flop_amount = runtimeInSeconds * flop_rate;
+            } else {
+                if (machines.find(execution_machine) == machines.end()) {
+                    throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJSON(): Task " + task->getID() +
+                                                " is said to have been executed on machine " + execution_machine +
+                                                " but no description for that machine is found on the JSON file");
+                }
+                if (machines[execution_machine].second >= 0) {
+                    double core_ghz = (machines[execution_machine].second) / 1000.0;
+                    double total_compute_power_used = core_ghz * (double) min_num_cores;
+                    double actual_flop_rate = total_compute_power_used * 1000.0 * 1000.0 * 1000.0;
+                    flop_amount = runtimeInSeconds * actual_flop_rate;
+                } else {
+                    flop_amount = (double) min_num_cores * runtimeInSeconds * flop_rate;// Assume a min-core execution
+                }
+            }
+
+            // Deal with RAM, if any
+            double ram_in_bytes = 0.0;
+            if (task_exec.contains("memoryInBytes")) {
+                ram_in_bytes = task_exec.at("memoryInBytes");
+            }
+
+            // Update the actual task data structure
+            task->setFlops(flop_amount);
+            task->setMinNumCores(min_num_cores);
+            task->setMaxNumCores(max_num_cores);
+            task->setMemoryRequirement(ram_in_bytes);
+
+            // Deal with the priority, if any
+            if (task_exec.contains("priority")) {
+                long priority = task_exec.at("priority");
+                task->setPriority(priority);
+            }
+
+            // Deal with written/read bytes, if any
+            if (task_exec.contains("readBytes")) {
+                unsigned long readBytes =  task_exec.at("readBytes");
+                task->setBytesRead(readBytes);
+            }
+            if (task_exec.contains("writtenBytes")) {
+                unsigned long readBytes =  task_exec.at("writtenBytes");
+                task->setBytesWritten(readBytes);
+            }
+
+
         }
 
         // Deal with task dependencies
