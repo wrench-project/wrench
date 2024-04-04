@@ -249,13 +249,8 @@ namespace wrench {
 #if 0
         // THIS MAKES ONLY A TINY BIT OF A PERFORMANCE BOOST
         // (ONLY WORKS WITH C++17)
-        // Adding a leading space because, weirdly, lexically_normal() doesn't behave
-        // correctly on Linux without it (it doesn't reduce "////" to "/", but does
-        // reduce " ////" to " /"
-        std::filesystem::path sanitized_path = " /" + path + "/";
+        std::filesystem::path sanitized_path =path + "/";
         std::string to_return = sanitized_path.lexically_normal();
-        // Remove the extra space
-        to_return.erase(0, 1);
         return to_return;
 #else
 
