@@ -52,7 +52,7 @@ namespace wrench {
 
         double getMemoryRequirement() const;
 
-        void setMemoryRequirement(double num_bytes) ;
+        void setMemoryRequirement(double num_bytes);
 
         unsigned long getNumberOfChildren();
 
