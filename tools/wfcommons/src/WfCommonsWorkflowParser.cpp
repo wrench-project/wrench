@@ -293,7 +293,6 @@ namespace wrench {
                 task->setBytesWritten(readBytes);
             }
 
-
         }
 
         // Deal with task dependencies
