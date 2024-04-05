@@ -188,7 +188,7 @@ protected:
 class BogusSetupTestWMS : public wrench::ExecutionController {
 public:
     BogusSetupTestWMS(BatchServiceTest *test,
-                      const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
+                      const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -769,7 +769,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 class StandardJobFailureTestWMS : public wrench::ExecutionController {
 public:
     StandardJobFailureTestWMS(BatchServiceTest *test,
-                              const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                              const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -900,7 +900,7 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
 class TwoStandardJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     TwoStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                    const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                    const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -932,7 +932,7 @@ private:
         batch_job_args["-c"] = std::to_string(10);   //number of cores per task1
 
         // Submit this job to the BatchComputeService service
-//        WRENCH_INFO("Submitting the first job");
+        //        WRENCH_INFO("Submitting the first job");
         job_manager->submitJob(standard_job_1, this->test->compute_service,
                                batch_job_args);
 
@@ -959,7 +959,7 @@ private:
         // Submit this job to the BatchComputeService service, after sleeping some epsilon
         // to ensure some sequence of the two jobs and not simultaneous events
         wrench::Simulation::sleep(0.000001);
-//        WRENCH_INFO("Submitting the second job");
+        //        WRENCH_INFO("Submitting the second job");
         job_manager->submitJob(standard_job_2, this->test->compute_service,
                                batch_job_args);
 
@@ -988,7 +988,8 @@ private:
             double expected_completion_time = 1800;
             RUNTIME_DBL_EQ(completion_time, expected_completion_time,
                            "Unexpected job completion time for job " + job->getName() + ": " +
-                                   std::to_string(completion_time), 0.0001);
+                                   std::to_string(completion_time),
+                           0.0001);
         }
         return 0;
     }
@@ -1004,7 +1005,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -2316,7 +2317,7 @@ private:
             std::map<std::string, std::string> task3_batch_job_args;
             task3_batch_job_args["-N"] = "1";
             task3_batch_job_args["-t"] = "60";//time in seconds
-            task3_batch_job_args["-c"] = "10"; //number of cores per node
+            task3_batch_job_args["-c"] = "10";//number of cores per node
             try {
                 job_manager->submitJob(job3, this->test->compute_service, task3_batch_job_args);
             } catch (wrench::ExecutionException &e) {
@@ -2452,7 +2453,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//            argv[1] = strdup("--wrench-full-log");
+    //            argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
