@@ -285,15 +285,13 @@ namespace wrench {
 
             // Deal with written/read bytes, if any
             if (task_exec.contains("readBytes")) {
-                unsigned long readBytes =  task_exec.at("readBytes");
+                unsigned long readBytes = task_exec.at("readBytes");
                 task->setBytesRead(readBytes);
             }
             if (task_exec.contains("writtenBytes")) {
-                unsigned long readBytes =  task_exec.at("writtenBytes");
+                unsigned long readBytes = task_exec.at("writtenBytes");
                 task->setBytesWritten(readBytes);
             }
-
-
         }
 
         // Deal with task dependencies
