@@ -35,6 +35,8 @@ jobs:
           export LDFLAGS="-L/usr/local/opt/llvm@16/lib"
           export CPPFLAGS="-I/usr/local/opt/llvm@16/include"
           ls /usr/local/opt/llvm@16/bin
+          /usr/local/opt/llvm@16/bin/clang --version
+          /usr/local/opt/llvm@16/bin/clang++ --version
           echo LDFLAGS=$LDFLAGS
           echo CPPFLAGS=$CPPFLAGS
           clang -v
