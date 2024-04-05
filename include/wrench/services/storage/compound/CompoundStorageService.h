@@ -10,13 +10,13 @@
 #ifndef WRENCH_COMPOUNDSTORAGESERVICE_H
 #define WRENCH_COMPOUNDSTORAGESERVICE_H
 
+#include "wrench/services/memory/MemoryManager.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/storage/StorageServiceMessage.h"
-#include "wrench/services/memory/MemoryManager.h"
-#include "wrench/services/storage/compound/CompoundStorageServiceProperty.h"
-#include "wrench/services/storage/compound/CompoundStorageServiceMessagePayload.h"
-#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/services/storage/compound/CompoundStorageServiceMessage.h"
+#include "wrench/services/storage/compound/CompoundStorageServiceMessagePayload.h"
+#include "wrench/services/storage/compound/CompoundStorageServiceProperty.h"
+#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 
 namespace wrench {
 
@@ -30,10 +30,11 @@ namespace wrench {
      * @return Vector of FileLocation (potentially with one element only) which should be used for the given file.
      */
     using StorageSelectionStrategyCallback = std::function<std::vector<std::shared_ptr<FileLocation>>(
-            const std::shared_ptr<DataFile> &file,
-            const std::map<std::string, std::vector<std::shared_ptr<StorageService>>> &resources,
-            const std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &mapping,
-            const std::vector<std::shared_ptr<FileLocation>> &previous_allocations)>;
+        const std::shared_ptr<DataFile> &file,
+        const std::map<std::string, std::vector<std::shared_ptr<StorageService>>> &resources,
+        const std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &mapping,
+        const std::vector<std::shared_ptr<FileLocation>> &previous_allocations,
+        unsigned int stripe_count)>;
 
     /**
      * @brief Enum for IO actions in traces
@@ -71,9 +72,9 @@ namespace wrench {
         double ts;
         /** @brief IO action */
         IOAction act;
-        int parts_count;// number of file parts in location array
+        int parts_count; // number of file parts in location array
         std::string file_name;
-        std::vector<DiskUsage> disk_usage;// new usage stats for updated disks
+        std::vector<DiskUsage> disk_usage; // new usage stats for updated disks
         std::vector<std::shared_ptr<FileLocation>> internal_locations;
     };
 
@@ -188,9 +189,13 @@ namespace wrench {
          */
         std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &getAllServices();
 
+        std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<FileLocation> &location);
+
         std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<DataFile> &file, S4U_CommPort *answer_commport);
 
-        std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<FileLocation> &location);
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location);
+
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location, unsigned int stripe_count);
 
         bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
@@ -226,7 +231,7 @@ namespace wrench {
 
         // Publicly accessible traces... (TODO: cleanup access to traces)
         /** @brief File read traces */
-        std::map<std::string, AllocationTrace> read_traces = {};
+        // std::map<std::string, AllocationTrace> read_traces = {};
         /** @brief File write traces */
         std::map<std::string, AllocationTrace> write_traces = {};
         /** @brief File copy traces */
@@ -247,8 +252,8 @@ namespace wrench {
 
         /** @brief Default property values **/
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "64000000"},
-                {CompoundStorageServiceProperty::INTERNAL_STRIPING, "true"},
+            {CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "64000000"},
+            {CompoundStorageServiceProperty::INTERNAL_STRIPING, "true"},
         };
 
         /** @brief Default message payload values
@@ -257,20 +262,20 @@ namespace wrench {
          *         requests, with minimum cost to the user.
          */
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {CompoundStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
-                {CompoundStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
-                {CompoundStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, 0},
-                {CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD, S4U_CommPort::default_control_message_size}};
+            {CompoundStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+            {CompoundStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+            {CompoundStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, 0},
+            {CompoundStorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, 0},
+            {CompoundStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD, 0},
+            {CompoundStorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 0},
+            {CompoundStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 0},
+            {CompoundStorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD, 0},
+            {CompoundStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 0},
+            {CompoundStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 0},
+            {CompoundStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD, 0},
+            {CompoundStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD, 0},
+            {CompoundStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD, 0},
+            {CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD, S4U_CommPort::default_control_message_size}};
 
         static unsigned long getNewUniqueNumber();
 
@@ -284,9 +289,9 @@ namespace wrench {
 
         int main() override;
 
-        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location, S4U_CommPort *answer_commport);
-
-        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location);
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location,
+                                                                                   unsigned int stripe_count,
+                                                                                   S4U_CommPort *answer_commport);
 
         bool processStorageSelectionMessage(const CompoundStorageAllocationRequestMessage *msg);
 
@@ -300,6 +305,8 @@ namespace wrench {
         unsigned int total_nb_storage_services = 0;
 
         std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_location_mapping = {};
+
+        std::map<std::shared_ptr<DataFile>, unsigned int> partial_io_stripe_index;
 
         StorageSelectionStrategyCallback &allocate;
 
@@ -322,6 +329,6 @@ namespace wrench {
         void traceInternalStorageUse(IOAction action, const std::vector<std::shared_ptr<FileLocation>> &locations = {});
     };
 
-};// namespace wrench
+}; // namespace wrench
 
-#endif// WRENCH_COMPOUNDSTORAGESERVICE_H
+#endif // WRENCH_COMPOUNDSTORAGESERVICE_H
