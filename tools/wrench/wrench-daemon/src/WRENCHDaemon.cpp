@@ -377,7 +377,7 @@ void WRENCHDaemon::run() {
         res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         res.set_header("Access-Control-Allow-Headers", "Content-Type");
         res.set_header("Access-Control-Max-Age", "86400");// One day
-        this->startSimulation(req, res); // Will set the Access-Control-Allow-Origin, which is terribly ugly
+        this->startSimulation(req, res);                  // Will set the Access-Control-Allow-Origin, which is terribly ugly
     });
 
     // Set some generic error handler

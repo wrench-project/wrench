@@ -28,9 +28,9 @@ public:
     }
 
     void genericRequestHandler(const json &req, crow::response &res, const std::string &api_function) {
-//                display_request_function(req);
-//                std::cerr << "JSON: " << req << "\n";
-//                std::cerr << "API FUNC: " << api_function << "\n";
+        //                display_request_function(req);
+        //                std::cerr << "JSON: " << req << "\n";
+        //                std::cerr << "API FUNC: " << api_function << "\n";
 
         json answer;
         try {
