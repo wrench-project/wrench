@@ -29,6 +29,7 @@ jobs:
           clang -v
           brew update
           brew install llvm@16
+          echo 'export PATH="/usr/local/opt/llvm@16/bin:$PATH"' >> /Users/runner/.bash_profile
           clang -v
       - name: Install nlohmann-json
         run: |
