@@ -26,10 +26,14 @@ jobs:
           rm '/usr/local/bin/2to3-3.11'
       - name: Update brew
         run: |
-          clang -v
           brew update
+      - name: Update clang
+        run: |
+          clang -v
           brew install llvm@16
           echo 'export PATH="/usr/local/opt/llvm@16/bin:$PATH"' >> /Users/runner/.bash_profile
+          export LDFLAGS="-L/usr/local/opt/llvm@16/lib"
+          export CPPFLAGS="-I/usr/local/opt/llvm@16/include"
           clang -v
       - name: Install nlohmann-json
         run: |
