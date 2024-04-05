@@ -86,6 +86,6 @@ namespace wrench {
     /***********************/
     /** \endcond INTERNAL     */
     /***********************/
-} // namespace wrench
+}// namespace wrench
 
-#endif // WRENCH_COMPOUNDSTORAGESERVICEMESSAGE_H
+#endif// WRENCH_COMPOUNDSTORAGESERVICEMESSAGE_H

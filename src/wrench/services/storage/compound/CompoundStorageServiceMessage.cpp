@@ -35,7 +35,7 @@ namespace wrench {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_commport == nullptr) {
             throw std::invalid_argument(
-                "CompoundStorageStorageSelectionRequestMessage::CompoundStorageStorageSelectionRequestMessage(): Invalid arguments");
+                    "CompoundStorageStorageSelectionRequestMessage::CompoundStorageStorageSelectionRequestMessage(): Invalid arguments");
         }
 #endif
         this->answer_commport = answer_commport;
@@ -51,7 +51,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CompoundStorageAllocationAnswerMessage::CompoundStorageAllocationAnswerMessage(
-        std::vector<std::shared_ptr<FileLocation>> locations, double payload)
+            std::vector<std::shared_ptr<FileLocation>> locations, double payload)
         : CompoundStorageServiceMessage(payload) {
         this->locations = locations;
     }
@@ -70,7 +70,7 @@ namespace wrench {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_commport == nullptr) {
             throw std::invalid_argument(
-                "CompoundStorageStorageSelectionRequestMessage::CompoundStorageStorageSelectionRequestMessage(): Invalid arguments");
+                    "CompoundStorageStorageSelectionRequestMessage::CompoundStorageStorageSelectionRequestMessage(): Invalid arguments");
         }
 #endif
         this->answer_commport = answer_commport;
@@ -85,9 +85,9 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CompoundStorageLookupAnswerMessage::CompoundStorageLookupAnswerMessage(
-        std::vector<std::shared_ptr<FileLocation>> locations, double payload)
+            std::vector<std::shared_ptr<FileLocation>> locations, double payload)
         : CompoundStorageServiceMessage(payload) {
         this->locations = locations;
     }
 
-} // namespace wrench
+}// namespace wrench
