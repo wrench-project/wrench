@@ -782,7 +782,7 @@ namespace wrench {
      */
     int SimpleStorageServiceNonBufferized::getNumRunningTransactionsOnDisk(simgrid::s4u::Disk *disk) {
         int count = 0;
-        for (const auto &t : this->running_transactions) {
+        for (const auto &t: this->running_transactions) {
             if ((t->src_disk == disk) or (t->dst_disk == disk)) {
                 count++;
             }
