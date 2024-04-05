@@ -34,6 +34,9 @@ jobs:
           echo 'export PATH="/usr/local/opt/llvm@16/bin:$PATH"' >> /Users/runner/.bash_profile
           export LDFLAGS="-L/usr/local/opt/llvm@16/lib"
           export CPPFLAGS="-I/usr/local/opt/llvm@16/include"
+          ls /usr/local/opt/llvm@16/bin
+          echo LDFLAGS=$LDFLAGS
+          echo CPPFLAGS=$CPPFLAGS
           clang -v
       - name: Install nlohmann-json
         run: |
