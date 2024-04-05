@@ -1056,7 +1056,7 @@ namespace wrench {
     json SimulationController::supportsCompoundJobs(json data) {
         std::string cs_name = data["service_name"];
 
-        std::cerr << "HERE: " <<  data << "\n";
+        std::cerr << "HERE: " << data << "\n";
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
             throw std::runtime_error("Unknown compute service " + cs_name);
