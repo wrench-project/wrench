@@ -30,6 +30,7 @@ jobs:
           brew update
           brew install llvm@15
           clang -v
+          ls -r /opt/homebrew/Cellar/
       - name: Install nlohmann-json
         run: |
           wget https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.tar.gz
