@@ -29,20 +29,12 @@ jobs:
           brew update
       - name: Update clang
         run: |
-          clang -v
           brew install llvm@16
           echo 'export PATH="/usr/local/opt/llvm@16/bin:$PATH"' >> /Users/runner/.bash_profile
           source /Users/runner/.bash_profile
           export LDFLAGS="-L/usr/local/opt/llvm@16/lib"
           export CPPFLAGS="-I/usr/local/opt/llvm@16/include"
-          ls /usr/local/opt/llvm@16/bin
-          echo "Clang version in /usr/local/opt/llvm@16/bin"
-          /usr/local/opt/llvm@16/bin/clang --version
-          /usr/local/opt/llvm@16/bin/clang++ --version
-          echo LDFLAGS=$LDFLAGS
-          echo CPPFLAGS=$CPPFLAGS
-          echo "Default version:"
-          clang --version
+          echo "Clang version: "`clang --version`
       - name: Install nlohmann-json
         run: |
           wget https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.tar.gz
