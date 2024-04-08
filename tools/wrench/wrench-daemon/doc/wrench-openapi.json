@@ -1285,7 +1285,7 @@
       }
     },
     "/simulation/{simid}/createCompoundJob": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -2188,7 +2188,7 @@
       }
     },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/setPriority": {
-      "get": {
+      "put": {
         "tags": [
           "WRENCH"
         ],
@@ -2238,7 +2238,7 @@
       }
     },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/addParentJob": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -2910,7 +2910,7 @@
       }
     },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/addFileCopyAction": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -2988,7 +2988,7 @@
       }
     },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/addFileDeleteAction": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -3123,7 +3123,7 @@
       }
     },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/addFileWriteAction": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -3197,7 +3197,7 @@
       }
     },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/addFileRegistryAddEntryAction": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -3247,7 +3247,7 @@
       }
     },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/addFileRegistryDeleteEntryAction": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -3297,7 +3297,7 @@
       }
     },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/removeAction": {
-      "get": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
