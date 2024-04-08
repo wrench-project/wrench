@@ -1199,16 +1199,17 @@ json SimulationController::addSleepAction(json data) {
         std::string child_compound_job_name = data["compound_job"];
         std::string parent_compound_job_name = data["parent_compound_job"];
 
-        std::shared_ptr<CompoundJob> compound_job;
+        std::shared_ptr<CompoundJob> parent_compound_job;
+        std::shared_ptr<CompoundJob> child_compound_job;
 
-        if (not this->compound_job_registry.lookup(parent_compound_job_name, compound_job)) {
+        if (not this->compound_job_registry.lookup(parent_compound_job_name, parent_compound_job)) {
             throw std::runtime_error("Unknown compound job " + parent_compound_job_name);
     }
-        if (not this->compound_job_registry.lookup(child_compound_job_name, compound_job)) {
+        if (not this->compound_job_registry.lookup(child_compound_job_name, child_compound_job)) {
             throw std::runtime_error("Unknown compound job " + child_compound_job_name);
         }
 
-        child_compound_job_name->addParentJob(parent_compound_job_name);
+        child_compound_job->addParentJob(parent_compound_job);
         return;
 }
 
