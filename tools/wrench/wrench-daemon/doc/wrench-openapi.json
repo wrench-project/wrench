@@ -1760,7 +1760,7 @@
         "tags": [
           "WRENCH"
         ],
-        "summary": "Create and start a file registery service.",
+        "summary": "Create and start a file registry service.",
         "operationId": "addFileRegistryService",
         "parameters": [
           {
@@ -2256,7 +2256,7 @@
             }
           },
           {
-            "name": "compound_job",
+            "name": "compound_job_name",
             "in": "path",
             "description": "Name of the compound job",
             "required": true,
@@ -5624,61 +5624,6 @@
           }
         }
       }
-    },
-    "/simulation/{simid}/addAction": {
-      "post": {
-        "tags": [
-          "WRENCH"
-        ],
-        "summary": "Create and start an Action.",
-        "operationId": "addAction",
-        "parameters": [
-          {
-            "name": "simid",
-            "in": "path",
-            "description": "ID of the simulation",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to start a new action.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "Name of the Action"
-                  },
-                  "prefix": {
-                    "type": "string",
-                    "description": "Prefix to create new name for action if name is not provided"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GenericResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
-        }
-      }
     }
   },
   "components": {
@@ -6074,6 +6019,14 @@
           "action_name": {
             "type": "string",
             "description": "The new action's name."
+          },
+          "uses_scratch": {
+            "type": "number",
+            "description": "Whether the action uses scratch."
+          },
+          "num_bytes_to_read": {
+            "type": "string",
+            "description": "The num of bytes the action's to read."
           },
           "wrench_api_request_success": {
             "type": "boolean",

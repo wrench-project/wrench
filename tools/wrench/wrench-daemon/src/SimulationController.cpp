@@ -976,14 +976,15 @@ namespace wrench {
         double ram = data["ram"];
         double min_num_cores = data["min_num_cores"];
         double max_num_cores = data["max_num_cores"];
-        std::tuple parallel_model = data["parallel_model"];
+        std::pair<std::string, double> parallel_model = data["parallel_model"];
         std::string model_type = std::get<0>(parallel_model);
         double value = std::get<1>(parallel_model);
 
+        std::shared_ptr<ParallelModel> model;
         if (model_type == "AMDAHL") {
-            std::shared_ptr<ParallelModel> model = ParallelModel::AMDAHL(value);
+            model = ParallelModel::AMDAHL(value);
         } else if (model_type == "CONSTANTEFFICIENCY") {
-            std::shared_ptr<ParallelModel> model = ParallelModel::CONSTANTEFFICIENCY(value);
+            model = ParallelModel::CONSTANTEFFICIENCY(value);
         }
 
         auto action = compound_job->addComputeAction(compute_action_name, flops, ram, min_num_cores, max_num_cores, model);
@@ -1145,13 +1146,14 @@ namespace wrench {
             throw std::runtime_error("Unknown storage service " + ss_name);
         }
 
-        std::string file_read_action_name = data["name"];
+        std::string file_read_action_name = data["action_name"];
         double num_bytes_to_read = data["num_bytes_to_read"];
 
+        shared_ptr<FileReadAction> action;
         if (num_bytes_to_read == -1) {
-            auto action = compound_job->addFileReadAction(file_write_action_name, file, ss);
+            action = compound_job->addFileReadAction(file_read_action_name, file, ss);
         } else {
-            auto action = compound_job->addFileReadAction(file_write_action_name, file, ss, num_bytes_to_read);
+            action = compound_job->addFileReadAction(file_read_action_name, file, ss, num_bytes_to_read);
         }
 
         json answer;
@@ -1164,7 +1166,7 @@ namespace wrench {
 
         // Question: Does the following function "getNumBytesToRead()" return total number of bytes in file if the
         //fileReadAction that was created wasn't passed in a NumBytesToRead parameter
-        answer["num_bytes_to_read"] = action->getNumBytesToRead()
+        answer["num_bytes_to_read"] = action->getNumBytesToRead();
         return answer;
     }
 
@@ -1196,7 +1198,7 @@ json SimulationController::addSleepAction(json data) {
     * @return JSON output
     */
     json SimulationController::addParentJob(json data) {
-        std::string child_compound_job_name = data["compound_job"];
+        std::string child_compound_job_name = data["compound_job_name"];
         std::string parent_compound_job_name = data["parent_compound_job"];
 
         std::shared_ptr<CompoundJob> parent_compound_job;
@@ -1210,7 +1212,7 @@ json SimulationController::addSleepAction(json data) {
         }
 
         child_compound_job->addParentJob(parent_compound_job);
-        return;
+        return {};
 }
 
     /**
