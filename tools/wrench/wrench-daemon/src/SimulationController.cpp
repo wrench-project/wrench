@@ -13,6 +13,7 @@
 #include <iostream>
 #include <utility>
 #include <unistd.h>
+#include <tuple>
 
 // The timeout use when the SimulationController receives a message
 // from the job manager. Can't be zero, but can be very small.
@@ -905,10 +906,10 @@ namespace wrench {
         std::string compound_job_name = data["name"];
 
         auto job = this->job_manager->createCompoundJob(compound_job_name);
-    this->compound_job_registry.insert(job->getName(), job);
-    json answer;
-    answer["job_name"] = job->getName();
-    return answer;
+        this->compound_job_registry.insert(job->getName(), job);
+        json answer;
+        answer["job_name"] = job->getName();
+        return answer;
 }
 
     /**
@@ -1146,7 +1147,7 @@ namespace wrench {
             throw std::runtime_error("Unknown storage service " + ss_name);
         }
 
-        std::string file_read_action_name = data["action_name"];
+        std::string file_read_action_name = data["name"];
         double num_bytes_to_read = data["num_bytes_to_read"];
 
         shared_ptr<FileReadAction> action;
@@ -1204,7 +1205,7 @@ json SimulationController::addSleepAction(json data) {
         std::shared_ptr<CompoundJob> parent_compound_job;
         std::shared_ptr<CompoundJob> child_compound_job;
 
-        if (not this->compound_job_registry.lookup(parent_compound_job_name, parent_compound_job)) {
+        if (not this->compound_job_registry.lookup(parent_compound_job_name,parent_compound_job)) {
             throw std::runtime_error("Unknown compound job " + parent_compound_job_name);
     }
         if (not this->compound_job_registry.lookup(child_compound_job_name, child_compound_job)) {
