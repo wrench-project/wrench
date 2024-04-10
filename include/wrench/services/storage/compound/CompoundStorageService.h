@@ -10,13 +10,13 @@
 #ifndef WRENCH_COMPOUNDSTORAGESERVICE_H
 #define WRENCH_COMPOUNDSTORAGESERVICE_H
 
+#include "wrench/services/memory/MemoryManager.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/storage/StorageServiceMessage.h"
-#include "wrench/services/memory/MemoryManager.h"
-#include "wrench/services/storage/compound/CompoundStorageServiceProperty.h"
-#include "wrench/services/storage/compound/CompoundStorageServiceMessagePayload.h"
-#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/services/storage/compound/CompoundStorageServiceMessage.h"
+#include "wrench/services/storage/compound/CompoundStorageServiceMessagePayload.h"
+#include "wrench/services/storage/compound/CompoundStorageServiceProperty.h"
+#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 
 namespace wrench {
 
@@ -33,7 +33,8 @@ namespace wrench {
             const std::shared_ptr<DataFile> &file,
             const std::map<std::string, std::vector<std::shared_ptr<StorageService>>> &resources,
             const std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &mapping,
-            const std::vector<std::shared_ptr<FileLocation>> &previous_allocations)>;
+            const std::vector<std::shared_ptr<FileLocation>> &previous_allocations,
+            unsigned int stripe_count)>;
 
     /**
      * @brief Enum for IO actions in traces
@@ -188,9 +189,13 @@ namespace wrench {
          */
         std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &getAllServices();
 
+        std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<FileLocation> &location);
+
         std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<DataFile> &file, S4U_CommPort *answer_commport);
 
-        std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<FileLocation> &location);
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location);
+
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location, unsigned int stripe_count);
 
         bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
@@ -226,7 +231,7 @@ namespace wrench {
 
         // Publicly accessible traces... (TODO: cleanup access to traces)
         /** @brief File read traces */
-        std::map<std::string, AllocationTrace> read_traces = {};
+        // std::map<std::string, AllocationTrace> read_traces = {};
         /** @brief File write traces */
         std::map<std::string, AllocationTrace> write_traces = {};
         /** @brief File copy traces */
@@ -284,9 +289,9 @@ namespace wrench {
 
         int main() override;
 
-        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location, S4U_CommPort *answer_commport);
-
-        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location);
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location,
+                                                                                   unsigned int stripe_count,
+                                                                                   S4U_CommPort *answer_commport);
 
         bool processStorageSelectionMessage(const CompoundStorageAllocationRequestMessage *msg);
 
@@ -300,6 +305,8 @@ namespace wrench {
         unsigned int total_nb_storage_services = 0;
 
         std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_location_mapping = {};
+
+        std::map<std::shared_ptr<DataFile>, unsigned int> partial_io_stripe_index;
 
         StorageSelectionStrategyCallback &allocate;
 

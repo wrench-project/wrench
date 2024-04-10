@@ -12,6 +12,7 @@
 
 
 #include <iostream>
+#include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
 
@@ -53,6 +54,14 @@ namespace wrench {
          */
         SimulationTimestamp(T *content) {
             this->content = std::unique_ptr<T>(content);
+            TRACK_OBJECT("timestamp");
+        }
+
+        /**
+         * @brief Destructor
+         */
+        ~SimulationTimestamp() {
+            UNTRACK_OBJECT("timestamp");
         }
 
         /***********************/

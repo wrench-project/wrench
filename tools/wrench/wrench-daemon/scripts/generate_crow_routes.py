@@ -28,6 +28,7 @@ if __name__ == "__main__":
     #Temporary check: how many types are in wrench-openapi.json
     basket = set()
     for path in data["paths"].keys():
+        print(path)
 
         method = list(data["paths"][path].keys())[0]
 
@@ -86,6 +87,7 @@ if __name__ == "__main__":
     '''
     apps = ""
 
+    index = 0
     for crow in crows.keys():
         route = crows[crow]
         app = '\tCROW_ROUTE(app, "{0}").methods(crow::HTTPMethod::{1})\n'.format(crow, route['method'].capitalize())
@@ -97,7 +99,8 @@ if __name__ == "__main__":
 
         # use last part of the path as the key to find the value
         sep = crow.split('/')
-        key = sep[-1]
+        key = sep[-1] + "_" + str(index)
+        index += 1
 
         parameter_list.append('const crow::request& req')
         for i in range(len(route['parameter_list'])):
@@ -108,7 +111,14 @@ if __name__ == "__main__":
         parameter_str = ', '.join(parameter_list)
         app += '([this]({0}){{\n'.format(parameter_str)
 
-        app += '\t\t\tjson req_json = json::parse(req.body);\n'
+        if route['method'].capitalize() == "Get":
+            # Since Get requests shouldn't have a body, we create a blank json object
+            # that will be populated from data in the URL
+            app += '\t\t\tjson req_json = {};\n'
+        else:
+            # Since Post/Put requests have a body, we create a json object from that body
+            # and will add to it data in the URL
+            app += '\t\t\tjson req_json = json::parse(req.body);\n'
         for parameter_name in route['parameter_list']:
             app += '\t\t\treq_json[toStr({0})] = {0};\n'.format(parameter_name)
 
@@ -129,11 +139,13 @@ if __name__ == "__main__":
     Create header file with map
     '''
     callback_map = ""
+    index = 0
     for crow in crows.keys():
         route = crows[crow]
-        key = route["path_suffix"]
+        key = route["path_suffix"] + "_" + str(index)
+        index += 1
         value = route["operationId"]
-        if key != "startSimulation": # Exlude this SPECIAL route
+        if key != "startSimulation_0": # Exclude this SPECIAL route
             callback_map += 'request_handlers["{0}"] = [sc](json data) {{ return sc->{1}(std::move(data)); }};\n'.format(key, value)
 
     with open(header_callback_map_path, 'w') as f:

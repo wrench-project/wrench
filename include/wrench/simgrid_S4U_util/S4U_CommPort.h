@@ -182,11 +182,12 @@ namespace wrench {
     private:
         friend class S4U_Daemon;
         friend class S4U_PendingCommunication;
+        friend class SimpleStorageServiceNonBufferized;
+        SimulationMessage *msg_mb;
+        SimulationMessage *msg_mq;
 
         simgrid::s4u::Mailbox *s4u_mb;
         simgrid::s4u::MessageQueue *s4u_mq;
-        SimulationMessage *msg_mb;
-        SimulationMessage *msg_mq;
         bool mb_comm_posted = false;
         simgrid::s4u::CommPtr mb_comm;
         bool mq_comm_posted = false;
