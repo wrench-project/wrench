@@ -26,11 +26,25 @@ jobs:
           rm '/usr/local/bin/2to3-3.11'
       - name: Update brew
         run: |
-          clang -v
           brew update
+      - name: Update clang
+        run: |
+          brew install llvm@16
+          echo 'export PATH="/usr/local/opt/llvm@16/bin:$PATH"' >> /Users/runner/.bash_profile
+          source /Users/runner/.bash_profile
+          export LDFLAGS="-L/usr/local/opt/llvm@16/lib"
+          export CPPFLAGS="-I/usr/local/opt/llvm@16/include"
+          echo "Clang version: "`clang --version`
       - name: Install nlohmann-json
         run: |
-          brew install nlohmann-json 
+          wget https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.tar.gz
+          tar -xzf v3.11.3.tar.gz
+          cd json-3.11.3 
+          mkdir build
+          cd build
+          cmake ..
+          make -j4
+          make install
       - name: Install googletest
         run: |
           brew install googletest
@@ -39,6 +53,7 @@ jobs:
 #          brew install python
       - name: Install boost
         run: |
+          brew install sbt
           brew install boost
       - name: Install Simgrid
         run: |

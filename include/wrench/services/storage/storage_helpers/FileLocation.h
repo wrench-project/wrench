@@ -59,7 +59,7 @@ namespace wrench {
         std::shared_ptr<StorageService> getServerStorageService();
 #endif
         std::string getPath();
-        bool isScratch() const;
+        [[nodiscard]] bool isScratch() const;
         std::string toString();
 
 

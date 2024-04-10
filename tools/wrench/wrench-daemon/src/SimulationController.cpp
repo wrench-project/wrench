@@ -304,7 +304,10 @@ namespace wrench {
         map<std::string, std::tuple<unsigned long, double>> resources;
         json jsonData = json::parse(resource);
         for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
-            resources.emplace(it.key(), it.value());
+            auto spec = it.value();
+            if (spec[0] < 0) spec[0] = ComputeService::ALL_CORES;
+            if (spec[1] < 0) spec[1] = ComputeService::ALL_RAM;
+            resources.emplace(it.key(), spec);
         }
 
         // Create the new service
@@ -568,7 +571,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::createFileCopyAtStorageService(json data) {
-        std::string ss_name = data["storage_service_name"];
+        std::string ss_name = data["service_name"];
         std::string filename = data["filename"];
 
         std::shared_ptr<StorageService> ss;
@@ -600,7 +603,7 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::lookupFileAtStorageService(json data) {
-        std::string ss_name = data["storage_service_name"];
+        std::string ss_name = data["service_name"];
         std::string filename = data["filename"];
 
         std::shared_ptr<StorageService> ss;
@@ -1248,7 +1251,7 @@ json SimulationController::addSleepAction(json data) {
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow  " + workflow_name);
         }
-        answer["flops"] = workflow->getTaskByID(data["name"])->getFlops();
+        answer["flops"] = workflow->getTaskByID(data["task_name"])->getFlops();
         return answer;
     }
 
@@ -1258,13 +1261,15 @@ json SimulationController::addSleepAction(json data) {
      * @return JSON output
      */
     json SimulationController::getTaskMinNumCores(json data) {
+        std::cerr << "HERE\n";
+        std::cerr << data << "\n";
         std::string workflow_name = data["workflow_name"];
         std::shared_ptr<Workflow> workflow;
         json answer;
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow  " + workflow_name);
         }
-        answer["min_num_cores"] = workflow->getTaskByID(data["name"])->getMinNumCores();
+        answer["min_num_cores"] = workflow->getTaskByID(data["task_name"])->getMinNumCores();
         return answer;
     }
 
@@ -1280,7 +1285,7 @@ json SimulationController::addSleepAction(json data) {
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow " + workflow_name);
         }
-        answer["max_num_cores"] = workflow->getTaskByID(data["name"])->getMaxNumCores();
+        answer["max_num_cores"] = workflow->getTaskByID(data["task_name"])->getMaxNumCores();
         return answer;
     }
 
@@ -1296,7 +1301,7 @@ json SimulationController::addSleepAction(json data) {
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow " + workflow_name);
         }
-        answer["memory"] = workflow->getTaskByID(data["name"])->getMemoryRequirement();
+        answer["memory"] = workflow->getTaskByID(data["task_name"])->getMemoryRequirement();
         return answer;
     }
 
@@ -1312,7 +1317,7 @@ json SimulationController::addSleepAction(json data) {
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow " + workflow_name);
         }
-        answer["time"] = workflow->getTaskByID(data["name"])->getStartDate();
+        answer["time"] = workflow->getTaskByID(data["task_name"])->getStartDate();
         return answer;
     }
 
@@ -1328,7 +1333,7 @@ json SimulationController::addSleepAction(json data) {
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow " + workflow_name);
         }
-        answer["time"] = workflow->getTaskByID(data["name"])->getEndDate();
+        answer["time"] = workflow->getTaskByID(data["task_name"])->getEndDate();
         return answer;
     }
 
@@ -1468,6 +1473,43 @@ json SimulationController::addSleepAction(json data) {
      * @param data JSON input
      * @return JSON output
      */
+    json SimulationController::getReadyTasks(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        auto tasks = workflow->getReadyTasks();
+        json answer;
+        std::vector<std::string> task_names;
+        for (const auto &t: tasks) {
+            task_names.push_back(t->getID());
+        }
+        answer["tasks"] = task_names;
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::workflowIsDone(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        json answer;
+        answer["result"] = workflow->isDone();
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::stageInputFiles(json data) {
         std::shared_ptr<StorageService> storage_service;
         std::string service_name = data["storage"];
@@ -1492,14 +1534,16 @@ json SimulationController::addSleepAction(json data) {
      * @return JSON output
      */
     json SimulationController::supportsCompoundJobs(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
 
+        std::cerr << "HERE: " << data << "\n";
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
         json answer;
         answer["result"] = cs->supportsCompoundJobs();
+        std::cerr << answer << "\n";
         return answer;
     }
 
@@ -1509,7 +1553,7 @@ json SimulationController::addSleepAction(json data) {
      * @return JSON output
      */
     json SimulationController::supportsPilotJobs(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
 
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
@@ -1526,7 +1570,7 @@ json SimulationController::addSleepAction(json data) {
      * @return JSON output
      */
     json SimulationController::supportsStandardJobs(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
 
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
@@ -1542,8 +1586,58 @@ json SimulationController::addSleepAction(json data) {
      * @param data JSON input
      * @return JSON output
      */
+    json SimulationController::getCoreFlopRates(json data) {
+        std::string cs_name = data["service_name"];
+
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+        json answer;
+        auto information = cs->getCoreFlopRate();
+        std::vector<std::string> hostnames;
+        std::vector<double> flop_rates;
+        for (auto &entry: information) {
+            hostnames.push_back(entry.first);
+            flop_rates.push_back(entry.second);
+        }
+        answer["hostnames"] = hostnames;
+        answer["flop_rates"] = flop_rates;
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::getCoreCounts(json data) {
+        std::string cs_name = data["service_name"];
+
+        std::shared_ptr<ComputeService> cs;
+        if (not this->compute_service_registry.lookup(cs_name, cs)) {
+            throw std::runtime_error("Unknown compute service " + cs_name);
+        }
+        json answer;
+        auto information = cs->getPerHostNumCores();
+        std::vector<std::string> hostnames;
+        std::vector<unsigned long> core_counts;
+        for (auto &entry: information) {
+            hostnames.push_back(entry.first);
+            core_counts.push_back(entry.second);
+        }
+        answer["hostnames"] = hostnames;
+        answer["core_counts"] = core_counts;
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::isVMRunning(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
         std::string vm_name = data["vm_name"];
 
         std::shared_ptr<ComputeService> cs;
@@ -1563,7 +1657,7 @@ json SimulationController::addSleepAction(json data) {
      * @return JSON output
      */
     json SimulationController::isVMDown(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
         std::string vm_name = data["vm_name"];
 
         std::shared_ptr<ComputeService> cs;
@@ -1583,7 +1677,7 @@ json SimulationController::addSleepAction(json data) {
      * @return JSON output
      */
     json SimulationController::suspendVM(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
         std::string vm_name = data["vm_name"];
 
         // Lookup the cloud compute service
@@ -1622,7 +1716,7 @@ json SimulationController::addSleepAction(json data) {
      * @return JSON output
      */
     json SimulationController::isVMSuspended(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
         std::string vm_name = data["vm_name"];
 
         std::shared_ptr<ComputeService> cs;
@@ -1643,7 +1737,7 @@ json SimulationController::addSleepAction(json data) {
      * @return JSON output
      */
     json SimulationController::resumeVM(json data) {
-        std::string cs_name = data["compute_service_name"];
+        std::string cs_name = data["service_name"];
         std::string vm_name = data["vm_name"];
 
         // Lookup the cloud compute service
@@ -1765,17 +1859,28 @@ json SimulationController::addSleepAction(json data) {
 
         json answer;
         try {
+            std::cerr << "CALLING CREATE WORKFLOW FROM JSON\n";
             auto wf = WfCommonsWorkflowParser::createWorkflowFromJSONString(json_string, reference_flop_rate, ignore_machine_specs,
                                                                             redundant_dependencies, ignore_cycle_creating_dependencies,
                                                                             min_cores_per_task, max_cores_per_task, enforce_num_cores,
                                                                             ignore_avg_cpu, show_warnings);
+            std::cerr << "CALLED CREATE WORKFLOW FROM JSON\n";
+            this->workflow_registry.insert(wf->getName(), wf);
+
             answer["workflow_name"] = wf->getName();
+
             std::vector<std::string> task_names;
             for (const auto &t: wf->getTasks()) {
                 task_names.push_back(t->getID());
             }
             answer["tasks"] = task_names;
-            this->workflow_registry.insert(wf->getName(), wf);
+
+            std::vector<std::string> file_names;
+            for (const auto &t: wf->getFileMap()) {
+                file_names.push_back(t.second->getID());
+            }
+            answer["files"] = file_names;
+
             return answer;
         } catch (std::exception &e) {
             throw std::runtime_error("Error while importing workflow from JSON: " + std::string(e.what()));

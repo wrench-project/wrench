@@ -35,12 +35,17 @@ namespace wrench {
      */
     class CompoundStorageAllocationRequestMessage : public CompoundStorageServiceMessage {
     public:
-        CompoundStorageAllocationRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file, double payload);
+        CompoundStorageAllocationRequestMessage(S4U_CommPort *answer_commport,
+                                                std::shared_ptr<DataFile> file,
+                                                unsigned int stripe_count,
+                                                double payload);
 
         /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
         /** @brief The path */
         std::shared_ptr<DataFile> file;
+
+        unsigned int stripe_count;
     };
 
     /**

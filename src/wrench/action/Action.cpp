@@ -28,6 +28,13 @@ WRENCH_LOG_CATEGORY(wrench_action, "Log category for  Action");
 namespace wrench {
 
     /**
+     * @brief Destructor
+     */
+    Action::~Action() {
+        UNTRACK_OBJECT("action");
+    }
+
+    /**
      * @brief Constructor
      * @param name: the action's name (if empty, a unique name will be picked)
      * @param prefix: the action's name prefix (if name is empty)
@@ -40,6 +47,7 @@ namespace wrench {
         }
         this->execution_history.push(Action::ActionExecution());
         this->priority = 0.0;
+        TRACK_OBJECT("action");
     }
 
     /**

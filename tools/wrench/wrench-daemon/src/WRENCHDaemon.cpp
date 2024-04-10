@@ -79,7 +79,7 @@ void setSuccessAnswer(Response &res, int port_number) {
     json answer;
     answer["wrench_api_request_success"] = true;
     answer["port_number"] = port_number;
-    res.set_header("access-control-allow-origin", "*");
+    res.set_header("Access-Control-Allow-Origin", "*");
     res.set_content(answer.dump(), "application/json");
 }
 
@@ -92,7 +92,7 @@ void setFailureAnswer(Response &res, const std::string &failure_cause) {
     json answer;
     answer["wrench_api_request_success"] = false;
     answer["failure_cause"] = failure_cause;
-    res.set_header("access-control-allow-origin", "*");
+    res.set_header("Access-Control-Allow-Origin", "*");
     res.set_content(answer.dump(), "application/json");
 }
 
@@ -322,7 +322,7 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
         }
 
         // Destroy the shared memory segment (important, since there is a limited
-        // number of them we can create, and besides we should clean-up after ourselves)
+        // number of them we can create, and besides we should clean up after ourselves)
         if (shmctl(shm_segment_id, IPC_RMID, nullptr) == -1) {
             perror("WARNING: shmctl()");
         }
@@ -345,9 +345,40 @@ void WRENCHDaemon::error_handling(const Request &req, Response &res) {
 * @brief The WRENCH daemon's "main" method
 */
 void WRENCHDaemon::run() {
+    std::vector<std::string> allowed_origins = {
+            "http://localhost:8000"};
+
     // Only set up POST request handler for "/api/startSimulation" since
     // all other API paths will be handled by a simulation daemon instead
-    server.Post("/api/startSimulation", [this](const Request &req, Response &res) { this->startSimulation(req, res); });
+    server.Post("/api/startSimulation", [this, allowed_origins](const Request &req, Response &res) {
+        // Check if the Origin header is present and matches any of the allowed origins
+        auto origin_header = req.get_header_value("Origin");
+        //      std::cerr << "REQ1 = " << req.body << "\n";
+        //      std::cerr << "REQ2 = " << req.path << "\n";
+        //      std::cerr << "ORIGIN_HEADER: " << origin_header << "\n";
+
+        //      std::cerr << "CALLING res.set_header()\n";
+        //      res.set_header("access-control-allow-origin", "*");
+        //      if (!origin_header.empty()) {
+        //          for (const auto &allowed_origin: allowed_origins) {
+        //              if (origin_header == allowed_origin) {
+        //                  // Set appropriate CORS headers
+        ////                    res.set_header("access-control-allow-origin", "*");
+        ////                    res.set_header("Access-Control-Allow-Origin", origin_header);
+        //        res.set_header("Access-Control-Allow-Origin", "http://localhost:8000");
+        // Start simulation
+        //                  std::cerr << "STARTING SIMULATION\n";
+        //                  this->startSimulation(req, res);
+        //                  return;
+        //              }
+        //          }
+        //      }
+
+        res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        res.set_header("Access-Control-Allow-Headers", "Content-Type");
+        res.set_header("Access-Control-Max-Age", "86400");// One day
+        this->startSimulation(req, res);                  // Will set the Access-Control-Allow-Origin, which is terribly ugly
+    });
 
     // Set some generic error handler
     server.set_error_handler([](const Request &req, Response &res) { WRENCHDaemon::error_handling(req, res); });
