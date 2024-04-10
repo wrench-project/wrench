@@ -187,18 +187,25 @@ namespace wrench {
      */
     json SimulationController::eventToJSON(double date, const std::shared_ptr<wrench::ExecutionEvent> &event) {
         // Construct the json event description
-        std::shared_ptr<wrench::StandardJob> job;
+        std::shared_ptr<wrench::Job> job;
         json event_desc;
 
         event_desc["event_date"] = date;
         // Deal with the different event types
-        if (auto failed = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
-            event_desc["event_type"] = "job_failure";
-            event_desc["failure_cause"] = failed->failure_cause->toString();
-            job = failed->standard_job;
-        } else if (auto complete = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
-            event_desc["event_type"] = "job_completion";
-            job = complete->standard_job;
+        if (auto failed_sj = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
+            event_desc["event_type"] = "standard_job_failure";
+            event_desc["failure_cause"] = failed_sj->failure_cause->toString();
+            job = failed_sj->standard_job;
+        } else if (auto complete_sj = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
+            event_desc["event_type"] = "standard_job_completion";
+            job = complete_sj->standard_job;
+        } else if (auto failed_cj = std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event)) {
+            event_desc["event_type"] = "compound_job_failure";
+            event_desc["failure_cause"] = failed_cj->failure_cause->toString();
+            job = failed_cj->job;
+        } else if (auto completed_cj = std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event)) {
+            event_desc["event_type"] = "compound_job_completion";
+            job = completed_cj->job;
         }
 
         event_desc["compute_service_name"] = job->getParentComputeService()->getName();
@@ -222,7 +229,7 @@ namespace wrench {
         this->event_queue.waitAndPop(event);
 
         // Construct the json event description
-        std::shared_ptr<wrench::StandardJob> job;
+//        std::shared_ptr<wrench::StandardJob> job;
         json event_desc = eventToJSON(event.first, event.second);
 
         // Construct the json answer
