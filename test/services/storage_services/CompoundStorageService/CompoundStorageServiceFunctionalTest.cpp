@@ -131,7 +131,8 @@ public:
             const std::shared_ptr<wrench::DataFile> &file,
             const std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &resources,
             const std::map<std::shared_ptr<wrench::DataFile>, std::vector<std::shared_ptr<wrench::FileLocation>>> &mapping,
-            const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations) {
+            const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations,
+            unsigned int stripe_count /*Unused in this test*/) {
 
         // Init round-robin
         static auto last_selected_server = resources.begin()->first;
@@ -342,8 +343,9 @@ void CompoundStorageServiceFunctionalTest::do_CopyToCSS_test() {
                                                                          const std::shared_ptr<wrench::DataFile> &file,
                                                                          const std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &resources,
                                                                          const std::map<std::shared_ptr<wrench::DataFile>, std::vector<std::shared_ptr<wrench::FileLocation>>> &mapping,
-                                                                         const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations) {
-        return allocator(file, resources, mapping, previous_allocations);
+                                                                         const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations,
+                                                                         unsigned int stripe_count) {
+        return allocator(file, resources, mapping, previous_allocations, stripe_count);
     };
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
                             new wrench::CompoundStorageService(
@@ -475,8 +477,9 @@ void CompoundStorageServiceFunctionalTest::do_WriteToCSS_test() {
                                                                          const std::shared_ptr<wrench::DataFile> &file,
                                                                          const std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &resources,
                                                                          const std::map<std::shared_ptr<wrench::DataFile>, std::vector<std::shared_ptr<wrench::FileLocation>>> &mapping,
-                                                                         const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations) {
-        return allocator(file, resources, mapping, previous_allocations);
+                                                                         const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations,
+                                                                         unsigned int stripe_count) {
+        return allocator(file, resources, mapping, previous_allocations, stripe_count);
     };
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
                             new wrench::CompoundStorageService(
@@ -632,8 +635,9 @@ void CompoundStorageServiceFunctionalTest::do_CopyFromCSS_test() {
                                                                          const std::shared_ptr<wrench::DataFile> &file,
                                                                          const std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &resources,
                                                                          const std::map<std::shared_ptr<wrench::DataFile>, std::vector<std::shared_ptr<wrench::FileLocation>>> &mapping,
-                                                                         const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations) {
-        return allocator(file, resources, mapping, previous_allocations);
+                                                                         const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations,
+                                                                         unsigned int stripe_count) {
+        return allocator(file, resources, mapping, previous_allocations, stripe_count);
     };
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
                             new wrench::CompoundStorageService(
@@ -808,8 +812,9 @@ void CompoundStorageServiceFunctionalTest::do_fullJob_test() {
                                                                          const std::shared_ptr<wrench::DataFile> &file,
                                                                          const std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &resources,
                                                                          const std::map<std::shared_ptr<wrench::DataFile>, std::vector<std::shared_ptr<wrench::FileLocation>>> &mapping,
-                                                                         const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations) {
-        return allocator(file, resources, mapping, previous_allocations);
+                                                                         const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations,
+                                                                         unsigned int stripe_count) {
+        return allocator(file, resources, mapping, previous_allocations, stripe_count);
     };
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
                             new wrench::CompoundStorageService(
@@ -1227,8 +1232,9 @@ void CompoundStorageServiceFunctionalTest::do_BasicError_test() {
                                                                          const std::shared_ptr<wrench::DataFile> &file,
                                                                          const std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &resources,
                                                                          const std::map<std::shared_ptr<wrench::DataFile>, std::vector<std::shared_ptr<wrench::FileLocation>>> &mapping,
-                                                                         const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations) {
-        return allocator(file, resources, mapping, previous_allocations);
+                                                                         const std::vector<std::shared_ptr<wrench::FileLocation>> &previous_allocations,
+                                                                         unsigned int stripe_count) {
+        return allocator(file, resources, mapping, previous_allocations, stripe_count);
     };
     ASSERT_NO_THROW(compound_storage_service = simulation->add(
                             new wrench::CompoundStorageService(

@@ -158,7 +158,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/createTask": {
+    "/simulation/{simid}/workflows/{workflow_name}/createTask": {
       "put": {
         "tags": [
           "WRENCH"
@@ -322,7 +322,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{tid}/inputFiles": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{tid}/inputFiles": {
       "get": {
         "tags": [
           "WRENCH"
@@ -381,7 +381,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{tid}/addInputFile": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{tid}/addInputFile": {
       "put": {
         "tags": [
           "WRENCH"
@@ -456,7 +456,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{tid}/outputFiles": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{tid}/outputFiles": {
       "get": {
         "tags": [
           "WRENCH"
@@ -515,7 +515,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{tid}/addOutputFile": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{tid}/addOutputFile": {
       "put": {
         "tags": [
           "WRENCH"
@@ -590,7 +590,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/inputFiles": {
+    "/simulation/{simid}/workflows/{workflow_name}/inputFiles": {
       "get": {
         "tags": [
           "WRENCH"
@@ -625,6 +625,106 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FileList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/workflows/{workflow_name}/readyTasks": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Return the list of ready tasks in the workflow.",
+        "deprecated": false,
+        "operationId": "getReadyTasks",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/workflows/{workflow_name}/isDone": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Return whether the workflow has finished executing or not.",
+        "deprecated": false,
+        "operationId": "workflowIsDone",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BooleanResponse"
                 }
               }
             }
@@ -801,7 +901,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetFlops": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetFlops": {
       "get": {
         "tags": [
           "WRENCH"
@@ -829,9 +929,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -860,7 +960,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetMinNumCores": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetMinNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -888,9 +988,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -919,7 +1019,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetMaxNumCores": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetMaxNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -947,9 +1047,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -978,7 +1078,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetMemory": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetMemory": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1006,9 +1106,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -1037,7 +1137,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetStartDate": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetStartDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1065,9 +1165,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -1096,7 +1196,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetEndDate": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetEndDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1124,9 +1224,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -1155,7 +1255,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/createStandardJob": {
+    "/simulation/{simid}/workflows/{workflow_name}/createStandardJob": {
       "put": {
         "tags": [
           "WRENCH"
@@ -1588,7 +1688,7 @@
         }
       }
     },
-    "/simulation/{simid}/supportsCompoundJobs": {
+    "/simulation/{simid}/compute_services/{service_name}/supportsCompoundJobs": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1604,6 +1704,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "Name of the compute service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1624,7 +1733,7 @@
         }
       }
     },
-    "/simulation/{simid}/supportsPilotJobs": {
+    "/simulation/{simid}/compute_services/{service_name}/supportsPilotJobs": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1640,6 +1749,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "Name of the compute service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1660,7 +1778,7 @@
         }
       }
     },
-    "/simulation/{simid}/supportsStandardJobs": {
+    "/simulation/{simid}/compute_services/{service_name}/supportsStandardJobs": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1676,6 +1794,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "Name of the compute service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1685,6 +1812,126 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BooleanResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compute_services/{service_name}/coreFlopRates": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Returns the core flop rate for each host managed by the compute service.",
+        "operationId": "getCoreFlopRates",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "hostnames": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "The service's compute hosts"
+                    },
+                    "flop_rates": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "description": "The service's compute hosts' flop rates"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compute_services/{service_name}/coreCounts": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Returns the core counts for each host managed by the compute service.",
+        "operationId": "getCoreCounts",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "hostnames": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "The service's compute hosts"
+                    },
+                    "flop_rates": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "description": "The service's compute hosts' core counts"
+                    }
+                  }
                 }
               }
             }
@@ -1984,7 +2231,7 @@
         }
       }
     },
-    "/simulation/{simid}/{storage_service_name}/createFileCopy": {
+    "/simulation/{simid}/storage_services/{service_name}/createFileCopy": {
       "post": {
         "tags": [
           "WRENCH"
@@ -2002,9 +2249,9 @@
             }
           },
           {
-            "name": "storage_service_name",
+            "name": "service_name",
             "in": "path",
-            "description": "The storage service's head host",
+            "description": "The storage service name",
             "required": true,
             "schema": {
               "type": "string"
@@ -2049,7 +2296,7 @@
         }
       }
     },
-    "/simulation/{simid}/{storage_service_name}/lookupFile": {
+    "/simulation/{simid}/storage_services/{service_name}/lookupFile": {
       "post": {
         "tags": [
           "WRENCH"
@@ -2067,7 +2314,7 @@
             }
           },
           {
-            "name": "storage_service_name",
+            "name": "service_name",
             "in": "path",
             "description": "The storage service's head host",
             "required": true,
@@ -4644,7 +4891,7 @@
         }
       }
     },
-    "/simulation/{simid}/createVM": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/createVM": {
       "post": {
         "tags": [
           "WRENCH"
@@ -4660,6 +4907,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
@@ -4669,10 +4925,6 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service name"
-                  },
                   "num_cores": {
                     "type": "integer",
                     "description": "The required number of cores"
@@ -4728,7 +4980,7 @@
         }
       }
     },
-    "/simulation/{simid}/startVM": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/startVM": {
       "post": {
         "tags": [
           "WRENCH"
@@ -4744,28 +4996,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to start a VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM to start"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4784,7 +5034,7 @@
         }
       }
     },
-    "/simulation/{simid}/shutdownVM": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/shutdownVM": {
       "post": {
         "tags": [
           "WRENCH"
@@ -4800,28 +5050,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to shutdown a VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM to shutdown"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4840,7 +5088,7 @@
         }
       }
     },
-    "/simulation/{simid}/destroyVM": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/destroyVM": {
       "post": {
         "tags": [
           "WRENCH"
@@ -4856,28 +5104,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to destroy a VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM to destroy"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4896,7 +5142,7 @@
         }
       }
     },
-    "/simulation/{simid}/isVMRunning": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/isVMRunning": {
       "get": {
         "tags": [
           "WRENCH"
@@ -4912,28 +5158,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check if VM is running.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "Name of the cloud compute service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "Name of the vm",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4952,7 +5196,7 @@
         }
       }
     },
-    "/simulation/{simid}/isVMDown": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/isVMDown": {
       "get": {
         "tags": [
           "WRENCH"
@@ -4968,28 +5212,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check if VM is down.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -5008,7 +5250,7 @@
         }
       }
     },
-    "/simulation/{simid}/suspendVM": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/suspendVM": {
       "post": {
         "tags": [
           "WRENCH"
@@ -5024,28 +5266,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to suspend a VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "compute_service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -5064,7 +5304,7 @@
         }
       }
     },
-    "/simulation/{simid}/resumeVM": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/resumeVM": {
       "post": {
         "tags": [
           "WRENCH"
@@ -5080,28 +5320,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to resume a VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "compute_service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -5120,7 +5358,7 @@
         }
       }
     },
-    "/simulation/{simid}/isVMSuspended": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/isVMSuspended": {
       "get": {
         "tags": [
           "WRENCH"
@@ -5136,28 +5374,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check if VM is suspended.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -5176,7 +5412,7 @@
         }
       }
     },
-    "/simulation/{simid}/getVMPhysicalHostname": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/getVMPhysicalHostname": {
       "get": {
         "tags": [
           "WRENCH"
@@ -5192,28 +5428,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check physical hostname.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "compute_service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -5232,7 +5466,7 @@
         }
       }
     },
-    "/simulation/{simid}/getVMComputeService": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/getVMComputeService": {
       "get": {
         "tags": [
           "WRENCH"
@@ -5248,28 +5482,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check compute service of VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -5400,7 +5632,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkflowResponseWithTaskList"
+                  "$ref": "#/components/schemas/WorkflowResponseWithTaskAndFileList"
                 }
               }
             }
@@ -5627,7 +5859,7 @@
           }
         }
       },
-      "WorkflowResponseWithTaskList": {
+      "WorkflowResponseWithTaskAndFileList": {
         "type": "object",
         "properties": {
           "wrench_api_request_success": {
@@ -5644,6 +5876,13 @@
               "type": "string"
             },
             "description": "The names of the workflow's tasks"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The names of the workflow's files"
           },
           "failure_cause": {
             "type": "string",

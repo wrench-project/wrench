@@ -42,11 +42,17 @@ namespace wrench {
 
         unsigned long getMaxNumCores() const;
 
+        void setMinNumCores(unsigned long num_cores);
+
+        void setMaxNumCores(unsigned long num_cores);
+
         std::shared_ptr<ParallelModel> getParallelModel() const;
 
         void setParallelModel(std::shared_ptr<ParallelModel> model);
 
         double getMemoryRequirement() const;
+
+        void setMemoryRequirement(double num_bytes);
 
         unsigned long getNumberOfChildren();
 

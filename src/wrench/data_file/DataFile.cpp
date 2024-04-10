@@ -19,12 +19,20 @@ WRENCH_LOG_CATEGORY(wrench_core_data_file, "Log category for DataFile");
 namespace wrench {
 
     /**
+     * @brief Destructor
+     */
+    DataFile::~DataFile() {
+        UNTRACK_OBJECT("file");
+    }
+
+    /**
      * @brief Constructor
      *
      * @param id: the file id
      * @param s: the file size
      */
     DataFile::DataFile(std::string id, double s) : id(std::move(id)), size(s) {
+        TRACK_OBJECT("file");
     }
 
     /**

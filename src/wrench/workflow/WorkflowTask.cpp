@@ -127,16 +127,15 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the number of f of the task (to be used only in very specific
+     * @brief Set the number of flops of the task (to be used only in very specific
      * cases in which it is guaranteed that changing a task's work after that task
      * has been created is a valid thing to do)
      *
-     * @param f: the number of f
+     * @param f: the number of flops
      */
     void WorkflowTask::setFlops(double f) {
         this->flops = f;
     }
-
 
     /**
      * @brief Get the minimum number of cores required for running the task
@@ -157,12 +156,45 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the memory_manager_service requirement of the task
+     * @brief Set the minimum number of cores required for running the task
+     *   (to be used only in very specific
+     * cases in which it is guaranteed that changing a task's minimum number of cores after that task
+     * has been created is a valid thing to do)
      *
-     * @return a memory_manager_service requirement (in bytes)
+     * @param num_cores: a number of cores
+     */
+    void WorkflowTask::setMinNumCores(unsigned long num_cores) {
+        this->min_num_cores = num_cores;
+    }
+
+    /**
+     * @brief Set the maximum number of cores that the task can use
+     *    (to be used only in very specific
+     * cases in which it is guaranteed that changing a task's maximum number of cores after that task
+     * has been created is a valid thing to do)
+     *
+     * @param num_cores: a number of cores
+     */
+    void WorkflowTask::setMaxNumCores(unsigned long num_cores) {
+        this->max_num_cores = num_cores;
+    }
+
+    /**
+     * @brief Get the memory requirement of the task
+     *
+     * @return a memory requirement (in bytes)
      */
     double WorkflowTask::getMemoryRequirement() const {
         return this->memory_requirement;
+    }
+
+    /**
+     * @brief Set the memory requirement of the task
+     *
+     * @return a memory requirement (in bytes)
+     */
+    void WorkflowTask::setMemoryRequirement(double num_bytes) {
+        this->memory_requirement = num_bytes;
     }
 
     /**

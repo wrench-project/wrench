@@ -18,6 +18,7 @@
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
+#include "../../../include/RuntimeAssert.h"
 
 WRENCH_LOG_CATEGORY(batch_service_test, "Log category for BatchServiceTest");
 
@@ -73,7 +74,7 @@ public:
     void do_ShutdownWithPendingRunningJobsTest_test();
 
 protected:
-    ~BatchServiceTest() {
+    ~BatchServiceTest() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }
@@ -187,7 +188,7 @@ protected:
 class BogusSetupTestWMS : public wrench::ExecutionController {
 public:
     BogusSetupTestWMS(BatchServiceTest *test,
-                      std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                      const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -210,7 +211,7 @@ TEST_F(BatchServiceTest, BogusSetupTest) {
 
 void BatchServiceTest::do_BogusSetupTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -268,7 +269,7 @@ void BatchServiceTest::do_BogusSetupTest_test() {
 class TerminateOneStandardJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     TerminateOneStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                             std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                             const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -434,7 +435,7 @@ TEST_F(BatchServiceTest, TerminateStandardJobsTest)
 
 void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -497,7 +498,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
 class TerminateOnePilotJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     TerminateOnePilotJobSubmissionTestWMS(BatchServiceTest *test,
-                                          std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                          const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -558,7 +559,7 @@ TEST_F(BatchServiceTest, TerminatePilotJobsTest)
 
 void BatchServiceTest::do_TerminatePilotJobsTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -621,7 +622,7 @@ class
         OneStandardJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     OneStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                    std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                    const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -705,7 +706,7 @@ TEST_F(BatchServiceTest, OneStandardJobSubmissionTest) {
 
 void BatchServiceTest::do_OneStandardJobTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -768,7 +769,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 class StandardJobFailureTestWMS : public wrench::ExecutionController {
 public:
     StandardJobFailureTestWMS(BatchServiceTest *test,
-                              std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                              const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -838,7 +839,7 @@ TEST_F(BatchServiceTest, StandardJobFailureTest) {
 
 void BatchServiceTest::do_StandardJobFailureTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -899,7 +900,7 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
 class TwoStandardJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     TwoStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                    std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                    const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -914,8 +915,7 @@ private:
 
         // Create and submit two jobs that should be able to run concurrently
         for (size_t i = 0; i < 2; i++) {
-            double time_fudge = 1;// 1 second seems to make it all work!
-            double task_flops = 10 * (1 * (1800 - time_fudge));
+            double task_flops = 10 * 1800;
             int num_cores = 10;
             double ram = 0.0;
             tasks.push_back(this->test->workflow->addTask("test_job_1_task_" + std::to_string(i),
@@ -932,14 +932,14 @@ private:
         batch_job_args["-c"] = std::to_string(10);   //number of cores per task1
 
         // Submit this job to the BatchComputeService service
+        //        WRENCH_INFO("Submitting the first job");
         job_manager->submitJob(standard_job_1, this->test->compute_service,
                                batch_job_args);
 
         // Create and submit a job that needs 2 nodes and 30 minutes
         tasks.clear();
         for (size_t i = 0; i < 2; i++) {
-            double time_fudge = 1;// 1 second seems to make it all work!
-            double task_flops = 10 * (1 * (1800 - time_fudge));
+            double task_flops = 10 * 1800;
             int num_cores = 10;
             double ram = 0.0;
             tasks.push_back(this->test->workflow->addTask("test_job_2_task_" + std::to_string(i),
@@ -956,12 +956,15 @@ private:
         batch_job_args["-t"] = std::to_string(18000);// Time in seconds (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);   //number of cores per task1
 
-        // Submit this job to the BatchComputeService service
+        // Submit this job to the BatchComputeService service, after sleeping some epsilon
+        // to ensure some sequence of the two jobs and not simultaneous events
+        wrench::Simulation::sleep(0.000001);
+        //        WRENCH_INFO("Submitting the second job");
         job_manager->submitJob(standard_job_2, this->test->compute_service,
                                batch_job_args);
 
         // Wait for the two execution events
-        for (auto job: {standard_job_1, standard_job_2}) {
+        for (auto const &job: {standard_job_1, standard_job_2}) {
             // Wait for the workflow execution event
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
@@ -982,21 +985,11 @@ private:
             }
 
             double completion_time = wrench::Simulation::getCurrentSimulatedDate();
-            double expected_completion_time;
-            if (job == standard_job_1) {
-                expected_completion_time = 1800;
-            } else if (job == standard_job_2) {
-                expected_completion_time = 1800;
-            } else {
-                throw std::runtime_error("Phantom job completion!");
-            }
-            double delta = std::abs(expected_completion_time - completion_time);
-            double tolerance = 2;
-            if (delta > tolerance) {
-                throw std::runtime_error("Unexpected job completion time for job " + job->getName() + ": " +
-                                         std::to_string(completion_time) + " (expected: " +
-                                         std::to_string(expected_completion_time) + ")");
-            }
+            double expected_completion_time = 1800;
+            RUNTIME_DBL_EQ(completion_time, expected_completion_time,
+                           "Unexpected job completion time for job " + job->getName() + ": " +
+                                   std::to_string(completion_time),
+                           0.0001);
         }
         return 0;
     }
@@ -1008,10 +1001,11 @@ TEST_F(BatchServiceTest, TwoStandardJobSubmissionTest) {
 
 void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1067,7 +1061,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
 class OnePilotJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     OnePilotJobSubmissionTestWMS(BatchServiceTest *test,
-                                 std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                 const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1164,7 +1158,7 @@ TEST_F(BatchServiceTest, OnePilotJobSubmissionTest) {
 
 void BatchServiceTest::do_PilotJobTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1228,7 +1222,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 class StandardPlusPilotJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     StandardPlusPilotJobSubmissionTestWMS(BatchServiceTest *test,
-                                          std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                          const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1334,7 +1328,7 @@ TEST_F(BatchServiceTest, StandardPlusPilotJobSubmissionTest) {
 
 void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1395,7 +1389,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 class InsufficientCoresJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     InsufficientCoresJobSubmissionTestWMS(BatchServiceTest *test,
-                                          std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                          const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1466,7 +1460,7 @@ TEST_F(BatchServiceTest, InsufficientCoresJobSubmissionTest) {
 
 void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1527,7 +1521,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 class NoArgumentsJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     NoArgumentsJobSubmissionTestWMS(BatchServiceTest *test,
-                                    std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                    const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1579,7 +1573,7 @@ TEST_F(BatchServiceTest, NoArgumentsJobSubmissionTest) {
 
 void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1640,7 +1634,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 class StandardJobTimeoutSubmissionTestWMS : public wrench::ExecutionController {
 public:
     StandardJobTimeoutSubmissionTestWMS(BatchServiceTest *test,
-                                        std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                        const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1721,7 +1715,7 @@ TEST_F(BatchServiceTest, StandardJobTimeOutTask) {
 
 void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1783,7 +1777,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 class PilotJobTimeoutSubmissionTestWMS : public wrench::ExecutionController {
 public:
     PilotJobTimeoutSubmissionTestWMS(BatchServiceTest *test,
-                                     std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                     const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1846,7 +1840,7 @@ TEST_F(BatchServiceTest, PilotJobTimeOutTaskTest) {
 
 void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1907,7 +1901,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 class BestFitStandardJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     BestFitStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                        std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                        const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -2046,7 +2040,7 @@ TEST_F(BatchServiceTest, BestFitStandardJobSubmissionTest)
 
 void BatchServiceTest::do_BestFitTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -2114,7 +2108,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 class FirstFitStandardJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     FirstFitStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                         std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                         const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -2196,7 +2190,7 @@ TEST_F(BatchServiceTest, FirstFitStandardJobSubmissionTest)
 
 void BatchServiceTest::do_FirstFitTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -2264,7 +2258,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
 class RoundRobinStandardJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     RoundRobinStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                           std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                                           const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -2276,7 +2270,8 @@ private:
         auto job_manager = this->createJobManager();
         {
             // Create a sequential task1 that lasts one min and requires 2 cores
-            std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 60, 2, 2, 0);
+            std::shared_ptr<wrench::WorkflowTask> task1_1 = this->test->workflow->addTask("task1_1", 60, 2, 2, 0);
+            std::shared_ptr<wrench::WorkflowTask> task1_2 = this->test->workflow->addTask("task1_2", 60, 2, 2, 0);
 
             //Create another sequential task1 that lasts one min and requires 9 cores
             std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 360, 9, 9, 0);
@@ -2287,7 +2282,7 @@ private:
             //Create another sequential task1 that lasts one min and requires 10 cores
             std::shared_ptr<wrench::WorkflowTask> task4 = this->test->workflow->addTask("task4", 600, 10, 10, 0);
 
-            auto job = job_manager->createStandardJob(task1);
+            auto job = job_manager->createStandardJob({task1_1, task1_2});
 
             auto job2 = job_manager->createStandardJob(task2);
 
@@ -2305,6 +2300,7 @@ private:
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what()));
             }
+            wrench::Simulation::sleep(0.01);
 
             std::map<std::string, std::string> task2_batch_job_args;
             task2_batch_job_args["-N"] = "1";
@@ -2316,17 +2312,19 @@ private:
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what()));
             }
+            wrench::Simulation::sleep(0.01);
 
             std::map<std::string, std::string> task3_batch_job_args;
             task3_batch_job_args["-N"] = "1";
             task3_batch_job_args["-t"] = "60";//time in seconds
-            task3_batch_job_args["-c"] = "1"; //number of cores per node
+            task3_batch_job_args["-c"] = "10";//number of cores per node
             try {
                 job_manager->submitJob(job3, this->test->compute_service, task3_batch_job_args);
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what()));
             }
+            wrench::Simulation::sleep(0.01);
 
             std::map<std::string, std::string> task4_batch_job_args;
             task4_batch_job_args["-N"] = "1";
@@ -2354,7 +2352,8 @@ private:
                 num_events++;
             }
 
-            WRENCH_INFO("Task1 completed on host %s", task1->getExecutionHost().c_str());
+            WRENCH_INFO("Task1_1 completed on host %s", task1_1->getExecutionHost().c_str());
+            WRENCH_INFO("Task1_2 completed on host %s", task1_2->getExecutionHost().c_str());
             WRENCH_INFO(
                     "Task2 completed on host %s", task2->getExecutionHost().c_str());
             WRENCH_INFO(
@@ -2370,17 +2369,19 @@ private:
             } else {
                 //congrats, round robin works
                 //however let's check further if the task1 hostname is equal to the task4 hostname
-                if (task1->getExecutionHost() != task4->getExecutionHost()) {
+                if ((task1_1->getExecutionHost() != task4->getExecutionHost()) and (task1_2->getExecutionHost() != task4->getExecutionHost())) {
                     throw std::runtime_error(
                             "BatchServiceTest::ROUNDROBINTEST():: The tasks did not execute on the right hosts: " +
-                            task1->getExecutionHost() + "-" +
+                            task1_1->getExecutionHost() + "-" +
+                            task1_2->getExecutionHost() + "-" +
                             task2->getExecutionHost() + "-" +
                             task3->getExecutionHost() + "-" +
                             task4->getExecutionHost());
                 }
             }
 
-            this->test->workflow->removeTask(task1);
+            this->test->workflow->removeTask(task1_1);
+            this->test->workflow->removeTask(task1_2);
             this->test->workflow->removeTask(task2);
             this->test->workflow->removeTask(task3);
             this->test->workflow->removeTask(task4);
@@ -2448,11 +2449,11 @@ TEST_F(BatchServiceTest, RoundRobinTaskTest)
 
 void BatchServiceTest::do_RoundRobinTask_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //        argv[1] = strdup("--wrench-full-log");
+    //            argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -2518,7 +2519,7 @@ class StandardJobInsidePilotJobTimeoutSubmissionTestWMS : public wrench::Executi
 public:
     StandardJobInsidePilotJobTimeoutSubmissionTestWMS(
             BatchServiceTest *test,
-            std::string hostname) : wrench::ExecutionController(hostname, "test") {
+            const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -2625,7 +2626,7 @@ TEST_F(BatchServiceTest, StandardJobInsidePilotJobTimeOutTaskTest) {
 
 void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -2686,7 +2687,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 class StandardJobInsidePilotJobSucessSubmissionTestWMS : public wrench::ExecutionController {
 public:
     StandardJobInsidePilotJobSucessSubmissionTestWMS(BatchServiceTest *test,
-                                                     std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                                                     const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -2777,7 +2778,7 @@ TEST_F(BatchServiceTest, StandardJobInsidePilotJobSucessTaskTest) {
 
 void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -2839,7 +2840,7 @@ class InsufficientCoresInsidePilotJobSubmissionTestWMS : public wrench::Executio
 public:
     InsufficientCoresInsidePilotJobSubmissionTestWMS(
             BatchServiceTest *test,
-            std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+            const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -2918,7 +2919,7 @@ TEST_F(BatchServiceTest, InsufficientCoresInsidePilotJobTaskTest) {
 
 void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -2979,7 +2980,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 class MultipleStandardJobSubmissionTestWMS : public wrench::ExecutionController {
 public:
     MultipleStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                         std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                         const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -3045,7 +3046,7 @@ TEST_F(BatchServiceTest, MultipleStandardJobSubmissionTest) {
 
 void BatchServiceTest::do_MultipleStandardTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -3106,7 +3107,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 class DifferentBatchAlgorithmsSubmissionTestWMS : public wrench::ExecutionController {
 public:
     DifferentBatchAlgorithmsSubmissionTestWMS(BatchServiceTest *test,
-                                              std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                              const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -3177,7 +3178,7 @@ TEST_F(BatchServiceTest, DISABLED_DifferentBatchAlgorithmsSubmissionTest)
 
 void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -3238,7 +3239,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 class ShutdownWithPendingRunningJobsTestWMS : public wrench::ExecutionController {
 public:
     ShutdownWithPendingRunningJobsTestWMS(BatchServiceTest *test,
-                                          std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                          const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
         this->test = test;
     }
 
@@ -3318,7 +3319,7 @@ TEST_F(BatchServiceTest, ShutdownWithPendingRunningJobsTest) {
 
 void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
