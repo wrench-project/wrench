@@ -164,6 +164,8 @@ namespace wrench {
                 {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, this->getPropertyValueAsString(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE)}}, {});
 
         ss->setIsScratch(true);
+        // Set the storage service's network timeout to that of this compute service
+        ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
         this->scratch_space_storage_service =
                 this->simulation->startNewService(ss);
     }
