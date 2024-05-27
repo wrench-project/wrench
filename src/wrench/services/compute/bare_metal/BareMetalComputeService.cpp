@@ -519,6 +519,8 @@ namespace wrench {
             const std::shared_ptr<CompoundJob> &job,
             std::map<std::string, std::string> &service_specific_arguments) {
         WRENCH_INFO("Asked to run compound job %s, which has %zu actions", job->getName().c_str(), job->getActions().size());
+        for (auto const &action: job->getActions())
+            WRENCH_INFO("  - ACTION %s (min #cores=%lu)", action->getName().c_str(), action->getMinNumCores());
 
         // Action execution service may have terminated
         try {
