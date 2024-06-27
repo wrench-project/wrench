@@ -523,7 +523,7 @@ namespace wrench {
          * @param location: a location
          **/
         virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
-            // no nothing
+            // do nothing
         }
 
         /***********************/

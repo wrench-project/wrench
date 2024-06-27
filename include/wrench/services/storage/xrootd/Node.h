@@ -135,9 +135,9 @@ namespace wrench {
 
             std::shared_ptr<Node> addChild(std::shared_ptr<Node> child);
 
-            /** @brief File systems */
-            std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
-
+            // TODO: HENRI COMMENTED THIS OUT, AND IT SEEMS FINE?
+//            /** @brief File systems */
+//            std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
 
             map<Node *, vector<stack<Node *>>> splitStack(vector<stack<Node *>> search_stack);
             virtual std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);

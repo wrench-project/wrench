@@ -16,6 +16,8 @@
 #include <unordered_map>
 #include <simgrid/s4u.hpp>
 
+#include <wrench/data_file/DataFile.h>
+
 
 namespace wrench {
 
@@ -25,7 +27,6 @@ namespace wrench {
 
     class StorageService;
     class SimpleStorageService;
-    class DataFile;
 
     /**
      * @brief  A class that encodes  a file location

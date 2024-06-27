@@ -27,6 +27,7 @@ endif ()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/conf/cmake/")
 find_package(Boost REQUIRED)
 find_package(SimGrid REQUIRED)
+find_package(FSMod REQUIRED)
 
 find_package(nlohmann_json)
 
