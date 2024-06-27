@@ -17,6 +17,7 @@
 #include "wrench/services/memory/MemoryManager.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include <fsmod.hpp>
 
 namespace wrench {
 
@@ -107,42 +108,53 @@ namespace wrench {
 
         double getTotalFilesZeroTime() override;
 
-        virtual std::string getBaseRootPath() override;
+        std::string getBaseRootPath() override;
 
         /**
          * @brief Reserve space at the storage service
          * @param location: a location
          * @return true if success, false otherwise
          */
-        virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
-            std::string mount_point;
-            std::string path_at_mount_point;
-            this->splitPath(location->getPath(), mount_point, path_at_mount_point);
-            return this->file_systems[mount_point]->reserveSpace(location->getFile(), path_at_mount_point);
+        bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
+            // THIS SHOULD NO LONGER BE USED? AND INSTEAD WE SHOULD CREATE A DOT FILE WITH SET SIZE
+            // AND REMOVE OR MOVE IT WHENEVER FAILED / CREATED
+            // Just create the file on the file system, tentatively
+            // TODO: Should this be marked unevictable by caching???
+            try {
+                this->file_system->create_file(location->getPath(), (sg_size_t) location->getFile()->getSize());
+            } catch (simgrid::Exception &ignore) {
+                return false;
+            }
+            return true;
         }
 
         /**
          * @brief Unreserve space at the storage service
          * @param location: a location
          */
-        virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
-            std::string mount_point;
-            std::string path_at_mount_point;
-            this->splitPath(location->getPath(), mount_point, path_at_mount_point);
-            this->file_systems[mount_point]->unreserveSpace(location->getFile(), path_at_mount_point);
+        void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
+            // Just remove the file from the file system
+            if (this->file_system->file_exists(location->getPath())) {
+                throw std::runtime_error("Calling unreserveSpace() on a location for which reserveSpace() likely wasn't allocated");
+            }
+            this->file_system->unlink_file(location->getPath());
+//            std::string mount_point;
+//            std::string path_at_mount_point;
+//            this->splitPath(location->getPath(), mount_point, path_at_mount_point);
+//            this->file_systems[mount_point]->unreserveSpace(location->getFile(), path_at_mount_point);
         }
 
-        /**
-        * @brief Get the mount point that stores a path
-        * @param path: path
-        *
-        * @return a mount point
-        */
-        std::string getPathMountPoint(const std::string &path) {
-            std::string mount_point, path_at_mount_point;
-            this->splitPath(path, mount_point, path_at_mount_point);
-            return mount_point;
-        }
+//        /**
+//        * @brief Get the mount point that stores a path
+//        * @param path: path
+//        *
+//        * @return a mount point
+//        */
+//        std::string getPathMountPoint(const std::string &path) {
+//            std::string mount_point, path_at_mount_point;
+//            this->splitPath(path, mount_point, path_at_mount_point);
+//            return mount_point;
+//        }
 
         void createFile(const std::shared_ptr<FileLocation> &location) override;
 
@@ -162,7 +174,7 @@ namespace wrench {
          * @brief Determine whether the storage service is bufferized
          * @return true if bufferized, false otherwise
          */
-        virtual bool isBufferized() const override {
+        bool isBufferized() const override {
             return this->is_bufferized;
         }
 
@@ -170,14 +182,14 @@ namespace wrench {
          * @brief Determine the storage service's buffer size
          * @return a size in bytes
          */
-        virtual double getBufferSize() const override {
+        double getBufferSize() const override {
             return this->buffer_size;
         }
 
 
-        virtual void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
+        void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
 
-        virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
+        void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -214,10 +226,10 @@ namespace wrench {
         /** @brief Whether the service is bufferized */
         bool is_bufferized;
 
-        /** @brief File systems */
-        std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
+        /** @brief File system */
+        std::shared_ptr<simgrid::fsmod::FileSystem> file_system;
 
-        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
+//        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
 
         /***********************/
         /** \endcond          **/

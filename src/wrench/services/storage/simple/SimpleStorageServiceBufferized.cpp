@@ -26,6 +26,8 @@
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
 #include <wrench/services/memory/MemoryManager.h>
 
+namespace sgfs = simgrid::fsmod;
+
 WRENCH_LOG_CATEGORY(wrench_core_simple_storage_service_bufferized,
                     "Log category for Simple Storage Service Bufferized");
 
@@ -73,10 +75,10 @@ namespace wrench {
 
         std::string message = "Simple Storage Service (Bufferized) " + this->getName() + "  starting on host " + this->getHostname();
         WRENCH_INFO("%s", message.c_str());
-        for (auto const &fs: this->file_systems) {
-            message = "  - mount point " + fs.first + ": " +
-                      std::to_string(fs.second->getFreeSpace()) + "/" +
-                      std::to_string(fs.second->getTotalCapacity()) + " Bytes";
+        for (auto const &part: this->file_system->get_partitions()) {
+            message = "  - mount point " + part->get_name() + ": " +
+                      std::to_string(part->get_free_space()) + "/" +
+                      std::to_string(part->get_size()) + " Bytes";
             WRENCH_INFO("%s", message.c_str());
         }
 
@@ -191,28 +193,33 @@ namespace wrench {
                                                                  S4U_CommPort *answer_commport) {
 
         auto file = location->getFile();
-        LogicalFileSystem *fs;
+        std::string tmp_file_path;
+        std::shared_ptr<sgfs::File> opened_file;
 
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        std::string mountpoint;
-        std::string path_at_mount_point;
-        if (not this->splitPath(location->getPath(), mountpoint, path_at_mount_point)) {
+        // Get the partition for the path
+        auto partition = this->file_system->get_partition_for_path_or_null(location->getPath());
+        if (!partition) {
             failure_cause = std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
         }
 
         if (not failure_cause) {
-            fs = this->file_systems[mountpoint].get();
 
             // If the file is not already there, do a capacity check/update
             // (If the file is already there, then there will just be an overwrite. Note that
             // if the overwrite fails, then the file will disappear, which is expected)
 
-            bool file_already_there = fs->doesDirectoryExist(path_at_mount_point) and
-                                      fs->isFileInDirectory(file, path_at_mount_point);
+            bool file_already_there = this->file_system->file_exists(location->getPath() + "/" + location->getFile()->getID());
+
+            if ((not file_already_there) and (num_bytes_to_write < location->getFile()->getSize())) {
+                throw std::runtime_error("SimpleStorageServiceBufferized::processFileWriteRequest(): Cannot write fewer number of bytes than the file size if the file isn't already present");
+            }
+
             if (not file_already_there) {
-                if (not fs->reserveSpace(file, path_at_mount_point)) {
+                // Create a dot version of the file at desired size
+                if (partition->get_free_space() < (sg_size_t) file->getSize()) {
                     failure_cause = std::shared_ptr<FailureCause>(
                             new StorageServiceNotEnoughSpace(
                                     file,
@@ -221,10 +228,10 @@ namespace wrench {
             }
         }
 
-        if (failure_cause == nullptr) {
+        if (not failure_cause) {
 
-            if (not fs->doesDirectoryExist(path_at_mount_point)) {
-                fs->createDirectory(path_at_mount_point);
+            if (not this->file_system->directory_exists(location->getPath())) {
+                this->file_system->create_directory(location->getPath());
             }
 
             // Generate a commport name on which to receive the file
@@ -291,21 +298,18 @@ namespace wrench {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
         auto file = location->getFile();
+        std::shared_ptr<sgfs::File> opened_file;
 
-        std::string mount_point;
-        std::string path_at_mount_point;
-        if ((not this->splitPath(location->getPath(), mount_point, path_at_mount_point)) or
-            (not this->file_systems[mount_point]->doesDirectoryExist(path_at_mount_point))) {
-            failure_cause = std::shared_ptr<FailureCause>(
-                    new InvalidDirectoryPath(location));
+        auto partition = this->file_system->get_partition_for_path_or_null(location->getPath());
+        if (not partition or this->file_system->directory_exists(location->getPath())) {
+            failure_cause = std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
         } else {
-            if (not this->file_systems[mount_point]->isFileInDirectory(file, path_at_mount_point)) {
+            if (not this->file_system->file_exists(location->getPath() + "/" + file->getID())) {
                 WRENCH_INFO(
                         "Received a read request for a file I don't have (%s)", location->toString().c_str());
                 failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));
             }
         }
-
 
         bool success = (failure_cause == nullptr);
         S4U_CommPort *commport_to_receive_the_file_content = nullptr;
@@ -331,6 +335,7 @@ namespace wrench {
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
+
             // Create a FileTransferThread
             auto ftt = std::make_shared<FileTransferThread>(
                     this->hostname,
@@ -349,13 +354,6 @@ namespace wrench {
             this->pending_file_transfer_threads.push_front(ftt);
             // Keep track of the commport as well
             this->ongoing_tmp_commports[ftt] = commport_to_receive_the_file_content;
-
-            // Update the file read date in the file system
-            this->file_systems[mount_point]->updateReadDate(file, path_at_mount_point);
-
-            // Mark the file as unevictable
-            this->file_systems[mount_point]->incrementNumRunningTransactionsForFileInDirectory(
-                    location->getFile(), path_at_mount_point);
         }
 
         return true;
@@ -373,9 +371,7 @@ namespace wrench {
             std::shared_ptr<FileLocation> &dst_location,
             S4U_CommPort *answer_commport) {
 
-
         auto file = src_location->getFile();
-
 
         // Check that the source has it
         if (not StorageService::hasFileAtLocation(src_location)) {
@@ -444,7 +440,7 @@ namespace wrench {
         ftt->setSimulation(this->simulation);
         this->pending_file_transfer_threads.push_back(ftt);
 
-        src_location->getStorageService()->incrementNumRunningOperationsForLocation(src_location);
+//        src_location->getStorageService()->incrementNumRunningOperationsForLocation(src_location);
 
         return true;
     }
@@ -514,13 +510,13 @@ namespace wrench {
             auto file = dst_location->getFile();
             std::string dst_mount_point;
             std::string dst_path_at_mount_point;
-            if (not this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point)) {
-                throw std::runtime_error("SimpleStorageServiceBufferized::processFileTransferThreadNotification(): splitPath should not have failed on the dst_location");
-            }
+//            if (not this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point)) {
+//                throw std::runtime_error("SimpleStorageServiceBufferized::processFileTransferThreadNotification(): splitPath should not have failed on the dst_location");
+//            }
             if (success) {
-                WRENCH_INFO("File %s stored!", file->getID().c_str());
-                this->file_systems[dst_mount_point]->storeFileInDirectory(
-                        file, dst_path_at_mount_point);
+//                WRENCH_INFO("File %s stored!", file->getID().c_str());
+//                this->file_systems[dst_mount_point]->storeFileInDirectory(
+//                        file, dst_path_at_mount_point);
                 // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
                 // Maybe no corresponding timestamp.
                 try {
@@ -530,7 +526,7 @@ namespace wrench {
 
             } else {
                 // Process the failure, meaning, just un-decrease the free space
-                this->file_systems[dst_mount_point]->unreserveSpace(file, dst_path_at_mount_point);
+//                this->file_systems[dst_mount_point]->unreserveSpace(file, dst_path_at_mount_point);
             }
         }
 
