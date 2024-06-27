@@ -140,10 +140,10 @@ namespace wrench {
         this->commport->reset();
         this->recv_commport->reset();
 
-        for (auto const &fs: this->file_systems) {
-            message = "  - mount point " + fs.first + ": " +
-                      std::to_string(fs.second->getFreeSpace()) + "/" +
-                      std::to_string(fs.second->getTotalCapacity()) + " Bytes";
+        for (auto const &part: this->file_system->get_partitions()) {
+            message = "  - mount point " + part->get_name() + ": " +
+                      std::to_string(part->get_free_space()) + "/" +
+                      std::to_string(part->get_size()) + " Bytes";
             WRENCH_INFO("%s", message.c_str());
         }
 
@@ -321,26 +321,25 @@ namespace wrench {
         }
 
         auto file = location->getFile();
-        LogicalFileSystem *fs;
+//        LogicalFileSystem *fs;
 
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        std::string mount_point;
-        std::string path_at_mount_point;
-        if (not this->splitPath(location->getPath(), mount_point, path_at_mount_point)) {
-            failure_cause = std::make_shared<InvalidDirectoryPath>(location);
+        auto partition = this->file_system->get_partition_for_path_or_null(location->getPath());
+        if (!partition) {
+            failure_cause = std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
         } else {
-            fs = this->file_systems[mount_point].get();
 
-            // If the file is not already there, do a capacity check/update
-            // (If the file is already there, then there will just be an overwrite.
-            bool file_already_there = fs->isFileInDirectory(file, path_at_mount_point);
+            bool file_already_there = this->file_system->file_exists(location->getPath() + "/" + location->getFile()->getID());
+
+            if ((not file_already_there) and (num_bytes_to_write < location->getFile()->getSize())) {
+                throw std::runtime_error("SimpleStorageServiceBufferized::processFileWriteRequest(): Cannot write fewer number of bytes than the file size if the file isn't already present");
+            }
 
             if (not file_already_there) {
-                // Reserve space
-                bool success = fs->reserveSpace(file, path_at_mount_point);
-                if (not success) {
+                // Create a dot version of the file at desired size
+                if (partition->get_free_space() < (sg_size_t) file->getSize()) {
                     failure_cause = std::shared_ptr<FailureCause>(
                             new StorageServiceNotEnoughSpace(
                                     file,
@@ -369,10 +368,10 @@ namespace wrench {
             return true;
         }
 
-        // Create directory if need be
-        if (not fs->doesDirectoryExist(path_at_mount_point)) {
-            fs->createDirectory(path_at_mount_point);
-        }
+//        // Create directory if need be
+//        if (not fs->doesDirectoryExist(path_at_mount_point)) {
+//            fs->createDirectory(path_at_mount_point);
+//        }
 
         // Reply with a "go ahead, send me the file" message
         answer_commport->dputMessage(

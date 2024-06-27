@@ -99,7 +99,7 @@ namespace wrench {
      *
      * @param answer_commport: the commport on which to expect the answer
      * @param location: the location
-     * @param num_bytes_to_write: the number of bytes to write to the file
+     * @param num_bytes_to_write: the number of bytes to write to the file.
      * @param wait_for_answer: whether to wait for the answer
      *
      * @throw ExecutionException
