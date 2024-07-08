@@ -244,8 +244,13 @@ namespace wrench {
             // Deal with the flop amount
             double flop_amount;
             std::string execution_machine;
-            if (task_exec.contains("machine")) {
-                execution_machine = task_exec.at("machine");
+            if (task_exec.contains("machines")) {
+                std::vector<std::string> machines = task_exec.at("machines");
+                if (machines.size() > 1) {
+                    throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJSON(): Task " + task->getID() +
+                                                " was executed on multiple machines, which WRENCH currently does not support");
+                }
+                execution_machine = machines.at(0);
             }
             if (ignore_machine_specs or execution_machine.empty()) {
                 flop_amount = runtimeInSeconds * flop_rate;
