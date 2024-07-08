@@ -27,14 +27,17 @@ jobs:
       - name: Update brew
         run: |
           brew update
-      - name: Update clang
+#     - name: Update clang
+#       run: |
+#         brew install llvm@16
+#         echo 'export PATH="/usr/local/opt/llvm@16/bin:$PATH"' >> /Users/runner/.bash_profile
+#         source /Users/runner/.bash_profile
+#         export LDFLAGS="-L/usr/local/opt/llvm@16/lib"
+#         export CPPFLAGS="-I/usr/local/opt/llvm@16/include"
+#         echo "Clang version: "`clang --version`
+      - name: Install gcc
         run: |
-          brew install llvm@16
-          echo 'export PATH="/usr/local/opt/llvm@16/bin:$PATH"' >> /Users/runner/.bash_profile
-          source /Users/runner/.bash_profile
-          export LDFLAGS="-L/usr/local/opt/llvm@16/lib"
-          export CPPFLAGS="-I/usr/local/opt/llvm@16/include"
-          echo "Clang version: "`clang --version`
+          brew install gcc
       - name: Install nlohmann-json
         run: |
           wget https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.tar.gz
@@ -66,6 +69,6 @@ jobs:
       - name: Source Build and Test
         run: |
           # build and test wrench
-          cmake -DENABLE_BATSCHED=off -DCMAKE_VERBOSE_MAKEFILE=ON .
+          cmake -DENABLE_BATSCHED=off -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/g++  -DCMAKE_VERBOSE_MAKEFILE=ON .
           make -j4 all unit_tests
           ./unit_tests
