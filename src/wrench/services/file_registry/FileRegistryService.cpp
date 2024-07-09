@@ -132,7 +132,6 @@ namespace wrench {
         if (location == nullptr) {
             throw std::invalid_argument("FileRegistryService::addEntry(): Invalid nullptr argument");
         }
-
         assertServiceIsUp();
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
