@@ -310,7 +310,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a file registry add entry action
+     * @brief Add a file registry delete entry action
      * @param name: the action's name
      * @param file_registry: the file registry
      * @param file_location: the file location
@@ -408,7 +408,7 @@ namespace wrench {
             throw std::invalid_argument("CompoundJob::addDependency(): Cannot add a dependency between a task and itself");
         }
         if (parent->getJob() != this->getSharedPtr() or child->getJob() != this->getSharedPtr()) {
-            throw std::invalid_argument("CompoundJob::addDependency(): Both actions must belong to this job");
+            throw std::invalid_argument("CompoundJob::addDependency(): Both actions muszt belong to this job");
         }
         if (pathExists(child, parent)) {
             throw std::invalid_argument("CompoundJob::addDependency(): Adding this dependency would create a cycle");
