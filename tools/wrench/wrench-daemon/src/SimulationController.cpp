@@ -171,7 +171,7 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::getSimulationTime(const json& data) {
+    json SimulationController::getSimulationTime(const json &data) {
         // This is not called by the simulation thread, but getting the
         // simulation time is fine as it doesn't change the state of the simulation
 
@@ -221,7 +221,7 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::waitForNextSimulationEvent(const json& data) {
+    json SimulationController::waitForNextSimulationEvent(const json &data) {
         // Set the time horizon to -1, to signify the "wait for next event" to the execution_controller
         time_horizon_to_reach = -1.0;
         // Wait for and grab the next event
@@ -244,7 +244,7 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::getSimulationEvents(const json& data) {
+    json SimulationController::getSimulationEvents(const json &data) {
         // Deal with all events
         std::pair<double, std::shared_ptr<wrench::ExecutionEvent>> event;
 
@@ -265,7 +265,7 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::getAllHostnames(const json& data) {
+    json SimulationController::getAllHostnames(const json &data) {
         std::vector<std::string> hostname_list = Simulation::getHostnameList();
         json answer = {};
         answer["hostnames"] = hostname_list;
@@ -1842,7 +1842,7 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::createWorkflow(const json& data) {
+    json SimulationController::createWorkflow(const json &data) {
 
         auto wf = wrench::Workflow::createWorkflow();
         json answer;
