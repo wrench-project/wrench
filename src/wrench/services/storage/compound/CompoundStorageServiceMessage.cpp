@@ -28,7 +28,9 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CompoundStorageAllocationRequestMessage::CompoundStorageAllocationRequestMessage(S4U_CommPort *answer_commport,
-                                                                                     std::shared_ptr<DataFile> file, double payload)
+                                                                                     std::shared_ptr<DataFile> file,
+                                                                                     unsigned int stripe_count,
+                                                                                     double payload)
         : CompoundStorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_commport == nullptr) {
@@ -38,6 +40,7 @@ namespace wrench {
 #endif
         this->answer_commport = answer_commport;
         this->file = file;
+        this->stripe_count = stripe_count;
     }
 
     /**

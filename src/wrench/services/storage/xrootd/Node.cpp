@@ -145,16 +145,16 @@ namespace wrench {
 
                         auto cached = getCached(msg->file);
                         supervisor->commport->dputMessage(
-                                                 new UpdateCacheMessage(
-                                                         msg->answer_commport,
-                                                         msg->original,
-                                                         msg->node,
-                                                         msg->file,
-                                                         cached,
-                                                         getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
-                                                                         cached.size(),
-                                                         msg->answered));
+                                new UpdateCacheMessage(
+                                        msg->answer_commport,
+                                        msg->original,
+                                        msg->node,
+                                        msg->file,
+                                        cached,
+                                        getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
+                                                getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                                        cached.size(),
+                                        msg->answered));
                     } else {
                         if (!children.empty()) {
 
@@ -170,21 +170,21 @@ namespace wrench {
                                         //File in internal storage
                                         cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
                                         supervisor->commport->dputMessage(
-                                                                 new UpdateCacheMessage(
-                                                                         msg->answer_commport,
-                                                                         msg->original,
-                                                                         msg->node,
-                                                                         msg->file,
-                                                                         set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
-                                                                         getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
-                                                                         msg->answered));
+                                                new UpdateCacheMessage(
+                                                        msg->answer_commport,
+                                                        msg->original,
+                                                        msg->node,
+                                                        msg->file,
+                                                        set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
+                                                        getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
+                                                                getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                        msg->answered));
                                     }
                                 } else {
                                     entry.first->commport->dputMessage(
-                                                             new AdvancedContinueSearchMessage(
-                                                                     msg,
-                                                                     entry.second));
+                                            new AdvancedContinueSearchMessage(
+                                                    msg,
+                                                    entry.second));
                                 }
                             }
                         }
@@ -194,15 +194,15 @@ namespace wrench {
                             //File in internal storage
                             cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
                             supervisor->commport->dputMessage(
-                                                     new UpdateCacheMessage(
-                                                             msg->answer_commport,
-                                                             msg->original,
-                                                             msg->node,
-                                                             msg->file,
-                                                             set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
-                                                             getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                     getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
-                                                             msg->answered));
+                                    new UpdateCacheMessage(
+                                            msg->answer_commport,
+                                            msg->original,
+                                            msg->node,
+                                            msg->file,
+                                            set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
+                                            getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
+                                                    getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                            msg->answered));
                         }
                     }
                     return true;
@@ -226,9 +226,9 @@ namespace wrench {
                         for (auto const &entry: splitStacks) {
                             if (entry.first != this) {
                                 entry.first->commport->dputMessage(
-                                                         new AdvancedRippleDelete(
-                                                                 msg,
-                                                                 entry.second));
+                                        new AdvancedRippleDelete(
+                                                msg,
+                                                entry.second));
                             }
                         }
                     }
@@ -238,8 +238,8 @@ namespace wrench {
             if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {//handle all the rest of the messages
                 try {
                     msg->ack_commport->dputMessage(
-                                             new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                     ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                            new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                                    ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
                 } catch (ExecutionException &e) {
                     return false;
                 }
@@ -254,22 +254,22 @@ namespace wrench {
                     if (msg->fileReadRequest) {
 
                         msg->answer_commport->dputMessage(
-                                                 new StorageServiceFileReadAnswerMessage(
-                                                         FileLocation::LOCATION(getSharedPtr<Node>(), msg->file),
-                                                         false,
-                                                         std::shared_ptr<FailureCause>(
-                                                                 new FileNotFound(FileLocation::LOCATION(getSharedPtr<Node>(), msg->file))),
-                                                         nullptr,
-                                                         0,
-                                                         1,
-                                                         getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
+                                new StorageServiceFileReadAnswerMessage(
+                                        FileLocation::LOCATION(getSharedPtr<Node>(), msg->file),
+                                        false,
+                                        std::shared_ptr<FailureCause>(
+                                                new FileNotFound(FileLocation::LOCATION(getSharedPtr<Node>(), msg->file))),
+                                        nullptr,
+                                        0,
+                                        1,
+                                        getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
 
                     } else {
                         msg->answer_commport->dputMessage(
-                                                 new StorageServiceFileLookupAnswerMessage(
-                                                         msg->file,
-                                                         false,
-                                                         getMessagePayloadValue(MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+                                new StorageServiceFileLookupAnswerMessage(
+                                        msg->file,
+                                        false,
+                                        getMessagePayloadValue(MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
                     }
                 }
             } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
@@ -282,20 +282,20 @@ namespace wrench {
                     shared_ptr<FileLocation> best = selectBest(cacheCopies);
 
                     msg->answer_commport->dputMessage(
-                                             new StorageServiceFileLookupAnswerMessage(
-                                                     file,
-                                                     true,
-                                                     getMessagePayloadValue(
-                                                             MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+                            new StorageServiceFileLookupAnswerMessage(
+                                    file,
+                                    true,
+                                    getMessagePayloadValue(
+                                            MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
                 } else {//File Not Cached
                     if (internalStorage && internalStorage->hasFile(file)) {
 
                         msg->answer_commport->dputMessage(
-                                                 new StorageServiceFileLookupAnswerMessage(
-                                                         file,
-                                                         true,
-                                                         getMessagePayloadValue(
-                                                                 MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+                                new StorageServiceFileLookupAnswerMessage(
+                                        file,
+                                        true,
+                                        getMessagePayloadValue(
+                                                MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
 
                     } else {//no internal storage
 
@@ -318,16 +318,16 @@ namespace wrench {
                                         // But just in case, I don't want a rogue search going who knows where
                                     } else {
                                         entry.first->commport->dputMessage(
-                                                                 new AdvancedContinueSearchMessage(
-                                                                         msg->answer_commport,
-                                                                         nullptr,
-                                                                         file,
-                                                                         this,
-                                                                         getMessagePayloadValue(
-                                                                                 MessagePayload::CONTINUE_SEARCH),
-                                                                         answered,
-                                                                         metavisor->defaultTimeToLive,
-                                                                         entry.second));
+                                                new AdvancedContinueSearchMessage(
+                                                        msg->answer_commport,
+                                                        nullptr,
+                                                        file,
+                                                        this,
+                                                        getMessagePayloadValue(
+                                                                MessagePayload::CONTINUE_SEARCH),
+                                                        answered,
+                                                        metavisor->defaultTimeToLive,
+                                                        entry.second));
                                     }
                                 }
                             } else {//shotgun continued search message to all children
@@ -336,24 +336,24 @@ namespace wrench {
 
                                 for (auto child: children) {
                                     child->commport->dputMessage(
-                                                             new ContinueSearchMessage(
-                                                                     msg->answer_commport,
-                                                                     nullptr,
-                                                                     file,
-                                                                     this,
-                                                                     getMessagePayloadValue(
-                                                                             MessagePayload::CONTINUE_SEARCH),
-                                                                     answered,
-                                                                     metavisor->defaultTimeToLive));
+                                            new ContinueSearchMessage(
+                                                    msg->answer_commport,
+                                                    nullptr,
+                                                    file,
+                                                    this,
+                                                    getMessagePayloadValue(
+                                                            MessagePayload::CONTINUE_SEARCH),
+                                                    answered,
+                                                    metavisor->defaultTimeToLive));
                                 }
                             }
                         } else {
                             msg->answer_commport->dputMessage(
-                                                     new StorageServiceFileLookupAnswerMessage(
-                                                             file,
-                                                             false,
-                                                             getMessagePayloadValue(
-                                                                     MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+                                    new StorageServiceFileLookupAnswerMessage(
+                                            file,
+                                            false,
+                                            getMessagePayloadValue(
+                                                    MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
                         }
                     }
                 }
@@ -371,13 +371,13 @@ namespace wrench {
                     auto best = selectBest(cacheCopies);
 
                     best->getStorageService()->commport->dputMessage(
-                                             new StorageServiceFileReadRequestMessage(
-                                                     msg->answer_commport,
-                                                     simgrid::s4u::this_actor::get_host(),
-                                                     best,
-                                                     msg->num_bytes_to_read,
-                                                     getMessagePayloadValue(
-                                                             MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
+                            new StorageServiceFileReadRequestMessage(
+                                    msg->answer_commport,
+                                    simgrid::s4u::this_actor::get_host(),
+                                    best,
+                                    msg->num_bytes_to_read,
+                                    getMessagePayloadValue(
+                                            MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
                 } else {//File Not Cached
                     if (internalStorage &&
                         internalStorage->hasFile(file)) {
@@ -386,13 +386,13 @@ namespace wrench {
                         //File in internal storage
                         cache.add(file, FileLocation::LOCATION(internalStorage, file));
                         internalStorage->commport->dputMessage(
-                                                 new StorageServiceFileReadRequestMessage(
-                                                         msg->answer_commport,
-                                                         simgrid::s4u::this_actor::get_host(),
-                                                         FileLocation::LOCATION(internalStorage, file),
-                                                         msg->num_bytes_to_read,
-                                                         getMessagePayloadValue(
-                                                                 MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD))
+                                new StorageServiceFileReadRequestMessage(
+                                        msg->answer_commport,
+                                        simgrid::s4u::this_actor::get_host(),
+                                        FileLocation::LOCATION(internalStorage, file),
+                                        msg->num_bytes_to_read,
+                                        getMessagePayloadValue(
+                                                MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD))
 
                         );
                     } else {//File not in internal storage or cache
@@ -418,46 +418,46 @@ namespace wrench {
                                         // But just in case, I don't want a rogue search going who knows where
                                     } else {
                                         entry.first->commport->dputMessage(
-                                                                 new AdvancedContinueSearchMessage(
-                                                                         msg->answer_commport,
-                                                                         make_shared<StorageServiceFileReadRequestMessage>(msg),
-                                                                         file,
-                                                                         this,
-                                                                         getMessagePayloadValue(
-                                                                                 MessagePayload::CONTINUE_SEARCH),
-                                                                         answered,
-                                                                         metavisor->defaultTimeToLive,
-                                                                         entry.second));
+                                                new AdvancedContinueSearchMessage(
+                                                        msg->answer_commport,
+                                                        make_shared<StorageServiceFileReadRequestMessage>(msg),
+                                                        file,
+                                                        this,
+                                                        getMessagePayloadValue(
+                                                                MessagePayload::CONTINUE_SEARCH),
+                                                        answered,
+                                                        metavisor->defaultTimeToLive,
+                                                        entry.second));
                                     }
                                 }
                             } else {//shotgun continued search message to all children
                                 WRENCH_DEBUG("Starting basic search for %s", file->getID().c_str());
                                 for (auto child: children) {
                                     child->commport->dputMessage(
-                                                             new ContinueSearchMessage(
-                                                                     msg->answer_commport,
-                                                                     make_shared<StorageServiceFileReadRequestMessage>(
-                                                                             msg),
-                                                                     file,
-                                                                     this,
-                                                                     getMessagePayloadValue(
-                                                                             MessagePayload::CONTINUE_SEARCH),
-                                                                     answered,
-                                                                     metavisor->defaultTimeToLive));
+                                            new ContinueSearchMessage(
+                                                    msg->answer_commport,
+                                                    make_shared<StorageServiceFileReadRequestMessage>(
+                                                            msg),
+                                                    file,
+                                                    this,
+                                                    getMessagePayloadValue(
+                                                            MessagePayload::CONTINUE_SEARCH),
+                                                    answered,
+                                                    metavisor->defaultTimeToLive));
                                 }
                             }
                         } else {// you asked a leaf directly and it didn't have the file
                             msg->answer_commport->dputMessage(new StorageServiceFileReadAnswerMessage(
-                                                             FileLocation::LOCATION(internalStorage, file),
-                                                             false,
-                                                             std::shared_ptr<FailureCause>(
-                                                                     new FileNotFound(
-                                                                             FileLocation::LOCATION(internalStorage, file))),
-                                                             nullptr,
-                                                             0,
-                                                             1,
-                                                             getMessagePayloadValue(
-                                                                     MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
+                                    FileLocation::LOCATION(internalStorage, file),
+                                    false,
+                                    std::shared_ptr<FailureCause>(
+                                            new FileNotFound(
+                                                    FileLocation::LOCATION(internalStorage, file))),
+                                    nullptr,
+                                    0,
+                                    1,
+                                    getMessagePayloadValue(
+                                            MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
                         }
                     }
                 }
@@ -470,15 +470,15 @@ namespace wrench {
                     WRENCH_DEBUG("Found %s in cache", msg->file->getID().c_str());
                     auto cached = getCached(msg->file);
                     supervisor->commport->dputMessage(new UpdateCacheMessage(
-                                                     msg->answer_commport,
-                                                     msg->original,
-                                                     msg->node,
-                                                     msg->file,
-                                                     cached,
-                                                     getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                             getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
-                                                                     cached.size(),
-                                                     msg->answered));
+                            msg->answer_commport,
+                            msg->original,
+                            msg->node,
+                            msg->file,
+                            cached,
+                            getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
+                                    getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                            cached.size(),
+                            msg->answered));
                 } else {//File Not Cached
                     if (internalStorage &&
                         internalStorage->hasFile(msg->file)) {
@@ -486,15 +486,15 @@ namespace wrench {
                         //File in internal storage
                         cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
                         supervisor->commport->dputMessage(
-                                                 new UpdateCacheMessage(
-                                                         msg->answer_commport,
-                                                         msg->original,
-                                                         msg->node,
-                                                         msg->file,
-                                                         set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
-                                                         getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
-                                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
-                                                         msg->answered));
+                                new UpdateCacheMessage(
+                                        msg->answer_commport,
+                                        msg->original,
+                                        msg->node,
+                                        msg->file,
+                                        set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage, msg->file)},
+                                        getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
+                                                getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                        msg->answered));
                     } else {//File not in internal storage or cache
                         if (children.size() > 0 &&
                             msg->timeToLive > 0) {//shotgun continued search message to all children
@@ -504,7 +504,7 @@ namespace wrench {
                                     this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                             for (auto child: children) {
                                 child->commport->dputMessage(
-                                                         new ContinueSearchMessage(msg));
+                                        new ContinueSearchMessage(msg));
                             }
                         } else {
                             //this is a leaf that just didn't have the file.  XRootD protocol is to silently fail in this case.  Do not respond
@@ -531,20 +531,20 @@ namespace wrench {
                             shared_ptr<FileLocation> best = selectBest(cacheCopies);
                             //msg->original->location=best;
                             best->getStorageService()->commport->dputMessage(
-                                                     new StorageServiceFileReadRequestMessage(
-                                                             msg->answer_commport,
-                                                             simgrid::s4u::this_actor::get_host(),
-                                                             best,
-                                                             msg->original->num_bytes_to_read,
-                                                             getMessagePayloadValue(
-                                                                     MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+                                    new StorageServiceFileReadRequestMessage(
+                                            msg->answer_commport,
+                                            simgrid::s4u::this_actor::get_host(),
+                                            best,
+                                            msg->original->num_bytes_to_read,
+                                            getMessagePayloadValue(
+                                                    MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
                         } else {//this was a file lookup
                             msg->answer_commport->dputMessage(
-                                                     new StorageServiceFileLookupAnswerMessage(
-                                                             msg->file,
-                                                             true,//xrootd silently fails if the file doesn't exist, so if we have gotten here, the file does for sure exist
-                                                             getMessagePayloadValue(
-                                                                     MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
+                                    new StorageServiceFileLookupAnswerMessage(
+                                            msg->file,
+                                            true,//xrootd silently fails if the file doesn't exist, so if we have gotten here, the file does for sure exist
+                                            getMessagePayloadValue(
+                                                    MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
                         }
                     }
                 }
@@ -565,19 +565,19 @@ namespace wrench {
                             // But just in case, I don't want a rogue search going who knows where
                         } else {
                             entry.first->commport->dputMessage(
-                                                     new AdvancedRippleDelete(
-                                                             msg,
-                                                             metavisor->defaultTimeToLive,
-                                                             entry.second));
+                                    new AdvancedRippleDelete(
+                                            msg,
+                                            metavisor->defaultTimeToLive,
+                                            entry.second));
                         }
                     }
                     msg->answer_commport->dputMessage(
-                                             new StorageServiceFileDeleteAnswerMessage(
-                                                     msg->location->getFile(),
-                                                     getSharedPtr<Node>(),
-                                                     true,
-                                                     nullptr,
-                                                     getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD))
+                            new StorageServiceFileDeleteAnswerMessage(
+                                    msg->location->getFile(),
+                                    getSharedPtr<Node>(),
+                                    true,
+                                    nullptr,
+                                    getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD))
 
                     );
                 } else {
@@ -585,13 +585,13 @@ namespace wrench {
 
 
                     msg->answer_commport->dputMessage(
-                                             new StorageServiceFileDeleteAnswerMessage(
-                                                     msg->location->getFile(),
-                                                     this->getSharedPtr<Node>(),
-                                                     true,
-                                                     nullptr,
-                                                     getMessagePayloadValue(
-                                                             MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
+                            new StorageServiceFileDeleteAnswerMessage(
+                                    msg->location->getFile(),
+                                    this->getSharedPtr<Node>(),
+                                    true,
+                                    nullptr,
+                                    getMessagePayloadValue(
+                                            MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
                 }
 
                 metavisor->deleteFile(msg->location->getFile());
@@ -625,14 +625,14 @@ namespace wrench {
                     std::string error_message = "Cannot write file at non-storage XRootD node";
                     auto location = FileLocation::LOCATION(this->getSharedPtr<Node>(), file);
                     msg->answer_commport->dputMessage(
-                                             new StorageServiceFileWriteAnswerMessage(
-                                                     location,
-                                                     false,
-                                                     std::shared_ptr<FailureCause>(
-                                                             new NotAllowed(getSharedPtr<Node>(), error_message)),
-                                                     {},
-                                                     0,
-                                                     getMessagePayloadValue(MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+                            new StorageServiceFileWriteAnswerMessage(
+                                    location,
+                                    false,
+                                    std::shared_ptr<FailureCause>(
+                                            new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                    {},
+                                    0,
+                                    getMessagePayloadValue(MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
 
                 } else {
                     // Forward the message
@@ -650,13 +650,13 @@ namespace wrench {
                         std::string error_message = "Cannot copy file to/from non-storage XRooD node";
                         auto location = FileLocation::LOCATION(getSharedPtr<Node>(), file);
                         msg->answer_commport->dputMessage(
-                                                 new StorageServiceFileCopyAnswerMessage(
-                                                         msg->src,
-                                                         msg->dst,
-                                                         false,
-                                                         std::shared_ptr<FailureCause>(
-                                                                 new NotAllowed(getSharedPtr<Node>(), error_message)),
-                                                         getMessagePayloadValue(MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+                                new StorageServiceFileCopyAnswerMessage(
+                                        msg->src,
+                                        msg->dst,
+                                        false,
+                                        std::shared_ptr<FailureCause>(
+                                                new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                        getMessagePayloadValue(MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
                     }
 
                 } else {

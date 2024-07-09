@@ -45,15 +45,11 @@ jobs:
             COMPILER: gcc10
             batsched: off
 
-          - build: "Ubuntu Focal - clang++-10"
-            DIST: ubuntu-focal
-            COMPILER: clang10
+          - build: "Debian Bookworm - g++-12"
+            DIST: debian-bookworm
+            COMPILER: gcc12
             batsched: off
 
-          - build: "Ubuntu Focal - g++-9"
-            DIST: ubuntu-focal
-            COMPILER: gcc9
-            batsched: off
 
           - build: "Ubuntu Jammy Jellyfish - clang++-14"
             DIST: ubuntu-jammy

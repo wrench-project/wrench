@@ -198,11 +198,11 @@ namespace wrench {
         // to the simulator if host shutdowns are to be simulated
         simgrid::s4u::Host::on_onoff.connect(
                 [](simgrid::s4u::Host const &h) {
-                  if (not Simulation::host_shutdown_enabled) {
-                      throw std::runtime_error(
-                              "It looks like you are simulating host failures/shutdowns during the simulated execution."
-                              " Please restart your simulation passing it the --wrench-host-shutdown-simulation command-line flag.");
-                  }
+                    if (not Simulation::host_shutdown_enabled) {
+                        throw std::runtime_error(
+                                "It looks like you are simulating host failures/shutdowns during the simulated execution."
+                                " Please restart your simulation passing it the --wrench-host-shutdown-simulation command-line flag.");
+                    }
                 });
 
         // Register a callback on link state changes to warn users
@@ -210,11 +210,11 @@ namespace wrench {
         // to the simulator if host shutdowns are to be simulated
         simgrid::s4u::Link::on_onoff_cb(
                 [](simgrid::s4u::Link const &l) {
-                  if (not Simulation::link_shutdown_enabled) {
-                      throw std::runtime_error(
-                              "It looks like you are simulating link failures/shutdowns during the simulated execution."
-                              " Please restart your simulation passing it the --wrench-link-shutdown-simulation command-line flag.");
-                  }
+                    if (not Simulation::link_shutdown_enabled) {
+                        throw std::runtime_error(
+                                "It looks like you are simulating link failures/shutdowns during the simulated execution."
+                                " Please restart your simulation passing it the --wrench-link-shutdown-simulation command-line flag.");
+                    }
                 });
 
 
@@ -1631,7 +1631,6 @@ namespace wrench {
 
     /**
      * @brief Remove all files from the simulation (use at your own peril if you're using the workflow API)
-     * @param file : file to remove
      */
     void Simulation::removeAllFiles() {
         Simulation::data_files.clear();

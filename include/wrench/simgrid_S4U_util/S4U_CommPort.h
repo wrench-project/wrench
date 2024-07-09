@@ -35,7 +35,9 @@ namespace wrench {
     class S4U_CommPort {
 
     public:
-
+        /**
+	 * @brief Returns a message type name as a string
+	 */
         template<class TMessageType>
         std::string get_type_name() {
             char const *type_name = typeid(TMessageType).name();
@@ -160,23 +162,32 @@ namespace wrench {
          */
         static S4U_CommPort *NULL_COMMPORT;
 
+
+        /**
+	 * @brief Return the commport's name (as a C++ string)
+	 * @return the commport's name
+	 */
         [[nodiscard]] const std::string get_name() const {
             return this->name;
         }
 
+        /**
+	 * @brief Return the commport's name (as a C-style string)
+	 * @return the commport's name
+	 */
         [[nodiscard]] const char *get_cname() const {
             return this->name.c_str();
         }
 
     private:
-
         friend class S4U_Daemon;
         friend class S4U_PendingCommunication;
+        friend class SimpleStorageServiceNonBufferized;
+        SimulationMessage *msg_mb;
+        SimulationMessage *msg_mq;
 
         simgrid::s4u::Mailbox *s4u_mb;
         simgrid::s4u::MessageQueue *s4u_mq;
-        SimulationMessage *msg_mb;
-        SimulationMessage *msg_mq;
         bool mb_comm_posted = false;
         simgrid::s4u::CommPtr mb_comm;
         bool mq_comm_posted = false;
@@ -186,8 +197,8 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> getMessage(double timeout, bool log);
 
 
-        void templateWaitingLog(const std::string& type, unsigned long long id);
-        void templateWaitingLogUpdate(const std::string& type, unsigned long long id);
+        void templateWaitingLog(const std::string &type, unsigned long long id);
+        void templateWaitingLogUpdate(const std::string &type, unsigned long long id);
 
         /** Statics **/
         friend class S4U_Simulation;

@@ -21,7 +21,8 @@ namespace wrench {
 
 
     SimulationMessage::~SimulationMessage() {
-//                WRENCH_INFO("DELETE: %s (%p)", this->getName().c_str(), this);
+        UNTRACK_OBJECT("message");
+        //                WRENCH_INFO("DELETE: %s (%p)", this->getName().c_str(), this);
     }
 
 
@@ -36,6 +37,7 @@ namespace wrench {
         }
 #endif
         this->payload = std::max<double>(0, payload);
+        TRACK_OBJECT("message");
     }
 
     /**

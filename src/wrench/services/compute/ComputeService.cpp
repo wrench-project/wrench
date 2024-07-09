@@ -52,11 +52,11 @@ namespace wrench {
         auto ack_commport = S4U_Daemon::getRunningActorRecvCommPort();
         try {
             this->commport->dputMessage(new ServiceStopDaemonMessage(
-                                            ack_commport,
-                                            send_failure_notifications,
-                                            termination_cause,
-                                            this->getMessagePayloadValue(
-                                                    ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
+                    ack_commport,
+                    send_failure_notifications,
+                    termination_cause,
+                    this->getMessagePayloadValue(
+                            ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &e) {
             this->shutting_down = false;
             throw;
@@ -164,6 +164,8 @@ namespace wrench {
                 {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, this->getPropertyValueAsString(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE)}}, {});
 
         ss->setIsScratch(true);
+        // Set the storage service's network timeout to that of this compute service
+        ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
         this->scratch_space_storage_service =
                 this->simulation->startNewService(ss);
     }
@@ -354,11 +356,11 @@ namespace wrench {
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         this->commport->putMessage(new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
-                                                       answer_commport,
-                                                       num_cores,
-                                                       ram,
-                                                       this->getMessagePayloadValue(
-                                                               ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
+                answer_commport,
+                num_cores,
+                ram,
+                this->getMessagePayloadValue(
+                        ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the reply
         auto msg = answer_commport->getMessage<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage>(
@@ -427,10 +429,10 @@ namespace wrench {
             auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
             this->commport->putMessage(new ComputeServiceResourceInformationRequestMessage(
-                                                           answer_commport,
-                                                           key,
-                                                           this->getMessagePayloadValue(
-                                                                   ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
+                    answer_commport,
+                    key,
+                    this->getMessagePayloadValue(
+                            ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
 
             // Get the reply
             auto msg = answer_commport->getMessage<ComputeServiceResourceInformationAnswerMessage>(

@@ -38,19 +38,29 @@ namespace wrench {
 
         void stopSimulation();
 
-        json getSimulationTime(json data);
+        json getSimulationTime(const json& data);
 
-        json getAllHostnames(json data);
+        json getAllHostnames(const json& data);
 
         json advanceTime(json data);
 
-        json getSimulationEvents(json);
+        json getSimulationEvents(const json&);
 
         json createStandardJob(json data);
         json submitStandardJob(json data);
         json getStandardJobTasks(json data);
         json addInputFile(json data);
         json addOutputFile(json data);
+
+        json createCompoundJob(json data);
+        json submitCompoundJob(json data);
+        json addComputeAction(json data);
+        json addFileCopyAction(json data);
+        json addFileDeleteAction(json data);
+        json addFileWriteAction(json data);
+        json addFileReadAction(json data);
+        json addSleepAction(json data);
+        json addParentJob(json data);
 
         json createTask(json data);
         json getTaskFlops(json data);
@@ -60,7 +70,7 @@ namespace wrench {
         json getTaskStartDate(json data);
         json getTaskEndDate(json data);
 
-        json waitForNextSimulationEvent(json data);
+        json waitForNextSimulationEvent(const json& data);
 
         json addBareMetalComputeService(json data);
 
@@ -74,6 +84,9 @@ namespace wrench {
         json lookupFileAtStorageService(json data);
 
         json addFileRegistryService(json data);
+        json fileRegistryServiceAddEntry(json data);
+        json fileRegistryServiceLookUpEntry(json data);
+        json fileRegistryServiceRemoveEntry(json data);
 
         json addFile(json data);
         json getFileSize(json data);
@@ -83,14 +96,16 @@ namespace wrench {
         json getTaskOutputFiles(json data);
 
         json getInputFiles(json data);
-
+        json getReadyTasks(json data);
         json stageInputFiles(json data);
+        json workflowIsDone(json data);
+
 
         json supportsCompoundJobs(json data);
-
         json supportsPilotJobs(json data);
-
         json supportsStandardJobs(json data);
+        json getCoreFlopRates(json data);
+        json getCoreCounts(json data);
 
         json createVM(json data);
 
@@ -116,7 +131,7 @@ namespace wrench {
 
         json getVMComputeService(json data);
 
-        json createWorkflow(json data);
+        json createWorkflow(const json& data);
 
         json createWorkflowFromJSON(json data);
 
@@ -126,15 +141,16 @@ namespace wrench {
 
         // Thread-safe key value stores
         KeyValueStore<std::shared_ptr<wrench::Workflow>> workflow_registry;
-        KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;
+        KeyValueStore<std::shared_ptr<wrench::StandardJob>> standard_job_registry;
+        KeyValueStore<std::shared_ptr<wrench::CompoundJob>> compound_job_registry;
         KeyValueStore<std::shared_ptr<ComputeService>> compute_service_registry;
         KeyValueStore<std::shared_ptr<StorageService>> storage_service_registry;
-        KeyValueStore<std::shared_ptr<FileRegistryService>> file_service_registry;
+        KeyValueStore<std::shared_ptr<FileRegistryService>> file_registry_service_registry;
 
         // Thread-safe queues for the server thread and the simulation thread to communicate
         BlockingQueue<std::pair<double, std::shared_ptr<wrench::ExecutionEvent>>> event_queue;
 
-        BlockingQueue<std::tuple<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>, std::map<std::string, std::string>>> submissions_to_do;
+//        BlockingQueue<std::tuple<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>, std::map<std::string, std::string>>> submissions_to_do;
 
         BlockingQueue<std::function<void()>> things_to_do;
 

@@ -340,7 +340,7 @@ namespace wrench {
         // Send the callback to the originator
         callback_commport->dputMessage(
                 new ComputeServiceCompoundJobDoneMessage(
-                                          job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
+                        job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
 
         this->running_jobs.erase(job);
@@ -360,8 +360,8 @@ namespace wrench {
         // Send the callback to the originator
         callback_commport->dputMessage(
                 new ComputeServiceCompoundJobFailedMessage(
-                                          job, this->getSharedPtr<HTCondorCentralManagerService>(),
-                                          this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
+                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
+                        this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
 
         this->running_jobs.erase(job);

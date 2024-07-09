@@ -158,7 +158,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/createTask": {
+    "/simulation/{simid}/workflows/{workflow_name}/createTask": {
       "put": {
         "tags": [
           "WRENCH"
@@ -322,7 +322,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{tid}/inputFiles": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{tid}/inputFiles": {
       "get": {
         "tags": [
           "WRENCH"
@@ -381,7 +381,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{tid}/addInputFile": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{tid}/addInputFile": {
       "put": {
         "tags": [
           "WRENCH"
@@ -456,7 +456,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{tid}/outputFiles": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{tid}/outputFiles": {
       "get": {
         "tags": [
           "WRENCH"
@@ -515,7 +515,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{tid}/addOutputFile": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{tid}/addOutputFile": {
       "put": {
         "tags": [
           "WRENCH"
@@ -590,7 +590,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/inputFiles": {
+    "/simulation/{simid}/workflows/{workflow_name}/inputFiles": {
       "get": {
         "tags": [
           "WRENCH"
@@ -625,6 +625,106 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FileList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/workflows/{workflow_name}/readyTasks": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Return the list of ready tasks in the workflow.",
+        "deprecated": false,
+        "operationId": "getReadyTasks",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/workflows/{workflow_name}/isDone": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Return whether the workflow has finished executing or not.",
+        "deprecated": false,
+        "operationId": "workflowIsDone",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "Description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BooleanResponse"
                 }
               }
             }
@@ -801,7 +901,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetFlops": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetFlops": {
       "get": {
         "tags": [
           "WRENCH"
@@ -829,9 +929,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -860,7 +960,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetMinNumCores": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetMinNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -888,9 +988,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -919,7 +1019,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetMaxNumCores": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetMaxNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -947,9 +1047,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -978,7 +1078,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetMemory": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetMemory": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1006,9 +1106,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -1037,7 +1137,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetStartDate": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetStartDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1065,9 +1165,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -1096,7 +1196,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/tasks/{name}/taskGetEndDate": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetEndDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1124,9 +1224,9 @@
             }
           },
           {
-            "name": "name",
+            "name": "task_name",
             "in": "path",
-            "description": "ID of the task",
+            "description": "Name of the task",
             "required": true,
             "schema": {
               "type": "string"
@@ -1155,7 +1255,7 @@
         }
       }
     },
-    "/simulation/{simid}/{workflow_name}/createStandardJob": {
+    "/simulation/{simid}/workflows/{workflow_name}/createStandardJob": {
       "put": {
         "tags": [
           "WRENCH"
@@ -1211,7 +1311,7 @@
         }
       }
     },
-    "/simulation/{simid}/jobs/{job_name}/submit": {
+    "/simulation/{simid}/standardJobs/{job_name}/submit": {
       "post": {
         "tags": [
           "WRENCH"
@@ -1260,6 +1360,58 @@
                       }
                     },
                     "description": "service-specific job arguments ({} means “use all defaults” )"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/createCompoundJob": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create a new compound job.",
+        "operationId": "createCompoundJob",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to create a new compound job",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of Compound job"
                   }
                 }
               }
@@ -1536,7 +1688,7 @@
         }
       }
     },
-    "/simulation/{simid}/supportsCompoundJobs": {
+    "/simulation/{simid}/compute_services/{service_name}/supportsCompoundJobs": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1552,6 +1704,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "Name of the compute service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1572,7 +1733,7 @@
         }
       }
     },
-    "/simulation/{simid}/supportsPilotJobs": {
+    "/simulation/{simid}/compute_services/{service_name}/supportsPilotJobs": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1588,6 +1749,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "Name of the compute service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1608,7 +1778,7 @@
         }
       }
     },
-    "/simulation/{simid}/supportsStandardJobs": {
+    "/simulation/{simid}/compute_services/{service_name}/supportsStandardJobs": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1624,6 +1794,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "Name of the compute service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1633,6 +1812,126 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BooleanResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compute_services/{service_name}/coreFlopRates": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Returns the core flop rate for each host managed by the compute service.",
+        "operationId": "getCoreFlopRates",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "hostnames": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "The service's compute hosts"
+                    },
+                    "flop_rates": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "description": "The service's compute hosts' flop rates"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compute_services/{service_name}/coreCounts": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Returns the core counts for each host managed by the compute service.",
+        "operationId": "getCoreCounts",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "hostnames": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "The service's compute hosts"
+                    },
+                    "flop_rates": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "description": "The service's compute hosts' core counts"
+                    }
+                  }
                 }
               }
             }
@@ -1708,7 +2007,7 @@
         "tags": [
           "WRENCH"
         ],
-        "summary": "Create and start a file registery service.",
+        "summary": "Create and start a file registry service.",
         "operationId": "addFileRegistryService",
         "parameters": [
           {
@@ -1755,7 +2054,184 @@
         }
       }
     },
-    "/simulation/{simid}/{storage_service_name}/createFileCopy": {
+    "/simulation/{simid}/fileRegistryServices/{file_registry_service_name}/addEntry": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add an entry to a file registry service.",
+        "operationId": "fileRegistryServiceAddEntry",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_registry_service_name",
+            "in": "path",
+            "Description": "Name of the file registry service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Entry to add.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileRegistryServiceEntry"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/fileRegistryServices/{file_registry_service_name}/lookupEntry": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Look up the locations of file.",
+        "operationId": "fileRegistryServiceLookUpEntry",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_registry_service_name",
+            "in": "path",
+            "Description": "Name of the file registry service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "File to lookup.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "file_name": {
+                    "type": "string",
+                    "description": "The name of the file in the entry"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageServiceList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/fileRegistryServices/{file_registry_service_name}/removeEntry": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Remove an entry from a file registry service.",
+        "operationId": "fileRegistryServiceRemoveEntry",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_registry_service_name",
+            "in": "path",
+            "description": "name of the file registry service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Entry to remove.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileRegistryServiceEntry"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/storage_services/{service_name}/createFileCopy": {
       "post": {
         "tags": [
           "WRENCH"
@@ -1773,9 +2249,9 @@
             }
           },
           {
-            "name": "storage_service_name",
+            "name": "service_name",
             "in": "path",
-            "description": "The storage service's head host",
+            "description": "The storage service name",
             "required": true,
             "schema": {
               "type": "string"
@@ -1820,7 +2296,7 @@
         }
       }
     },
-    "/simulation/{simid}/{storage_service_name}/lookupFile": {
+    "/simulation/{simid}/storage_services/{service_name}/lookupFile": {
       "post": {
         "tags": [
           "WRENCH"
@@ -1838,7 +2314,7 @@
             }
           },
           {
-            "name": "storage_service_name",
+            "name": "service_name",
             "in": "path",
             "description": "The storage service's head host",
             "required": true,
@@ -1885,7 +2361,2537 @@
         }
       }
     },
-    "/simulation/{simid}/createVM": {
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/submit": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Submit a compound job.",
+        "operationId": "submitCompoundJob",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Job characteristics.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "compute_service_name": {
+                    "type": "string",
+                    "description": "The compute service's name"
+                  },
+                  "service_specific_args": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "service-specific job arguments ({} means “use all defaults” )"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/setPriority": {
+      "put": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/addParentJob": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add parent compound job to compound job",
+        "deprecated": false,
+        "operationId": "addParentJob",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to add a parent compound job.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "parent_compound_job": {
+                    "type": "string",
+                    "description": "Name of parent compound job."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/getParentJobs": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/addChildJob": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/getChildrenJobs": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/getMinimumRequiredMemory": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/getMinimumRequiredNumCores": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/getState": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/hasFailed": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/hasSuccessfullyCompleted": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/addActionDependency": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/addSleepAction": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add a sleep action to compound job",
+        "deprecated": false,
+        "operationId": "addSleepAction",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to add a sleep action.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of sleep action."
+                  },
+                  "sleep_time": {
+                    "type": "string",
+                    "description": "Time to sleep."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/addComputeAction": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add a compute action to compound job",
+        "deprecated": false,
+        "operationId": "addComputeAction",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to add a compute action.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of compute action."
+                  },
+                  "flops": {
+                    "type": "float",
+                    "description": "Amount of flops."
+                  },
+                  "ram": {
+                    "type": "float",
+                    "description": "Amount of ram needed."
+                  },
+                  "max_num_cores": {
+                    "type": "long",
+                    "description": "Maximum amount of cores."
+                  },
+                  "min_num_cores": {
+                    "type": "long",
+                    "description": "Minimum amount of cores."
+                  },
+                  "parallel_model": {
+                    "type": "tuple",
+                    "description": "Info for making parallel model."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericRespone"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/addFileCopyAction": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add a file copy action to compound job",
+        "deprecated": false,
+        "operationId": "addFileCopyAction",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to add a file copy action.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of file copy action."
+                  },
+                  "file_name": {
+                    "type": "File",
+                    "description": "File object."
+                  },
+                  "src_storage_service_name": {
+                    "type": "StorageService",
+                    "description": "Storage Service the file is copied from."
+                  },
+                  "dest_storage_service_name": {
+                    "type": "StorageService",
+                    "description": "Storage Service the file is copied to."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/addFileDeleteAction": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add a file delete action to compound job",
+        "deprecated": false,
+        "operationId": "addFileDeleteAction",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to add a file delete action.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of file delete action."
+                  },
+                  "file_name": {
+                    "type": "File",
+                    "description": "File object to be deleted."
+                  },
+                  "storage_service_name": {
+                    "type": "StorageService",
+                    "description": "Storage Service the file is deleted from."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/addFileReadAction": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add a file read action to compound job",
+        "deprecated": false,
+        "operationId": "addFileReadAction",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to add a file read action.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileReadAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddActionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Compound job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/addFileWriteAction": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add a file write action to compound job.",
+        "deprecated": false,
+        "operationId": "addFileWriteAction",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to add a file write action.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of file write action."
+                  },
+                  "file_name": {
+                    "type": "File",
+                    "description": "File object to write to."
+                  },
+                  "storage_service_name": {
+                    "type": "StorageService",
+                    "description": "Storage Service to write the file to."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/addFileRegistryAddEntryAction": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/addFileRegistryDeleteEntryAction": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/removeAction": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetParents": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetChildren": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetPriority": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionSetPriority": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetFlops": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetMinNumCores": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's minimum number of cores.",
+        "deprecated": false,
+        "operationId": "getTaskMinNumCores",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskCores"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetMaxNumCores": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's maximum number of cores.",
+        "deprecated": false,
+        "operationId": "getTaskMaxNumCores",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskCores"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetMinRAMFootprint": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's minimum number of cores.",
+        "deprecated": false,
+        "operationId": "getTaskMinNumCores",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskCores"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetMemory": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's memory requirement.",
+        "deprecated": false,
+        "operationId": "getTaskMemory",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskMem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionUsesScratch": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's memory requirement.",
+        "deprecated": false,
+        "operationId": "getTaskMemory",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskMem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetState": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetStartDate": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's start date.",
+        "deprecated": false,
+        "operationId": "getTaskStartDate",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetEndDate": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's end date.",
+        "deprecated": false,
+        "operationId": "getTaskEndDate",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetExecutionHistory": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/actionGetFailureCause": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/fileCopyAction/getDestinationFileLocation": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/fileCopyAction/getFile": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/fileCopyAction/getSourceFileLocation": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/fileReadAction/getUsedFileLocation": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/fileRegistryAction/getFile": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/fileRegistryAction/getFileLocation": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{compound_job_name}/actions/{name}/fileRegistryAction/getFileRegistryService": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's flops",
+        "deprecated": false,
+        "operationId": "getTaskFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/cloud_compute_services/{service_name}/createVM": {
       "post": {
         "tags": [
           "WRENCH"
@@ -1901,6 +4907,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
@@ -1910,10 +4925,6 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service name"
-                  },
                   "num_cores": {
                     "type": "integer",
                     "description": "The required number of cores"
@@ -1969,7 +4980,7 @@
         }
       }
     },
-    "/simulation/{simid}/startVM": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/startVM": {
       "post": {
         "tags": [
           "WRENCH"
@@ -1985,28 +4996,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to start a VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM to start"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2025,7 +5034,7 @@
         }
       }
     },
-    "/simulation/{simid}/shutdownVM": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/shutdownVM": {
       "post": {
         "tags": [
           "WRENCH"
@@ -2041,28 +5050,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to shutdown a VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM to shutdown"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2081,7 +5088,7 @@
         }
       }
     },
-    "/simulation/{simid}/destroyVM": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/destroyVM": {
       "post": {
         "tags": [
           "WRENCH"
@@ -2097,28 +5104,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to destroy a VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM to destroy"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2137,7 +5142,7 @@
         }
       }
     },
-    "/simulation/{simid}/isVMRunning": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/isVMRunning": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2153,28 +5158,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check if VM is running.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "Name of the cloud compute service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "Name of the vm",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2193,7 +5196,7 @@
         }
       }
     },
-    "/simulation/{simid}/isVMDown": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/isVMDown": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2209,28 +5212,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check if VM is down.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2249,7 +5250,7 @@
         }
       }
     },
-    "/simulation/{simid}/suspendVM": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/suspendVM": {
       "post": {
         "tags": [
           "WRENCH"
@@ -2265,28 +5266,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to suspend a VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "compute_service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2305,7 +5304,7 @@
         }
       }
     },
-    "/simulation/{simid}/resumeVM": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/resumeVM": {
       "post": {
         "tags": [
           "WRENCH"
@@ -2321,28 +5320,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to resume a VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "compute_service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2361,7 +5358,7 @@
         }
       }
     },
-    "/simulation/{simid}/isVMSuspended": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/isVMSuspended": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2377,28 +5374,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check if VM is suspended.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2417,7 +5412,7 @@
         }
       }
     },
-    "/simulation/{simid}/getVMPhysicalHostname": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/getVMPhysicalHostname": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2433,28 +5428,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check physical hostname.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "compute_service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2473,7 +5466,7 @@
         }
       }
     },
-    "/simulation/{simid}/getVMComputeService": {
+    "/simulation/{simid}/cloud_compute_services/{service_name}/vms/{vm_name}/getVMComputeService": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2489,28 +5482,26 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "description": "Input to check compute service of VM.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "service_name": {
-                    "type": "string",
-                    "description": "The cloud service's name"
-                  },
-                  "vm_name": {
-                    "type": "string",
-                    "description": "The name of the VM"
-                  }
-                }
-              }
+          },
+          {
+            "name": "service_name",
+            "in": "path",
+            "description": "The cloud compute service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vm_name",
+            "in": "path",
+            "description": "The VM name",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2641,7 +5632,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkflowResponseWithTaskList"
+                  "$ref": "#/components/schemas/WorkflowResponseWithTaskAndFileList"
                 }
               }
             }
@@ -2787,6 +5778,40 @@
           }
         }
       },
+      "FileRegistryServiceEntry": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string",
+            "description": "Name of the file in the entry"
+          },
+          "storage_service_name": {
+            "type": "string",
+            "description": "Name of the storage service in the entry"
+          }
+        }
+      },
+      "FileReadAction": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the action"
+          },
+          "file_name": {
+            "type": "string",
+            "description": "Name of the file to read"
+          },
+          "storage_service_name": {
+            "type": "string",
+            "description": "Name of the storage service the file is stored in"
+          },
+          "num_bytes_to_read": {
+            "type": "number",
+            "description": "Number of bytes to read from the file"
+          }
+        }
+      },
       "GenericResponse": {
         "type": "object",
         "properties": {
@@ -2834,7 +5859,7 @@
           }
         }
       },
-      "WorkflowResponseWithTaskList": {
+      "WorkflowResponseWithTaskAndFileList": {
         "type": "object",
         "properties": {
           "wrench_api_request_success": {
@@ -2851,6 +5876,13 @@
               "type": "string"
             },
             "description": "The names of the workflow's tasks"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The names of the workflow's files"
           },
           "failure_cause": {
             "type": "string",
@@ -3006,12 +6038,57 @@
           }
         }
       },
+      "StorageServiceList": {
+        "type": "object",
+        "properties": {
+          "StorageServices": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of Storage Service names"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
       "JobResponse": {
         "type": "object",
         "properties": {
           "job_name": {
             "type": "string",
             "description": "The new job's name."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "AddActionResponse": {
+        "type": "object",
+        "properties": {
+          "action_name": {
+            "type": "string",
+            "description": "The new action's name."
+          },
+          "uses_scratch": {
+            "type": "number",
+            "description": "Whether the action uses scratch."
+          },
+          "num_bytes_to_read": {
+            "type": "string",
+            "description": "The num of bytes the action's to read."
           },
           "wrench_api_request_success": {
             "type": "boolean",

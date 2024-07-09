@@ -86,6 +86,9 @@ namespace wrench {
                                             commport(commport), transfer_size(transfer_size), stream(nullptr) {
             }
         };
+
+        int getNumRunningTransactionsOnDisk(simgrid::s4u::Disk *disk);
+
         /***********************/
         /** \endcond          **/
         /***********************/
