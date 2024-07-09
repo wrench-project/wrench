@@ -38,13 +38,13 @@ namespace wrench {
 
         void stopSimulation();
 
-        json getSimulationTime(json data);
+        json getSimulationTime(const json& data);
 
-        json getAllHostnames(json data);
+        json getAllHostnames(const json& data);
 
         json advanceTime(json data);
 
-        json getSimulationEvents(json);
+        json getSimulationEvents(const json&);
 
         json createStandardJob(json data);
         json submitStandardJob(json data);
@@ -70,7 +70,7 @@ namespace wrench {
         json getTaskStartDate(json data);
         json getTaskEndDate(json data);
 
-        json waitForNextSimulationEvent(json data);
+        json waitForNextSimulationEvent(const json& data);
 
         json addBareMetalComputeService(json data);
 
@@ -131,7 +131,7 @@ namespace wrench {
 
         json getVMComputeService(json data);
 
-        json createWorkflow(json data);
+        json createWorkflow(const json& data);
 
         json createWorkflowFromJSON(json data);
 
