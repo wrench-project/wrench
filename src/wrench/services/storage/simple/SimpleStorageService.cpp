@@ -321,8 +321,8 @@ namespace wrench {
     bool SimpleStorageService::processStopDaemonRequest(S4U_CommPort *ack_commport) {
         try {
             ack_commport->putMessage(
-                                    new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                            SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                    new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                            SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &ignore) {}
         return false;
     }

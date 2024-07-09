@@ -297,9 +297,9 @@ private:
 
         // Is the state sensible?
         RUNTIME_EQ(file_read_action->getState(), wrench::Action::State::COMPLETED, "action state");
-//        if (file_read_action->getState() != wrench::Action::State::COMPLETED) {
-//            throw std::runtime_error("Unexpected action state: " + file_read_action->getStateAsString());
-//        }
+        //        if (file_read_action->getState() != wrench::Action::State::COMPLETED) {
+        //            throw std::runtime_error("Unexpected action state: " + file_read_action->getStateAsString());
+        //        }
 
         return 0;
     }

@@ -84,28 +84,33 @@ namespace wrench {
         //        std::cerr << "IN DAEMON CONSTRUCTOR: " << this->process_name << "\n";
         this->commport = S4U_CommPort::getTemporaryCommPort();
         this->recv_commport = S4U_CommPort::getTemporaryCommPort();
+        TRACK_OBJECT("actor");
     }
 
+    /**
+     * @brief Destructor
+     */
     S4U_Daemon::~S4U_Daemon() {
-//        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s, %p)'", this->getName().c_str(), this->s4u_actor.get());
+        //        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s, %p)'", this->getName().c_str(), this->s4u_actor.get());
 
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
 #endif
+        UNTRACK_OBJECT("actor");
     }
 
-//    /**
-//     * @brief Release all mutexes that the running actor holds, if any
-//     */
-//    void S4U_Daemon::release_held_mutexes() {
-//        if (S4U_Daemon::map_actor_to_held_mutexes.find(simgrid::s4u::this_actor::get_pid()) != S4U_Daemon::map_actor_to_held_mutexes.end()) {
-//            for (auto const &mutex : S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()]) {
-//                mutex->unlock();
-//            }
-//            S4U_Daemon::map_actor_to_held_mutexes.erase(simgrid::s4u::this_actor::get_pid());
-//        }
-//        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].erase(this->daemon_lock);
-//    }
+    //    /**
+    //     * @brief Release all mutexes that the running actor holds, if any
+    //     */
+    //    void S4U_Daemon::release_held_mutexes() {
+    //        if (S4U_Daemon::map_actor_to_held_mutexes.find(simgrid::s4u::this_actor::get_pid()) != S4U_Daemon::map_actor_to_held_mutexes.end()) {
+    //            for (auto const &mutex : S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()]) {
+    //                mutex->unlock();
+    //            }
+    //            S4U_Daemon::map_actor_to_held_mutexes.erase(simgrid::s4u::this_actor::get_pid());
+    //        }
+    //        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].erase(this->daemon_lock);
+    //    }
 
     /**
      * @brief Cleanup function called when the daemon terminates (for whatever reason). The
@@ -119,10 +124,10 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void S4U_Daemon::cleanup(bool has_returned_from_main, int return_value) {
-//        WRENCH_INFO("IN S4U_Daemon::cleanup() for %s", this->process_name.c_str());
+        //        WRENCH_INFO("IN S4U_Daemon::cleanup() for %s", this->process_name.c_str());
 
         // Releasing held mutexes, if any
-//        this->release_held_mutexes();
+        //        this->release_held_mutexes();
 
         // Default behavior is to throw in case of any problem
         if ((not has_returned_from_main) and (not S4U_Simulation::isHostOn(hostname))) {
@@ -200,7 +205,7 @@ namespace wrench {
             throw std::runtime_error("S4U_Daemon::startDaemon(): SimGrid actor creation failed... shouldn't happen.");
         }
 
-//        WRENCH_INFO("STARTED ACTOR %p (%s)", this->s4u_actor.get(), this->process_name.c_str());
+        //        WRENCH_INFO("STARTED ACTOR %p (%s)", this->s4u_actor.get(), this->process_name.c_str());
 
         // nullptr is returned if the host is off (not the current behavior in SimGrid... just paranoid here)
         if (this->s4u_actor == nullptr) {
@@ -225,8 +230,6 @@ namespace wrench {
                 this->s4u_actor->set_auto_restart(true);
             }
         }
-
-
     }
 
     /**
@@ -275,15 +278,15 @@ namespace wrench {
  * @brief Method that run's the user-defined main method (that's called by the S4U actor class)
  */
     void S4U_Daemon::runMainMethod() {
-//        this->commport = S4U_CommPort::getTemporaryCommPort();
-//        this->recv_commport = S4U_CommPort::getTemporaryCommPort();
+        //        this->commport = S4U_CommPort::getTemporaryCommPort();
+        //        this->recv_commport = S4U_CommPort::getTemporaryCommPort();
         // Set the commport receiver
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
         this->commport->s4u_mb->set_receiver(this->s4u_actor);
         //        this->recv_commport->set_receiver(this->s4u_actor);
 
         S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()] = this->recv_commport;
-//        S4U_Daemon::running_actors.insert(this->getSharedPtr<S4U_Daemon>());
+        //        S4U_Daemon::running_actors.insert(this->getSharedPtr<S4U_Daemon>());
 
         this->num_starts++;
         // Compute zero flop so that nothing happens
@@ -299,8 +302,7 @@ namespace wrench {
         S4U_CommPort::retireTemporaryCommPort(this->commport);
         this->recv_commport->s4u_mb->set_receiver(nullptr);
         S4U_CommPort::retireTemporaryCommPort(this->recv_commport);
-//        S4U_Daemon::running_actors.erase(this->getSharedPtr<S4U_Daemon>());
-
+        //        S4U_Daemon::running_actors.erase(this->getSharedPtr<S4U_Daemon>());
     }
 
 
@@ -401,7 +403,7 @@ namespace wrench {
  */
     void S4U_Daemon::acquireDaemonLock() {
         this->daemon_lock->lock();
-//        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].insert(this->daemon_lock);
+        //        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].insert(this->daemon_lock);
     }
 
     /**
@@ -409,7 +411,7 @@ namespace wrench {
  */
     void S4U_Daemon::releaseDaemonLock() {
         this->daemon_lock->unlock();
-//        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].erase(this->daemon_lock);
+        //        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].erase(this->daemon_lock);
     }
 
     /**

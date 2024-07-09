@@ -136,7 +136,6 @@ namespace wrench {
         double network_timeout = 30.0;
 
 
-
         /** @brief A boolean that indicates if the service is in the middle of shutting down **/
         bool shutting_down = false;
 

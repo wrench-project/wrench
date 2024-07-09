@@ -315,10 +315,10 @@ namespace wrench {
         try {
             this->commport->putMessage(new ServiceStopDaemonMessage(
                     ack_commport,
-                                            false,
-                                            ComputeService::TerminationCause::TERMINATION_NONE,
-                                            this->getMessagePayloadValue(
-                                                    ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
+                    false,
+                    ComputeService::TerminationCause::TERMINATION_NONE,
+                    this->getMessagePayloadValue(
+                            ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
 
             // Wait for the ack
             message = ack_commport->getMessage<ServiceDaemonStoppedMessage>(

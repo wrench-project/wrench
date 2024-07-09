@@ -235,8 +235,8 @@ namespace wrench {
             // This is Synchronous
             try {
                 msg->ack_commport->putMessage(
-                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                HTCondorComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                                HTCondorComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
                 return false;
             }

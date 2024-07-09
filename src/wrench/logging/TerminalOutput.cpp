@@ -12,6 +12,7 @@
 #include <iostream>
 #include <wrench/logging/TerminalOutput.h>
 
+
 namespace wrench {
 
     const char *TerminalOutput::color_codes[] = {

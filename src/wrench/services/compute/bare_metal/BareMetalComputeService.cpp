@@ -194,20 +194,20 @@ namespace wrench {
             const std::map<std::string, std::string> &service_specific_args) {
         assertServiceIsUp();
 
-//        WRENCH_INFO("BareMetalComputeService::submitCompoundJob()");
+        //        WRENCH_INFO("BareMetalComputeService::submitCompoundJob()");
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         //  send a "run a standard job" message to the daemon's commport
         this->commport->putMessage(
-                                new ComputeServiceSubmitCompoundJobRequestMessage(
-                                        answer_commport, job, service_specific_args,
-                                        this->getMessagePayloadValue(
-                                                ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                new ComputeServiceSubmitCompoundJobRequestMessage(
+                        answer_commport, job, service_specific_args,
+                        this->getMessagePayloadValue(
+                                ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
         auto msg = answer_commport->getMessage<ComputeServiceSubmitCompoundJobAnswerMessage>(this->network_timeout,
-                                                                                         "ComputeService::submitCompoundJob(): Received an");
+                                                                                             "ComputeService::submitCompoundJob(): Received an");
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
         }
@@ -434,8 +434,8 @@ namespace wrench {
             // This is Synchronous
             try {
                 msg->ack_commport->putMessage(
-                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                                BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
                 return false;
             }
@@ -495,12 +495,12 @@ namespace wrench {
 
         //  send a "terminate a compound job" message to the daemon's commport
         this->commport->putMessage(
-                                new ComputeServiceTerminateCompoundJobRequestMessage(
-                                        answer_commport, job, this->getMessagePayloadValue(BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                new ComputeServiceTerminateCompoundJobRequestMessage(
+                        answer_commport, job, this->getMessagePayloadValue(BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         // Get the answer
         auto msg = answer_commport->getMessage<ComputeServiceTerminateCompoundJobAnswerMessage>(
-                                                                                            "BareMetalComputeService::terminateCompoundJob(): Received an");
+                "BareMetalComputeService::terminateCompoundJob(): Received an");
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
         }
@@ -519,6 +519,8 @@ namespace wrench {
             const std::shared_ptr<CompoundJob> &job,
             std::map<std::string, std::string> &service_specific_arguments) {
         WRENCH_INFO("Asked to run compound job %s, which has %zu actions", job->getName().c_str(), job->getActions().size());
+        for (auto const &action: job->getActions())
+            WRENCH_INFO("  - ACTION %s (min #cores=%lu)", action->getName().c_str(), action->getMinNumCores());
 
         // Action execution service may have terminated
         try {
@@ -663,9 +665,9 @@ namespace wrench {
         bool answer = this->action_execution_service->IsThereAtLeastOneHostWithAvailableResources(num_cores, ram);
         answer_commport->dputMessage(
                 new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
-                                        answer,
-                                        this->getMessagePayloadValue(
-                                                BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
+                        answer,
+                        this->getMessagePayloadValue(
+                                BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
     }
 
     /**

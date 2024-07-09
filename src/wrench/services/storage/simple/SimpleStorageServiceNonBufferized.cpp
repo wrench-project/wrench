@@ -36,7 +36,7 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void SimpleStorageServiceNonBufferized::cleanup(bool has_returned_from_main, int return_value) {
-//        this->release_held_mutexes();
+        //        this->release_held_mutexes();
     }
 
     /**
@@ -76,6 +76,9 @@ namespace wrench {
             transaction->dst_location->getStorageService()->isBufferized()) {
             transaction->dst_location->getStorageService()->createFile(transaction->dst_location);
         }
+
+        // TODO: If below I do dputMessage instead of putMessage, the MessImpl objects accumulate
+        //       and are freed only at the end of the simulation.
 
         // Send back the relevant ack if this was a read
         if (transaction->dst_location == nullptr) {
@@ -172,89 +175,60 @@ namespace wrench {
 
 
         /** Main loop **/
-        bool commport_comm_has_been_posted = false;
-        std::shared_ptr<S4U_PendingCommunication> commport_pending_comm;
+        bool comm_has_been_posted = false;
+        bool mess_has_been_posted = false;
+        simgrid::s4u::CommPtr comm_ptr;
+        simgrid::s4u::MessPtr mess_ptr;
         std::unique_ptr<SimulationMessage> simulation_message;
+
         while (true) {
 
             S4U_Simulation::computeZeroFlop();
 
             this->startPendingTransactions();
 
-            // Create an async recv if needed
-            if (not commport_comm_has_been_posted) {
+            // Create an async recv on the mailbox if needed
+            if (not comm_has_been_posted) {
                 try {
-                    commport_pending_comm = this->commport->igetMessage();
-//                    commport_pending_comm = this->commport->get_async<void>((void **) (&(simulation_message)));
+                    comm_ptr = this->commport->s4u_mb->get_async<void>((void **) (&(simulation_message)));
                 } catch (wrench::ExecutionException &e) {
                     // oh well
                     continue;
                 }
-                commport_comm_has_been_posted = true;
+                comm_has_been_posted = true;
+            }
+            // Create an async recv on the message queue if needed
+            if (not mess_has_been_posted) {
+                mess_ptr = this->commport->s4u_mq->get_async<void>((void **) (&(simulation_message)));
+                mess_has_been_posted = true;
             }
 
             // Create all activities to wait on
-#if 0
-            std::vector<simgrid::s4u::ActivityPtr> pending_activities;
-            pending_activities.emplace_back(commport_pending_comm);
-            for (auto const &transaction: this->running_transactions) {
-                pending_activities.emplace_back(transaction->stream);
-            }
-#else
             simgrid::s4u::ActivitySet pending_activities;
-            pending_activities.push(commport_pending_comm->comm_ptr);
-            pending_activities.push(commport_pending_comm->mess_ptr);
+            pending_activities.push(comm_ptr);
+            pending_activities.push(mess_ptr);
             for (auto const &transaction: this->running_transactions) {
                 pending_activities.push(transaction->stream);
             }
-#endif
 
-#if 0
-            // Wait one activity to complete
-            int finished_activity_index;
-            try {
-                finished_activity_index = (int) simgrid::s4u::Activity::wait_any(pending_activities);
-            } catch (simgrid::NetworkFailureException &e) {
-                // the comm failed
-                commport_comm_has_been_posted = false;
-                continue;// oh well
-            } catch (simgrid::Exception &e) {
-                // This likely doesn't happen, but let's keep it here for now
-                for (int i = 1; i < (int) pending_activities.size(); i++) {
-                    if (pending_activities.at(i)->get_state() == simgrid::s4u::Activity::State::FAILED) {
-                        auto finished_transaction = this->running_transactions[i - 1];
-                        this->stream_to_transactions.erase(finished_transaction->stream);
-                        processTransactionFailure(finished_transaction);
-                        continue;
-                    }
-                }
-                continue;
-            } catch (std::exception &e) {
-                continue;
-            }
-#else
             // Wait for one activity to complete
             simgrid::s4u::ActivityPtr finished_activity;
             try {
                 finished_activity = pending_activities.wait_any();
             } catch (simgrid::Exception &e) {
                 auto failed_activity = pending_activities.get_failed_activity();
-                if (failed_activity == commport_pending_comm->comm_ptr) {
+                if (failed_activity == comm_ptr) {
                     // the comm failed
-                    commport_comm_has_been_posted = false;
-                    commport_pending_comm->mess_ptr->cancel();
-                    commport_pending_comm->mess_ptr = nullptr;
-                    commport_pending_comm->comm_ptr->cancel();
-                    commport_pending_comm->comm_ptr = nullptr;
+                    comm_has_been_posted = false;
+                    comm_ptr->cancel();
+                    comm_ptr = nullptr;
                     continue;// oh well
                 }
-                if (failed_activity == commport_pending_comm->mess_ptr) {
+                if (failed_activity == mess_ptr) {
                     // the mess failed
-                    commport_comm_has_been_posted = false;
-                    commport_pending_comm->mess_ptr->cancel();
-                    commport_pending_comm->mess_ptr = nullptr;
-                    commport_pending_comm->comm_ptr->cancel();
-                    commport_pending_comm->comm_ptr = nullptr;
+                    mess_has_been_posted = false;
+                    mess_ptr->cancel();
+                    mess_ptr = nullptr;
                     continue;// oh well
                 }
 
@@ -264,20 +238,14 @@ namespace wrench {
                 processTransactionFailure(transaction);
                 continue;
             }
-#endif
 
-            if (finished_activity == commport_pending_comm->comm_ptr) {
-//                XXX IS THIS A GOOD IDEA???? SHOULD WE JuSt REPLICATE CODE FROM COMPORT
-                commport_pending_comm->mess_ptr->cancel();
-                auto msg = commport_pending_comm->simulation_message.get();
-//                commport_pending_comm->mess_ptr->cancel();
-                commport_comm_has_been_posted = false;
+            if (finished_activity == comm_ptr) {
+                auto msg = simulation_message.get();
+                comm_has_been_posted = false;
                 if (not processNextMessage(msg)) break;
-            } else if (finished_activity == commport_pending_comm->mess_ptr) {
-//                simulation_message = commport_pending_comm->wait();
-                auto msg = commport_pending_comm->simulation_message.get();
-                commport_pending_comm->comm_ptr->cancel();
-                commport_comm_has_been_posted = false;
+            } else if (finished_activity == mess_ptr) {
+                auto msg = simulation_message.get();
+                mess_has_been_posted = false;
                 if (not processNextMessage(msg)) break;
             } else {
                 auto stream = boost::dynamic_pointer_cast<simgrid::s4u::Io>(finished_activity);
@@ -490,7 +458,7 @@ namespace wrench {
                             1,
                             this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
         } catch (ExecutionException &e) {
-            return true; // oh well
+            return true;// oh well
         }
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
@@ -805,6 +773,21 @@ namespace wrench {
         } else {
             return processFileCopyRequestIAmTheSource(src, dst, answer_commport);
         }
+    }
+
+    /**
+     * @brief Returns the number of running transactions on a disk, as far as this
+     *        storage service know
+     * @return a number of transactions
+     */
+    int SimpleStorageServiceNonBufferized::getNumRunningTransactionsOnDisk(simgrid::s4u::Disk *disk) {
+        int count = 0;
+        for (const auto &t: this->running_transactions) {
+            if ((t->src_disk == disk) or (t->dst_disk == disk)) {
+                count++;
+            }
+        }
+        return count;
     }
 
 }// namespace wrench

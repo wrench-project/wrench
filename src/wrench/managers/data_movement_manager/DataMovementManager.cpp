@@ -270,10 +270,10 @@ namespace wrench {
 
             // Replay
             this->creator_commport->dputMessage(
-                                     new DataManagerFileCopyAnswerMessage(msg->src,
-                                                                          msg->dst,
-                                                                          msg->success,
-                                                                          std::move(msg->failure_cause)));
+                    new DataManagerFileCopyAnswerMessage(msg->src,
+                                                         msg->dst,
+                                                         msg->success,
+                                                         std::move(msg->failure_cause)));
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<DataMovementManagerFileReaderThreadMessage>(message)) {
@@ -290,10 +290,10 @@ namespace wrench {
 
             // Forward it back
             this->creator_commport->dputMessage(
-                                     new DataManagerFileReadAnswerMessage(msg->location,
-                                                                          msg->num_bytes,
-                                                                          msg->success,
-                                                                          std::move(msg->failure_cause)));
+                    new DataManagerFileReadAnswerMessage(msg->location,
+                                                         msg->num_bytes,
+                                                         msg->success,
+                                                         std::move(msg->failure_cause)));
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<DataMovementManagerFileWriterThreadMessage>(message)) {
@@ -312,20 +312,20 @@ namespace wrench {
             }
 
             if (request.file_registry_service) {
-//                WRENCH_INFO("Trying to do a register");
+                //                WRENCH_INFO("Trying to do a register");
                 try {
                     request.file_registry_service->addEntry(request.location);
                 } catch (ExecutionException &e) {
-//                    WRENCH_INFO("Oops, couldn't do it");
+                    //                    WRENCH_INFO("Oops, couldn't do it");
                     // don't throw, just keep file_registry_service_update to false
                 }
             }
 
             // Forward it back
             this->creator_commport->dputMessage(
-                                     new DataManagerFileWriteAnswerMessage(msg->location,
-                                                                           msg->success,
-                                                                           std::move(msg->failure_cause)));
+                    new DataManagerFileWriteAnswerMessage(msg->location,
+                                                          msg->success,
+                                                          std::move(msg->failure_cause)));
             return true;
 
         } else {

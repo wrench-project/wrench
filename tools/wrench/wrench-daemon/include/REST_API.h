@@ -28,8 +28,9 @@ public:
     }
 
     void genericRequestHandler(const json &req, crow::response &res, const std::string &api_function) {
-        //display_request_function(req);
-        //        std::cerr << "API FUNC: " << api_function << "\n";
+        //                display_request_function(req);
+        //                std::cerr << "JSON: " << req << "\n";
+        //                std::cerr << "API FUNC: " << api_function << "\n";
 
         json answer;
         try {
@@ -40,7 +41,7 @@ public:
             answer["wrench_api_request_success"] = false;
             answer["failure_cause"] = e.what();
         }
-        res.set_header("access-control-allow-origin", "*");
+        res.set_header("Access-Control-Allow-Origin", "*");
         res.body = to_string(answer);
     }
 

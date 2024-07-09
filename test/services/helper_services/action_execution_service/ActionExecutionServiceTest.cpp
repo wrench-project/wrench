@@ -494,21 +494,21 @@ private:
 
         // Is the start-date sensible?
         RUNTIME_DBL_EQ(action->getStartDate(), 0, "action start date", EPSILON);
-//        if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
-//            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
-//        }
+        //        if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
+        //            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
+        //        }
 
         // Is the end-date sensible?
         RUNTIME_DBL_EQ(action->getEndDate(), 5.0, "action end date", EPSILON);
-//        if (action->getEndDate() + EPSILON < 5.0 or action->getEndDate() > 5.0 + EPSILON) {
-//            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~5.0)");
-//        }
+        //        if (action->getEndDate() + EPSILON < 5.0 or action->getEndDate() > 5.0 + EPSILON) {
+        //            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~5.0)");
+        //        }
 
         // Is the state sensible?
         RUNTIME_EQ(action->getState(), wrench::Action::State::KILLED, "action state");
-//        if (action->getState() != wrench::Action::State::KILLED) {
-//            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
-//        }
+        //        if (action->getState() != wrench::Action::State::KILLED) {
+        //            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
+        //        }
 
         return 0;
     }
@@ -631,23 +631,23 @@ private:
 
         // Is the start-date sensible?
         RUNTIME_DBL_EQ(action->getStartDate(), 11.0, "action start date", EPSILON);
-//        if (std::abs<double>(action->getStartDate() - 11.0) > EPSILON) {
-//            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
-//        }
+        //        if (std::abs<double>(action->getStartDate() - 11.0) > EPSILON) {
+        //            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
+        //        }
 
         // Is the end-date sensible?
         RUNTIME_DBL_EQ(action->getEndDate(), 44.333333333333335701810, "action end date", EPSILON);
-//        double expected = 44.333333333333335701810;
-//        if (std::abs<double>(action->getEndDate() - expected) > EPSILON) {
-//            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) +
-//                                     " (expected: " + std::to_string(expected) + ")");
-//        }
+        //        double expected = 44.333333333333335701810;
+        //        if (std::abs<double>(action->getEndDate() - expected) > EPSILON) {
+        //            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) +
+        //                                     " (expected: " + std::to_string(expected) + ")");
+        //        }
 
         // Is the state sensible?
         RUNTIME_EQ(action->getState(), wrench::Action::State::COMPLETED, "action state");
-//        if (action->getState() != wrench::Action::State::COMPLETED) {
-//            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
-//        }
+        //        if (action->getState() != wrench::Action::State::COMPLETED) {
+        //            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
+        //        }
 
         // Check out the history
         auto history = action->getExecutionHistory();
@@ -797,21 +797,21 @@ private:
 
         // Is the start-date sensible?
         RUNTIME_DBL_EQ(action->getStartDate(), 0.0, "action start date", EPSILON);
-//        if (action->getStartDate() > EPSILON) {
-//            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
-//        }
+        //        if (action->getStartDate() > EPSILON) {
+        //            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
+        //        }
 
         // Is the end-date sensible?
         RUNTIME_DBL_EQ(action->getEndDate(), 1.0, "action end date", EPSILON);
-//        if (action->getEndDate() + EPSILON < 1.0 or action->getEndDate() > 1.0 + EPSILON) {
-//            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~1.0)");
-//        }
+        //        if (action->getEndDate() + EPSILON < 1.0 or action->getEndDate() > 1.0 + EPSILON) {
+        //            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~1.0)");
+        //        }
 
         // Is the state sensible?
         RUNTIME_EQ(action->getState(), wrench::Action::State::FAILED, "action state");
-//        if (action->getState() != wrench::Action::State::FAILED) {
-//            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
-//        }
+        //        if (action->getState() != wrench::Action::State::FAILED) {
+        //            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
+        //        }
 
         return 0;
     }

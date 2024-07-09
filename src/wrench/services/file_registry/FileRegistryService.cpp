@@ -66,9 +66,9 @@ namespace wrench {
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         this->commport->putMessage(new FileRegistryFileLookupRequestMessage(
-                                                       answer_commport, file,
-                                                       this->getMessagePayloadValue(
-                                                               FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+                answer_commport, file,
+                this->getMessagePayloadValue(
+                        FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         auto msg = answer_commport->getMessage<FileRegistryFileLookupAnswerMessage>(
                 this->network_timeout,
@@ -132,7 +132,6 @@ namespace wrench {
         if (location == nullptr) {
             throw std::invalid_argument("FileRegistryService::addEntry(): Invalid nullptr argument");
         }
-
         assertServiceIsUp();
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
@@ -221,8 +220,8 @@ namespace wrench {
             // This is Synchronous
             try {
                 msg->ack_commport->putMessage(
-                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                                FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
                 return false;
             }
@@ -278,8 +277,8 @@ namespace wrench {
             S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST));
 
             msg->answer_commport->dputMessage(
-                                     new FileRegistryAddEntryAnswerMessage(this->getMessagePayloadValue(
-                                             FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
+                    new FileRegistryAddEntryAnswerMessage(this->getMessagePayloadValue(
+                            FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<FileRegistryRemoveEntryRequestMessage>(message)) {
