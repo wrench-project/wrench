@@ -53,6 +53,9 @@ namespace wrench {
         //        sg_storage_file_system_init();
     }
 
+    /**
+     * @brief Enable the use of SMPI
+     */
     void S4U_Simulation::enableSMPI() {
         static bool enabled = false;
 

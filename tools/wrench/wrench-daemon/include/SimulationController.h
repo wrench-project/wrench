@@ -38,13 +38,13 @@ namespace wrench {
 
         void stopSimulation();
 
-        json getSimulationTime(const json& data);
+        json getSimulationTime(const json &data);
 
-        json getAllHostnames(const json& data);
+        json getAllHostnames(const json &data);
 
         json advanceTime(json data);
 
-        json getSimulationEvents(const json&);
+        json getSimulationEvents(const json &);
 
         json createStandardJob(json data);
         json submitStandardJob(json data);
@@ -70,7 +70,7 @@ namespace wrench {
         json getTaskStartDate(json data);
         json getTaskEndDate(json data);
 
-        json waitForNextSimulationEvent(const json& data);
+        json waitForNextSimulationEvent(const json &data);
 
         json addBareMetalComputeService(json data);
 
@@ -131,7 +131,7 @@ namespace wrench {
 
         json getVMComputeService(json data);
 
-        json createWorkflow(const json& data);
+        json createWorkflow(const json &data);
 
         json createWorkflowFromJSON(json data);
 
@@ -150,7 +150,7 @@ namespace wrench {
         // Thread-safe queues for the server thread and the simulation thread to communicate
         BlockingQueue<std::pair<double, std::shared_ptr<wrench::ExecutionEvent>>> event_queue;
 
-//        BlockingQueue<std::tuple<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>, std::map<std::string, std::string>>> submissions_to_do;
+        //        BlockingQueue<std::tuple<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>, std::map<std::string, std::string>>> submissions_to_do;
 
         BlockingQueue<std::function<void()>> things_to_do;
 

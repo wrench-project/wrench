@@ -69,7 +69,7 @@ namespace wrench {
     protected:
         friend class JobManager;
 
-        Job(std::string name, std::shared_ptr<JobManager> job_manager);
+        Job(const std::string &name, std::shared_ptr<JobManager> job_manager);
 
         void setServiceSpecificArguments(std::map<std::string, std::string> args);
 
