@@ -943,8 +943,9 @@ namespace wrench {
 
         /**
         * @brief write a file on this node.
-	* @param answer_commport: a commport on which to send the answer messagej
+	* @param answer_commport: a commport on which to send the answer message
         * @param location: a location
+	* @param num_bytes_to_write: A number of bytes to write
 	* @param wait_for_answer: true if this method should wait for the answer, false otherwise
         *
         * @throw std::invalid_argument

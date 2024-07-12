@@ -23,6 +23,7 @@ namespace wrench {
      * @brief Constructor
      * @param answer_commport: the commport to which to send the answer
      * @param file: the file for which storage allocation is requested
+     * @param stripe_count: the strip count
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
