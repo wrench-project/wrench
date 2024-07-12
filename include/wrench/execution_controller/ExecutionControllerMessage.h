@@ -32,7 +32,7 @@ namespace wrench {
      */
     class ExecutionControllerAlarmTimerMessage : public ExecutionControllerMessage {
     public:
-        explicit ExecutionControllerAlarmTimerMessage(const std::string &message, double payload);
+        explicit ExecutionControllerAlarmTimerMessage(std::string message, double payload);
         /** @brief The message sent my the timer */
         std::string message;
     };

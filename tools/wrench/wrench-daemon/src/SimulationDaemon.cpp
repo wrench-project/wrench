@@ -9,7 +9,6 @@
 
 #include <string>
 #include <utility>
-#include <vector>
 #include <thread>
 #include <boost/program_options.hpp>
 #include <nlohmann/json.hpp>

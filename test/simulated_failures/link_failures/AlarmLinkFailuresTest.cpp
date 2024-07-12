@@ -97,6 +97,7 @@ private:
             e.getCause()->toString();
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             cause->getCommPortName();
+            cause->getMessageName();
         }
 
         return 0;
