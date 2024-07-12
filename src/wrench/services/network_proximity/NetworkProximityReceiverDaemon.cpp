@@ -27,6 +27,7 @@ namespace wrench {
      * @brief Constructor
      * @param simulation: a pointer to the simulation object
      * @param hostname: the hostname on which to start the service
+     * @param messagepayload_list: the message payload list
      */
 
     NetworkProximityReceiverDaemon::NetworkProximityReceiverDaemon(
