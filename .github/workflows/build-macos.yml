@@ -47,7 +47,7 @@ jobs:
           cd build
           cmake ..
           make -j4
-          make install
+          sudo make install
       - name: Install googletest
         run: |
           brew install googletest
@@ -65,7 +65,7 @@ jobs:
           git checkout 98331a543f36f7991a92affa966a8f162c240984
           cmake .
           make -j4
-          make install
+          sudo make install
       - name: Source Build and Test
         run: |
           # build and test wrench

@@ -106,13 +106,13 @@ namespace wrench {
 
     /**
      * @brief Instantiate and start a bandwidth meter
-     * @param linknames: the list of metered links
+     * @param link_names: the list of metered links
      * @param measurement_period: the measurement period
      * @return a link meter
      */
     std::shared_ptr<BandwidthMeterService>
-    ExecutionController::createBandwidthMeter(const std::vector<std::string> &linknames, double measurement_period) {
-        auto bandwidth_meter_raw_ptr = new BandwidthMeterService(this->hostname, linknames, measurement_period);
+    ExecutionController::createBandwidthMeter(const std::vector<std::string> &link_names, double measurement_period) {
+        auto bandwidth_meter_raw_ptr = new BandwidthMeterService(this->hostname, link_names, measurement_period);
         std::shared_ptr<BandwidthMeterService> bandwidth_meter = std::shared_ptr<BandwidthMeterService>(bandwidth_meter_raw_ptr);
         bandwidth_meter->setSimulation(this->simulation);
         bandwidth_meter->start(bandwidth_meter, true, false);// Always daemonize, no auto-restart

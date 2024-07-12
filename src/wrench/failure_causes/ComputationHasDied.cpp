@@ -26,7 +26,7 @@ namespace wrench {
      * @return the message
      */
     std::string ComputationHasDied::toString() {
-        return std::string("A computation has died (failed or killed)");
+        return {"A computation has died (failed or killed)"};
     }
 
 }// namespace wrench
