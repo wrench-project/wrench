@@ -28,16 +28,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Getter
-     * @return the file
+     * @brief Get the file that wasn't found
+     * @return a file
      */
     std::shared_ptr<DataFile> FileNotFound::getFile() {
         return this->location->getFile();
     }
 
     /**
-     * @brief Getter
-     * @return the storage service
+     * @brief Get the storage service on which the file wasn't found
+     * @return a storage service
      */
     std::shared_ptr<FileLocation> FileNotFound::getLocation() {
         return this->location;
@@ -45,7 +45,7 @@ namespace wrench {
 
     /**
      * @brief Get the human-readable failure message
-     * @return the message
+     * @return a message
      */
     std::string FileNotFound::toString() {
         std::string msg = "Couldn't find file " + this->location->getFile()->getID();

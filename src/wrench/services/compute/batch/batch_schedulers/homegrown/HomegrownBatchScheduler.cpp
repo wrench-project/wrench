@@ -12,6 +12,13 @@
 
 namespace wrench {
 
+    /**
+     * @brief First-Fit selection of hosts
+     * @param cs: the compute service
+     * @param num_nodes: number of nodes
+     * @param cores_per_node: number of cores per node
+     * @param ram_per_node: RAM per node in bytes
+     */
     std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> HomegrownBatchScheduler::selectHostsFirstFit(BatchComputeService *cs,
                                                                                                                    unsigned long num_nodes,
                                                                                                                    unsigned long cores_per_node,
@@ -39,6 +46,13 @@ namespace wrench {
         return resources;
     }
 
+    /**
+     * @brief Best-Fit host selection
+     * @param cs: the compute service
+     * @param num_nodes: number of nodes
+     * @param cores_per_node: number of cores per node
+     * @param ram_per_node: RAM per node in bytes
+     */
     std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> HomegrownBatchScheduler::selectHostsBestFit(BatchComputeService *cs,
                                                                                                                   unsigned long num_nodes,
                                                                                                                   unsigned long cores_per_node,
@@ -87,6 +101,14 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Round-Robin selection of hosts
+     * @param cs: the compute service
+     * @param round_robin_host_selector_idx: current host selector index
+     * @param num_nodes: number of nodes
+     * @param cores_per_node: number of cores per node
+     * @param ram_per_node: RAM per node in bytes
+     */
     std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> HomegrownBatchScheduler::selectHostsRoundRobin(BatchComputeService *cs,
                                                                                                                      unsigned long *round_robin_host_selector_idx,
                                                                                                                      unsigned long num_nodes,
