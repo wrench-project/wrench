@@ -19,6 +19,7 @@ WRENCH_LOG_CATEGORY(wrench_core_compound_storage_system,
 
 namespace wrench {
 
+    /** @brief The null allocator */
     StorageSelectionStrategyCallback NullAllocator = [](const std::shared_ptr<DataFile> &file,
                                                         const std::map<std::string, std::vector<std::shared_ptr<StorageService>>> &resources,
                                                         const std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &mapping,
@@ -49,7 +50,7 @@ namespace wrench {
      *  @brief Constructor
      *  @param hostname: the name of the host on which this service will run
      *  @param storage_services: subordinate storage services
-     *  @param storage_selection: the storage selection strategy callback
+     *  @param allocate: the storage allocation strategy
      *  @param property_list: the configurable properties
      *  @param messagepayload_list: the configurable message payloads
      */
@@ -317,6 +318,7 @@ namespace wrench {
      *         callback.
      *
      *  @param file: the file of interest
+     *  @param stripe_count: number of stripes required for the given file (overrides any global setting)
      *  @param answer_commport: the answer commport to which the reply from the server should be sent
      *
      *  @return A vector of shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or could be allocated

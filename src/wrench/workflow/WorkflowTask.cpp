@@ -191,7 +191,8 @@ namespace wrench {
     /**
      * @brief Set the memory requirement of the task
      *
-     * @return a memory requirement (in bytes)
+     * @param num_bytes: a number of bytes
+     *
      */
     void WorkflowTask::setMemoryRequirement(double num_bytes) {
         this->memory_requirement = num_bytes;
@@ -305,9 +306,7 @@ namespace wrench {
 
     /**
      * @brief Get a task internal state as a string
-     *
      * @param internal_state: the internal state
-     *
      * @return an internal state as a string
      */
     std::string WorkflowTask::stateToString(WorkflowTask::InternalState internal_state) {
@@ -917,24 +916,24 @@ namespace wrench {
     }
 
     /**
- * @brief Set the task's parallel model
- * @param model: a parallel model
- */
+     * @brief Set the task's parallel model
+     * @param model: a parallel model
+     */
     void WorkflowTask::setParallelModel(std::shared_ptr<ParallelModel> model) {
         this->parallel_model = std::move(model);
     }
 
     /**
- * @brief Get the task's parallel model
- * @return the parallel model
- */
+     * @brief Get the task's parallel model
+     * @return the parallel model
+     */
     std::shared_ptr<ParallelModel> WorkflowTask::getParallelModel() const {
         return this->parallel_model;
     }
 
     /**
- * @brief Update task readiness
- */
+     * @brief Update task readiness
+     */
     void WorkflowTask::updateReadiness() {
         if (this->getState() == WorkflowTask::State::NOT_READY) {
             for (auto const &parent: this->getParents()) {
