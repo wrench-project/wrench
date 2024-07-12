@@ -70,6 +70,7 @@ jobs:
       - name: Source Build and Test
         run: |
           # build and test wrench
-          cmake -DENABLE_BATSCHED=off -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/g++  -DCMAKE_VERBOSE_MAKEFILE=ON .
+          #cmake -DENABLE_BATSCHED=off -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/g++  -DCMAKE_VERBOSE_MAKEFILE=ON .
+          cmake -DENABLE_BATSCHED=off -DCMAKE_VERBOSE_MAKEFILE=ON .
           make -j4 all unit_tests
           ./unit_tests
