@@ -74,6 +74,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Returns the name of the message for which the error occurred
+     * @return the message name
+     */
+    std::string NetworkError::getMessageName() {
+        return this->message_name;
+    }
+
+    /**
      * @brief Get the human-readable failure message
      * @return the message
      */
@@ -92,6 +100,8 @@ namespace wrench {
         }
         return "Network error (" + error + ") while " + operation + (this->message_name.empty() ? "" : " a message with name " + this->message_name) + " via commport " + this->commport_name;
     }
+
+
 
 
 }// namespace wrench
