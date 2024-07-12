@@ -12,7 +12,7 @@
 
 namespace wrench {
 
-     /**
+    /**
      * @brief First-Fit selection of hosts
      * @param cs: the compute service
      * @param num_nodes: number of nodes

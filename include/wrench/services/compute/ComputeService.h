@@ -175,7 +175,7 @@ namespace wrench {
 
         void startScratchStorageService();
 
-	/**
+        /**
          * @brief Construct a dict for resource information
          * @param key: the desired key
          * @return a dictionary
