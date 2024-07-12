@@ -44,7 +44,7 @@ namespace wrench {
         S4U_CommPort *answer_commport;
         /** @brief The path */
         std::shared_ptr<DataFile> file;
-
+        /** @brief the stripe count */
         unsigned int stripe_count;
     };
 
