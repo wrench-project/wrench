@@ -30,7 +30,6 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h>
-#include <wrench/failure_causes/HostError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_action_scheduler, "Log category for Action Scheduler");
 
