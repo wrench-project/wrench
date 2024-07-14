@@ -1,7 +1,7 @@
 .. _user-api:
 
-WRENCH User API
-***************
+WRENCH User C++ API
+*******************
 
 Runtime System Users use WRENCH to simulate application workload 
 executions using an already available, in-simulation implementation 
