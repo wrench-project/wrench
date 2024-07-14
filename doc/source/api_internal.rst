@@ -1,7 +1,7 @@
 .. _internal-api:
 
-WRENCH Internal API
-***************
+WRENCH Internal C++ API
+***********************
 
 Internal Developers contribute to the WRENCH code, typically by 
 implementing new Core Services.
