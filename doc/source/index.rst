@@ -152,3 +152,4 @@ The main channel to reach the WRENCH team is via the support email:
    api_developer.rst
    api_internal.rst
    rest_api.rst
+   python_api.rst

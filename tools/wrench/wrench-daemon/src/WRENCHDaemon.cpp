@@ -15,7 +15,6 @@
 #include <thread>
 #include <boost/program_options.hpp>
 #include <nlohmann/json.hpp>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/shm.h>
 
