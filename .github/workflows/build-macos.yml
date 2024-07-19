@@ -47,10 +47,10 @@ jobs:
 #      - name: Install Python
 #        run: |
 #          brew install python
-      - name: Fix fortran
-        run: |
-         ls /usr/lib/*gfortran*
-         ls /usr/local/lib/*gfortran*
+#      - name: Fix fortran
+#        run: |
+#         ls /usr/lib/*gfortran*
+#         ls /usr/local/lib/*gfortran*
       - name: Install boost
         run: |
           brew install sbt
