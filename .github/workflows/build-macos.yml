@@ -49,7 +49,6 @@ jobs:
 #          brew install python
       - name: Fix fortran
         run: |
-         ls /usr/bin/*gfortran*
          ls /usr/lib/*gfortran*
          ls /usr/local/lib/*gfortran*
       - name: Install boost
