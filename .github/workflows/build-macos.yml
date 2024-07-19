@@ -56,7 +56,7 @@ jobs:
           git clone https://framagit.org/simgrid/simgrid.git
           cd simgrid
           git checkout 98331a543f36f7991a92affa966a8f162c240984
-          cmake .
+          cmake -Denable_smpi=off .
           make -j4
           sudo make install
       - name: Source Build and Test
