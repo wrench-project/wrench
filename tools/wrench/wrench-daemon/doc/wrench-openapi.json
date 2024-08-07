@@ -5593,7 +5593,7 @@
                     "type": "bool",
                     "description": "Ignore machine specs"
                   },
-                  "redundant, dependencies": {
+                  "ignore_redundant_dependencies": {
                     "type": "bool",
                     "description": "Redundant dependencies"
                   },
