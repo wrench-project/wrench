@@ -22,14 +22,12 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <SimulationDaemon.h>
-#include "REST_API.h"
 
 using json = nlohmann::json;
 
 // Range of ports that simulation daemons can listen on
 #define PORT_MIN 10000
 #define PORT_MAX 20000
-
 
 std::vector<std::string> WRENCHDaemon::allowed_origins;
 
