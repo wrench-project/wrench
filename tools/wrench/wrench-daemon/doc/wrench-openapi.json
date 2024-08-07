@@ -5753,10 +5753,6 @@
       "StandardJob": {
         "type": "object",
         "properties": {
-          "workflow_name": {
-            "type": "string",
-            "description": "Name of the workflow to which the task is being added"
-          },
           "tasks": {
             "type": "array",
             "items": {
