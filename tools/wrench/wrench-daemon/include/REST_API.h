@@ -23,16 +23,16 @@ public:
              std::function<void(const crow::request &req)> display_request_function,
              std::shared_ptr<wrench::SimulationController> &sc) : display_request_function(std::move(display_request_function)) {
 
-        // Set up all request handlers (automatically generated code!)
-        #include "./callback-map.h"
-        #include "./routes.h"
+// Set up all request handlers (automatically generated code!)
+#include "./callback-map.h"
+#include "./routes.h"
     }
 
 
     void genericRequestHandler(const json &req, crow::response &res, const std::string &api_function) {
-//        display_request_function(req);
-//        std::cerr << "JSON: " << req << "\n";
-//        std::cerr << "API FUNC: " << api_function << "\n";
+        //        display_request_function(req);
+        //        std::cerr << "JSON: " << req << "\n";
+        //        std::cerr << "API FUNC: " << api_function << "\n";
 
         json answer;
         try {
