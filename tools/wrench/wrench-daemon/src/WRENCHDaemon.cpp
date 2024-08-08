@@ -44,7 +44,7 @@ std::vector<std::string> WRENCHDaemon::allowed_origins;
 WRENCHDaemon::WRENCHDaemon(bool simulation_logging,
                            bool daemon_logging,
                            int port_number,
-                           const std::string& allowed_origin,
+                           const std::string &allowed_origin,
                            int sleep_us) : simulation_logging(simulation_logging),
                                            daemon_logging(daemon_logging),
                                            port_number(port_number),
@@ -232,20 +232,20 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
             // do the creation here and the launch in a thread, but it seems that SimGrid
             // does not like that - likely due to the maestro business)
             auto simulation_thread = std::thread([simulation_launcher, this, body, &guard, &signal]() {
-              // Create simulation
-              simulation_launcher->createSimulation(this->simulation_logging,
-                                                    body["platform_xml"],
-                                                    body["controller_hostname"],
-                                                    this->sleep_us);
-              // Signal the parent thread that simulation creation has been done, successfully or not
-              {
-                  std::unique_lock<std::mutex> lock(guard);
-                  signal.notify_one();
-              }
-              // If no failure, then proceed with the launch!
-              if (not simulation_launcher->launchError()) {
-                  simulation_launcher->launchSimulation();
-              }
+                // Create simulation
+                simulation_launcher->createSimulation(this->simulation_logging,
+                                                      body["platform_xml"],
+                                                      body["controller_hostname"],
+                                                      this->sleep_us);
+                // Signal the parent thread that simulation creation has been done, successfully or not
+                {
+                    std::unique_lock<std::mutex> lock(guard);
+                    signal.notify_one();
+                }
+                // If no failure, then proceed with the launch!
+                if (not simulation_launcher->launchError()) {
+                    simulation_launcher->launchSimulation();
+                }
             });
 
             // Waiting for the simulation thread to have created the simulation, successfully or not
@@ -278,7 +278,7 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
                 if (write(fd[1], &success, sizeof(bool)) == -1) {
                     perror("write()");
                     writeStringToSharedMemorySegment(shm_segment_id, "Internal wrench-daemon error: write(): " +
-                                                                     std::string(strerror(errno)));
+                                                                             std::string(strerror(errno)));
                     exit(1);
                 }
 
@@ -356,7 +356,7 @@ void WRENCHDaemon::run() {
     // Only set up POST request handler for "/api/startSimulation" since
     // all other API paths will be handled by a simulation daemon instead
     server.Post("/api/startSimulation", [this](const Request &req, Response &res) {
-      this->startSimulation(req, res);
+        this->startSimulation(req, res);
     });
 
     // Set some generic error handler

@@ -35,7 +35,7 @@ public:
     WRENCHDaemon(bool simulation_logging,
                  bool daemon_logging,
                  int port_number,
-                 const std::string& allowed_origin,
+                 const std::string &allowed_origin,
                  int sleep_us);
 
     void run();
@@ -43,7 +43,7 @@ public:
     static void allow_origin(crow::response &res) {
         res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
         res.set_header("Access-Control-Allow-Headers", "Content-Type");
-        for (auto const &origin : allowed_origins) {
+        for (auto const &origin: allowed_origins) {
             res.set_header("Access-Control-Allow-Origin", origin);
         }
     }
@@ -51,7 +51,7 @@ public:
     static void allow_origin(Response &res) {
         res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
         res.set_header("Access-Control-Allow-Headers", "Content-Type");
-        for (auto const &origin : allowed_origins) {
+        for (auto const &origin: allowed_origins) {
             res.set_header("Access-Control-Allow-Origin", origin);
         }
     }
