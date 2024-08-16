@@ -26,18 +26,29 @@ endif ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/conf/cmake/")
 message("CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
+
+# Find Boost
 find_package(Boost REQUIRED)
 
-include("${CMAKE_SOURCE_DIR}/conf/cmake/FindSimGrid.cmake")
-
-if (NOT DEFINED SimGrid_PATH)
-	message(STATUS "SimGrid_PATH is not defined, using default path")
-    find_package(SimGrid REQUIRED)
-else()
-	message(STATUS "Using SimGrid_PATH: ${SimGrid_PATH}")
-	find_package(SimGrid REQUIRED HINTS ${SimGrid_PATH})
+# Find SimGrid
+if (DEFINED SimGrid_PATH)
+    if (NOT EXISTS "${SimGrid_PATH}")
+        message(FATAL_ERROR "The specified SimGrid_PATH doesn't exit")
+    else()
+        file(GLOB LIBSIMGRID_FILES
+                "${SimGrid_PATH}/lib/libsimgrid.so"
+                "${SimGrid_PATH}/lib/libsimgrid.dylib"
+                )
+        if (NOT LIBSIMGRID_FILES)
+            message(FATAL_ERROR "The specified SimGrid_PATH doesn't seem to contain a valid SimGrid installation")
+        else()
+            set(CMAKE_PREFIX_PATH ${SimGrid_PATH} ${CMAKE_PREFIX_PATH})
+        endif()
+    endif()
 endif()
+find_package(SimGrid REQUIRED)
 
+# Find nlohmann_json
 find_package(nlohmann_json)
 
 set(CMAKE_CXX_STANDARD 17)
