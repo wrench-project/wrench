@@ -25,8 +25,18 @@ if (ENABLE_WRENCH_INTERNAL_EXCEPTIONS)
 endif ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/conf/cmake/")
+message("CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
 find_package(Boost REQUIRED)
-find_package(SimGrid REQUIRED)
+
+include("${CMAKE_SOURCE_DIR}/conf/cmake/FindSimGrid.cmake")
+
+if (NOT DEFINED SimGrid_PATH)
+	message(STATUS "SimGrid_PATH is not defined, using default path")
+    find_package(SimGrid REQUIRED)
+else()
+	message(STATUS "Using SimGrid_PATH: ${SimGrid_PATH}")
+	find_package(SimGrid REQUIRED HINTS ${SimGrid_PATH})
+endif()
 
 find_package(nlohmann_json)
 
