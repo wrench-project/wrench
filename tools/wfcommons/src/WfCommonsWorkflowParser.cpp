@@ -244,7 +244,7 @@ namespace wrench {
             // Deal with the flop amount
             double flop_amount;
             std::string execution_machine;
-            if (task_exec.contains("machines")) {
+            if (task_exec.contains("machines") and machines.size() > 0) {
                 std::vector<std::string> machines = task_exec.at("machines");
                 if (machines.size() > 1) {
                     throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJSON(): Task " + task->getID() +
