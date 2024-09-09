@@ -45,7 +45,7 @@ namespace wrench {
      * @param hostname: the name of the host on which the service will run
      * @param process_name_prefix: the prefix for the process name
      */
-    Service::Service(const std::string& hostname, const std::string& process_name_prefix) : S4U_Daemon(hostname, process_name_prefix) {
+    Service::Service(const std::string &hostname, const std::string &process_name_prefix) : S4U_Daemon(hostname, process_name_prefix) {
         this->name = process_name_prefix;
     }
 
@@ -411,8 +411,8 @@ namespace wrench {
      * @param default_property_values: list of default properties
      * @param overridden_property_values: list of overridden properties (override the default)
      */
-    void Service::setProperties(const WRENCH_PROPERTY_COLLECTION_TYPE& default_property_values,
-                                const WRENCH_PROPERTY_COLLECTION_TYPE& overridden_property_values) {
+    void Service::setProperties(const WRENCH_PROPERTY_COLLECTION_TYPE &default_property_values,
+                                const WRENCH_PROPERTY_COLLECTION_TYPE &overridden_property_values) {
         // Set default properties
         for (auto const &p: default_property_values) {
             this->setProperty(p.first, p.second);
@@ -429,8 +429,8 @@ namespace wrench {
      * @param default_messagepayload_values: list of default message payloads
      * @param overridden_messagepayload_values: list of overridden message payloads (override the default)
      */
-    void Service::setMessagePayloads(const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& default_messagepayload_values,
-                                     const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& overridden_messagepayload_values) {
+    void Service::setMessagePayloads(const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &default_messagepayload_values,
+                                     const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &overridden_messagepayload_values) {
         // Set default messagepayloads
         for (auto const &p: default_messagepayload_values) {
             this->setMessagePayload(p.first, p.second);

@@ -11,6 +11,7 @@
 #define WRENCH_DAEMON_H
 
 #include "httplib.h"
+#include "crow.h"
 
 using httplib::Request;
 using httplib::Response;
@@ -34,16 +35,36 @@ public:
     WRENCHDaemon(bool simulation_logging,
                  bool daemon_logging,
                  int port_number,
+                 const std::string &allowed_origin,
                  int sleep_us);
 
     void run();
 
+    static void allow_origin(crow::response &res) {
+        res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
+        res.set_header("Access-Control-Allow-Headers", "Content-Type");
+        for (auto const &origin: allowed_origins) {
+            res.set_header("Access-Control-Allow-Origin", origin);
+        }
+    }
+
+    static void allow_origin(Response &res) {
+        res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
+        res.set_header("Access-Control-Allow-Headers", "Content-Type");
+        for (auto const &origin: allowed_origins) {
+            res.set_header("Access-Control-Allow-Origin", origin);
+        }
+    }
+
 private:
     httplib::Server server;
+
+    static std::vector<std::string> allowed_origins;
 
     bool simulation_logging;
     bool daemon_logging;
     int port_number;
+    std::string allowed_origin;
     int sleep_us;
 
     void startSimulation(const Request &req, Response &res);

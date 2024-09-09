@@ -106,7 +106,7 @@
       }
     },
     "/simulation/{simid}/advanceTime": {
-      "put": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -159,7 +159,7 @@
       }
     },
     "/simulation/{simid}/workflows/{workflow_name}/createTask": {
-      "put": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -382,7 +382,7 @@
       }
     },
     "/simulation/{simid}/workflows/{workflow_name}/tasks/{tid}/addInputFile": {
-      "put": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -516,7 +516,7 @@
       }
     },
     "/simulation/{simid}/workflows/{workflow_name}/tasks/{tid}/addOutputFile": {
-      "put": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -741,7 +741,7 @@
       }
     },
     "/simulation/{simid}/addFile": {
-      "put": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -1256,7 +1256,7 @@
       }
     },
     "/simulation/{simid}/workflows/{workflow_name}/createStandardJob": {
-      "put": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -2435,7 +2435,7 @@
       }
     },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/setPriority": {
-      "put": {
+      "post": {
         "tags": [
           "WRENCH"
         ],
@@ -5593,7 +5593,7 @@
                     "type": "bool",
                     "description": "Ignore machine specs"
                   },
-                  "redundant, dependencies": {
+                  "ignore_redundant_dependencies": {
                     "type": "bool",
                     "description": "Redundant dependencies"
                   },
@@ -5753,10 +5753,6 @@
       "StandardJob": {
         "type": "object",
         "properties": {
-          "workflow_name": {
-            "type": "string",
-            "description": "Name of the workflow to which the task is being added"
-          },
           "tasks": {
             "type": "array",
             "items": {
