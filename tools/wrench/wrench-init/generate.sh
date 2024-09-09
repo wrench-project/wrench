@@ -28,6 +28,11 @@ cat $1"/FindWRENCH.cmake"
 echo "\"\"\""
 echo ""
 
+echo "FILE_CONTENT_README_MD = r\"\"\""
+cat $1"/tools/wrench/wrench-init/base_code/README.md"
+echo "\"\"\""
+echo ""
+
 echo "FILE_CONTENT_CMAKELISTS_TXT = r\"\"\""
 cat $1"/tools/wrench/wrench-init/base_code/CMakeLists.txt"
 echo "\"\"\""
