@@ -1,6 +1,6 @@
 # CMake find module to search for the SimGrid library.
 
-# Copyright (c) 2016-2023. The SimGrid Team.
+# Copyright (c) 2016-2024. The SimGrid Team.
 #
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the license (GNU LGPL) which comes with this package.
@@ -13,7 +13,7 @@
 #    CMAKE_PREFIX_PATH="/path/to/FindSimGrid.cmake:$CMAKE_PREFIX_PATH"  cmake .
 #
 # If this file does not find SimGrid, define SimGrid_PATH:
-#    cmake -DSimGrid_PATH=/path/to/simgrid .
+#    cmake -DSIMGRID_PATH=/path/to/simgrid .
 
 #
 # DEVELOPERS OF PROGRAMS USING SIMGRID
@@ -26,19 +26,32 @@
 #  2. This will define a target called 'SimGrid::Simgrid'. Use it as:
 #       target_link_libraries(your-simulator SimGrid::SimGrid)
 #
-#  It also defines a SimGrid_VERSION macro, that you can use to deal with API
+#  It also defines a SIMGRID_VERSION macro, that you can use to deal with API
 #    evolutions as follows:
 #
-#    #if SimGrid_VERSION < 31800
+#    #include <simgrid/version.h>
+#    #if SIMGRID_VERSION < 31800
 #      (code to use if the installed version is lower than v3.18)
-#    #elif SimGrid_VERSION < 31900
+#    #elif SIMGRID_VERSION < 31900
 #      (code to use if we are using SimGrid v3.18.x)
 #    #else
-#      (code to use with SimGrid v3.19+)
+#      (code to use with SimGrid v3.19 or later)
 #    #endif
 #
-#  Since SimGrid header files require C++17, so we set CMAKE_CXX_STANDARD to 17.
+#  Since SimGrid header files require C++17, we set CMAKE_CXX_STANDARD to 17.
 #    Change this variable in your own file if you need a later standard.
+
+# DEVELOPPERS OF MPI PROGRAMS USING SIMGRID
+#   You should use smpi_c_target() on the targets that are intended to run in SMPI.
+#   ${SMPIRUN} is correctly set if it's installed.
+#
+#   Example:
+#     add_executable(roundtrip roundtrip.c)
+#     smpi_c_target(roundtrip)
+#
+#     enable_testing()
+#     add_test(NAME Roundtrip
+#              COMMAND ${SMPIRUN} -platform ${CMAKE_SOURCE_DIR}/../cluster_backbone.xml -np 2 ./roundtrip)
 
 #
 # IMPROVING THIS FILE
@@ -48,7 +61,7 @@
 #    https://cmake.org/Wiki/CMake/Tutorials/How_to_create_a_ProjectConfig.cmake_file
 #    https://github.com/boostcon/cppnow_presentations_2017/blob/master/05-19-2017_friday/effective_cmake__daniel_pfeifer__cppnow_05-19-2017.pdf
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.5)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -56,18 +69,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_path(SimGrid_INCLUDE_DIR
   NAMES simgrid/config.h
   NAMES simgrid/version.h
-  PATHS ${SimGrid_PATH}/include /opt/simgrid/include
+  PATHS ${SimGrid_PATH}/include ${SIMGRID_PATH}/include /opt/simgrid/include
 )
 if (NOT SimGrid_INCLUDE_DIR)
   # search under the old name
   find_path(SimGrid_INCLUDE_DIR
     NAMES simgrid_config.h
-    PATHS ${SimGrid_PATH}/include /opt/simgrid/include
+    PATHS ${SimGrid_PATH}/include ${SIMGRID_PATH}/include /opt/simgrid/include
   )
 endif()
 find_library(SimGrid_LIBRARY
   NAMES simgrid
-  PATHS ${SimGrid_PATH}/lib /opt/simgrid/lib
+  PATHS ${SimGrid_PATH}/lib ${SIMGRID_PATH}/lib /opt/simgrid/lib
 )
 mark_as_advanced(SimGrid_INCLUDE_DIR)
 mark_as_advanced(SimGrid_LIBRARY)
@@ -103,6 +116,17 @@ find_package_handle_standard_args(SimGrid
 )
 
 if (SimGrid_FOUND)
+
+  find_program(SMPIRUN smpirun
+               HINTS ${SimGrid_PATH}/bin /opt/simgrid/bin)
+
+  MACRO(smpi_c_target NAME)
+    target_compile_options(${NAME} PUBLIC "-include;smpi/smpi_helpers.h;-fPIC;-shared;-Wl,-z,defs")
+    target_link_options(${NAME} PUBLIC "-fPIC;-shared;-Wl,-z,defs;-lm")
+    target_link_libraries(${NAME} PUBLIC ${SimGrid_LIBRARY})
+    target_include_directories(${NAME} PUBLIC "${SimGrid_INCLUDE_DIR};${SimGrid_INCLUDE_DIR}/smpi")
+  ENDMACRO()
+
   add_library(SimGrid::SimGrid SHARED IMPORTED)
   set_target_properties(SimGrid::SimGrid PROPERTIES
     INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${SimGrid_INCLUDE_DIR}
