@@ -22,7 +22,7 @@ And, one of the following: - **g++** - version 7.5 or higher - **clang**
 Required Dependencies
 ---------------------
 
--  `SimGrid <https://simgrid.org/>`__ – version 3.34
+-  `SimGrid <https://simgrid.org/>`__ – version 3.36
 -  `JSON for Modern C++ <https://github.com/nlohmann/json>`__ – version
    3.9.0 or higher
 
