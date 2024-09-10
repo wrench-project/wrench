@@ -5,6 +5,13 @@ WRENCH Release Notes
 
 Nothing new yet
 
+### wrench 2.3
+
+- More full-feature REST API that gives access to the Action API in addition to the Workflow API
+- Upgrade to SimGrid v3.36, which comes with several bug fixes
+- Upgrade to WfCommon's WfFormat 1.5
+- Countless minor bug fixes and code updates
+
 ### wrench 2.2
 
 - Implementation of `wrench-daemon`, which can be started on the local machine and supports a REST API so that users can create and run simulations in a language-agnostic manner.
