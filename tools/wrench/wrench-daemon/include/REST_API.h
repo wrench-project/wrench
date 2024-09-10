@@ -9,6 +9,8 @@
 
 #include <utility>
 #include "crow.h"
+#include "WRENCHDaemon.h"
+
 #define toStr(name) (#name)
 
 #ifndef WRENCH_REST_API_H
@@ -21,16 +23,16 @@ public:
              std::function<void(const crow::request &req)> display_request_function,
              std::shared_ptr<wrench::SimulationController> &sc) : display_request_function(std::move(display_request_function)) {
 
-        // Set up all request handlers (automatically generated code!)
+// Set up all request handlers (automatically generated code!)
 #include "./callback-map.h"
-
 #include "./routes.h"
     }
 
+
     void genericRequestHandler(const json &req, crow::response &res, const std::string &api_function) {
-        //                display_request_function(req);
-        //                std::cerr << "JSON: " << req << "\n";
-        //                std::cerr << "API FUNC: " << api_function << "\n";
+        //        display_request_function(req);
+        //        std::cerr << "JSON: " << req << "\n";
+        //        std::cerr << "API FUNC: " << api_function << "\n";
 
         json answer;
         try {
@@ -41,7 +43,8 @@ public:
             answer["wrench_api_request_success"] = false;
             answer["failure_cause"] = e.what();
         }
-        res.set_header("Access-Control-Allow-Origin", "*");
+
+        WRENCHDaemon::allow_origin(res);
         res.body = to_string(answer);
     }
 

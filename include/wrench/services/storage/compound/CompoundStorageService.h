@@ -61,6 +61,7 @@ namespace wrench {
         std::shared_ptr<StorageService> service;
         /** @brief Free space in byte */
         double free_space;
+        /** @brief the file count */
         uint64_t file_count;
     };
 
@@ -72,9 +73,13 @@ namespace wrench {
         double ts;
         /** @brief IO action */
         IOAction act;
-        int parts_count;// number of file parts in location array
+        /** @brief number of file parts in location array */
+        int parts_count;
+        /** @brief file name */
         std::string file_name;
-        std::vector<DiskUsage> disk_usage;// new usage stats for updated disks
+        /** @brief new usage stats for updated disks */
+        std::vector<DiskUsage> disk_usage;
+        /** @brief internal locations */
         std::vector<std::shared_ptr<FileLocation>> internal_locations;
     };
 

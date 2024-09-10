@@ -2,7 +2,8 @@
 #
 # Usage: run_all_examples [executable_to_exclude1,executable_to_exclude2,....]
 
-TO_ALWAYS_EXCLUDE="wrench-example-cloud-bag-of-tasks-energy"
+#TO_ALWAYS_EXCLUDE="wrench-example-cloud-bag-of-tasks-energy"
+TO_ALWAYS_EXCLUDE=""
 
 TO_EXCLUDE="{$TO_ALWAYS_EXCLUDE},{$1}"
 

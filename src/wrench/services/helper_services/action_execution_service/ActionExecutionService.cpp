@@ -30,7 +30,6 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h>
-#include <wrench/failure_causes/HostError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_action_scheduler, "Log category for Action Scheduler");
 
@@ -396,7 +395,7 @@ namespace wrench {
 
         // Select the "best" host
         double lowest_load = DBL_MAX;
-        simgrid::s4u::Host *picked_host;
+        simgrid::s4u::Host *picked_host = nullptr;
         unsigned long picked_num_cores = 0;
         for (auto const &h: possible_hosts) {
             unsigned long num_running_threads = this->running_thread_counts[h];

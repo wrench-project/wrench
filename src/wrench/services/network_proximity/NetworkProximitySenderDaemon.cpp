@@ -56,7 +56,6 @@ namespace wrench {
      *               so as to avoid idiosyncratic behaviors that occur with perfect synchrony
      * @param noise_seed seed for the noise RNG
      * @param messagepayload_list: a message payload list
-     * @param suffix: suffix to append to the service name and commport
      */
 
     NetworkProximitySenderDaemon::NetworkProximitySenderDaemon(

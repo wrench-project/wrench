@@ -11,8 +11,8 @@ can be built and installed as:
    make wrench-daemon
    make install  # try "sudo make install" if you do not have write privileges
 
-The wrench-daemon is to be started on your local machine (see ``wrench-daemon --help`` for command-line options).
-and comprises an HTTP server that answers REST API requests.
+The wrench-daemon is to be started on your local machine and comprises an
+HTTP server that answers REST API requests. Use ``wrench-daemon --help`` for command-line options.
 
 The full documentation of the REST API is provided on `this page <restapi/index.html>`_
 

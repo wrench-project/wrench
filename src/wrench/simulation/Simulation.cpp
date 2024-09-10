@@ -184,6 +184,7 @@ namespace wrench {
             } else if (not strcmp(argv[i], "--wrench-version")) {
                 version_requested = true;
             } else if (not strcmp(argv[i], "--wrench-pagecache-simulation")) {
+                throw std::invalid_argument("The use of --wrench-pagecache-simulation has been deprecated for now");
                 Simulation::pagecache_enabled = true;
             } else {
                 cleanedup_args.emplace_back(argv[i]);

@@ -778,6 +778,7 @@ namespace wrench {
     /**
      * @brief Returns the number of running transactions on a disk, as far as this
      *        storage service know
+     * @param disk: a disk
      * @return a number of transactions
      */
     int SimpleStorageServiceNonBufferized::getNumRunningTransactionsOnDisk(simgrid::s4u::Disk *disk) {

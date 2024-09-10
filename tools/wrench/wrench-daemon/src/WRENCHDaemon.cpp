@@ -15,7 +15,6 @@
 #include <thread>
 #include <boost/program_options.hpp>
 #include <nlohmann/json.hpp>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/shm.h>
 
@@ -30,21 +29,28 @@ using json = nlohmann::json;
 #define PORT_MIN 10000
 #define PORT_MAX 20000
 
+std::vector<std::string> WRENCHDaemon::allowed_origins;
+
+
 /**
 * @brief Constructor
 * @param simulation_logging true if simulation logging should be printed
 * @param daemon_logging true if daemon logging should be printed
 * @param port_number port number on which to listen
+* @param allowed_origin allowed origin for http connection
 * @param sleep_us number of micro-seconds or real time that the simulation daemon's simulation execution_controller
 *        thread should sleep at each iteration
 */
 WRENCHDaemon::WRENCHDaemon(bool simulation_logging,
                            bool daemon_logging,
                            int port_number,
+                           const std::string &allowed_origin,
                            int sleep_us) : simulation_logging(simulation_logging),
                                            daemon_logging(daemon_logging),
                                            port_number(port_number),
-                                           sleep_us(sleep_us) {}
+                                           sleep_us(sleep_us) {
+    WRENCHDaemon::allowed_origins.push_back(allowed_origin);
+}
 
 /**
 * @brief Helper method to check whether a port is available for binding/listening
@@ -71,15 +77,16 @@ bool WRENCHDaemon::isPortTaken(int port) {
 }
 
 /**
-* @brief Helper function to set up a "success" HTTP answer
+* @brief Helper function to send a "success" HTTP answer to a simulation start
 * @param res the response object to update
 * @param port_number the port_number on which simulation client will need to connect
 */
-void setSuccessAnswer(Response &res, int port_number) {
+void setSimulationStartSuccessAnswer(Response &res, int port_number) {
     json answer;
     answer["wrench_api_request_success"] = true;
     answer["port_number"] = port_number;
-    res.set_header("Access-Control-Allow-Origin", "*");
+
+    WRENCHDaemon::allow_origin(res);
     res.set_content(answer.dump(), "application/json");
 }
 
@@ -88,11 +95,11 @@ void setSuccessAnswer(Response &res, int port_number) {
 * @param res res the response object to update
 * @param failure_cause a human-readable error message
 */
-void setFailureAnswer(Response &res, const std::string &failure_cause) {
+void setSimulationStartFailureAnswer(Response &res, const std::string &failure_cause) {
     json answer;
     answer["wrench_api_request_success"] = false;
     answer["failure_cause"] = failure_cause;
-    res.set_header("Access-Control-Allow-Origin", "*");
+    WRENCHDaemon::allow_origin(res);
     res.set_content(answer.dump(), "application/json");
 }
 
@@ -127,7 +134,7 @@ std::string readStringFromSharedMemorySegment(int shm_segment_id) {
     }
     std::string to_return = std::string(shm_segment);
     if (shmdt(shm_segment) == -1) {
-        perror("WARNING: shmdt()");
+        perror("WARNING: shmdt(): ");
     }
     return to_return;
 }
@@ -152,7 +159,7 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
     try {
         body = json::parse(req.body);
     } catch (std::exception &e) {
-        setFailureAnswer(res, "Internal error: malformed json in request");
+        setSimulationStartFailureAnswer(res, "Internal error: malformed json in request");
         return;
     }
 
@@ -167,7 +174,7 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
     auto shm_segment_id = shmget(IPC_PRIVATE, 4096, IPC_CREAT | SHM_R | SHM_W);
     if (shm_segment_id == -1) {
         perror("shmget()");
-        setFailureAnswer(res, "Internal wrench-daemon error: shmget(): " + std::string(strerror(errno)));
+        setSimulationStartFailureAnswer(res, "Internal wrench-daemon error: shmget(): " + std::string(strerror(errno)));
         return;
     }
 
@@ -179,7 +186,7 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
     auto child_pid = fork();
     if (child_pid == -1) {
         perror("fork()");
-        setFailureAnswer(res, "Internal wrench-daemon error: fork(): " + std::string(strerror(errno)));
+        setSimulationStartFailureAnswer(res, "Internal wrench-daemon error: fork(): " + std::string(strerror(errno)));
         return;
     }
 
@@ -308,17 +315,17 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
         int stat_loc;
         if (waitpid(child_pid, &stat_loc, 0) == -1) {
             perror("waitpid()");
-            setFailureAnswer(res, "Internal wrench-daemon error: waitpid(): " + std::string(strerror(errno)));
+            setSimulationStartFailureAnswer(res, "Internal wrench-daemon error: waitpid(): " + std::string(strerror(errno)));
             return;
         }
 
         // Create json answer that will inform the client of success or failure, based on
         // child's exit code (which was relayed to this process from the grand-child)
         if (WEXITSTATUS(stat_loc) == 0) {
-            setSuccessAnswer(res, simulation_port_number);
+            setSimulationStartSuccessAnswer(res, simulation_port_number);
         } else {
             // Grab the error message from the shared memory segment and set up the failure answer
-            setFailureAnswer(res, readStringFromSharedMemorySegment(shm_segment_id));
+            setSimulationStartFailureAnswer(res, readStringFromSharedMemorySegment(shm_segment_id));
         }
 
         // Destroy the shared memory segment (important, since there is a limited
@@ -345,39 +352,11 @@ void WRENCHDaemon::error_handling(const Request &req, Response &res) {
 * @brief The WRENCH daemon's "main" method
 */
 void WRENCHDaemon::run() {
-    std::vector<std::string> allowed_origins = {
-            "http://localhost:8000"};
 
     // Only set up POST request handler for "/api/startSimulation" since
     // all other API paths will be handled by a simulation daemon instead
-    server.Post("/api/startSimulation", [this, allowed_origins](const Request &req, Response &res) {
-        // Check if the Origin header is present and matches any of the allowed origins
-        auto origin_header = req.get_header_value("Origin");
-        //      std::cerr << "REQ1 = " << req.body << "\n";
-        //      std::cerr << "REQ2 = " << req.path << "\n";
-        //      std::cerr << "ORIGIN_HEADER: " << origin_header << "\n";
-
-        //      std::cerr << "CALLING res.set_header()\n";
-        //      res.set_header("access-control-allow-origin", "*");
-        //      if (!origin_header.empty()) {
-        //          for (const auto &allowed_origin: allowed_origins) {
-        //              if (origin_header == allowed_origin) {
-        //                  // Set appropriate CORS headers
-        ////                    res.set_header("access-control-allow-origin", "*");
-        ////                    res.set_header("Access-Control-Allow-Origin", origin_header);
-        //        res.set_header("Access-Control-Allow-Origin", "http://localhost:8000");
-        // Start simulation
-        //                  std::cerr << "STARTING SIMULATION\n";
-        //                  this->startSimulation(req, res);
-        //                  return;
-        //              }
-        //          }
-        //      }
-
-        res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        res.set_header("Access-Control-Allow-Headers", "Content-Type");
-        res.set_header("Access-Control-Max-Age", "86400");// One day
-        this->startSimulation(req, res);                  // Will set the Access-Control-Allow-Origin, which is terribly ugly
+    server.Post("/api/startSimulation", [this](const Request &req, Response &res) {
+        this->startSimulation(req, res);
     });
 
     // Set some generic error handler

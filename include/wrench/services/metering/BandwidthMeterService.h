@@ -21,8 +21,8 @@ namespace wrench {
      */
     class BandwidthMeterService : public Service {
     public:
-        BandwidthMeterService(std::string hostname, const std::vector<std::string> &linknames, double period);
-        BandwidthMeterService(std::string hostname, const std::map<std::string, double> &measurement_periods);
+        BandwidthMeterService(const std::string &hostname, const std::vector<std::string> &linknames, double period);
+        BandwidthMeterService(const std::string &hostname, const std::map<std::string, double> &measurement_periods);
 
         /***********************/
         /** \cond DEVELOPER    */
