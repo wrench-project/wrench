@@ -8,7 +8,6 @@
  */
 
 #include <wrench/services/metering/BandwidthMeterService.h>
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench-dev.h>
 
 #define EPSILON 0.0001
@@ -22,7 +21,7 @@ namespace wrench {
      * @param hostname: the hostname on which the service should start
      * @param measurement_periods: the measurement period for each monitored link
      */
-    BandwidthMeterService::BandwidthMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) : Service(hostname, "bandwidth_meter") {
+    BandwidthMeterService::BandwidthMeterService(const std::string &hostname, const std::map<std::string, double> &measurement_periods) : Service(hostname, "bandwidth_meter") {
         if (measurement_periods.empty()) {
             throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): no host to meter!");
         }
@@ -48,7 +47,7 @@ namespace wrench {
      * @param linknames: the list of metered links, as link ids
      * @param measurement_period: the measurement period
      */
-    BandwidthMeterService::BandwidthMeterService(const std::string hostname, const std::vector<std::string> &linknames,
+    BandwidthMeterService::BandwidthMeterService(const std::string &hostname, const std::vector<std::string> &linknames,
                                                  double measurement_period) : Service(hostname, "bandwidth_meter") {
         if (linknames.empty()) {
             throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): no host to meter!");

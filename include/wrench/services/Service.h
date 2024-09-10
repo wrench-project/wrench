@@ -66,7 +66,7 @@ namespace wrench {
 
         void assertServiceIsUp();
 
-        double getNetworkTimeoutValue();
+        double getNetworkTimeoutValue() const;
         void setNetworkTimeoutValue(double value);
 
         /***********************/
@@ -105,19 +105,19 @@ namespace wrench {
 
         ~Service() override;
 
-        Service(std::string hostname, std::string process_name_prefix);
+        Service(const std::string &hostname, const std::string &process_name_prefix);
 
         // Property stuff
         void setProperty(WRENCH_PROPERTY_TYPE, const std::string &);
 
-        void setProperties(WRENCH_PROPERTY_COLLECTION_TYPE default_property_values,
-                           WRENCH_PROPERTY_COLLECTION_TYPE overriden_property_values);
+        void setProperties(const WRENCH_PROPERTY_COLLECTION_TYPE &default_property_values,
+                           const WRENCH_PROPERTY_COLLECTION_TYPE &overriden_property_values);
 
         // MessagePayload stuff
         void setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE, double);
 
-        void setMessagePayloads(WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values,
-                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE overriden_messagepayload_values);
+        void setMessagePayloads(const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &default_messagepayload_values,
+                                const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &overriden_messagepayload_values);
 
         void serviceSanityCheck();
 

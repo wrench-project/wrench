@@ -171,7 +171,7 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::getSimulationTime(const json& data) {
+    json SimulationController::getSimulationTime(const json &data) {
         // This is not called by the simulation thread, but getting the
         // simulation time is fine as it doesn't change the state of the simulation
 
@@ -221,7 +221,7 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::waitForNextSimulationEvent(const json& data) {
+    json SimulationController::waitForNextSimulationEvent(const json &data) {
         // Set the time horizon to -1, to signify the "wait for next event" to the execution_controller
         time_horizon_to_reach = -1.0;
         // Wait for and grab the next event
@@ -244,7 +244,7 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::getSimulationEvents(const json& data) {
+    json SimulationController::getSimulationEvents(const json &data) {
         // Deal with all events
         std::pair<double, std::shared_ptr<wrench::ExecutionEvent>> event;
 
@@ -265,7 +265,7 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::getAllHostnames(const json& data) {
+    json SimulationController::getAllHostnames(const json &data) {
         std::vector<std::string> hostname_list = Simulation::getHostnameList();
         json answer = {};
         answer["hostnames"] = hostname_list;
@@ -1268,8 +1268,6 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskMinNumCores(json data) {
-        std::cerr << "HERE\n";
-        std::cerr << data << "\n";
         std::string workflow_name = data["workflow_name"];
         std::shared_ptr<Workflow> workflow;
         json answer;
@@ -1547,14 +1545,12 @@ namespace wrench {
     json SimulationController::supportsCompoundJobs(json data) {
         std::string cs_name = data["service_name"];
 
-        std::cerr << "HERE: " << data << "\n";
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
             throw std::runtime_error("Unknown compute service " + cs_name);
         }
         json answer;
         answer["result"] = cs->supportsCompoundJobs();
-        std::cerr << answer << "\n";
         return answer;
     }
 
@@ -1842,7 +1838,7 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::createWorkflow(const json& data) {
+    json SimulationController::createWorkflow(const json &data) {
 
         auto wf = wrench::Workflow::createWorkflow();
         json answer;
@@ -1870,12 +1866,10 @@ namespace wrench {
 
         json answer;
         try {
-            std::cerr << "CALLING CREATE WORKFLOW FROM JSON\n";
             auto wf = WfCommonsWorkflowParser::createWorkflowFromJSONString(json_string, reference_flop_rate, ignore_machine_specs,
                                                                             redundant_dependencies, ignore_cycle_creating_dependencies,
                                                                             min_cores_per_task, max_cores_per_task, enforce_num_cores,
                                                                             ignore_avg_cpu, show_warnings);
-            std::cerr << "CALLED CREATE WORKFLOW FROM JSON\n";
             this->workflow_registry.insert(wf->getName(), wf);
 
             answer["workflow_name"] = wf->getName();

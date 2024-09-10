@@ -1,4 +1,12 @@
-import json, re, jsonref, sys
+import json
+import re
+import sys
+
+try:
+    import jsonref
+except ImportError as e:
+    print("Error: The module 'jsonref' is not installed.")
+    print("Please install it using: pip install jsonref")
 
 
 
@@ -28,7 +36,7 @@ if __name__ == "__main__":
     #Temporary check: how many types are in wrench-openapi.json
     basket = set()
     for path in data["paths"].keys():
-        print(path)
+        sys.stderr.write(f"Creating route: {path}\n")
 
         method = list(data["paths"][path].keys())[0]
 
@@ -36,7 +44,7 @@ if __name__ == "__main__":
 
         routes = {}
 
-        parameter_list = re.findall("\{(.*?)\}", path, re.I|re.M)
+        parameter_list = re.findall("{(.*?)}", path, re.I|re.M)
 
         operation = data["paths"][path][method]
 
@@ -93,7 +101,7 @@ if __name__ == "__main__":
         app = '\tCROW_ROUTE(app, "{0}").methods(crow::HTTPMethod::{1})\n'.format(crow, route['method'].capitalize())
         app += '\t\t'
 
-        type_list = re.findall("\<(.*?)\>", crow, re.I|re.M)
+        type_list = re.findall("<(.*?)>", crow, re.I|re.M)
         (route['parameter_list'], type_list)
         parameter_list = []
 

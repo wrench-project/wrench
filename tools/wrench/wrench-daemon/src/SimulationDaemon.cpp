@@ -9,7 +9,6 @@
 
 #include <string>
 #include <utility>
-#include <vector>
 #include <thread>
 #include <boost/program_options.hpp>
 #include <nlohmann/json.hpp>
@@ -36,8 +35,8 @@ void SimulationDaemon::run() {
         this->terminateSimulation(req, res);
         return res;
     });
-    // Set up ALL POST request handlers for API calls
 
+    // Set up ALL  request handlers for API calls
     REST_API rest_api(
             this->app,
             [this](const crow::request &req) { this->displayRequest(req); },
@@ -90,8 +89,6 @@ void SimulationDaemon::alive(const crow::request &req, crow::response &res) {
     json answer;
     answer["wrench_api_request_success"] = true;
     answer["alive"] = true;
-
-    res.set_header("Access-Control-Allow-Origin", "*");
     res.body = to_string(answer);
 }
 
@@ -128,8 +125,6 @@ void SimulationDaemon::terminateSimulation(const crow::request &req, crow::respo
     // Create a json answer
     json answer;
     answer["wrench_api_request_success"] = true;
-
-    //    res.set_header("access-control-allow-origin", "*");
     res.body = to_string(answer);
 
     app.stop();

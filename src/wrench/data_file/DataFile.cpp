@@ -7,12 +7,10 @@
  * (at your option) any later version.
  */
 
-#include <map>
 #include <utility>
 #include <wrench/logging/TerminalOutput.h>
 
 #include <wrench/data_file/DataFile.h>
-#include <wrench/workflow/WorkflowTask.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_data_file, "Log category for DataFile");
 

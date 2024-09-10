@@ -30,16 +30,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Getter
-     * @return the service
+     * @brief Get the service on which the functionality was not available
+     * @return a service
      */
     std::shared_ptr<Service> FunctionalityNotAvailable::getService() {
         return this->service;
     }
 
     /**
-     * @brief Getter
-     * @return the functionality name
+     * @brief Get the name of the functionality that wasn't available
+     * @return a functionality name
      */
     std::string FunctionalityNotAvailable::getFunctionalityName() {
         return this->functionality_name;

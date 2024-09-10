@@ -175,6 +175,11 @@ namespace wrench {
 
         void startScratchStorageService();
 
+        /**
+         * @brief Construct a dict for resource information
+         * @param key: the desired key
+         * @return a dictionary
+         */
         virtual std::map<std::string, double> constructResourceInformation(const std::string &key) = 0;
 
         /***********************/

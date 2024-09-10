@@ -30,7 +30,7 @@ namespace wrench {
      * @param name: job name (if empty, a name will be chosen for you)
      * @param job_manager: manager in charge of this job
      */
-    Job::Job(std::string name, std::shared_ptr<JobManager> job_manager) {
+    Job::Job(const std::string &name, std::shared_ptr<JobManager> job_manager) {
         if (name.empty()) {
             this->name = "job_" + std::to_string(getNewUniqueNumber());
         } else {

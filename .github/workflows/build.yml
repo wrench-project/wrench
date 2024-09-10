@@ -50,7 +50,6 @@ jobs:
             COMPILER: gcc12
             batsched: off
 
-
           - build: "Ubuntu Jammy Jellyfish - clang++-14"
             DIST: ubuntu-jammy
             COMPILER: clang14
@@ -94,7 +93,7 @@ jobs:
           docker exec wrench mkdir wrench/build;
           # build and test wrench
           docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
-          docker exec -w /home/wrench/wrench/build wrench make all unit_tests examples;
+          docker exec -w /home/wrench/wrench/build wrench make all unit_tests examples wrench-daemon;
           docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
           docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh wrench-example-batch-smpi-action;
 
