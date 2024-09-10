@@ -116,7 +116,7 @@ namespace wrench {
                     auto event = action_executor->waitForNextEvent();
                     auto io_event = std::dynamic_pointer_cast<wrench::FileReadCompletedEvent>(event);
                     if (not io_event) {
-                        throw std::runtime_error("Custom action: unexpected IO event: " + io_event->toString());
+                        throw std::runtime_error("Custom action: unexpected IO event: " + event->toString());
                     }
                 }
                 communicator->barrier();
