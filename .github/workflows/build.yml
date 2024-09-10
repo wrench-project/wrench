@@ -50,7 +50,6 @@ jobs:
             COMPILER: gcc12
             batsched: off
 
-
           - build: "Ubuntu Jammy Jellyfish - clang++-14"
             DIST: ubuntu-jammy
             COMPILER: clang14
