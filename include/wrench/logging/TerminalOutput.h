@@ -52,34 +52,34 @@ public:
 namespace wrench {
 
 
-/* Wrappers around XBT_* macros, using a bit of those macro's internal magic as well
+    /* Wrappers around XBT_* macros, using a bit of those macro's internal magic as well
  * to avoid generating useless (but space consuming) color ASCII codes
  */
 
 #define WRENCH_LOG_CATEGORY(cname, desc) XBT_LOG_NEW_DEFAULT_CATEGORY(cname, desc)
 
-#define WRENCH_INFO(...)                                                                 \
+#define WRENCH_INFO(...)                                                                              \
     if (_XBT_LOG_ISENABLEDV((*_misuse_of_XBT_LOG_macros_detected__default), xbt_log_priority_info)) { \
-        wrench::TerminalOutput::beginThisProcessColor();                                 \
-        XBT_INFO(__VA_ARGS__);                                                           \
-        wrench::TerminalOutput::endThisProcessColor();                                   \
-    }                                                                                    \
+        wrench::TerminalOutput::beginThisProcessColor();                                              \
+        XBT_INFO(__VA_ARGS__);                                                                        \
+        wrench::TerminalOutput::endThisProcessColor();                                                \
+    }                                                                                                 \
     static_assert(true, "")
 
-#define WRENCH_DEBUG(...)                                                                 \
+#define WRENCH_DEBUG(...)                                                                              \
     if (_XBT_LOG_ISENABLEDV((*_misuse_of_XBT_LOG_macros_detected__default), xbt_log_priority_debug)) { \
-        wrench::TerminalOutput::beginThisProcessColor();                                  \
-        XBT_DEBUG(__VA_ARGS__);                                                           \
-        wrench::TerminalOutput::endThisProcessColor();                                    \
-    }                                                                                     \
+        wrench::TerminalOutput::beginThisProcessColor();                                               \
+        XBT_DEBUG(__VA_ARGS__);                                                                        \
+        wrench::TerminalOutput::endThisProcessColor();                                                 \
+    }                                                                                                  \
     static_assert(true, "")
 
-#define WRENCH_WARN(...)                                                                    \
+#define WRENCH_WARN(...)                                                                                 \
     if (_XBT_LOG_ISENABLEDV((*_misuse_of_XBT_LOG_macros_detected__default), xbt_log_priority_warning)) { \
-        wrench::TerminalOutput::beginThisProcessColor();                                    \
-        XBT_WARN(__VA_ARGS__);                                                              \
-        wrench::TerminalOutput::endThisProcessColor();                                      \
-    }                                                                                       \
+        wrench::TerminalOutput::beginThisProcessColor();                                                 \
+        XBT_WARN(__VA_ARGS__);                                                                           \
+        wrench::TerminalOutput::endThisProcessColor();                                                   \
+    }                                                                                                    \
     static_assert(true, "")
 
     /***********************/
