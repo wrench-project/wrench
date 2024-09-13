@@ -129,7 +129,7 @@ namespace wrench {
 
     /**
      * @brief Returns the action's failure cause
-     * @return an internal state
+     * @return aa failure cause
      */
     std::shared_ptr<FailureCause> Action::getFailureCause() const {
         return this->execution_history.top().failure_cause;
