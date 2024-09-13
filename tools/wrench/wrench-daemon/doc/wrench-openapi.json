@@ -2627,7 +2627,7 @@
                   },
                   "parallel_model": {
                     "type": "tuple",
-                    "description": "Info for making parallel model."
+                    "description": "Info for making parallel model as a (string, float) tuple. The string is the parallel model type, which can be AMDAHL or CONSTANTEFFICIENCY.  Each model takes a float parameter between 0.0 and 1.0. The AMDAHL model's parameter denotes the fraction of the sequential execution time that is perfectly parallelizable. The CONSTANTEFFICIENCY model's parameter is simply the parallel efficiency"
                   }
                 }
               }
