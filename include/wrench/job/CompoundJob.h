@@ -150,6 +150,8 @@ namespace wrench {
                                                 unsigned long num_processes,
                                                 unsigned long num_cores_per_process);
 
+        std::shared_ptr<Action> getActionByName(const std::string &name);
+
         void removeAction(std::shared_ptr<Action> &action);
 
         void addActionDependency(const std::shared_ptr<Action> &parent, const std::shared_ptr<Action> &child);

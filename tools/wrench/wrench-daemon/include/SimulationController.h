@@ -61,6 +61,8 @@ namespace wrench {
         json addFileReadAction(json data);
         json addSleepAction(json data);
         json addParentJob(json data);
+        json getActionStartDate(json data);
+        json getActionEndDate(json data);
 
         json createTask(json data);
         json getTaskFlops(json data);
@@ -92,7 +94,6 @@ namespace wrench {
         json getFileSize(json data);
 
         json getTaskInputFiles(json data);
-
         json getTaskOutputFiles(json data);
 
         json getInputFiles(json data);
