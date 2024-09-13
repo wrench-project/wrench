@@ -996,6 +996,8 @@ namespace wrench {
             model = ParallelModel::AMDAHL(value);
         } else if (model_type == "CONSTANTEFFICIENCY") {
             model = ParallelModel::CONSTANTEFFICIENCY(value);
+        } else {
+            throw std::runtime_error("Unknown parallel model type " + model_type);
         }
 
         auto action = compound_job->addComputeAction(compute_action_name, flops, ram, min_num_cores, max_num_cores, model);
