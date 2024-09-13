@@ -901,7 +901,7 @@
         }
       }
     },
-    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetFlops": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/getFlops": {
       "get": {
         "tags": [
           "WRENCH"
@@ -960,7 +960,7 @@
         }
       }
     },
-    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetMinNumCores": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/getMinNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1019,7 +1019,7 @@
         }
       }
     },
-    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetMaxNumCores": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/getMaxNumCores": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1078,7 +1078,7 @@
         }
       }
     },
-    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetMemory": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/getMemory": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1137,7 +1137,7 @@
         }
       }
     },
-    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetStartDate": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/getStartDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -1196,7 +1196,7 @@
         }
       }
     },
-    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/taskGetEndDate": {
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/getEndDate": {
       "get": {
         "tags": [
           "WRENCH"
@@ -2928,6 +2928,124 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/actions/{action_name}/getStartDate": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's start date.",
+        "deprecated": false,
+        "operationId": "getActionStartDate",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action_name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/actions/{action_name}/getEndDate": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's end date.",
+        "deprecated": false,
+        "operationId": "getActionEndDate",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action_name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeResponse"
                 }
               }
             }
