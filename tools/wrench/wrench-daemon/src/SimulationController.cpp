@@ -1567,6 +1567,37 @@ namespace wrench {
         return answer;
     }
 
+    json SimulationController::getNumberOfChildren(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        std::shared_ptr<WorkflowTask> children;;
+        json answer;
+        answer["children"] = workflow->getTaskByID(data["task_name"])->getNumberOfChildren();
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::getBottomLevel(json data) {
+        std::string workflow_name = data["workflow_name"];
+        std::shared_ptr<Workflow> workflow;
+        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+            throw std::runtime_error("Unknown workflow " + workflow_name);
+        }
+        std::shared_ptr<WorkflowTask> bottom_level;
+        //        auto task = workflow->getTaskByID(data["tid"]);
+        json answer;
+        //        answer["result"] = bottom_level->getBottomLevel();
+        answer["level"] = workflow->getTaskByID(data["task_name"])->getBottomLevel();
+        return answer;
+    }
+
     /**
      * @brief REST API Handler
      * @param data JSON input
