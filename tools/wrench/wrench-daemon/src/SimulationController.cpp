@@ -1646,7 +1646,8 @@ namespace wrench {
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
             throw std::runtime_error("Unknown workflow " + workflow_name);
         }
-        std::shared_ptr<WorkflowTask> children;;
+        std::shared_ptr<WorkflowTask> children;
+        ;
         json answer;
         answer["number_of_children"] = workflow->getTaskByID(data["task_name"])->getNumberOfChildren();
         return answer;
