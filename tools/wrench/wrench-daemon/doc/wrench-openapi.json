@@ -1026,7 +1026,7 @@
         ],
         "summary": "Get the number of children of a task.",
         "deprecated": false,
-        "operationId": "getNumberOfChildren",
+        "operationId": "getTaskNumberOfChildren",
         "parameters": [
           {
             "name": "simid",
@@ -1085,7 +1085,7 @@
         ],
         "summary": "Get a task's bottom level",
         "deprecated": false,
-        "operationId": "getBottomLevel",
+        "operationId": "getTaskBottomLevel",
         "parameters": [
           {
             "name": "simid",
@@ -4570,6 +4570,40 @@
           "memory": {
             "type": "number",
             "description": "The task's memory requirement in bytes."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "TaskNumberOfChildren": {
+        "type": "object",
+        "properties": {
+          "number_of_children": {
+            "type": "number",
+            "description": "The task's number of children."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "TaskBottomLevel": {
+        "type": "object",
+        "properties": {
+          "bottom_level": {
+            "type": "number",
+            "description": "The task's bottom-level."
           },
           "wrench_api_request_success": {
             "type": "boolean",
