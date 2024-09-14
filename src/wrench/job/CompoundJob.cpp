@@ -532,7 +532,7 @@ namespace wrench {
      * @return an action
      */
     std::shared_ptr<Action> CompoundJob::getActionByName(const std::string &name) {
-        for (auto const &action : this->actions) {
+        for (auto const &action: this->actions) {
             if (action->getName() == name) {
                 return action;
             }
