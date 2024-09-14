@@ -7,47 +7,43 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_FILEWRITERTHREAD_H
 #define WRENCH_FILEWRITERTHREAD_H
 
 #include <list>
 #include <utility>
 
-#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
+#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/simulation/SimulationMessage.h"
 
 namespace wrench {
 
+/***********************/
+/** \cond INTERNAL    */
+/***********************/
 
-    /***********************/
-    /** \cond INTERNAL    */
-    /***********************/
+/**
+ * @brief A helper daemon (co-located with a data movement manager)
+ */
+class FileWriterThread : public Service {
 
-    /**
-     * @brief A helper daemon (co-located with a data movement manager)
-     */
-    class FileWriterThread : public Service {
+public:
+  FileWriterThread(std::string hostname, S4U_CommPort *creator_commport,
+                   std::shared_ptr<FileLocation> location);
 
-    public:
-        FileWriterThread(std::string hostname, S4U_CommPort *creator_commport,
-                         std::shared_ptr<FileLocation> location);
+protected:
+private:
+  int main() override;
 
-    protected:
-    private:
-        int main() override;
+  S4U_CommPort *creator_commport;
+  std::shared_ptr<FileLocation> location;
+};
 
-        S4U_CommPort *creator_commport;
-        std::shared_ptr<FileLocation> location;
-    };
+/***********************/
+/** \endcond            */
+/***********************/
 
-    /***********************/
-    /** \endcond            */
-    /***********************/
+} // namespace wrench
 
-
-}// namespace wrench
-
-
-#endif//WRENCH_FILEWRITERTHREAD_H
+#endif // WRENCH_FILEWRITERTHREAD_H

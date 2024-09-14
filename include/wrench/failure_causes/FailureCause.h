@@ -14,45 +14,45 @@
 #include <string>
 
 #include "wrench/services/Service.h"
-#include "wrench/services/storage/StorageService.h"
 #include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/storage/StorageService.h"
 
 namespace wrench {
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /**
-     * @brief A top-level class to describe all simulation-valid failures that can occur during
-     *        workflow execution (and should/could be handled by a WMS)
-     *
-     */
-    class FailureCause {
+/**
+ * @brief A top-level class to describe all simulation-valid failures that can
+ * occur during workflow execution (and should/could be handled by a WMS)
+ *
+ */
+class FailureCause {
 
-    public:
-        FailureCause() = default;
+public:
+  FailureCause() = default;
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        virtual ~FailureCause() = default;
-        /***********************/
-        /** \endcond           */
-        /***********************/
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
+  virtual ~FailureCause() = default;
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        /**
-         * @brief Return an error message that describes the failure cause (to be overridden)
-         *
-         * @return an error message
-         */
-        virtual std::string toString() = 0;
-    };
+  /**
+   * @brief Return an error message that describes the failure cause (to be
+   * overridden)
+   *
+   * @return an error message
+   */
+  virtual std::string toString() = 0;
+};
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-
-#endif//WRENCH_FAILURECAUSE_H
+#endif // WRENCH_FAILURECAUSE_H

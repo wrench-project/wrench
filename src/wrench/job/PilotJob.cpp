@@ -13,38 +13,37 @@
 
 namespace wrench {
 
-    /**
-     * @brief Constructor
-     *
-     * @param job_manager: a job manager
-     */
-    PilotJob::PilotJob(std::shared_ptr<JobManager> job_manager) : Job("", std::move(job_manager)), state(PilotJob::State::NOT_SUBMITTED) {
-        this->name = "pilot_job_" + std::to_string(Job::getNewUniqueNumber());
-    }
+/**
+ * @brief Constructor
+ *
+ * @param job_manager: a job manager
+ */
+PilotJob::PilotJob(std::shared_ptr<JobManager> job_manager)
+    : Job("", std::move(job_manager)), state(PilotJob::State::NOT_SUBMITTED) {
+  this->name = "pilot_job_" + std::to_string(Job::getNewUniqueNumber());
+}
 
-    /**
-     * @brief Get the state of the pilot job
-     * @return the state
-     */
-    PilotJob::State PilotJob::getState() {
-        return this->state;
-    }
+/**
+ * @brief Get the state of the pilot job
+ * @return the state
+ */
+PilotJob::State PilotJob::getState() { return this->state; }
 
-    /**
-     * @brief Get the compute service provided by the (running) pilot job
-     * @return a compute service
-     */
-    std::shared_ptr<BareMetalComputeService> PilotJob::getComputeService() {
-        return this->compute_service;
-    }
+/**
+ * @brief Get the compute service provided by the (running) pilot job
+ * @return a compute service
+ */
+std::shared_ptr<BareMetalComputeService> PilotJob::getComputeService() {
+  return this->compute_service;
+}
 
-    //    /**
-    //     * @brief Set the compute service that runs on the pilot job
-    //     * @param cs: a compute service
-    //     */
-    //    void PilotJob::setComputeService(std::shared_ptr<BareMetalComputeService> cs) {
-    //        this->compute_service = std::move(cs);
-    //    }
+//    /**
+//     * @brief Set the compute service that runs on the pilot job
+//     * @param cs: a compute service
+//     */
+//    void PilotJob::setComputeService(std::shared_ptr<BareMetalComputeService>
+//    cs) {
+//        this->compute_service = std::move(cs);
+//    }
 
-
-}// namespace wrench
+} // namespace wrench

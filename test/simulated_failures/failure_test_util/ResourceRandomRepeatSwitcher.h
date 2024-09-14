@@ -15,44 +15,38 @@
 
 namespace wrench {
 
-    class ResourceRandomRepeatSwitcher : public Service {
+class ResourceRandomRepeatSwitcher : public Service {
 
-    public:
-        enum ResourceType {
-            HOST,
-            LINK
-        };
+public:
+  enum ResourceType { HOST, LINK };
 
+  explicit ResourceRandomRepeatSwitcher(
+      std::string host_on_which_to_run, double seed,
+      double min_sleep_before_off_time, double max_sleep_before_off_time,
+      double min_sleep_before_on_time, double max_sleep_before_on_time,
+      std::string resource_to_switch, ResourceType resource_type);
 
-        explicit ResourceRandomRepeatSwitcher(std::string host_on_which_to_run, double seed,
-                                              double min_sleep_before_off_time, double max_sleep_before_off_time,
-                                              double min_sleep_before_on_time, double max_sleep_before_on_time,
-                                              std::string resource_to_switch,
-                                              ResourceType resource_type);
+  void kill();
 
-        void kill();
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+private:
+  double seed;
+  double min_sleep_before_off_time;
+  double max_sleep_before_off_time;
+  double min_sleep_before_on_time;
+  double max_sleep_before_on_time;
+  std::string resource_to_switch;
+  ResourceType resource_type;
+  int main() override;
+};
 
-    private:
-        double seed;
-        double min_sleep_before_off_time;
-        double max_sleep_before_off_time;
-        double min_sleep_before_on_time;
-        double max_sleep_before_on_time;
-        std::string resource_to_switch;
-        ResourceType resource_type;
-        int main() override;
-    };
+/***********************/
+/** \endcond            */
+/***********************/
 
-    /***********************/
-    /** \endcond            */
-    /***********************/
+}; // namespace wrench
 
-
-};// namespace wrench
-
-
-#endif//WRENCH_RESOURCERANDOMREPEATSWITCHER_H
+#endif // WRENCH_RESOURCERANDOMREPEATSWITCHER_H

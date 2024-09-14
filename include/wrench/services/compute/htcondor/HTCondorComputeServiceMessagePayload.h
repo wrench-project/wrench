@@ -14,11 +14,11 @@
 
 namespace wrench {
 
-    /**
-     * @brief Configurable message payloads for an htcondor
-     */
-    class HTCondorComputeServiceMessagePayload : public ComputeServiceMessagePayload {
-    };
-}// namespace wrench
+/**
+ * @brief Configurable message payloads for an htcondor
+ */
+class HTCondorComputeServiceMessagePayload
+    : public ComputeServiceMessagePayload {};
+} // namespace wrench
 
-#endif//WRENCH_HTCONDORCOMPUTESERVICEMESSAGEPAYLOAD_H
+#endif // WRENCH_HTCONDORCOMPUTESERVICEMESSAGEPAYLOAD_H

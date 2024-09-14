@@ -9,7 +9,4 @@
 
 #include <wrench/services/storage/simple/SimpleStorageServiceMessagePayload.h>
 
-namespace wrench {
-
-
-};
+namespace wrench {};

@@ -13,26 +13,28 @@
 
 namespace wrench {
 
-    /**
-     * @brief Constructor
-     *
-     */
-    ActionExecutorMessage::ActionExecutorMessage() : SimulationMessage(0) {
-    }
+/**
+ * @brief Constructor
+ *
+ */
+ActionExecutorMessage::ActionExecutorMessage() : SimulationMessage(0) {}
 
-    /**
-     * @brief Constructor
-     *
-     * @param action_executor: The Action Executor
-     */
-    ActionExecutorDoneMessage::ActionExecutorDoneMessage(std::shared_ptr<ActionExecutor> action_executor) : ActionExecutorMessage() {
+/**
+ * @brief Constructor
+ *
+ * @param action_executor: The Action Executor
+ */
+ActionExecutorDoneMessage::ActionExecutorDoneMessage(
+    std::shared_ptr<ActionExecutor> action_executor)
+    : ActionExecutorMessage() {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if (action_executor == nullptr) {
-            throw std::invalid_argument("ActionExecutorDoneMessage::ActionExecutorDoneMessage(): invalid argument");
-        }
+  if (action_executor == nullptr) {
+    throw std::invalid_argument(
+        "ActionExecutorDoneMessage::ActionExecutorDoneMessage(): invalid "
+        "argument");
+  }
 #endif
-        this->action_executor = std::move(action_executor);
-    }
+  this->action_executor = std::move(action_executor);
+}
 
-
-}// namespace wrench
+} // namespace wrench

@@ -17,43 +17,40 @@
 
 namespace wrench {
 
-    class DataFile;
-    class FileLocation;
+class DataFile;
+class FileLocation;
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    class FileLocation;
+class FileLocation;
 
-    /**
-     * @brief A "file is already being copied" failure cause
-     */
-    class FileAlreadyBeingRead : public FailureCause {
+/**
+ * @brief A "file is already being copied" failure cause
+ */
+class FileAlreadyBeingRead : public FailureCause {
 
+public:
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
+  FileAlreadyBeingRead(std::shared_ptr<FileLocation> location);
 
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        FileAlreadyBeingRead(std::shared_ptr<FileLocation> location);
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+  std::shared_ptr<FileLocation> getLocation();
+  std::string toString() override;
 
-        std::shared_ptr<FileLocation> getLocation();
-        std::string toString() override;
+private:
+  std::shared_ptr<FileLocation> location;
+};
 
-    private:
-        std::shared_ptr<FileLocation> location;
-    };
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
-
-
-#endif//WRENCH_FILE_ALREADY_BEING_READ_H
+#endif // WRENCH_FILE_ALREADY_BEING_READ_H

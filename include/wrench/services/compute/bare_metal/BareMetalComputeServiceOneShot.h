@@ -10,60 +10,58 @@
 #ifndef WRENCH_BAREMETALCOMPUTESERVICEONESHOT_H
 #define WRENCH_BAREMETALCOMPUTESERVICEONESHOT_H
 
-
 #include <queue>
 
-#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
-#include "BareMetalComputeServiceProperty.h"
 #include "BareMetalComputeServiceMessagePayload.h"
-
+#include "BareMetalComputeServiceProperty.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 
 namespace wrench {
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
-    class Simulation;
-    class StorageService;
-    class FailureCause;
-    class Alarm;
-    class Action;
-    class ActionExecutionService;
+class Simulation;
+class StorageService;
+class FailureCause;
+class Alarm;
+class Action;
+class ActionExecutionService;
 
+/**
+ * @brief A bare-metal compute service that only runs one job, provided to its
+ * constructor
+ */
+class BareMetalComputeServiceOneShot : public BareMetalComputeService {
 
-    /**
-     * @brief A bare-metal compute service that only runs one job, provided to its constructor
-     */
-    class BareMetalComputeServiceOneShot : public BareMetalComputeService {
+  friend class BatchComputeService;
 
-        friend class BatchComputeService;
+public:
+protected:
+private:
+  friend class Simulation;
+  friend class BatchComputeService;
 
-    public:
-    protected:
-    private:
-        friend class Simulation;
-        friend class BatchComputeService;
+  BareMetalComputeServiceOneShot(
+      std::shared_ptr<CompoundJob> job, const std::string &hostname,
+      std::map<std::string, std::tuple<unsigned long, double>>
+          compute_resources,
+      WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+      std::shared_ptr<PilotJob> pj, const std::string &suffix,
+      std::shared_ptr<StorageService>
+          scratch_space); // reference to upper level scratch space
 
-        BareMetalComputeServiceOneShot(std::shared_ptr<CompoundJob> job,
-                                       const std::string &hostname,
-                                       std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                                       WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                       WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-                                       std::shared_ptr<PilotJob> pj,
-                                       const std::string &suffix,
-                                       std::shared_ptr<StorageService> scratch_space);// reference to upper level scratch space
+  int main() override;
 
-        int main() override;
+  std::shared_ptr<CompoundJob> job;
+};
 
-        std::shared_ptr<CompoundJob> job;
-    };
+/***********************/
+/** \endcond           */
+/***********************/
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+} // namespace wrench
 
-}// namespace wrench
-
-
-#endif//WRENCH_BAREMETALCOMPUTESERVICEONESHOT_H
+#endif // WRENCH_BAREMETALCOMPUTESERVICEONESHOT_H

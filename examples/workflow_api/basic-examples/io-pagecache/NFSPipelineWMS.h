@@ -7,42 +7,42 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_EXAMPLE_NFS_PIPELINE_WMS_H
 #define WRENCH_EXAMPLE_NFS_PIPELINE_WMS_H
 
 #include <wrench-dev.h>
 
-
 namespace wrench {
 
-    /**
-     *  @brief A Workflow Management System (WMS) implementation
-     */
-    class NFSPipelineWMS : public ExecutionController {
+/**
+ *  @brief A Workflow Management System (WMS) implementation
+ */
+class NFSPipelineWMS : public ExecutionController {
 
-    public:
-        // Constructor
-        NFSPipelineWMS(
-                const std::shared_ptr<Workflow> &workflow,
-                const std::shared_ptr<ComputeService> &bare_metal_compute_service,
-                const std::shared_ptr<StorageService> &client_storage_service,
-                const std::shared_ptr<StorageService> &server_storage_service,
-                const std::string &hostname);
+public:
+  // Constructor
+  NFSPipelineWMS(
+      const std::shared_ptr<Workflow> &workflow,
+      const std::shared_ptr<ComputeService> &bare_metal_compute_service,
+      const std::shared_ptr<StorageService> &client_storage_service,
+      const std::shared_ptr<StorageService> &server_storage_service,
+      const std::string &hostname);
 
-    protected:
-        // Overridden method
-        void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
-        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
+protected:
+  // Overridden method
+  void processEventStandardJobCompletion(
+      std::shared_ptr<StandardJobCompletedEvent>) override;
+  void processEventStandardJobFailure(
+      std::shared_ptr<StandardJobFailedEvent>) override;
 
-    private:
-        // main() method of the WMS
-        int main() override;
+private:
+  // main() method of the WMS
+  int main() override;
 
-        std::shared_ptr<Workflow> workflow;
-        std::shared_ptr<ComputeService> bare_metal_compute_service;
-        std::shared_ptr<StorageService> client_storage_service;
-        std::shared_ptr<StorageService> server_storage_service;
-    };
-}// namespace wrench
-#endif//WRENCH_EXAMPLE_NFS_PIPELINE_WMS_H
+  std::shared_ptr<Workflow> workflow;
+  std::shared_ptr<ComputeService> bare_metal_compute_service;
+  std::shared_ptr<StorageService> client_storage_service;
+  std::shared_ptr<StorageService> server_storage_service;
+};
+} // namespace wrench
+#endif // WRENCH_EXAMPLE_NFS_PIPELINE_WMS_H

@@ -17,35 +17,35 @@ WRENCH_LOG_CATEGORY(wrench_core_not_allowed, "Log category for NotAllowed");
 
 namespace wrench {
 
-    /**
-     * @brief Constructor
-     * @param service: the service that cause the error (or nullptr if no known service for the error)
-     * @param error_message: a custom error message
-     */
-    NotAllowed::NotAllowed(std::shared_ptr<Service> service, std::string &error_message) {
-        this->service = std::move(service);
-        this->error_message = error_message;
-    }
+/**
+ * @brief Constructor
+ * @param service: the service that cause the error (or nullptr if no known
+ * service for the error)
+ * @param error_message: a custom error message
+ */
+NotAllowed::NotAllowed(std::shared_ptr<Service> service,
+                       std::string &error_message) {
+  this->service = std::move(service);
+  this->error_message = error_message;
+}
 
-    /**
-     * @brief Get the service that caused the error
-     * @return the service
-     */
-    std::shared_ptr<Service> NotAllowed::getService() {
-        return this->service;
-    }
+/**
+ * @brief Get the service that caused the error
+ * @return the service
+ */
+std::shared_ptr<Service> NotAllowed::getService() { return this->service; }
 
-    /**
-     * @brief Get the human-readable failure message
-     * @return the message
-     */
-    std::string NotAllowed::toString() {
-        if (this->service) {
-            return "The service (" + this->service->getName() + ") does not allow the operation (" + this->error_message + ")";
-        } else {
-            return "Operation not allowed (" + this->error_message + ")";
-        }
-    }
+/**
+ * @brief Get the human-readable failure message
+ * @return the message
+ */
+std::string NotAllowed::toString() {
+  if (this->service) {
+    return "The service (" + this->service->getName() +
+           ") does not allow the operation (" + this->error_message + ")";
+  } else {
+    return "Operation not allowed (" + this->error_message + ")";
+  }
+}
 
-
-}// namespace wrench
+} // namespace wrench
