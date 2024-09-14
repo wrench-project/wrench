@@ -60,9 +60,11 @@ namespace wrench {
         json addFileWriteAction(json data);
         json addFileReadAction(json data);
         json addSleepAction(json data);
+        json addActionDependency(json data);
         json addParentJob(json data);
         json getActionStartDate(json data);
         json getActionEndDate(json data);
+        json getActionFailureCause(json data);
 
         json createTask(json data);
         json getTaskFlops(json data);
@@ -100,7 +102,6 @@ namespace wrench {
         json getReadyTasks(json data);
         json stageInputFiles(json data);
         json workflowIsDone(json data);
-
 
         json supportsCompoundJobs(json data);
         json supportsPilotJobs(json data);

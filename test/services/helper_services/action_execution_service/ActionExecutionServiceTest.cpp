@@ -156,6 +156,9 @@ private:
         // Add a sleep action to it
         auto action = job->addSleepAction("my_sleep", 10.0);
 
+        // Coverage
+        auto fc = action->getFailureCause();
+
         // Submit the action to the action executor
         action_execution_service->submitAction(action);
 
