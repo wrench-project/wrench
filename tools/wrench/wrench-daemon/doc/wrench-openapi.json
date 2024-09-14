@@ -1019,6 +1019,124 @@
         }
       }
     },
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/getNumberOfChildren": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get the number of children of a task.",
+        "deprecated": false,
+        "operationId": "getNumberOfChildren",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "task_name",
+            "in": "path",
+            "description": "Name of the task",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NumberOfChildren"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/getBottomLevel": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get a task's bottom level",
+        "deprecated": false,
+        "operationId": "getBottomLevel",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "task_name",
+            "in": "path",
+            "description": "Name of the task",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BottomLevel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
     "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/getMaxNumCores": {
       "get": {
         "tags": [
