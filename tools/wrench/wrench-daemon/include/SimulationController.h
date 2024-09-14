@@ -73,6 +73,8 @@ namespace wrench {
         json getTaskMemory(json data);
         json getTaskStartDate(json data);
         json getTaskEndDate(json data);
+        json getTaskNumberOfChildren(json data);
+        json getTaskBottomLevel(json data);
 
         json waitForNextSimulationEvent(const json &data);
 
@@ -137,9 +139,6 @@ namespace wrench {
 
         json createWorkflowFromJSON(json data);
 
-        json getNumberOfChildren(json data);
-
-        json getBottomLevel(json data);
 
     private:
         template<class T>
