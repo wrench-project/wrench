@@ -7,13 +7,11 @@
  * (at your option) any later version.
  */
 
-
 #include <wrench/services/storage/StorageServiceProperty.h>
-
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(StorageServiceProperty, BUFFER_SIZE);
-    SET_PROPERTY_NAME(StorageServiceProperty, CACHING_BEHAVIOR);
+SET_PROPERTY_NAME(StorageServiceProperty, BUFFER_SIZE);
+SET_PROPERTY_NAME(StorageServiceProperty, CACHING_BEHAVIOR);
 
-};// namespace wrench
+}; // namespace wrench

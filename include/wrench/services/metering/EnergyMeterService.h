@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_ENERGYMETERSERVICE_H
 #define WRENCH_ENERGYMETERSERVICE_H
 
@@ -15,34 +14,35 @@
 
 namespace wrench {
 
-    /**
-     * @brief A service that measures and records energy consumption on a set of hosts at regular time intervals
-     */
-    class EnergyMeterService : public Service {
+/**
+ * @brief A service that measures and records energy consumption on a set of
+ * hosts at regular time intervals
+ */
+class EnergyMeterService : public Service {
 
-    public:
-        EnergyMeterService(std::string hostname, const std::vector<std::string> &hostnames, double period);
-        EnergyMeterService(std::string hostname, const std::map<std::string, double> &measurement_periods);
+public:
+  EnergyMeterService(std::string hostname,
+                     const std::vector<std::string> &hostnames, double period);
+  EnergyMeterService(std::string hostname,
+                     const std::map<std::string, double> &measurement_periods);
 
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
-        void stop() override;
-        void kill();
-        /***********************/
-        /** \endcond           */
-        /***********************/
+  /***********************/
+  /** \cond DEVELOPER    */
+  /***********************/
+  void stop() override;
+  void kill();
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
+private:
+  int main() override;
+  bool processNextMessage(double timeout);
 
-    private:
-        int main() override;
-        bool processNextMessage(double timeout);
+  std::map<std::string, double> measurement_periods;
+  std::map<std::string, double> time_to_next_measurement;
+};
 
-        std::map<std::string, double> measurement_periods;
-        std::map<std::string, double> time_to_next_measurement;
-    };
+} // namespace wrench
 
-}// namespace wrench
-
-
-#endif//WRENCH_ENERGYMETERSERVICE_H
+#endif // WRENCH_ENERGYMETERSERVICE_H

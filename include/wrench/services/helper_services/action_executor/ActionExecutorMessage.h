@@ -7,44 +7,44 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_ACTIONEXECUTORMESSAGE_H
 #define WRENCH_ACTIONEXECUTORMESSAGE_H
 
-
-#include "wrench/simulation/SimulationMessage.h"
 #include "wrench-dev.h"
+#include "wrench/simulation/SimulationMessage.h"
 
 namespace wrench {
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
-    class ActionExecutor;
+class ActionExecutor;
 
-    /**
-     * @brief Top-level class for messages received/sent by an ActionExecutor
-     */
-    class ActionExecutorMessage : public SimulationMessage {
-    protected:
-        explicit ActionExecutorMessage();
-    };
+/**
+ * @brief Top-level class for messages received/sent by an ActionExecutor
+ */
+class ActionExecutorMessage : public SimulationMessage {
+protected:
+  explicit ActionExecutorMessage();
+};
 
-    /**
-     * @brief A message sent by an ActionExecutor when it's successfully completed an action
-     */
-    class ActionExecutorDoneMessage : public ActionExecutorMessage {
-    public:
-        explicit ActionExecutorDoneMessage(std::shared_ptr<ActionExecutor> action_executor);
-        /** @brief The Action Executor */
-        std::shared_ptr<ActionExecutor> action_executor;
-    };
+/**
+ * @brief A message sent by an ActionExecutor when it's successfully completed
+ * an action
+ */
+class ActionExecutorDoneMessage : public ActionExecutorMessage {
+public:
+  explicit ActionExecutorDoneMessage(
+      std::shared_ptr<ActionExecutor> action_executor);
+  /** @brief The Action Executor */
+  std::shared_ptr<ActionExecutor> action_executor;
+};
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
-}// namespace wrench
+} // namespace wrench
 
-#endif//WRENCH_ACTIONEXECUTORMESSAGE_H
+#endif // WRENCH_ACTIONEXECUTORMESSAGE_H

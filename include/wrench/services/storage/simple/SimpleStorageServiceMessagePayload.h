@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_SIMPLESTORAGESERVICEMESSAGEPAYLOAD_H
 #define WRENCH_SIMPLESTORAGESERVICEMESSAGEPAYLOAD_H
 
@@ -15,14 +14,13 @@
 
 namespace wrench {
 
-    /**
-    * @brief Configurable message payloads for a SimpleStorageService
-    */
-    class SimpleStorageServiceMessagePayload : public StorageServiceMessagePayload {
-    public:
-    };
+/**
+ * @brief Configurable message payloads for a SimpleStorageService
+ */
+class SimpleStorageServiceMessagePayload : public StorageServiceMessagePayload {
+public:
+};
 
-}// namespace wrench
+} // namespace wrench
 
-
-#endif//WRENCH_SIMPLESTORAGESERVICEMESSAGEPAYLOAD_H
+#endif // WRENCH_SIMPLESTORAGESERVICEMESSAGEPAYLOAD_H

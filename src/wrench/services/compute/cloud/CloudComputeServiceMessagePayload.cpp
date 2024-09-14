@@ -9,22 +9,35 @@
 
 #include <wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h>
 
-
 namespace wrench {
 
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, CREATE_VM_REQUEST_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, CREATE_VM_ANSWER_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, START_VM_REQUEST_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, START_VM_ANSWER_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, RESUME_VM_REQUEST_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, RESUME_VM_ANSWER_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, DESTROY_VM_REQUEST_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, DESTROY_VM_ANSWER_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        CREATE_VM_REQUEST_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        CREATE_VM_ANSWER_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        START_VM_REQUEST_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        START_VM_ANSWER_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        RESUME_VM_REQUEST_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        RESUME_VM_ANSWER_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        DESTROY_VM_REQUEST_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload,
+                        DESTROY_VM_ANSWER_MESSAGE_PAYLOAD);
 
-}// namespace wrench
+} // namespace wrench

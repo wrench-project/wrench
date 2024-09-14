@@ -9,44 +9,44 @@
 
 #include <wrench/failure_causes/InvalidDirectoryPath.h>
 
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/failure_causes/FailureCause.h>
 #include <wrench/data_file/DataFile.h>
+#include <wrench/failure_causes/FailureCause.h>
 #include <wrench/job/Job.h>
-#include <wrench/services/storage/StorageService.h>
+#include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/compute/ComputeService.h>
+#include <wrench/services/storage/StorageService.h>
 
 #include <utility>
 
-WRENCH_LOG_CATEGORY(wrench_core_invalid_directory_path, "Log category for InvalidDirectoryPath");
+WRENCH_LOG_CATEGORY(wrench_core_invalid_directory_path,
+                    "Log category for InvalidDirectoryPath");
 
 namespace wrench {
 
+/**
+ * @brief Constructor
+ * @param location: the location with the invalid path
+ */
+InvalidDirectoryPath::InvalidDirectoryPath(
+    const std::shared_ptr<FileLocation> &location) {
+  this->location = location;
+}
 
-    /**
-     * @brief Constructor
-     * @param location: the location with the invalid path
-     */
-    InvalidDirectoryPath::InvalidDirectoryPath(const std::shared_ptr<FileLocation> &location) {
-        this->location = location;
-    }
+/**
+ * @brief Get the location with the invalid path
+ * @return a storage service
+ */
+std::shared_ptr<FileLocation> InvalidDirectoryPath::getLocation() {
+  return this->location;
+}
 
-    /**
-     * @brief Get the location with the invalid path
-     * @return a storage service
-     */
-    std::shared_ptr<FileLocation> InvalidDirectoryPath::getLocation() {
-        return this->location;
-    }
+/**
+ * @brief Get the human-readable failure message
+ * @return the message
+ */
+std::string InvalidDirectoryPath::toString() {
+  return "Storage service " + this->location->getStorageService()->getName() +
+         " doesn't have a " + this->getLocation()->getPath() + " path";
+}
 
-
-    /**
-     * @brief Get the human-readable failure message
-     * @return the message
-     */
-    std::string InvalidDirectoryPath::toString() {
-        return "Storage service " + this->location->getStorageService()->getName() + " doesn't have a " +
-               this->getLocation()->getPath() + " path";
-    }
-
-}// namespace wrench
+} // namespace wrench

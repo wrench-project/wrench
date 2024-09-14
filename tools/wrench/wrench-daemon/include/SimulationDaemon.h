@@ -10,49 +10,49 @@
 #ifndef SIMULATION_DAEMON_H
 #define SIMULATION_DAEMON_H
 
-#include "httplib.h"
 #include "crow.h"
+#include "httplib.h"
 
 using httplib::Request;
 using httplib::Response;
 
-#include <wrench-dev.h>
 #include <map>
-#include <vector>
-#include <queue>
 #include <mutex>
+#include <queue>
+#include <vector>
+#include <wrench-dev.h>
 
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
-
 /**
- * @brief A class that implements a Simulation Daemon process (in the run() method)
+ * @brief A class that implements a Simulation Daemon process (in the run()
+ * method)
  */
 class SimulationDaemon {
 
 public:
-    SimulationDaemon(bool daemon_logging, int simulation_port_number,
-                     std::shared_ptr<wrench::SimulationController> simulation_controller,
-                     std::thread &simulation_thread);
+  SimulationDaemon(
+      bool daemon_logging, int simulation_port_number,
+      std::shared_ptr<wrench::SimulationController> simulation_controller,
+      std::thread &simulation_thread);
 
-    void run();
+  void run();
 
 private:
-    crow::SimpleApp app;
+  crow::SimpleApp app;
 
-    bool daemon_logging;
-    int simulation_port_number;
-    std::shared_ptr<wrench::SimulationController> simulation_controller;
-    std::thread &simulation_thread;
+  bool daemon_logging;
+  int simulation_port_number;
+  std::shared_ptr<wrench::SimulationController> simulation_controller;
+  std::thread &simulation_thread;
 
-    void displayRequest(const crow::request &req) const;
+  void displayRequest(const crow::request &req) const;
 
-    void terminateSimulation(const crow::request &req, crow::response &res);
+  void terminateSimulation(const crow::request &req, crow::response &res);
 
-    void alive(const crow::request &req, crow::response &res);
+  void alive(const crow::request &req, crow::response &res);
 };
 
-
-#endif// SIMULATION_DAEMON_H
+#endif // SIMULATION_DAEMON_H

@@ -10,53 +10,57 @@
 #ifndef WRENCH_PARALLELMODEL_H
 #define WRENCH_PARALLELMODEL_H
 
-#include <vector>
-#include <memory>
 #include <functional>
+#include <memory>
+#include <vector>
 
 namespace wrench {
 
-    /**
-     * @brief A virtual class (with convenient static methods) to define 
-     *        parallel task performance models
-     */
-    class ParallelModel {
+/**
+ * @brief A virtual class (with convenient static methods) to define
+ *        parallel task performance models
+ */
+class ParallelModel {
 
-    public:
-        static std::shared_ptr<ParallelModel> AMDAHL(double alpha);
-        static std::shared_ptr<ParallelModel> CONSTANTEFFICIENCY(double efficiency);
-        static std::shared_ptr<ParallelModel> CUSTOM(const std::function<double(double, long)> &lambda_sequential, const std::function<double(double, long)> &lambda_per_thread);
+public:
+  static std::shared_ptr<ParallelModel> AMDAHL(double alpha);
+  static std::shared_ptr<ParallelModel> CONSTANTEFFICIENCY(double efficiency);
+  static std::shared_ptr<ParallelModel>
+  CUSTOM(const std::function<double(double, long)> &lambda_sequential,
+         const std::function<double(double, long)> &lambda_per_thread);
 
-        /***********************/
-        /** \cond INTERNAL    **/
-        /***********************/
+  /***********************/
+  /** \cond INTERNAL    **/
+  /***********************/
 
-        /**
-         * @brief A method that computes the amount of purely sequential work
-         * @param total_work: the total amount of work (in flops)
-         * @param num_threads: the number of threads
-         *
-         * @return an amount of work (in flop)
-         */
-        virtual double getPurelySequentialWork(double total_work, unsigned long num_threads) = 0;
-        /**
-         * @brief A method that computes the amount of per-thread parallel work
-         * @param total_work: the total amount of work (in flops)
-         * @param num_threads: the number of threads
-         *
-         * @return an amount of work (in flop)
-         */
-        virtual double getParallelPerThreadWork(double total_work, unsigned long num_threads) = 0;
+  /**
+   * @brief A method that computes the amount of purely sequential work
+   * @param total_work: the total amount of work (in flops)
+   * @param num_threads: the number of threads
+   *
+   * @return an amount of work (in flop)
+   */
+  virtual double getPurelySequentialWork(double total_work,
+                                         unsigned long num_threads) = 0;
+  /**
+   * @brief A method that computes the amount of per-thread parallel work
+   * @param total_work: the total amount of work (in flops)
+   * @param num_threads: the number of threads
+   *
+   * @return an amount of work (in flop)
+   */
+  virtual double getParallelPerThreadWork(double total_work,
+                                          unsigned long num_threads) = 0;
 
-        virtual ~ParallelModel() = default;
+  virtual ~ParallelModel() = default;
 
-        /***********************/
-        /** \endcond          **/
-        /***********************/
+  /***********************/
+  /** \endcond          **/
+  /***********************/
 
-    private:
-    };
+private:
+};
 
-}// namespace wrench
+} // namespace wrench
 
-#endif//WRENCH_PARALLELMODEL_H
+#endif // WRENCH_PARALLELMODEL_H

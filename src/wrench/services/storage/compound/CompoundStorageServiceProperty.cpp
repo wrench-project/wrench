@@ -11,8 +11,8 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(CompoundStorageServiceProperty, MAX_ALLOCATION_CHUNK_SIZE);
+SET_PROPERTY_NAME(CompoundStorageServiceProperty, MAX_ALLOCATION_CHUNK_SIZE);
 
-    SET_PROPERTY_NAME(CompoundStorageServiceProperty, INTERNAL_STRIPING);
+SET_PROPERTY_NAME(CompoundStorageServiceProperty, INTERNAL_STRIPING);
 
-};// namespace wrench
+}; // namespace wrench
