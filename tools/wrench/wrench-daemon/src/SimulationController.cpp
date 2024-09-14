@@ -1211,7 +1211,7 @@ namespace wrench {
     * @return JSON output
     */
     json SimulationController::addActionDependency(json data) {
-        std::string compougnd_job_name = data["compound_job_name"];
+        std::string compound_job_name = data["compound_job_name"];
         std::string parent_action_name = data["parent_action_name"];
         std::string child_action_name = data["child_action_name"];
         std::shared_ptr<CompoundJob> job;
@@ -1635,7 +1635,12 @@ namespace wrench {
         return answer;
     }
 
-    json SimulationController::getNumberOfChildren(json data) {
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::getTaskNumberOfChildren(json data) {
         std::string workflow_name = data["workflow_name"];
         std::shared_ptr<Workflow> workflow;
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
@@ -1643,7 +1648,7 @@ namespace wrench {
         }
         std::shared_ptr<WorkflowTask> children;;
         json answer;
-        answer["children"] = workflow->getTaskByID(data["task_name"])->getNumberOfChildren();
+        answer["number_of_children"] = workflow->getTaskByID(data["task_name"])->getNumberOfChildren();
         return answer;
     }
 
@@ -1652,7 +1657,7 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
-    json SimulationController::getBottomLevel(json data) {
+    json SimulationController::getTaskBottomLevel(json data) {
         std::string workflow_name = data["workflow_name"];
         std::shared_ptr<Workflow> workflow;
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
@@ -1662,7 +1667,7 @@ namespace wrench {
         //        auto task = workflow->getTaskByID(data["tid"]);
         json answer;
         //        answer["result"] = bottom_level->getBottomLevel();
-        answer["level"] = workflow->getTaskByID(data["task_name"])->getBottomLevel();
+        answer["bottom_level"] = workflow->getTaskByID(data["task_name"])->getBottomLevel();
         return answer;
     }
 
