@@ -3061,6 +3061,76 @@
         }
       }
     },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/addActionDependency": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add a dependency between two actions in a compound job.",
+        "deprecated": false,
+        "operationId": "addActionDependency",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to create an action dependency.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "parent_action_name": {
+                    "type": "string",
+                    "description": "Name of the parent action."
+                  },
+                  "child_action_name": {
+                    "type": "File",
+                    "description": "Name of the child action."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
     "/simulation/{simid}/compoundJobs/{compound_job_name}/actions/{action_name}/getStartDate": {
       "get": {
         "tags": [
@@ -3164,6 +3234,65 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TimeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/actions/{action_name}/getFailureCause": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's failure cause as a string (or the empty string if no failure).",
+        "deprecated": false,
+        "operationId": "getActionFailureCause",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action_name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionFailureCauseResponse"
                 }
               }
             }
@@ -4441,6 +4570,23 @@
           "memory": {
             "type": "number",
             "description": "The task's memory requirement in bytes."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "ActionFailureCauseResponse": {
+        "type": "object",
+        "properties": {
+          "action_failure_cause": {
+            "type": "string",
+            "description": "The action's failure cause (or the empty string if no failure)."
           },
           "wrench_api_request_success": {
             "type": "boolean",
