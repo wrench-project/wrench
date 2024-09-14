@@ -1671,7 +1671,7 @@ namespace wrench {
         answer["bottom_level"] = workflow->getTaskByID(data["task_name"])->getBottomLevel();
         return answer;
     }
-    
+
     /**
      * REST API Handler
      * @param data JSON input
