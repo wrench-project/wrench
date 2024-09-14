@@ -1670,30 +1670,7 @@ namespace wrench {
         answer["bottom_level"] = workflow->getTaskByID(data["task_name"])->getBottomLevel();
         return answer;
     }
-
-    /**
-     * @brief REST API Handler
-     * @param data JSON input
-     * @return JSON output
-     */
-    json SimulationController::stageInputFiles(json data) {
-        std::shared_ptr<StorageService> storage_service;
-        std::string service_name = data["storage"];
-        std::string workflow_name = data["workflow_name"];
-        std::shared_ptr<Workflow> workflow;
-        if (not this->storage_service_registry.lookup(service_name, storage_service)) {
-            throw std::runtime_error("Unknown storage service " + service_name);
-        }
-        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
-            throw std::runtime_error("Unknown workflow " + workflow_name);
-        }
-
-        for (auto const &f: workflow->getInputFiles()) {
-            this->simulation->stageFile(f, storage_service);
-        }
-        return {};
-    }
-
+    
     /**
      * REST API Handler
      * @param data JSON input
