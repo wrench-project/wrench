@@ -9,6 +9,4 @@
 
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorProperty.h>
 
-namespace wrench {
-
-};
+namespace wrench {};

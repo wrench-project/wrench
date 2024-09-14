@@ -17,31 +17,29 @@
 
 namespace wrench {
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /**
-    * @brief An "Unknown" failure cause (should not happen)
-    */
-    class SomeActionsHaveFailed : public FailureCause {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        SomeActionsHaveFailed();
-        /***********************/
-        /** \endcond           */
-        /***********************/
+/**
+ * @brief An "Unknown" failure cause (should not happen)
+ */
+class SomeActionsHaveFailed : public FailureCause {
+public:
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
+  SomeActionsHaveFailed();
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        std::string toString() override;
-    };
+  std::string toString() override;
+};
 
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
-
-
-#endif//WRENCH_SOME_ACTIONS_HAVE_FAILED_H
+#endif // WRENCH_SOME_ACTIONS_HAVE_FAILED_H

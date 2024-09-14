@@ -13,39 +13,39 @@
 #include <set>
 #include <string>
 
-#include "wrench/services/Service.h"
 #include "FailureCause.h"
+#include "wrench/services/Service.h"
 
 namespace wrench {
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /**
-    * @brief A "operation not allowed" failure cause
-    */
-    class NotAllowed : public FailureCause {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        NotAllowed(std::shared_ptr<Service> service, std::string &error_message);
-        /***********************/
-        /** \endcond           */
-        /***********************/
+/**
+ * @brief A "operation not allowed" failure cause
+ */
+class NotAllowed : public FailureCause {
+public:
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
+  NotAllowed(std::shared_ptr<Service> service, std::string &error_message);
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        std::shared_ptr<Service> getService();
-        std::string toString() override;
+  std::shared_ptr<Service> getService();
+  std::string toString() override;
 
-    private:
-        std::shared_ptr<Service> service;
-        std::string error_message;
-    };
+private:
+  std::shared_ptr<Service> service;
+  std::string error_message;
+};
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-#endif//WRENCH_NOT_ALLOWED_H
+#endif // WRENCH_NOT_ALLOWED_H

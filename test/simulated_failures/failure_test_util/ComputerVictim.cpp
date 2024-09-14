@@ -9,29 +9,30 @@
 
 #include "ComputerVictim.h"
 
-#include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
+#include <wrench/simulation/Simulation.h>
 
 WRENCH_LOG_CATEGORY(computer_victim, "Log category for Computer");
 
-
-wrench::ComputerVictim::ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, wrench::S4U_CommPort *commport_to_notify)
+wrench::ComputerVictim::ComputerVictim(std::string host_on_which_to_run,
+                                       double flops, SimulationMessage *msg,
+                                       wrench::S4U_CommPort *commport_to_notify)
     : Service(host_on_which_to_run, "victim") {
-    this->flops = flops;
-    this->msg = msg;
-    this->commport_to_notify = commport_to_notify;
+  this->flops = flops;
+  this->msg = msg;
+  this->commport_to_notify = commport_to_notify;
 }
-
 
 int wrench::ComputerVictim::main() {
 
-    WRENCH_INFO("Starting  (%u)", this->num_starts);
-    WRENCH_INFO("Computing %.3lf flops...", this->flops);
-    wrench::Simulation::compute(this->flops);
-    this->commport_to_notify->putMessage(this->msg);
-    return 0;
+  WRENCH_INFO("Starting  (%u)", this->num_starts);
+  WRENCH_INFO("Computing %.3lf flops...", this->flops);
+  wrench::Simulation::compute(this->flops);
+  this->commport_to_notify->putMessage(this->msg);
+  return 0;
 }
 
-void wrench::ComputerVictim::cleanup(bool has_terminated_cleanly, int return_value) {
-    // Do nothing (ignore failures)
+void wrench::ComputerVictim::cleanup(bool has_terminated_cleanly,
+                                     int return_value) {
+  // Do nothing (ignore failures)
 }

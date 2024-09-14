@@ -10,107 +10,104 @@
 #ifndef WRENCH_JOB_H
 #define WRENCH_JOB_H
 
-
-#include <string>
-#include <stack>
 #include <map>
 #include <memory>
+#include <stack>
+#include <string>
 
 #include "wrench/managers/job_manager/JobManager.h"
 
 namespace wrench {
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    class Workflow;
-    class ComputeService;
+class Workflow;
+class ComputeService;
 
+/**
+ * @brief Abstraction of a job used for executing tasks in a Workflow
+ */
+class Job {
 
-    /**
-     * @brief Abstraction of a job used for executing tasks in a Workflow
-     */
-    class Job {
+public:
+  std::string getName();
 
-    public:
-        std::string getName();
+  double getSubmitDate() const;
+  double getEndDate() const;
 
-        double getSubmitDate() const;
-        double getEndDate() const;
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+  S4U_CommPort *popCallbackCommPort();
 
-        S4U_CommPort *popCallbackCommPort();
+  void printCallbackCommPortStack();
 
-        void printCallbackCommPortStack();
+  void pushCallbackCommPort(S4U_CommPort *commport);
 
-        void pushCallbackCommPort(S4U_CommPort *commport);
+  S4U_CommPort *getCallbackCommPort();
 
-        S4U_CommPort *getCallbackCommPort();
+  S4U_CommPort *getOriginCallbackCommPort();
 
-        S4U_CommPort *getOriginCallbackCommPort();
+  void setParentComputeService(std::shared_ptr<ComputeService> compute_service);
 
-        void setParentComputeService(std::shared_ptr<ComputeService> compute_service);
+  std::shared_ptr<ComputeService> getParentComputeService();
 
-        std::shared_ptr<ComputeService> getParentComputeService();
+  virtual ~Job();
 
+  virtual void setPriority(double p);
 
-        virtual ~Job();
+  double getPriority() const;
 
-        virtual void setPriority(double p);
+  std::map<std::string, std::string> &getServiceSpecificArguments();
 
-        double getPriority() const;
+protected:
+  friend class JobManager;
 
-        std::map<std::string, std::string> &getServiceSpecificArguments();
+  Job(const std::string &name, std::shared_ptr<JobManager> job_manager);
 
-    protected:
-        friend class JobManager;
+  void setServiceSpecificArguments(std::map<std::string, std::string> args);
 
-        Job(const std::string &name, std::shared_ptr<JobManager> job_manager);
+  static unsigned long getNewUniqueNumber();
 
-        void setServiceSpecificArguments(std::map<std::string, std::string> args);
+  /** @brief Service-specific arguments used during job submission **/
+  std::map<std::string, std::string> service_specific_args;
 
-        static unsigned long getNewUniqueNumber();
+  /** @brief Stack of callback commports (to pop notifications) */
+  std::stack<S4U_CommPort *> callback_commport_stack;
+  /** @brief The Job Manager in charge of this job **/
+  std::shared_ptr<JobManager> job_manager;
+  /** @brief The originator's commport_name */
+  S4U_CommPort *originator_commport;
 
-        /** @brief Service-specific arguments used during job submission **/
-        std::map<std::string, std::string> service_specific_args;
+  /** @brief The job's name */
+  std::string name;
+  /** @brief The date at which the job was last submitted */
+  double submit_date;
+  /** @brief The date at which the job ended (with success or failure) */
+  double end_date;
+  /** @brief The compute service to which the job was submitted */
+  std::shared_ptr<ComputeService> parent_compute_service;
 
-        /** @brief Stack of callback commports (to pop notifications) */
-        std::stack<S4U_CommPort *> callback_commport_stack;
-        /** @brief The Job Manager in charge of this job **/
-        std::shared_ptr<JobManager> job_manager;
-        /** @brief The originator's commport_name */
-        S4U_CommPort *originator_commport;
+  /** @brief Whether the job has already been submitted to the job manager */
+  bool already_submitted_to_job_manager = false;
 
-        /** @brief The job's name */
-        std::string name;
-        /** @brief The date at which the job was last submitted */
-        double submit_date;
-        /** @brief The date at which the job ended (with success or failure) */
-        double end_date;
-        /** @brief The compute service to which the job was submitted */
-        std::shared_ptr<ComputeService> parent_compute_service;
+  /** @brief The job's priority (the higher the number, the higher the priority)
+   */
+  double priority = 0.0;
 
-        /** @brief Whether the job has already been submitted to the job manager */
-        bool already_submitted_to_job_manager = false;
+private:
+  /***********************/
+  /** \endcond           */
+  /***********************/
+};
 
-        /** @brief The job's priority (the higher the number, the higher the priority) */
-        double priority = 0.0;
+/***********************/
+/** \endcond           */
+/***********************/
 
-    private:
-        /***********************/
-        /** \endcond           */
-        /***********************/
-    };
+} // namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-
-}// namespace wrench
-
-
-#endif//WRENCH_JOB_H
+#endif // WRENCH_JOB_H

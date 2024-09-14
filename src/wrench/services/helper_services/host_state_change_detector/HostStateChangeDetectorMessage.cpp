@@ -13,41 +13,44 @@
 
 namespace wrench {
 
-    /**
-     * @brief Constructor
-     *
-     */
-    HostStateChangeDetectorMessage::HostStateChangeDetectorMessage() : SimulationMessage(0) {
-    }
+/**
+ * @brief Constructor
+ *
+ */
+HostStateChangeDetectorMessage::HostStateChangeDetectorMessage()
+    : SimulationMessage(0) {}
 
+/**
+ * @brief Constructor
+ *
+ * @param hostname: the name of the host that has turned on
+ */
+HostHasTurnedOnMessage::HostHasTurnedOnMessage(std::string hostname)
+    : HostStateChangeDetectorMessage() {
+  this->hostname = std::move(hostname);
+}
 
-    /**
-     * @brief Constructor
-     *
-     * @param hostname: the name of the host that has turned on
-     */
-    HostHasTurnedOnMessage::HostHasTurnedOnMessage(std::string hostname) : HostStateChangeDetectorMessage() {
-        this->hostname = std::move(hostname);
-    }
+/**
+ * @brief Constructor
+ *
+ * @param hostname: the name of the host that has turned off
+ */
+HostHasTurnedOffMessage::HostHasTurnedOffMessage(std::string hostname)
+    : HostStateChangeDetectorMessage() {
+  this->hostname = std::move(hostname);
+}
 
-    /**
-     * @brief Constructor
-     *
-     * @param hostname: the name of the host that has turned off
-     */
-    HostHasTurnedOffMessage::HostHasTurnedOffMessage(std::string hostname) : HostStateChangeDetectorMessage() {
-        this->hostname = std::move(hostname);
-    }
+/**
+ * @brief Constructor
+ *
+ * @param hostname: the name of the host that has changed speed
+ * @param speed: the host's new speed
+ */
+HostHasChangedSpeedMessage::HostHasChangedSpeedMessage(std::string hostname,
+                                                       double speed)
+    : HostStateChangeDetectorMessage() {
+  this->hostname = std::move(hostname);
+  this->speed = speed;
+}
 
-    /**
-     * @brief Constructor
-     *
-     * @param hostname: the name of the host that has changed speed
-     * @param speed: the host's new speed
-     */
-    HostHasChangedSpeedMessage::HostHasChangedSpeedMessage(std::string hostname, double speed) : HostStateChangeDetectorMessage() {
-        this->hostname = std::move(hostname);
-        this->speed = speed;
-    }
-
-}// namespace wrench
+} // namespace wrench

@@ -17,46 +17,43 @@
 
 namespace wrench {
 
-    class DataFile;
-    class FileLocation;
+class DataFile;
+class FileLocation;
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    class FileLocation;
+class FileLocation;
 
-    /**
-     * @brief A "file is already being copied" failure cause
-     */
-    class FileAlreadyBeingCopied : public FailureCause {
+/**
+ * @brief A "file is already being copied" failure cause
+ */
+class FileAlreadyBeingCopied : public FailureCause {
 
+public:
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
+  FileAlreadyBeingCopied(std::shared_ptr<FileLocation> src,
+                         std::shared_ptr<FileLocation> dst);
 
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        FileAlreadyBeingCopied(std::shared_ptr<FileLocation> src,
-                               std::shared_ptr<FileLocation> dst);
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+  std::shared_ptr<FileLocation> getSourceLocation();
+  std::shared_ptr<FileLocation> getDestinationLocation();
+  std::string toString() override;
 
-        std::shared_ptr<FileLocation> getSourceLocation();
-        std::shared_ptr<FileLocation> getDestinationLocation();
-        std::string toString() override;
+private:
+  std::shared_ptr<FileLocation> src_location;
+  std::shared_ptr<FileLocation> dst_location;
+};
 
-    private:
-        std::shared_ptr<FileLocation> src_location;
-        std::shared_ptr<FileLocation> dst_location;
-    };
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
-
-
-#endif//WRENCH_FILE_ALREADY_BEING_COPIED_H
+#endif // WRENCH_FILE_ALREADY_BEING_COPIED_H

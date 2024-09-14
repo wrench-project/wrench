@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_UNITPARSER_H
 #define WRENCH_UNITPARSER_H
 
@@ -15,42 +14,45 @@
 
 namespace wrench {
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
-    /**
-     * @brief A class used to part string specification of values with units into
-     *        a single value (e.g., "2KiB" -> 2048 bytes, "1h" -> 3600 seconds). It supports
-     *        all the SimGrid-supported units.
-     */
-    class UnitParser {
+/**
+ * @brief A class used to part string specification of values with units into
+ *        a single value (e.g., "2KiB" -> 2048 bytes, "1h" -> 3600 seconds). It
+ * supports all the SimGrid-supported units.
+ */
+class UnitParser {
 
-        /**
-         * @brief A helper nested class to facilitate unit conversion
-         * (Essentially Cut-And-Pasted from simgrid/src/surf/xml/surfxml_sax_cb.cpp)
-         */
-        class unit_scale : public std::unordered_map<std::string, double> {
-        public:
-            using std::unordered_map<std::string, double>::unordered_map;
-            // tuples are : <unit, value for unit, base (2 or 10), true if abbreviated>
-            unit_scale(std::initializer_list<std::tuple<const std::string, double, int, bool>> generators);
-        };
+  /**
+   * @brief A helper nested class to facilitate unit conversion
+   * (Essentially Cut-And-Pasted from simgrid/src/surf/xml/surfxml_sax_cb.cpp)
+   */
+  class unit_scale : public std::unordered_map<std::string, double> {
+  public:
+    using std::unordered_map<std::string, double>::unordered_map;
+    // tuples are : <unit, value for unit, base (2 or 10), true if abbreviated>
+    unit_scale(
+        std::initializer_list<std::tuple<const std::string, double, int, bool>>
+            generators);
+  };
 
-    private:
-        static double parseValueWithUnit(const std::string &string, const unit_scale &units, const char *default_unit);
+private:
+  static double parseValueWithUnit(const std::string &string,
+                                   const unit_scale &units,
+                                   const char *default_unit);
 
-    public:
-        static double parse_size(const std::string &string);
-        static double parse_compute_speed(const std::string &string);
-        static double parse_bandwidth(const std::string &string);
-        static double parse_time(const std::string &string);
-    };
+public:
+  static double parse_size(const std::string &string);
+  static double parse_compute_speed(const std::string &string);
+  static double parse_bandwidth(const std::string &string);
+  static double parse_time(const std::string &string);
+};
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-
-#endif//WRENCH_UNITPARSER_H
+#endif // WRENCH_UNITPARSER_H

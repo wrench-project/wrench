@@ -10,32 +10,32 @@
 #ifndef WRENCH_DATAFILE_H
 #define WRENCH_DATAFILE_H
 
-#include <string>
 #include <map>
+#include <string>
 
 namespace wrench {
 
-    /**
-     * @brief A data file used/produced by a WorkflowTask in a Workflow
-     */
-    class DataFile {
+/**
+ * @brief A data file used/produced by a WorkflowTask in a Workflow
+ */
+class DataFile {
 
-    public:
-        double getSize() const;
-        void setSize(double size);
-        std::string getID() const;
-        ~DataFile();
+public:
+  double getSize() const;
+  void setSize(double size);
+  std::string getID() const;
+  ~DataFile();
 
-    protected:
-        friend class Simulation;
-        DataFile(std::string id, double size);
+protected:
+  friend class Simulation;
+  DataFile(std::string id, double size);
 
-        /** @brief File id/name **/
-        std::string id;
-        /** @brief File size in bytes **/
-        double size;// in bytes
-    };
+  /** @brief File id/name **/
+  std::string id;
+  /** @brief File size in bytes **/
+  double size; // in bytes
+};
 
-}// namespace wrench
+} // namespace wrench
 
-#endif//WRENCH_DATAFILE_H
+#endif // WRENCH_DATAFILE_H

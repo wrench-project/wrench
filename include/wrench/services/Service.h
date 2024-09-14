@@ -7,150 +7,154 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_SERVICE_H
 #define WRENCH_SERVICE_H
 
-
-#include <string>
 #include <map>
 #include <memory>
+#include <string>
 
-#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
-#include "wrench/services/ServiceProperty.h"
 #include "wrench/services/ServiceMessagePayload.h"
+#include "wrench/services/ServiceProperty.h"
+#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 namespace wrench {
-    /**
-     * @brief Abstraction of a service property collection type
-     */
-    typedef std::map<WRENCH_PROPERTY_TYPE, std::string> WRENCH_PROPERTY_COLLECTION_TYPE;
-    /**
-     * @brief Abstraction of a service message payload collection type
-     */
-    typedef std::map<WRENCH_MESSAGEPAYLOAD_TYPE, double> WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE;
+/**
+ * @brief Abstraction of a service property collection type
+ */
+typedef std::map<WRENCH_PROPERTY_TYPE, std::string>
+    WRENCH_PROPERTY_COLLECTION_TYPE;
+/**
+ * @brief Abstraction of a service message payload collection type
+ */
+typedef std::map<WRENCH_MESSAGEPAYLOAD_TYPE, double>
+    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE;
 
+class FailureCause;
 
-    class FailureCause;
+/**
+ * @brief A service that can be added to the simulation and that can be used by
+ * a WMS when executing a workflow
+ */
+class Service : public S4U_Daemon {
 
-    /**
-     * @brief A service that can be added to the simulation and that can be used by a WMS
-     *        when executing a workflow
-     */
-    class Service : public S4U_Daemon {
+public:
+  /***********************/
+  /** \cond DEVELOPER    */
+  /***********************/
 
-    public:
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
+  void start(const std::shared_ptr<Service> &this_service, bool daemonize,
+             bool auto_restart);
+  virtual void stop();
+  void suspend();
+  void resume();
 
-        void start(const std::shared_ptr<Service> &this_service, bool daemonize, bool auto_restart);
-        virtual void stop();
-        void suspend();
-        void resume();
+  std::string getHostname();
+  std::string getPhysicalHostname();
 
-        std::string getHostname();
-        std::string getPhysicalHostname();
+  bool isUp();
 
-        bool isUp();
+  std::string getPropertyValueAsString(WRENCH_PROPERTY_TYPE);
+  double getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE);
+  unsigned long getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE);
+  bool getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE);
 
-        std::string getPropertyValueAsString(WRENCH_PROPERTY_TYPE);
-        double getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE);
-        unsigned long getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE);
-        bool getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE);
+  double getPropertyValueAsTimeInSecond(WRENCH_PROPERTY_TYPE);
+  double getPropertyValueAsSizeInByte(WRENCH_PROPERTY_TYPE);
+  double getPropertyValueAsBandwidthInBytePerSecond(WRENCH_PROPERTY_TYPE);
 
-        double getPropertyValueAsTimeInSecond(WRENCH_PROPERTY_TYPE);
-        double getPropertyValueAsSizeInByte(WRENCH_PROPERTY_TYPE);
-        double getPropertyValueAsBandwidthInBytePerSecond(WRENCH_PROPERTY_TYPE);
+  const WRENCH_PROPERTY_COLLECTION_TYPE &getPropertyList() const;
 
-        const WRENCH_PROPERTY_COLLECTION_TYPE &getPropertyList() const;
+  void assertServiceIsUp();
 
-        void assertServiceIsUp();
+  double getNetworkTimeoutValue() const;
+  void setNetworkTimeoutValue(double value);
 
-        double getNetworkTimeoutValue() const;
-        void setNetworkTimeoutValue(double value);
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+  simgrid::s4u::Host *getHost();
 
-        simgrid::s4u::Host *getHost();
+  double getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE);
+  const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &getMessagePayloadList() const;
 
+  void setStateToDown();
 
-        double getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE);
-        const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &getMessagePayloadList() const;
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        void setStateToDown();
+protected:
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
+  friend class S4U_Simulation;
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+  /**
+   * @brief Assert for the service being up
+   * @param s: a service
+   */
+  static void assertServiceIsUp(std::shared_ptr<Service> s) {
+    s->assertServiceIsUp();
+  };
 
-    protected:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        friend class S4U_Simulation;
+  friend class Simulation;
 
-        /**
-         * @brief Assert for the service being up
-         * @param s: a service
-         */
-        static void assertServiceIsUp(std::shared_ptr<Service> s) { s->assertServiceIsUp(); };
+  ~Service() override;
 
-        friend class Simulation;
+  Service(const std::string &hostname, const std::string &process_name_prefix);
 
-        ~Service() override;
+  // Property stuff
+  void setProperty(WRENCH_PROPERTY_TYPE, const std::string &);
 
-        Service(const std::string &hostname, const std::string &process_name_prefix);
+  void setProperties(
+      const WRENCH_PROPERTY_COLLECTION_TYPE &default_property_values,
+      const WRENCH_PROPERTY_COLLECTION_TYPE &overriden_property_values);
 
-        // Property stuff
-        void setProperty(WRENCH_PROPERTY_TYPE, const std::string &);
+  // MessagePayload stuff
+  void setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE, double);
 
-        void setProperties(const WRENCH_PROPERTY_COLLECTION_TYPE &default_property_values,
-                           const WRENCH_PROPERTY_COLLECTION_TYPE &overriden_property_values);
+  void setMessagePayloads(const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE
+                              &default_messagepayload_values,
+                          const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE
+                              &overriden_messagepayload_values);
 
-        // MessagePayload stuff
-        void setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE, double);
+  void serviceSanityCheck();
 
-        void setMessagePayloads(const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &default_messagepayload_values,
-                                const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &overriden_messagepayload_values);
+  /** @brief The service's property list */
+  WRENCH_PROPERTY_COLLECTION_TYPE property_list;
 
-        void serviceSanityCheck();
+  /** @brief The service's messagepayload list */
+  WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list;
 
-        /** @brief The service's property list */
-        WRENCH_PROPERTY_COLLECTION_TYPE property_list;
+  /** @brief The service's name */
+  std::string name;
 
-        /** @brief The service's messagepayload list */
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list;
+  /** @brief The time (in seconds) after which a service that doesn't send back
+   * a reply (control) message causes a NetworkTimeOut exception. (default: 30
+   * second; if <0 never timeout)
+   */
+  double network_timeout = 30.0;
 
-        /** @brief The service's name */
-        std::string name;
+  /** @brief A boolean that indicates if the service is in the middle of
+   * shutting down **/
+  bool shutting_down = false;
 
-        /** @brief The time (in seconds) after which a service that doesn't send back a reply (control) message causes
-         *  a NetworkTimeOut exception. (default: 30 second; if <0 never timeout)
-         */
-        double network_timeout = 30.0;
+private:
+  double getPropertyValueWithUnitsAsValue(
+      WRENCH_PROPERTY_TYPE property,
+      const std::function<double(std::string &s)> &unit_parsing_function);
 
+  static std::set<std::shared_ptr<Service>> servicesSetToAutoRestart;
 
-        /** @brief A boolean that indicates if the service is in the middle of shutting down **/
-        bool shutting_down = false;
+  /***********************/
+  /** \endcond           */
+  /***********************/
+};
+} // namespace wrench
 
-    private:
-        double getPropertyValueWithUnitsAsValue(
-                WRENCH_PROPERTY_TYPE property,
-                const std::function<double(std::string &s)> &unit_parsing_function);
-
-        static std::set<std::shared_ptr<Service>> servicesSetToAutoRestart;
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
-    };
-}// namespace wrench
-
-
-#endif//WRENCH_SERVICE_H
+#endif // WRENCH_SERVICE_H

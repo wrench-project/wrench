@@ -15,35 +15,35 @@
 
 namespace wrench {
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
-    /**
-     * @brief A service that immediately detects when some service crashes and then notifies
-     *        some other service of the crash
-     */
-    class ServiceTerminationDetector : public Service {
+/**
+ * @brief A service that immediately detects when some service crashes and then
+ * notifies some other service of the crash
+ */
+class ServiceTerminationDetector : public Service {
 
-    public:
-        explicit ServiceTerminationDetector(std::string host_on_which_to_run, std::shared_ptr<Service> service_to_monitor,
-                                            S4U_CommPort *commport_to_notify, bool notify_on_crash, bool notify_on_termination);
+public:
+  explicit ServiceTerminationDetector(
+      std::string host_on_which_to_run,
+      std::shared_ptr<Service> service_to_monitor,
+      S4U_CommPort *commport_to_notify, bool notify_on_crash,
+      bool notify_on_termination);
 
+private:
+  std::shared_ptr<Service> service_to_monitor;
+  S4U_CommPort *commport_to_notify;
+  int main() override;
+  bool notify_on_crash;
+  bool notify_on_termination;
+};
 
-    private:
-        std::shared_ptr<Service> service_to_monitor;
-        S4U_CommPort *commport_to_notify;
-        int main() override;
-        bool notify_on_crash;
-        bool notify_on_termination;
-    };
+/***********************/
+/** \endcond            */
+/***********************/
 
-    /***********************/
-    /** \endcond            */
-    /***********************/
+} // namespace wrench
 
-
-}// namespace wrench
-
-
-#endif//WRENCH_FAILUREDETECTOR_H
+#endif // WRENCH_FAILUREDETECTOR_H

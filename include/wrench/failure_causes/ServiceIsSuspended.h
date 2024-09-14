@@ -13,42 +13,40 @@
 #include <set>
 #include <string>
 
-#include "wrench/services/Service.h"
 #include "FailureCause.h"
+#include "wrench/services/Service.h"
 
 namespace wrench {
 
-    class Service;
+class Service;
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /**
-     * @brief A "service is suspended" failure cause
-     */
-    class ServiceIsSuspended : public FailureCause {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        explicit ServiceIsSuspended(std::shared_ptr<Service> service);
-        /***********************/
-        /** \endcond           */
-        /***********************/
+/**
+ * @brief A "service is suspended" failure cause
+ */
+class ServiceIsSuspended : public FailureCause {
+public:
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
+  explicit ServiceIsSuspended(std::shared_ptr<Service> service);
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        std::shared_ptr<Service> getService();
-        std::string toString() override;
+  std::shared_ptr<Service> getService();
+  std::string toString() override;
 
-    private:
-        std::shared_ptr<Service> service;
-    };
+private:
+  std::shared_ptr<Service> service;
+};
 
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
-
-
-#endif//WRENCH_SERVICE_IS_SUSPENDED_H
+#endif // WRENCH_SERVICE_IS_SUSPENDED_H

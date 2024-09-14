@@ -18,40 +18,39 @@
 
 namespace wrench {
 
-    class DataFile;
+class DataFile;
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /**
-     * @brief A "not enough space on storage service" failure cause
-     */
-    class StorageServiceNotEnoughSpace : public FailureCause {
+/**
+ * @brief A "not enough space on storage service" failure cause
+ */
+class StorageServiceNotEnoughSpace : public FailureCause {
 
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        StorageServiceNotEnoughSpace(std::shared_ptr<DataFile> file, std::shared_ptr<StorageService> storage_service);
-        /***********************/
-        /** \endcond           */
-        /***********************/
+public:
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
+  StorageServiceNotEnoughSpace(std::shared_ptr<DataFile> file,
+                               std::shared_ptr<StorageService> storage_service);
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        std::shared_ptr<DataFile> getFile();
-        std::shared_ptr<StorageService> getStorageService();
-        std::string toString() override;
+  std::shared_ptr<DataFile> getFile();
+  std::shared_ptr<StorageService> getStorageService();
+  std::string toString() override;
 
+private:
+  std::shared_ptr<DataFile> file;
+  std::shared_ptr<StorageService> storage_service;
+};
 
-    private:
-        std::shared_ptr<DataFile> file;
-        std::shared_ptr<StorageService> storage_service;
-    };
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
-
-
-#endif//WRENCH_STORAGE_SERVICE_NOT_ENOUGH_SPACE_H
+#endif // WRENCH_STORAGE_SERVICE_NOT_ENOUGH_SPACE_H

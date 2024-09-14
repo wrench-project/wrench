@@ -10,5 +10,6 @@
 #include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h>
 
 namespace wrench {
-    SET_MESSAGEPAYLOAD_NAME(HTCondorCentralManagerServiceMessagePayload, HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(HTCondorCentralManagerServiceMessagePayload,
+                        HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD);
 }

@@ -14,33 +14,32 @@
 
 namespace wrench {
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
-    /**
-    * @brief Top-level class for messages received/sent by a ExecutionController
-    */
-    class ExecutionControllerMessage : public SimulationMessage {
-    protected:
-        explicit ExecutionControllerMessage(double payload);
-    };
+/**
+ * @brief Top-level class for messages received/sent by a ExecutionController
+ */
+class ExecutionControllerMessage : public SimulationMessage {
+protected:
+  explicit ExecutionControllerMessage(double payload);
+};
 
+/**
+ * @brief Message sent when a timer set by a ExecutionController goes off
+ */
+class ExecutionControllerAlarmTimerMessage : public ExecutionControllerMessage {
+public:
+  explicit ExecutionControllerAlarmTimerMessage(std::string message,
+                                                double payload);
+  /** @brief The message sent my the timer */
+  std::string message;
+};
 
-    /**
-     * @brief Message sent when a timer set by a ExecutionController goes off
-     */
-    class ExecutionControllerAlarmTimerMessage : public ExecutionControllerMessage {
-    public:
-        explicit ExecutionControllerAlarmTimerMessage(std::string message, double payload);
-        /** @brief The message sent my the timer */
-        std::string message;
-    };
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
-
-#endif//WRENCH_EXECUTIONCONTROLLERMESSAGE_H
+#endif // WRENCH_EXECUTIONCONTROLLERMESSAGE_H

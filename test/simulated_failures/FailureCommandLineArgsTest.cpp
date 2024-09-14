@@ -16,12 +16,12 @@
 class FailureCommandLineArgsTest : public ::testing::Test {
 
 public:
-    void do_MissingFailureCommandLineArgsTest_test();
+  void do_MissingFailureCommandLineArgsTest_test();
 
 protected:
-    FailureCommandLineArgsTest() {
-        // Create a platform file
-        std::string xml = R"(<?xml version='1.0'?>
+  FailureCommandLineArgsTest() {
+    // Create a platform file
+    std::string xml = R"(<?xml version='1.0'?>
                           <!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
                           <platform version="4.1"> 
                              <zone id="AS0" routing="Full"> 
@@ -53,72 +53,75 @@ protected:
                                  <route src="DualCoreHost" dst="QuadCoreHost"> <link_ctn id="1"/> </route>
                              </zone> 
                           </platform>)";
-        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
-        fprintf(platform_file, "%s", xml.c_str());
-        fclose(platform_file);
-    }
+    FILE *platform_file = fopen(platform_file_path.c_str(), "w");
+    fprintf(platform_file, "%s", xml.c_str());
+    fclose(platform_file);
+  }
 
-    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
+  std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
 
 /**********************************************************************/
 /**            MISSING ARGS TEST                                     **/
 /**********************************************************************/
 
-class MissingFailureCommandLineArgsTestWMS : public wrench::ExecutionController {
+class MissingFailureCommandLineArgsTestWMS
+    : public wrench::ExecutionController {
 
 public:
-    MissingFailureCommandLineArgsTestWMS(FailureCommandLineArgsTest *test,
-                                         std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
-    }
+  MissingFailureCommandLineArgsTestWMS(FailureCommandLineArgsTest *test,
+                                       std::string &hostname)
+      : wrench::ExecutionController(hostname, "test"), test(test) {}
 
 private:
-    FailureCommandLineArgsTest *test;
+  FailureCommandLineArgsTest *test;
 
-    int main() override {
+  int main() override {
 
-        try {
-            wrench::Simulation::turnOffHost("DualCoreHost");
-            throw std::runtime_error("Shouldn't be able to turn off a host with passing a specific command-line arg");
-        } catch (std::runtime_error &ignore) {
-        }
-        try {
-            wrench::Simulation::turnOffLink("1");
-            throw std::runtime_error("Shouldn't be able to turn off a host with passing a specific command-line arg");
-        } catch (std::runtime_error &ignore) {
-        }
-
-        return 0;
+    try {
+      wrench::Simulation::turnOffHost("DualCoreHost");
+      throw std::runtime_error("Shouldn't be able to turn off a host with "
+                               "passing a specific command-line arg");
+    } catch (std::runtime_error &ignore) {
     }
+    try {
+      wrench::Simulation::turnOffLink("1");
+      throw std::runtime_error("Shouldn't be able to turn off a host with "
+                               "passing a specific command-line arg");
+    } catch (std::runtime_error &ignore) {
+    }
+
+    return 0;
+  }
 };
 
 TEST_F(FailureCommandLineArgsTest, MissingFailureCommandLineArgsTest) {
-    DO_TEST_WITH_FORK(do_MissingFailureCommandLineArgsTest_test);
+  DO_TEST_WITH_FORK(do_MissingFailureCommandLineArgsTest_test);
 }
 
 void FailureCommandLineArgsTest::do_MissingFailureCommandLineArgsTest_test() {
 
-    // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+  // Create and initialize a simulation
+  auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+  int argc = 1;
+  char **argv = (char **)calloc(argc, sizeof(char *));
+  argv[0] = strdup("unit_test");
+  //    argv[1] = strdup("--wrench-full-log");
 
-    ASSERT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
-    simulation->instantiatePlatform(platform_file_path);
+  simulation->instantiatePlatform(platform_file_path);
 
-    // Get a hostname
-    std::string hostname = "DualCoreHost";
-    ASSERT_NO_THROW(simulation->add(
-            new MissingFailureCommandLineArgsTestWMS(this, hostname)));
+  // Get a hostname
+  std::string hostname = "DualCoreHost";
+  ASSERT_NO_THROW(simulation->add(
+      new MissingFailureCommandLineArgsTestWMS(this, hostname)));
 
-    // Running a "run a single task" simulation
-    ASSERT_NO_THROW(simulation->launch());
+  // Running a "run a single task" simulation
+  ASSERT_NO_THROW(simulation->launch());
 
-    for (int i = 0; i < argc; i++)
-        free(argv[i]);
-    free(argv);
+  for (int i = 0; i < argc; i++)
+    free(argv[i]);
+  free(argv);
 }

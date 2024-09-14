@@ -7,165 +7,178 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_XRootDMessage_H
 #define WRENCH_XRootDMessage_H
 
-
 #include <memory>
 
-#include "wrench/services/ServiceMessage.h"
+#include "SearchStack.h"
 #include "wrench/failure_causes/FailureCause.h"
+#include "wrench/services/ServiceMessage.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
-#include "wrench/simulation/SimulationTimestampTypes.h"
+#include "wrench/services/storage/StorageServiceMessage.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/simulation/SimulationOutput.h"
-#include "SearchStack.h"
-#include "wrench/services/storage/StorageServiceMessage.h"
+#include "wrench/simulation/SimulationTimestampTypes.h"
 
 namespace wrench {
-    namespace XRootD {
+namespace XRootD {
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        class Node;
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
+class Node;
 
-        /**
-         * @brief Top-level class for messages received/sent by a XRootD Node
-         */
-        class Message : public StorageServiceMessage {
-        protected:
-            Message(double payload);
-        };
-        /**
-         * @brief A message sent to a XRootD Node to continue an ongoing search for a file
-         */
-        class ContinueSearchMessage : public Message {
-        public:
-            ContinueSearchMessage(S4U_CommPort *answer_commport,
-                                  std::shared_ptr<StorageServiceFileReadRequestMessage> original,
-                                  std::shared_ptr<DataFile> file,
-                                  Node *node,
-                                  double payload,
-                                  std::shared_ptr<bool> answered,
-                                  int timeToLive);
-            ContinueSearchMessage(ContinueSearchMessage *toCopy);
-            /** @brief CommPort to which the FINAL answer message should be sent */
-            S4U_CommPort *answer_commport;
+/**
+ * @brief Top-level class for messages received/sent by a XRootD Node
+ */
+class Message : public StorageServiceMessage {
+protected:
+  Message(double payload);
+};
+/**
+ * @brief A message sent to a XRootD Node to continue an ongoing search for a
+ * file
+ */
+class ContinueSearchMessage : public Message {
+public:
+  ContinueSearchMessage(
+      S4U_CommPort *answer_commport,
+      std::shared_ptr<StorageServiceFileReadRequestMessage> original,
+      std::shared_ptr<DataFile> file, Node *node, double payload,
+      std::shared_ptr<bool> answered, int timeToLive);
+  ContinueSearchMessage(ContinueSearchMessage *toCopy);
+  /** @brief CommPort to which the FINAL answer message should be sent */
+  S4U_CommPort *answer_commport;
 
-            /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/
-            std::shared_ptr<StorageServiceFileReadRequestMessage> original;
+  /** @brief The original file read request that kicked off the search (if null
+   * this was a lookup request)*/
+  std::shared_ptr<StorageServiceFileReadRequestMessage> original;
 
-            /** @brief The file being searched for */
-            std::shared_ptr<DataFile> file;
+  /** @brief The file being searched for */
+  std::shared_ptr<DataFile> file;
 
-            /** The node that originally received the FileLookupRequest or FileReadRequest */
-            Node *node;
-            /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_commport spamming for multiple file hits */
-            std::shared_ptr<bool> answered;
-            /** How many more hops this message can live for, to prevent messages living forever in improper configurations with loops.*/
-            int timeToLive;
-        };
+  /** The node that originally received the FileLookupRequest or FileReadRequest
+   */
+  Node *node;
+  /** @brief Whether or not the calling client has been answered yet.  Used to
+   * prevent answer_commport spamming for multiple file hits */
+  std::shared_ptr<bool> answered;
+  /** How many more hops this message can live for, to prevent messages living
+   * forever in improper configurations with loops.*/
+  int timeToLive;
+};
 
-        /**
-        * @brief A message sent to a XRootD Node to update the cache
-        */
+/**
+ * @brief A message sent to a XRootD Node to update the cache
+ */
 
-        class UpdateCacheMessage : public Message {
-        public:
-            UpdateCacheMessage(S4U_CommPort *answer_commport, std::shared_ptr<StorageServiceFileReadRequestMessage> original, Node *node, std::shared_ptr<DataFile> file, std::set<std::shared_ptr<FileLocation>> locations,
-                               double payload, std::shared_ptr<bool> answered);
-            UpdateCacheMessage(UpdateCacheMessage &other);
-            UpdateCacheMessage(UpdateCacheMessage *other);
-            /** @brief CommPort to which the FINAL answer message should be sent */
-            S4U_CommPort *answer_commport;
-            /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/
-            std::shared_ptr<StorageServiceFileReadRequestMessage> original;
-            /** @brief The file found */
-            std::shared_ptr<DataFile> file;
-            /** @brief the locations to cache */
-            set<std::shared_ptr<FileLocation>> locations;
-            /** @brief The highest node in the tree to return to when caching (should be the node the original message was sent) */
-            Node *node;
-            /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_commport spamming for multiple file hits */
-            std::shared_ptr<bool> answered;
-        };
-        /**
-        * @brief A message who's only purpose in life is to act as a timeout for file searches looking for files that dont exist
-        */
+class UpdateCacheMessage : public Message {
+public:
+  UpdateCacheMessage(
+      S4U_CommPort *answer_commport,
+      std::shared_ptr<StorageServiceFileReadRequestMessage> original,
+      Node *node, std::shared_ptr<DataFile> file,
+      std::set<std::shared_ptr<FileLocation>> locations, double payload,
+      std::shared_ptr<bool> answered);
+  UpdateCacheMessage(UpdateCacheMessage &other);
+  UpdateCacheMessage(UpdateCacheMessage *other);
+  /** @brief CommPort to which the FINAL answer message should be sent */
+  S4U_CommPort *answer_commport;
+  /** @brief The original file read request that kicked off the search (if null
+   * this was a lookup request)*/
+  std::shared_ptr<StorageServiceFileReadRequestMessage> original;
+  /** @brief The file found */
+  std::shared_ptr<DataFile> file;
+  /** @brief the locations to cache */
+  set<std::shared_ptr<FileLocation>> locations;
+  /** @brief The highest node in the tree to return to when caching (should be
+   * the node the original message was sent) */
+  Node *node;
+  /** @brief Whether or not the calling client has been answered yet.  Used to
+   * prevent answer_commport spamming for multiple file hits */
+  std::shared_ptr<bool> answered;
+};
+/**
+ * @brief A message who's only purpose in life is to act as a timeout for file
+ * searches looking for files that dont exist
+ */
 
-        class FileNotFoundAlarm : public Message {
-        public:
-            FileNotFoundAlarm(S4U_CommPort *answer_commport,
-                              std::shared_ptr<DataFile> file,
-                              bool fileReadRequest,
-                              std::shared_ptr<bool> answered);
+class FileNotFoundAlarm : public Message {
+public:
+  FileNotFoundAlarm(S4U_CommPort *answer_commport,
+                    std::shared_ptr<DataFile> file, bool fileReadRequest,
+                    std::shared_ptr<bool> answered);
 
-            /** @brief CommPort to which the FINAL answer message should be sent */
-            S4U_CommPort *answer_commport;
-            /** @brief The file being searched for */
-            std::shared_ptr<DataFile> file;
-            /** @brief Whether this message is in response to a file read request (true) or a file lookup request (false) */
-            bool fileReadRequest;
-            /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_commport spamming for multiple file hits */
-            std::shared_ptr<bool> answered;
-        };
-        /**
-         * @brief A message sent to a XRootD Node to delete a file
-         */
-        class RippleDelete : public Message {
-        public:
-            RippleDelete(std::shared_ptr<DataFile> file, double payload, int timeToLive);
-            RippleDelete(RippleDelete *other);
-            RippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive);
-            /** @brief The file to delete */
-            std::shared_ptr<DataFile> file;
-            /** @brief The remaining hops before the message should no longer be perpetuated */
-            int timeToLive;
-        };
+  /** @brief CommPort to which the FINAL answer message should be sent */
+  S4U_CommPort *answer_commport;
+  /** @brief The file being searched for */
+  std::shared_ptr<DataFile> file;
+  /** @brief Whether this message is in response to a file read request (true)
+   * or a file lookup request (false) */
+  bool fileReadRequest;
+  /** @brief Whether or not the calling client has been answered yet.  Used to
+   * prevent answer_commport spamming for multiple file hits */
+  std::shared_ptr<bool> answered;
+};
+/**
+ * @brief A message sent to a XRootD Node to delete a file
+ */
+class RippleDelete : public Message {
+public:
+  RippleDelete(std::shared_ptr<DataFile> file, double payload, int timeToLive);
+  RippleDelete(RippleDelete *other);
+  RippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive);
+  /** @brief The file to delete */
+  std::shared_ptr<DataFile> file;
+  /** @brief The remaining hops before the message should no longer be
+   * perpetuated */
+  int timeToLive;
+};
 
-        /**
-         * @brief A message sent to a XRootD Node to delete a file
-         */
-        class AdvancedContinueSearchMessage : public ContinueSearchMessage {
-        public:
-            AdvancedContinueSearchMessage(S4U_CommPort *answer_commport,
-                                          std::shared_ptr<StorageServiceFileReadRequestMessage> original,
-                                          std::shared_ptr<DataFile> file,
-                                          Node *node,
-                                          double payload,
-                                          std::shared_ptr<bool> answered,
-                                          int timeToLive,
-                                          std::vector<std::stack<Node *>> search_stack);
-            AdvancedContinueSearchMessage(AdvancedContinueSearchMessage *toCopy);
-            AdvancedContinueSearchMessage(ContinueSearchMessage *toCopy, std::vector<std::stack<Node *>> search_stack);
+/**
+ * @brief A message sent to a XRootD Node to delete a file
+ */
+class AdvancedContinueSearchMessage : public ContinueSearchMessage {
+public:
+  AdvancedContinueSearchMessage(
+      S4U_CommPort *answer_commport,
+      std::shared_ptr<StorageServiceFileReadRequestMessage> original,
+      std::shared_ptr<DataFile> file, Node *node, double payload,
+      std::shared_ptr<bool> answered, int timeToLive,
+      std::vector<std::stack<Node *>> search_stack);
+  AdvancedContinueSearchMessage(AdvancedContinueSearchMessage *toCopy);
+  AdvancedContinueSearchMessage(ContinueSearchMessage *toCopy,
+                                std::vector<std::stack<Node *>> search_stack);
 
-            /** @brief The paths to follow */
-            std::vector<std::stack<Node *>> search_stack;
-        };
+  /** @brief The paths to follow */
+  std::vector<std::stack<Node *>> search_stack;
+};
 
-        /**
-         *
-         * @brief A message sent to a XRootD Node to delete a file
-         */
-        class AdvancedRippleDelete : public RippleDelete {
-        public:
-            AdvancedRippleDelete(std::shared_ptr<DataFile> file, double payload, int timeToLive, std::vector<std::stack<Node *>> search_stack);
-            AdvancedRippleDelete(AdvancedRippleDelete *other);
-            AdvancedRippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive, std::vector<std::stack<Node *>> search_stack);
-            AdvancedRippleDelete(RippleDelete *other, std::vector<std::stack<Node *>> search_stack);
+/**
+ *
+ * @brief A message sent to a XRootD Node to delete a file
+ */
+class AdvancedRippleDelete : public RippleDelete {
+public:
+  AdvancedRippleDelete(std::shared_ptr<DataFile> file, double payload,
+                       int timeToLive,
+                       std::vector<std::stack<Node *>> search_stack);
+  AdvancedRippleDelete(AdvancedRippleDelete *other);
+  AdvancedRippleDelete(StorageServiceFileDeleteRequestMessage *other,
+                       int timeToLive,
+                       std::vector<std::stack<Node *>> search_stack);
+  AdvancedRippleDelete(RippleDelete *other,
+                       std::vector<std::stack<Node *>> search_stack);
 
-            /** @brief The paths to follow */
-            std::vector<std::stack<Node *>> search_stack;
-        };
+  /** @brief The paths to follow */
+  std::vector<std::stack<Node *>> search_stack;
+};
 
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace XRootD
+}; // namespace wrench
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
-    }// namespace XRootD
-};   // namespace wrench
-
-
-#endif//WRENCH_XRootDMessage_H
+#endif // WRENCH_XRootDMessage_H

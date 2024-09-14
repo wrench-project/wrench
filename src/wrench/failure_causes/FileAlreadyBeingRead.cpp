@@ -7,41 +7,42 @@
  * (at your option) any later version.
  */
 
-
-#include <wrench/logging/TerminalOutput.h>
 #include <wrench/failure_causes/FileAlreadyBeingRead.h>
+#include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
 
 #include <utility>
 
-WRENCH_LOG_CATEGORY(wrench_core_file_already_being_read, "Log category for FileAlreadyBeingRead");
+WRENCH_LOG_CATEGORY(wrench_core_file_already_being_read,
+                    "Log category for FileAlreadyBeingRead");
 
 namespace wrench {
 
-    /**
-     * @brief Constructor
-     * @param location: the location
-     */
-    FileAlreadyBeingRead::FileAlreadyBeingRead(std::shared_ptr<FileLocation> location) {
-        this->location = std::move(location);
-    }
+/**
+ * @brief Constructor
+ * @param location: the location
+ */
+FileAlreadyBeingRead::FileAlreadyBeingRead(
+    std::shared_ptr<FileLocation> location) {
+  this->location = std::move(location);
+}
 
-    /**
-     * @brief Getter
-     * @return the file
-     */
-    std::shared_ptr<FileLocation> FileAlreadyBeingRead::getLocation() {
-        return this->location;
-    }
+/**
+ * @brief Getter
+ * @return the file
+ */
+std::shared_ptr<FileLocation> FileAlreadyBeingRead::getLocation() {
+  return this->location;
+}
 
-    /**
-     * @brief Get the human-readable failure message
-     * @return the message
-     */
-    std::string FileAlreadyBeingRead::toString() {
-        return "File " + this->location->getFile()->getID() + " is already being read (" +
-               "location = " + this->location->toString() + ")";
-    }
+/**
+ * @brief Get the human-readable failure message
+ * @return the message
+ */
+std::string FileAlreadyBeingRead::toString() {
+  return "File " + this->location->getFile()->getID() +
+         " is already being read (" +
+         "location = " + this->location->toString() + ")";
+}
 
-
-}// namespace wrench
+} // namespace wrench
