@@ -136,6 +136,10 @@ namespace wrench {
 
         json createWorkflowFromJSON(json data);
 
+        json getNumberOfChildren(json data);
+
+        json getBottomLevel(json data);
+
     private:
         template<class T>
         json startService(T *s);
