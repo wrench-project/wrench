@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+
 #ifndef WRENCH_FILEREGISTRYPROPERTY_H
 #define WRENCH_FILEREGISTRYPROPERTY_H
 
@@ -14,30 +15,31 @@
 
 namespace wrench {
 
-/**
- * @brief Configurable properties for a FileRegistryService
- */
-class FileRegistryServiceProperty : public ServiceProperty {
+    /**
+     * @brief Configurable properties for a FileRegistryService
+     */
+    class FileRegistryServiceProperty : public ServiceProperty {
 
-public:
-  /**
-   * @brief The computational cost, in flops, of looking entries for a file
-   */
-  DECLARE_PROPERTY_NAME(LOOKUP_COMPUTE_COST);
+    public:
+        /** 
+         * @brief The computational cost, in flops, of looking entries for a file
+         */
+        DECLARE_PROPERTY_NAME(LOOKUP_COMPUTE_COST);
 
-  /**
-   * @brief The computational cost, in flops, of adding, an
-   * entry for a file
-   */
-  DECLARE_PROPERTY_NAME(ADD_ENTRY_COMPUTE_COST);
+        /**
+         * @brief The computational cost, in flops, of adding, an
+         * entry for a file
+         */
+        DECLARE_PROPERTY_NAME(ADD_ENTRY_COMPUTE_COST);
 
-  /**
-   * @brief The computational cost, in flops, of
-   * removing an entry for a file
-   */
-  DECLARE_PROPERTY_NAME(REMOVE_ENTRY_COMPUTE_COST);
-};
+        /**
+         * @brief The computational cost, in flops, of
+         * removing an entry for a file
+         */
+        DECLARE_PROPERTY_NAME(REMOVE_ENTRY_COMPUTE_COST);
+    };
 
-} // namespace wrench
+}// namespace wrench
 
-#endif // WRENCH_FILEREGISTRYPROPERTY_H
+
+#endif//WRENCH_FILEREGISTRYPROPERTY_H

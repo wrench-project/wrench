@@ -10,27 +10,30 @@
 #ifndef WRENCH_CONDORTIMESTAMP_H
 #define WRENCH_CONDORTIMESTAMP_H
 
+
 #include <wrench-dev.h>
+
 
 namespace wrench {
 
-class Simulation;
-class WorkflowTask;
-class StorageService;
-class FileLocation;
+    class Simulation;
+    class WorkflowTask;
+    class StorageService;
+    class FileLocation;
 
-class CondorGridStartTimestamp : public SimulationTimestampPair {
-public:
-protected:
-private:
-};
+    class CondorGridStartTimestamp : public SimulationTimestampPair {
+    public:
+    protected:
+    private:
+    };
 
-class CondorGridEndTimestamp : public SimulationTimestampPair {
-public:
-protected:
-private:
-};
+    class CondorGridEndTimestamp : public SimulationTimestampPair {
+    public:
+    protected:
+    private:
+    };
 
-} // namespace wrench
 
-#endif // WRENCH_CONDORTIMESTAMP_H
+}// namespace wrench
+
+#endif//WRENCH_CONDORTIMESTAMP_H

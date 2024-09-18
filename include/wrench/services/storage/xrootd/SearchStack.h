@@ -15,35 +15,35 @@
 ///***********************/
 ///** \cond INTERNAL    **/
 ///***********************/
-// namespace wrench {
-//     namespace XRootD{
-//         class Node;
-//         /**
-//         * @brief A possibly defunct stack to use for a file search.
-//         */
-//         class SearchStack{
-//         public:
-//             SearchStack(Node* terminal,std::shared_ptr<DataFile> file);
+//namespace wrench {
+//    namespace XRootD{
+//        class Node;
+//        /**
+//        * @brief A possibly defunct stack to use for a file search.
+//        */
+//        class SearchStack{
+//        public:
+//            SearchStack(Node* terminal,std::shared_ptr<DataFile> file);
 //
-//             std::list<Node*> stack;
-//             std::list<Node*>::iterator current;
-//             Node* terminalNode;
-//             Node* headNode=nullptr;
-//             std::shared_ptr<DataFile> file;
-//             std::shared_ptr<FileLocation> fileLocation;
+//            std::list<Node*> stack;
+//            std::list<Node*>::iterator current;
+//            Node* terminalNode;
+//            Node* headNode=nullptr;
+//            std::shared_ptr<DataFile> file;
+//            std::shared_ptr<FileLocation> fileLocation;
 //
-//             Node* moveDown();
-//             Node* moveUp();
-//             Node* peak();
-//             bool atStart();
-//             bool atEnd();
-//             bool empty();
-//             void push(Node* node);
-//             bool inTree(Node* potentialParent);
-//         };
+//            Node* moveDown();
+//            Node* moveUp();
+//            Node* peak();
+//            bool atStart();
+//            bool atEnd();
+//            bool empty();
+//            void push(Node* node);
+//            bool inTree(Node* potentialParent);
+//        };
 //
-//     }
-// }
+//    }
+//}
 ///***********************/
 ///** \endcond          **/
 ///***********************/

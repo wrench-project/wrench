@@ -13,23 +13,21 @@
 
 namespace wrench {
 
-/**
- * @brief Constructor
- *
- * @param payload: the message size in bytes
- */
-ExecutionControllerMessage::ExecutionControllerMessage(double payload)
-    : SimulationMessage(payload) {}
+    /**
+     * @brief Constructor
+     *
+     * @param payload: the message size in bytes
+     */
+    ExecutionControllerMessage::ExecutionControllerMessage(double payload) : SimulationMessage(payload) {}
 
-/**
- * @brief Constructor
- * @param message: the (string) message to be sent
- * @param payload: message size in bytes
- *
- * @throw std::invalid_argument
- */
-ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(
-    std::string message, double payload)
-    : ExecutionControllerMessage(payload), message(std::move(message)) {}
+    /**
+     * @brief Constructor
+     * @param message: the (string) message to be sent
+     * @param payload: message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(std::string message, double payload) : ExecutionControllerMessage(payload), message(std::move(message)) {}
 
-} // namespace wrench
+
+}// namespace wrench

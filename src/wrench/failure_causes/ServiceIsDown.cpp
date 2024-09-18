@@ -14,32 +14,33 @@
 
 #include <utility>
 
-WRENCH_LOG_CATEGORY(wrench_core_service_is_down,
-                    "Log category for ServiceIsDown");
+WRENCH_LOG_CATEGORY(wrench_core_service_is_down, "Log category for ServiceIsDown");
 
 namespace wrench {
 
-/**
- * @brief Constructor
- * @param service: the service that was down
- */
-ServiceIsDown::ServiceIsDown(std::shared_ptr<Service> service) {
-  this->service = std::move(service);
-}
+    /**
+     * @brief Constructor
+     * @param service: the service that was down
+     */
+    ServiceIsDown::ServiceIsDown(std::shared_ptr<Service> service) {
+        this->service = std::move(service);
+    }
 
-/**
- * @brief Getter
- * @return the service
- */
-std::shared_ptr<Service> ServiceIsDown::getService() { return this->service; }
+    /**
+     * @brief Getter
+     * @return the service
+     */
+    std::shared_ptr<Service> ServiceIsDown::getService() {
+        return this->service;
+    }
 
-/**
- * @brief Get the human-readable failure message
- * @return the message
- */
-std::string ServiceIsDown::toString() {
-  return "Service " + this->service->getName() + " on host " +
-         this->service->getHostname() + " was terminated";
-}
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string ServiceIsDown::toString() {
+        return "Service " + this->service->getName() + " on host " + this->service->getHostname() + " was terminated";
+    }
 
-} // namespace wrench
+
+}// namespace wrench

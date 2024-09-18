@@ -10,637 +10,564 @@
 #ifndef WRENCH_STORAGESERVICE_H
 #define WRENCH_STORAGESERVICE_H
 
-#include <set>
 #include <string>
+#include <set>
 
-#include "wrench/job/StandardJob.h"
 #include "wrench/services/Service.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
-#include "wrench/services/storage/storage_helpers/FileLocation.h"
+#include "wrench/job/StandardJob.h"
 #include "wrench/services/storage/storage_helpers/LogicalFileSystem.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 namespace wrench {
 
-class Simulation;
-class DataFile;
+    class Simulation;
+    class DataFile;
 
-/**
- * @brief The storage service base class
- */
-class StorageService : public Service {
+    /**
+     * @brief The storage service base class
+     */
+    class StorageService : public Service {
 
-public:
-  /***********************/
-  /** \cond DEVELOPER   **/
-  /***********************/
+    public:
+        /***********************/
+        /** \cond DEVELOPER   **/
+        /***********************/
 
-  /**
-   * @brief Stop the servier
-   */
-  void stop() override;
+        /**
+         * @brief Stop the servier
+         */
+        void stop() override;
 
-  /** File Lookup methods (in simulation) **/
+        /** File Lookup methods (in simulation) **/
 
-  /**
-   * @brief Lookup whether a file exists at a location (incurs simulated
-   * overheads)
-   * @param location a location
-   * @return true if the file is present at the location, or false
-   */
-  static bool
-  lookupFileAtLocation(const std::shared_ptr<FileLocation> &location) {
-    if (location == nullptr) {
-      throw std::invalid_argument(
-          "StorageService::lookupFileAtLocation(): invalid argument argument");
-    }
-    return location->getStorageService()->lookupFile(location);
-  }
-  /**
-   * @brief Lookup whether a file exists on the storage service (incurs
-   * simulated overheads)
-   * @param file a file
-   * @return true if the file is present, or false
-   */
-  bool lookupFile(const std::shared_ptr<DataFile> &file) {
-    return this->lookupFile(file, "/");
-  }
-  /**
-   * @brief Lookup whether a file exists on the storage service (incurs
-   * simulated overheads)
-   * @param file a file
-   * @param path a path
-   * @return true if the file is present, or false
-   */
-  virtual bool lookupFile(const std::shared_ptr<DataFile> &file,
-                          const std::string &path) {
-    return this->lookupFile(
-        wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(),
-                                       FileLocation::sanitizePath(path), file));
-  }
-  /**
-   * @brief Lookup whether a file exists at a location on the storage service
-   * (incurs simulated overheads)
-   * @param location a location
-   * @return true if the file is present, or false
-   */
-  virtual bool lookupFile(const std::shared_ptr<FileLocation> &location) {
-    return this->lookupFile(S4U_Daemon::getRunningActorRecvCommPort(),
-                            location);
-  }
+        /**
+         * @brief Lookup whether a file exists at a location (incurs simulated overheads)
+         * @param location a location
+         * @return true if the file is present at the location, or false
+         */
+        static bool lookupFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::lookupFileAtLocation(): invalid argument argument");
+            }
+            return location->getStorageService()->lookupFile(location);
+        }
+        /**
+         * @brief Lookup whether a file exists on the storage service (incurs simulated overheads)
+         * @param file a file
+         * @return true if the file is present, or false
+         */
+        bool lookupFile(const std::shared_ptr<DataFile> &file) {
+            return this->lookupFile(file, "/");
+        }
+        /**
+         * @brief Lookup whether a file exists on the storage service (incurs simulated overheads)
+         * @param file a file
+         * @param path a path
+         * @return true if the file is present, or false
+         */
+        virtual bool lookupFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            return this->lookupFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
+        }
+        /**
+         * @brief Lookup whether a file exists at a location on the storage service (incurs simulated overheads)
+         * @param location a location
+         * @return true if the file is present, or false
+         */
+        virtual bool lookupFile(const std::shared_ptr<FileLocation> &location) {
+            return this->lookupFile(S4U_Daemon::getRunningActorRecvCommPort(), location);
+        }
 
-  /** File deletion methods **/
+        /** File deletion methods **/
 
-  /**
-   * @brief Delete a file at a location (incurs simulated overheads)
-   * @param location a location
-   */
-  static void
-  deleteFileAtLocation(const std::shared_ptr<FileLocation> &location) {
-    if (location == nullptr) {
-      throw std::invalid_argument(
-          "StorageService::deleteFileAtLocation(): invalid argument argument");
-    }
-    location->getStorageService()->deleteFile(location);
-  }
-  /**
-   * @brief Delete a file at the storage service (incurs simulated overheads)
-   * @param file a file
-   */
-  void deleteFile(const std::shared_ptr<DataFile> &file) {
-    this->deleteFile(file, "/");
-  }
-  /**
-   * @brief Delete a file at the storage service (incurs simulated overheads)
-   * @param file a file
-   * @param path a path
-   */
-  virtual void deleteFile(const std::shared_ptr<DataFile> &file,
-                          const std::string &path) {
-    this->deleteFile(
-        wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(),
-                                       FileLocation::sanitizePath(path), file));
-  }
-  /**
-   * @brief Delete a file at the storage service (incurs simulated overheads)
-   * @param location a location
-   */
-  virtual void deleteFile(const std::shared_ptr<FileLocation> &location) {
-    this->deleteFile(S4U_Daemon::getRunningActorRecvCommPort(), location, true);
-  }
+        /**
+         * @brief Delete a file at a location (incurs simulated overheads)
+         * @param location a location
+         */
+        static void deleteFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::deleteFileAtLocation(): invalid argument argument");
+            }
+            location->getStorageService()->deleteFile(location);
+        }
+        /**
+         * @brief Delete a file at the storage service (incurs simulated overheads)
+         * @param file a file
+         */
+        void deleteFile(const std::shared_ptr<DataFile> &file) {
+            this->deleteFile(file, "/");
+        }
+        /**
+         * @brief Delete a file at the storage service (incurs simulated overheads)
+         * @param file a file
+         * @param path a path
+         */
+        virtual void deleteFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            this->deleteFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
+        }
+        /**
+         * @brief Delete a file at the storage service (incurs simulated overheads)
+         * @param location a location
+         */
+        virtual void deleteFile(const std::shared_ptr<FileLocation> &location) {
+            this->deleteFile(S4U_Daemon::getRunningActorRecvCommPort(), location, true);
+        }
 
-  /** File read methods **/
-  /**
-   * @brief Read a file at a location (incurs simulated overheads)
-   * @param location a location
-   */
-  static void
-  readFileAtLocation(const std::shared_ptr<FileLocation> &location) {
-    if (location == nullptr) {
-      throw std::invalid_argument(
-          "StorageService::readFileAtLocation(): invalid argument argument");
-    }
-    location->getStorageService()->readFile(location,
-                                            location->getFile()->getSize());
-  }
-  /**
-   * @brief Read a file at a location (incurs simulated overheads)
-   * @param location a location
-   * @param num_bytes a number of bytes to read
-   */
-  static void readFileAtLocation(const std::shared_ptr<FileLocation> &location,
-                                 double num_bytes) {
-    if (location == nullptr) {
-      throw std::invalid_argument(
-          "StorageService::readFileAtLocation(): invalid argument argument");
-    }
-    location->getStorageService()->readFile(location, num_bytes);
-  }
-  /**
-   * @brief Read a file at the storage service (incurs simulated overheads)
-   * @param file a file
-   */
-  void readFile(const std::shared_ptr<DataFile> &file) {
-    this->readFile(file, "/", file->getSize());
-  }
-  /**
-   * @brief Read a file at the storage service (incurs simulated overheads)
-   * @param file a file
-   * @param num_bytes a number of bytes to read
-   */
-  void readFile(const std::shared_ptr<DataFile> &file, double num_bytes) {
-    this->readFile(file, "/", num_bytes);
-  }
-  /**
-   * @brief Read a file at the storage service (incurs simulated overheads)
-   * @param file a file
-   * @param path a path
-   */
-  virtual void readFile(const std::shared_ptr<DataFile> &file,
-                        const std::string &path) {
-    this->readFile(file, FileLocation::sanitizePath(path), file->getSize());
-  }
-  /**
-   * @brief Read a file at the storage service (incurs simulated overheads)
-   * @param file a file
-   * @param path a path
-   * @param num_bytes a number of bytes to read
-   */
-  virtual void readFile(const std::shared_ptr<DataFile> &file,
-                        const std::string &path, double num_bytes) {
-    this->readFile(
-        wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(),
-                                       FileLocation::sanitizePath(path), file),
-        num_bytes);
-  }
-  /**
-   * @brief Read a file at the storage service (incurs simulated overheads)
-   * @param location a location
-   */
-  void readFile(const std::shared_ptr<FileLocation> &location) {
-    this->readFile(S4U_Daemon::getRunningActorRecvCommPort(), location,
-                   location->getFile()->getSize(), true);
-  }
-  /**
-   * @brief Read a file at the storage service (incurs simulated overheads)
-   * @param location a location
-   * @param num_bytes a number of bytes to read
-   */
-  virtual void readFile(const std::shared_ptr<FileLocation> &location,
-                        double num_bytes) {
-    this->readFile(S4U_Daemon::getRunningActorRecvCommPort(), location,
-                   num_bytes, true);
-  }
+        /** File read methods **/
+        /**
+         * @brief Read a file at a location (incurs simulated overheads)
+         * @param location a location
+         */
+        static void readFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::readFileAtLocation(): invalid argument argument");
+            }
+            location->getStorageService()->readFile(location, location->getFile()->getSize());
+        }
+        /**
+         * @brief Read a file at a location (incurs simulated overheads)
+         * @param location a location
+         * @param num_bytes a number of bytes to read
+         */
+        static void readFileAtLocation(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::readFileAtLocation(): invalid argument argument");
+            }
+            location->getStorageService()->readFile(location, num_bytes);
+        }
+        /**
+         * @brief Read a file at the storage service (incurs simulated overheads)
+         * @param file a file
+         */
+        void readFile(const std::shared_ptr<DataFile> &file) {
+            this->readFile(file, "/", file->getSize());
+        }
+        /**
+         * @brief Read a file at the storage service (incurs simulated overheads)
+         * @param file a file
+         * @param num_bytes a number of bytes to read
+         */
+        void readFile(const std::shared_ptr<DataFile> &file, double num_bytes) {
+            this->readFile(file, "/", num_bytes);
+        }
+        /**
+         * @brief Read a file at the storage service (incurs simulated overheads)
+         * @param file a file
+         * @param path a path
+         */
+        virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            this->readFile(file, FileLocation::sanitizePath(path), file->getSize());
+        }
+        /**
+         * @brief Read a file at the storage service (incurs simulated overheads)
+         * @param file a file
+         * @param path a path
+         * @param num_bytes a number of bytes to read
+         */
+        virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes) {
+            this->readFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file), num_bytes);
+        }
+        /**
+         * @brief Read a file at the storage service (incurs simulated overheads)
+         * @param location a location
+         */
+        void readFile(const std::shared_ptr<FileLocation> &location) {
+            this->readFile(S4U_Daemon::getRunningActorRecvCommPort(), location, location->getFile()->getSize(), true);
+        }
+        /**
+         * @brief Read a file at the storage service (incurs simulated overheads)
+         * @param location a location
+         * @param num_bytes a number of bytes to read
+         */
+        virtual void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+            this->readFile(S4U_Daemon::getRunningActorRecvCommPort(), location, num_bytes, true);
+        }
 
-  /** File write methods **/
-  /**
-   * @brief Write a file at a location (incurs simulated overheads)
-   * @param location a location
-   */
-  static void
-  writeFileAtLocation(const std::shared_ptr<FileLocation> &location) {
-    if (location == nullptr) {
-      throw std::invalid_argument(
-          "StorageService::writeFileAtLocation(): invalid argument argument");
-    }
-    location->getStorageService()->writeFile(location);
-  }
-  /**
-   * @brief Write a file at the storage service (incurs simulated overheads)
-   * @param file a file
-   */
-  void writeFile(const std::shared_ptr<DataFile> &file) {
-    this->writeFile(file, "/");
-  }
-  /**
-   * @brief Write a file at the storage service (incurs simulated overheads)
-   * @param file a file
-   * @param path a path
-   */
-  virtual void writeFile(const std::shared_ptr<DataFile> &file,
-                         const std::string &path) {
-    this->writeFile(
-        wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(),
-                                       FileLocation::sanitizePath(path), file));
-  }
-  /**
-   * @brief Write a file at the storage service (incurs simulated overheads)
-   * @param location a location
-   */
-  virtual void writeFile(const std::shared_ptr<FileLocation> &location) {
-    this->writeFile(S4U_Daemon::getRunningActorRecvCommPort(), location,
-                    location->getFile()->getSize(), true);
-  }
+        /** File write methods **/
+        /**
+         * @brief Write a file at a location (incurs simulated overheads)
+         * @param location a location
+         */
+        static void writeFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::writeFileAtLocation(): invalid argument argument");
+            }
+            location->getStorageService()->writeFile(location);
+        }
+        /**
+         * @brief Write a file at the storage service (incurs simulated overheads)
+         * @param file a file
+         */
+        void writeFile(const std::shared_ptr<DataFile> &file) {
+            this->writeFile(file, "/");
+        }
+        /**
+         * @brief Write a file at the storage service (incurs simulated overheads)
+         * @param file a file
+         * @param path a path
+         */
+        virtual void writeFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            this->writeFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
+        }
+        /**
+         * @brief Write a file at the storage service (incurs simulated overheads)
+         * @param location a location
+         */
+        virtual void writeFile(const std::shared_ptr<FileLocation> &location) {
+            this->writeFile(S4U_Daemon::getRunningActorRecvCommPort(), location, location->getFile()->getSize(), true);
+        }
 
-  /** Non-Simulation methods **/
+        /** Non-Simulation methods **/
 
-  /** File lookup methods */
+        /** File lookup methods */
 
-  /**
-   * @brief Determines whether a file is present at a location (in zero
-   * simulated time)
-   * @param location: a location
-   * @return true if the file is present, false otherwise
-   */
-  static bool hasFileAtLocation(const std::shared_ptr<FileLocation> &location) {
-    if (location == nullptr) {
-      throw std::invalid_argument(
-          "StorageService::hasFileAtLocation(): invalid argument argument");
-    }
-    return location->getStorageService()->hasFile(location);
-  }
-  /**
-   * @brief Determines whether a file is present at the storage service (in zero
-   * simulated time)
-   * @param file: a file
-   * @return true if the file is present, false otherwise
-   */
-  bool hasFile(const std::shared_ptr<DataFile> &file) {
-    return this->hasFile(file, "/");
-  }
-  /**
-   * @brief Determines whether a file is present at the storage service (in zero
-   * simulated time)
-   * @param file: a file
-   * @param path: a path
-   * @return true if the file is present, false otherwise
-   */
-  virtual bool hasFile(const std::shared_ptr<DataFile> &file,
-                       const std::string &path) {
-    return this->hasFile(
-        wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(),
-                                       FileLocation::sanitizePath(path), file));
-  }
-  /**
-   * @brief Determines whether a file is present at the storage service (in zero
-   * simulated time)
-   * @param location: a location
-   * @return true if the file is present, false otherwise
-   */
-  virtual bool hasFile(const std::shared_ptr<FileLocation> &location) = 0;
+        /**
+         * @brief Determines whether a file is present at a location (in zero simulated time)
+         * @param location: a location
+         * @return true if the file is present, false otherwise
+         */
+        static bool hasFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::hasFileAtLocation(): invalid argument argument");
+            }
+            return location->getStorageService()->hasFile(location);
+        }
+        /**
+         * @brief Determines whether a file is present at the storage service (in zero simulated time)
+         * @param file: a file
+         * @return true if the file is present, false otherwise
+         */
+        bool hasFile(const std::shared_ptr<DataFile> &file) {
+            return this->hasFile(file, "/");
+        }
+        /**
+         * @brief Determines whether a file is present at the storage service (in zero simulated time)
+         * @param file: a file
+         * @param path: a path
+         * @return true if the file is present, false otherwise
+         */
+        virtual bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            return this->hasFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
+        }
+        /**
+         * @brief Determines whether a file is present at the storage service (in zero simulated time)
+         * @param location: a location
+         * @return true if the file is present, false otherwise
+         */
+        virtual bool hasFile(const std::shared_ptr<FileLocation> &location) = 0;
 
-  /** File creation methods */
-  /**
-   * @brief Create a file at a location (in zero simulated time)
-   * @param location: a location
-   */
-  static void
-  createFileAtLocation(const std::shared_ptr<FileLocation> &location) {
-    if (location == nullptr) {
-      throw std::invalid_argument(
-          "StorageService::createFileAtLocation(): invalid argument argument");
-    }
-    location->getStorageService()->createFile(location);
-  }
-  /**
-   * @brief Create a file at the storage service (in zero simulated time)
-   * @param file: a file
-   */
-  void createFile(const std::shared_ptr<DataFile> &file) {
-    this->createFile(file, "/");
-  }
-  /**
-   * @brief Create a file at the storage service (in zero simulated time)
-   * @param file: a file
-   * @param path: a path
-   */
-  virtual void createFile(const std::shared_ptr<DataFile> &file,
-                          const std::string &path) {
-    this->createFile(
-        wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(),
-                                       FileLocation::sanitizePath(path), file));
-  }
-  /**
-   * @brief Create a file at the storage service (in zero simulated time)
-   * @param location: a location
-   */
-  virtual void createFile(const std::shared_ptr<FileLocation> &location) = 0;
+        /** File creation methods */
+        /**
+         * @brief Create a file at a location (in zero simulated time)
+         * @param location: a location
+         */
+        static void createFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::createFileAtLocation(): invalid argument argument");
+            }
+            location->getStorageService()->createFile(location);
+        }
+        /**
+         * @brief Create a file at the storage service (in zero simulated time)
+         * @param file: a file
+         */
+        void createFile(const std::shared_ptr<DataFile> &file) {
+            this->createFile(file, "/");
+        }
+        /**
+         * @brief Create a file at the storage service (in zero simulated time)
+         * @param file: a file
+         * @param path: a path
+         */
+        virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            this->createFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
+        }
+        /**
+         * @brief Create a file at the storage service (in zero simulated time)
+         * @param location: a location
+         */
+        virtual void createFile(const std::shared_ptr<FileLocation> &location) = 0;
 
-  /** File removal methods */
-  /**
-   * @brief Remove a file at a location (in zero simulated time)
-   * @param location: a location
-   */
-  static void
-  removeFileAtLocation(const std::shared_ptr<FileLocation> &location) {
-    if (location == nullptr) {
-      throw std::invalid_argument(
-          "StorageService::removeFileAtLocation(): invalid argument argument");
-    }
-    location->getStorageService()->removeFile(location);
-  }
-  /**
-   * @brief Remove a file at the storage service (in zero simulated time)
-   * @param file: a file
-   */
-  void removeFile(const std::shared_ptr<DataFile> &file) {
-    this->removeFile(file, "/");
-  }
-  /**
-   * @brief Remove a file at the storage service (in zero simulated time)
-   * @param file: a file
-   * @param path: a path
-   */
-  virtual void removeFile(const std::shared_ptr<DataFile> &file,
-                          const std::string &path) {
-    this->removeFile(
-        wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(),
-                                       FileLocation::sanitizePath(path), file));
-  }
-  /**
-   * @brief Remove a file at the storage service (in zero simulated time)
-   * @param location: a location
-   */
-  virtual void removeFile(const std::shared_ptr<FileLocation> &location) = 0;
 
-  /**
-   * @brief Remove a directory and all files at the storage service (in zero
-   * simulated time)
-   * @param path a path
-   */
-  virtual void removeDirectory(const std::string &path) = 0;
+        /** File removal methods */
+        /**
+         * @brief Remove a file at a location (in zero simulated time)
+         * @param location: a location
+         */
+        static void removeFileAtLocation(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::removeFileAtLocation(): invalid argument argument");
+            }
+            location->getStorageService()->removeFile(location);
+        }
+        /**
+         * @brief Remove a file at the storage service (in zero simulated time)
+         * @param file: a file
+         */
+        void removeFile(const std::shared_ptr<DataFile> &file) {
+            this->removeFile(file, "/");
+        }
+        /**
+         * @brief Remove a file at the storage service (in zero simulated time)
+         * @param file: a file
+         * @param path: a path
+         */
+        virtual void removeFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            this->removeFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
+        }
+        /**
+         * @brief Remove a file at the storage service (in zero simulated time)
+         * @param location: a location
+         */
+        virtual void removeFile(const std::shared_ptr<FileLocation> &location) = 0;
 
-  /** File write date methods */
-  /**
-   * @brief Get a file's last write date at a location (in zero simulated time)
-   * @param location:  a location
-   * @return a date in seconds, or -1 if the file is not found
-   */
-  double
-  getFileLocationLastWriteDate(const std::shared_ptr<FileLocation> &location) {
-    if (location == nullptr) {
-      throw std::invalid_argument(
-          "StorageService::getFileLocationLastWriteDate(): invalid argument "
-          "argument");
-    }
-    return this->getFileLastWriteDate(location);
-  }
-  /**
-   * @brief Get a file's last write date at the storage service (in zero
-   * simulated time)
-   * @param file: a file
-   * @return a date in seconds
-   */
-  double getFileLastWriteDate(const std::shared_ptr<DataFile> &file) {
-    return this->getFileLastWriteDate(file, "/");
-  }
-  /**
-   * @brief Get a file's last write date at the storage service (in zero
-   * simulated time)
-   * @param file: a file
-   * @param path: a path
-   * @return a date in seconds
-   */
-  virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file,
-                                      const std::string &path) {
-    return this->getFileLastWriteDate(
-        wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(),
-                                       FileLocation::sanitizePath(path), file));
-  }
-  /**
-   * @brief Get a file's last write date at the storage service (in zero
-   * simulated time)
-   * @param location: a location
-   * @return a date in seconds
-   */
-  virtual double
-  getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) = 0;
 
-  /** Service load methods */
-  /**
-   * @brief Get the storage service's load
-   * @return a load metric
-   */
-  virtual double getLoad() = 0;
+        /**
+         * @brief Remove a directory and all files at the storage service (in zero simulated time)
+         * @param path a path
+         */
+        virtual void removeDirectory(const std::string &path) = 0;
 
-  /** Service total space method */
-  /**
-   * @brief Get the storage service's total space (in zero simulated time)
-   * @return a capacity in bytes
-   */
-  virtual double getTotalSpace() = 0;
+        /** File write date methods */
+        /**
+         * @brief Get a file's last write date at a location (in zero simulated time)
+         * @param location:  a location
+         * @return a date in seconds, or -1 if the file is not found
+         */
+        double getFileLocationLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+            if (location == nullptr) {
+                throw std::invalid_argument("StorageService::getFileLocationLastWriteDate(): invalid argument argument");
+            }
+            return this->getFileLastWriteDate(location);
+        }
+        /**
+         * @brief Get a file's last write date at the storage service (in zero simulated time)
+         * @param file: a file
+         * @return a date in seconds
+         */
+        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file) {
+            return this->getFileLastWriteDate(file, "/");
+        }
+        /**
+         * @brief Get a file's last write date at the storage service (in zero simulated time)
+         * @param file: a file
+         * @param path: a path
+         * @return a date in seconds
+         */
+        virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
+            return this->getFileLastWriteDate(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
+        }
+        /**
+         * @brief Get a file's last write date at the storage service (in zero simulated time)
+         * @param location: a location
+         * @return a date in seconds
+         */
+        virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) = 0;
 
-  /** Service free space method */
-  /**
-   * @brief Get the storage service's total free space (incurs simulated
-   * overhead)
-   * @return a capacity in bytes
-   */
-  double getTotalFreeSpace();
+        /** Service load methods */
+        /**
+         * @brief Get the storage service's load
+         * @return a load metric
+         */
+        virtual double getLoad() = 0;
 
-  /** Service free space method */
-  /**
-   * @brief Get the storage service's free space at a path (incurs simulated
-   * overhead)
-   * @brief path a path
-   * @return a capacity in bytes
-   */
-  virtual double getTotalFreeSpaceAtPath(const std::string &path);
+        /** Service total space method */
+        /**
+         * @brief Get the storage service's total space (in zero simulated time)
+         * @return a capacity in bytes
+         */
+        virtual double getTotalSpace() = 0;
 
-  /** Service free space tracing (doesn't incur simulated overhead) */
-  /**
-   *  @brief Get the storage service's total free space (no simulated overhead)
-   *  @return Current free space in bytes
-   *
-   */
-  virtual double getTotalFreeSpaceZeroTime() {
-    throw std::runtime_error("StorageService::traceTotalFreeSpace: should have "
-                             "been overridden by derived class");
-  }
+        /** Service free space method */
+        /**
+         * @brief Get the storage service's total free space (incurs simulated overhead)
+         * @return a capacity in bytes
+         */
+        double getTotalFreeSpace();
 
-  /** Service number of allocated files tracing (doesn't incur simulated
-   * overhead) */
-  /**
-   *  @brief Get the number of files registered to the filesystem(s) associated
-   * with this service (no simulated overhead)
-   *  @return Current number of registered Datafile for all filesystem(s) from
-   * this service
-   *
-   */
-  virtual double getTotalFilesZeroTime() {
-    throw std::runtime_error("StorageService::traceTotalFiles: should have "
-                             "been overridden by derived class");
-  }
+        /** Service free space method */
+        /**
+         * @brief Get the storage service's free space at a path (incurs simulated overhead)
+         * @brief path a path
+         * @return a capacity in bytes
+         */
+        virtual double getTotalFreeSpaceAtPath(const std::string &path);
 
-  /**
-   * @brief Get the storage's service base root path
-   * @return a path
-   */
-  virtual std::string getBaseRootPath() { return "/"; }
+        /** Service free space tracing (doesn't incur simulated overhead) */
+        /**
+         *  @brief Get the storage service's total free space (no simulated overhead)
+         *  @return Current free space in bytes
+         *
+         */
+        virtual double getTotalFreeSpaceZeroTime() {
+            throw std::runtime_error("StorageService::traceTotalFreeSpace: should have been overridden by derived class");
+        }
 
-  /**
-   * @brief Copy a file from one location to another
-   * @param src_location: a source location
-   * @param dst_location: a destination location
-   */
-  static void copyFile(const std::shared_ptr<FileLocation> &src_location,
-                       const std::shared_ptr<FileLocation> &dst_location);
+        /** Service number of allocated files tracing (doesn't incur simulated overhead) */
+        /**
+         *  @brief Get the number of files registered to the filesystem(s) associated with this service (no simulated overhead)
+         *  @return Current number of registered Datafile for all filesystem(s) from this service
+         *
+         */
+        virtual double getTotalFilesZeroTime() {
+            throw std::runtime_error("StorageService::traceTotalFiles: should have been overridden by derived class");
+        }
 
-  /**
-   * @brief Helper method to read multiple files
-   *
-   * @param locations: a map of files to locations
-   */
-  static void
-  readFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>
-                locations);
+        /**
+         * @brief Get the storage's service base root path
+         * @return a path
+         */
+        virtual std::string getBaseRootPath() {
+            return "/";
+        }
 
-  /**
-   * @brief Helper method to write multiple files
-   *
-   * @param locations: a map of files to locations
-   */
-  static void
-  writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>
-                 locations);
+        /**
+         * @brief Copy a file from one location to another
+         * @param src_location: a source location
+         * @param dst_location: a destination location
+         */
+        static void copyFile(const std::shared_ptr<FileLocation> &src_location,
+                             const std::shared_ptr<FileLocation> &dst_location);
 
-  /**
-   * @brief Determine whether the storage service is bufferized
-   * @return true if bufferized, false otherwise
-   */
-  virtual bool isBufferized() const = 0;
-  /**
-   * @brief Determine the storage service's buffer size
-   * @return a size in bytes
-   */
-  virtual double getBufferSize() const = 0;
+        /**
+         * @brief Helper method to read multiple files
+         *
+         * @param locations: a map of files to locations
+         */
+        static void readFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
-  /**
-   * @brief Determines whether the storage service is a scratch service of a
-   * ComputeService
-   * @return true if it is, false otherwise
-   */
-  bool isScratch() const { return this->is_scratch; }
+        /**
+         * @brief Helper method to write multiple files
+         *
+         * @param locations: a map of files to locations
+         */
+        static void writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
-  /***********************/
-  /** \endcond          **/
-  /***********************/
+        /**
+         * @brief Determine whether the storage service is bufferized
+         * @return true if bufferized, false otherwise
+         */
+        virtual bool isBufferized() const = 0;
+        /**
+         * @brief Determine the storage service's buffer size
+         * @return a size in bytes
+         */
+        virtual double getBufferSize() const = 0;
 
-  /***********************/
-  /** \cond INTERNAL    **/
-  /***********************/
+        /**
+         * @brief Determines whether the storage service is a scratch service of a ComputeService
+         * @return true if it is, false otherwise
+         */
+        bool isScratch() const {
+            return this->is_scratch;
+        }
 
-  /**
-   * @brief Initiate a file copy from one location to another
-   * @param answer_commport: a commport_name on which to receive
-   * completion/failure notification
-   * @param src_location: a source location
-   * @param dst_location: a destination location
-   */
-  static void
-  initiateFileCopy(S4U_CommPort *answer_commport,
-                   const std::shared_ptr<FileLocation> &src_location,
-                   const std::shared_ptr<FileLocation> &dst_location);
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
-  /**
-   * @brief Reserve space at the storage service
-   * @param location: a location
-   * @return true if success, false otherwise
-   */
-  virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) = 0;
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
 
-  /**
-   * @brief Unreserve space at the storage service
-   * @param location: a location
-   */
-  virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) = 0;
+        /**
+         * @brief Initiate a file copy from one location to another
+         * @param answer_commport: a commport_name on which to receive completion/failure notification
+         * @param src_location: a source location
+         * @param dst_location: a destination location
+         */
+        static void initiateFileCopy(S4U_CommPort *answer_commport,
+                                     const std::shared_ptr<FileLocation> &src_location,
+                                     const std::shared_ptr<FileLocation> &dst_location);
 
-  virtual void deleteFile(S4U_CommPort *answer_commport,
-                          const std::shared_ptr<FileLocation> &location,
-                          bool wait_for_answer);
+        /**
+         * @brief Reserve space at the storage service
+         * @param location: a location
+         * @return true if success, false otherwise
+         */
+        virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) = 0;
 
-  virtual bool lookupFile(S4U_CommPort *answer_commport,
-                          const std::shared_ptr<FileLocation> &location);
+        /**
+         * @brief Unreserve space at the storage service
+         * @param location: a location
+         */
+        virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) = 0;
 
-  virtual void readFile(S4U_CommPort *answer_commport,
-                        const std::shared_ptr<FileLocation> &location,
-                        double num_bytes, bool wait_for_answer);
+        virtual void deleteFile(S4U_CommPort *answer_commport,
+                                const std::shared_ptr<FileLocation> &location,
+                                bool wait_for_answer);
 
-  virtual void writeFile(S4U_CommPort *answer_commport,
-                         const std::shared_ptr<FileLocation> &location,
-                         double num_bytes_to_write, bool wait_for_answer);
+        virtual bool lookupFile(S4U_CommPort *answer_commport,
+                                const std::shared_ptr<FileLocation> &location);
 
-  /**
-   * @brief Decrement the number of operations for a location
-   * @param location: a location
-   **/
-  virtual void decrementNumRunningOperationsForLocation(
-      const std::shared_ptr<FileLocation> &location) {
-    // do nothing
-  }
+        virtual void readFile(S4U_CommPort *answer_commport,
+                              const std::shared_ptr<FileLocation> &location,
+                              double num_bytes,
+                              bool wait_for_answer);
 
-  /**
-   * @brief Increment the number of operations for a location
-   * @param location: a location
-   **/
-  virtual void incrementNumRunningOperationsForLocation(
-      const std::shared_ptr<FileLocation> &location) {
-    // no nothing
-  }
+        virtual void writeFile(S4U_CommPort *answer_commport,
+                               const std::shared_ptr<FileLocation> &location,
+                               double num_bytes_to_write,
+                               bool wait_for_answer);
 
-  /***********************/
-  /** \endcond          **/
-  /***********************/
+        /**
+         * @brief Decrement the number of operations for a location
+         * @param location: a location
+         **/
+        virtual void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
+            // do nothing
+        }
 
-protected:
-  /***********************/
-  /** \cond INTERNAL    **/
-  /***********************/
+        /**
+         * @brief Increment the number of operations for a location
+         * @param location: a location
+         **/
+        virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
+            // no nothing
+        }
 
-  friend class ComputeService;
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
-  StorageService(const std::string &hostname, const std::string &service_name);
+    protected:
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
 
-  virtual void setIsScratch(bool is_scratch);
+        friend class ComputeService;
 
-  /** Fast-Access common message payloads! **/
-  //        double
-  //        StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD;
-  //        double
-  //        StorageServiceMessagePayload_FILE_READ_ANSWER_MESSAGE_PAYLOAD;
-  /***********************/
-  /** \endcond          **/
-  /***********************/
+        StorageService(const std::string &hostname,
+                       const std::string &service_name);
 
-private:
-  enum FileOperation {
-    READ,
-    WRITE,
-  };
+        virtual void setIsScratch(bool is_scratch);
 
-  virtual void writeFilePartial(const std::shared_ptr<FileLocation> &location,
-                                double num_bytes_to_write) {
-    this->writeFile(S4U_Daemon::getRunningActorRecvCommPort(), location,
-                    num_bytes_to_write, true);
-  }
+        /** Fast-Access common message payloads! **/
+        //        double StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD;
+        //        double StorageServiceMessagePayload_FILE_READ_ANSWER_MESSAGE_PAYLOAD;
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
-  static void writeOrReadFiles(
-      FileOperation action,
-      std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>
-          locations);
+    private:
+        enum FileOperation {
+            READ,
+            WRITE,
+        };
 
-  bool is_scratch;
-};
 
-} // namespace wrench
+        virtual void writeFilePartial(const std::shared_ptr<FileLocation> &location, double num_bytes_to_write) {
+            this->writeFile(S4U_Daemon::getRunningActorRecvCommPort(), location, num_bytes_to_write, true);
+        }
 
-#endif // WRENCH_STORAGESERVICE_H
+        static void writeOrReadFiles(FileOperation action,
+                                     std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
+
+        bool is_scratch;
+    };
+
+
+}// namespace wrench
+
+
+#endif//WRENCH_STORAGESERVICE_H

@@ -12,43 +12,40 @@
 
 #include <wrench-dev.h>
 
+
 namespace wrench {
 
-/**
- *  @brief A Workflow Management System (WMS) implementation
- */
-class CondorWMS : public ExecutionController {
+    /**
+     *  @brief A Workflow Management System (WMS) implementation
+     */
+    class CondorWMS : public ExecutionController {
 
-public:
-  // Constructor
-  CondorWMS(
-      const std::shared_ptr<Workflow> &workflow,
-      const std::shared_ptr<wrench::HTCondorComputeService>
-          &htcondor_compute_service,
-      const std::shared_ptr<wrench::BatchComputeService> &batch_compute_service,
-      const std::shared_ptr<wrench::CloudComputeService> &cloud_compute_service,
-      const std::shared_ptr<wrench::StorageService> &storage_service,
-      std::string hostname);
+    public:
+        // Constructor
+        CondorWMS(const std::shared_ptr<Workflow> &workflow,
+                  const std::shared_ptr<wrench::HTCondorComputeService> &htcondor_compute_service,
+                  const std::shared_ptr<wrench::BatchComputeService> &batch_compute_service,
+                  const std::shared_ptr<wrench::CloudComputeService> &cloud_compute_service,
+                  const std::shared_ptr<wrench::StorageService> &storage_service,
+                  std::string hostname);
 
-protected:
-  // Overridden method
-  void processEventStandardJobCompletion(
-      std::shared_ptr<StandardJobCompletedEvent>) override;
-  /**
-  void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>)
-  override;
-  **/
-private:
-  // main() method of the WMS
-  int main() override;
+    protected:
+        // Overridden method
+        void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
+        /**
+        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
+        **/
+    private:
+        // main() method of the WMS
+        int main() override;
 
-  std::shared_ptr<Workflow> workflow;
-  std::shared_ptr<wrench::HTCondorComputeService> htcondor_compute_service;
-  std::shared_ptr<wrench::BatchComputeService> batch_compute_service;
-  std::shared_ptr<wrench::CloudComputeService> cloud_compute_service;
-  std::shared_ptr<wrench::StorageService> storage_service;
-};
+        std::shared_ptr<Workflow> workflow;
+        std::shared_ptr<wrench::HTCondorComputeService> htcondor_compute_service;
+        std::shared_ptr<wrench::BatchComputeService> batch_compute_service;
+        std::shared_ptr<wrench::CloudComputeService> cloud_compute_service;
+        std::shared_ptr<wrench::StorageService> storage_service;
+    };
 
-} // namespace wrench
+}// namespace wrench
 
-#endif // WRENCH_CONDORWMS_H
+#endif//WRENCH_CONDORWMS_H

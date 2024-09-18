@@ -7,6 +7,9 @@
  * (at your option) any later version.
  */
 
+
 #include <wrench/simulation/SimulationTimestamp.h>
 
-namespace wrench {};
+namespace wrench {
+
+};

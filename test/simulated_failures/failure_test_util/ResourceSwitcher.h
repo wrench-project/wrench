@@ -15,33 +15,39 @@
 
 namespace wrench {
 
-class ResourceSwitcher : public Service {
+    class ResourceSwitcher : public Service {
 
-public:
-  enum ResourceType { HOST, LINK };
+    public:
+        enum ResourceType {
+            HOST,
+            LINK
+        };
 
-  enum Action { TURN_ON, TURN_OFF };
+        enum Action {
+            TURN_ON,
+            TURN_OFF
+        };
 
-  explicit ResourceSwitcher(std::string host_on_which_to_run, double sleep_time,
-                            std::string host_to_switch, Action action,
-                            ResourceType resource_type);
+        explicit ResourceSwitcher(std::string host_on_which_to_run, double sleep_time, std::string host_to_switch, Action action, ResourceType resource_type);
 
-  /***********************/
-  /** \endcond           */
-  /***********************/
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-private:
-  double sleep_time;
-  std::string resource_to_switch;
-  Action action;
-  ResourceType resource_type;
-  int main();
-};
+    private:
+        double sleep_time;
+        std::string resource_to_switch;
+        Action action;
+        ResourceType resource_type;
+        int main();
+    };
 
-/***********************/
-/** \endcond            */
-/***********************/
+    /***********************/
+    /** \endcond            */
+    /***********************/
 
-}; // namespace wrench
 
-#endif // WRENCH_RESOURCESWITCHER_H
+};// namespace wrench
+
+
+#endif//WRENCH_RESOURCESWITCHER_H

@@ -14,37 +14,33 @@
 
 namespace wrench {
 
-class WMS;
+    class WMS;
 
-/**
- * @brief A service that measures and records bandwidth usage on a set of links
- * at regular time intervals
- */
-class BandwidthMeterService : public Service {
-public:
-  BandwidthMeterService(const std::string &hostname,
-                        const std::vector<std::string> &linknames,
-                        double period);
-  BandwidthMeterService(
-      const std::string &hostname,
-      const std::map<std::string, double> &measurement_periods);
+    /**
+     * @brief A service that measures and records bandwidth usage on a set of links at regular time intervals
+     */
+    class BandwidthMeterService : public Service {
+    public:
+        BandwidthMeterService(const std::string &hostname, const std::vector<std::string> &linknames, double period);
+        BandwidthMeterService(const std::string &hostname, const std::map<std::string, double> &measurement_periods);
 
-  /***********************/
-  /** \cond DEVELOPER    */
-  /***********************/
-  void stop() override;
-  void kill();
-  /***********************/
-  /** \endcond           */
-  /***********************/
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+        void stop() override;
+        void kill();
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-private:
-  int main() override;
-  bool processNextMessage(double timeout);
 
-  std::map<std::string, double> measurement_periods;
-  std::map<std::string, double> time_to_next_measurement;
-};
-} // namespace wrench
+    private:
+        int main() override;
+        bool processNextMessage(double timeout);
 
-#endif // WRENCH_BANDWIDTHMETERSERVICE_H
+        std::map<std::string, double> measurement_periods;
+        std::map<std::string, double> time_to_next_measurement;
+    };
+}// namespace wrench
+
+#endif//WRENCH_BANDWIDTHMETERSERVICE_H

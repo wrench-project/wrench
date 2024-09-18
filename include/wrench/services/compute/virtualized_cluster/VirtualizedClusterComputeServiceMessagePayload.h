@@ -15,21 +15,18 @@
 
 namespace wrench {
 
-/**
- * @brief Configurable message payloads for a VirtualizedClusterComputeService
- */
-class VirtualizedClusterComputeServiceMessagePayload
-    : public CloudComputeServiceMessagePayload {
+    /**
+     * @brief Configurable message payloads for a VirtualizedClusterComputeService
+     */
+    class VirtualizedClusterComputeServiceMessagePayload : public CloudComputeServiceMessagePayload {
 
-public:
-  /** @brief The number of bytes in the control message sent to the service to
-   * request a VM migration. **/
-  DECLARE_MESSAGEPAYLOAD_NAME(MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD);
-  /** @brief The number of bytes in the control message sent by the service in
-   * answer to a VM migration request. **/
-  DECLARE_MESSAGEPAYLOAD_NAME(MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD);
-};
+    public:
+        /** @brief The number of bytes in the control message sent to the service to request a VM migration. **/
+        DECLARE_MESSAGEPAYLOAD_NAME(MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent by the service in answer to a VM migration request. **/
+        DECLARE_MESSAGEPAYLOAD_NAME(MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD);
+    };
 
-} // namespace wrench
+}// namespace wrench
 
-#endif // WRENCH_VIRTUALIZEDCLUSTERMESSAGEPAYLOAD_H
+#endif//WRENCH_VIRTUALIZEDCLUSTERMESSAGEPAYLOAD_H

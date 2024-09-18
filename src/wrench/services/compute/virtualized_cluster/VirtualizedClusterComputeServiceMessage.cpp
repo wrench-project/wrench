@@ -12,57 +12,53 @@
 
 namespace wrench {
 
-/**
- * @brief Constructor
- *
- * @param payload: the message size in bytes
- */
-VirtualizedClusterComputeServiceMessage::
-    VirtualizedClusterComputeServiceMessage(double payload)
-    : ComputeServiceMessage(payload) {}
+    /**
+     * @brief Constructor
+     *
+     * @param payload: the message size in bytes
+     */
+    VirtualizedClusterComputeServiceMessage::VirtualizedClusterComputeServiceMessage(double payload) : ComputeServiceMessage(payload) {
+    }
 
-/**
- * @brief Constructor
- *
- * @param answer_commport: the commport to which to send the answer
- * @param vm_name: the name of the new VM host
- * @param dest_pm_hostname: the name of the destination physical machine host
- * @param payload: the message size in bytes
- *
- * @throw std::invalid_argument
- */
-VirtualizedClusterComputeServiceMigrateVMRequestMessage::
-    VirtualizedClusterComputeServiceMigrateVMRequestMessage(
-        S4U_CommPort *answer_commport, const std::string &vm_name,
-        const std::string &dest_pm_hostname, double payload)
-    : VirtualizedClusterComputeServiceMessage(payload) {
+    /**
+     * @brief Constructor
+     *
+     * @param answer_commport: the commport to which to send the answer
+     * @param vm_name: the name of the new VM host
+     * @param dest_pm_hostname: the name of the destination physical machine host
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    VirtualizedClusterComputeServiceMigrateVMRequestMessage::VirtualizedClusterComputeServiceMigrateVMRequestMessage(
+            S4U_CommPort *answer_commport,
+            const std::string &vm_name,
+            const std::string &dest_pm_hostname,
+            double payload) : VirtualizedClusterComputeServiceMessage(payload) {
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-  if ((answer_commport == nullptr) || dest_pm_hostname.empty() ||
-      vm_name.empty()) {
-    throw std::invalid_argument(
-        "VirtualizedClusterComputeServiceMigrateVMRequestMessage::"
-        "VirtualizedClusterComputeServiceMigrateVMRequestMessage(): Invalid "
-        "arguments");
-  }
+        if ((answer_commport == nullptr) || dest_pm_hostname.empty() || vm_name.empty()) {
+            throw std::invalid_argument(
+                    "VirtualizedClusterComputeServiceMigrateVMRequestMessage::VirtualizedClusterComputeServiceMigrateVMRequestMessage(): Invalid arguments");
+        }
 #endif
-  this->answer_commport = answer_commport;
-  this->vm_name = vm_name;
-  this->dest_pm_hostname = dest_pm_hostname;
-}
+        this->answer_commport = answer_commport;
+        this->vm_name = vm_name;
+        this->dest_pm_hostname = dest_pm_hostname;
+    }
 
-/**
- * @brief Constructor
- *
- * @param success: whether the VM migration was successful or not
- * @param failure_cause: a failure cause (or nullptr if success)
- * @param payload: the message size in bytes
- */
-VirtualizedClusterComputeServiceMigrateVMAnswerMessage::
-    VirtualizedClusterComputeServiceMigrateVMAnswerMessage(
-        bool success, std::shared_ptr<FailureCause> failure_cause,
-        double payload)
-    : VirtualizedClusterComputeServiceMessage(payload), success(success),
-      failure_cause(std::move(failure_cause)) {}
+    /**
+     * @brief Constructor
+     *
+     * @param success: whether the VM migration was successful or not
+     * @param failure_cause: a failure cause (or nullptr if success)
+     * @param payload: the message size in bytes
+     */
+    VirtualizedClusterComputeServiceMigrateVMAnswerMessage::VirtualizedClusterComputeServiceMigrateVMAnswerMessage(
+            bool success,
+            std::shared_ptr<FailureCause> failure_cause,
+            double payload) : VirtualizedClusterComputeServiceMessage(payload), success(success),
+                              failure_cause(std::move(failure_cause)) {}
 
-} // namespace wrench
+
+}// namespace wrench
