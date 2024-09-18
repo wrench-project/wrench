@@ -18,37 +18,35 @@
 
 namespace wrench {
 
-    class Job;
+class Job;
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /**
-    * @brief A "job has been killed" failure cause
-    */
-    class JobKilled : public FailureCause {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        JobKilled(std::shared_ptr<Job> job);
-        /***********************/
-        /** \endcond           */
-        /***********************/
+/**
+ * @brief A "job has been killed" failure cause
+ */
+class JobKilled : public FailureCause {
+public:
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
+  JobKilled(std::shared_ptr<Job> job);
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        std::shared_ptr<Job> getJob();
-        std::string toString() override;
+  std::shared_ptr<Job> getJob();
+  std::string toString() override;
 
-    private:
-        std::shared_ptr<Job> job;
-    };
+private:
+  std::shared_ptr<Job> job;
+};
 
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
-
-
-#endif//WRENCH_JOB_FILLED_H
+#endif // WRENCH_JOB_FILLED_H

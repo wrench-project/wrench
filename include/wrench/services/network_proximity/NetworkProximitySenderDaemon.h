@@ -10,64 +10,67 @@
 #ifndef WRENCH_NETWORKSENDERDAEMON_H
 #define WRENCH_NETWORKSENDERDAEMON_H
 
-#include <random>
 #include "wrench/services/Service.h"
-#include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
-#include "wrench/services/network_proximity/NetworkProximityServiceMessagePayload.h"
 #include "wrench/services/network_proximity/NetworkProximityReceiverDaemon.h"
+#include "wrench/services/network_proximity/NetworkProximityServiceMessagePayload.h"
+#include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
+#include <random>
 
 namespace wrench {
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
-    class Simulation;
+class Simulation;
 
-    /**
-     * @brief A daemon used by a NetworkProximityService to run network measurements (proximity is computed between two such running daemons)
-     */
-    class NetworkProximitySenderDaemon : public Service {
-    public:
-        NetworkProximitySenderDaemon(Simulation *simulation, std::string hostname,
-                                     S4U_CommPort *network_proximity_service_commport,
-                                     double message_size, double measurement_period,
-                                     double noise, int noise_seed, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
+/**
+ * @brief A daemon used by a NetworkProximityService to run network measurements
+ * (proximity is computed between two such running daemons)
+ */
+class NetworkProximitySenderDaemon : public Service {
+public:
+  NetworkProximitySenderDaemon(
+      Simulation *simulation, std::string hostname,
+      S4U_CommPort *network_proximity_service_commport, double message_size,
+      double measurement_period, double noise, int noise_seed,
+      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
 
-    private:
-        friend class Simulation;
+private:
+  friend class Simulation;
 
-        std::default_random_engine rng;
+  std::default_random_engine rng;
 
-        //        NetworkProximitySenderDaemon(Simulation *simulation, std::string hostname,
-        //                               S4U_CommPort *network_proximity_service_commport,
-        //                               double message_size, double measurement_period,
-        //                               double noise, int noise_seed, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list, std::string suffix);
+  //        NetworkProximitySenderDaemon(Simulation *simulation, std::string
+  //        hostname,
+  //                               S4U_CommPort
+  //                               *network_proximity_service_commport, double
+  //                               message_size, double measurement_period,
+  //                               double noise, int noise_seed,
+  //                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE
+  //                               messagepayload_list, std::string suffix);
 
+  double message_size;
+  double measurement_period;
+  double max_noise;
 
-        double message_size;
-        double measurement_period;
-        double max_noise;
+  std::string suffix;
+  S4U_CommPort *next_commport_to_send;
+  std::shared_ptr<NetworkProximityReceiverDaemon> next_daemon_to_send;
+  std::string next_host_to_send;
+  S4U_CommPort *network_proximity_service_commport;
 
-        std::string suffix;
-        S4U_CommPort *next_commport_to_send;
-        std::shared_ptr<NetworkProximityReceiverDaemon> next_daemon_to_send;
-        std::string next_host_to_send;
-        S4U_CommPort *network_proximity_service_commport;
+  int main() override;
+  void cleanup(bool has_returned_from_main, int return_value) override;
 
-        int main() override;
-        void cleanup(bool has_returned_from_main, int return_value) override;
+  double getTimeUntilNextMeasurement();
 
+  bool processNextMessage(double timeout);
+};
 
-        double getTimeUntilNextMeasurement();
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-        bool processNextMessage(double timeout);
-    };
-
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
-
-
-#endif//WRENCH_NETWORKSENDERDAEMON_H
+#endif // WRENCH_NETWORKSENDERDAEMON_H

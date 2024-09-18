@@ -16,36 +16,38 @@
 
 namespace wrench {
 
-    /**
-     * @brief A class that defines an Amdahl's Law-based parallel task performance model.
-     */
-    class AmdahlParallelModel : public ParallelModel {
+/**
+ * @brief A class that defines an Amdahl's Law-based parallel task performance
+ * model.
+ */
+class AmdahlParallelModel : public ParallelModel {
 
-    public:
-        double getAlpha() const;
-        void setAlpha(double alpha);
+public:
+  double getAlpha() const;
+  void setAlpha(double alpha);
 
-        /***********************/
-        /** \cond INTERNAL    **/
-        /***********************/
+  /***********************/
+  /** \cond INTERNAL    **/
+  /***********************/
 
-        double getPurelySequentialWork(double total_work, unsigned long num_threads) override;
-        double getParallelPerThreadWork(double total_work, unsigned long num_threads) override;
-        ~AmdahlParallelModel() override = default;
+  double getPurelySequentialWork(double total_work,
+                                 unsigned long num_threads) override;
+  double getParallelPerThreadWork(double total_work,
+                                  unsigned long num_threads) override;
+  ~AmdahlParallelModel() override = default;
 
-        /***********************/
-        /** \endcond          **/
-        /***********************/
+  /***********************/
+  /** \endcond          **/
+  /***********************/
 
-    protected:
-    private:
-        friend class ParallelModel;
+protected:
+private:
+  friend class ParallelModel;
 
-        AmdahlParallelModel(double alpha);
-        double alpha;// Fraction of the work that's parallelizable
-    };
+  AmdahlParallelModel(double alpha);
+  double alpha; // Fraction of the work that's parallelizable
+};
 
+} // namespace wrench
 
-}// namespace wrench
-
-#endif//WRENCH_AMDAHLPARALLELMODEL_H
+#endif // WRENCH_AMDAHLPARALLELMODEL_H

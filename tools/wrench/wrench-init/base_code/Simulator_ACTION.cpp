@@ -29,35 +29,39 @@
  */
 int main(int argc, char **argv) {
 
-    /* Create a WRENCH simulation object */
-    auto simulation = wrench::Simulation::createSimulation();
+  /* Create a WRENCH simulation object */
+  auto simulation = wrench::Simulation::createSimulation();
 
-    /* Initialize the simulation */
-    simulation->init(&argc, argv);
+  /* Initialize the simulation */
+  simulation->init(&argc, argv);
 
-    /* Parsing of the command-line arguments */
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <xml platform file> [--log=controller.threshold=info | --wrench-full-log]" << std::endl;
-        exit(1);
-    }
+  /* Parsing of the command-line arguments */
+  if (argc != 2) {
+    std::cerr << "Usage: " << argv[0]
+              << " <xml platform file> [--log=controller.threshold=info | "
+                 "--wrench-full-log]"
+              << std::endl;
+    exit(1);
+  }
 
-    /* Instantiating the simulated platform */
-    simulation->instantiatePlatform(argv[1]);
+  /* Instantiating the simulated platform */
+  simulation->instantiatePlatform(argv[1]);
 
-    /* Instantiate a storage service on the platform */
-    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
-            "StorageHost", {"/"}, {}, {}));
+  /* Instantiate a storage service on the platform */
+  auto storage_service =
+      simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+          "StorageHost", {"/"}, {}, {}));
 
-    /* Instantiate a bare-metal compute service on the platform */
-    auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
-            "ComputeHost", {"ComputeHost"}, "", {}, {}));
+  /* Instantiate a bare-metal compute service on the platform */
+  auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
+      "ComputeHost", {"ComputeHost"}, "", {}, {}));
 
-    /* Instantiate an execution controller */
-    auto controller = simulation->add(
-            new wrench::Controller(baremetal_service, storage_service, "UserHost"));
+  /* Instantiate an execution controller */
+  auto controller = simulation->add(
+      new wrench::Controller(baremetal_service, storage_service, "UserHost"));
 
-    /* Launch the simulation */
-    simulation->launch();
+  /* Launch the simulation */
+  simulation->launch();
 
-    return 0;
+  return 0;
 }

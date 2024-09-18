@@ -11,6 +11,7 @@
 
 namespace wrench {
 
-    SET_MESSAGEPAYLOAD_NAME(CompoundStorageServiceMessagePayload, STORAGE_SELECTION_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(CompoundStorageServiceMessagePayload,
+                        STORAGE_SELECTION_PAYLOAD);
 
 };

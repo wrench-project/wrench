@@ -16,50 +16,47 @@
 
 namespace wrench {
 
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+class DataFile;
+class FileLocation;
 
-    class DataFile;
-    class FileLocation;
+/**
+ * @brief A class that implements a file read action
+ */
+class FileReadAction : public Action {
 
-    /**
-     * @brief A class that implements a file read action
-     */
-    class FileReadAction : public Action {
+public:
+  std::shared_ptr<DataFile> getFile() const;
+  std::vector<std::shared_ptr<FileLocation>> getFileLocations() const;
+  std::shared_ptr<FileLocation> getUsedFileLocation() const;
+  double getNumBytesToRead() const;
+  bool usesScratch() const override;
 
-    public:
-        std::shared_ptr<DataFile> getFile() const;
-        std::vector<std::shared_ptr<FileLocation>> getFileLocations() const;
-        std::shared_ptr<FileLocation> getUsedFileLocation() const;
-        double getNumBytesToRead() const;
-        bool usesScratch() const override;
+protected:
+  friend class CompoundJob;
 
-    protected:
-        friend class CompoundJob;
+  FileReadAction(const std::string &name,
+                 std::vector<std::shared_ptr<FileLocation>> file_locations,
+                 double num_bytes_to_read);
 
-        FileReadAction(const std::string &name,
-                       std::vector<std::shared_ptr<FileLocation>> file_locations,
-                       double num_bytes_to_read);
+  void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+  void
+  terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
+private:
+  std::shared_ptr<DataFile> file;
+  std::vector<std::shared_ptr<FileLocation>> file_locations;
+  std::shared_ptr<FileLocation> used_location;
+  double num_bytes_to_read;
+};
 
-        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
-        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
+/***********************/
+/** \endcond           */
+/***********************/
 
+} // namespace wrench
 
-    private:
-        std::shared_ptr<DataFile> file;
-        std::vector<std::shared_ptr<FileLocation>> file_locations;
-        std::shared_ptr<FileLocation> used_location;
-        double num_bytes_to_read;
-    };
-
-
-    /***********************/
-    /** \endcond           */
-    /***********************/
-
-}// namespace wrench
-
-#endif//WRENCH_FILE_READ_ACTION_H
+#endif // WRENCH_FILE_READ_ACTION_H

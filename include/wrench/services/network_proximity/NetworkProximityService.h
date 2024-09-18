@@ -10,111 +10,138 @@
 #ifndef WRENCH_NETWORKPROXIMITYSERVICE_H
 #define WRENCH_NETWORKPROXIMITYSERVICE_H
 
+#include "wrench/services/Service.h"
+#include "wrench/services/network_proximity/NetworkProximityReceiverDaemon.h"
+#include "wrench/services/network_proximity/NetworkProximitySenderDaemon.h"
+#include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include <cfloat>
 #include <complex>
 #include <random>
-#include "wrench/services/Service.h"
-#include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
-#include "wrench/services/network_proximity/NetworkProximitySenderDaemon.h"
-#include "wrench/services/network_proximity/NetworkProximityReceiverDaemon.h"
-#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 namespace wrench {
 
-    /**
-     * @brief A network proximity service that continuously estimates inter-host latencies
-     *        and can be queried for such estimates
-     */
-    class NetworkProximityService : public Service {
+/**
+ * @brief A network proximity service that continuously estimates inter-host
+ * latencies and can be queried for such estimates
+ */
+class NetworkProximityService : public Service {
 
-    private:
-        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "0s"},
-                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "1024"},
-                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "60s"},
-                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "20"},
-                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED, "0"},
-                {NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"},
-                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED, "1"}};
+private:
+  WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
+      {NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "0s"},
+      {NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE,
+       "ALLTOALL"},
+      {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "1024"},
+      {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,
+       "60s"},
+      {NetworkProximityServiceProperty::
+           NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE,
+       "20"},
+      {NetworkProximityServiceProperty::
+           NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED,
+       "0"},
+      {NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE,
+       "1.0"},
+      {NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED,
+       "1"}};
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
-                {NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
-                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD, S4U_CommPort::default_control_message_size},
-                {NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
-                {NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
-                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD, S4U_CommPort::default_control_message_size},
-                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, S4U_CommPort::default_control_message_size},
-        };
+  WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+      {NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,
+       S4U_CommPort::default_control_message_size},
+      {NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,
+       S4U_CommPort::default_control_message_size},
+      {NetworkProximityServiceMessagePayload::
+           NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD,
+       S4U_CommPort::default_control_message_size},
+      {NetworkProximityServiceMessagePayload::
+           NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD,
+       S4U_CommPort::default_control_message_size},
+      {NetworkProximityServiceMessagePayload::
+           NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD,
+       S4U_CommPort::default_control_message_size},
+      {NetworkProximityServiceMessagePayload::
+           NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD,
+       S4U_CommPort::default_control_message_size},
+      {NetworkProximityServiceMessagePayload::
+           NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD,
+       S4U_CommPort::default_control_message_size},
+  };
 
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+public:
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
 
-        /**
-         * @brief A convenient constant that is returned as a latency between two hosts
-         *        when no latency estimates are available for this pair of hosts.
-         */
-        static constexpr double NOT_AVAILABLE = DBL_MAX;
+  /**
+   * @brief A convenient constant that is returned as a latency between two
+   * hosts when no latency estimates are available for this pair of hosts.
+   */
+  static constexpr double NOT_AVAILABLE = DBL_MAX;
 
-        ~NetworkProximityService() override;
+  ~NetworkProximityService() override;
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        NetworkProximityService(std::string db_hostname,
-                                std::vector<std::string> hosts_in_network,
-                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+  NetworkProximityService(
+      std::string db_hostname, std::vector<std::string> hosts_in_network,
+      WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
+  /***********************/
+  /** \cond DEVELOPER    */
+  /***********************/
 
-        std::vector<std::string> getHostnameList();
+  std::vector<std::string> getHostnameList();
 
-        std::pair<double, double> getHostPairDistance(std::pair<std::string, std::string> hosts);
+  std::pair<double, double>
+  getHostPairDistance(std::pair<std::string, std::string> hosts);
 
-        std::pair<std::pair<double, double>, double> getHostCoordinate(std::string);
+  std::pair<std::pair<double, double>, double> getHostCoordinate(std::string);
 
-        std::string getNetworkProximityServiceType();
+  std::string getNetworkProximityServiceType();
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-    protected:
-        void cleanup(bool has_returned_from_main, int return_value) override;
+protected:
+  void cleanup(bool has_returned_from_main, int return_value) override;
 
-    private:
-        friend class Simulation;
+private:
+  friend class Simulation;
 
-        std::vector<std::shared_ptr<NetworkProximitySenderDaemon>> network_sender_daemons;
-        std::vector<std::shared_ptr<NetworkProximityReceiverDaemon>> network_receiver_daemons;
-        std::vector<std::string> hosts_in_network;
+  std::vector<std::shared_ptr<NetworkProximitySenderDaemon>>
+      network_sender_daemons;
+  std::vector<std::shared_ptr<NetworkProximityReceiverDaemon>>
+      network_receiver_daemons;
+  std::vector<std::string> hosts_in_network;
 
-        std::default_random_engine master_rng;
+  std::default_random_engine master_rng;
 
-        int main() override;
+  int main() override;
 
-        bool processNextMessage();
+  bool processNextMessage();
 
-        void addEntryToDatabase(const std::pair<std::string, std::string> &pair_hosts, double proximity_value);
+  void addEntryToDatabase(const std::pair<std::string, std::string> &pair_hosts,
+                          double proximity_value);
 
-        std::map<std::pair<std::string, std::string>, std::pair<double, double>> entries;
+  std::map<std::pair<std::string, std::string>, std::pair<double, double>>
+      entries;
 
-        std::map<std::string, std::pair<std::complex<double>, double>> coordinate_lookup_table;
+  std::map<std::string, std::pair<std::complex<double>, double>>
+      coordinate_lookup_table;
 
-        std::shared_ptr<NetworkProximityReceiverDaemon>
-        getCommunicationPeer(std::shared_ptr<NetworkProximitySenderDaemon> sender_daemon);
+  std::shared_ptr<NetworkProximityReceiverDaemon> getCommunicationPeer(
+      std::shared_ptr<NetworkProximitySenderDaemon> sender_daemon);
 
-        void vivaldiUpdate(double proximityValue, std::string sender_hostname, std::string peer_hostname);
+  void vivaldiUpdate(double proximityValue, std::string sender_hostname,
+                     std::string peer_hostname);
 
-        void validateProperties();
-    };
-}// namespace wrench
+  void validateProperties();
+};
+} // namespace wrench
 
-#endif//WRENCH_NETWORKPROXIMITYSERVICE_H
+#endif // WRENCH_NETWORKPROXIMITYSERVICE_H

@@ -12,86 +12,85 @@
 
 #include "wrench/services/compute/batch/BatchJob.h"
 
-
 namespace wrench {
 
-    /***********************/
-    /** \cond              */
-    /***********************/
+/***********************/
+/** \cond              */
+/***********************/
 
-    /**
-     * @brief A class that implements a batch job set abstrsaction
-     */
-    class BatchJobSetCoreLevel {
+/**
+ * @brief A class that implements a batch job set abstrsaction
+ */
+class BatchJobSetCoreLevel {
 
-    public:
-        BatchJobSetCoreLevel() = default;
+public:
+  BatchJobSetCoreLevel() = default;
 
-        /** @brief The job set **/
-        std::set<std::shared_ptr<BatchJob>> jobs;
+  /** @brief The job set **/
+  std::set<std::shared_ptr<BatchJob>> jobs;
 
-        /** @brief Core utilization **/
-        std::unordered_map<int, unsigned long> core_utilization;
+  /** @brief Core utilization **/
+  std::unordered_map<int, unsigned long> core_utilization;
 
-        /**
-         * @brief Overloaded += operator
-         * @param right: right-hand side
-         * @return
-         */
-        BatchJobSetCoreLevel &operator+=(const BatchJobSetCoreLevel &right) {
-            for (const auto &j: right.jobs) {
-                add(j);
-            }
-            return *this;
+  /**
+   * @brief Overloaded += operator
+   * @param right: right-hand side
+   * @return
+   */
+  BatchJobSetCoreLevel &operator+=(const BatchJobSetCoreLevel &right) {
+    for (const auto &j : right.jobs) {
+      add(j);
+    }
+    return *this;
+  }
+
+  /**
+   * @brief Overloaded -= operator
+   * @param right: right-hand side
+   * @return
+   */
+  BatchJobSetCoreLevel &operator-=(const BatchJobSetCoreLevel &right) {
+    for (const auto &j : right.jobs) {
+      remove(j);
+    }
+    return *this;
+  }
+
+  /**
+   * @brief Add a batch job to the set
+   * @param job: the batch job
+   */
+  void inline add(std::shared_ptr<BatchJob> job) {
+    if (this->jobs.find(job) == this->jobs.end()) {
+      for (auto const &i : job->getAllocatedNodeIndices()) {
+        if (this->core_utilization.find(i) == this->core_utilization.end()) {
+          this->core_utilization[i] = job->getRequestedCoresPerNode();
+        } else {
+          this->core_utilization[i] += job->getRequestedCoresPerNode();
         }
+      }
+      this->jobs.insert(job);
+    }
+  }
 
-        /**
-         * @brief Overloaded -= operator
-         * @param right: right-hand side
-         * @return
-         */
-        BatchJobSetCoreLevel &operator-=(const BatchJobSetCoreLevel &right) {
-            for (const auto &j: right.jobs) {
-                remove(j);
-            }
-            return *this;
-        }
+  /**
+   * @brief Remove a batch job from the set
+   * @param job: the batch job
+   */
+  void inline remove(std::shared_ptr<BatchJob> job) {
+    if (this->jobs.find(job) != this->jobs.end()) {
+      for (auto const &i : job->getAllocatedNodeIndices()) {
+        this->core_utilization[i] -= job->getRequestedCoresPerNode();
+      }
+      this->jobs.erase(job);
+    }
+  }
+};
 
-        /**
-         * @brief Add a batch job to the set
-         * @param job: the batch job
-         */
-        void inline add(std::shared_ptr<BatchJob> job) {
-            if (this->jobs.find(job) == this->jobs.end()) {
-                for (auto const &i: job->getAllocatedNodeIndices()) {
-                    if (this->core_utilization.find(i) == this->core_utilization.end()) {
-                        this->core_utilization[i] = job->getRequestedCoresPerNode();
-                    } else {
-                        this->core_utilization[i] += job->getRequestedCoresPerNode();
-                    }
-                }
-                this->jobs.insert(job);
-            }
-        }
+/***********************/
+/** \endcond           */
+/***********************/
 
-        /**
-         * @brief Remove a batch job from the set
-         * @param job: the batch job
-         */
-        void inline remove(std::shared_ptr<BatchJob> job) {
-            if (this->jobs.find(job) != this->jobs.end()) {
-                for (auto const &i: job->getAllocatedNodeIndices()) {
-                    this->core_utilization[i] -= job->getRequestedCoresPerNode();
-                }
-                this->jobs.erase(job);
-            }
-        }
-    };
+} // namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-
-}// namespace wrench
-
-#endif//WRENCH_BATCHJOBSETCORELEVEL_H
+#endif // WRENCH_BATCHJOBSETCORELEVEL_H

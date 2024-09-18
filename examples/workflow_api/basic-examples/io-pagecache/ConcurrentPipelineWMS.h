@@ -7,40 +7,40 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_EXAMPLE_ONE_TASK_AT_A_TIME_H
 #define WRENCH_EXAMPLE_ONE_TASK_AT_A_TIME_H
 
 #include <wrench-dev.h>
 
-
 namespace wrench {
 
-    /**
-     *  @brief A Workflow Management System (WMS) implementation
-     */
-    class ConcurrentPipelineWMS : public ExecutionController {
+/**
+ *  @brief A Workflow Management System (WMS) implementation
+ */
+class ConcurrentPipelineWMS : public ExecutionController {
 
-    public:
-        // Constructor
-        ConcurrentPipelineWMS(
-                const std::shared_ptr<Workflow> &workflow,
-                const std::shared_ptr<BareMetalComputeService> &compute_service,
-                const std::shared_ptr<StorageService> &storage_service,
-                const std::string &hostname);
+public:
+  // Constructor
+  ConcurrentPipelineWMS(
+      const std::shared_ptr<Workflow> &workflow,
+      const std::shared_ptr<BareMetalComputeService> &compute_service,
+      const std::shared_ptr<StorageService> &storage_service,
+      const std::string &hostname);
 
-    protected:
-        // Overridden method
-        void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
-        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
+protected:
+  // Overridden method
+  void processEventStandardJobCompletion(
+      std::shared_ptr<StandardJobCompletedEvent>) override;
+  void processEventStandardJobFailure(
+      std::shared_ptr<StandardJobFailedEvent>) override;
 
-    private:
-        // main() method of the WMS
-        int main() override;
+private:
+  // main() method of the WMS
+  int main() override;
 
-        std::shared_ptr<Workflow> workflow;
-        std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
-        std::shared_ptr<StorageService> storage_service;
-    };
-}// namespace wrench
-#endif//WRENCH_EXAMPLE_ONE_TASK_AT_A_TIME_H
+  std::shared_ptr<Workflow> workflow;
+  std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
+  std::shared_ptr<StorageService> storage_service;
+};
+} // namespace wrench
+#endif // WRENCH_EXAMPLE_ONE_TASK_AT_A_TIME_H
