@@ -19,41 +19,37 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
 
-/**
- * @brief A helper class that manages messages (in terms of
- * memory_manager_service deallocation to avoid leaks when a message was sent
- * but never received). That is, if messages are in flight when the receiver
- * daemon fails, than, because the receiver is the one freeing memory, we have
- * memory leaks. This takes extra time however, and many simulations never
- * simulate failures anyway, so it's use is only optional at compile time.
- * Perhaps would be a good idea to make its usage optional at runtime?
- */
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
-class MessageManager {
+    /**
+     * @brief A helper class that manages messages (in terms of memory_manager_service deallocation to avoid leaks when
+     *        a message was sent but never received). That is, if messages are in flight when the receiver daemon fails,
+     *        than, because the receiver is the one freeing memory, we have memory leaks.
+     *        This takes extra time however, and many simulations never simulate failures anyway, so it's use is only optional
+     *        at compile time. Perhaps would be a good idea to make its usage optional at runtime?
+     */
 
-  static std::unordered_map<const S4U_CommPort *,
-                            std::unordered_set<SimulationMessage *>>
-      messages;
+    class MessageManager {
 
-public:
-  static void manageMessage(const S4U_CommPort *commport,
-                            SimulationMessage *msg);
-  static void cleanUpMessages(const S4U_CommPort *commport);
-  static void removeReceivedMessage(const S4U_CommPort *commport,
-                                    SimulationMessage *msg);
-  static void cleanUpAllMessages();
-  static void print();
-};
+        static std::unordered_map<const S4U_CommPort *, std::unordered_set<SimulationMessage *>> messages;
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
+    public:
+        static void manageMessage(const S4U_CommPort *commport, SimulationMessage *msg);
+        static void cleanUpMessages(const S4U_CommPort *commport);
+        static void removeReceivedMessage(const S4U_CommPort *commport, SimulationMessage *msg);
+        static void cleanUpAllMessages();
+        static void print();
+    };
 
-#endif // WRENCH_MESSAGEMANAGER_H
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
 
-#endif // MESSAGE_MANAGER
+
+#endif//WRENCH_MESSAGEMANAGER_H
+
+#endif//MESSAGE_MANAGER

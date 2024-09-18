@@ -13,34 +13,32 @@
  * (at your option) any later version.
  */
 
+
 #include "wrench/services/ServiceMessagePayload.h"
 #include <wrench/services/storage/StorageServiceMessagePayload.h>
 
 namespace wrench {
-namespace XRootD {
-/**
- * @brief Configurable message payloads for a XRootD node
- */
-class MessagePayload : public StorageServiceMessagePayload {
+    namespace XRootD {
+        /**
+         * @brief Configurable message payloads for a XRootD node
+         */
+        class MessagePayload : public StorageServiceMessagePayload {
 
-public:
-  /** @brief The number of bytes in the control message sent by the daemon to
-   * answer a file read request **/
-  DECLARE_MESSAGEPAYLOAD_NAME(FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD);
+        public:
+            /** @brief The number of bytes in the control message sent by the daemon to answer a file read request **/
+            DECLARE_MESSAGEPAYLOAD_NAME(FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD);
 
-  /** @brief The number of bytes in the control message sent by the daemon to
-   * pass on a search request **/
-  DECLARE_MESSAGEPAYLOAD_NAME(CONTINUE_SEARCH);
+            /** @brief The number of bytes in the control message sent by the daemon to pass on a search request **/
+            DECLARE_MESSAGEPAYLOAD_NAME(CONTINUE_SEARCH);
 
-  /** @brief The number of bytes in the control message sent by the daemon to
-   * update the cache **/
-  DECLARE_MESSAGEPAYLOAD_NAME(UPDATE_CACHE);
+            /** @brief The number of bytes in the control message sent by the daemon to update the cache **/
+            DECLARE_MESSAGEPAYLOAD_NAME(UPDATE_CACHE);
 
-  /** @brief The number of bytes for each cache entry when sent over the network
-   * **/
-  DECLARE_MESSAGEPAYLOAD_NAME(CACHE_ENTRY);
-};
-}; // namespace XRootD
-}; // namespace wrench
+            /** @brief The number of bytes for each cache entry when sent over the network **/
+            DECLARE_MESSAGEPAYLOAD_NAME(CACHE_ENTRY);
+        };
+    };// namespace XRootD
+};    // namespace wrench
 
-#endif // WRENCH_XROOTDMESSAGEPAYLOAD_H
+
+#endif//WRENCH_XROOTDMESSAGEPAYLOAD_H

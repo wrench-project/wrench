@@ -7,9 +7,9 @@
  * (at your option) any later version.
  */
 
-#include "../include/TestWithFork.h"
 #include <gtest/gtest.h>
 #include <wrench/util/PointerUtil.h>
+#include "../include/TestWithFork.h"
 
 #if 0
 

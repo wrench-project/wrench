@@ -13,140 +13,116 @@
 
 namespace wrench {
 
-/**
- * @brief Constructor
- */
-JobManagerMessage::JobManagerMessage() : SimulationMessage(0) {}
+    /**
+     * @brief Constructor
+     */
+    JobManagerMessage::JobManagerMessage() : SimulationMessage(0) {
+    }
 
-/**
- * @brief Constructor
- * @param job: the job that is done
- * @param compute_service: the ComputeService on which it ran
- * @param necessary_state_changes: necessary task state changes
- */
-JobManagerStandardJobCompletedMessage::JobManagerStandardJobCompletedMessage(
-    std::shared_ptr<StandardJob> job,
-    std::shared_ptr<ComputeService> compute_service,
-    std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State>
-        necessary_state_changes)
-    : JobManagerMessage() {
+
+    /**
+     * @brief Constructor 
+     * @param job: the job that is done
+     * @param compute_service: the ComputeService on which it ran 
+     * @param necessary_state_changes: necessary task state changes
+     */
+    JobManagerStandardJobCompletedMessage::JobManagerStandardJobCompletedMessage(std::shared_ptr<StandardJob> job,
+                                                                                 std::shared_ptr<ComputeService> compute_service,
+                                                                                 std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> necessary_state_changes)
+        : JobManagerMessage() {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-  if ((job == nullptr) || (compute_service == nullptr)) {
-    throw std::invalid_argument(
-        "JobManagerStandardJobCompletedMessage::"
-        "JobManagerStandardJobCompletedMessage(): Invalid arguments");
-  }
+        if ((job == nullptr) || (compute_service == nullptr)) {
+            throw std::invalid_argument("JobManagerStandardJobCompletedMessage::JobManagerStandardJobCompletedMessage(): Invalid arguments");
+        }
 #endif
-  this->job = std::move(job);
-  this->compute_service = std::move(compute_service);
-  this->necessary_state_changes = std::move(necessary_state_changes);
-}
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
+        this->necessary_state_changes = std::move(necessary_state_changes);
+    }
 
-/**
- * @brief Constructor
- * @param job: the job that has failed
- * @param compute_service: the ComputeService on which it ran
- * @param necessary_state_changes: necessary task state changes
- * @param necessary_failure_count_increments: necessary task failure count
- * increments
- * @param cause: the cause of the failure
- */
-JobManagerStandardJobFailedMessage::JobManagerStandardJobFailedMessage(
-    std::shared_ptr<StandardJob> job,
-    std::shared_ptr<ComputeService> compute_service,
-    std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State>
-        necessary_state_changes,
-    std::set<std::shared_ptr<WorkflowTask>> necessary_failure_count_increments,
-    std::shared_ptr<FailureCause> cause)
-    : JobManagerMessage() {
+    /**
+     * @brief Constructor 
+     * @param job: the job that has failed
+     * @param compute_service: the ComputeService on which it ran 
+     * @param necessary_state_changes: necessary task state changes
+     * @param necessary_failure_count_increments: necessary task failure count increments
+     * @param cause: the cause of the failure
+     */
+    JobManagerStandardJobFailedMessage::JobManagerStandardJobFailedMessage(std::shared_ptr<StandardJob> job,
+                                                                           std::shared_ptr<ComputeService> compute_service,
+                                                                           std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> necessary_state_changes,
+                                                                           std::set<std::shared_ptr<WorkflowTask>> necessary_failure_count_increments,
+                                                                           std::shared_ptr<FailureCause> cause) : JobManagerMessage() {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-  if ((job == nullptr) || (compute_service == nullptr) || (cause == nullptr)) {
-    throw std::invalid_argument(
-        "JobManagerStandardJobFailedMessage::"
-        "JobManagerStandardJobFailedMessage(): Invalid arguments");
-  }
+        if ((job == nullptr) || (compute_service == nullptr) || (cause == nullptr)) {
+            throw std::invalid_argument("JobManagerStandardJobFailedMessage::JobManagerStandardJobFailedMessage(): Invalid arguments");
+        }
 #endif
-  this->job = std::move(job);
-  this->compute_service = std::move(compute_service);
-  this->necessary_state_changes = std::move(necessary_state_changes);
-  this->necessary_failure_count_increments =
-      std::move(necessary_failure_count_increments);
-  this->cause = std::move(cause);
-}
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
+        this->necessary_state_changes = std::move(necessary_state_changes);
+        this->necessary_failure_count_increments = std::move(necessary_failure_count_increments);
+        this->cause = std::move(cause);
+    }
 
-//    /**
-//     * @brief Constructor
-//     * @param job: the job that has failed
-//     * @param compute_service: the ComputeService on which it ran
-//     * @param cause: the cause of the failure
-//     */
-//    JobManagerPilotJobFailedMessage::JobManagerPilotJobFailedMessage(std::shared_ptr<PilotJob>
-//    job,
-//                                                                     std::shared_ptr<ComputeService>
-//                                                                     compute_service,
-//                                                                     std::shared_ptr<FailureCause>
-//                                                                     cause) :
-//                                                                     JobManagerMessage()
-//                                                                     {
-//#ifdef WRENCH_INTERNAL_EXCEPTIONS
-//        if ((job == nullptr) || (compute_service == nullptr)) {
-//            throw
-//            std::invalid_argument("JobManagerPilotJobFailedMessage::JobManagerPilotJobFailedMessage():
-//            Invalid arguments");
-//        }
-//#endif
-//        this->job = std::move(job);
-//        this->compute_service = std::move(compute_service);
-//        this->cause = std::move(cause);
-//    }
+    //    /**
+    //     * @brief Constructor
+    //     * @param job: the job that has failed
+    //     * @param compute_service: the ComputeService on which it ran
+    //     * @param cause: the cause of the failure
+    //     */
+    //    JobManagerPilotJobFailedMessage::JobManagerPilotJobFailedMessage(std::shared_ptr<PilotJob> job,
+    //                                                                     std::shared_ptr<ComputeService> compute_service,
+    //                                                                     std::shared_ptr<FailureCause> cause) : JobManagerMessage() {
+    //#ifdef WRENCH_INTERNAL_EXCEPTIONS
+    //        if ((job == nullptr) || (compute_service == nullptr)) {
+    //            throw std::invalid_argument("JobManagerPilotJobFailedMessage::JobManagerPilotJobFailedMessage(): Invalid arguments");
+    //        }
+    //#endif
+    //        this->job = std::move(job);
+    //        this->compute_service = std::move(compute_service);
+    //        this->cause = std::move(cause);
+    //    }
 
-/**
- * @brief Message from by job manager to notify somebody of a standard job
- * successfully completed
- * @param job: the job
- * @param compute_service: the compute service that did the job
- */
-JobManagerCompoundJobCompletedMessage::JobManagerCompoundJobCompletedMessage(
-    std::shared_ptr<CompoundJob> job,
-    std::shared_ptr<ComputeService> compute_service)
-    : JobManagerMessage() {
+
+    /**
+     * @brief Message from by job manager to notify somebody of a standard job successfully completed
+     * @param job: the job
+     * @param compute_service: the compute service that did the job
+     */
+    JobManagerCompoundJobCompletedMessage::JobManagerCompoundJobCompletedMessage(std::shared_ptr<CompoundJob> job,
+                                                                                 std::shared_ptr<ComputeService> compute_service) : JobManagerMessage() {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-  if ((job == nullptr) || (compute_service == nullptr)) {
-    throw std::invalid_argument(
-        "JobManagerCompoundJobCompletedMessage::"
-        "JobManagerCompoundJobCompletedMessage(): Invalid arguments");
-  }
+        if ((job == nullptr) || (compute_service == nullptr)) {
+            throw std::invalid_argument("JobManagerCompoundJobCompletedMessage::JobManagerCompoundJobCompletedMessage(): Invalid arguments");
+        }
 #endif
-  this->job = std::move(job);
-  this->compute_service = std::move(compute_service);
-}
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
+    }
 
-/**
- * @brief Message from by job manager to notify somebody of a standard job has
- * failed to complete
- * @param job: the job
- * @param compute_service: the compute service that did the job
- * @param cause: the failure cause
- */
-JobManagerCompoundJobFailedMessage::JobManagerCompoundJobFailedMessage(
-    std::shared_ptr<CompoundJob> job,
-    std::shared_ptr<ComputeService> compute_service,
-    std::shared_ptr<FailureCause> cause)
-    : JobManagerMessage() {
+    /**
+     * @brief Message from by job manager to notify somebody of a standard job has failed to complete
+     * @param job: the job
+     * @param compute_service: the compute service that did the job
+     * @param cause: the failure cause
+     */
+    JobManagerCompoundJobFailedMessage::JobManagerCompoundJobFailedMessage(std::shared_ptr<CompoundJob> job,
+                                                                           std::shared_ptr<ComputeService> compute_service,
+                                                                           std::shared_ptr<FailureCause> cause) : JobManagerMessage() {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-  if ((job == nullptr) || (compute_service == nullptr)) {
-    throw std::invalid_argument(
-        "JobManagerCompoundJobFailedMessage::"
-        "JobManagerCompoundJobFailedMessage(): Invalid arguments");
-  }
+        if ((job == nullptr) || (compute_service == nullptr)) {
+            throw std::invalid_argument("JobManagerCompoundJobFailedMessage::JobManagerCompoundJobFailedMessage(): Invalid arguments");
+        }
 #endif
-  this->job = std::move(job);
-  this->compute_service = std::move(compute_service);
-  this->cause = std::move(cause);
-}
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
+        this->cause = std::move(cause);
+    }
 
-/**
- * @brief Message sent to the job manager to wake it up
- */
-JobManagerWakeupMessage::JobManagerWakeupMessage() : JobManagerMessage() {}
-} // namespace wrench
+    /**
+     * @brief Message sent to the job manager to wake it up
+     */
+    JobManagerWakeupMessage::JobManagerWakeupMessage() : JobManagerMessage() {
+    }
+}// namespace wrench

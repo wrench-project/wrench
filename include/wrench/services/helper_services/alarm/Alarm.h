@@ -10,51 +10,50 @@
 #ifndef WRENCH_ALARM_H
 #define WRENCH_ALARM_H
 
+#include <string>
+#include <memory>
 #include "wrench/services/Service.h"
 #include "wrench/simulation/SimulationMessage.h"
-#include <memory>
-#include <string>
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
-class Simulation;
 
-/**
- * @brief A one-shot service that sends a message to a commport_name after some
- * specified amount of time and terminates
- */
-class Alarm : public Service {
+    class Simulation;
 
-  friend class S4U_Daemon;
+    /**
+     * @brief A one-shot service that sends a message to a commport_name after some specified amount of time and terminates
+     */
+    class Alarm : public Service {
 
-public:
-  static std::shared_ptr<Alarm>
-  createAndStartAlarm(Simulation *simulation, double date, std::string hostname,
-                      S4U_CommPort *reply_commport, SimulationMessage *msg,
-                      std::string suffix);
+        friend class S4U_Daemon;
 
-  void kill();
+    public:
+        static std::shared_ptr<Alarm> createAndStartAlarm(Simulation *simulation, double date, std::string hostname,
+                                                          S4U_CommPort *reply_commport,
+                                                          SimulationMessage *msg, std::string suffix);
 
-private:
-  Alarm(double date, std::string hostname, S4U_CommPort *reply_commport,
-        SimulationMessage *msg, std::string suffix);
+        void kill();
 
-  double date;
-  //        std::string reply_commport_name;
-  S4U_CommPort *reply_commport;
-  std::unique_ptr<SimulationMessage> msg;
+    private:
+        Alarm(double date, std::string hostname, S4U_CommPort *reply_commport,
+              SimulationMessage *msg, std::string suffix);
 
-  int main() override;
-};
+        double date;
+        //        std::string reply_commport_name;
+        S4U_CommPort *reply_commport;
+        std::unique_ptr<SimulationMessage> msg;
 
-/***********************/
-/** \endcond           */
-/***********************/
+        int main() override;
+    };
 
-} // namespace wrench
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
-#endif // WRENCH_ALARM_H
+}// namespace wrench
+
+#endif//WRENCH_ALARM_H

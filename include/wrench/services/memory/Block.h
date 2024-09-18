@@ -11,68 +11,69 @@
 #ifndef WRENCH_BLOCK_H
 #define WRENCH_BLOCK_H
 
-#include "wrench/services/storage/storage_helpers/FileLocation.h"
+
 #include <string>
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL    */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL    */
+    /***********************/
 
-/**
- * @brief A class that implements a "block" abstraction for memory management
- */
-class Block {
+    /**
+     * @brief A class that implements a "block" abstraction for memory management
+     */
+    class Block {
 
-public:
-  Block(std::string fid, std::shared_ptr<FileLocation> location, double sz,
-        double last_access, bool is_dirty, double dirty_time);
+    public:
+        Block(std::string fid, std::shared_ptr<FileLocation> location, double sz,
+              double last_access, bool is_dirty, double dirty_time);
 
-  Block(Block *blk);
+        Block(Block *blk);
 
-  std::string getFileId();
+        std::string getFileId();
 
-  void setFileId(std::string &fid);
+        void setFileId(std::string &fid);
 
-  //        std::string getMountpoint();
+        //        std::string getMountpoint();
 
-  //        void setMountpoint(std::string mountpoint);
+        //        void setMountpoint(std::string mountpoint);
 
-  double getSize() const;
+        double getSize() const;
 
-  void setSize(double size);
+        void setSize(double size);
 
-  double getLastAccess() const;
+        double getLastAccess() const;
 
-  void setLastAccess(double last_access);
+        void setLastAccess(double last_access);
 
-  bool isDirty() const;
+        bool isDirty() const;
 
-  void setDirty(bool is_dirty);
+        void setDirty(bool is_dirty);
 
-  double getDirtyTime() const;
+        double getDirtyTime() const;
 
-  void setDirtyTime(double dirty_time);
+        void setDirtyTime(double dirty_time);
 
-  const std::shared_ptr<FileLocation> &getLocation() const;
+        const std::shared_ptr<FileLocation> &getLocation() const;
 
-  Block *split(double remaining);
+        Block *split(double remaining);
 
-private:
-  std::string file_id;
-  //        std::string mountpoint;
-  std::shared_ptr<FileLocation> location;
-  double size;
-  double last_access;
-  bool dirty;
-  double dirty_time;
+    private:
+        std::string file_id;
+        //        std::string mountpoint;
+        std::shared_ptr<FileLocation> location;
+        double size;
+        double last_access;
+        bool dirty;
+        double dirty_time;
 
-  /***********************/
-  /** \endcond           */
-  /***********************/
-};
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
 
-} // namespace wrench
+}// namespace wrench
 
-#endif // WRENCH_BLOCK_H
+#endif//WRENCH_BLOCK_H

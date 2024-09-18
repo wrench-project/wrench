@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+
 #ifndef WRENCH_EXAMPLE_MPI_ACTION_CONTROLLER_H
 #define WRENCH_EXAMPLE_MPI_ACTION_CONTROLLER_H
 
@@ -14,25 +15,25 @@
 
 namespace wrench {
 
-class Simulation;
+    class Simulation;
 
-/**
- *  @brief A Controller implementation (inherits from ExecutionController)
- */
-class BatchMPIActionController : public ExecutionController {
+    /**
+     *  @brief A Controller implementation (inherits from ExecutionController)
+     */
+    class BatchMPIActionController : public ExecutionController {
 
-public:
-  // Constructor
-  BatchMPIActionController(std::shared_ptr<BatchComputeService> batch_cs,
-                           std::shared_ptr<StorageService> ss,
-                           const std::string &hostname);
+    public:
+        // Constructor
+        BatchMPIActionController(std::shared_ptr<BatchComputeService> batch_cs,
+                                 std::shared_ptr<StorageService> ss,
+                                 const std::string &hostname);
 
-private:
-  // main() method of the Controller
-  int main() override;
+    private:
+        // main() method of the Controller
+        int main() override;
 
-  std::shared_ptr<BatchComputeService> batch_cs;
-  std::shared_ptr<StorageService> ss;
-};
-} // namespace wrench
-#endif // WRENCH_EXAMPLE_MPI_ACTION_CONTROLLER_H
+        std::shared_ptr<BatchComputeService> batch_cs;
+        std::shared_ptr<StorageService> ss;
+    };
+}// namespace wrench
+#endif//WRENCH_EXAMPLE_MPI_ACTION_CONTROLLER_H
