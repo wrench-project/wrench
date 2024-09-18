@@ -16,41 +16,41 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
-/**
- * @brief A class that defines a conservative backfilling batch scheduler
- */
-class ConservativeBackfillingBatchScheduler : public HomegrownBatchScheduler {
+    /**
+     * @brief A class that defines a conservative backfilling batch scheduler
+     */
+    class ConservativeBackfillingBatchScheduler : public HomegrownBatchScheduler {
 
-public:
-  explicit ConservativeBackfillingBatchScheduler(BatchComputeService *cs);
+    public:
+        explicit ConservativeBackfillingBatchScheduler(BatchComputeService *cs);
 
-  void processQueuedJobs() override;
+        void processQueuedJobs() override;
 
-  void processJobSubmission(std::shared_ptr<BatchJob> batch_job) override;
-  void processJobFailure(std::shared_ptr<BatchJob> batch_job) override;
-  void processJobCompletion(std::shared_ptr<BatchJob> batch_job) override;
-  void processJobTermination(std::shared_ptr<BatchJob> batch_job) override;
+        void processJobSubmission(std::shared_ptr<BatchJob> batch_job) override;
+        void processJobFailure(std::shared_ptr<BatchJob> batch_job) override;
+        void processJobCompletion(std::shared_ptr<BatchJob> batch_job) override;
+        void processJobTermination(std::shared_ptr<BatchJob> batch_job) override;
 
-  void compactSchedule();
+        void compactSchedule();
 
-  std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>>
-  scheduleOnHosts(unsigned long, unsigned long, double) override;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) override;
 
-  std::map<std::string, double> getStartTimeEstimates(
-      std::set<std::tuple<std::string, unsigned long, unsigned long, double>>
-          set_of_jobs) override;
+        std::map<std::string, double>
+        getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
 
-private:
-  std::unique_ptr<NodeAvailabilityTimeLine> schedule;
-};
+    private:
+        std::unique_ptr<NodeAvailabilityTimeLine> schedule;
+    };
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
 
-#endif // WRENCH_CONSERVATIVEBACKFILLINGBATCHSCHEDULER_H
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
+
+
+#endif//WRENCH_CONSERVATIVEBACKFILLINGBATCHSCHEDULER_H

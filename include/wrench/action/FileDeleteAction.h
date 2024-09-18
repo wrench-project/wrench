@@ -16,42 +16,44 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
 
-class DataFile;
-class FileLocation;
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief A class that implements a file deletion action
- */
-class FileDeleteAction : public Action {
+    class DataFile;
+    class FileLocation;
 
-public:
-  std::shared_ptr<DataFile> getFile() const;
-  std::shared_ptr<FileLocation> getFileLocation() const;
-  bool usesScratch() const override;
+    /**
+     * @brief A class that implements a file deletion action
+     */
+    class FileDeleteAction : public Action {
 
-protected:
-  friend class CompoundJob;
+    public:
+        std::shared_ptr<DataFile> getFile() const;
+        std::shared_ptr<FileLocation> getFileLocation() const;
+        bool usesScratch() const override;
 
-  FileDeleteAction(const std::string &name, std::shared_ptr<DataFile> file,
-                   std::shared_ptr<FileLocation> file_location);
+    protected:
+        friend class CompoundJob;
 
-  void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
-  void
-  terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        FileDeleteAction(const std::string &name,
+                         std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> file_location);
 
-private:
-  std::shared_ptr<DataFile> file;
-  std::shared_ptr<FileLocation> file_location;
-};
 
-/***********************/
-/** \endcond           */
-/***********************/
+        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
-} // namespace wrench
+    private:
+        std::shared_ptr<DataFile> file;
+        std::shared_ptr<FileLocation> file_location;
+    };
 
-#endif // WRENCH_FILE_DELETE_ACTION_H
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
+}// namespace wrench
+
+#endif//WRENCH_FILE_DELETE_ACTION_H

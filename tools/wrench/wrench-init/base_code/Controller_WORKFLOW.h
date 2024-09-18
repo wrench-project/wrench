@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
@@ -14,31 +15,30 @@
 
 namespace wrench {
 
-/**
- *  @brief A Workflow Management System (WMS) implementation
- */
-class Controller : public ExecutionController {
+    /**
+     *  @brief A Workflow Management System (WMS) implementation
+     */
+    class Controller : public ExecutionController {
 
-public:
-  // Constructor
-  Controller(std::shared_ptr<Workflow> workflow,
-             const std::shared_ptr<BareMetalComputeService>
-                 &bare_metal_compute_service,
-             const std::shared_ptr<SimpleStorageService> &storage_service,
-             const std::string &hostname);
+    public:
+        // Constructor
+        Controller(
+                std::shared_ptr<Workflow> workflow,
+                const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
+                const std::shared_ptr<SimpleStorageService> &storage_service,
+                const std::string &hostname);
 
-protected:
-  // Overridden method
-  void processEventStandardJobCompletion(
-      std::shared_ptr<StandardJobCompletedEvent>) override;
+    protected:
+        // Overridden method
+        void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
 
-private:
-  // main() method of the WMS
-  int main() override;
+    private:
+        // main() method of the WMS
+        int main() override;
 
-  std::shared_ptr<Workflow> workflow;
-  const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
-  const std::shared_ptr<SimpleStorageService> storage_service;
-};
-} // namespace wrench
-#endif // CONTROLLER_H
+        std::shared_ptr<Workflow> workflow;
+        const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
+        const std::shared_ptr<SimpleStorageService> storage_service;
+    };
+}// namespace wrench
+#endif//CONTROLLER_H

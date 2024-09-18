@@ -10,68 +10,63 @@
 #ifndef WRENCH_BATSCHEDNETWORKLISTENER_H
 #define WRENCH_BATSCHEDNETWORKLISTENER_H
 
-#include "BatchComputeServiceProperty.h"
 #include "wrench/services/Service.h"
+#include "BatchComputeServiceProperty.h"
 
 namespace wrench {
 
-class BatchComputeService;
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+    class BatchComputeService;
+
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
 #ifdef ENABLE_BATSCHED
-/**
- * @brief A helper service that handles all interaction with Batsched
- */
-class BatschedNetworkListener : public Service {
+    /**
+     * @brief A helper service that handles all interaction with Batsched
+     */
+    class BatschedNetworkListener : public Service {
 
-public:
-  BatschedNetworkListener(std::string hostname,
-                          std::shared_ptr<BatchComputeService> batch_service,
-                          S4U_CommPort *batch_service_commport,
-                          std::string sched_port, std::string data_to_send,
-                          WRENCH_PROPERTY_COLLECTION_TYPE property_list = {});
+    public:
+        BatschedNetworkListener(std::string hostname, std::shared_ptr<BatchComputeService> batch_service,
+                                S4U_CommPort *batch_service_commport, std::string sched_port,
+                                std::string data_to_send, WRENCH_PROPERTY_COLLECTION_TYPE property_list = {});
 
-private:
-  WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {};
+    private:
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {};
 
-  WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {};
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {};
 
-  BatschedNetworkListener(std::string,
-                          std::shared_ptr<BatchComputeService> batch_service,
-                          S4U_CommPort *batch_service_commport,
-                          std::string sched_port, std::string data_to_send,
-                          WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                          std::string suffix);
+        BatschedNetworkListener(std::string, std::shared_ptr<BatchComputeService> batch_service, S4U_CommPort *batch_service_commport, std::string sched_port,
+                                std::string data_to_send, WRENCH_PROPERTY_COLLECTION_TYPE property_list, std::string suffix);
 
-  int main() override;
-  std::string self_port;
-  std::string sched_port;
-  std::string data_to_send;
-  std::string reply_received;
-  std::shared_ptr<BatchComputeService> batch_service;
-  S4U_CommPort *batch_service_commport;
 
-  void
-  sendExecuteMessageToBatchComputeService(S4U_CommPort *answer_commport,
-                                          std::string execute_job_reply_data);
-  void
-  sendQueryAnswerMessageToBatchComputeService(double estimated_waiting_time);
-  void send_receive();
-};
+        int main() override;
+        std::string self_port;
+        std::string sched_port;
+        std::string data_to_send;
+        std::string reply_received;
+        std::shared_ptr<BatchComputeService> batch_service;
+        S4U_CommPort *batch_service_commport;
 
-#else // ENABLE_BATSCHED
-/**
- * @brief An empty class to make Doxygen happy when Batsched is not enabled
- */
-class BatschedNetworkListener {};
+        void sendExecuteMessageToBatchComputeService(S4U_CommPort *answer_commport, std::string execute_job_reply_data);
+        void sendQueryAnswerMessageToBatchComputeService(double estimated_waiting_time);
+        void send_receive();
+    };
+
+#else// ENABLE_BATSCHED
+    /**
+     * @brief An empty class to make Doxygen happy when Batsched is not enabled
+     */
+    class BatschedNetworkListener {
+    };
 #endif
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
 
-#endif // WRENCH_BATSCHEDNETWORKLISTENER_H
+
+#endif//WRENCH_BATSCHEDNETWORKLISTENER_H

@@ -14,24 +14,22 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
-/**
- * @brief Configurable message payloads for an HTCondor Central Manager service
- */
-class HTCondorCentralManagerServiceMessagePayload
-    : public ComputeServiceMessagePayload {
-public:
-  /** @brief The number of bytes in the control message sent by the daemon to
-   * state that the negotiator has been completed **/
-  DECLARE_MESSAGEPAYLOAD_NAME(HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD);
-};
+    /**
+     * @brief Configurable message payloads for an HTCondor Central Manager service
+     */
+    class HTCondorCentralManagerServiceMessagePayload : public ComputeServiceMessagePayload {
+    public:
+        /** @brief The number of bytes in the control message sent by the daemon to state that the negotiator has been completed **/
+        DECLARE_MESSAGEPAYLOAD_NAME(HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD);
+    };
 
-/***********************/
-/** \endcond INTERNAL  */
-/***********************/
-} // namespace wrench
+    /***********************/
+    /** \endcond INTERNAL  */
+    /***********************/
+}// namespace wrench
 
-#endif // WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGEPAYLOAD_H
+#endif//WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGEPAYLOAD_H

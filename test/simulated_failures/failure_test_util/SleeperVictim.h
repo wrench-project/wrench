@@ -11,27 +11,27 @@
 #define WRENCH_SLEEPER_H
 
 #include "wrench/services/Service.h"
-#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/simulation/SimulationMessage.h"
+#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 
 namespace wrench {
 
-class SleeperVictim : public Service {
+    class SleeperVictim : public Service {
 
-public:
-  explicit SleeperVictim(std::string host_on_which_to_run,
-                         double seconds_of_life, SimulationMessage *msg,
-                         S4U_CommPort *commport_to_notify);
+    public:
+        explicit SleeperVictim(std::string host_on_which_to_run, double seconds_of_life, SimulationMessage *msg, S4U_CommPort *commport_to_notify);
 
-  void cleanup(bool has_terminated_cleanly, int return_value) override;
+        void cleanup(bool has_terminated_cleanly, int return_value) override;
 
-private:
-  double seconds_of_life;
-  SimulationMessage *msg;
-  S4U_CommPort *commport_to_notify;
-  int main() override;
-};
+    private:
+        double seconds_of_life;
+        SimulationMessage *msg;
+        S4U_CommPort *commport_to_notify;
+        int main() override;
+    };
 
-}; // namespace wrench
 
-#endif // WRENCH_SLEEPER_H
+};// namespace wrench
+
+
+#endif//WRENCH_SLEEPER_H

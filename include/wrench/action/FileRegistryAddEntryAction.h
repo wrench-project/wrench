@@ -16,46 +16,46 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
 
-class DataFile;
-class FileLocation;
-class FileRegistryService;
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief A class that implements a file registry (add entry) action
- */
-class FileRegistryAddEntryAction : public FileRegistryAction {
+    class DataFile;
+    class FileLocation;
+    class FileRegistryService;
 
-public:
-protected:
-  friend class CompoundJob;
+    /**
+     * @brief A class that implements a file registry (add entry) action
+     */
+    class FileRegistryAddEntryAction : public FileRegistryAction {
 
-  /**
-   * @brief Constructor
-   * @param name: the action's name
-   * @param file_registry_service: the file registry service to update
-   * @param file_location: the file location
-   */
-  FileRegistryAddEntryAction(
-      const std::string &name,
-      std::shared_ptr<FileRegistryService> file_registry_service,
-      std::shared_ptr<FileLocation> file_location)
-      : FileRegistryAction(FileRegistryAction::ADD, name,
-                           std::move(file_registry_service),
-                           std::move(file_location)) {}
+    public:
+    protected:
+        friend class CompoundJob;
 
-private:
-  std::shared_ptr<FileRegistryService> file_registry_service;
-  std::shared_ptr<FileLocation> file_location;
-};
+        /**
+        * @brief Constructor
+        * @param name: the action's name
+        * @param file_registry_service: the file registry service to update
+        * @param file_location: the file location
+        */
+        FileRegistryAddEntryAction(const std::string &name,
+                                   std::shared_ptr<FileRegistryService> file_registry_service,
+                                   std::shared_ptr<FileLocation> file_location) : FileRegistryAction(FileRegistryAction::ADD, name, std::move(file_registry_service), std::move(file_location)) {}
 
-/***********************/
-/** \endcond           */
-/***********************/
 
-} // namespace wrench
+    private:
+        std::shared_ptr<FileRegistryService> file_registry_service;
+        std::shared_ptr<FileLocation> file_location;
+    };
 
-#endif // WRENCH_FILE_REGISTRY_ADD_ENTRY_ACTION_H
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
+
+}// namespace wrench
+
+#endif//WRENCH_FILE_REGISTRY_ADD_ENTRY_ACTION_H

@@ -11,22 +11,22 @@
 
 #include <wrench/failure_causes/ComputationHasDied.h>
 
-WRENCH_LOG_CATEGORY(wrench_core_computation_has_died,
-                    "Log category for ComputationHasDied");
+WRENCH_LOG_CATEGORY(wrench_core_computation_has_died, "Log category for ComputationHasDied");
 
 namespace wrench {
 
-/** @brief Constructor
- *
- */
-ComputationHasDied::ComputationHasDied() = default;
+    /** @brief Constructor
+     *
+     */
+    ComputationHasDied::ComputationHasDied() = default;
 
-/**
- * @brief Get the human-readable failure message
- * @return the message
- */
-std::string ComputationHasDied::toString() {
-  return {"A computation has died (failed or killed)"};
-}
 
-} // namespace wrench
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string ComputationHasDied::toString() {
+        return {"A computation has died (failed or killed)"};
+    }
+
+}// namespace wrench

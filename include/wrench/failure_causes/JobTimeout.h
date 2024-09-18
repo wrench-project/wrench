@@ -17,35 +17,37 @@
 
 namespace wrench {
 
-class Job;
+    class Job;
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief A "job has timed out" failure cause
- */
-class JobTimeout : public FailureCause {
-public:
-  /***********************/
-  /** \cond INTERNAL     */
-  /***********************/
-  JobTimeout(std::shared_ptr<Job> job);
-  /***********************/
-  /** \endcond           */
-  /***********************/
+    /**
+    * @brief A "job has timed out" failure cause
+    */
+    class JobTimeout : public FailureCause {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        JobTimeout(std::shared_ptr<Job> job);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-  std::shared_ptr<Job> getJob();
-  std::string toString() override;
+        std::shared_ptr<Job> getJob();
+        std::string toString() override;
 
-private:
-  std::shared_ptr<Job> job;
-};
+    private:
+        std::shared_ptr<Job> job;
+    };
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
 
-#endif // WRENCH_JOB_TIMEOUT_H
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
+
+
+#endif//WRENCH_JOB_TIMEOUT_H

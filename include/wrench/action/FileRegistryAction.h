@@ -16,50 +16,56 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
 
-class DataFile;
-class FileLocation;
-class FileRegistryService;
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief A class that implements a file registry (abstract) action
- */
-class FileRegistryAction : public Action {
+    class DataFile;
+    class FileLocation;
+    class FileRegistryService;
 
-public:
-  std::shared_ptr<DataFile> getFile() const;
-  std::shared_ptr<FileLocation> getFileLocation() const;
-  std::shared_ptr<FileRegistryService> getFileRegistryService() const;
+    /**
+     * @brief A class that implements a file registry (abstract) action
+     */
+    class FileRegistryAction : public Action {
 
-protected:
-  friend class CompoundJob;
+    public:
+        std::shared_ptr<DataFile> getFile() const;
+        std::shared_ptr<FileLocation> getFileLocation() const;
+        std::shared_ptr<FileRegistryService> getFileRegistryService() const;
 
-  /**
-   * @brief File registry action type enum
-   */
-  enum Type { ADD, DELETE };
+    protected:
+        friend class CompoundJob;
 
-  FileRegistryAction(FileRegistryAction::Type type, const std::string &name,
-                     std::shared_ptr<FileRegistryService> file_registry_service,
-                     std::shared_ptr<FileLocation> file_location);
+        /**
+         * @brief File registry action type enum
+         */
+        enum Type {
+            ADD,
+            DELETE
+        };
 
-  void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
-  void
-  terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        FileRegistryAction(FileRegistryAction::Type type,
+                           const std::string &name,
+                           std::shared_ptr<FileRegistryService> file_registry_service,
+                           std::shared_ptr<FileLocation> file_location);
 
-private:
-  FileRegistryAction::Type type;
-  std::shared_ptr<FileRegistryService> file_registry_service;
-  std::shared_ptr<FileLocation> file_location;
-};
 
-/***********************/
-/** \endcond           */
-/***********************/
+        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
-} // namespace wrench
+    private:
+        FileRegistryAction::Type type;
+        std::shared_ptr<FileRegistryService> file_registry_service;
+        std::shared_ptr<FileLocation> file_location;
+    };
 
-#endif // WRENCH_FILE_REGISTRY_ACTION_H
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
+}// namespace wrench
+
+#endif//WRENCH_FILE_REGISTRY_ACTION_H

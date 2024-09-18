@@ -7,33 +7,35 @@
  * (at your option) any later version.
  */
 
+
 #ifndef WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_BATCH_H
 #define WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_BATCH_H
 
 #include <wrench-dev.h>
 
+
 namespace wrench {
 
-/**
- *  @brief A Workflow Management System (WMS) implementation
- */
-class TwoTasksAtATimeBatchWMS : public ExecutionController {
+    /**
+     *  @brief A Workflow Management System (WMS) implementation
+     */
+    class TwoTasksAtATimeBatchWMS : public ExecutionController {
 
-public:
-  // Constructor
-  TwoTasksAtATimeBatchWMS(
-      std::shared_ptr<Workflow> workflow,
-      const std::shared_ptr<BatchComputeService> &batch_compute_service,
-      const std::shared_ptr<StorageService> &storage_service,
-      const std::string &hostname);
+    public:
+        // Constructor
+        TwoTasksAtATimeBatchWMS(
+                std::shared_ptr<Workflow> workflow,
+                const std::shared_ptr<BatchComputeService> &batch_compute_service,
+                const std::shared_ptr<StorageService> &storage_service,
+                const std::string &hostname);
 
-private:
-  // main() method of the WMS
-  int main() override;
+    private:
+        // main() method of the WMS
+        int main() override;
 
-  std::shared_ptr<Workflow> workflow;
-  const std::shared_ptr<BatchComputeService> batch_compute_service;
-  const std::shared_ptr<StorageService> storage_service;
-};
-} // namespace wrench
-#endif // WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_BATCH_H
+        std::shared_ptr<Workflow> workflow;
+        const std::shared_ptr<BatchComputeService> batch_compute_service;
+        const std::shared_ptr<StorageService> storage_service;
+    };
+}// namespace wrench
+#endif//WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_BATCH_H

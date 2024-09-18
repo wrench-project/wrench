@@ -11,7 +11,7 @@
 
 namespace wrench {
 
-SET_PROPERTY_NAME(FileRegistryServiceProperty, LOOKUP_COMPUTE_COST);
-SET_PROPERTY_NAME(FileRegistryServiceProperty, ADD_ENTRY_COMPUTE_COST);
-SET_PROPERTY_NAME(FileRegistryServiceProperty, REMOVE_ENTRY_COMPUTE_COST);
-} // namespace wrench
+    SET_PROPERTY_NAME(FileRegistryServiceProperty, LOOKUP_COMPUTE_COST);
+    SET_PROPERTY_NAME(FileRegistryServiceProperty, ADD_ENTRY_COMPUTE_COST);
+    SET_PROPERTY_NAME(FileRegistryServiceProperty, REMOVE_ENTRY_COMPUTE_COST);
+}// namespace wrench

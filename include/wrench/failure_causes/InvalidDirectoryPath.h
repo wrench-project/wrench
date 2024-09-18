@@ -13,42 +13,45 @@
 #include <set>
 #include <string>
 
+#include "wrench/services/Service.h"
 #include "FailureCause.h"
 #include "InvalidDirectoryPath.h"
-#include "wrench/services/Service.h"
 
 namespace wrench {
 
-class StorageService;
+    class StorageService;
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief A "unknown mount point storage service" failure cause
- */
-class InvalidDirectoryPath : public FailureCause {
+    /**
+     * @brief A "unknown mount point storage service" failure cause
+      */
+    class InvalidDirectoryPath : public FailureCause {
 
-public:
-  /***********************/
-  /** \cond INTERNAL     */
-  /***********************/
-  InvalidDirectoryPath(const std::shared_ptr<FileLocation> &location);
-  /***********************/
-  /** \endcond           */
-  /***********************/
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        InvalidDirectoryPath(
+                const std::shared_ptr<FileLocation> &location);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-  std::shared_ptr<FileLocation> getLocation();
-  std::string toString() override;
+        std::shared_ptr<FileLocation> getLocation();
+        std::string toString() override;
 
-private:
-  std::shared_ptr<FileLocation> location;
-};
+    private:
+        std::shared_ptr<FileLocation> location;
+    };
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
 
-#endif // WRENCH_INVALIDDIRECTORYPATH_H
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
+
+
+#endif//WRENCH_INVALIDDIRECTORYPATH_H

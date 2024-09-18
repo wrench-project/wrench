@@ -7,23 +7,25 @@
  * (at your option) any later version.
  */
 
+
 #ifndef WRENCH_POINTERUTIL_H
 #define WRENCH_POINTERUTIL_H
 
-#include <deque>
+
 #include <memory>
 #include <set>
+#include <deque>
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
-/**
- * @brief A helper class that implements useful smart pointer operations
- */
-class PointerUtil {
+    /**
+     * @brief A helper class that implements useful smart pointer operations
+     */
+    class PointerUtil {
 
 #if 0
 
@@ -98,12 +100,14 @@ class PointerUtil {
                                                            std::set<std::unique_ptr<T1>> *to);
 
 #endif
-};
+    };
 
-/***********************/
-/** \endcond           */
-/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
-} // namespace wrench
 
-#endif // WRENCH_POINTERUTIL_H
+}// namespace wrench
+
+
+#endif//WRENCH_POINTERUTIL_H

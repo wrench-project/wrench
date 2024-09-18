@@ -14,44 +14,45 @@
 #include <string>
 
 #include "FailureCause.h"
-#include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/storage/StorageService.h"
+#include "wrench/services/compute/ComputeService.h"
 
 namespace wrench {
 
-class Service;
+    class Service;
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief A "requested functionality is not available on that service" failure
- * cause
- */
-class FunctionalityNotAvailable : public FailureCause {
-public:
-  /***********************/
-  /** \cond INTERNAL     */
-  /***********************/
-  FunctionalityNotAvailable(std::shared_ptr<Service> service,
-                            std::string functionality_name);
-  /***********************/
-  /** \endcond           */
-  /***********************/
 
-  std::shared_ptr<Service> getService();
-  std::string getFunctionalityName();
-  std::string toString() override;
+    /**
+     * @brief A "requested functionality is not available on that service" failure cause
+     */
+    class FunctionalityNotAvailable : public FailureCause {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        FunctionalityNotAvailable(std::shared_ptr<Service> service, std::string functionality_name);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-private:
-  std::shared_ptr<Service> service;
-  std::string functionality_name;
-};
+        std::shared_ptr<Service> getService();
+        std::string getFunctionalityName();
+        std::string toString() override;
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
+    private:
+        std::shared_ptr<Service> service;
+        std::string functionality_name;
+    };
 
-#endif // WRENCH_FUNCTIONALITY_NOT_AVAILABLE_H
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
+
+
+#endif//WRENCH_FUNCTIONALITY_NOT_AVAILABLE_H

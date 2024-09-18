@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+
 #ifndef WRENCH_COMPUTESERVICEPROPERTY_H
 #define WRENCH_COMPUTESERVICEPROPERTY_H
 
@@ -14,16 +15,16 @@
 
 namespace wrench {
 
-/**
- * @brief Configurable properties for a ComputeService
- */
-class ComputeServiceProperty : public ServiceProperty {
-public:
-  /** @brief The buffer size of the compute service's scratch space (see
-   *documentation of StorageServiceProperty::BUFFER_SIZE) default: 0
-   **/
-  DECLARE_PROPERTY_NAME(SCRATCH_SPACE_BUFFER_SIZE);
-};
-} // namespace wrench
+    /**
+     * @brief Configurable properties for a ComputeService
+     */
+    class ComputeServiceProperty : public ServiceProperty {
+    public:
+        /** @brief The buffer size of the compute service's scratch space (see documentation of StorageServiceProperty::BUFFER_SIZE)
+         *  default: 0
+         **/
+        DECLARE_PROPERTY_NAME(SCRATCH_SPACE_BUFFER_SIZE);
+    };
+}// namespace wrench
 
-#endif // WRENCH_COMPUTESERVICEPROPERTY_H
+#endif//WRENCH_COMPUTESERVICEPROPERTY_H

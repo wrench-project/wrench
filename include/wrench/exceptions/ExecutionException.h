@@ -13,65 +13,71 @@
 
 #include <exception>
 #include <memory>
-#include <string.h>
 #include <string>
 #include <utility>
+#include <string.h>
 
 #include "wrench/failure_causes/FailureCause.h"
 
 namespace wrench {
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief An generic exception that is thrown whenever something
- * unexpected (but simulation-valid) occurs during the simulated
- * execution of a WMS
- */
-class ExecutionException : public std::exception {
+    /**
+		 * @brief An generic exception that is thrown whenever something
+		 * unexpected (but simulation-valid) occurs during the simulated
+		 * execution of a WMS
+		 */
+    class ExecutionException : public std::exception {
 
-private:
-  std::shared_ptr<FailureCause> cause;
+    private:
+        std::shared_ptr<FailureCause> cause;
 
-public:
-  /**
-   * @brief Get the exception's error message
-   * @return the exception's message, as a C-style string
-   */
-  virtual const char *what() const throw() {
-    // Without the strdup() below, we get some valgrind warnings...
-    return strdup(cause->toString().c_str());
-  }
+    public:
+        /**
+				 * @brief Get the exception's error message
+				 * @return the exception's message, as a C-style string
+				 */
+        virtual const char *what() const throw() {
+            // Without the strdup() below, we get some valgrind warnings...
+            return strdup(cause->toString().c_str());
+        }
 
-  /**
-   * @brief Get the failure cause
-   * @return the failure cause
-   */
-  std::shared_ptr<FailureCause> getCause() { return this->cause; }
+        /**
+         * @brief Get the failure cause
+         * @return the failure cause
+         */
+        std::shared_ptr<FailureCause> getCause() {
+            return this->cause;
+        }
 
-  /***********************/
-  /** \cond INTERNAL    */
-  /***********************/
 
-  /**
-   * @brief Constructor
-   * @param cause: the cause of the failure
-   */
-  explicit ExecutionException(std::shared_ptr<FailureCause> cause) {
-    this->cause = std::move(cause);
-  }
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
 
-  /***********************/
-  /** \endcond           */
-  /***********************/
-};
+        /**
+				 * @brief Constructor
+				 * @param cause: the cause of the failure
+				 */
+        explicit ExecutionException(std::shared_ptr<FailureCause> cause) {
+            this->cause = std::move(cause);
+        }
 
-/***********************/
-/** \endcond          */
-/***********************/
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
 
-} // namespace wrench
 
-#endif // WRENCH_EXECUTION_EXCEPTION_H
+    /***********************/
+    /** \endcond          */
+    /***********************/
+
+
+}// namespace wrench
+
+
+#endif//WRENCH_EXECUTION_EXCEPTION_H

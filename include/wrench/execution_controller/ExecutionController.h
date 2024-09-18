@@ -10,104 +10,97 @@
 #ifndef WRENCH_EXECUTIONCONTROLLER_H
 #define WRENCH_EXECUTIONCONTROLLER_H
 
-#include "wrench/execution_events/CompoundJobCompletedEvent.h"
+#include "wrench/services/metering/EnergyMeterService.h"
+#include "wrench/services/metering/BandwidthMeterService.h"
+#include "wrench/services/Service.h"
+#include "wrench/managers/data_movement_manager/DataMovementManager.h"
+#include "wrench/services/compute/cloud/CloudComputeService.h"
 #include "wrench/execution_events/CompoundJobFailedEvent.h"
+#include "wrench/execution_events/CompoundJobCompletedEvent.h"
+#include "wrench/execution_events/StandardJobCompletedEvent.h"
+#include "wrench/execution_events/StandardJobFailedEvent.h"
+#include "wrench/execution_events/PilotJobStartedEvent.h"
+#include "wrench/execution_events/PilotJobExpiredEvent.h"
 #include "wrench/execution_events/FileCopyCompletedEvent.h"
 #include "wrench/execution_events/FileCopyFailedEvent.h"
 #include "wrench/execution_events/FileReadCompletedEvent.h"
 #include "wrench/execution_events/FileReadFailedEvent.h"
 #include "wrench/execution_events/FileWriteCompletedEvent.h"
 #include "wrench/execution_events/FileWriteFailedEvent.h"
-#include "wrench/execution_events/PilotJobExpiredEvent.h"
-#include "wrench/execution_events/PilotJobStartedEvent.h"
-#include "wrench/execution_events/StandardJobCompletedEvent.h"
-#include "wrench/execution_events/StandardJobFailedEvent.h"
 #include "wrench/execution_events/TimerEvent.h"
-#include "wrench/managers/data_movement_manager/DataMovementManager.h"
-#include "wrench/services/Service.h"
-#include "wrench/services/compute/cloud/CloudComputeService.h"
-#include "wrench/services/metering/BandwidthMeterService.h"
-#include "wrench/services/metering/EnergyMeterService.h"
 #include "wrench/workflow/Workflow.h"
 
 namespace wrench {
 
-class Simulation;
+    class Simulation;
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief An abstraction of an execution controller, i.e., a running process
- * that interacts with other services to accomplish some computational goal. The
- * simulation will terminate when all execution controllers have terminated.
- */
-class ExecutionController : public Service {
+    /**
+     * @brief An abstraction of an execution controller, i.e., a running process that interacts
+     * with other services to accomplish some computational goal. The simulation will terminate
+     * when all execution controllers have terminated.
+     */
+    class ExecutionController : public Service {
 
-public:
-  virtual std::shared_ptr<JobManager> createJobManager();
-  virtual std::shared_ptr<DataMovementManager> createDataMovementManager();
-  std::shared_ptr<EnergyMeterService>
-  createEnergyMeter(const std::map<std::string, double> &measurement_periods);
-  std::shared_ptr<EnergyMeterService>
-  createEnergyMeter(const std::vector<std::string> &hostnames,
-                    double measurement_period);
-  std::shared_ptr<BandwidthMeterService> createBandwidthMeter(
-      const std::map<std::string, double> &measurement_periods);
-  std::shared_ptr<BandwidthMeterService>
-  createBandwidthMeter(const std::vector<std::string> &linknames,
-                       double measurement_period);
 
-  std::shared_ptr<ExecutionEvent> waitForNextEvent();
-  std::shared_ptr<ExecutionEvent> waitForNextEvent(double timeout);
+    public:
+        virtual std::shared_ptr<JobManager> createJobManager();
+        virtual std::shared_ptr<DataMovementManager> createDataMovementManager();
+        std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
+        std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period);
+        std::shared_ptr<BandwidthMeterService> createBandwidthMeter(const std::map<std::string, double> &measurement_periods);
+        std::shared_ptr<BandwidthMeterService> createBandwidthMeter(const std::vector<std::string> &linknames, double measurement_period);
 
-  void waitForAndProcessNextEvent();
-  bool waitForAndProcessNextEvent(double timeout);
 
-  virtual void
-      processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent>);
-  virtual void processEventCompoundJobCompletion(
-      std::shared_ptr<CompoundJobCompletedEvent>);
+        std::shared_ptr<ExecutionEvent> waitForNextEvent();
+        std::shared_ptr<ExecutionEvent> waitForNextEvent(double timeout);
 
-  virtual void processEventStandardJobCompletion(
-      std::shared_ptr<StandardJobCompletedEvent>);
-  virtual void
-      processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>);
+        void waitForAndProcessNextEvent();
+        bool waitForAndProcessNextEvent(double timeout);
 
-  virtual void processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent>);
-  virtual void
-      processEventPilotJobExpiration(std::shared_ptr<PilotJobExpiredEvent>);
+        virtual void processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent>);
+        virtual void processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent>);
 
-  virtual void
-      processEventFileCopyCompletion(std::shared_ptr<FileCopyCompletedEvent>);
-  virtual void
-      processEventFileCopyFailure(std::shared_ptr<FileCopyFailedEvent>);
+        virtual void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>);
+        virtual void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>);
 
-  virtual void processEventTimer(std::shared_ptr<TimerEvent>);
 
-  void setDaemonized(bool daemonized);
+        virtual void processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent>);
+        virtual void processEventPilotJobExpiration(std::shared_ptr<PilotJobExpiredEvent>);
 
-  ExecutionController(const std::string &hostname, const std::string &suffix);
+        virtual void processEventFileCopyCompletion(std::shared_ptr<FileCopyCompletedEvent>);
+        virtual void processEventFileCopyFailure(std::shared_ptr<FileCopyFailedEvent>);
 
-  void setTimer(double date, std::string message);
+        virtual void processEventTimer(std::shared_ptr<TimerEvent>);
 
-protected:
-private:
-  friend class Simulation;
-  friend class DataMovementManager;
-  friend class JobManager;
+        void setDaemonized(bool daemonized);
 
-  bool daemonized = false;
+        ExecutionController(
+                const std::string &hostname,
+                const std::string &suffix);
 
-private:
-  virtual int main() = 0;
-};
+        void setTimer(double date, std::string message);
 
-/***********************/
-/** \endcond           */
-/***********************/
+    protected:
+    private:
+        friend class Simulation;
+        friend class DataMovementManager;
+        friend class JobManager;
 
-} // namespace wrench
+        bool daemonized = false;
 
-#endif // WRENCH_EXECUTIONCONTROLLER_H
+    private:
+        virtual int main() = 0;
+    };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
+}// namespace wrench
+
+
+#endif//WRENCH_EXECUTIONCONTROLLER_H
