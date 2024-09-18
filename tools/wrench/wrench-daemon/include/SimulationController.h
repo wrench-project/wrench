@@ -62,11 +62,13 @@ namespace wrench {
         json addSleepAction(json data);
         json addActionDependency(json data);
         json addParentJob(json data);
+        json getActionState(json data);
         json getActionStartDate(json data);
         json getActionEndDate(json data);
         json getActionFailureCause(json data);
 
         json createTask(json data);
+        json getTaskState(json data);
         json getTaskFlops(json data);
         json getTaskMinNumCores(json data);
         json getTaskMaxNumCores(json data);
