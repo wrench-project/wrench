@@ -9,4 +9,6 @@
 
 #include <wrench/services/compute/batch/BatchComputeServiceMessagePayload.h>
 
-namespace wrench {}
+namespace wrench {
+
+}

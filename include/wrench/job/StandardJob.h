@@ -7,15 +7,17 @@
  * (at your option) any later version.
  */
 
+
 #ifndef WRENCH_STANDARDJOB_H
 #define WRENCH_STANDARDJOB_H
+
 
 #include <map>
 #include <set>
 #include <vector>
-#include <wrench/data_file/DataFile.h>
 #include <wrench/workflow/Workflow.h>
 #include <wrench/workflow/WorkflowTask.h>
+#include <wrench/data_file/DataFile.h>
 
 #include "Job.h"
 
@@ -23,164 +25,142 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-class DataFile;
-class WorkflowTask;
-class Action;
+    class DataFile;
+    class WorkflowTask;
+    class Action;
 
-/**
- * @brief A standard (i.e., non-pilot) workflow job that can be submitted to a
- * ComputeService by a WMS (via a JobManager)
- */
-class StandardJob : public Job,
-                    public std::enable_shared_from_this<StandardJob> {
 
-public:
-  //        ~StandardJob() {
-  //            std::cerr << "IN STANDARD JOB DESTRUCTOR: CJOB.REF# = " <<
-  //            this->compound_job.use_count() << "\n";
-  //        }
+    /**
+     * @brief A standard (i.e., non-pilot) workflow job that can be submitted to a ComputeService
+     * by a WMS (via a JobManager)
+     */
+    class StandardJob : public Job, public std::enable_shared_from_this<StandardJob> {
 
-  /** @brief Standard job states */
-  enum State {
-    /** @brief Not submitted yet */
-    NOT_SUBMITTED,
-    /** @brief Submitted but not running yet */
-    PENDING,
-    /** @brief Running */
-    RUNNING,
-    /** @brief Completed successfully */
-    COMPLETED,
-    /** @brief Failed */
-    FAILED,
-    /** @brief Terminated by submitter */
-    TERMINATED
-  };
+    public:
+        //        ~StandardJob() {
+        //            std::cerr << "IN STANDARD JOB DESTRUCTOR: CJOB.REF# = " << this->compound_job.use_count() << "\n";
+        //        }
 
-  std::vector<std::shared_ptr<WorkflowTask>> getTasks() const;
+        /** @brief Standard job states */
+        enum State {
+            /** @brief Not submitted yet */
+            NOT_SUBMITTED,
+            /** @brief Submitted but not running yet */
+            PENDING,
+            /** @brief Running */
+            RUNNING,
+            /** @brief Completed successfully */
+            COMPLETED,
+            /** @brief Failed */
+            FAILED,
+            /** @brief Terminated by submitter */
+            TERMINATED
+        };
 
-  unsigned long getMinimumRequiredNumCores() const;
+        std::vector<std::shared_ptr<WorkflowTask>> getTasks() const;
 
-  double getMinimumRequiredMemory() const;
+        unsigned long getMinimumRequiredNumCores() const;
 
-  unsigned long getNumCompletedTasks() const;
+        double getMinimumRequiredMemory() const;
 
-  unsigned long getNumTasks() const;
+        unsigned long getNumCompletedTasks() const;
 
-  StandardJob::State getState();
+        unsigned long getNumTasks() const;
 
-  std::map<std::shared_ptr<DataFile>,
-           std::vector<std::shared_ptr<FileLocation>>>
-  getFileLocations() const;
-  /***********************/
-  /** \cond INTERNAL     */
-  /***********************/
+        StandardJob::State getState();
 
-  bool usesScratch();
 
-  /** @brief The job's computational tasks */
-  std::vector<std::shared_ptr<WorkflowTask>> tasks;
+        std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> getFileLocations() const;
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
 
-  /** @brief The job's total computational cost (in flops) */
-  double total_flops;
+        bool usesScratch();
 
-  /** @brief The file locations that tasks should read/write files from/to. Each
-   * file is given a list of locations, in preferred order */
-  std::map<std::shared_ptr<DataFile>,
-           std::vector<std::shared_ptr<FileLocation>>>
-      file_locations;
+        /** @brief The job's computational tasks */
+        std::vector<std::shared_ptr<WorkflowTask>> tasks;
 
-  /** @brief The ordered file copy operations to perform before computational
-   * tasks */
-  std::vector<
-      std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>>
-      pre_file_copies;
-  /** @brief The ordered file copy operations to perform after computational
-   * tasks */
-  std::vector<
-      std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>>
-      post_file_copies;
-  /** @brief The ordered file deletion operations to perform at the end */
-  std::vector<std::shared_ptr<FileLocation>> cleanup_file_deletions;
+        /** @brief The job's total computational cost (in flops) */
+        double total_flops;
 
-  /**
-   * @brief Get the shared pointer for this object
-   * @return a shared pointer to the object
-   */
-  std::shared_ptr<StandardJob> getSharedPtr() {
-    return this->shared_from_this();
-  }
+        /** @brief The file locations that tasks should read/write files from/to. Each file is given a list of locations, in preferred order */
+        std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations;
 
-  double getPreJobOverheadInSeconds() const;
-  void setPreJobOverheadInSeconds(double overhead);
-  double getPostJobOverheadInSeconds() const;
-  void setPostJobOverheadInSeconds(double overhead);
+        /** @brief The ordered file copy operations to perform before computational tasks */
+        std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
+        /** @brief The ordered file copy operations to perform after computational tasks */
+        std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
+        /** @brief The ordered file deletion operations to perform at the end */
+        std::vector<std::shared_ptr<FileLocation>> cleanup_file_deletions;
 
-private:
-  friend class BareMetalComputeService;
-  friend class JobManager;
-  friend class ExecutionEvent;
+        /**
+         * @brief Get the shared pointer for this object
+         * @return a shared pointer to the object
+         */
+        std::shared_ptr<StandardJob> getSharedPtr() { return this->shared_from_this(); }
 
-  StandardJob(
-      std::shared_ptr<JobManager> job_manager,
-      std::vector<std::shared_ptr<WorkflowTask>> tasks,
-      std::map<std::shared_ptr<DataFile>,
-               std::vector<std::shared_ptr<FileLocation>>> &file_locations,
-      std::vector<std::tuple<std::shared_ptr<FileLocation>,
-                             std::shared_ptr<FileLocation>>> &pre_file_copies,
-      std::vector<std::tuple<std::shared_ptr<FileLocation>,
-                             std::shared_ptr<FileLocation>>> &post_file_copies,
-      std::vector<std::shared_ptr<FileLocation>> &cleanup_file_deletions);
+        double getPreJobOverheadInSeconds() const;
+        void setPreJobOverheadInSeconds(double overhead);
+        double getPostJobOverheadInSeconds() const;
+        void setPostJobOverheadInSeconds(double overhead);
 
-  void createUnderlyingCompoundJob(
-      const std::shared_ptr<ComputeService> &compute_service);
-  void processCompoundJobOutcome(
-      std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State>
-          &state_changes,
-      std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments,
-      std::shared_ptr<FailureCause> &job_failure_cause, Simulation *simulation);
-  static void applyTaskUpdates(
-      std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State>
-          &state_changes,
-      std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments);
 
-  static void
-  analyzeActions(const std::vector<std::shared_ptr<Action>> &actions,
-                 bool *at_least_one_failed, bool *at_least_one_killed,
-                 std::shared_ptr<FailureCause> *failure_cause,
-                 double *earliest_start_date, double *latest_end_date,
-                 double *earliest_failure_date);
+    private:
+        friend class BareMetalComputeService;
+        friend class JobManager;
+        friend class ExecutionEvent;
 
-  State state;
-  double pre_overhead = 0.0;
-  double post_overhead = 0.0;
+        StandardJob(std::shared_ptr<JobManager> job_manager,
+                    std::vector<std::shared_ptr<WorkflowTask>> tasks, std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
+                    std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &pre_file_copies,
+                    std::vector<std::tuple<std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &post_file_copies,
+                    std::vector<std::shared_ptr<FileLocation>> &cleanup_file_deletions);
 
-  std::shared_ptr<CompoundJob> compound_job;
-  std::shared_ptr<Action> pre_overhead_action = nullptr;
-  std::shared_ptr<Action> post_overhead_action = nullptr;
-  std::vector<std::shared_ptr<Action>> pre_file_copy_actions;
-  std::map<std::shared_ptr<WorkflowTask>, std::vector<std::shared_ptr<Action>>>
-      task_file_read_actions;
-  std::map<std::shared_ptr<WorkflowTask>, std::shared_ptr<Action>>
-      task_compute_actions;
-  std::map<std::shared_ptr<WorkflowTask>, std::vector<std::shared_ptr<Action>>>
-      task_file_write_actions;
-  std::vector<std::shared_ptr<Action>> post_file_copy_actions;
-  std::vector<std::shared_ptr<Action>> cleanup_actions;
-  std::shared_ptr<Action> scratch_cleanup = nullptr;
+        void createUnderlyingCompoundJob(const std::shared_ptr<ComputeService> &compute_service);
+        void processCompoundJobOutcome(std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
+                                       std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments,
+                                       std::shared_ptr<FailureCause> &job_failure_cause,
+                                       Simulation *simulation);
+        static void applyTaskUpdates(std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
+                                     std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments);
 
-  /***********************/
-  /** \endcond           */
-  /***********************/
-};
+        static void analyzeActions(const std::vector<std::shared_ptr<Action>> &actions,
+                                   bool *at_least_one_failed,
+                                   bool *at_least_one_killed,
+                                   std::shared_ptr<FailureCause> *failure_cause,
+                                   double *earliest_start_date,
+                                   double *latest_end_date,
+                                   double *earliest_failure_date);
 
-/***********************/
-/** \endcond           */
-/***********************/
 
-} // namespace wrench
+        State state;
+        double pre_overhead = 0.0;
+        double post_overhead = 0.0;
 
-#endif // WRENCH_STANDARDJOB_H
+        std::shared_ptr<CompoundJob> compound_job;
+        std::shared_ptr<Action> pre_overhead_action = nullptr;
+        std::shared_ptr<Action> post_overhead_action = nullptr;
+        std::vector<std::shared_ptr<Action>> pre_file_copy_actions;
+        std::map<std::shared_ptr<WorkflowTask>, std::vector<std::shared_ptr<Action>>> task_file_read_actions;
+        std::map<std::shared_ptr<WorkflowTask>, std::shared_ptr<Action>> task_compute_actions;
+        std::map<std::shared_ptr<WorkflowTask>, std::vector<std::shared_ptr<Action>>> task_file_write_actions;
+        std::vector<std::shared_ptr<Action>> post_file_copy_actions;
+        std::vector<std::shared_ptr<Action>> cleanup_actions;
+        std::shared_ptr<Action> scratch_cleanup = nullptr;
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
+}// namespace wrench
+
+#endif//WRENCH_STANDARDJOB_H

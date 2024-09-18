@@ -16,52 +16,48 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
 
-class DataFile;
-class FileLocation;
-class FileRegistryService;
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief A class that implements a file registry (delete entry) action
- */
-class FileRegistryDeleteEntryAction : public FileRegistryAction {
+    class DataFile;
+    class FileLocation;
+    class FileRegistryService;
 
-public:
-protected:
-  friend class CompoundJob;
+    /**
+     * @brief A class that implements a file registry (delete entry) action
+     */
+    class FileRegistryDeleteEntryAction : public FileRegistryAction {
 
-  /**
-   * @brief Constructor
-   * @param name: the action's name
-   * @param file_registry_service: the file registry service to update
-   * @param file_location: the file location
-   */
-  FileRegistryDeleteEntryAction(
-      const std::string &name,
-      std::shared_ptr<FileRegistryService> file_registry_service,
-      std::shared_ptr<FileLocation> file_location)
-      : FileRegistryAction(FileRegistryAction::DELETE, name,
-                           std::move(file_registry_service),
-                           std::move(file_location)) {}
+    public:
+    protected:
+        friend class CompoundJob;
 
-  //        void execute(std::shared_ptr<ActionExecutor>
-  //        action_executor,unsigned long num_threads, double ram_footprint)
-  //        override; void terminate(std::shared_ptr<ActionExecutor>
-  //        action_executor) override;
+        /**
+        * @brief Constructor
+        * @param name: the action's name
+        * @param file_registry_service: the file registry service to update
+        * @param file_location: the file location
+        */
+        FileRegistryDeleteEntryAction(const std::string &name,
+                                      std::shared_ptr<FileRegistryService> file_registry_service,
+                                      std::shared_ptr<FileLocation> file_location) : FileRegistryAction(FileRegistryAction::DELETE, name, std::move(file_registry_service), std::move(file_location)) {}
 
-private:
-  std::shared_ptr<FileRegistryService> file_registry_service;
-  std::shared_ptr<DataFile> file;
-  std::shared_ptr<FileLocation> file_location;
-};
+        //        void execute(std::shared_ptr<ActionExecutor> action_executor,unsigned long num_threads, double ram_footprint) override;
+        //        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
 
-/***********************/
-/** \endcond           */
-/***********************/
+    private:
+        std::shared_ptr<FileRegistryService> file_registry_service;
+        std::shared_ptr<DataFile> file;
+        std::shared_ptr<FileLocation> file_location;
+    };
 
-} // namespace wrench
 
-#endif // WRENCH_FILE_REGISTRY_DELETE_ENTRY_ACTION_H
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
+}// namespace wrench
+
+#endif//WRENCH_FILE_REGISTRY_DELETE_ENTRY_ACTION_H

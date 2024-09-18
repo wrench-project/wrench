@@ -11,32 +11,30 @@
 
 namespace wrench {
 
-/**
- * @brief Constructor
- *
- * @param payload: the message size in bytes
- */
-HTCondorCentralManagerServiceMessage::HTCondorCentralManagerServiceMessage(
-    double payload)
-    : ServiceMessage(payload) {}
+    /**
+     * @brief Constructor
+     *
+     * @param payload: the message size in bytes
+     */
+    HTCondorCentralManagerServiceMessage::HTCondorCentralManagerServiceMessage(double payload)
+        : ServiceMessage(payload) {}
 
-/**
- * @brief Constructor
- *
- * @param scheduled_jobs: list of pending jobs upon negotiator completion
- * @param payload: the message size in bytes
- */
-NegotiatorCompletionMessage::NegotiatorCompletionMessage(
-    std::set<std::shared_ptr<Job>> scheduled_jobs, double payload)
-    : HTCondorCentralManagerServiceMessage(payload),
-      scheduled_jobs(scheduled_jobs) {}
+    /**
+     * @brief Constructor
+     *
+     * @param scheduled_jobs: list of pending jobs upon negotiator completion
+     * @param payload: the message size in bytes
+     */
+    NegotiatorCompletionMessage::NegotiatorCompletionMessage(std::set<std::shared_ptr<Job>> scheduled_jobs, double payload)
+        : HTCondorCentralManagerServiceMessage(payload), scheduled_jobs(scheduled_jobs) {}
 
-/**
- * @brief Constructor
- *
- * @param payload: the message size in bytes
- */
-CentralManagerWakeUpMessage::CentralManagerWakeUpMessage(double payload)
-    : HTCondorCentralManagerServiceMessage(payload) {}
 
-} // namespace wrench
+    /**
+     * @brief Constructor
+     *
+     * @param payload: the message size in bytes
+     */
+    CentralManagerWakeUpMessage::CentralManagerWakeUpMessage(double payload)
+        : HTCondorCentralManagerServiceMessage(payload) {}
+
+}// namespace wrench

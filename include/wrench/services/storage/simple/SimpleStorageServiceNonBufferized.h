@@ -12,139 +12,148 @@
 
 #include <utility>
 
-#include "SimpleStorageServiceMessagePayload.h"
-#include "SimpleStorageServiceProperty.h"
-#include "wrench/services/memory/MemoryManager.h"
-#include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/services/storage/storage_helpers/FileTransferThread.h"
+#include "wrench/services/storage/simple/SimpleStorageService.h"
+#include "SimpleStorageServiceProperty.h"
+#include "SimpleStorageServiceMessagePayload.h"
+#include "wrench/services/memory/MemoryManager.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 
 namespace wrench {
 
-class SimulationMessage;
+    class SimulationMessage;
 
-class SimulationTimestampFileCopyStart;
+    class SimulationTimestampFileCopyStart;
 
-class S4U_PendingCommunication;
+    class S4U_PendingCommunication;
 
-/**
- * @brief The non-bufferized (i.e., BUFFER_SIZE == 0) implementation
- */
-class SimpleStorageServiceNonBufferized : public SimpleStorageService {
-
-public:
-  /***********************/
-  /** \cond INTERNAL    **/
-  /***********************/
-
-  /**
-   * @brief Internal structure to describe transaction
-   */
-  struct Transaction {
-    /** @brief source location */
-    std::shared_ptr<FileLocation> src_location;
-    /** @brief source host */
-    simgrid::s4u::Host *src_host;
-    /** @brief source disk */
-    simgrid::s4u::Disk *src_disk;
-    /** @brief destination location */
-    std::shared_ptr<FileLocation> dst_location;
-    /** @brief destination host */
-    simgrid::s4u::Host *dst_host;
-    /** @brief destination disk */
-    simgrid::s4u::Disk *dst_disk;
-    /** @brief commport_name to report to */
-    S4U_CommPort *commport;
-    /** @brief transfer size */
-    double transfer_size;
-    /** @brief SG IO op */
-    simgrid::s4u::IoPtr stream;
-
-  public:
     /**
-     * @brief Constructor
-     * @param src_location: source location
-     * @param src_host: source host
-     * @param src_disk: source disk
-     * @param dst_location: destination location
-     * @param dst_host: destination host
-     * @param dst_disk: destination disk
-     * @param commport: commport to report to
-     * @param transfer_size: transfer size
+     * @brief The non-bufferized (i.e., BUFFER_SIZE == 0) implementation
      */
-    Transaction(std::shared_ptr<FileLocation> src_location,
-                simgrid::s4u::Host *src_host, simgrid::s4u::Disk *src_disk,
-                std::shared_ptr<FileLocation> dst_location,
-                simgrid::s4u::Host *dst_host, simgrid::s4u::Disk *dst_disk,
-                S4U_CommPort *commport, double transfer_size)
-        : src_location(std::move(src_location)), src_host(src_host),
-          src_disk(src_disk), dst_location(std::move(dst_location)),
-          dst_host(dst_host), dst_disk(dst_disk), commport(commport),
-          transfer_size(transfer_size), stream(nullptr) {}
-  };
+    class SimpleStorageServiceNonBufferized : public SimpleStorageService {
 
-  int getNumRunningTransactionsOnDisk(simgrid::s4u::Disk *disk);
+    public:
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
 
-  /***********************/
-  /** \endcond          **/
-  /***********************/
+        /**
+         * @brief Internal structure to describe transaction
+         */
+        struct Transaction {
+            /** @brief source location */
+            std::shared_ptr<FileLocation> src_location;
+            /** @brief source host */
+            simgrid::s4u::Host *src_host;
+            /** @brief source disk */
+            simgrid::s4u::Disk *src_disk;
+            /** @brief destination location */
+            std::shared_ptr<FileLocation> dst_location;
+            /** @brief destination host */
+            simgrid::s4u::Host *dst_host;
+            /** @brief destination disk */
+            simgrid::s4u::Disk *dst_disk;
+            /** @brief commport_name to report to */
+            S4U_CommPort *commport;
+            /** @brief transfer size */
+            double transfer_size;
+            /** @brief SG IO op */
+            simgrid::s4u::IoPtr stream;
 
-private:
-  friend class SimpleStorageService;
 
-  //  Constructor
-  SimpleStorageServiceNonBufferized(
-      const std::string &hostname, std::set<std::string> mount_points,
-      WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+        public:
+            /**
+             * @brief Constructor
+             * @param src_location: source location
+             * @param src_host: source host
+             * @param src_disk: source disk
+             * @param dst_location: destination location
+             * @param dst_host: destination host
+             * @param dst_disk: destination disk
+             * @param commport: commport to report to
+             * @param transfer_size: transfer size
+             */
+            Transaction(
+                    std::shared_ptr<FileLocation> src_location,
+                    simgrid::s4u::Host *src_host,
+                    simgrid::s4u::Disk *src_disk,
+                    std::shared_ptr<FileLocation> dst_location,
+                    simgrid::s4u::Host *dst_host,
+                    simgrid::s4u::Disk *dst_disk,
+                    S4U_CommPort *commport,
+                    double transfer_size) : src_location(std::move(src_location)), src_host(src_host), src_disk(src_disk),
+                                            dst_location(std::move(dst_location)), dst_host(dst_host), dst_disk(dst_disk),
+                                            commport(commport), transfer_size(transfer_size), stream(nullptr) {
+            }
+        };
 
-  friend class Simulation;
+        int getNumRunningTransactionsOnDisk(simgrid::s4u::Disk *disk);
 
-  void cleanup(bool has_returned_from_main, int return_value) override;
-  double getLoad() override;
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
-  int main() override;
 
-  bool processNextMessage(SimulationMessage *message);
+    private:
+        friend class SimpleStorageService;
 
-  bool processFileWriteRequest(std::shared_ptr<FileLocation> &location,
-                               double num_bytes_to_write,
-                               S4U_CommPort *answer_commport,
+        //  Constructor
+        SimpleStorageServiceNonBufferized(const std::string &hostname,
+                                          std::set<std::string> mount_points,
+                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+
+        friend class Simulation;
+
+
+        void cleanup(bool has_returned_from_main, int return_value) override;
+        double getLoad() override;
+
+        int main() override;
+
+        bool processNextMessage(SimulationMessage *message);
+
+        bool processFileWriteRequest(std::shared_ptr<FileLocation> &location,
+                                     double num_bytes_to_write,
+                                     S4U_CommPort *answer_commport,
+                                     simgrid::s4u::Host *requesting_host);
+
+        bool
+        processFileReadRequest(const std::shared_ptr<FileLocation> &location,
+                               double num_bytes_to_read, S4U_CommPort *answer_commport,
                                simgrid::s4u::Host *requesting_host);
 
-  bool processFileReadRequest(const std::shared_ptr<FileLocation> &location,
-                              double num_bytes_to_read,
-                              S4U_CommPort *answer_commport,
-                              simgrid::s4u::Host *requesting_host);
 
-  bool processFileCopyRequest(std::shared_ptr<FileLocation> &src,
-                              std::shared_ptr<FileLocation> &dst,
-                              S4U_CommPort *answer_commport);
+        bool processFileCopyRequest(
+                std::shared_ptr<FileLocation> &src,
+                std::shared_ptr<FileLocation> &dst,
+                S4U_CommPort *answer_commport);
 
-  bool processFileCopyRequestIAmTheSource(std::shared_ptr<FileLocation> &src,
-                                          std::shared_ptr<FileLocation> &dst,
-                                          S4U_CommPort *answer_commport);
+        bool processFileCopyRequestIAmTheSource(
+                std::shared_ptr<FileLocation> &src,
+                std::shared_ptr<FileLocation> &dst,
+                S4U_CommPort *answer_commport);
 
-  bool processFileCopyRequestIAmNotTheSource(std::shared_ptr<FileLocation> &src,
-                                             std::shared_ptr<FileLocation> &dst,
-                                             S4U_CommPort *answer_commport);
+        bool processFileCopyRequestIAmNotTheSource(
+                std::shared_ptr<FileLocation> &src,
+                std::shared_ptr<FileLocation> &dst,
+                S4U_CommPort *answer_commport);
 
-  void startPendingTransactions();
 
-  void
-  processTransactionCompletion(const std::shared_ptr<Transaction> &transaction);
-  void
-  processTransactionFailure(const std::shared_ptr<Transaction> &transaction);
+        void startPendingTransactions();
 
-  std::deque<std::shared_ptr<Transaction>> pending_transactions;
-  std::set<std::shared_ptr<Transaction>> running_transactions;
+        void processTransactionCompletion(const std::shared_ptr<Transaction> &transaction);
+        void processTransactionFailure(const std::shared_ptr<Transaction> &transaction);
 
-  std::unordered_map<simgrid::s4u::IoPtr, std::shared_ptr<Transaction>>
-      stream_to_transactions;
 
-  std::shared_ptr<MemoryManager> memory_manager;
-};
+        std::deque<std::shared_ptr<Transaction>> pending_transactions;
+        std::set<std::shared_ptr<Transaction>> running_transactions;
 
-} // namespace wrench
+        std::unordered_map<simgrid::s4u::IoPtr, std::shared_ptr<Transaction>> stream_to_transactions;
 
-#endif // WRENCH_SIMPLESTORAGESERVICENONBUFFERIZED_H
+        std::shared_ptr<MemoryManager> memory_manager;
+    };
+
+}// namespace wrench
+
+#endif//WRENCH_SIMPLESTORAGESERVICENONBUFFERIZED_H

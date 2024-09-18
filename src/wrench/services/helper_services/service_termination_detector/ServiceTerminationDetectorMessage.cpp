@@ -13,48 +13,42 @@
 
 namespace wrench {
 
-/**
- * @brief Constructor
- *
- */
-ServiceTerminationDetectorMessage::ServiceTerminationDetectorMessage()
-    : SimulationMessage(0) {}
+    /**
+     * @brief Constructor
+     *
+     */
+    ServiceTerminationDetectorMessage::ServiceTerminationDetectorMessage() : SimulationMessage(0) {
+    }
 
-/**
- * @brief Constructor
- *
- * @param service: the service that has crashed
- */
-ServiceHasCrashedMessage::ServiceHasCrashedMessage(
-    std::shared_ptr<Service> service)
-    : ServiceTerminationDetectorMessage() {
+
+    /**
+     * @brief Constructor
+     *
+     * @param service: the service that has crashed
+     */
+    ServiceHasCrashedMessage::ServiceHasCrashedMessage(std::shared_ptr<Service> service) : ServiceTerminationDetectorMessage() {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-  if (service == nullptr) {
-    throw std::invalid_argument("ServiceHasCrashedMessage::"
-                                "ServiceHasCrashedMessage(): invalid argument");
-  }
+        if (service == nullptr) {
+            throw std::invalid_argument("ServiceHasCrashedMessage::ServiceHasCrashedMessage(): invalid argument");
+        }
 #endif
-  this->service = std::move(service);
-}
+        this->service = std::move(service);
+    }
 
-/**
- * @brief Constructor
- *
- * @param service: the service that has terminated
- * @param exit_code: the service exit_code
- */
-ServiceHasTerminatedMessage::ServiceHasTerminatedMessage(
-    std::shared_ptr<Service> service, int exit_code)
-    : ServiceTerminationDetectorMessage() {
+    /**
+     * @brief Constructor
+     *
+     * @param service: the service that has terminated
+     * @param exit_code: the service exit_code
+     */
+    ServiceHasTerminatedMessage::ServiceHasTerminatedMessage(std::shared_ptr<Service> service, int exit_code) : ServiceTerminationDetectorMessage() {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-  if (service == nullptr) {
-    throw std::invalid_argument(
-        "ServiceHasTerminatedMessage::ServiceHasTerminatedMessage(): invalid "
-        "argument");
-  }
+        if (service == nullptr) {
+            throw std::invalid_argument("ServiceHasTerminatedMessage::ServiceHasTerminatedMessage(): invalid argument");
+        }
 #endif
-  this->service = std::move(service);
-  this->exit_code = exit_code;
-}
+        this->service = std::move(service);
+        this->exit_code = exit_code;
+    }
 
-} // namespace wrench
+}// namespace wrench

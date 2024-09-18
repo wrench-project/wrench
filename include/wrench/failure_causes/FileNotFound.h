@@ -17,38 +17,39 @@
 
 namespace wrench {
 
-class DataFile;
-class FileLocation;
+    class DataFile;
+    class FileLocation;
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief A "file was not found" failure cause
- */
-class FileNotFound : public FailureCause {
+    /**
+     * @brief A "file was not found" failure cause
+     */
+    class FileNotFound : public FailureCause {
 
-public:
-  /***********************/
-  /** \cond INTERNAL     */
-  /***********************/
-  FileNotFound(std::shared_ptr<FileLocation> location);
-  /***********************/
-  /** \endcond           */
-  /***********************/
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        FileNotFound(std::shared_ptr<FileLocation> location);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-  std::shared_ptr<DataFile> getFile();
-  std::shared_ptr<FileLocation> getLocation();
-  std::string toString() override;
+        std::shared_ptr<DataFile> getFile();
+        std::shared_ptr<FileLocation> getLocation();
+        std::string toString() override;
 
-private:
-  std::shared_ptr<FileLocation> location;
-};
+    private:
+        std::shared_ptr<FileLocation> location;
+    };
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
 
-#endif // WRENCH_FILENOTFOUND_H
+
+#endif//WRENCH_FILENOTFOUND_H

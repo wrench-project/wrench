@@ -1,138 +1,164 @@
 #pragma once
 
-#include "crow/utility.h"
-#include <iostream>
-#include <stdexcept>
-#include <string>
 #include <vector>
+#include <string>
+#include <stdexcept>
+#include <iostream>
+#include "crow/utility.h"
 
 namespace crow {
-const char cr = '\r';
-const char lf = '\n';
-const std::string crlf("\r\n");
+    const char cr = '\r';
+    const char lf = '\n';
+    const std::string crlf("\r\n");
 
-enum class HTTPMethod : char {
+    enum class HTTPMethod : char {
 #ifndef DELETE
-  DELETE = 0,
-  GET,
-  HEAD,
-  POST,
-  PUT,
+        DELETE = 0,
+        GET,
+        HEAD,
+        POST,
+        PUT,
 
-  CONNECT,
-  OPTIONS,
-  TRACE,
+        CONNECT,
+        OPTIONS,
+        TRACE,
 
-  PATCH,
-  PURGE,
+        PATCH,
+        PURGE,
 
-  COPY,
-  LOCK,
-  MKCOL,
-  MOVE,
-  PROPFIND,
-  PROPPATCH,
-  SEARCH,
-  UNLOCK,
-  BIND,
-  REBIND,
-  UNBIND,
-  ACL,
+        COPY,
+        LOCK,
+        MKCOL,
+        MOVE,
+        PROPFIND,
+        PROPPATCH,
+        SEARCH,
+        UNLOCK,
+        BIND,
+        REBIND,
+        UNBIND,
+        ACL,
 
-  REPORT,
-  MKACTIVITY,
-  CHECKOUT,
-  MERGE,
+        REPORT,
+        MKACTIVITY,
+        CHECKOUT,
+        MERGE,
 
-  MSEARCH,
-  NOTIFY,
-  SUBSCRIBE,
-  UNSUBSCRIBE,
+        MSEARCH,
+        NOTIFY,
+        SUBSCRIBE,
+        UNSUBSCRIBE,
 
-  MKCALENDAR,
+        MKCALENDAR,
 
-  LINK,
-  UNLINK,
+        LINK,
+        UNLINK,
 
-  SOURCE,
+        SOURCE,
 #endif
 
-  Delete = 0,
-  Get,
-  Head,
-  Post,
-  Put,
+        Delete = 0,
+        Get,
+        Head,
+        Post,
+        Put,
 
-  Connect,
-  Options,
-  Trace,
+        Connect,
+        Options,
+        Trace,
 
-  Patch,
-  Purge,
+        Patch,
+        Purge,
 
-  Copy,
-  Lock,
-  MkCol,
-  Move,
-  Propfind,
-  Proppatch,
-  Search,
-  Unlock,
-  Bind,
-  Rebind,
-  Unbind,
-  Acl,
+        Copy,
+        Lock,
+        MkCol,
+        Move,
+        Propfind,
+        Proppatch,
+        Search,
+        Unlock,
+        Bind,
+        Rebind,
+        Unbind,
+        Acl,
 
-  Report,
-  MkActivity,
-  Checkout,
-  Merge,
+        Report,
+        MkActivity,
+        Checkout,
+        Merge,
 
-  MSearch,
-  Notify,
-  Subscribe,
-  Unsubscribe,
+        MSearch,
+        Notify,
+        Subscribe,
+        Unsubscribe,
 
-  MkCalendar,
+        MkCalendar,
 
-  Link,
-  Unlink,
+        Link,
+        Unlink,
 
-  Source,
+        Source,
 
-  InternalMethodCount,
-  // should not add an item below this line: used for array count
-};
 
-constexpr const char *method_strings[] = {
-    "DELETE",     "GET",        "HEAD",      "POST",        "PUT",
+        InternalMethodCount,
+        // should not add an item below this line: used for array count
+    };
 
-    "CONNECT",    "OPTIONS",    "TRACE",
+    constexpr const char *method_strings[] =
+            {
+                    "DELETE",
+                    "GET",
+                    "HEAD",
+                    "POST",
+                    "PUT",
 
-    "PATCH",      "PURGE",
+                    "CONNECT",
+                    "OPTIONS",
+                    "TRACE",
 
-    "COPY",       "LOCK",       "MKCOL",     "MOVE",        "PROPFIND",
-    "PROPPATCH",  "SEARCH",     "UNLOCK",    "BIND",        "REBIND",
-    "UNBIND",     "ACL",
+                    "PATCH",
+                    "PURGE",
 
-    "REPORT",     "MKACTIVITY", "CHECKOUT",  "MERGE",
+                    "COPY",
+                    "LOCK",
+                    "MKCOL",
+                    "MOVE",
+                    "PROPFIND",
+                    "PROPPATCH",
+                    "SEARCH",
+                    "UNLOCK",
+                    "BIND",
+                    "REBIND",
+                    "UNBIND",
+                    "ACL",
 
-    "M-SEARCH",   "NOTIFY",     "SUBSCRIBE", "UNSUBSCRIBE",
+                    "REPORT",
+                    "MKACTIVITY",
+                    "CHECKOUT",
+                    "MERGE",
 
-    "MKCALENDAR",
+                    "M-SEARCH",
+                    "NOTIFY",
+                    "SUBSCRIBE",
+                    "UNSUBSCRIBE",
 
-    "LINK",       "UNLINK",
+                    "MKCALENDAR",
 
-    "SOURCE"};
+                    "LINK",
+                    "UNLINK",
 
-inline std::string method_name(HTTPMethod method) {
-  if (CROW_LIKELY(method < HTTPMethod::InternalMethodCount)) {
-    return method_strings[(unsigned char)method];
-  }
-  return "invalid";
-}
+                    "SOURCE"};
 
-// clang-format off
+
+    inline std::string method_name(HTTPMethod method) {
+        if (CROW_LIKELY(method < HTTPMethod::InternalMethodCount)) {
+            return method_strings[(unsigned char) method];
+        }
+        return "invalid";
+    }
+
+    // clang-format off
 
     enum status
     {
@@ -179,84 +205,84 @@ inline std::string method_name(HTTPMethod method) {
         VARIANT_ALSO_NEGOTIATES       = 506
     };
 
-// clang-format on
+    // clang-format on
 
-enum class ParamType : char {
-  INT,
-  UINT,
-  DOUBLE,
-  STRING,
-  PATH,
+    enum class ParamType : char {
+        INT,
+        UINT,
+        DOUBLE,
+        STRING,
+        PATH,
 
-  MAX
-};
+        MAX
+    };
 
-/// @cond SKIP
-struct routing_params {
-  std::vector<int64_t> int_params;
-  std::vector<uint64_t> uint_params;
-  std::vector<double> double_params;
-  std::vector<std::string> string_params;
+    /// @cond SKIP
+    struct routing_params {
+        std::vector<int64_t> int_params;
+        std::vector<uint64_t> uint_params;
+        std::vector<double> double_params;
+        std::vector<std::string> string_params;
 
-  void debug_print() const {
-    std::cerr << "routing_params" << std::endl;
-    for (auto i : int_params)
-      std::cerr << i << ", ";
-    std::cerr << std::endl;
-    for (auto i : uint_params)
-      std::cerr << i << ", ";
-    std::cerr << std::endl;
-    for (auto i : double_params)
-      std::cerr << i << ", ";
-    std::cerr << std::endl;
-    for (auto &i : string_params)
-      std::cerr << i << ", ";
-    std::cerr << std::endl;
-  }
+        void debug_print() const {
+            std::cerr << "routing_params" << std::endl;
+            for (auto i: int_params)
+                std::cerr << i << ", ";
+            std::cerr << std::endl;
+            for (auto i: uint_params)
+                std::cerr << i << ", ";
+            std::cerr << std::endl;
+            for (auto i: double_params)
+                std::cerr << i << ", ";
+            std::cerr << std::endl;
+            for (auto &i: string_params)
+                std::cerr << i << ", ";
+            std::cerr << std::endl;
+        }
 
-  template <typename T> T get(unsigned) const;
-};
+        template<typename T>
+        T get(unsigned) const;
+    };
 
-template <> inline int64_t routing_params::get<int64_t>(unsigned index) const {
-  return int_params[index];
-}
+    template<>
+    inline int64_t routing_params::get<int64_t>(unsigned index) const {
+        return int_params[index];
+    }
 
-template <>
-inline uint64_t routing_params::get<uint64_t>(unsigned index) const {
-  return uint_params[index];
-}
+    template<>
+    inline uint64_t routing_params::get<uint64_t>(unsigned index) const {
+        return uint_params[index];
+    }
 
-template <> inline double routing_params::get<double>(unsigned index) const {
-  return double_params[index];
-}
+    template<>
+    inline double routing_params::get<double>(unsigned index) const {
+        return double_params[index];
+    }
 
-template <>
-inline std::string routing_params::get<std::string>(unsigned index) const {
-  return string_params[index];
-}
-/// @endcond
+    template<>
+    inline std::string routing_params::get<std::string>(unsigned index) const {
+        return string_params[index];
+    }
+    /// @endcond
 
-struct routing_handle_result {
-  uint16_t rule_index;
-  std::vector<uint16_t> blueprint_indices;
-  routing_params r_params;
-  HTTPMethod method;
+    struct routing_handle_result {
+        uint16_t rule_index;
+        std::vector<uint16_t> blueprint_indices;
+        routing_params r_params;
+        HTTPMethod method;
 
-  routing_handle_result() {}
+        routing_handle_result() {}
 
-  routing_handle_result(uint16_t rule_index_,
-                        std::vector<uint16_t> blueprint_indices_,
-                        routing_params r_params_)
-      : rule_index(rule_index_), blueprint_indices(blueprint_indices_),
-        r_params(r_params_) {}
+        routing_handle_result(uint16_t rule_index_, std::vector<uint16_t> blueprint_indices_, routing_params r_params_) : rule_index(rule_index_),
+                                                                                                                          blueprint_indices(blueprint_indices_),
+                                                                                                                          r_params(r_params_) {}
 
-  routing_handle_result(uint16_t rule_index_,
-                        std::vector<uint16_t> blueprint_indices_,
-                        routing_params r_params_, HTTPMethod method_)
-      : rule_index(rule_index_), blueprint_indices(blueprint_indices_),
-        r_params(r_params_), method(method_) {}
-};
-} // namespace crow
+        routing_handle_result(uint16_t rule_index_, std::vector<uint16_t> blueprint_indices_, routing_params r_params_, HTTPMethod method_) : rule_index(rule_index_),
+                                                                                                                                              blueprint_indices(blueprint_indices_),
+                                                                                                                                              r_params(r_params_),
+                                                                                                                                              method(method_) {}
+    };
+}// namespace crow
 
 // clang-format off
 #ifndef CROW_MSVC_WORKAROUND

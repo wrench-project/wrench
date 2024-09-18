@@ -9,8 +9,8 @@
 
 #include <wrench/failure_causes/HostError.h>
 
-#include <wrench/failure_causes/FailureCause.h>
 #include <wrench/logging/TerminalOutput.h>
+#include <wrench/failure_causes/FailureCause.h>
 
 #include <utility>
 
@@ -18,19 +18,20 @@ WRENCH_LOG_CATEGORY(wrench_core_host_error, "Log category for HostError");
 
 namespace wrench {
 
-/**
- * @brief Constructor
- * @param hostname: the name of the host that experienced the error
- */
-HostError::HostError(std::string hostname) {
-  this->hostname = std::move(hostname);
-}
+    /**
+     * @brief Constructor
+     * @param hostname: the name of the host that experienced the error
+     */
+    HostError::HostError(std::string hostname) {
+        this->hostname = std::move(hostname);
+    }
 
-/** @brief Get the human-readable failure message
- * @return the message
- */
-std::string HostError::toString() {
-  return "The host (" + this->hostname + ") is down / has crashed";
-}
+    /** @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string HostError::toString() {
+        return "The host (" + this->hostname + ") is down / has crashed";
+    }
 
-} // namespace wrench
+
+}// namespace wrench

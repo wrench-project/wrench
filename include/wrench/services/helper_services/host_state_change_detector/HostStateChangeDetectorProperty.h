@@ -14,21 +14,22 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
-/**
- * @brief Configurable properties for a HostStateChangeDetector
- */
+    /**
+     * @brief Configurable properties for a HostStateChangeDetector
+     */
 
-class HostStateChangeDetectorProperty : public ServiceProperty {
-public:
-};
+    class HostStateChangeDetectorProperty : public ServiceProperty {
+    public:
+    };
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
 
-#endif // WRENCH_HOSTSTATECHANGEDETECTORPROPERTY_H
+
+#endif//WRENCH_HOSTSTATECHANGEDETECTORPROPERTY_H

@@ -5,91 +5,86 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL    */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL    */
+    /***********************/
 
-/**
- * @brief A batch job, which encapsulates a Job and additional information
- *        used by a batch
- */
-class BatchJob {
-public:
-  // job, jobid, -t, -N, -c, ending s4u_timestamp (-1 as undetermined)
-  BatchJob(const std::shared_ptr<CompoundJob> &job, unsigned long job_id,
-           unsigned long time_in_seconds, unsigned long number_nodes,
-           unsigned long cores_per_node, const std::string &username,
-           double ending_time_stamp, double arrival_time_stamp);
+    /**
+     * @brief A batch job, which encapsulates a Job and additional information
+     *        used by a batch
+     */
+    class BatchJob {
+    public:
+        //job, jobid, -t, -N, -c, ending s4u_timestamp (-1 as undetermined)
+        BatchJob(const std::shared_ptr<CompoundJob> &job, unsigned long job_id, unsigned long time_in_seconds, unsigned long number_nodes,
+                 unsigned long cores_per_node, const std::string &username, double ending_time_stamp, double arrival_time_stamp);
 
-  unsigned long getJobID() const;
-  unsigned long getRequestedTime() const;
-  void setRequestedTime(unsigned long time);
-  unsigned long getRequestedCoresPerNode() const;
-  std::string getUsername();
-  double getMemoryRequirement();
-  double getBeginTimestamp() const;
-  void setBeginTimestamp(double time_stamp);
-  double getEndingTimestamp() const;
-  double getArrivalTimestamp() const;
-  unsigned long getRequestedNumNodes() const;
-  std::shared_ptr<CompoundJob> getCompoundJob();
-  void setEndingTimestamp(double time_stamp);
-  std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>>
-  getResourcesAllocated();
-  void setAllocatedResources(
-      const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>>
-          &resources);
 
-  /**
-   * @brief Set the indices of the allocated nodes
-   * @param indices: a list of indices
-   */
-  void setAllocatedNodeIndices(std::vector<int> indices) {
-    this->allocated_node_indices = indices;
-  }
+        unsigned long getJobID() const;
+        unsigned long getRequestedTime() const;
+        void setRequestedTime(unsigned long time);
+        unsigned long getRequestedCoresPerNode() const;
+        std::string getUsername();
+        double getMemoryRequirement();
+        double getBeginTimestamp() const;
+        void setBeginTimestamp(double time_stamp);
+        double getEndingTimestamp() const;
+        double getArrivalTimestamp() const;
+        unsigned long getRequestedNumNodes() const;
+        std::shared_ptr<CompoundJob> getCompoundJob();
+        void setEndingTimestamp(double time_stamp);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> getResourcesAllocated();
+        void setAllocatedResources(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &resources);
 
-  /**
-   * @brief Get the indices of allocated nodes
-   * @return a list of indices
-   */
-  std::vector<int> getAllocatedNodeIndices() {
-    return this->allocated_node_indices;
-  }
+        /** 
+         * @brief Set the indices of the allocated nodes
+         * @param indices: a list of indices
+         */
+        void setAllocatedNodeIndices(std::vector<int> indices) {
+            this->allocated_node_indices = indices;
+        }
 
-private:
-  friend class ConservativeBackfillingBatchScheduler;
-  friend class ConservativeBackfillingBatchSchedulerCoreLevel;
+        /** 
+         * @brief Get the indices of allocated nodes
+         * @return a list of indices
+         */
+        std::vector<int> getAllocatedNodeIndices() {
+            return this->allocated_node_indices;
+        }
 
-  u_int32_t conservative_bf_start_date;        // Field used by CONSERVATIVE_BF
-  u_int32_t conservative_bf_expected_end_date; // Field used by CONSERVATIVE_BF
+    private:
+        friend class ConservativeBackfillingBatchScheduler;
+        friend class ConservativeBackfillingBatchSchedulerCoreLevel;
 
-  unsigned long job_id;
-  unsigned long requested_num_nodes;
-  unsigned long requested_time;
-  std::shared_ptr<CompoundJob> compound_job;
-  unsigned long requested_cores_per_node;
-  std::string username;
-  double begin_time_stamp;
-  double ending_time_stamp;
-  double arrival_time_stamp;
-  std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>>
-      resources_allocated;
+        u_int32_t conservative_bf_start_date;       // Field used by CONSERVATIVE_BF
+        u_int32_t conservative_bf_expected_end_date;// Field used by CONSERVATIVE_BF
 
-  std::vector<int> allocated_node_indices;
+        unsigned long job_id;
+        unsigned long requested_num_nodes;
+        unsigned long requested_time;
+        std::shared_ptr<CompoundJob> compound_job;
+        unsigned long requested_cores_per_node;
+        std::string username;
+        double begin_time_stamp;
+        double ending_time_stamp;
+        double arrival_time_stamp;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources_allocated;
 
-public:
-  // Variables below are for the BatSim-style CSV output log file (only ifdef
-  // ENABLED_BATSCHED)
-  /** @brief The meta-data field for BatSim-style CSV output */
-  std::string csv_metadata;
-  /** @brief The allocated processors field for BatSim-style CSV output */
-  std::string csv_allocated_processors;
-};
+        std::vector<int> allocated_node_indices;
 
-/***********************/
-/** \endcond           */
-/***********************/
+    public:
+        // Variables below are for the BatSim-style CSV output log file (only ifdef ENABLED_BATSCHED)
+        /** @brief The meta-data field for BatSim-style CSV output */
+        std::string csv_metadata;
+        /** @brief The allocated processors field for BatSim-style CSV output */
+        std::string csv_allocated_processors;
+    };
 
-} // namespace wrench
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
-#endif // WRENCH_BATCHJOB_H
+}// namespace wrench
+
+
+#endif//WRENCH_BATCHJOB_H

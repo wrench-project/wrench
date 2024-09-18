@@ -18,38 +18,40 @@
 
 namespace wrench {
 
-class Job;
+    class Job;
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief A "compute service doesn't have enough cores" failure cause
- */
-class NotEnoughResources : public FailureCause {
-public:
-  /***********************/
-  /** \cond INTERNAL     */
-  /***********************/
-  NotEnoughResources(std::shared_ptr<Job> job,
-                     std::shared_ptr<Service> service);
-  /***********************/
-  /** \endcond           */
-  /***********************/
 
-  std::shared_ptr<Job> getJob();
-  std::shared_ptr<Service> getService();
-  std::string toString() override;
+    /**
+     * @brief A "compute service doesn't have enough cores" failure cause
+     */
+    class NotEnoughResources : public FailureCause {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        NotEnoughResources(std::shared_ptr<Job> job, std::shared_ptr<Service> service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-private:
-  std::shared_ptr<Job> job;
-  std::shared_ptr<Service> service;
-};
+        std::shared_ptr<Job> getJob();
+        std::shared_ptr<Service> getService();
+        std::string toString() override;
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
+    private:
+        std::shared_ptr<Job> job;
+        std::shared_ptr<Service> service;
+    };
 
-#endif // WRENCH_NOT_ENOUGH_RESOURCES_H
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
+
+
+#endif//WRENCH_NOT_ENOUGH_RESOURCES_H

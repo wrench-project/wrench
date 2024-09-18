@@ -10,11 +10,10 @@
 //#include "wrench/services/storage/xrootd/XRootD.h"
 //#include "wrench/services/storage/xrootd/Node.h"
 //
-// namespace wrench {
+//namespace wrench {
 //    namespace XRootD{
 //
-//        SearchStack::SearchStack(Node* terminal,std::shared_ptr<DataFile>
-//        file):terminalNode(terminal),file(file),fileLocation(terminalNode->hasFile(file)){
+//        SearchStack::SearchStack(Node* terminal,std::shared_ptr<DataFile> file):terminalNode(terminal),file(file),fileLocation(terminalNode->hasFile(file)){
 //            current=stack.begin();
 //        }
 //
@@ -58,11 +57,8 @@
 //                    return true;
 //                }
 //                current=current->getParent();
-//                if(stack.size()>metavisor->size()){//crude cycle detection,
-//                but should prevent infinite unexplainable loop on file read
-//                    throw std::runtime_error("Cycle detected in XRootD file
-//                    server.  This version of wrench does not support cycles
-//                    within XRootD.");
+//                if(stack.size()>metavisor->size()){//crude cycle detection, but should prevent infinite unexplainable loop on file read
+//                    throw std::runtime_error("Cycle detected in XRootD file server.  This version of wrench does not support cycles within XRootD.");
 //                }
 //            }while( current!=nullptr);
 //

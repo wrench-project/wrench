@@ -18,35 +18,37 @@
 
 namespace wrench {
 
-class Service;
+    class Service;
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief A "service is down" failure cause
- */
-class ServiceIsDown : public FailureCause {
-public:
-  /***********************/
-  /** \cond INTERNAL     */
-  /***********************/
-  explicit ServiceIsDown(std::shared_ptr<Service> service);
-  /***********************/
-  /** \endcond           */
-  /***********************/
+    /**
+     * @brief A "service is down" failure cause
+     */
+    class ServiceIsDown : public FailureCause {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        explicit ServiceIsDown(std::shared_ptr<Service> service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-  std::shared_ptr<Service> getService();
-  std::string toString() override;
+        std::shared_ptr<Service> getService();
+        std::string toString() override;
 
-private:
-  std::shared_ptr<Service> service;
-};
+    private:
+        std::shared_ptr<Service> service;
+    };
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
 
-#endif // WRENCH_SERVICE_IS_DOWN_H
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
+
+
+#endif//WRENCH_SERVICE_IS_DOWN_H
