@@ -17,58 +17,51 @@
 
 namespace wrench {
 
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/**
+ * @brief A "network error (or endpoint is down)" failure cause
+ */
+class NetworkError : public FailureCause {
+public:
+  /** @brief Enumerated type to describe whether the network error occured
+   * while sending or receiving
+   */
+  enum OperationType { SENDING, RECEIVING };
 
-    /**
-     * @brief A "network error (or endpoint is down)" failure cause
-     */
-    class NetworkError : public FailureCause {
-    public:
-        /** @brief Enumerated type to describe whether the network error occured
-         * while sending or receiving
-         */
-        enum OperationType {
-            SENDING,
-            RECEIVING
-        };
+  /** @brief Enumerated type to describe the type of the network error
+   */
+  enum ErrorType { TIMEOUT, FAILURE };
 
-        /** @brief Enumerated type to describe the type of the network error
-         */
-        enum ErrorType {
-            TIMEOUT,
-            FAILURE
-        };
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
+  NetworkError(NetworkError::OperationType, NetworkError::ErrorType,
+               const std::string &commport_name,
+               const std::string &message_name);
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        NetworkError(NetworkError::OperationType, NetworkError::ErrorType, const std::string &commport_name, const std::string &message_name);
-        /***********************/
-        /** \endcond           */
-        /***********************/
+  std::string toString() override;
+  bool whileReceiving();
+  bool whileSending();
+  bool isTimeout();
+  std::string getCommPortName();
+  std::string getMessageName();
 
-        std::string toString() override;
-        bool whileReceiving();
-        bool whileSending();
-        bool isTimeout();
-        std::string getCommPortName();
-        std::string getMessageName();
+private:
+  NetworkError::OperationType operation_type;
+  NetworkError::ErrorType error_type;
+  std::string commport_name;
+  std::string message_name;
+};
 
-    private:
-        NetworkError::OperationType operation_type;
-        NetworkError::ErrorType error_type;
-        std::string commport_name;
-        std::string message_name;
-    };
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
-
-
-#endif//WRENCH_NETWORK_ERROR_H
+#endif // WRENCH_NETWORK_ERROR_H

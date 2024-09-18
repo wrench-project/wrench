@@ -12,72 +12,68 @@
 
 #include <set>
 
+#include "wrench/action/Action.h"
 #include "wrench/execution_controller/ExecutionController.h"
 #include "wrench/services/Service.h"
-#include "wrench/action/Action.h"
 
 namespace wrench {
 
-    class Simulation;
-    class Action;
-    class ActionExecutionService;
+class Simulation;
+class Action;
+class ActionExecutionService;
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /**
-     * @brief An service that performs an Action
-     */
-    class ActionExecutor : public ExecutionController {
+/**
+ * @brief An service that performs an Action
+ */
+class ActionExecutor : public ExecutionController {
 
-    public:
-        unsigned long getNumCoresAllocated() const;
-        double getMemoryAllocated() const;
-        double getThreadCreationOverhead();
-        std::shared_ptr<Action> getAction();
+public:
+  unsigned long getNumCoresAllocated() const;
+  double getMemoryAllocated() const;
+  double getThreadCreationOverhead();
+  std::shared_ptr<Action> getAction();
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
 
-        ActionExecutor(
-                std::string hostname,
-                unsigned long num_cores,
-                double ram_footprint,
-                double thread_creation_overhead,
-                bool simulate_computation_as_sleep,
-                S4U_CommPort *callback_commport,
-                std::shared_ptr<Action> action,
-                std::shared_ptr<ActionExecutionService> action_execution_service);
+  ActionExecutor(
+      std::string hostname, unsigned long num_cores, double ram_footprint,
+      double thread_creation_overhead, bool simulate_computation_as_sleep,
+      S4U_CommPort *callback_commport, std::shared_ptr<Action> action,
+      std::shared_ptr<ActionExecutionService> action_execution_service);
 
-        int main() override;
-        void kill(bool job_termination);
-        void cleanup(bool has_returned_from_main, int return_value) override;
-        std::shared_ptr<ActionExecutionService> getActionExecutionService() const;
-        bool getSimulateComputationAsSleep();
+  int main() override;
+  void kill(bool job_termination);
+  void cleanup(bool has_returned_from_main, int return_value) override;
+  std::shared_ptr<ActionExecutionService> getActionExecutionService() const;
+  bool getSimulateComputationAsSleep();
 
-    private:
-        std::shared_ptr<Action> action;
-        std::shared_ptr<ActionExecutionService> action_execution_service;
-        S4U_CommPort *callback_commport;
-        bool killed_on_purpose;
+private:
+  std::shared_ptr<Action> action;
+  std::shared_ptr<ActionExecutionService> action_execution_service;
+  S4U_CommPort *callback_commport;
+  bool killed_on_purpose;
 
-        bool simulation_compute_as_sleep;
-        double thread_creation_overhead;
+  bool simulation_compute_as_sleep;
+  double thread_creation_overhead;
 
-        unsigned long num_cores;
-        double ram_footprint;
+  unsigned long num_cores;
+  double ram_footprint;
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
-    };
+  /***********************/
+  /** \endcond           */
+  /***********************/
+};
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
-}// namespace wrench
+} // namespace wrench
 
-#endif//WRENCH_ACTION_EXECUTOR_H
+#endif // WRENCH_ACTION_EXECUTOR_H

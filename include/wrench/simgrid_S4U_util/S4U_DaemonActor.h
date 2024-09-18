@@ -12,14 +12,12 @@
 #ifndef WRENCH_SIM4U_DAEMONACTOR_H
 #define WRENCH_SIM4U_DAEMONACTOR_H
 
-
+#include "wrench-dev.h"
 #include "wrench/logging/TerminalOutput.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include "wrench-dev.h"
-#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
-
 
 /***********************/
 /** \cond INTERNAL     */
@@ -27,38 +25,32 @@
 
 namespace wrench {
 
-    class S4U_Daemon;
+class S4U_Daemon;
 
-    /**
-     * @brief The S4U actor that's the foundation for the S4U_Daemon abstraction
-     */
-    class S4U_DaemonActor {
+/**
+ * @brief The S4U actor that's the foundation for the S4U_Daemon abstraction
+ */
+class S4U_DaemonActor {
 
-    public:
-        /**
-         * @brief Constructor
-         * @param d: a daemon instance
-         */
-        explicit S4U_DaemonActor(S4U_Daemon *d) {
-            this->daemon = d;
-        }
+public:
+  /**
+   * @brief Constructor
+   * @param d: a daemon instance
+   */
+  explicit S4U_DaemonActor(S4U_Daemon *d) { this->daemon = d; }
 
-        /**
-         * @brief The S4U way of defining the actor's "main" method
-         */
-        void operator()() {
+  /**
+   * @brief The S4U way of defining the actor's "main" method
+   */
+  void operator()() { this->daemon->runMainMethod(); }
 
-            this->daemon->runMainMethod();
-        }
+private:
+  S4U_Daemon *daemon;
+};
 
-    private:
-        S4U_Daemon *daemon;
-    };
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
-
-
-#endif//WRENCH_SIM4U_DAEMONACTOR_H
+#endif // WRENCH_SIM4U_DAEMONACTOR_H

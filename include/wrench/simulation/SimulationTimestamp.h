@@ -10,68 +10,63 @@
 #ifndef WRENCH_SIMULATIONTIMESTAMP_H
 #define WRENCH_SIMULATIONTIMESTAMP_H
 
-
-#include <iostream>
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
+#include <iostream>
 
 namespace wrench {
 
-    /**
-     * @brief A time-stamped simulation event stored in SimulationOutput
-     *
-     * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
-     */
-    template<class T>
-    class SimulationTimestamp {
+/**
+ * @brief A time-stamped simulation event stored in SimulationOutput
+ *
+ * @tparam a particular SimulationTimestampXXXX class (defined in
+ * SimulationTimestampTypes.h)
+ */
+template <class T> class SimulationTimestamp {
 
-    public:
-        /**
-         * Retrieve the timestamp's content
-         *
-         * @return a pointer to a object of class T, i.e., a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
-         */
-        T *const getContent() {
-            return this->content.get();
-        }
+public:
+  /**
+   * Retrieve the timestamp's content
+   *
+   * @return a pointer to a object of class T, i.e., a particular
+   * SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+   */
+  T *const getContent() { return this->content.get(); }
 
-        /**
-         * Retrieve the recorded time of the timestamp
-         *
-         * @return the recorded time of the timestamp
-         */
-        double getDate() {
-            return this->getContent()->getDate();
-        }
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
+  /**
+   * Retrieve the recorded time of the timestamp
+   *
+   * @return the recorded time of the timestamp
+   */
+  double getDate() { return this->getContent()->getDate(); }
+  /***********************/
+  /** \cond DEVELOPER    */
+  /***********************/
 
-        /**
-         * @brief Constructor
-         * @param content: a pointer to a object of class T, i.e., a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
-         */
-        SimulationTimestamp(T *content) {
-            this->content = std::unique_ptr<T>(content);
-            TRACK_OBJECT("timestamp");
-        }
+  /**
+   * @brief Constructor
+   * @param content: a pointer to a object of class T, i.e., a particular
+   * SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+   */
+  SimulationTimestamp(T *content) {
+    this->content = std::unique_ptr<T>(content);
+    TRACK_OBJECT("timestamp");
+  }
 
-        /**
-         * @brief Destructor
-         */
-        ~SimulationTimestamp() {
-            UNTRACK_OBJECT("timestamp");
-        }
+  /**
+   * @brief Destructor
+   */
+  ~SimulationTimestamp() { UNTRACK_OBJECT("timestamp"); }
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-    private:
-        std::unique_ptr<T> content;
-    };
+private:
+  std::unique_ptr<T> content;
+};
 
-}// namespace wrench
+} // namespace wrench
 
-#endif//WRENCH_SIMULATIONTIMESTAMP_H
+#endif // WRENCH_SIMULATIONTIMESTAMP_H

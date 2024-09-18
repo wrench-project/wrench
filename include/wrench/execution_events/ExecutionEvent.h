@@ -7,57 +7,56 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_EXECUTIONEVENT_H
 #define WRENCH_EXECUTIONEVENT_H
 
-#include <string>
 #include "wrench/failure_causes/FailureCause.h"
+#include <string>
 
 /***********************/
 /** \cond DEVELOPER    */
 /***********************/
 
 namespace wrench {
-    /**
-     * @brief A class to represent the various execution events that
-     * are relevant to the execution of a workflow.
-     */
-    class ExecutionEvent {
+/**
+ * @brief A class to represent the various execution events that
+ * are relevant to the execution of a workflow.
+ */
+class ExecutionEvent {
 
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        static std::shared_ptr<ExecutionEvent> waitForNextExecutionEvent(S4U_CommPort *commport, double timeout);
+public:
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
+  static std::shared_ptr<ExecutionEvent>
+  waitForNextExecutionEvent(S4U_CommPort *commport, double timeout);
 
-        /**
-         * @brief Get a textual description of the event
-         * @return a text string
-         */
-        virtual std::string toString() { return "Generic ExecutionEvent"; }
+  /**
+   * @brief Get a textual description of the event
+   * @return a text string
+   */
+  virtual std::string toString() { return "Generic ExecutionEvent"; }
 
-        /**
-         * @brief Destructor
-         */
-        virtual ~ExecutionEvent() = default;
+  /**
+   * @brief Destructor
+   */
+  virtual ~ExecutionEvent() = default;
 
-    protected:
-        /**
-         * @brief Constructor
-         */
-        ExecutionEvent() = default;
+protected:
+  /**
+   * @brief Constructor
+   */
+  ExecutionEvent() = default;
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
-    };
+  /***********************/
+  /** \endcond           */
+  /***********************/
+};
 
-}// namespace wrench
+} // namespace wrench
 
 /***********************/
 /** \endcond           */
 /***********************/
 
-
-#endif//WRENCH_EXECUTIONEVENT_H
+#endif // WRENCH_EXECUTIONEVENT_H

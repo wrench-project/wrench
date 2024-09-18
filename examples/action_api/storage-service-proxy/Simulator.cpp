@@ -24,7 +24,6 @@
 
 #include "Controller.h"
 
-
 /**
  * @brief The Simulator's main function
  *
@@ -34,53 +33,65 @@
  */
 int main(int argc, char **argv) {
 
-    /* Create a WRENCH simulation object */
-    auto simulation = wrench::Simulation::createSimulation();
+  /* Create a WRENCH simulation object */
+  auto simulation = wrench::Simulation::createSimulation();
 
-    /* Initialize the simulation */
-    simulation->init(&argc, argv);
+  /* Initialize the simulation */
+  simulation->init(&argc, argv);
 
-    /* Parsing of the command-line arguments */
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <xml platform file>  [--log=controller.threshold=info | --wrench-full-log]" << std::endl;
-        exit(1);
-    }
+  /* Parsing of the command-line arguments */
+  if (argc != 2) {
+    std::cerr << "Usage: " << argv[0]
+              << " <xml platform file>  [--log=controller.threshold=info | "
+                 "--wrench-full-log]"
+              << std::endl;
+    exit(1);
+  }
 
-    /* Instantiating the simulated platform */
-    simulation->instantiatePlatform(argv[1]);
+  /* Instantiating the simulated platform */
+  simulation->instantiatePlatform(argv[1]);
 
-    /* Instantiate a bare-metal compute service on the platform */
-    auto baremetal_service = simulation->add(new wrench::BareMetalComputeService("Client", {"Client"}, "", {}, {}));
-    simulation->add(baremetal_service);
+  /* Instantiate a bare-metal compute service on the platform */
+  auto baremetal_service = simulation->add(
+      new wrench::BareMetalComputeService("Client", {"Client"}, "", {}, {}));
+  simulation->add(baremetal_service);
 
-    /* Creat a proxy configure with two storage services (a "remote" and a "cache") */
-    auto remote = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Remote", {"/"}));
-    auto cache = simulation->add(
-            wrench::SimpleStorageService::createSimpleStorageService(
-                    "Proxy", /* The cache doesn't HAVE to be on the proxy, but it really should be otherwise simulation may be inaccurate */
-                    {"/"},
-                    {{wrench::SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"}}
-                    /* Make the Cache an LRU cache, this is optional, but probably the desired behavior */
-                    ));
-    auto proxy = simulation->add(
-            wrench::StorageServiceProxy::createRedirectProxy(
-                    "Proxy",
-                    cache,
-                    remote, /*optional set remote as the default remote server */
-                    {{wrench::StorageServiceProxyProperty::UNCACHED_READ_METHOD, "CopyThenRead"}}
-                    /* There are 3 read methods, CopyThenRead, magicRead, and readThrough, check the StorageServiceProxyPropery docs for more details*/
-                    ));
+  /* Creat a proxy configure with two storage services (a "remote" and a
+   * "cache") */
+  auto remote =
+      simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+          "Remote", {"/"}));
+  auto cache =
+      simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+          "Proxy", /* The cache doesn't HAVE to be on the proxy, but it really
+                      should be otherwise simulation may be inaccurate */
+          {"/"},
+          {{wrench::SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"}}
+          /* Make the Cache an LRU cache, this is optional, but probably the
+             desired behavior */
+          ));
+  auto proxy = simulation->add(wrench::StorageServiceProxy::createRedirectProxy(
+      "Proxy", cache,
+      remote, /*optional set remote as the default remote server */
+      {{wrench::StorageServiceProxyProperty::UNCACHED_READ_METHOD,
+        "CopyThenRead"}}
+      /* There are 3 read methods, CopyThenRead, magicRead, and readThrough,
+         check the StorageServiceProxyPropery docs for more details*/
+      ));
 
-    /* Create another storage service, the "target" */
-    auto target = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Target", {"/"}));
+  /* Create another storage service, the "target" */
+  auto target =
+      simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+          "Target", {"/"}));
 
-    /* Instantiate an execution controller */
-    auto controller = simulation->add(new wrench::Controller(baremetal_service, proxy, remote, target, "Client"));
+  /* Instantiate an execution controller */
+  auto controller = simulation->add(new wrench::Controller(
+      baremetal_service, proxy, remote, target, "Client"));
 
-    /* Launch the simulation */
-    std::cerr << "Launching the Simulation...\n";
-    simulation->launch();
-    std::cerr << "Simulation done!\n";
+  /* Launch the simulation */
+  std::cerr << "Launching the Simulation...\n";
+  simulation->launch();
+  std::cerr << "Simulation done!\n";
 
-    return 0;
+  return 0;
 }

@@ -11,28 +11,27 @@
 #define WRENCH_COMPUTER_H
 
 #include "wrench/services/Service.h"
-#include "wrench/simulation/SimulationMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/simulation/SimulationMessage.h"
 
 namespace wrench {
 
-    class ComputerVictim
-        : public Service {
+class ComputerVictim : public Service {
 
-    public:
-        explicit ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, wrench::S4U_CommPort *commport_to_notify);
+public:
+  explicit ComputerVictim(std::string host_on_which_to_run, double flops,
+                          SimulationMessage *msg,
+                          wrench::S4U_CommPort *commport_to_notify);
 
-        void cleanup(bool has_terminated_cleanly, int return_value) override;
+  void cleanup(bool has_terminated_cleanly, int return_value) override;
 
-    private:
-        double flops;
-        SimulationMessage *msg;
-        wrench::S4U_CommPort *commport_to_notify;
-        int main() override;
-    };
+private:
+  double flops;
+  SimulationMessage *msg;
+  wrench::S4U_CommPort *commport_to_notify;
+  int main() override;
+};
 
+}; // namespace wrench
 
-};// namespace wrench
-
-
-#endif//WRENCH_COMPUTER_H
+#endif // WRENCH_COMPUTER_H

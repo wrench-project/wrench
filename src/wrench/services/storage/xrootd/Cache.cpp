@@ -1,93 +1,102 @@
 /**
-* Copyright (c) 2017. The WRENCH Team.
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*/
+ * Copyright (c) 2017. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 #include "wrench/services/storage/xrootd/Cache.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 namespace wrench {
-    namespace XRootD {
-        /**
-         * @brief Check the cache for a file
-         * @param file: The file to check the cache for
-         * @return true if the file is cached and if timestamp (not implemented) is valid, false otherwise
-         */
-        bool Cache::isCached(std::shared_ptr<DataFile> file) {
-            double earliestAllowedTime = wrench::S4U_Simulation::getClock() - maxCacheTime;
-            auto entries = cache[file];
-            //after getting all possible cache entries, loop through them "all" and check the timestamps, removing any that fail.  If you find even 1 success, return true and stop cleaning.
-            for (auto ittr = entries.begin(); ittr != entries.end(); /*intentionaly blank*/) {
-                auto entry = *ittr;
-                if (entry.second < earliestAllowedTime) {
-                    ittr = entries.erase(ittr);
-                } else {
-                    return true;
-                }
-            }
-            return false;
-        }
-        /**
-         * @brief Add a file to the cache
-         * @param file: The file to add to the cache
-         * @param location: The location to add to the cache
-         */
-        void Cache::add(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-            double currentSimTime = wrench::S4U_Simulation::getClock();
-            cache[file][location] = currentSimTime;
-        }
+namespace XRootD {
+/**
+ * @brief Check the cache for a file
+ * @param file: The file to check the cache for
+ * @return true if the file is cached and if timestamp (not implemented) is
+ * valid, false otherwise
+ */
+bool Cache::isCached(std::shared_ptr<DataFile> file) {
+  double earliestAllowedTime =
+      wrench::S4U_Simulation::getClock() - maxCacheTime;
+  auto entries = cache[file];
+  // after getting all possible cache entries, loop through them "all" and check
+  // the timestamps, removing any that fail.  If you find even 1 success, return
+  // true and stop cleaning.
+  for (auto ittr = entries.begin(); ittr != entries.end();
+       /*intentionaly blank*/) {
+    auto entry = *ittr;
+    if (entry.second < earliestAllowedTime) {
+      ittr = entries.erase(ittr);
+    } else {
+      return true;
+    }
+  }
+  return false;
+}
+/**
+ * @brief Add a file to the cache
+ * @param file: The file to add to the cache
+ * @param location: The location to add to the cache
+ */
+void Cache::add(const std::shared_ptr<DataFile> &file,
+                const std::shared_ptr<FileLocation> &location) {
+  double currentSimTime = wrench::S4U_Simulation::getClock();
+  cache[file][location] = currentSimTime;
+}
 
-        /**
-        * @brief Add a file to the cache
-        * @param file: The file to add to the cache
-        * @param locations: The locations to add to the cache
-        */
-        void Cache::add(const std::shared_ptr<DataFile> &file, const std::set<std::shared_ptr<FileLocation>> &locations) {
-            double currentSimTime = wrench::S4U_Simulation::getClock();
-            for (auto const &location: locations) {
-                cache[file][location] = currentSimTime;
-            }
-        }
-        /**
-         * @brief get all valid cached copies.
-         * @param file: The file to check the cache for
-         * @return the set of valid cached copies.  (empty set if not found)
-         */
-        std::set<std::shared_ptr<FileLocation>> Cache::get(const std::shared_ptr<DataFile> &file) {
-            double earliestAllowedTime = wrench::S4U_Simulation::getClock() - maxCacheTime;
-            auto entries = cache[file];
-            std::set<std::shared_ptr<FileLocation>> ret;
-            for (auto ittr = entries.begin(); ittr != entries.end();) {// intentionally blank 3rd term
-                auto entry = *ittr;
-                if (entry.second < earliestAllowedTime) {
-                    ittr = entries.erase(ittr);
-                } else {
-                    ret.insert(entry.first);
-                    ittr++;
-                }
-            }
-            return ret;
+/**
+ * @brief Add a file to the cache
+ * @param file: The file to add to the cache
+ * @param locations: The locations to add to the cache
+ */
+void Cache::add(const std::shared_ptr<DataFile> &file,
+                const std::set<std::shared_ptr<FileLocation>> &locations) {
+  double currentSimTime = wrench::S4U_Simulation::getClock();
+  for (auto const &location : locations) {
+    cache[file][location] = currentSimTime;
+  }
+}
+/**
+ * @brief get all valid cached copies.
+ * @param file: The file to check the cache for
+ * @return the set of valid cached copies.  (empty set if not found)
+ */
+std::set<std::shared_ptr<FileLocation>>
+Cache::get(const std::shared_ptr<DataFile> &file) {
+  double earliestAllowedTime =
+      wrench::S4U_Simulation::getClock() - maxCacheTime;
+  auto entries = cache[file];
+  std::set<std::shared_ptr<FileLocation>> ret;
+  for (auto ittr = entries.begin();
+       ittr != entries.end();) { // intentionally blank 3rd term
+    auto entry = *ittr;
+    if (entry.second < earliestAllowedTime) {
+      ittr = entries.erase(ittr);
+    } else {
+      ret.insert(entry.first);
+      ittr++;
+    }
+  }
+  return ret;
 
-        } /**
-         * @brief get all valid cached copies.
-         * @param file: The file to check the cache for
-         * @return the set of valid cached copies.  (empty set if not found)
-         */
+} /**
+   * @brief get all valid cached copies.
+   * @param file: The file to check the cache for
+   * @return the set of valid cached copies.  (empty set if not found)
+   */
 
-        std::set<std::shared_ptr<FileLocation>> Cache::operator[](const std::shared_ptr<DataFile> &file) {
-            return get(file);
-        }
+std::set<std::shared_ptr<FileLocation>>
+Cache::operator[](const std::shared_ptr<DataFile> &file) {
+  return get(file);
+}
 
-        /**
-         * @brief remove all copies of a file from the cache
-         * @param file: The file to check the cache for
-         */
+/**
+ * @brief remove all copies of a file from the cache
+ * @param file: The file to check the cache for
+ */
 
-        void Cache::remove(const std::shared_ptr<DataFile> &file) {
-            cache.erase(file);
-        }
+void Cache::remove(const std::shared_ptr<DataFile> &file) { cache.erase(file); }
 
 #if 0
         /**
@@ -120,5 +129,5 @@ namespace wrench {
         }
 #endif
 
-    }// namespace XRootD
-}// namespace wrench
+} // namespace XRootD
+} // namespace wrench

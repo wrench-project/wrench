@@ -14,15 +14,13 @@
 
 namespace wrench {
 
+/**
+ * @brief Configurable message payloads for a batch
+ */
+class BatchComputeServiceMessagePayload : public ComputeServiceMessagePayload {
 
-    /**
-     * @brief Configurable message payloads for a batch
-     */
-    class BatchComputeServiceMessagePayload : public ComputeServiceMessagePayload {
+public:
+};
+} // namespace wrench
 
-    public:
-    };
-}// namespace wrench
-
-
-#endif//WRENCH_BATCHSERVICEMESSAGEPAYLOAD_H
+#endif // WRENCH_BATCHSERVICEMESSAGEPAYLOAD_H

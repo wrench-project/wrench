@@ -14,45 +14,48 @@
 
 namespace wrench {
 
-    /**
-     * @brief Configurable properties for a NetworkProximityService
-     */
+/**
+ * @brief Configurable properties for a NetworkProximityService
+ */
 
-    class NetworkProximityServiceProperty : public ServiceProperty {
-    public:
-        /** @brief The overhead of looking up entries for a file (default: 0, default unit: second)
-         *         Examples: "1", "1s", "1.5ms" etc.
-         **/
-        DECLARE_PROPERTY_NAME(LOOKUP_OVERHEAD);
+class NetworkProximityServiceProperty : public ServiceProperty {
+public:
+  /** @brief The overhead of looking up entries for a file (default: 0, default
+   *unit: second) Examples: "1", "1s", "1.5ms" etc.
+   **/
+  DECLARE_PROPERTY_NAME(LOOKUP_OVERHEAD);
 
-        /** @brief The type of network proximity implementation to be used:
-         *   - ALLTOALL: a simple all-to-all algorithm (default)
-         *   - VIVALDI: The Vivaldi network coordinate-based approach
-         */
-        DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_SERVICE_TYPE);
+  /** @brief The type of network proximity implementation to be used:
+   *   - ALLTOALL: a simple all-to-all algorithm (default)
+   *   - VIVALDI: The Vivaldi network coordinate-based approach
+   */
+  DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_SERVICE_TYPE);
 
-        /** @brief The message size (in bytes) to be used in RTT measurements (default: 1024) **/
-        DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MESSAGE_SIZE);
+  /** @brief The message size (in bytes) to be used in RTT measurements
+   * (default: 1024) **/
+  DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MESSAGE_SIZE);
 
-        /** @brief The inter-measurement period to be used (default: 60, default unit seconds)
-         *         Examples: "60", "1m", "1.2h", etc.
-         **/
-        DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD);
+  /** @brief The inter-measurement period to be used (default: 60, default unit
+   *seconds) Examples: "60", "1m", "1.2h", etc.
+   **/
+  DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD);
 
-        /** @brief The maximum random uniformly distributed noise (in seconds) to be added to the measurement period (useful
-         * to avoid idiosyncratic effects of perfect synchrony) (default: 20) **/
-        DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE);
+  /** @brief The maximum random uniformly distributed noise (in seconds) to be
+   * added to the measurement period (useful to avoid idiosyncratic effects of
+   * perfect synchrony) (default: 20) **/
+  DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE);
 
-        /** @brief The seed for the noise random number generator **/
-        DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED);
+  /** @brief The seed for the noise random number generator **/
+  DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED);
 
-        /** @brief The percentage of other network proximity daemons that each network proximity daemon will conduct RTT measurements with (default: 1.0)**/
-        DECLARE_PROPERTY_NAME(NETWORK_DAEMON_COMMUNICATION_COVERAGE);
+  /** @brief The percentage of other network proximity daemons that each network
+   * proximity daemon will conduct RTT measurements with (default: 1.0)**/
+  DECLARE_PROPERTY_NAME(NETWORK_DAEMON_COMMUNICATION_COVERAGE);
 
-        /** @brief The random (integer) number generator seed used by the service to pick RTT measurement peers (default: 1) **/
-        DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_PEER_LOOKUP_SEED);
-    };
-}// namespace wrench
+  /** @brief The random (integer) number generator seed used by the service to
+   * pick RTT measurement peers (default: 1) **/
+  DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_PEER_LOOKUP_SEED);
+};
+} // namespace wrench
 
-
-#endif//WRENCH_NETWORKPROXIMITYSERVICEPROPERTY_H
+#endif // WRENCH_NETWORKPROXIMITYSERVICEPROPERTY_H

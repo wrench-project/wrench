@@ -12,178 +12,176 @@
 
 #include <string>
 
-#include <simgrid/s4u.hpp>
 #include <iostream>
+#include <simgrid/s4u.hpp>
 
 //#define ACTOR_TRACKING_OUTPUT yes
 
-
 namespace wrench {
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
-    class Simulation;
-    class S4U_CommPort;
+class Simulation;
+class S4U_CommPort;
 
-    /**
-     * @brief A generic "running daemon" abstraction that serves as a basis for all simulated processes
-     */
-    class S4U_Daemon : public std::enable_shared_from_this<S4U_Daemon> {
+/**
+ * @brief A generic "running daemon" abstraction that serves as a basis for all
+ * simulated processes
+ */
+class S4U_Daemon : public std::enable_shared_from_this<S4U_Daemon> {
 
-        class LifeSaver {
-        public:
-            explicit LifeSaver(std::shared_ptr<S4U_Daemon> &reference) : reference(reference) {}
+  class LifeSaver {
+  public:
+    explicit LifeSaver(std::shared_ptr<S4U_Daemon> &reference)
+        : reference(reference) {}
 
-            std::shared_ptr<S4U_Daemon> reference;
-        };
+    std::shared_ptr<S4U_Daemon> reference;
+  };
 
+public:
+  /**
+   * @brief A convenient map between actors and their default receive commports
+   */
+  static std::unordered_map<aid_t, S4U_CommPort *> map_actor_to_recv_commport;
 
-    public:
-        /**
-         * @brief A convenient map between actors and their default receive commports
-         */
-        static std::unordered_map<aid_t, S4U_CommPort *> map_actor_to_recv_commport;
+  /**
+   * @brief A map of actors to sets of held mutexes
+   */
+  static std::unordered_map<aid_t, std::set<simgrid::s4u::MutexPtr>>
+      map_actor_to_held_mutexes;
 
-        /**
-         * @brief A map of actors to sets of held mutexes
-         */
-        static std::unordered_map<aid_t, std::set<simgrid::s4u::MutexPtr>> map_actor_to_held_mutexes;
+  /** @brief The name of the daemon */
+  std::string process_name;
 
+  /** @brief The daemon's commport_name **/
+  S4U_CommPort *commport;
+  /** @brief The daemon's receive commport_name (to send to another daemon so
+   * that that daemon can reply) **/
+  S4U_CommPort *recv_commport;
 
-        /** @brief The name of the daemon */
-        std::string process_name;
+  /** @brief The name of the host on which the daemon is running */
+  std::string hostname;
 
-        /** @brief The daemon's commport_name **/
-        S4U_CommPort *commport;
-        /** @brief The daemon's receive commport_name (to send to another daemon so that that daemon can reply) **/
-        S4U_CommPort *recv_commport;
+  static S4U_CommPort *getRunningActorRecvCommPort();
 
-        /** @brief The name of the host on which the daemon is running */
-        std::string hostname;
+  S4U_Daemon(const std::string &hostname,
+             const std::string &process_name_prefix);
 
-        static S4U_CommPort *getRunningActorRecvCommPort();
+  // Daemon without a commport_name (not needed?)
+  //        S4U_Daemon(std::string hostname, std::string process_name_prefix);
 
-        S4U_Daemon(const std::string &hostname, const std::string &process_name_prefix);
+  virtual ~S4U_Daemon();
 
-        // Daemon without a commport_name (not needed?)
-        //        S4U_Daemon(std::string hostname, std::string process_name_prefix);
+  void startDaemon(bool _daemonized, bool _auto_restart);
 
-        virtual ~S4U_Daemon();
+  void createLifeSaver(std::shared_ptr<S4U_Daemon> reference);
+  void deleteLifeSaver();
 
-        void startDaemon(bool _daemonized, bool _auto_restart);
+  virtual void cleanup(bool has_returned_from_main, int return_value);
 
-        void createLifeSaver(std::shared_ptr<S4U_Daemon> reference);
-        void deleteLifeSaver();
+  /**
+   * @brief The daemon's main method, to be overridden
+   * @return 0 on success, non-0 on failure!
+   */
+  virtual int main() = 0;
 
-        virtual void cleanup(bool has_returned_from_main, int return_value);
+  bool hasReturnedFromMain() const;
+  int getReturnValue() const;
+  bool isDaemonized() const;
+  bool isSetToAutoRestart() const;
+  void setupOnExitFunction();
 
-        /**
-         * @brief The daemon's main method, to be overridden
-         * @return 0 on success, non-0 on failure!
-         */
-        virtual int main() = 0;
+  std::pair<bool, int> join();
 
-        bool hasReturnedFromMain() const;
-        int getReturnValue() const;
-        bool isDaemonized() const;
-        bool isSetToAutoRestart() const;
-        void setupOnExitFunction();
+  void suspendActor();
 
-        std::pair<bool, int> join();
+  void resumeActor();
 
-        void suspendActor();
+  std::string getName() const;
 
-        void resumeActor();
+  /** @brief Daemon states */
+  enum State {
+    /** @brief CREATED state: the daemon has been created but not started */
+    CREATED,
+    /** @brief UP state: the daemon has been started and is still running */
+    UP,
+    /** @brief DOWN state: the daemon has been shutdown and/or has terminated */
+    DOWN,
+    /** @brief SUSPENDED state: the daemon has been suspended (and hopefully
+       will be resumed0 */
+    SUSPENDED,
+  };
 
+  S4U_Daemon::State getState();
 
-        std::string getName() const;
+  /** @brief The daemon's life saver */
+  LifeSaver *life_saver = nullptr;
 
-        /** @brief Daemon states */
-        enum State {
-            /** @brief CREATED state: the daemon has been created but not started */
-            CREATED,
-            /** @brief UP state: the daemon has been started and is still running */
-            UP,
-            /** @brief DOWN state: the daemon has been shutdown and/or has terminated */
-            DOWN,
-            /** @brief SUSPENDED state: the daemon has been suspended (and hopefully will be resumed0 */
-            SUSPENDED,
-        };
+  /** @brief Method to acquire the daemon's lock */
+  void acquireDaemonLock();
 
-        S4U_Daemon::State getState();
+  /** @brief Method to release the daemon's lock */
+  void releaseDaemonLock();
 
-        /** @brief The daemon's life saver */
-        LifeSaver *life_saver = nullptr;
+  Simulation *getSimulation();
 
-        /** @brief Method to acquire the daemon's lock */
-        void acquireDaemonLock();
+  void setSimulation(Simulation *simulation);
 
-        /** @brief Method to release the daemon's lock */
-        void releaseDaemonLock();
+  bool killActor();
 
-        Simulation *getSimulation();
+protected:
+  /** @brief a pointer to the simulation object */
+  Simulation *simulation;
 
-        void setSimulation(Simulation *simulation);
+  /** @brief The service's state */
+  State state;
 
-        bool killActor();
+  friend class S4U_DaemonActor;
+  void runMainMethod();
 
-    protected:
-        /** @brief a pointer to the simulation object */
-        Simulation *simulation;
+  /** @brief The S4U actor */
+  simgrid::s4u::ActorPtr s4u_actor;
 
-        /** @brief The service's state */
-        State state;
+  /** @brief The host on which the daemon is running */
+  simgrid::s4u::Host *host;
 
-        friend class S4U_DaemonActor;
-        void runMainMethod();
+  //        void release_held_mutexes();
 
-        /** @brief The S4U actor */
-        simgrid::s4u::ActorPtr s4u_actor;
+  /**
+   * @brief Method to retrieve the shared_ptr to a S4U_daemon
+   * @tparam T: the class of the daemon (the base class is S4U_Daemon)
+   * @return a shared pointer
+   */
+  template <class T> std::shared_ptr<T> getSharedPtr() {
+    return std::dynamic_pointer_cast<T>(this->shared_from_this());
+  }
 
-        /** @brief The host on which the daemon is running */
-        simgrid::s4u::Host *host;
+  /** @brief The number of time that this daemon has started (i.e., 1 + number
+   * of restarts) */
+  unsigned int num_starts = 0;
 
-        //        void release_held_mutexes();
+private:
+  // Lock used typically to prevent kill() from killing the actor
+  // while it's in the middle of doing something critical
+  simgrid::s4u::MutexPtr daemon_lock;
 
-        /**
-         * @brief Method to retrieve the shared_ptr to a S4U_daemon
-         * @tparam T: the class of the daemon (the base class is S4U_Daemon)
-         * @return a shared pointer
-         */
-        template<class T>
-        std::shared_ptr<T> getSharedPtr() {
-            return std::dynamic_pointer_cast<T>(this->shared_from_this());
-        }
+  bool has_returned_from_main = false; // Set to true after main returns
+  int return_value = 0;                // Set to the value returned by main
+  bool daemonized{};                   // Set to true if daemon is daemonized
+  bool auto_restart{}; // Set to true if daemon is supposed to auto-restart
 
-
-        /** @brief The number of time that this daemon has started (i.e., 1 + number of restarts) */
-        unsigned int num_starts = 0;
-
-    private:
-        // Lock used typically to prevent kill() from killing the actor
-        // while it's in the middle of doing something critical
-        simgrid::s4u::MutexPtr daemon_lock;
-
-
-        bool has_returned_from_main = false;// Set to true after main returns
-        int return_value = 0;               // Set to the value returned by main
-        bool daemonized{};                  // Set to true if daemon is daemonized
-        bool auto_restart{};                // Set to true if daemon is supposed to auto-restart
-
-        static int num_non_daemonized_actors_running;
-
+  static int num_non_daemonized_actors_running;
 
 #ifdef ACTOR_TRACKING_OUTPUT
-        std::string process_name_prefix;
+  std::string process_name_prefix;
 #endif
-    };
+};
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-
-#endif//WRENCH_SIM4U_DAEMON_H
+#endif // WRENCH_SIM4U_DAEMON_H

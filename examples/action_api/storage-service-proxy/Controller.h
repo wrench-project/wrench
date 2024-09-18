@@ -8,7 +8,6 @@
  * (at your option) any later version.
  */
 
-
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
@@ -16,35 +15,37 @@
 
 namespace wrench {
 
-    /**
-     *  @brief A Workflow Management System (WMS) implementation
-     */
-    class Controller : public ExecutionController {
+/**
+ *  @brief A Workflow Management System (WMS) implementation
+ */
+class Controller : public ExecutionController {
 
-    public:
-        // Constructor
-        Controller(
-                const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
-                const shared_ptr<StorageServiceProxy> &proxy,
-                const shared_ptr<StorageService> &remote,
-                const shared_ptr<StorageService> &target,
-                const std::string &hostname);
+public:
+  // Constructor
+  Controller(const std::shared_ptr<BareMetalComputeService>
+                 &bare_metal_compute_service,
+             const shared_ptr<StorageServiceProxy> &proxy,
+             const shared_ptr<StorageService> &remote,
+             const shared_ptr<StorageService> &target,
+             const std::string &hostname);
 
-    protected:
-        // Overridden method
-        void processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent>) override;
-        void processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent> event) override;
+protected:
+  // Overridden method
+  void processEventCompoundJobCompletion(
+      std::shared_ptr<CompoundJobCompletedEvent>) override;
+  void processEventCompoundJobFailure(
+      std::shared_ptr<CompoundJobFailedEvent> event) override;
 
-    private:
-        // main() method of the Controller
-        int main() override;
+private:
+  // main() method of the Controller
+  int main() override;
 
-        const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
-        const shared_ptr<StorageServiceProxy> &proxy;
-        const shared_ptr<StorageService> &remote;
-        const shared_ptr<StorageService> &target;
-    };
+  const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
+  const shared_ptr<StorageServiceProxy> &proxy;
+  const shared_ptr<StorageService> &remote;
+  const shared_ptr<StorageService> &target;
+};
 
-}// namespace wrench
+} // namespace wrench
 
-#endif//CONTROLLER_H
+#endif // CONTROLLER_H

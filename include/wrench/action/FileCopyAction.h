@@ -16,48 +16,46 @@
 
 namespace wrench {
 
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+class DataFile;
+class FileLocation;
 
-    class DataFile;
-    class FileLocation;
+/**
+ * @brief A class that implements a file copy action
+ */
+class FileCopyAction : public Action {
 
-    /**
-     * @brief A class that implements a file copy action
-     */
-    class FileCopyAction : public Action {
+public:
+  std::shared_ptr<DataFile> getFile() const;
+  std::shared_ptr<FileLocation> getSourceFileLocation() const;
+  std::shared_ptr<FileLocation> getDestinationFileLocation() const;
 
-    public:
-        std::shared_ptr<DataFile> getFile() const;
-        std::shared_ptr<FileLocation> getSourceFileLocation() const;
-        std::shared_ptr<FileLocation> getDestinationFileLocation() const;
+  bool usesScratch() const override;
 
-        bool usesScratch() const override;
+protected:
+  friend class CompoundJob;
 
-    protected:
-        friend class CompoundJob;
+  FileCopyAction(const std::string &name,
+                 std::shared_ptr<FileLocation> src_file_location,
+                 std::shared_ptr<FileLocation> dst_file_location);
 
-        FileCopyAction(const std::string &name,
-                       std::shared_ptr<FileLocation> src_file_location,
-                       std::shared_ptr<FileLocation> dst_file_location);
+  void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+  void
+  terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
+private:
+  std::shared_ptr<DataFile> file;
+  std::shared_ptr<FileLocation> src_file_location;
+  std::shared_ptr<FileLocation> dst_file_location;
+};
 
-        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
-        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
+/***********************/
+/** \endcond           */
+/***********************/
 
-    private:
-        std::shared_ptr<DataFile> file;
-        std::shared_ptr<FileLocation> src_file_location;
-        std::shared_ptr<FileLocation> dst_file_location;
-    };
+} // namespace wrench
 
-
-    /***********************/
-    /** \endcond           */
-    /***********************/
-
-}// namespace wrench
-
-#endif//WRENCH_FILE_COPY_ACTION_H
+#endif // WRENCH_FILE_COPY_ACTION_H

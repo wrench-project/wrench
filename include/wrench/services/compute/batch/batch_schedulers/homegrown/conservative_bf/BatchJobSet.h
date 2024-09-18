@@ -14,74 +14,74 @@
 
 namespace wrench {
 
-    /***********************/
-    /** \cond              */
-    /***********************/
+/***********************/
+/** \cond              */
+/***********************/
 
-    /**
-     * @brief A class that implements a batch job set abstrsaction
-     */
-    class BatchJobSet {
+/**
+ * @brief A class that implements a batch job set abstrsaction
+ */
+class BatchJobSet {
 
-    public:
-        BatchJobSet() = default;
+public:
+  BatchJobSet() = default;
 
-        /** @brief The job set **/
-        std::set<std::shared_ptr<BatchJob>> jobs;
-        /** @brief number of utilized nodes **/
-        unsigned long num_nodes_utilized = 0;
+  /** @brief The job set **/
+  std::set<std::shared_ptr<BatchJob>> jobs;
+  /** @brief number of utilized nodes **/
+  unsigned long num_nodes_utilized = 0;
 
-        /**
-         * @brief Overloaded += operator
-         * @param right: right-hand side
-         * @return
-         */
-        BatchJobSet &operator+=(const BatchJobSet &right) {
-            for (const auto &j: right.jobs) {
-                add(j);
-            }
-            return *this;
-        }
+  /**
+   * @brief Overloaded += operator
+   * @param right: right-hand side
+   * @return
+   */
+  BatchJobSet &operator+=(const BatchJobSet &right) {
+    for (const auto &j : right.jobs) {
+      add(j);
+    }
+    return *this;
+  }
 
-        /**
-         * @brief Overloaded -= operator
-         * @param right: right-hand side
-         * @return
-         */
-        BatchJobSet &operator-=(const BatchJobSet &right) {
-            for (const auto &j: right.jobs) {
-                remove(j);
-            }
-            return *this;
-        }
+  /**
+   * @brief Overloaded -= operator
+   * @param right: right-hand side
+   * @return
+   */
+  BatchJobSet &operator-=(const BatchJobSet &right) {
+    for (const auto &j : right.jobs) {
+      remove(j);
+    }
+    return *this;
+  }
 
-        /**
-         * @brief Add a batch job to the set
-         * @param job: the batch job
-         */
-        void inline add(std::shared_ptr<BatchJob> job) {
-            if (this->jobs.find(job) == this->jobs.end()) {
-                num_nodes_utilized += job->getRequestedNumNodes();
-                this->jobs.insert(job);
-            }
-        }
+  /**
+   * @brief Add a batch job to the set
+   * @param job: the batch job
+   */
+  void inline add(std::shared_ptr<BatchJob> job) {
+    if (this->jobs.find(job) == this->jobs.end()) {
+      num_nodes_utilized += job->getRequestedNumNodes();
+      this->jobs.insert(job);
+    }
+  }
 
-        /**
-         * @brief Remove a batch job from the set
-         * @param job: the batch job
-         */
-        void inline remove(std::shared_ptr<BatchJob> job) {
-            if (this->jobs.find(job) != this->jobs.end()) {
-                num_nodes_utilized -= job->getRequestedNumNodes();
-                this->jobs.erase(job);
-            }
-        }
-    };
+  /**
+   * @brief Remove a batch job from the set
+   * @param job: the batch job
+   */
+  void inline remove(std::shared_ptr<BatchJob> job) {
+    if (this->jobs.find(job) != this->jobs.end()) {
+      num_nodes_utilized -= job->getRequestedNumNodes();
+      this->jobs.erase(job);
+    }
+  }
+};
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
-}// namespace wrench
+} // namespace wrench
 
-#endif//WRENCH_BATCHJOBSET_H
+#endif // WRENCH_BATCHJOBSET_H

@@ -10,9 +10,9 @@
 #ifndef WRENCH_COREAVAILABILITYTIMELINE_H
 #define WRENCH_COREAVAILABILITYTIMELINE_H
 
-#include <vector>
-#include <boost/icl/interval_map.hpp>
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/BatchJobSetCoreLevel.h"
+#include <boost/icl/interval_map.hpp>
+#include <vector>
 
 /***********************/
 /** \cond              */
@@ -20,38 +20,47 @@
 
 namespace wrench {
 
+class BatchJob;
 
-    class BatchJob;
+/**
+ * @brief A class that implements a node availability time line abstraction
+ */
+class CoreAvailabilityTimeLine {
 
-    /**
-     * @brief A class that implements a node availability time line abstraction
-     */
-    class CoreAvailabilityTimeLine {
+public:
+  explicit CoreAvailabilityTimeLine(unsigned long max_num_nodes,
+                                    unsigned long max_num_cores_per_node);
+  void setTimeOrigin(u_int32_t t);
+  void add(u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) {
+    update(true, start, end, job);
+  }
+  void remove(u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) {
+    update(false, start, end, job);
+  }
+  void clear();
+  void print();
+  std::set<std::shared_ptr<BatchJob>> getJobsInFirstSlot();
+  std::pair<u_int32_t, std::vector<int>>
+  findEarliestStartTime(uint32_t duration, unsigned long num_nodes,
+                        unsigned long num_cores_per_node);
 
-    public:
-        explicit CoreAvailabilityTimeLine(unsigned long max_num_nodes, unsigned long max_num_cores_per_node);
-        void setTimeOrigin(u_int32_t t);
-        void add(u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) { update(true, start, end, job); }
-        void remove(u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) { update(false, start, end, job); }
-        void clear();
-        void print();
-        std::set<std::shared_ptr<BatchJob>> getJobsInFirstSlot();
-        std::pair<u_int32_t, std::vector<int>> findEarliestStartTime(uint32_t duration, unsigned long num_nodes, unsigned long num_cores_per_node);
+private:
+  unsigned long max_num_nodes;
+  unsigned long max_num_cores_per_node;
+  boost::icl::interval_map<u_int32_t, BatchJobSetCoreLevel,
+                           boost::icl::partial_enricher>
+      availability_timeslots;
 
-    private:
-        unsigned long max_num_nodes;
-        unsigned long max_num_cores_per_node;
-        boost::icl::interval_map<u_int32_t, BatchJobSetCoreLevel, boost::icl::partial_enricher> availability_timeslots;
+  void update(bool add, u_int32_t start, u_int32_t end,
+              std::shared_ptr<BatchJob> job);
 
-        void update(bool add, u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job);
+  std::set<int> integer_sequence;
+};
 
-        std::set<int> integer_sequence;
-    };
-
-}// namespace wrench
+} // namespace wrench
 
 /***********************/
 /** \endcond           */
 /***********************/
 
-#endif//WRENCH_COREEAVAILABILITYTIMELINE_H
+#endif // WRENCH_COREEAVAILABILITYTIMELINE_H

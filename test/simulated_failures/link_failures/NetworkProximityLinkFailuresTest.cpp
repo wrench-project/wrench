@@ -7,84 +7,83 @@
  * (at your option) any later version.
  */
 
-
+#include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <boost/algorithm/string.hpp>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
-#include "../failure_test_util/ResourceSwitcher.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
+#include "../failure_test_util/ResourceSwitcher.h"
 
-WRENCH_LOG_CATEGORY(network_proximity_link_failures, "Log category for NetworkProximityLinkFailuresTest");
-
+WRENCH_LOG_CATEGORY(network_proximity_link_failures,
+                    "Log category for NetworkProximityLinkFailuresTest");
 
 class NetworkProximityLinkFailuresTest : public ::testing::Test {
 
 public:
-    std::shared_ptr<wrench::DataFile> input_file;
-    std::shared_ptr<wrench::DataFile> output_file;
-    std::shared_ptr<wrench::WorkflowTask> task;
-    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
-    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+  std::shared_ptr<wrench::DataFile> input_file;
+  std::shared_ptr<wrench::DataFile> output_file;
+  std::shared_ptr<wrench::WorkflowTask> task;
+  std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
+  std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
-    std::shared_ptr<wrench::Workflow> workflow;
+  std::shared_ptr<wrench::Workflow> workflow;
 
+  std::shared_ptr<wrench::NetworkProximityService> network_proximity_service =
+      nullptr;
 
-    std::shared_ptr<wrench::NetworkProximityService> network_proximity_service = nullptr;
-
-    void do_NetworkProximityLinkFailures_Test();
+  void do_NetworkProximityLinkFailures_Test();
 
 protected:
-    ~NetworkProximityLinkFailuresTest() {
-        workflow->clear();
-        wrench::Simulation::removeAllFiles();
-    }
+  ~NetworkProximityLinkFailuresTest() {
+    workflow->clear();
+    wrench::Simulation::removeAllFiles();
+  }
 
-    NetworkProximityLinkFailuresTest() {
+  NetworkProximityLinkFailuresTest() {
 
-        // Create the simplest workflow
-        workflow = wrench::Workflow::createWorkflow();
+    // Create the simplest workflow
+    workflow = wrench::Workflow::createWorkflow();
 
-        // Create a one-host platform file
-        std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
-                          "<platform version=\"4.1\"> "
-                          "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"StableHost\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
-                          "       <link id=\"1\" bandwidth=\"100MBps\" latency=\"0us\"/>"
-                          "       <link id=\"2\" bandwidth=\"100MBps\" latency=\"0us\"/>"
-                          "       <link id=\"3\" bandwidth=\"100MBps\" latency=\"0us\"/>"
-                          "       <link id=\"4\" bandwidth=\"1MBps\" latency=\"1000us\"/>"
-                          "       <link id=\"5\" bandwidth=\"1MBps\" latency=\"20000us\"/>"
-                          "       <link id=\"6\" bandwidth=\"1MBps\" latency=\"3000us\"/>"
-                          "       <route src=\"StableHost\" dst=\"Host1\"> <link_ctn id=\"1\""
-                          "/> </route>"
-                          "       <route src=\"StableHost\" dst=\"Host2\"> <link_ctn id=\"2\""
-                          "/> </route>"
-                          "       <route src=\"StableHost\" dst=\"Host3\"> <link_ctn id=\"3\""
-                          "/> </route>"
-                          "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"4\""
-                          "/> </route>"
-                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"5\""
-                          "/> </route>"
-                          "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"6\""
-                          "/> </route>"
-                          "   </zone> "
-                          "</platform>";
+    // Create a one-host platform file
+    std::string xml =
+        "<?xml version='1.0'?>"
+        "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
+        "<platform version=\"4.1\"> "
+        "   <zone id=\"AS0\" routing=\"Full\"> "
+        "       <host id=\"StableHost\" speed=\"1f\" core=\"10\"/> "
+        "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
+        "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
+        "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
+        "       <link id=\"1\" bandwidth=\"100MBps\" latency=\"0us\"/>"
+        "       <link id=\"2\" bandwidth=\"100MBps\" latency=\"0us\"/>"
+        "       <link id=\"3\" bandwidth=\"100MBps\" latency=\"0us\"/>"
+        "       <link id=\"4\" bandwidth=\"1MBps\" latency=\"1000us\"/>"
+        "       <link id=\"5\" bandwidth=\"1MBps\" latency=\"20000us\"/>"
+        "       <link id=\"6\" bandwidth=\"1MBps\" latency=\"3000us\"/>"
+        "       <route src=\"StableHost\" dst=\"Host1\"> <link_ctn id=\"1\""
+        "/> </route>"
+        "       <route src=\"StableHost\" dst=\"Host2\"> <link_ctn id=\"2\""
+        "/> </route>"
+        "       <route src=\"StableHost\" dst=\"Host3\"> <link_ctn id=\"3\""
+        "/> </route>"
+        "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"4\""
+        "/> </route>"
+        "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"5\""
+        "/> </route>"
+        "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"6\""
+        "/> </route>"
+        "   </zone> "
+        "</platform>";
 
-        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
-        fprintf(platform_file, "%s", xml.c_str());
-        fclose(platform_file);
-    }
+    FILE *platform_file = fopen(platform_file_path.c_str(), "w");
+    fprintf(platform_file, "%s", xml.c_str());
+    fclose(platform_file);
+  }
 
-    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
+  std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
-
 
 /**********************************************************************/
 /**  FAILURE TEST                                                    **/
@@ -93,89 +92,97 @@ protected:
 class NetworkProxLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
-    NetworkProxLinkFailuresTestWMS(NetworkProximityLinkFailuresTest *test,
-                                   std::string hostname) : wrench::ExecutionController(hostname, "test") {
-        this->test = test;
-    }
+  NetworkProxLinkFailuresTestWMS(NetworkProximityLinkFailuresTest *test,
+                                 std::string hostname)
+      : wrench::ExecutionController(hostname, "test") {
+    this->test = test;
+  }
 
 private:
-    NetworkProximityLinkFailuresTest *test;
+  NetworkProximityLinkFailuresTest *test;
 
-    int main() override {
+  int main() override {
 
-        for (int i = 1; i <= 6; i++) {
-            // Starting a link murderer!!
-            auto switcher = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
-                    new wrench::ResourceRandomRepeatSwitcher("StableHost", 666,
-                                                             10, 1000,
-                                                             10, 20,
-                                                             std::to_string(i),
-                                                             wrench::ResourceRandomRepeatSwitcher::LINK));
+    for (int i = 1; i <= 6; i++) {
+      // Starting a link murderer!!
+      auto switcher = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
+          new wrench::ResourceRandomRepeatSwitcher(
+              "StableHost", 666, 10, 1000, 10, 20, std::to_string(i),
+              wrench::ResourceRandomRepeatSwitcher::LINK));
 
-
-            switcher->setSimulation(this->simulation);
-            switcher->start(switcher, true, false);// Daemonized, no auto-restart
-        }
-
-        std::vector<std::string> hosts = {"Host1", "Host2", "Host3"};
-
-        for (int trial = 0; trial < 1000; trial++) {
-            WRENCH_INFO("TRIAL = %d", trial);
-            std::string host1 = hosts[trial % 3];
-            std::string host2 = hosts[(37 * trial + 11) % 3];
-
-            auto first_pair_to_compute_proximity = std::make_pair(host1, host2);
-
-            wrench::Simulation::sleep(100);
-            auto result = this->test->network_proximity_service->getHostPairDistance(
-                    first_pair_to_compute_proximity);
-            WRENCH_INFO("%s-%s: %.3lf %.3lf", host1.c_str(), host2.c_str(), result.first, result.second);
-        }
-
-        return 0;
+      switcher->setSimulation(this->simulation);
+      switcher->start(switcher, true, false); // Daemonized, no auto-restart
     }
+
+    std::vector<std::string> hosts = {"Host1", "Host2", "Host3"};
+
+    for (int trial = 0; trial < 1000; trial++) {
+      WRENCH_INFO("TRIAL = %d", trial);
+      std::string host1 = hosts[trial % 3];
+      std::string host2 = hosts[(37 * trial + 11) % 3];
+
+      auto first_pair_to_compute_proximity = std::make_pair(host1, host2);
+
+      wrench::Simulation::sleep(100);
+      auto result = this->test->network_proximity_service->getHostPairDistance(
+          first_pair_to_compute_proximity);
+      WRENCH_INFO("%s-%s: %.3lf %.3lf", host1.c_str(), host2.c_str(),
+                  result.first, result.second);
+    }
+
+    return 0;
+  }
 };
 
 TEST_F(NetworkProximityLinkFailuresTest, RandomLinkFailures) {
-    DO_TEST_WITH_FORK(do_NetworkProximityLinkFailures_Test);
+  DO_TEST_WITH_FORK(do_NetworkProximityLinkFailures_Test);
 }
 
 void NetworkProximityLinkFailuresTest::do_NetworkProximityLinkFailures_Test() {
 
-    // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-link-shutdown-simulation");
+  // Create and initialize a simulation
+  auto simulation = wrench::Simulation::createSimulation();
+  int argc = 2;
+  char **argv = (char **)calloc(argc, sizeof(char *));
+  argv[0] = strdup("unit_test");
+  argv[1] = strdup("--wrench-link-shutdown-simulation");
 
-    simulation->init(&argc, argv);
+  simulation->init(&argc, argv);
 
-    // Setting up the platform
-    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    // Get a hostname
-    std::string stable_hostname = "StableHost";
+  // Get a hostname
+  std::string stable_hostname = "StableHost";
 
-    std::vector<std::string> hosts_in_network = {"Host1", "Host2", "Host3"};
+  std::vector<std::string> hosts_in_network = {"Host1", "Host2", "Host3"};
 
-    ASSERT_NO_THROW(network_proximity_service = simulation->add(new wrench::NetworkProximityService(stable_hostname, hosts_in_network,
-                                                                                                    {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "100"},
-                                                                                                     {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "1"},
-                                                                                                     {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "10"}},
-                                                                                                    {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD, 0}})));
+  ASSERT_NO_THROW(network_proximity_service =
+                      simulation->add(new wrench::NetworkProximityService(
+                          stable_hostname, hosts_in_network,
+                          {{wrench::NetworkProximityServiceProperty::
+                                NETWORK_PROXIMITY_MEASUREMENT_PERIOD,
+                            "100"},
+                           {wrench::NetworkProximityServiceProperty::
+                                NETWORK_PROXIMITY_MESSAGE_SIZE,
+                            "1"},
+                           {wrench::NetworkProximityServiceProperty::
+                                NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE,
+                            "10"}},
+                          {{wrench::NetworkProximityServiceMessagePayload::
+                                NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD,
+                            0}})));
 
-    // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+  // Create a WMS
+  std::shared_ptr<wrench::ExecutionController> wms = nullptr;
 
-    ASSERT_NO_THROW(wms = simulation->add(
-                            new NetworkProxLinkFailuresTestWMS(this,
-                                                               stable_hostname)));
+  ASSERT_NO_THROW(wms = simulation->add(new NetworkProxLinkFailuresTestWMS(
+                      this, stable_hostname)));
 
-    // Running a "run a single task1" simulation
-    ASSERT_NO_THROW(simulation->launch());
+  // Running a "run a single task1" simulation
+  ASSERT_NO_THROW(simulation->launch());
 
-    for (int i = 0; i < argc; i++)
-        free(argv[i]);
-    free(argv);
+  for (int i = 0; i < argc; i++)
+    free(argv[i]);
+  free(argv);
 }
