@@ -1272,6 +1272,31 @@ namespace wrench {
      * @param data JSON input
      * @return JSON output
      */
+    json SimulationController::getActionState(json data) {
+      std::string compound_job_name = data["compound_job_name"];
+      std::string action_name = data["action_name"];
+
+      std::shared_ptr<CompoundJob> job;
+      if (not this->compound_job_registry.lookup(compound_job_name, job)) {
+        throw std::runtime_error("Unknown job " + compound_job_name);
+      }
+
+      std::shared_ptr<Action> action;
+      try {
+        action = job->getActionByName(action_name);
+      } catch (std::invalid_argument &e) {
+        throw std::runtime_error("Unknown action " + action_name + " in job " + compound_job_name);
+      }
+      json answer;
+      answer["state"] = (int)(action->getState());
+      return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
     json SimulationController::getActionStartDate(json data) {
         std::string compound_job_name = data["compound_job_name"];
         std::string action_name = data["action_name"];
@@ -1364,6 +1389,22 @@ namespace wrench {
                                    data["max_num_cores"],
                                    data["memory"]);
         return {};
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     */
+    json SimulationController::getTaskState(json data) {
+      std::string workflow_name = data["workflow_name"];
+      std::shared_ptr<Workflow> workflow;
+      json answer;
+      if (not this->workflow_registry.lookup(workflow_name, workflow)) {
+        throw std::runtime_error("Unknown workflow  " + workflow_name);
+      }
+      answer["state"] = workflow->getTaskByID(data["task_name"])->getState();
+      return answer;
     }
 
     /**
