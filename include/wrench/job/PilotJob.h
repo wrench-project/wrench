@@ -14,67 +14,66 @@
 
 namespace wrench {
 
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+class BareMetalComputeService;
 
-    class BareMetalComputeService;
+/**
+ * @brief A pilot (i.e., non-standard) workflow job that can be submitted to a
+ * ComputeService by a WMS (via a JobManager)
+ */
+class PilotJob : public Job {
 
-    /**
-     * @brief A pilot (i.e., non-standard) workflow job that can be submitted to a ComputeService
-     * by a WMS (via a JobManager)
-     */
-    class PilotJob : public Job {
+public:
+  /** @brief Pilot job states */
+  enum State {
+    /** @brief Not submitted yet */
+    NOT_SUBMITTED,
+    /** @brief Submitted but not running */
+    PENDING,
+    /** @brief Running */
+    RUNNING,
+    /** @brief Expired due to a time-to-live limit */
+    EXPIRED,
+    /** @brief Failed */
+    FAILED,
+    /** @brief Terminated by submitter **/
+    TERMINATED
+  };
 
-    public:
-        /** @brief Pilot job states */
-        enum State {
-            /** @brief Not submitted yet */
-            NOT_SUBMITTED,
-            /** @brief Submitted but not running */
-            PENDING,
-            /** @brief Running */
-            RUNNING,
-            /** @brief Expired due to a time-to-live limit */
-            EXPIRED,
-            /** @brief Failed */
-            FAILED,
-            /** @brief Terminated by submitter **/
-            TERMINATED
-        };
+  std::shared_ptr<BareMetalComputeService> getComputeService();
 
-        std::shared_ptr<BareMetalComputeService> getComputeService();
+  PilotJob::State getState();
 
-        PilotJob::State getState();
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+  //        void setComputeService(std::shared_ptr<BareMetalComputeService> cs);
 
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-        //        void setComputeService(std::shared_ptr<BareMetalComputeService> cs);
+private:
+  std::shared_ptr<CompoundJob> compound_job;
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+  friend class JobManager;
 
-    private:
-        std::shared_ptr<CompoundJob> compound_job;
+  explicit PilotJob(std::shared_ptr<JobManager> job_manager);
 
-        friend class JobManager;
+  State state;
+  std::shared_ptr<BareMetalComputeService>
+      compute_service; // Associated compute service, i.e., the running pilot
+                       // job
+};
 
-        explicit PilotJob(std::shared_ptr<JobManager> job_manager);
+/***********************/
+/** \endcond           */
+/***********************/
 
-        State state;
-        std::shared_ptr<BareMetalComputeService> compute_service;// Associated compute service, i.e., the running pilot job
-    };
+} // namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-
-}// namespace wrench
-
-
-#endif//WRENCH_PILOTJOB_H
+#endif // WRENCH_PILOTJOB_H

@@ -16,46 +16,46 @@
 
 namespace wrench {
 
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/**
+ * @brief A class that implements a custom action
+ */
+class CustomAction : public Action {
 
-    /**
-     * @brief A class that implements a custom action
-     */
-    class CustomAction : public Action {
+public:
+protected:
+  friend class CompoundJob;
 
-    public:
-    protected:
-        friend class CompoundJob;
+  CustomAction(
+      const std::string &name, double ram, unsigned long num_cores,
+      std::function<void(std::shared_ptr<ActionExecutor>)> lambda_execute,
+      std::function<void(std::shared_ptr<ActionExecutor>)> lambda_terminate);
 
-        CustomAction(const std::string &name,
-                     double ram,
-                     unsigned long num_cores,
-                     std::function<void(std::shared_ptr<ActionExecutor>)> lambda_execute,
-                     std::function<void(std::shared_ptr<ActionExecutor>)> lambda_terminate);
+  unsigned long getMinNumCores() const override;
+  unsigned long getMaxNumCores() const override;
+  double getMinRAMFootprint() const override;
 
-        unsigned long getMinNumCores() const override;
-        unsigned long getMaxNumCores() const override;
-        double getMinRAMFootprint() const override;
+  void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+  void
+  terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
-        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
-        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
+private:
+  double ram;
+  unsigned long num_cores;
 
-    private:
-        double ram;
-        unsigned long num_cores;
+  std::function<void(std::shared_ptr<ActionExecutor> action_executor)>
+      lambda_execute;
+  std::function<void(std::shared_ptr<ActionExecutor> action_executor)>
+      lambda_terminate;
+};
 
-        std::function<void(std::shared_ptr<ActionExecutor> action_executor)> lambda_execute;
-        std::function<void(std::shared_ptr<ActionExecutor> action_executor)> lambda_terminate;
-    };
+/***********************/
+/** \endcond           */
+/***********************/
 
+} // namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-
-}// namespace wrench
-
-#endif//WRENCH_CUSTOM_ACTION_H
+#endif // WRENCH_CUSTOM_ACTION_H

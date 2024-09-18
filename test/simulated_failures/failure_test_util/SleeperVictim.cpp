@@ -9,29 +9,31 @@
 
 #include "SleeperVictim.h"
 
-#include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
+#include <wrench/simulation/Simulation.h>
 
 WRENCH_LOG_CATEGORY(sleeper_victom, "Log category for Sleeper");
 
-
-wrench::SleeperVictim::SleeperVictim(std::string host_on_which_to_run, double seconds_of_life, SimulationMessage *msg, S4U_CommPort *commport_to_notify)
+wrench::SleeperVictim::SleeperVictim(std::string host_on_which_to_run,
+                                     double seconds_of_life,
+                                     SimulationMessage *msg,
+                                     S4U_CommPort *commport_to_notify)
     : Service(host_on_which_to_run, "victim") {
-    this->seconds_of_life = seconds_of_life;
-    this->msg = msg;
-    this->commport_to_notify = commport_to_notify;
+  this->seconds_of_life = seconds_of_life;
+  this->msg = msg;
+  this->commport_to_notify = commport_to_notify;
 }
-
 
 int wrench::SleeperVictim::main() {
 
-    WRENCH_INFO("Starting  (%u)", this->num_starts);
-    WRENCH_INFO("Sleeping for %.3lf seconds...", this->seconds_of_life);
-    wrench::Simulation::sleep(this->seconds_of_life);
-    this->commport_to_notify->putMessage(this->msg);
-    return 0;
+  WRENCH_INFO("Starting  (%u)", this->num_starts);
+  WRENCH_INFO("Sleeping for %.3lf seconds...", this->seconds_of_life);
+  wrench::Simulation::sleep(this->seconds_of_life);
+  this->commport_to_notify->putMessage(this->msg);
+  return 0;
 }
 
-void wrench::SleeperVictim::cleanup(bool has_terminated_cleanly, int return_value) {
-    // Do nothing (ignore failures)
+void wrench::SleeperVictim::cleanup(bool has_terminated_cleanly,
+                                    int return_value) {
+  // Do nothing (ignore failures)
 }

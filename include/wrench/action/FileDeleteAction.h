@@ -16,44 +16,42 @@
 
 namespace wrench {
 
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+class DataFile;
+class FileLocation;
 
-    class DataFile;
-    class FileLocation;
+/**
+ * @brief A class that implements a file deletion action
+ */
+class FileDeleteAction : public Action {
 
-    /**
-     * @brief A class that implements a file deletion action
-     */
-    class FileDeleteAction : public Action {
+public:
+  std::shared_ptr<DataFile> getFile() const;
+  std::shared_ptr<FileLocation> getFileLocation() const;
+  bool usesScratch() const override;
 
-    public:
-        std::shared_ptr<DataFile> getFile() const;
-        std::shared_ptr<FileLocation> getFileLocation() const;
-        bool usesScratch() const override;
+protected:
+  friend class CompoundJob;
 
-    protected:
-        friend class CompoundJob;
+  FileDeleteAction(const std::string &name, std::shared_ptr<DataFile> file,
+                   std::shared_ptr<FileLocation> file_location);
 
-        FileDeleteAction(const std::string &name,
-                         std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> file_location);
+  void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+  void
+  terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
+private:
+  std::shared_ptr<DataFile> file;
+  std::shared_ptr<FileLocation> file_location;
+};
 
-        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
-        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
+/***********************/
+/** \endcond           */
+/***********************/
 
-    private:
-        std::shared_ptr<DataFile> file;
-        std::shared_ptr<FileLocation> file_location;
-    };
+} // namespace wrench
 
-
-    /***********************/
-    /** \endcond           */
-    /***********************/
-
-}// namespace wrench
-
-#endif//WRENCH_FILE_DELETE_ACTION_H
+#endif // WRENCH_FILE_DELETE_ACTION_H

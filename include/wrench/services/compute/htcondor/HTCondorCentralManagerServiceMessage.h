@@ -10,50 +10,54 @@
 #ifndef WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGE_H
 #define WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGE_H
 
-#include "wrench/services/ServiceMessage.h"
-#include "wrench/job/StandardJob.h"
 #include "wrench/job/Job.h"
+#include "wrench/job/StandardJob.h"
+#include "wrench/services/ServiceMessage.h"
 
 #include <vector>
 
 namespace wrench {
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
-    /**
-     * @brief Top-level class for messages received/sent by a HTCondorCentralManagerService
-     */
-    class HTCondorCentralManagerServiceMessage : public ServiceMessage {
-    protected:
-        HTCondorCentralManagerServiceMessage(double payload);
-    };
+/**
+ * @brief Top-level class for messages received/sent by a
+ * HTCondorCentralManagerService
+ */
+class HTCondorCentralManagerServiceMessage : public ServiceMessage {
+protected:
+  HTCondorCentralManagerServiceMessage(double payload);
+};
 
-    /**
-     * @brief A message received by a HTCondorCentralManagerService so that it is notified of a negotiator
-     *        cycle completion
-     */
-    class NegotiatorCompletionMessage : public HTCondorCentralManagerServiceMessage {
-    public:
-        NegotiatorCompletionMessage(std::set<std::shared_ptr<Job>> scheduled_jobs, double payload);
+/**
+ * @brief A message received by a HTCondorCentralManagerService so that it is
+ * notified of a negotiator cycle completion
+ */
+class NegotiatorCompletionMessage
+    : public HTCondorCentralManagerServiceMessage {
+public:
+  NegotiatorCompletionMessage(std::set<std::shared_ptr<Job>> scheduled_jobs,
+                              double payload);
 
-        /** @brief List of scheduled jobs */
-        std::set<std::shared_ptr<Job>> scheduled_jobs;
-    };
+  /** @brief List of scheduled jobs */
+  std::set<std::shared_ptr<Job>> scheduled_jobs;
+};
 
-    /**
-     * @brief A message received by a HTCondorCentralManagerService so that it wakes up and
-     * tries to dispatch jobs again
-     */
-    class CentralManagerWakeUpMessage : public HTCondorCentralManagerServiceMessage {
-    public:
-        explicit CentralManagerWakeUpMessage(double payload);
-    };
+/**
+ * @brief A message received by a HTCondorCentralManagerService so that it wakes
+ * up and tries to dispatch jobs again
+ */
+class CentralManagerWakeUpMessage
+    : public HTCondorCentralManagerServiceMessage {
+public:
+  explicit CentralManagerWakeUpMessage(double payload);
+};
 
-    /***********************/
-    /** \endcond INTERNAL  */
-    /***********************/
-}// namespace wrench
+/***********************/
+/** \endcond INTERNAL  */
+/***********************/
+} // namespace wrench
 
-#endif//WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGE_H
+#endif // WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGE_H

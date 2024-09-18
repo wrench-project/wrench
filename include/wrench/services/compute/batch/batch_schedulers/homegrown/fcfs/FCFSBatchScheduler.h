@@ -14,43 +14,46 @@
 /** \cond INTERNAL     */
 /***********************/
 
-#include "wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h"
 
 namespace wrench {
 
-    /**
-     * @brief A class that implements a FCFS batch scheduler
-     */
-    class FCFSBatchScheduler : public HomegrownBatchScheduler {
+/**
+ * @brief A class that implements a FCFS batch scheduler
+ */
+class FCFSBatchScheduler : public HomegrownBatchScheduler {
 
-    public:
-        /**
-         * @brief Constructor
-         *
-         * @param cs: the batch compute service for which this scheduler is operating
-         */
-        explicit FCFSBatchScheduler(BatchComputeService *cs) : HomegrownBatchScheduler(cs) {}
+public:
+  /**
+   * @brief Constructor
+   *
+   * @param cs: the batch compute service for which this scheduler is operating
+   */
+  explicit FCFSBatchScheduler(BatchComputeService *cs)
+      : HomegrownBatchScheduler(cs) {}
 
-        void processQueuedJobs() override;
+  void processQueuedJobs() override;
 
-        void processJobSubmission(std::shared_ptr<BatchJob> batch_job) override;
-        void processJobFailure(std::shared_ptr<BatchJob> batch_job) override;
-        void processJobCompletion(std::shared_ptr<BatchJob> batch_job) override;
-        void processJobTermination(std::shared_ptr<BatchJob> batch_job) override;
+  void processJobSubmission(std::shared_ptr<BatchJob> batch_job) override;
+  void processJobFailure(std::shared_ptr<BatchJob> batch_job) override;
+  void processJobCompletion(std::shared_ptr<BatchJob> batch_job) override;
+  void processJobTermination(std::shared_ptr<BatchJob> batch_job) override;
 
-        std::shared_ptr<BatchJob> pickNextJobToSchedule();
+  std::shared_ptr<BatchJob> pickNextJobToSchedule();
 
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) override;
+  std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>>
+  scheduleOnHosts(unsigned long, unsigned long, double) override;
 
-        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
-    };
+  std::map<std::string, double> getStartTimeEstimates(
+      std::set<std::tuple<std::string, unsigned long, unsigned long, double>>
+          set_of_jobs) override;
+};
 
-}// namespace wrench
+} // namespace wrench
 
 /***********************/
 /** \endcond           */
 /***********************/
 
-
-#endif//WRENCH_FCFSBATCHSCHEDULER_H
+#endif // WRENCH_FCFSBATCHSCHEDULER_H

@@ -9,23 +9,28 @@
 
 #include <wrench/services/network_proximity/NetworkProximityServiceProperty.h>
 
-
 namespace wrench {
 
+SET_PROPERTY_NAME(NetworkProximityServiceProperty, LOOKUP_OVERHEAD);
 
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, LOOKUP_OVERHEAD);
+SET_PROPERTY_NAME(NetworkProximityServiceProperty,
+                  NETWORK_PROXIMITY_SERVICE_TYPE);
 
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_SERVICE_TYPE);
+SET_PROPERTY_NAME(NetworkProximityServiceProperty,
+                  NETWORK_PROXIMITY_MESSAGE_SIZE);
 
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_MESSAGE_SIZE);
+SET_PROPERTY_NAME(NetworkProximityServiceProperty,
+                  NETWORK_PROXIMITY_MEASUREMENT_PERIOD);
 
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_MEASUREMENT_PERIOD);
+SET_PROPERTY_NAME(NetworkProximityServiceProperty,
+                  NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE);
 
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE);
+SET_PROPERTY_NAME(NetworkProximityServiceProperty,
+                  NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED);
 
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED);
+SET_PROPERTY_NAME(NetworkProximityServiceProperty,
+                  NETWORK_DAEMON_COMMUNICATION_COVERAGE);
 
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_DAEMON_COMMUNICATION_COVERAGE);
-
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_PEER_LOOKUP_SEED);
-}// namespace wrench
+SET_PROPERTY_NAME(NetworkProximityServiceProperty,
+                  NETWORK_PROXIMITY_PEER_LOOKUP_SEED);
+} // namespace wrench

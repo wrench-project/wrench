@@ -11,39 +11,38 @@
 #ifndef WRENCH_SIMGRIDMESSAGES_H
 #define WRENCH_SIMGRIDMESSAGES_H
 
-#include <string>
-#include <map>
 #include <iostream>
-
+#include <map>
+#include <string>
 
 namespace wrench {
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
-    /**
-    * @brief Top-level class to describe a message communicated by processes in the simulation
-    */
-    class SimulationMessage {
+/**
+ * @brief Top-level class to describe a message communicated by processes in the
+ * simulation
+ */
+class SimulationMessage {
 
-    public:
-        explicit SimulationMessage(double payload);
-        virtual ~SimulationMessage();
+public:
+  explicit SimulationMessage(double payload);
+  virtual ~SimulationMessage();
 
-        virtual std::string getName();
+  virtual std::string getName();
 
-        /** @brief The message name */
-        //std::string name;//we dont need this anymore :)
-        /** @brief The message size in bytes */
-        double payload;
-    };
+  /** @brief The message name */
+  // std::string name;//we dont need this anymore :)
+  /** @brief The message size in bytes */
+  double payload;
+};
 
+/***********************/
+/** \endcond           */
+/***********************/
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+} // namespace wrench
 
-}// namespace wrench
-
-#endif//WRENCH_SIMGRIDMESSAGES_H
+#endif // WRENCH_SIMGRIDMESSAGES_H

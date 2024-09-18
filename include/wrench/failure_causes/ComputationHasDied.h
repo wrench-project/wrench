@@ -14,38 +14,36 @@
 #include <string>
 
 #include "wrench/services/Service.h"
-#include "wrench/services/storage/StorageService.h"
 #include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/storage/StorageService.h"
 
 namespace wrench {
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
+/**
+ * @brief A "compute thread has died" failure cause
+ */
+class ComputationHasDied : public FailureCause {
+public:
+  /***********************/
+  /** \cond INTERNAL     */
+  /***********************/
+  ComputationHasDied();
+  /***********************/
+  /** \endcond           */
+  /***********************/
 
-    /**
-   * @brief A "compute thread has died" failure cause
-   */
-    class ComputationHasDied : public FailureCause {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        ComputationHasDied();
-        /***********************/
-        /** \endcond           */
-        /***********************/
+  std::string toString() override;
 
-        std::string toString() override;
+private:
+};
 
-    private:
-    };
+/***********************/
+/** \endcond           */
+/***********************/
+} // namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-}// namespace wrench
-
-
-#endif//WRENCH_COMPUTE_THREAD_HAS_DIED_H
+#endif // WRENCH_COMPUTE_THREAD_HAS_DIED_H

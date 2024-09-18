@@ -7,65 +7,66 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_HOSTSTATECHANGEDETECTORMESSAGE_H
 #define WRENCH_HOSTSTATECHANGEDETECTORMESSAGE_H
 
-
-#include "wrench/simulation/SimulationMessage.h"
 #include "wrench-dev.h"
+#include "wrench/simulation/SimulationMessage.h"
 
 namespace wrench {
 
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+/**
+ * @brief Top-level class for messages received/sent by a
+ * HostStateChangeDetector
+ */
+class HostStateChangeDetectorMessage : public SimulationMessage {
+protected:
+  explicit HostStateChangeDetectorMessage();
+};
 
-    /**
-     * @brief Top-level class for messages received/sent by a HostStateChangeDetector
-     */
-    class HostStateChangeDetectorMessage : public SimulationMessage {
-    protected:
-        explicit HostStateChangeDetectorMessage();
-    };
+/**
+ * @brief A message sent by the HostStateChangeDetector to notify some listener
+ * that a host has turned on
+ */
+class HostHasTurnedOnMessage : public HostStateChangeDetectorMessage {
+public:
+  explicit HostHasTurnedOnMessage(std::string hostname);
+  /** @brief The name of the host that has tuned on */
+  std::string hostname;
+};
 
-    /**
-     * @brief A message sent by the HostStateChangeDetector to notify some listener that a host has turned on 
-     */
-    class HostHasTurnedOnMessage : public HostStateChangeDetectorMessage {
-    public:
-        explicit HostHasTurnedOnMessage(std::string hostname);
-        /** @brief The name of the host that has tuned on */
-        std::string hostname;
-    };
+/**
+ * @brief A message sent by the HostStateChangeDetector to notify some listener
+ * that a host has turned off
+ */
+class HostHasTurnedOffMessage : public HostStateChangeDetectorMessage {
+public:
+  explicit HostHasTurnedOffMessage(std::string hostname);
+  /** @brief The name of the host that has tuned off */
+  std::string hostname;
+};
 
-    /**
-     * @brief A message sent by the HostStateChangeDetector to notify some listener that a host has turned off 
-     */
-    class HostHasTurnedOffMessage : public HostStateChangeDetectorMessage {
-    public:
-        explicit HostHasTurnedOffMessage(std::string hostname);
-        /** @brief The name of the host that has tuned off */
-        std::string hostname;
-    };
+/**
+ * @brief A message sent by the HostStateChangeDetector to notify some listener
+ * that a host has changed speed
+ */
+class HostHasChangedSpeedMessage : public HostStateChangeDetectorMessage {
+public:
+  explicit HostHasChangedSpeedMessage(std::string hostname, double speed);
+  /** @brief The name of the host that has tuned off */
+  std::string hostname;
+  /** @brief The host's (new) speed */
+  double speed;
+};
 
-    /**
-     * @brief A message sent by the HostStateChangeDetector to notify some listener that a host has changed speed
-     */
-    class HostHasChangedSpeedMessage : public HostStateChangeDetectorMessage {
-    public:
-        explicit HostHasChangedSpeedMessage(std::string hostname, double speed);
-        /** @brief The name of the host that has tuned off */
-        std::string hostname;
-        /** @brief The host's (new) speed */
-        double speed;
-    };
+/***********************/
+/** \endcond           */
+/***********************/
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+} // namespace wrench
 
-}// namespace wrench
-
-#endif//WRENCH_HOSTSTATECHANGEDETECTORMESSAGE_H
+#endif // WRENCH_HOSTSTATECHANGEDETECTORMESSAGE_H

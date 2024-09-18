@@ -18,36 +18,37 @@
 
 namespace wrench {
 
-    class BatchComputeService;
+class BatchComputeService;
 
-    /**
-     * @brief A WMS that only submits a single job to a given batch service, which is used
-     *        to implement batch workload replay
-     */
-    class WorkloadTraceFileReplayerEventReceiver : public ExecutionController {
+/**
+ * @brief A WMS that only submits a single job to a given batch service, which
+ * is used to implement batch workload replay
+ */
+class WorkloadTraceFileReplayerEventReceiver : public ExecutionController {
 
-    public:
-        /**
-         * @brief Constructor
-         * @param hostname: the name of the host on which the "one job" WMS will run
-         * @param job_manager: A JobManager with which to interact
-         */
-        WorkloadTraceFileReplayerEventReceiver(std::string hostname, std::shared_ptr<JobManager> job_manager) : ExecutionController(
-                                                                                                                        hostname,
-                                                                                                                        "workload_trace_file_replayer_event_receiver"),
-                                                                                                                job_manager(job_manager) {}
+public:
+  /**
+   * @brief Constructor
+   * @param hostname: the name of the host on which the "one job" WMS will run
+   * @param job_manager: A JobManager with which to interact
+   */
+  WorkloadTraceFileReplayerEventReceiver(
+      std::string hostname, std::shared_ptr<JobManager> job_manager)
+      : ExecutionController(hostname,
+                            "workload_trace_file_replayer_event_receiver"),
+        job_manager(job_manager) {}
 
-        int main() override;
+  int main() override;
 
-    private:
-        std::string hostname;
-        std::shared_ptr<JobManager> job_manager;
-    };
+private:
+  std::string hostname;
+  std::shared_ptr<JobManager> job_manager;
+};
 
-}// namespace wrench
+} // namespace wrench
 
 /***********************/
 /** \endcond          **/
 /***********************/
 
-#endif//WRENCH_ONEJOBWMS_H
+#endif // WRENCH_ONEJOBWMS_H

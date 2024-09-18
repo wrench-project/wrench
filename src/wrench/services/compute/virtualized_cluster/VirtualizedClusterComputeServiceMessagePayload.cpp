@@ -10,10 +10,11 @@
 
 #include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.h>
 
-
 namespace wrench {
 
-    SET_MESSAGEPAYLOAD_NAME(VirtualizedClusterComputeServiceMessagePayload, MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(VirtualizedClusterComputeServiceMessagePayload, MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(VirtualizedClusterComputeServiceMessagePayload,
+                        MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD);
+SET_MESSAGEPAYLOAD_NAME(VirtualizedClusterComputeServiceMessagePayload,
+                        MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD);
 
-}// namespace wrench
+} // namespace wrench

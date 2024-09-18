@@ -16,55 +16,56 @@
 
 namespace wrench {
 
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+class ParallelModel;
 
-    class ParallelModel;
+/**
+ * @brief A class that implements a compute action
+ */
+class ComputeAction : public Action {
 
-    /**
-     * @brief A class that implements a compute action
-     */
-    class ComputeAction : public Action {
+public:
+  double getFlops() const;
+  unsigned long getMinNumCores() const override;
+  unsigned long getMaxNumCores() const override;
+  double getMinRAMFootprint() const override;
+  std::shared_ptr<ParallelModel> getParallelModel() const;
 
-    public:
-        double getFlops() const;
-        unsigned long getMinNumCores() const override;
-        unsigned long getMaxNumCores() const override;
-        double getMinRAMFootprint() const override;
-        std::shared_ptr<ParallelModel> getParallelModel() const;
+protected:
+  friend class CompoundJob;
 
-    protected:
-        friend class CompoundJob;
+  ComputeAction(const std::string &name, double flops, double ram,
+                unsigned long min_core, unsigned long max_core,
+                std::shared_ptr<ParallelModel> parallel_model);
 
-        ComputeAction(const std::string &name,
-                      double flops,
-                      double ram,
-                      unsigned long min_core,
-                      unsigned long max_core,
-                      std::shared_ptr<ParallelModel> parallel_model);
+  void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+  void
+  terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
-        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
-        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
+private:
+  double flops;
+  unsigned long min_num_cores;
+  unsigned long max_num_cores;
+  double ram;
+  std::shared_ptr<ParallelModel> parallel_model;
 
-    private:
-        double flops;
-        unsigned long min_num_cores;
-        unsigned long max_num_cores;
-        double ram;
-        std::shared_ptr<ParallelModel> parallel_model;
+  static void simulateComputationAsSleep(
+      const std::shared_ptr<ActionExecutor> &action_executor,
+      unsigned long num_threads, double sequential_work,
+      double parallel_per_thread_work);
+  static void simulateComputationAsComputation(
+      const std::shared_ptr<ActionExecutor> &action_executor,
+      unsigned long num_threads, double sequential_work,
+      double parallel_per_thread_work);
+};
 
-        static void simulateComputationAsSleep(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work);
-        static void simulateComputationAsComputation(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work);
-    };
+/***********************/
+/** \endcond           */
+/***********************/
 
+} // namespace wrench
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-
-}// namespace wrench
-
-
-#endif//WRENCH_COMPUTEACTION_H
+#endif // WRENCH_COMPUTEACTION_H
