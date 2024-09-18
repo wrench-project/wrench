@@ -7,63 +7,58 @@
  * (at your option) any later version.
  */
 
+
 #include <wrench/workflow/parallel_model/CustomParallelModel.h>
 
 #include <wrench/logging/TerminalOutput.h>
 
 #include <utility>
 
-WRENCH_LOG_CATEGORY(wrench_core_custom_parallel_model,
-                    "Log category for CustomParallelModel");
+WRENCH_LOG_CATEGORY(wrench_core_custom_parallel_model, "Log category for CustomParallelModel");
 
 namespace wrench {
 
-/**
- * @brief Constructor
- * @param lambda_sequential: a function that, when given a total flop amount and
- * a number of threads, the amount of purely sequential work
- * @param lambda_per_thread: a function that, when given a total flop amount and
- * a number of threads, the amount of pre-thread parallel work
- */
-CustomParallelModel::CustomParallelModel(
-    std::function<double(double, unsigned long)> lambda_sequential,
-    std::function<double(double, unsigned long)> lambda_per_thread) {
-  this->lambda_sequential = std::move(lambda_sequential);
-  this->lambda_per_thread = std::move(lambda_per_thread);
-}
+    /**
+     * @brief Constructor
+     * @param lambda_sequential: a function that, when given a total flop amount and a number of
+     *        threads, the amount of purely sequential work
+     * @param lambda_per_thread: a function that, when given a total flop amount and a number of
+     *        threads, the amount of pre-thread parallel work
+     */
+    CustomParallelModel::CustomParallelModel(std::function<double(double, unsigned long)> lambda_sequential,
+                                             std::function<double(double, unsigned long)> lambda_per_thread) {
+        this->lambda_sequential = std::move(lambda_sequential);
+        this->lambda_per_thread = std::move(lambda_per_thread);
+    }
 
-//    /**
-//     * @brief Returns the amount of work each thread much perform
-//     * @param total_work: total amount of work
-//     * @param num_threads: the number of threads
-//     * @return a vector of work amounts
-//     */
-//    std::vector<double> CustomParallelModel::getWorkPerThread(double
-//    total_work, unsigned long num_threads) {
-//        return this->lambda(total_work, num_threads);
-//    }
+    //    /**
+    //     * @brief Returns the amount of work each thread much perform
+    //     * @param total_work: total amount of work
+    //     * @param num_threads: the number of threads
+    //     * @return a vector of work amounts
+    //     */
+    //    std::vector<double> CustomParallelModel::getWorkPerThread(double total_work, unsigned long num_threads) {
+    //        return this->lambda(total_work, num_threads);
+    //    }
 
-/**
- * @brief Returns the purely sequential amount of work
- * @param total_work: total amount of work (in flops)
- * @param num_threads: number of threads
- * @return an amount of work (in flops)
- */
-double CustomParallelModel::getPurelySequentialWork(double total_work,
-                                                    unsigned long num_threads) {
-  return this->lambda_sequential(total_work, num_threads);
-}
+    /**
+     * @brief Returns the purely sequential amount of work
+     * @param total_work: total amount of work (in flops)
+     * @param num_threads: number of threads
+     * @return an amount of work (in flops)
+     */
+    double CustomParallelModel::getPurelySequentialWork(double total_work, unsigned long num_threads) {
+        return this->lambda_sequential(total_work, num_threads);
+    }
 
-/**
- * @brief Returns the per-thread parallel amount of work
- * @param total_work: total amount of work (in flops)
- * @param num_threads: number of threads
- * @return an amount of work (in flops)
- */
-double
-CustomParallelModel::getParallelPerThreadWork(double total_work,
-                                              unsigned long num_threads) {
-  return this->lambda_per_thread(total_work, num_threads);
-}
+    /**
+     * @brief Returns the per-thread parallel amount of work
+     * @param total_work: total amount of work (in flops)
+     * @param num_threads: number of threads
+     * @return an amount of work (in flops)
+     */
+    double CustomParallelModel::getParallelPerThreadWork(double total_work, unsigned long num_threads) {
+        return this->lambda_per_thread(total_work, num_threads);
+    }
 
-} // namespace wrench
+}// namespace wrench

@@ -8,45 +8,46 @@
  *
  */
 
-#include <boost/core/demangle.hpp>
-#include <typeinfo>
-#include <wrench/data_file/DataFile.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simulation/SimulationMessage.h>
+#include <wrench/data_file/DataFile.h>
+#include <typeinfo>
+#include <boost/core/demangle.hpp>
 
-WRENCH_LOG_CATEGORY(wrench_core_simulation_message,
-                    "Log category for SimulationMessage");
+WRENCH_LOG_CATEGORY(wrench_core_simulation_message, "Log category for SimulationMessage");
+
 
 namespace wrench {
 
-SimulationMessage::~SimulationMessage() {
-  UNTRACK_OBJECT("message");
-  //                WRENCH_INFO("DELETE: %s (%p)", this->getName().c_str(),
-  //                this);
-}
 
-/**
- * @brief Constructor
- * @param payload: message size in bytes
- */
-SimulationMessage::SimulationMessage(double payload) {
+    SimulationMessage::~SimulationMessage() {
+        UNTRACK_OBJECT("message");
+        //                WRENCH_INFO("DELETE: %s (%p)", this->getName().c_str(), this);
+    }
+
+
+    /**
+     * @brief Constructor
+     * @param payload: message size in bytes
+     */
+    SimulationMessage::SimulationMessage(double payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-  if (payload < 0) {
-    throw std::invalid_argument(
-        "SimulationMessage::SimulationMessage(): Invalid arguments");
-  }
+        if (payload < 0) {
+            throw std::invalid_argument("SimulationMessage::SimulationMessage(): Invalid arguments");
+        }
 #endif
-  this->payload = std::max<double>(0, payload);
-  TRACK_OBJECT("message");
-}
+        this->payload = std::max<double>(0, payload);
+        TRACK_OBJECT("message");
+    }
 
-/**
- * @brief Retrieve the message name
- * @return the name
- */
-std::string SimulationMessage::getName() {
-  char const *name = typeid(*this).name();
-  return boost::core::demangle(name);
-}
+    /**
+     * @brief Retrieve the message name
+     * @return the name
+     */
+    std::string SimulationMessage::getName() {
+        char const *name = typeid(*this).name();
+        return boost::core::demangle(name);
+    }
 
-} // namespace wrench
+
+}// namespace wrench

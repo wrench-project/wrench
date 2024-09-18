@@ -7,42 +7,42 @@
  * (at your option) any later version.
  */
 
+
 #ifndef WRENCH_EXAMPLE_COMPLEX_JOB_H
 #define WRENCH_EXAMPLE_COMPLEX_JOB_H
 
 #include <wrench-dev.h>
 
+
 namespace wrench {
 
-/**
- *  @brief A Workflow Management System (WMS) implementation
- */
-class ComplexJobWMS : public ExecutionController {
+    /**
+     *  @brief A Workflow Management System (WMS) implementation
+     */
+    class ComplexJobWMS : public ExecutionController {
 
-public:
-  // Constructor
-  ComplexJobWMS(
-      const std::shared_ptr<Workflow> &workflow,
-      const std::shared_ptr<ComputeService> &bare_metal_compute_service,
-      const std::shared_ptr<StorageService> &storage_service1,
-      const std::shared_ptr<StorageService> &storage_service2,
-      const std::string &hostname);
+    public:
+        // Constructor
+        ComplexJobWMS(
+                const std::shared_ptr<Workflow> &workflow,
+                const std::shared_ptr<ComputeService> &bare_metal_compute_service,
+                const std::shared_ptr<StorageService> &storage_service1,
+                const std::shared_ptr<StorageService> &storage_service2,
+                const std::string &hostname);
 
-protected:
-  // Overridden method
-  void processEventStandardJobCompletion(
-      std::shared_ptr<StandardJobCompletedEvent>) override;
-  void processEventStandardJobFailure(
-      std::shared_ptr<StandardJobFailedEvent>) override;
+    protected:
+        // Overridden method
+        void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
+        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
 
-private:
-  // main() method of the WMS
-  int main() override;
+    private:
+        // main() method of the WMS
+        int main() override;
 
-  std::shared_ptr<Workflow> workflow;
-  std::shared_ptr<ComputeService> bare_metal_compute_service;
-  std::shared_ptr<StorageService> storage_service1;
-  std::shared_ptr<StorageService> storage_service2;
-};
-} // namespace wrench
-#endif // WRENCH_EXAMPLE_COMPLEX_JOB_H
+        std::shared_ptr<Workflow> workflow;
+        std::shared_ptr<ComputeService> bare_metal_compute_service;
+        std::shared_ptr<StorageService> storage_service1;
+        std::shared_ptr<StorageService> storage_service2;
+    };
+}// namespace wrench
+#endif//WRENCH_EXAMPLE_COMPLEX_JOB_H

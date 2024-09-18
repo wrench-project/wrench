@@ -7,54 +7,55 @@
  * (at your option) any later version.
  */
 
-#include <wrench/data_file/DataFile.h>
-#include <wrench/failure_causes/FileAlreadyBeingCopied.h>
+
 #include <wrench/logging/TerminalOutput.h>
+#include <wrench/failure_causes/FileAlreadyBeingCopied.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
 
 #include <utility>
 
-WRENCH_LOG_CATEGORY(wrench_core_file_already_being_copied,
-                    "Log category for FileAlreadyBeingCopied");
+WRENCH_LOG_CATEGORY(wrench_core_file_already_being_copied, "Log category for FileAlreadyBeingCopied");
 
 namespace wrench {
 
-/**
- * @brief Constructor
- * @param src: the source location
- * @param dst: the destination location
- */
-FileAlreadyBeingCopied::FileAlreadyBeingCopied(
-    std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst) {
-  this->src_location = std::move(src);
-  this->dst_location = std::move(dst);
-}
+    /**
+     * @brief Constructor
+     * @param src: the source location
+     * @param dst: the destination location
+     */
+    FileAlreadyBeingCopied::FileAlreadyBeingCopied(std::shared_ptr<FileLocation> src,
+                                                   std::shared_ptr<FileLocation> dst) {
+        this->src_location = std::move(src);
+        this->dst_location = std::move(dst);
+    }
 
-/**
- * @brief Getter
- * @return the source location
- */
-std::shared_ptr<FileLocation> FileAlreadyBeingCopied::getSourceLocation() {
-  return this->src_location;
-}
 
-/**
- * @brief Getter
- * @return the source location
- */
-std::shared_ptr<FileLocation> FileAlreadyBeingCopied::getDestinationLocation() {
-  return this->dst_location;
-}
+    /**
+     * @brief Getter
+     * @return the source location
+     */
+    std::shared_ptr<FileLocation> FileAlreadyBeingCopied::getSourceLocation() {
+        return this->src_location;
+    }
 
-/**
- * @brief Get the human-readable failure message
- * @return the message
- */
-std::string FileAlreadyBeingCopied::toString() {
-  return "File " + this->src_location->getFile()->getID() +
-         " is already being copied (" +
-         "src = " + this->src_location->toString() + "; " +
-         "dst = " + this->dst_location->toString() + ")";
-}
+    /**
+    * @brief Getter
+    * @return the source location
+    */
+    std::shared_ptr<FileLocation> FileAlreadyBeingCopied::getDestinationLocation() {
+        return this->dst_location;
+    }
 
-} // namespace wrench
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string FileAlreadyBeingCopied::toString() {
+        return "File " + this->src_location->getFile()->getID() + " is already being copied (" +
+               "src = " + this->src_location->toString() + "; " +
+               "dst = " + this->dst_location->toString() + ")";
+    }
+
+
+}// namespace wrench

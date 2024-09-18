@@ -7,43 +7,47 @@
  * (at your option) any later version.
  */
 
+
 #ifndef WRENCH_FILEWRITERTHREAD_H
 #define WRENCH_FILEWRITERTHREAD_H
 
 #include <list>
 #include <utility>
 
-#include "wrench/services/storage/storage_helpers/FileLocation.h"
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 #include "wrench/simulation/SimulationMessage.h"
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL    */
-/***********************/
 
-/**
- * @brief A helper daemon (co-located with a data movement manager)
- */
-class FileWriterThread : public Service {
+    /***********************/
+    /** \cond INTERNAL    */
+    /***********************/
 
-public:
-  FileWriterThread(std::string hostname, S4U_CommPort *creator_commport,
-                   std::shared_ptr<FileLocation> location);
+    /**
+     * @brief A helper daemon (co-located with a data movement manager)
+     */
+    class FileWriterThread : public Service {
 
-protected:
-private:
-  int main() override;
+    public:
+        FileWriterThread(std::string hostname, S4U_CommPort *creator_commport,
+                         std::shared_ptr<FileLocation> location);
 
-  S4U_CommPort *creator_commport;
-  std::shared_ptr<FileLocation> location;
-};
+    protected:
+    private:
+        int main() override;
 
-/***********************/
-/** \endcond            */
-/***********************/
+        S4U_CommPort *creator_commport;
+        std::shared_ptr<FileLocation> location;
+    };
 
-} // namespace wrench
+    /***********************/
+    /** \endcond            */
+    /***********************/
 
-#endif // WRENCH_FILEWRITERTHREAD_H
+
+}// namespace wrench
+
+
+#endif//WRENCH_FILEWRITERTHREAD_H

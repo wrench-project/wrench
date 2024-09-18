@@ -17,32 +17,34 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief An "Unknown" failure cause (should not happen)
- */
-class FatalFailure : public FailureCause {
-public:
-  /***********************/
-  /** \cond INTERNAL     */
-  /***********************/
-  FatalFailure(std::string message);
-  /***********************/
-  /** \endcond           */
-  /***********************/
+    /**
+    * @brief An "Unknown" failure cause (should not happen)
+    */
+    class FatalFailure : public FailureCause {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        FatalFailure(std::string message);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-  std::string toString();
+        std::string toString();
 
-private:
-  std::string message;
-};
+    private:
+        std::string message;
+    };
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
 
-#endif // WRENCH_FATAL_FAILURE_H
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
+
+
+#endif//WRENCH_FATAL_FAILURE_H

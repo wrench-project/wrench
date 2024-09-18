@@ -7,10 +7,11 @@
  * (at your option) any later version.
  */
 
-#include <algorithm>
-#include <exception>
+
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
+#include <algorithm>
+#include <exception>
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
@@ -20,99 +21,91 @@ WRENCH_LOG_CATEGORY(bogus_message_test, "Log category for BogusMessageTest");
 class BogusMessageTest : public ::testing::Test {
 
 public:
-  std::shared_ptr<wrench::Service> service = nullptr;
-  wrench::S4U_CommPort *dst_commport;
+    std::shared_ptr<wrench::Service> service = nullptr;
+    wrench::S4U_CommPort *dst_commport;
 
-  void do_BogusMessage_Test(std::string service_type);
+    void do_BogusMessage_Test(std::string service_type);
 
 protected:
-  BogusMessageTest() {
+    BogusMessageTest() {
 
-    // Create the simplest workflow
-    workflow = wrench::Workflow::createWorkflow();
 
-    // Create a one-host platform file
-    std::string xml =
-        "<?xml version='1.0'?>"
-        "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
-        "<platform version=\"4.1\"> "
-        "   <zone id=\"AS0\" routing=\"Full\"> "
-        "       <host id=\"Host1\" speed=\"1f\" core=\"10\" > "
-        "          <disk id=\"large_disk\" read_bw=\"100MBps\" "
-        "write_bw=\"100MBps\">"
-        "             <prop id=\"size\" value=\"2000000B\"/>"
-        "             <prop id=\"mount\" value=\"/\"/>"
-        "          </disk>"
-        "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" "
-        "write_bw=\"100MBps\">"
-        "             <prop id=\"size\" value=\"1000000B\"/>"
-        "             <prop id=\"mount\" value=\"/scratch\"/>"
-        "          </disk>"
-        "       </host>"
-        "       <host id=\"Host2\" speed=\"1f\" core=\"10\" > "
-        "          <disk id=\"large_disk\" read_bw=\"100MBps\" "
-        "write_bw=\"100MBps\">"
-        "             <prop id=\"size\" value=\"2000000B\"/>"
-        "             <prop id=\"mount\" value=\"/\"/>"
-        "          </disk>"
-        "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" "
-        "write_bw=\"100MBps\">"
-        "             <prop id=\"size\" value=\"1000000B\"/>"
-        "             <prop id=\"mount\" value=\"/scratch\"/>"
-        "          </disk>"
-        "       </host>"
-        "       <host id=\"Host3\" speed=\"1f\" core=\"10\" > "
-        "          <disk id=\"large_disk\" read_bw=\"100MBps\" "
-        "write_bw=\"100MBps\">"
-        "             <prop id=\"size\" value=\"2000000B\"/>"
-        "             <prop id=\"mount\" value=\"/\"/>"
-        "          </disk>"
-        "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" "
-        "write_bw=\"100MBps\">"
-        "             <prop id=\"size\" value=\"1000000B\"/>"
-        "             <prop id=\"mount\" value=\"/scratch\"/>"
-        "          </disk>"
-        "       </host>"
-        "       <host id=\"Host4\" speed=\"1f\" core=\"10\" > "
-        "          <disk id=\"large_disk\" read_bw=\"100MBps\" "
-        "write_bw=\"100MBps\">"
-        "             <prop id=\"size\" value=\"2000000B\"/>"
-        "             <prop id=\"mount\" value=\"/\"/>"
-        "          </disk>"
-        "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" "
-        "write_bw=\"100MBps\">"
-        "             <prop id=\"size\" value=\"1000000B\"/>"
-        "             <prop id=\"mount\" value=\"/scratch\"/>"
-        "          </disk>"
-        "       </host>"
-        "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-        "       <link id=\"2\" bandwidth=\"1000GBps\" latency=\"1000us\"/>"
-        "       <link id=\"3\" bandwidth=\"2000GBps\" latency=\"1500us\"/>"
-        "       <link id=\"4\" bandwidth=\"3000GBps\" latency=\"0us\"/>"
-        "       <link id=\"5\" bandwidth=\"8000GBps\" latency=\"0us\"/>"
-        "       <link id=\"6\" bandwidth=\"2900GBps\" latency=\"0us\"/>"
-        "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\""
-        "/> </route>"
-        "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\""
-        "/> </route>"
-        "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"3\""
-        "/> </route>"
-        "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"4\""
-        "/> </route>"
-        "       <route src=\"Host2\" dst=\"Host4\"> <link_ctn id=\"5\""
-        "/> </route>"
-        "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"6\""
-        "/> </route>"
-        "   </zone> "
-        "</platform>";
+        // Create the simplest workflow
+        workflow = wrench::Workflow::createWorkflow();
 
-    FILE *platform_file = fopen(platform_file_path.c_str(), "w");
-    fprintf(platform_file, "%s", xml.c_str());
-    fclose(platform_file);
-  }
+        // Create a one-host platform file
+        std::string xml = "<?xml version='1.0'?>"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
+                          "<platform version=\"4.1\"> "
+                          "   <zone id=\"AS0\" routing=\"Full\"> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"2000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"1000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"2000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"1000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"2000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"1000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"2000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"1000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                          "       <link id=\"2\" bandwidth=\"1000GBps\" latency=\"1000us\"/>"
+                          "       <link id=\"3\" bandwidth=\"2000GBps\" latency=\"1500us\"/>"
+                          "       <link id=\"4\" bandwidth=\"3000GBps\" latency=\"0us\"/>"
+                          "       <link id=\"5\" bandwidth=\"8000GBps\" latency=\"0us\"/>"
+                          "       <link id=\"6\" bandwidth=\"2900GBps\" latency=\"0us\"/>"
+                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\""
+                          "/> </route>"
+                          "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\""
+                          "/> </route>"
+                          "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"3\""
+                          "/> </route>"
+                          "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"4\""
+                          "/> </route>"
+                          "       <route src=\"Host2\" dst=\"Host4\"> <link_ctn id=\"5\""
+                          "/> </route>"
+                          "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"6\""
+                          "/> </route>"
+                          "   </zone> "
+                          "</platform>";
 
-  std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-  std::shared_ptr<wrench::Workflow> workflow;
+        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
+        fprintf(platform_file, "%s", xml.c_str());
+        fclose(platform_file);
+    }
+
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 /**********************************************************************/
@@ -121,58 +114,58 @@ protected:
 
 class BogusMessageTestWMS : public wrench::ExecutionController {
 
-  class BogusMessage : public wrench::SimulationMessage {
+    class BogusMessage : public wrench::SimulationMessage {
 
-  public:
-    BogusMessage() : wrench::SimulationMessage(1) {}
-  };
+    public:
+        BogusMessage() : wrench::SimulationMessage(1) {
+        }
+    };
 
 public:
-  BogusMessageTestWMS(BogusMessageTest *test, std::string hostname)
-      : wrench::ExecutionController(hostname, "test") {
-    this->test = test;
-  }
+    BogusMessageTestWMS(BogusMessageTest *test,
+                        std::string hostname) : wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+    }
 
 private:
-  BogusMessageTest *test;
+    BogusMessageTest *test;
 
-  int main() override {
-    wrench::Simulation::sleep(1000);
-    try {
-      this->test->dst_commport->putMessage(new BogusMessage());
-    } catch (std::runtime_error &e) {
+    int main() override {
+        wrench::Simulation::sleep(1000);
+        try {
+            this->test->dst_commport->putMessage(new BogusMessage());
+        } catch (std::runtime_error &e) {
+        }
+        return 0;
     }
-    return 0;
-  }
 };
+
 
 class NoopWMS : public wrench::ExecutionController {
 
 public:
-  NoopWMS(BogusMessageTest *test, std::string hostname,
-          bool create_data_movement_manager)
-      : wrench::ExecutionController(hostname, "test") {
-    this->test = test;
-    this->create_data_movement_manager = create_data_movement_manager;
-  }
+    NoopWMS(BogusMessageTest *test, std::string hostname, bool create_data_movement_manager) : wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->create_data_movement_manager = create_data_movement_manager;
+    }
 
 private:
-  BogusMessageTest *test;
-  bool create_data_movement_manager;
+    BogusMessageTest *test;
+    bool create_data_movement_manager;
 
-  int main() override {
+    int main() override {
 
-    wrench::Simulation::sleep(10);
+        wrench::Simulation::sleep(10);
 
-    if (this->create_data_movement_manager) {
-      auto dmm = this->createDataMovementManager();
-      this->test->dst_commport = dmm->commport;
-    } else {
-      this->test->dst_commport = this->test->service->commport;
+        if (this->create_data_movement_manager) {
+            auto dmm = this->createDataMovementManager();
+            this->test->dst_commport = dmm->commport;
+        } else {
+            this->test->dst_commport = this->test->service->commport;
+        }
+        this->waitForAndProcessNextEvent();
+        return 0;
     }
-    this->waitForAndProcessNextEvent();
-    return 0;
-  }
 };
 
 /*************************************************************
@@ -183,60 +176,57 @@ private:
  *************************************************************/
 
 TEST_F(BogusMessageTest, FileRegistryService) {
-  DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test,
-                                                 "file_registry", false);
+    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "file_registry", false);
 }
 
 TEST_F(BogusMessageTest, SimpleStorage) {
-  DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test,
-                                                 "simple_storage", true);
+    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "simple_storage", true);
 }
 
 TEST_F(BogusMessageTest, DataMovementManager) {
-  DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test,
-                                                 "data_movement_manager", true);
+    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "data_movement_manager", true);
 }
 
 void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
 
-  // Create and initialize a simulation
-  auto simulation = wrench::Simulation::createSimulation();
-  int argc = 1;
-  char **argv = (char **)calloc(argc, sizeof(char *));
-  argv[0] = strdup("unit_test");
 
-  simulation->init(&argc, argv);
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+    int argc = 1;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
 
-  // Setting up the platform
-  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    simulation->init(&argc, argv);
 
-  // Get a hostname
-  std::string hostname = wrench::Simulation::getHostnameList()[0];
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-  // Create a service
-  if (service_type == "file_registry") {
-    this->service = simulation->add(new wrench::FileRegistryService(hostname));
-    this->dst_commport = this->service->commport;
-  } else if (service_type == "simple_storage") {
-    this->service = simulation->add(
-        wrench::SimpleStorageService::createSimpleStorageService(hostname,
-                                                                 {"/"}));
-    this->dst_commport = this->service->commport;
-  } else if (service_type == "data_movement_manager") {
-    auto wms = new NoopWMS(this, hostname, true);
-    this->service = simulation->add(wms);
-    this->dst_commport = nullptr; // Will be set by the WMS on DMM is created
-  }
+    // Get a hostname
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
-  // Create the Bogus Message WMS
-  std::shared_ptr<wrench::ExecutionController> wms;
+    // Create a service
+    if (service_type == "file_registry") {
+        this->service = simulation->add(new wrench::FileRegistryService(hostname));
+        this->dst_commport = this->service->commport;
+    } else if (service_type == "simple_storage") {
+        this->service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"}));
+        this->dst_commport = this->service->commport;
+    } else if (service_type == "data_movement_manager") {
+        auto wms = new NoopWMS(this, hostname, true);
+        this->service = simulation->add(wms);
+        this->dst_commport = nullptr;// Will be set by the WMS on DMM is created
+    }
 
-  ASSERT_NO_THROW(wms =
-                      simulation->add(new BogusMessageTestWMS(this, hostname)));
+    // Create the Bogus Message WMS
+    std::shared_ptr<wrench::ExecutionController> wms;
 
-  ASSERT_NO_THROW(simulation->launch());
+    ASSERT_NO_THROW(wms = simulation->add(
+                            new BogusMessageTestWMS(this, hostname)));
 
-  for (int i = 0; i < argc; i++)
-    free(argv[i]);
-  free(argv);
+    ASSERT_NO_THROW(simulation->launch());
+
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
 }

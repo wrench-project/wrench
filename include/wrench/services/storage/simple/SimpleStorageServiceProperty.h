@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+
 #ifndef WRENCH_SIMPLESTORAGESERVICEPROPERTY_H
 #define WRENCH_SIMPLESTORAGESERVICEPROPERTY_H
 
@@ -14,17 +15,17 @@
 
 namespace wrench {
 
-/**
- * @brief Configurable properties for a SimpleStorageService
- */
-class SimpleStorageServiceProperty : public StorageServiceProperty {
+    /**
+    * @brief Configurable properties for a SimpleStorageService
+    */
+    class SimpleStorageServiceProperty : public StorageServiceProperty {
 
-public:
-  /** @brief The maximum number of concurrent data connections supported by the
-   * service (default = "infinity") **/
-  DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-};
+    public:
+        /** @brief The maximum number of concurrent data connections supported by the service (default = "infinity") **/
+        DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+    };
 
-} // namespace wrench
+}// namespace wrench
 
-#endif // WRENCH_SIMPLESTORAGESERVICEPROPERTY_H
+
+#endif//WRENCH_SIMPLESTORAGESERVICEPROPERTY_H

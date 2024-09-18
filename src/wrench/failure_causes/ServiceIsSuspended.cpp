@@ -7,40 +7,40 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/ServiceIsSuspended.h>
 #include <wrench/logging/TerminalOutput.h>
+#include <wrench/failure_causes/ServiceIsSuspended.h>
 #include <wrench/services/Service.h>
 
 #include <utility>
 
-WRENCH_LOG_CATEGORY(wrench_core_service_is_suspended,
-                    "Log category for ServiceIsSuspended");
+WRENCH_LOG_CATEGORY(wrench_core_service_is_suspended, "Log category for ServiceIsSuspended");
 
 namespace wrench {
 
-/**
- * @brief Constructor
- * @param service: the service that was suspended
- */
-ServiceIsSuspended::ServiceIsSuspended(std::shared_ptr<Service> service) {
-  this->service = std::move(service);
-}
 
-/**
- * @brief Getter
- * @return the service
- */
-std::shared_ptr<Service> ServiceIsSuspended::getService() {
-  return this->service;
-}
+    /**
+     * @brief Constructor
+     * @param service: the service that was suspended
+     */
+    ServiceIsSuspended::ServiceIsSuspended(std::shared_ptr<Service> service) {
+        this->service = std::move(service);
+    }
 
-/**
- * @brief Get the human-readable failure message
- * @return the message
- */
-std::string ServiceIsSuspended::toString() {
-  return "Service " + this->service->getName() + " on host " +
-         this->service->getHostname() + " is suspended";
-}
+    /**
+     * @brief Getter
+     * @return the service
+     */
+    std::shared_ptr<Service> ServiceIsSuspended::getService() {
+        return this->service;
+    }
 
-} // namespace wrench
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string ServiceIsSuspended::toString() {
+        return "Service " + this->service->getName() + " on host " + this->service->getHostname() + " is suspended";
+    }
+
+
+}// namespace wrench

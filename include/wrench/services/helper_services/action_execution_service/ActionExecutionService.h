@@ -10,194 +10,173 @@
 #ifndef WRENCH_ACTION_SCHEDULER_H
 #define WRENCH_ACTION_SCHEDULER_H
 
+
 #include <queue>
 
 #include "wrench/services/compute/ComputeService.h"
-#include "wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h"
 #include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h"
+#include "wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h"
+
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
-class Simulation;
-class FailureCause;
-class Alarm;
-class Action;
-class ActionExecutor;
+    class Simulation;
+    class FailureCause;
+    class Alarm;
+    class Action;
+    class ActionExecutor;
 
-/**
- * @brief An action execution service that:
- *   - Accepts only ready actions
- *   - Run actions FCFS w.r.t to memory constraints without backfilling
- *   - Will oversubscribe cores in whatever way
- *   - Attempts some load balancing
- *   - Tries to execute actions with as many cores as possible
- */
-class ActionExecutionService : public Service {
 
-private:
-  WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-      {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD, "0"},
-      {ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "false"},
-      {ActionExecutionServiceProperty::
-           TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,
-       "false"},
-      {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH,
-       "true"},
-  };
+    /**
+     * @brief An action execution service that:
+     *   - Accepts only ready actions
+     *   - Run actions FCFS w.r.t to memory constraints without backfilling
+     *   - Will oversubscribe cores in whatever way
+     *   - Attempts some load balancing
+     *   - Tries to execute actions with as many cores as possible
+     */
+    class ActionExecutionService : public Service {
 
-  WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-      {ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,
-       S4U_CommPort::default_control_message_size}};
+    private:
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
+                {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD, "0"},
+                {ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "false"},
+                {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, "false"},
+                {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"},
+        };
 
-public:
-  // Public Constructor
-  ActionExecutionService(
-      const std::string &hostname,
-      const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>>
-          &compute_resources,
-      std::shared_ptr<Service> parent_service,
-      WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+                {ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size}};
 
-  /***********************/
-  /** \cond INTERNAL     */
-  /***********************/
+    public:
+        // Public Constructor
+        ActionExecutionService(const std::string &hostname,
+                               const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &compute_resources,
+                               std::shared_ptr<Service> parent_service,
+                               WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
-  bool actionCanRun(const std::shared_ptr<Action> &action);
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
 
-  std::shared_ptr<Service> getParentService() const;
+        bool actionCanRun(const std::shared_ptr<Action> &action);
 
-  void setParentService(std::shared_ptr<Service> parent);
+        std::shared_ptr<Service> getParentService() const;
 
-  void submitAction(const std::shared_ptr<Action> &action);
+        void setParentService(std::shared_ptr<Service> parent);
 
-  void terminateAction(std::shared_ptr<Action> action,
-                       ComputeService::TerminationCause termination_cause);
+        void submitAction(const std::shared_ptr<Action> &action);
 
-  bool IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores,
-                                                   double ram);
+        void terminateAction(std::shared_ptr<Action> action, ComputeService::TerminationCause termination_cause);
 
-  std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &
-  getComputeResources();
+        bool IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores, double ram);
 
-  std::map<std::string, double> getResourceInformation(const std::string &key);
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &getComputeResources();
 
-  ~ActionExecutionService();
+        std::map<std::string, double> getResourceInformation(const std::string &key);
 
-  /***********************/
-  /** \endcond           */
-  /***********************/
+        ~ActionExecutionService();
 
-private:
-  friend class Simulation;
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-  void validateProperties();
+    private:
+        friend class Simulation;
 
-  int num_hosts_turned_on;
+        void validateProperties();
 
-  std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>>
-      compute_resources;
+        int num_hosts_turned_on;
 
-  // Core availabilities (for each hosts, how many cores and how many bytes of
-  // RAM are currently available on it)
-  std::unordered_map<simgrid::s4u::Host *, double> ram_availabilities;
-  std::unordered_map<simgrid::s4u::Host *, unsigned long> running_thread_counts;
 
-  std::shared_ptr<Service> parent_service = nullptr;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
 
-  std::unordered_map<std::shared_ptr<StandardJob>,
-                     std::set<std::shared_ptr<DataFile>>>
-      files_in_scratch;
+        // Core availabilities (for each hosts, how many cores and how many bytes of RAM are currently available on it)
+        std::unordered_map<simgrid::s4u::Host *, double> ram_availabilities;
+        std::unordered_map<simgrid::s4u::Host *, unsigned long> running_thread_counts;
 
-  // Set of running jobs
-  std::set<std::shared_ptr<Action>> running_actions;
+        std::shared_ptr<Service> parent_service = nullptr;
 
-  // Action execution specs
-  std::unordered_map<std::shared_ptr<Action>,
-                     std::tuple<simgrid::s4u::Host *, unsigned long>>
-      action_run_specs;
+        std::unordered_map<std::shared_ptr<StandardJob>, std::set<std::shared_ptr<DataFile>>> files_in_scratch;
 
-  std::set<std::shared_ptr<Action>> all_actions;
-  std::deque<std::shared_ptr<Action>> ready_actions;
+        // Set of running jobs
+        std::set<std::shared_ptr<Action>> running_actions;
 
-  // Set of running ActionExecutors
-  std::unordered_map<std::shared_ptr<Action>, std::shared_ptr<ActionExecutor>>
-      action_executors;
+        // Action execution specs
+        std::unordered_map<std::shared_ptr<Action>, std::tuple<simgrid::s4u::Host *, unsigned long>> action_run_specs;
 
-  int main() override;
+        std::set<std::shared_ptr<Action>> all_actions;
+        std::deque<std::shared_ptr<Action>> ready_actions;
 
-  // Helper functions to make main() a bit more palatable
+        // Set of running ActionExecutors
+        std::unordered_map<std::shared_ptr<Action>, std::shared_ptr<ActionExecutor>> action_executors;
 
-  void terminate(bool send_failure_notifications,
-                 ComputeService::TerminationCause termination_cause);
+        int main() override;
 
-  void failCurrentActions();
+        // Helper functions to make main() a bit more palatable
 
-  void processActionExecutorCompletion(
-      const std::shared_ptr<ActionExecutor> &executor);
+        void terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
-  void
-  processActionExecutorFailure(const std::shared_ptr<ActionExecutor> &executor);
+        void failCurrentActions();
 
-  void
-  processActionExecutorCrash(const std::shared_ptr<ActionExecutor> &executor);
+        void processActionExecutorCompletion(const std::shared_ptr<ActionExecutor> &executor);
 
-  void processActionTerminationRequest(
-      const std::shared_ptr<Action> &action, S4U_CommPort *answer_commport,
-      ComputeService::TerminationCause termination_cause);
+        void processActionExecutorFailure(const std::shared_ptr<ActionExecutor> &executor);
 
-  bool processNextMessage();
+        void processActionExecutorCrash(const std::shared_ptr<ActionExecutor> &executor);
 
-  void dispatchReadyActions();
+        void processActionTerminationRequest(const std::shared_ptr<Action> &action, S4U_CommPort *answer_commport, ComputeService::TerminationCause termination_cause);
 
-  //        void someHostIsBackOn(simgrid::s4u::Host const &h);
-  //        bool host_back_on = false;
+        bool processNextMessage();
 
-  /** @brief Reasons why a standard job could be terminated */
-  enum JobTerminationCause {
-    /** @brief The WMS intentionally requested, via a JobManager, that a running
-       job is to be terminated */
-    TERMINATED,
+        void dispatchReadyActions();
 
-    /** @brief The compute service was directed to stop, and any running
-       StandardJob will fail */
-    COMPUTE_SERVICE_KILLED
-  };
+        //        void someHostIsBackOn(simgrid::s4u::Host const &h);
+        //        bool host_back_on = false;
 
-  void terminateRunningAction(std::shared_ptr<Action> action,
-                              bool killed_due_to_job_cancellation);
 
-  void killAction(const std::shared_ptr<Action> &action,
-                  const std::shared_ptr<FailureCause> &cause);
+        /** @brief Reasons why a standard job could be terminated */
+        enum JobTerminationCause {
+            /** @brief The WMS intentionally requested, via a JobManager, that a running job is to be terminated */
+            TERMINATED,
 
-  void processSubmitAction(S4U_CommPort *answer_commport,
-                           const std::shared_ptr<Action> &action);
+            /** @brief The compute service was directed to stop, and any running StandardJob will fail */
+            COMPUTE_SERVICE_KILLED
+        };
 
-  std::tuple<simgrid::s4u::Host *, unsigned long>
-  pickAllocation(const std::shared_ptr<Action> &action,
-                 simgrid::s4u::Host *required_host,
-                 unsigned long required_num_cores,
-                 std::set<simgrid::s4u::Host *> &hosts_to_avoid);
+        void terminateRunningAction(std::shared_ptr<Action> action, bool killed_due_to_job_cancellation);
 
-  bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
+        void killAction(const std::shared_ptr<Action> &action, const std::shared_ptr<FailureCause> &cause);
 
-  void cleanup(bool has_terminated_cleanly, int return_value) override;
 
-  bool areAllComputeResourcesDownWithNoActionExecutorRunning();
+        void processSubmitAction(S4U_CommPort *answer_commport, const std::shared_ptr<Action> &action);
 
-  int exit_code = 0;
+        std::tuple<simgrid::s4u::Host *, unsigned long> pickAllocation(const std::shared_ptr<Action> &action,
+                                                                       simgrid::s4u::Host *required_host, unsigned long required_num_cores,
+                                                                       std::set<simgrid::s4u::Host *> &hosts_to_avoid);
 
-  std::shared_ptr<HostStateChangeDetector> host_state_change_monitor;
-};
 
-/***********************/
-/** \endcond           */
-/***********************/
+        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
 
-} // namespace wrench
+        void cleanup(bool has_terminated_cleanly, int return_value) override;
 
-#endif // WRENCH_ACTION_SCHEDULER_H
+        bool areAllComputeResourcesDownWithNoActionExecutorRunning();
+
+        int exit_code = 0;
+
+        std::shared_ptr<HostStateChangeDetector> host_state_change_monitor;
+    };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
+}// namespace wrench
+
+
+#endif//WRENCH_ACTION_SCHEDULER_H

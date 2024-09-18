@@ -16,35 +16,36 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
 
-/**
- * @brief A class that implements a sleep action
- */
-class SleepAction : public Action {
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-public:
-  double getSleepTime() const;
+    /**
+     * @brief A class that implements a sleep action
+     */
+    class SleepAction : public Action {
 
-protected:
-  friend class CompoundJob;
+    public:
+        double getSleepTime() const;
 
-  SleepAction(const std::string &name, double sleep_time);
+    protected:
+        friend class CompoundJob;
 
-  void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
-  void
-  terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        SleepAction(const std::string &name, double sleep_time);
 
-private:
-  double sleep_time;
-};
+        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
-/***********************/
-/** \endcond           */
-/***********************/
+    private:
+        double sleep_time;
+    };
 
-} // namespace wrench
 
-#endif // WRENCH_SLEEP_ACTION_H
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
+}// namespace wrench
+
+#endif//WRENCH_SLEEP_ACTION_H

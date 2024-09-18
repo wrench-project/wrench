@@ -11,23 +11,23 @@
 
 #include <wrench/logging/TerminalOutput.h>
 
-WRENCH_LOG_CATEGORY(wrench_core_some_actions_have_failed,
-                    "Log category for SomeActionsHaveFailed");
+WRENCH_LOG_CATEGORY(wrench_core_some_actions_have_failed, "Log category for SomeActionsHaveFailed");
 
 namespace wrench {
 
-/**
- * @brief Constructor
- *
- */
-SomeActionsHaveFailed::SomeActionsHaveFailed() {}
+    /**
+    * @brief Constructor
+    *
+    */
+    SomeActionsHaveFailed::SomeActionsHaveFailed() {
+    }
 
-/**
- * @brief Get the human-readable failure message
- * @return the message
- */
-std::string SomeActionsHaveFailed::toString() {
-  return std::string("Some actions have failed");
-}
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string SomeActionsHaveFailed::toString() {
+        return std::string("Some actions have failed");
+    }
 
-} // namespace wrench
+}// namespace wrench

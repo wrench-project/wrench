@@ -11,13 +11,13 @@
 
 namespace wrench {
 
-/**
- * @brief Constructor
- *
- * @param payload: the message size in bytes
- */
-BatchComputeServiceMessage::BatchComputeServiceMessage(double payload)
-    : ComputeServiceMessage(payload) {}
+    /**
+     * @brief Constructor
+     *
+     * @param payload: the message size in bytes
+     */
+    BatchComputeServiceMessage::BatchComputeServiceMessage(double payload) : ComputeServiceMessage(payload) {
+    }
 
 #if 0
     /**
@@ -63,46 +63,43 @@ BatchComputeServiceMessage::BatchComputeServiceMessage(double payload)
     }
 #endif
 
-/**
- * @brief Constructor
- * @param answer_commport: the commport to reply to
- * @param batsched_decision_reply: the decision reply from Batsched
- * @param payload: the message size in bytes
- *
- * @throw std::invalid_argument
- */
-BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(
-    S4U_CommPort *answer_commport, std::string batsched_decision_reply,
-    double payload)
-    : BatchComputeServiceMessage(payload) {
+    /**
+     * @brief Constructor
+     * @param answer_commport: the commport to reply to
+     * @param batsched_decision_reply: the decision reply from Batsched
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(S4U_CommPort *answer_commport,
+                                                                           std::string batsched_decision_reply,
+                                                                           double payload)
+        : BatchComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-  if (answer_commport == nullptr) {
-    throw std::invalid_argument(
-        "BatchExecuteJobFromBatSchedMessage::"
-        "BatchExecuteJobFromBatSchedMessage(): Empty answer commport");
-  }
-  if (batsched_decision_reply.empty()) {
-    throw std::invalid_argument(
-        "BatchExecuteJobFromBatSchedMessage::"
-        "BatchExecuteJobFromBatSchedMessage(): Empty batsched decision reply");
-  }
+        if (answer_commport == nullptr) {
+            throw std::invalid_argument(
+                    "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty answer commport");
+        }
+        if (batsched_decision_reply.empty()) {
+            throw std::invalid_argument(
+                    "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty batsched decision reply");
+        }
 #endif
-  this->answer_commport = answer_commport;
-  this->batsched_decision_reply = std::move(batsched_decision_reply);
-}
+        this->answer_commport = answer_commport;
+        this->batsched_decision_reply = std::move(batsched_decision_reply);
+    }
 
-/**
- * @brief Constructor
- * @param estimated_job_start_time: the estimated job start time
- * @param payload: the message size in bytes
- *
- * @throw std::invalid_argument
- */
-BatchQueryAnswerMessage::BatchQueryAnswerMessage(
-    double estimated_job_start_time, double payload)
-    : BatchComputeServiceMessage(payload) {
-  this->estimated_start_time = estimated_job_start_time;
-}
+    /**
+     * @brief Constructor
+     * @param estimated_job_start_time: the estimated job start time
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    BatchQueryAnswerMessage::BatchQueryAnswerMessage(double estimated_job_start_time, double payload)
+        : BatchComputeServiceMessage(payload) {
+        this->estimated_start_time = estimated_job_start_time;
+    }
 
 #if 0
     /**
@@ -135,6 +132,7 @@ BatchQueryAnswerMessage::BatchQueryAnswerMessage(
     }
 #endif
 
+
 #if 0
     /**
      * @brief Constructor
@@ -148,52 +146,48 @@ BatchQueryAnswerMessage::BatchQueryAnswerMessage(
 
 #endif
 
-/**
- * @brief Constructor
- * @param answer_commport: the commport to which the answer should be sent back
- * @param job: the BatchComputeService job
- * @param payload: the message size in bytes
- *
- * @throw std::invalid_argument
- */
-BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(
-    S4U_CommPort *answer_commport, std::shared_ptr<BatchJob> job,
-    double payload)
-    : BatchComputeServiceMessage(payload) {
+    /**
+     * @brief Constructor
+     * @param answer_commport: the commport to which the answer should be sent back
+     * @param job: the BatchComputeService job
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(S4U_CommPort *answer_commport,
+                                                                               std::shared_ptr<BatchJob> job, double payload)
+        : BatchComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-  if (job == nullptr) {
-    throw std::invalid_argument(
-        "BatchComputeServiceJobRequestMessage::"
-        "BatchComputeServiceJobRequestMessage(): Invalid arguments");
-  }
-  if (answer_commport == nullptr) {
-    throw std::invalid_argument(
-        "BatchComputeServiceJobRequestMessage::"
-        "BatchComputeServiceJobRequestMessage(): Empty answer commport");
-  }
+        if (job == nullptr) {
+            throw std::invalid_argument(
+                    "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Invalid arguments");
+        }
+        if (answer_commport == nullptr) {
+            throw std::invalid_argument(
+                    "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Empty answer commport");
+        }
 #endif
-  this->answer_commport = answer_commport;
-  this->job = std::move(job);
-}
+        this->answer_commport = answer_commport;
+        this->job = std::move(job);
+    }
 
-/**
- * @brief Constructor
- * @param job: a BatchComputeService job
- * @param payload: the message size in bytes
- *
- * @throw std::invalid_arguments
- */
-AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job,
-                                               double payload)
-    : ServiceMessage(payload) {
+    /**
+     * @brief Constructor
+     * @param job: a BatchComputeService job
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_arguments
+     */
+    AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job, double payload)
+        : ServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-  if (job == nullptr) {
-    throw std::invalid_argument(
-        "AlarmJobTimeOutMessage::AlarmJobTimeOutMessage: Invalid argument");
-  }
+        if (job == nullptr) {
+            throw std::invalid_argument(
+                    "AlarmJobTimeOutMessage::AlarmJobTimeOutMessage: Invalid argument");
+        }
 #endif
-  this->job = std::move(job);
-}
+        this->job = std::move(job);
+    }
 
 #if 0
     /**
@@ -207,4 +201,4 @@ AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job,
             : ServiceMessage("ALARM_NOTIFY_BATSCHED", payload), job_id(job_id) {}
 #endif
 
-} // namespace wrench
+}// namespace wrench

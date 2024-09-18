@@ -15,15 +15,14 @@
 
 namespace wrench {
 
-/**
- * @brief Configurable properties for a VirtualizedClusterComputeService
- */
-class VirtualizedClusterComputeServiceProperty
-    : public CloudComputeServiceProperty {
+    /**
+     * @brief Configurable properties for a VirtualizedClusterComputeService
+     */
+    class VirtualizedClusterComputeServiceProperty : public CloudComputeServiceProperty {
 
-public:
-};
+    public:
+    };
 
-} // namespace wrench
+}// namespace wrench
 
-#endif // WRENCH_VIRTUALIZEDCLUSTERPROPERTY_H
+#endif//WRENCH_VIRTUALIZEDCLUSTERPROPERTY_H

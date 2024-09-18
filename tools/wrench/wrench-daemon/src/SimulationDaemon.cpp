@@ -7,15 +7,15 @@
  * (at your option) any later version.
  */
 
+#include <string>
+#include <utility>
+#include <thread>
 #include <boost/program_options.hpp>
 #include <nlohmann/json.hpp>
-#include <string>
-#include <thread>
-#include <utility>
 
-#include "REST_API.h"
 #include "SimulationController.h"
 #include "SimulationDaemon.h"
+#include "REST_API.h"
 
 using json = nlohmann::json;
 
@@ -23,38 +23,33 @@ using json = nlohmann::json;
  * @brief The Simulation Daemon's "main" method
  */
 void SimulationDaemon::run() {
-  // Set up GET request handler for the (likely useless) "alive" path
-  CROW_ROUTE(app, "/simulation/<string>/alive")
-      .methods("GET"_method)(
-          [this](const crow::request &req, const string &simid) {
-            crow::response res;
-            this->alive(req, res);
-            return res;
-          });
-  // Set up POST request handler for terminating simulation
-  CROW_ROUTE(app, "/simulation/<string>/terminateSimulation")
-      .methods("POST"_method)(
-          [this](const crow::request &req, const string &simid) {
-            crow::response res;
-            this->terminateSimulation(req, res);
-            return res;
-          });
+    // Set up GET request handler for the (likely useless) "alive" path
+    CROW_ROUTE(app, "/simulation/<string>/alive").methods("GET"_method)([this](const crow::request &req, const string &simid) {
+        crow::response res;
+        this->alive(req, res);
+        return res;
+    });
+    // Set up POST request handler for terminating simulation
+    CROW_ROUTE(app, "/simulation/<string>/terminateSimulation").methods("POST"_method)([this](const crow::request &req, const string &simid) {
+        crow::response res;
+        this->terminateSimulation(req, res);
+        return res;
+    });
 
-  // Set up ALL  request handlers for API calls
-  REST_API rest_api(
-      this->app,
-      [this](const crow::request &req) { this->displayRequest(req); },
-      this->simulation_controller);
+    // Set up ALL  request handlers for API calls
+    REST_API rest_api(
+            this->app,
+            [this](const crow::request &req) { this->displayRequest(req); },
+            this->simulation_controller);
 
-  if (daemon_logging) {
-    std::cerr << " PID " << getpid() << " listening on port "
-              << simulation_port_number << "\n";
-  }
+    if (daemon_logging) {
+        std::cerr << " PID " << getpid() << " listening on port " << simulation_port_number << "\n";
+    }
 
-  // Test ToDo: Investigate multi-threads later
-  app.port(simulation_port_number).run();
+    // Test ToDo: Investigate multi-threads later
+    app.port(simulation_port_number).run();
 
-  //    exit(0);
+    //    exit(0);
 }
 
 /**
@@ -66,36 +61,35 @@ void SimulationDaemon::run() {
  * @param simulation_thread the simulation thread
  */
 SimulationDaemon::SimulationDaemon(
-    bool daemon_logging, int simulation_port_number,
-    std::shared_ptr<wrench::SimulationController> simulation_controller,
-    std::thread &simulation_thread)
-    : daemon_logging(daemon_logging),
-      simulation_port_number(simulation_port_number),
-      simulation_controller(
-          std::move(std::move(std::move(simulation_controller)))),
-      simulation_thread(simulation_thread) {}
+        bool daemon_logging,
+        int simulation_port_number,
+        std::shared_ptr<wrench::SimulationController> simulation_controller,
+        std::thread &simulation_thread) : daemon_logging(daemon_logging),
+                                          simulation_port_number(simulation_port_number),
+                                          simulation_controller(std::move(std::move(std::move(simulation_controller)))),
+                                          simulation_thread(simulation_thread) {
+}
 
 /**
  * @brief Helper method for logging
  * @param req HTTP request
  */
 void SimulationDaemon::displayRequest(const crow::request &req) const {
-  unsigned long max_line_length = 120;
-  if (daemon_logging) {
-    std::cerr << req.url << " " << req.body.substr(0, max_line_length)
-              << (req.body.length() > max_line_length ? "..." : "")
-              << std::endl;
-  }
+    unsigned long max_line_length = 120;
+    if (daemon_logging) {
+        std::cerr << req.url << " " << req.body.substr(0, max_line_length)
+                  << (req.body.length() > max_line_length ? "..." : "") << std::endl;
+    }
 }
 
 void SimulationDaemon::alive(const crow::request &req, crow::response &res) {
-  SimulationDaemon::displayRequest(req);
+    SimulationDaemon::displayRequest(req);
 
-  // Create json answer
-  json answer;
-  answer["wrench_api_request_success"] = true;
-  answer["alive"] = true;
-  res.body = to_string(answer);
+    // Create json answer
+    json answer;
+    answer["wrench_api_request_success"] = true;
+    answer["alive"] = true;
+    res.body = to_string(answer);
 }
 
 /***********************
@@ -121,22 +115,21 @@ void SimulationDaemon::alive(const crow::request &req, crow::response &res) {
  * }
  * END_REST_API_DOCUMENTATION
  */
-void SimulationDaemon::terminateSimulation(const crow::request &req,
-                                           crow::response &res) {
-  displayRequest(req);
+void SimulationDaemon::terminateSimulation(const crow::request &req, crow::response &res) {
+    displayRequest(req);
 
-  // Stop the simulation thread and wait for it to have stopped
-  simulation_controller->stopSimulation();
-  simulation_thread.join();
+    // Stop the simulation thread and wait for it to have stopped
+    simulation_controller->stopSimulation();
+    simulation_thread.join();
 
-  // Create a json answer
-  json answer;
-  answer["wrench_api_request_success"] = true;
-  res.body = to_string(answer);
+    // Create a json answer
+    json answer;
+    answer["wrench_api_request_success"] = true;
+    res.body = to_string(answer);
 
-  app.stop();
-  if (daemon_logging) {
-    std::cerr << " PID " << getpid() << " terminated.\n";
-  }
-  exit(1);
+    app.stop();
+    if (daemon_logging) {
+        std::cerr << " PID " << getpid() << " terminated.\n";
+    }
+    exit(1);
 }
