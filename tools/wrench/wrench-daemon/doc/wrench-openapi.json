@@ -370,14 +370,8 @@
               }
             }
           },
-          "404": {
-            "description": "Task not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -445,14 +439,8 @@
               }
             }
           },
-          "404": {
-            "description": "Task not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -504,14 +492,8 @@
               }
             }
           },
-          "404": {
-            "description": "Task not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -579,14 +561,8 @@
               }
             }
           },
-          "404": {
-            "description": "Task not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -629,14 +605,8 @@
               }
             }
           },
-          "404": {
-            "description": "Task not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -679,14 +649,8 @@
               }
             }
           },
-          "404": {
-            "description": "Task not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -729,14 +693,8 @@
               }
             }
           },
-          "404": {
-            "description": "Task not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -790,14 +748,8 @@
               }
             }
           },
-          "404": {
-            "description": "Task not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -840,14 +792,8 @@
               }
             }
           },
-          "404": {
-            "description": "File not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -890,14 +836,61 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
+        }
+      }
+    },
+    "/simulation/{simid}/workflows/{workflow_name}/tasks/{task_name}/getState": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get a task's state",
+        "deprecated": false,
+        "operationId": "getTaskState",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
+          {
+            "name": "workflow_name",
+            "in": "path",
+            "description": "Name of the workflow",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "task_name",
+            "in": "path",
+            "description": "Name of the task",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StateResponse"
+                }
+              }
+            }
+          },
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -949,14 +942,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1008,14 +995,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1067,14 +1048,8 @@
               }
             }
           },
-          "404": {
-            "description": "Task not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1126,14 +1101,8 @@
               }
             }
           },
-          "404": {
-            "description": "Task not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1185,14 +1154,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1244,14 +1207,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1303,14 +1260,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1362,14 +1313,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2282,14 +2227,8 @@
               }
             }
           },
-          "404": {
-            "description": "Task not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2403,14 +2342,8 @@
               }
             }
           },
-          "404": {
-            "description": "Simulation or storage service not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2468,14 +2401,8 @@
               }
             }
           },
-          "404": {
-            "description": "Simulation or storage service not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2607,14 +2534,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2677,14 +2598,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2763,14 +2678,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2841,14 +2750,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2915,14 +2818,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2976,14 +2873,8 @@
               }
             }
           },
-          "404": {
-            "description": "Compound job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3050,14 +2941,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3120,14 +3005,61 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
+        }
+      }
+    },
+    "/simulation/{simid}/compoundJobs/{compound_job_name}/actions/{action_name}/getState": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get an action's state.",
+        "deprecated": false,
+        "operationId": "getActionState",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
+          {
+            "name": "compound_job_name",
+            "in": "path",
+            "description": "Name of the compound job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action_name",
+            "in": "path",
+            "description": "Name of the action",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StateResponse"
+                }
+              }
+            }
+          },
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3179,14 +3111,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3238,14 +3164,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3297,14 +3217,8 @@
               }
             }
           },
-          "404": {
-            "description": "Job not found",
-            "content": {}
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3390,10 +3304,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3444,10 +3356,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3498,10 +3408,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3552,10 +3460,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3606,10 +3512,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3660,10 +3564,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3714,10 +3616,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3768,10 +3668,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3822,10 +3720,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3876,10 +3772,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3930,10 +3824,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -3966,10 +3858,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -4054,10 +3944,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -4090,15 +3978,21 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     }
   },
   "components": {
+    "responses": {
+      "NotFound": {
+        "description": "Resource not found (invalid route?)"
+      },
+      "MethodNotAllowed": {
+        "description": "Method not allowed (invalid operation or input?)"
+      }
+    },
     "schemas": {
       "SimulationInput": {
         "type": "object",
@@ -4296,6 +4190,23 @@
               "type": "string"
             },
             "description": "The names of the workflow's files"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "StateResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "state": {
+            "type": "number",
+            "description": "A state as an integer"
           },
           "failure_cause": {
             "type": "string",
