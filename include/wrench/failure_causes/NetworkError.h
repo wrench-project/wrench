@@ -17,51 +17,58 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
 
-/**
- * @brief A "network error (or endpoint is down)" failure cause
- */
-class NetworkError : public FailureCause {
-public:
-  /** @brief Enumerated type to describe whether the network error occured
-   * while sending or receiving
-   */
-  enum OperationType { SENDING, RECEIVING };
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-  /** @brief Enumerated type to describe the type of the network error
-   */
-  enum ErrorType { TIMEOUT, FAILURE };
+    /**
+     * @brief A "network error (or endpoint is down)" failure cause
+     */
+    class NetworkError : public FailureCause {
+    public:
+        /** @brief Enumerated type to describe whether the network error occured
+         * while sending or receiving
+         */
+        enum OperationType {
+            SENDING,
+            RECEIVING
+        };
 
-  /***********************/
-  /** \cond INTERNAL     */
-  /***********************/
-  NetworkError(NetworkError::OperationType, NetworkError::ErrorType,
-               const std::string &commport_name,
-               const std::string &message_name);
-  /***********************/
-  /** \endcond           */
-  /***********************/
+        /** @brief Enumerated type to describe the type of the network error
+         */
+        enum ErrorType {
+            TIMEOUT,
+            FAILURE
+        };
 
-  std::string toString() override;
-  bool whileReceiving();
-  bool whileSending();
-  bool isTimeout();
-  std::string getCommPortName();
-  std::string getMessageName();
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        NetworkError(NetworkError::OperationType, NetworkError::ErrorType, const std::string &commport_name, const std::string &message_name);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-private:
-  NetworkError::OperationType operation_type;
-  NetworkError::ErrorType error_type;
-  std::string commport_name;
-  std::string message_name;
-};
+        std::string toString() override;
+        bool whileReceiving();
+        bool whileSending();
+        bool isTimeout();
+        std::string getCommPortName();
+        std::string getMessageName();
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
+    private:
+        NetworkError::OperationType operation_type;
+        NetworkError::ErrorType error_type;
+        std::string commport_name;
+        std::string message_name;
+    };
 
-#endif // WRENCH_NETWORK_ERROR_H
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
+
+
+#endif//WRENCH_NETWORK_ERROR_H

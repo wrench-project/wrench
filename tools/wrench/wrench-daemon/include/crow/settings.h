@@ -8,8 +8,7 @@
 /* #ifdef - enables logging */
 #define CROW_ENABLE_LOGGING
 
-/* #ifdef - enforces section 5.2 and 6.1 of RFC6455 (only accepting masked
- * messages from clients) */
+/* #ifdef - enforces section 5.2 and 6.1 of RFC6455 (only accepting masked messages from clients) */
 //#define CROW_ENFORCE_WS_SPEC
 
 /* #define - specifies log level */
@@ -63,7 +62,6 @@
 #if __cplusplus > 201103L
 #define CROW_GCC83_WORKAROUND
 #else
-#error                                                                         \
-    "GCC 8.1 - 8.3 has a bug that prevents Crow from compiling with C++11. Please update GCC to > 8.3 or use C++ > 11."
+#error "GCC 8.1 - 8.3 has a bug that prevents Crow from compiling with C++11. Please update GCC to > 8.3 or use C++ > 11."
 #endif
 #endif

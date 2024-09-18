@@ -8,129 +8,121 @@
  *
  */
 
+
 #ifndef WRENCH_MEMORYMANAGER_H
 #define WRENCH_MEMORYMANAGER_H
 
-#include "Block.h"
+#include <string>
 #include "wrench/services/Service.h"
 #include "wrench/simulation/Simulation.h"
-#include <string>
+#include "Block.h"
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL    */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL    */
+    /***********************/
 
-/**
- * @brief A class that implemnets a MemoryManager service to simulate Linux
- * in-memory page caching for I/O operations
- */
-class MemoryManager : public Service {
+    /**
+     * @brief A class that implemnets a MemoryManager service to simulate Linux in-memory 
+     * page caching for I/O operations
+     */
+    class MemoryManager : public Service {
 
-public:
-private:
-  simgrid::s4u::Disk *memory;
-  double dirty_ratio;
-  int interval;
-  int expired_time;
-  std::vector<Block *> inactive_list;
-  std::vector<Block *> active_list;
-  double total;
+    public:
+    private:
+        simgrid::s4u::Disk *memory;
+        double dirty_ratio;
+        int interval;
+        int expired_time;
+        std::vector<Block *> inactive_list;
+        std::vector<Block *> active_list;
+        double total;
 
-  // We keep track of these properties since we don't want to traverse through
-  // two LRU lists to get them.
-  double free;
-  double cached;
-  double dirty;
+        // We keep track of these properties since we don't want to traverse through two LRU lists to get them.
+        double free;
+        double cached;
+        double dirty;
 
-  std::vector<double> time_log;
-  std::vector<double> dirty_log;
-  std::vector<double> cached_log;
-  std::vector<double> free_log;
+        std::vector<double> time_log;
+        std::vector<double> dirty_log;
+        std::vector<double> cached_log;
+        std::vector<double> free_log;
 
-  MemoryManager(simgrid::s4u::Disk *memory, double dirty_ratio, int interval,
-                int expired_time, std::string hostname);
 
-  int main() override;
+        MemoryManager(simgrid::s4u::Disk *memory, double dirty_ratio, int interval, int expired_time, std::string hostname);
 
-  void balanceLruLists();
+        int main() override;
 
-  double pdflush();
+        void balanceLruLists();
 
-  double flushExpiredData(std::vector<Block *> &list);
+        double pdflush();
 
-  double flushLruList(std::vector<Block *> &list, double amount,
-                      const std::string &excluded_filename);
+        double flushExpiredData(std::vector<Block *> &list);
 
-  double evictLruList(std::vector<Block *> &lru_list, double amount,
-                      std::string excluded_filename);
+        double flushLruList(std::vector<Block *> &list, double amount, const std::string &excluded_filename);
 
-public:
-  static std::shared_ptr<MemoryManager>
-  initAndStart(Simulation *simulation, simgrid::s4u::Disk *memory,
-               double dirty_ratio, int interval, int expired_time,
-               std::string hostname);
+        double evictLruList(std::vector<Block *> &lru_list, double amount, std::string excluded_filename);
 
-  void kill();
+    public:
+        static std::shared_ptr<MemoryManager> initAndStart(Simulation *simulation, simgrid::s4u::Disk *memory,
+                                                           double dirty_ratio, int interval, int expired_time,
+                                                           std::string hostname);
 
-  simgrid::s4u::Disk *getMemory() const;
+        void kill();
 
-  void setMemory(simgrid::s4u::Disk *memory);
+        simgrid::s4u::Disk *getMemory() const;
 
-  double getDirtyRatio() const;
+        void setMemory(simgrid::s4u::Disk *memory);
 
-  void setDirtyRatio(double dirty_ratio);
+        double getDirtyRatio() const;
 
-  double getFreeMemory() const;
+        void setDirtyRatio(double dirty_ratio);
 
-  void releaseMemory(double released_amt);
+        double getFreeMemory() const;
 
-  void useAnonymousMemory(double used_amt);
+        void releaseMemory(double released_amt);
 
-  double getTotalCachedAmount() const;
+        void useAnonymousMemory(double used_amt);
 
-  double getDirty() const;
+        double getTotalCachedAmount() const;
 
-  double getEvictableMemory();
+        double getDirty() const;
 
-  double getAvailableMemory();
+        double getEvictableMemory();
 
-  double getTotalMemory();
+        double getAvailableMemory();
 
-  double flush(double amount, const std::string &excluded_filename);
+        double getTotalMemory();
 
-  double evict(double amount, std::string excluded_filename);
+        double flush(double amount, const std::string &excluded_filename);
 
-  simgrid::s4u::IoPtr readToCache(std::string filename,
-                                  std::shared_ptr<FileLocation> location,
-                                  double amount, bool async);
+        double evict(double amount, std::string excluded_filename);
 
-  void readChunkFromCache(std::string filename, double amount);
+        simgrid::s4u::IoPtr readToCache(std::string filename, std::shared_ptr<FileLocation> location,
+                                        double amount, bool async);
 
-  void writebackToCache(std::string filename,
-                        std::shared_ptr<FileLocation> location, double amount,
-                        bool is_dirty);
+        void readChunkFromCache(std::string filename, double amount);
 
-  void addToCache(std::string filename, std::shared_ptr<FileLocation> location,
-                  double amount, bool is_dirty);
+        void writebackToCache(std::string filename, std::shared_ptr<FileLocation> location, double amount, bool is_dirty);
 
-  double getCachedAmount(std::string filename);
+        void addToCache(std::string filename, std::shared_ptr<FileLocation> location, double amount, bool is_dirty);
 
-  std::vector<Block *> getCachedBlocks(std::string filename);
+        double getCachedAmount(std::string filename);
 
-  static simgrid::s4u::Disk *getDisk(std::string mountpoint,
-                                     std::string hostname);
+        std::vector<Block *> getCachedBlocks(std::string filename);
 
-  void log();
+        static simgrid::s4u::Disk *getDisk(std::string mountpoint, std::string hostname);
 
-  void export_log(std::string filename);
+        void log();
 
-  /***********************/
-  /** \endcond          */
-  /***********************/
-};
+        void export_log(std::string filename);
 
-} // namespace wrench
+        /***********************/
+        /** \endcond          */
+        /***********************/
+    };
 
-#endif // WRENCH_MEMORYMANAGER_H
+}// namespace wrench
+
+#endif//WRENCH_MEMORYMANAGER_H

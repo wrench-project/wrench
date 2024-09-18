@@ -9,10 +9,10 @@
 
 #include <wrench/services/compute/cloud/CloudComputeServiceProperty.h>
 
+
 namespace wrench {
 
-SET_PROPERTY_NAME(CloudComputeServiceProperty, VM_BOOT_OVERHEAD);
-SET_PROPERTY_NAME(CloudComputeServiceProperty,
-                  VM_RESOURCE_ALLOCATION_ALGORITHM);
+    SET_PROPERTY_NAME(CloudComputeServiceProperty, VM_BOOT_OVERHEAD);
+    SET_PROPERTY_NAME(CloudComputeServiceProperty, VM_RESOURCE_ALLOCATION_ALGORITHM);
 
-} // namespace wrench
+}// namespace wrench

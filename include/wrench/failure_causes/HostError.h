@@ -14,39 +14,40 @@
 #include <string>
 
 #include "wrench/services/Service.h"
-#include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/storage/StorageService.h"
+#include "wrench/services/compute/ComputeService.h"
 
 namespace wrench {
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief A "host error" failure cause (e.g., attempted to start a daemon on a
- * host that is off)
- */
-class HostError : public FailureCause {
-public:
-  /***********************/
-  /** \cond INTERNAL     */
-  /***********************/
-  HostError(std::string hostname);
+    /**
+     * @brief A "host error" failure cause (e.g., attempted to start a daemon on a host that is off)
+     */
+    class HostError : public FailureCause {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        HostError(std::string hostname);
 
-  /***********************/
-  /** \endcond           */
-  /***********************/
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-  std::string toString() override;
+        std::string toString() override;
 
-private:
-  std::string hostname;
-};
+    private:
+        std::string hostname;
+    };
 
-/***********************/
-/** \endcond           */
-/***********************/
-} // namespace wrench
 
-#endif // WRENCH_HOST_ERROR_H
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
+
+
+#endif//WRENCH_HOST_ERROR_H

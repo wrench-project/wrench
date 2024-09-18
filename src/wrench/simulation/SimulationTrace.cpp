@@ -9,4 +9,6 @@
 
 #include <wrench/simulation/SimulationTrace.h>
 
-namespace wrench {};
+namespace wrench {
+
+};

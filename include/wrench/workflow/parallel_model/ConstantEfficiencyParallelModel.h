@@ -16,37 +16,35 @@
 
 namespace wrench {
 
-/**
- * @brief A class the implemens a constant-efficiency parallel task performance
- * model
- */
-class ConstantEfficiencyParallelModel : public ParallelModel {
+    /**
+     * @brief A class the implemens a constant-efficiency parallel task performance model
+     */
+    class ConstantEfficiencyParallelModel : public ParallelModel {
 
-public:
-  double getEfficiency() const;
-  void setEfficiency(double efficiency);
+    public:
+        double getEfficiency() const;
+        void setEfficiency(double efficiency);
 
-  /***********************/
-  /** \cond INTERNAL    **/
-  /***********************/
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
 
-  double getPurelySequentialWork(double total_work,
-                                 unsigned long num_threads) override;
-  double getParallelPerThreadWork(double total_work,
-                                  unsigned long num_threads) override;
-  ~ConstantEfficiencyParallelModel() override {}
+        double getPurelySequentialWork(double total_work, unsigned long num_threads) override;
+        double getParallelPerThreadWork(double total_work, unsigned long num_threads) override;
+        ~ConstantEfficiencyParallelModel() override {}
 
-  /***********************/
-  /** \endcond          **/
-  /***********************/
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
-private:
-  friend class ParallelModel;
+    private:
+        friend class ParallelModel;
 
-  ConstantEfficiencyParallelModel(double efficiency);
-  double efficiency; // Parallel efficiency
-};
+        ConstantEfficiencyParallelModel(double efficiency);
+        double efficiency;// Parallel efficiency
+    };
 
-} // namespace wrench
 
-#endif // WRENCH_CONSTANTEFFICIENCYPARALLELMODEL_H
+}// namespace wrench
+
+#endif//WRENCH_CONSTANTEFFICIENCYPARALLELMODEL_H

@@ -10,42 +10,41 @@
 #ifndef WRENCH_ACTION_EXECUTION_SERVICE_PROPERTY_H
 #define WRENCH_ACTION_EXECUTION_SERVICE_PROPERTY_H
 
+
 #include "wrench/services/ServiceProperty.h"
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
-/**
- * @brief Configurable properties for a ActionExecutionService
- */
-class ActionExecutionServiceProperty : public ServiceProperty {
+    /**
+     * @brief Configurable properties for a ActionExecutionService
+     */
+    class ActionExecutionServiceProperty : public ServiceProperty {
 
-public:
-  /** @brief The ActionExecutionService's overhead for creating a thread
-   *(Default value: "0", Default unit: second). Example: "1s", "14ms", "0.12s"
-   **/
-  DECLARE_PROPERTY_NAME(THREAD_CREATION_OVERHEAD);
+    public:
+        /** @brief The ActionExecutionService's overhead for creating a thread (Default value: "0", Default unit: second).
+         *         Example: "1s", "14ms", "0.12s"
+         **/
+        DECLARE_PROPERTY_NAME(THREAD_CREATION_OVERHEAD);
 
-  /** @brief Whether the ActionExecutionService should simulation computations
-   * as sleep **/
-  DECLARE_PROPERTY_NAME(SIMULATE_COMPUTATION_AS_SLEEP);
+        /** @brief Whether the ActionExecutionService should simulation computations as sleep **/
+        DECLARE_PROPERTY_NAME(SIMULATE_COMPUTATION_AS_SLEEP);
 
-  /** @brief Whether the ActionExecutionService should terminate if all its
-   * hosts are down **/
-  DECLARE_PROPERTY_NAME(TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
+        /** @brief Whether the ActionExecutionService should terminate if all its hosts are down **/
+        DECLARE_PROPERTY_NAME(TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
 
-  /** @brief If true, fail action after an executor crash, otherwise re-ready it
-   * and try again  **/
-  DECLARE_PROPERTY_NAME(FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH);
-};
+        /** @brief If true, fail action after an executor crash, otherwise re-ready it and try again  **/
+        DECLARE_PROPERTY_NAME(FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH);
+    };
 
-/***********************/
-/** \endcond           */
-/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
-} // namespace wrench
+}// namespace wrench
 
-#endif // WRENCH_ACTION_EXECUTION_SERVICE_PROPERTY_H
+
+#endif//WRENCH_ACTION_EXECUTION_SERVICE_PROPERTY_H

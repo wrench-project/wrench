@@ -10,160 +10,155 @@
 #ifndef WRENCH_ACTION_H
 #define WRENCH_ACTION_H
 
-#include <iostream>
 #include <memory>
+#include <string>
 #include <set>
 #include <stack>
-#include <string>
+#include <iostream>
 
 namespace wrench {
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
 
-class CompoundJob;
-class FailureCause;
-class ActionExecutor;
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-/**
- * @brief An abstract class that implements the concept of an action
- */
-class Action : public std::enable_shared_from_this<Action> {
+    class CompoundJob;
+    class FailureCause;
+    class ActionExecutor;
 
-public:
-  /** @brief Action states */
-  enum State {
-    /** @brief Not ready (not ready, because depends on other actions) */
-    NOT_READY,
-    /** @brief Ready (ready to execute) */
-    READY,
-    /** @brief Started (is being executed) */
-    STARTED,
-    /** @brief Completed (successfully completed) */
-    COMPLETED,
-    /** @brief Killed (due to user actions, service being terminated, etc.) */
-    KILLED,
-    /** @brief Failed (has failed) */
-    FAILED
-  };
+    /**
+     * @brief An abstract class that implements the concept of an action
+     */
+    class Action : public std::enable_shared_from_this<Action> {
 
-  const std::string &getName() const;
-  std::shared_ptr<CompoundJob> getJob() const;
-  Action::State getState() const;
-  std::string getStateAsString() const;
-  static std::string stateToString(Action::State state);
+    public:
+        /** @brief Action states */
+        enum State {
+            /** @brief Not ready (not ready, because depends on other actions) */
+            NOT_READY,
+            /** @brief Ready (ready to execute) */
+            READY,
+            /** @brief Started (is being executed) */
+            STARTED,
+            /** @brief Completed (successfully completed) */
+            COMPLETED,
+            /** @brief Killed (due to user actions, service being terminated, etc.) */
+            KILLED,
+            /** @brief Failed (has failed) */
+            FAILED
+        };
 
-  double getStartDate() const;
-  double getEndDate() const;
-  std::shared_ptr<FailureCause> getFailureCause() const;
+        const std::string &getName() const;
+        std::shared_ptr<CompoundJob> getJob() const;
+        Action::State getState() const;
+        std::string getStateAsString() const;
+        static std::string stateToString(Action::State state);
 
-  std::set<std::shared_ptr<Action>> getChildren();
+        double getStartDate() const;
+        double getEndDate() const;
+        std::shared_ptr<FailureCause> getFailureCause() const;
 
-  std::set<std::shared_ptr<Action>> getParents();
+        std::set<std::shared_ptr<Action>> getChildren();
 
-  virtual unsigned long getMinNumCores() const;
-  virtual unsigned long getMaxNumCores() const;
-  virtual double getMinRAMFootprint() const;
+        std::set<std::shared_ptr<Action>> getParents();
 
-  virtual bool usesScratch() const;
+        virtual unsigned long getMinNumCores() const;
+        virtual unsigned long getMaxNumCores() const;
+        virtual double getMinRAMFootprint() const;
 
-  void setPriority(double priority);
-  double getPriority() const;
+        virtual bool usesScratch() const;
 
-  static std::string
-  getActionTypeAsString(const std::shared_ptr<Action> &action);
+        void setPriority(double priority);
+        double getPriority() const;
 
-  /**
-   * @brief A data structure that keeps track of an action's execution(s)
-   */
-  struct ActionExecution {
-    /** @brief start date **/
-    double start_date = -1.0;
-    /** @brief end date **/
-    double end_date = -1.0;
-    /** @brief final state **/
-    Action::State state;
-    /** @brief execution host (could be a virtual host)**/
-    std::string execution_host;
-    /** @brief physical execution host **/
-    std::string physical_execution_host;
-    /** @brief Number of allocated cores **/
-    unsigned long num_cores_allocated = 0;
-    /** @brief RAM allocated cores **/
-    double ram_allocated = 0;
-    /** @brief Failure cause (if applicable) **/
-    std::shared_ptr<FailureCause> failure_cause;
-  };
+        static std::string getActionTypeAsString(const std::shared_ptr<Action> &action);
 
-  std::stack<Action::ActionExecution> &getExecutionHistory();
+        /**
+         * @brief A data structure that keeps track of an action's execution(s)
+         */
+        struct ActionExecution {
+            /** @brief start date **/
+            double start_date = -1.0;
+            /** @brief end date **/
+            double end_date = -1.0;
+            /** @brief final state **/
+            Action::State state;
+            /** @brief execution host (could be a virtual host)**/
+            std::string execution_host;
+            /** @brief physical execution host **/
+            std::string physical_execution_host;
+            /** @brief Number of allocated cores **/
+            unsigned long num_cores_allocated = 0;
+            /** @brief RAM allocated cores **/
+            double ram_allocated = 0;
+            /** @brief Failure cause (if applicable) **/
+            std::shared_ptr<FailureCause> failure_cause;
+        };
 
-  /**
-   * @brief Get the shared pointer for this object
-   * @return a shared pointer to the object
-   */
-  std::shared_ptr<Action> getSharedPtr() { return this->shared_from_this(); }
+        std::stack<Action::ActionExecution> &getExecutionHistory();
 
-protected:
-  friend class CompoundJob;
-  friend class ActionExecutor;
-  friend class ActionExecutionService;
-  friend class BareMetalComputeService; // this is a bit unfortunate (to call
-                                        // setFailureCause - perhaps go through
-                                        // CompoundJob?)
-  friend class BatchComputeService;     // this is a bit unfortunate (to call
-                                        // setFailureCause - perhaps go through
-                                        // CompoundJob?)
+        /**
+         * @brief Get the shared pointer for this object
+         * @return a shared pointer to the object
+         */
+        std::shared_ptr<Action> getSharedPtr() { return this->shared_from_this(); }
 
-  void newExecution(Action::State state);
+    protected:
+        friend class CompoundJob;
+        friend class ActionExecutor;
+        friend class ActionExecutionService;
+        friend class BareMetalComputeService;// this is a bit unfortunate (to call setFailureCause - perhaps go through CompoundJob?)
+        friend class BatchComputeService;    // this is a bit unfortunate (to call setFailureCause - perhaps go through CompoundJob?)
 
-  void setStartDate(double date);
-  void setEndDate(double date);
-  void setState(Action::State new_state);
-  void setExecutionHost(const std::string &host);
-  void setNumCoresAllocated(unsigned long num_cores);
-  void setRAMAllocated(double ram);
-  void setFailureCause(const std::shared_ptr<FailureCause> &failure_cause);
+        void newExecution(Action::State state);
 
-  virtual ~Action();
+        void setStartDate(double date);
+        void setEndDate(double date);
+        void setState(Action::State new_state);
+        void setExecutionHost(const std::string &host);
+        void setNumCoresAllocated(unsigned long num_cores);
+        void setRAMAllocated(double ram);
+        void setFailureCause(const std::shared_ptr<FailureCause> &failure_cause);
 
-  Action(const std::string &name, const std::string &prefix);
+        virtual ~Action();
 
-  /**
-   * @brief Method to execute the task
-   * @param action_executor: the executor that executes this action
-   */
-  virtual void
-  execute(const std::shared_ptr<ActionExecutor> &action_executor) = 0;
-  /**
-   * @brief Method called when the task terminates
-   * @param action_executor:  the executor that executes this action
-   */
-  virtual void
-  terminate(const std::shared_ptr<ActionExecutor> &action_executor) = 0;
+        Action(const std::string &name, const std::string &prefix);
 
-  void updateState();
+        /**
+        * @brief Method to execute the task
+        * @param action_executor: the executor that executes this action
+        */
+        virtual void execute(const std::shared_ptr<ActionExecutor> &action_executor) = 0;
+        /**
+         * @brief Method called when the task terminates
+         * @param action_executor:  the executor that executes this action
+         */
+        virtual void terminate(const std::shared_ptr<ActionExecutor> &action_executor) = 0;
 
-private:
-  std::set<Action *> parents;
-  std::set<Action *> children;
+        void updateState();
 
-  double priority;
+    private:
+        std::set<Action *> parents;
+        std::set<Action *> children;
 
-  std::string name;
-  std::weak_ptr<CompoundJob> job;
+        double priority;
 
-  std::map<std::string, std::string> service_specific_arguments;
+        std::string name;
+        std::weak_ptr<CompoundJob> job;
 
-  static unsigned long getNewUniqueNumber();
+        std::map<std::string, std::string> service_specific_arguments;
 
-  std::stack<ActionExecution> execution_history;
-};
+        static unsigned long getNewUniqueNumber();
 
-/***********************/
-/** \endcond           */
-/***********************/
+        std::stack<ActionExecution> execution_history;
+    };
 
-} // namespace wrench
 
-#endif // WRENCH_ACTION_H
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
+}// namespace wrench
+
+#endif//WRENCH_ACTION_H

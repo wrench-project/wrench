@@ -17,24 +17,24 @@ WRENCH_LOG_CATEGORY(wrench_core_fatal_failure, "Log category for FatalFailure");
 
 namespace wrench {
 
-/**
- * @brief Constructor
- * @param message: the failure message
- */
-FatalFailure::FatalFailure(std::string message) {
-  this->message = std::move(message);
-}
+    /**
+    * @brief Constructor
+    * @param message: the failure message
+    */
+    FatalFailure::FatalFailure(std::string message) {
+        this->message = std::move(message);
+    }
 
-/**
- * @brief Get the human-readable failure message
- * @return the message
- */
-std::string FatalFailure::toString() {
-  if (this->message.empty()) {
-    return std::string("Internal implementation failure, likely a WRENCH bug");
-  } else {
-    return std::string(this->message + " (internal implementation failure)");
-  }
-}
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string FatalFailure::toString() {
+        if (this->message.empty()) {
+            return std::string("Internal implementation failure, likely a WRENCH bug");
+        } else {
+            return std::string(this->message + " (internal implementation failure)");
+        }
+    }
 
-} // namespace wrench
+}// namespace wrench
