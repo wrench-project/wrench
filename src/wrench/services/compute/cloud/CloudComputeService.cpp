@@ -61,6 +61,9 @@ namespace wrench {
         // Initialize internal data structures
         this->execution_hosts = execution_hosts;
         for (auto const &h: this->execution_hosts) {
+            if (not S4U_Simulation::hostExists(h)) {
+                throw std::invalid_argument("CloudComputeService::CloudComputeService(): unknown host " + h);
+            }
             this->used_ram_per_execution_host[h] = 0;
             this->used_cores_per_execution_host[h] = 0;
         }
