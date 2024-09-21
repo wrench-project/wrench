@@ -5,7 +5,18 @@ WRENCH Release Notes
 
 Nothing new yet
 
+### wrench 2.3
+
+(Sepember 10, 2024) this release includes **minor enhancements and upgrades**. More specifically:
+
+- More full-feature REST API that gives access to the Action API in addition to the Workflow API
+- Upgrade to SimGrid v3.36, which comes with several bug fixes
+- Upgrade to WfCommon's WfFormat 1.5
+- Countless minor bug fixes and code updates
+
 ### wrench 2.2
+
+(July 20, 2023) this release includes **a new REST API**, **new StorageService implementations**, and **fast simulation of zero-size messages**. More specifically:
 
 - Implementation of `wrench-daemon`, which can be started on the local machine and supports a REST API so that users can create and run simulations in a language-agnostic manner.
 - Implementation of non-bufferized (i.e., buffer size of zero) storage services, which is transparent to the user but can vastly reduce simulation time by using a fluid (rather than message-based) model for how storage services read/write data to/from disk while sending/receiving that same data to/from the network. 
@@ -18,7 +29,7 @@ Nothing new yet
 
 ### wrench 2.1
 
-(october 7, 2022) this release include **a new storage service implementation**, **performance enhancements**, and **minor bug fixes**. More specifically:
+(October 7, 2022) this release includes **a new storage service implementation**, **performance enhancements**, and **minor bug fixes**. More specifically:
 
 - implementation of a new storage service for the simulation of the [XRootD](https://xrootd.slac.stanford.edu/) storage system, along with implementation and examples.
 - performance and scalability improvements that reduce memory footprint and simulation execution time. 
