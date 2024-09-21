@@ -68,6 +68,7 @@ namespace wrench {
 
         unsigned long getNumLevels();
 
+        double getStartDate();
         double getCompletionDate();
 
         std::vector<std::shared_ptr<DataFile>> getInputFiles() const;

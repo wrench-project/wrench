@@ -25,7 +25,7 @@ namespace wrench {
 
     public:
         /**
-         * @brief Create an abstract workflow based on a JSON file in the WfFormat (version 1.4) from WfCommons. This method
+         * @brief Create an abstract workflow based on a JSON file in the WfFormat (version 1.5) from WfCommons. This method
          *        makes executive decisions when information in the JSON file is incomplete and/or contradictory. Pass true
          *        as the last argument to see all warnings on stderr.
          *
@@ -78,7 +78,7 @@ namespace wrench {
 
 
         /**
-         * @brief Create an abstract workflow based on a JSON file in the WfFormat (version 1.4) from WfCommons. This method
+         * @brief Create an abstract workflow based on a JSON file in the WfFormat (version 1.5) from WfCommons. This method
          *        makes executive decisions when information in the JSON file is incomplete and/or contradictory. Pass true
          *        as the last argument to see all warnings on stderr.
          *
@@ -128,7 +128,18 @@ namespace wrench {
                                                                       bool enforce_num_cores = false,
                                                                       bool ignore_avg_cpu = false,
                                                                       bool show_warnings = false);
+
+        /**
+         * @brief Method to create a JSON string in the WfFormat (version 1.5) from WfCommons, from a workflow object.
+         *
+         * @param workflow: a workflow
+         * @return a JSON string
+         */
+        static std::string createJSONStringFromWorkflow(std::shared_ptr<Workflow> workflow);
+
     };
+
+
 
 }// namespace wrench
 
