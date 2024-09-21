@@ -12,31 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  format:
-    name: "Code Formatting"
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: DoozyX/clang-format-lint-action@v0.13
-        with:
-          source: '.'
-          exclude: './doc'
-          extensions: 'h,cpp'
-          clangFormatVersion: 13
-          inplace: True
-      - uses: EndBug/add-and-commit@v4
-        with:
-          message: 'Committing clang-format changes'
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-
   build:
     runs-on: ubuntu-latest
     if: ${{ always() }}
-    needs: format
-
     strategy:
       matrix:
         include:
@@ -49,7 +27,6 @@ jobs:
             DIST: debian-bookworm
             COMPILER: gcc12
             batsched: off
-
 
           - build: "Ubuntu Jammy Jellyfish - clang++-14"
             DIST: ubuntu-jammy
@@ -94,7 +71,7 @@ jobs:
           docker exec wrench mkdir wrench/build;
           # build and test wrench
           docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
-          docker exec -w /home/wrench/wrench/build wrench make all unit_tests examples;
+          docker exec -w /home/wrench/wrench/build wrench make all unit_tests examples wrench-daemon;
           docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
           docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh wrench-example-batch-smpi-action;
 

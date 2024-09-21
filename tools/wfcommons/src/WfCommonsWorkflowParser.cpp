@@ -199,6 +199,10 @@ namespace wrench {
             } catch (nlohmann::json::out_of_range &e) {
                 // do nothing
             }
+            if (num_cores <= 0) {
+                if (show_warnings) std::cerr << "[WARNING]: Task " << task->getID() << " specifies an invalid number of cores (" + std::to_string(num_cores) + "): Assuming 1 core instead.\n";
+                num_cores = 1;
+            }
 
             double runtimeInSeconds = task_exec.at("runtimeInSeconds");
             // Scale runtime based on avgCPU unless disabled

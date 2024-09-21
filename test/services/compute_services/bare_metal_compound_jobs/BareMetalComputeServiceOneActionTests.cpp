@@ -403,6 +403,12 @@ private:
         job->getPriority();     // coverage
         job->getStateAsString();// coverage
         auto action = job->addSleepAction("my_sleep", 10.0);
+        auto same_action = job->getActionByName("my_sleep");
+        try {
+            auto bogus_action = job->getActionByName("bogus");
+            throw std::runtime_error("Should not be able to lookup by name an action that doesn't exist");
+        } catch (std::invalid_argument &ignore) {}
+
         job_manager->submitJob(job, this->test->compute_service, {});
         job->getStateAsString();// coverage
 

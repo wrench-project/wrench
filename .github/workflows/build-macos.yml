@@ -44,23 +44,15 @@ jobs:
       - name: Install googletest
         run: |
           brew install googletest
-#      - name: Install Python
-#        run: |
-#          brew install python
-#      - name: Fix fortran
-#        run: |
-#         ls /opt/homebrew/bin/*gfortran*
-#         ls /opt/homebrew/lib/*gfortran*
-#         ls /usr/local/lib/*gfortran*
       - name: Install boost
         run: |
           brew install sbt
           brew install boost
       - name: Install Simgrid
         run: |
-          git clone https://framagit.org/simgrid/simgrid.git
-          cd simgrid
-          git checkout 98331a543f36f7991a92affa966a8f162c240984
+          wget --no-check-certificate https://framagit.org/simgrid/simgrid/-/archive/v3.36/simgrid-v3.36.tar.gz
+          tar -xf simgrid-v3.36.tar.gz
+          cd simgrid-v3.36
           cmake .
           make -j4
           sudo make install
