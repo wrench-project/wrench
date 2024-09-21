@@ -1,4 +1,12 @@
-import json, re, jsonref, sys
+import json
+import re
+import sys
+
+try:
+    import jsonref
+except ImportError as e:
+    print("Error: The module 'jsonref' is not installed.")
+    print("Please install it using: pip install jsonref")
 
 
 

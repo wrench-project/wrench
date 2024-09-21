@@ -395,7 +395,7 @@ namespace wrench {
 
         // Select the "best" host
         double lowest_load = DBL_MAX;
-        simgrid::s4u::Host *picked_host;
+        simgrid::s4u::Host *picked_host = nullptr;
         unsigned long picked_num_cores = 0;
         for (auto const &h: possible_hosts) {
             unsigned long num_running_threads = this->running_thread_counts[h];

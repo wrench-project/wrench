@@ -527,6 +527,20 @@ namespace wrench {
     }
 
     /**
+     * @brief Returns an action in the job's given its name (or throws std::invalid_argument)
+     * @param name: an action name
+     * @return an action
+     */
+    std::shared_ptr<Action> CompoundJob::getActionByName(const std::string &name) {
+        for (auto const &action: this->actions) {
+            if (action->getName() == name) {
+                return action;
+            }
+        }
+        throw std::invalid_argument("CompoundJob::getActionByName(): No action with name " + name);
+    }
+
+    /**
      * @brief Print the task map
      */
     void CompoundJob::printTaskMap() {
