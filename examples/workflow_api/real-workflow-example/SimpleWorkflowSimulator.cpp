@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
      * which files can be written and read.  This particular storage service, which is an instance
      * of wrench::SimpleStorageService, is started on WMSHost in the
      * platform (platform/batch_platform.xml), which has an attached disk called large_disk. The SimpleStorageService
-     * is a bare bone storage service implementation provided by WRENCH.
+     * is a bare-bone storage service implementation provided by WRENCH.
      * Throughout the simulation execution, input/output files of workflow tasks will be located
      * in this storage service.
      */
