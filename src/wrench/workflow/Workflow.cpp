@@ -666,17 +666,33 @@ namespace wrench {
      *        If the workflow has not completed)
      */
     double Workflow::getCompletionDate() {
-        double makespan = -1.0;
+        double completion_date = -1.0;
         for (auto const &task: this->tasks) {
             if (task.second->getState() != WorkflowTask::State::COMPLETED) {
-                makespan = -1.0;
+                completion_date = -1.0;
                 break;
             } else {
-                makespan = std::max<double>(makespan, task.second->getEndDate());
+                completion_date = std::max<double>(completion_date, task.second->getEndDate());
             }
         }
-        return makespan;
+        return completion_date;
     }
+
+    /**
+     * @brief Returns the workflow's start date
+     * @return a date in seconds (or a negative value
+     *        if no workflow task has successfully completed)
+     */
+    double Workflow::getStartDate() {
+        double start_date = -1.0;
+        for (auto const &task: this->tasks) {
+            if (task.second->getState() == WorkflowTask::State::COMPLETED) {
+                start_date = std::min<double>(start_date, task.second->getStartDate());
+            }
+        }
+        return start_date;
+    }
+
 
     /**
      * @brief Get the workflow task for which a file is an output
