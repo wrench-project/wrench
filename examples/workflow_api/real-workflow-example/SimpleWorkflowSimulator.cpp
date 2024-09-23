@@ -12,6 +12,8 @@
 
 #include "SimpleWMS.h"
 #include <wrench/tools/wfcommons/WfCommonsWorkflowParser.h>
+#include <iostream>
+#include <fstream>
 
 
 /**
@@ -206,6 +208,15 @@ int main(int argc, char **argv) {
 
     std::cerr << "Number of tasks that failed at least once: " << num_failed_tasks << "\n";
     std::cerr << "Average computation time / communication+IO time ratio over all tasks: " << computation_communication_ratio_average << "\n";
+
+    /* Exporting the workflow to a WfFormat instance, just for kicks
+     */
+    std::string json_string = wrench::WfCommonsWorkflowParser::createJSONStringFromWorkflow(workflow);
+    std::string output_file_path = "/tmp/output_workflow.json";
+    std::ofstream output_file(output_file_path);
+    output_file << json_string << std::endl;
+    output_file.close();
+    std::cerr << "Output WfFormat workflow instance written to " << output_file_path << std::endl;
 
     return 0;
 }
