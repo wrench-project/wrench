@@ -373,6 +373,7 @@ namespace wrench {
 //            fs->createDirectory(path_at_mount_point);
 //        }
 
+
         // Reply with a "go ahead, send me the file" message
         answer_commport->dputMessage(
                 new StorageServiceFileWriteAnswerMessage(
