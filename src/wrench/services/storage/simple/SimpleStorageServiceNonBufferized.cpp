@@ -321,7 +321,6 @@ namespace wrench {
         }
 
         auto file = location->getFile();
-//        LogicalFileSystem *fs;
 
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
@@ -368,11 +367,10 @@ namespace wrench {
             return true;
         }
 
-//        // Create directory if need be
-//        if (not fs->doesDirectoryExist(path_at_mount_point)) {
-//            fs->createDirectory(path_at_mount_point);
-//        }
-
+        // Create directory if need be
+        if (not this->file_system->directory_exists(location->getPath())) {
+            this->file_system->create_directory(location->getPath());
+        }
 
         // Reply with a "go ahead, send me the file" message
         answer_commport->dputMessage(
@@ -387,7 +385,7 @@ namespace wrench {
 
         // Create the streaming activity
         auto me_host = simgrid::s4u::this_actor::get_host();
-        simgrid::s4u::Disk *me_disk = fs->getDisk();
+        auto me_disk = location->getDiskOrNull();
 
         // Create a Transaction
         auto transaction = std::make_shared<Transaction>(
@@ -423,28 +421,23 @@ namespace wrench {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        LogicalFileSystem *fs = nullptr;
-        auto file = location->getFile();
-
-        std::string mount_point;
-        std::string path_at_mount_point;
-        if ((not this->splitPath(location->getPath(), mount_point, path_at_mount_point)) or
-            (not this->file_systems[mount_point]->doesDirectoryExist(path_at_mount_point))) {
-            failure_cause = std::shared_ptr<FailureCause>(
-                    new InvalidDirectoryPath(location));
+        auto partition = this->file_system->get_partition_for_path_or_null(location->getPath());
+        if (!partition) {
+            failure_cause = std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
         } else {
-            fs = this->file_systems[mount_point].get();
-
-            if (not fs->isFileInDirectory(file, path_at_mount_point)) {
-                WRENCH_INFO(
-                        "Received a read request for a file I don't have (%s)", location->toString().c_str());
-                failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));
+            auto file = location->getFile();
+            if (not this->file_system->directory_exists(location->getPath())) {
+                failure_cause = std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
+            } else {
+                if (not this->file_system->file_exists(location->getPath() + "/" + file->getID())) {
+                    WRENCH_INFO(
+                            "Received a read request for a file I don't have (%s)", location->toString().c_str());
+                    failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));
+                }
             }
         }
 
         bool success = (failure_cause == nullptr);
-
-        // If a success, create the chunk_receiving commport
 
         // Send back the corresponding ack
         try {
@@ -463,14 +456,19 @@ namespace wrench {
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
-            // Make the file un-evictable
+            // Make the file unevictable
             location->getStorageService()->incrementNumRunningOperationsForLocation(location);
 
-            fs->updateReadDate(location->getFile(), location->getPath());
+            auto file = location->getFile();
+
+            // Open and read the file (just to update the read date)
+            auto opened_file = this->file_system->open(location->getPath() + "/" + file->getID(), "r");
+            opened_file->read((sg_size_t)file->getSize(), false);
+            this->file_system->close(opened_file);
 
             // Create the streaming activity
             auto me_host = simgrid::s4u::this_actor::get_host();
-            simgrid::s4u::Disk *me_disk = fs->getDisk();
+            auto me_disk = location->getDiskOrNull();
 
             // Create a Transaction
             auto transaction = std::make_shared<Transaction>(
@@ -520,25 +518,23 @@ namespace wrench {
         }
 
         auto file = src_location->getFile();
-        LogicalFileSystem *fs;
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        std::string dst_mount_point;
-        std::string dst_path_at_mount_point;
-        if (not this->splitPath(dst_location->getPath(), dst_mount_point, dst_path_at_mount_point)) {
+        // Check directory paths
+        if (not this->file_system->directory_exists(dst_location->getPath())) {
             failure_cause = std::make_shared<InvalidDirectoryPath>(dst_location);
         }
 
         if (!failure_cause) {
-
-            fs = this->file_systems[dst_mount_point].get();
+            std::shared_ptr<simgrid::fsmod::FileSystem> dst_file_system = dst_location->getStorageService()->getFileSystem();
 
             // If file is not already here, reserve space for it
-            bool file_is_already_here = fs->isFileInDirectory(dst_location->getFile(), dst_path_at_mount_point);
-            if ((not file_is_already_here) and (not fs->reserveSpace(dst_location->getFile(), dst_path_at_mount_point))) {
-                failure_cause = std::make_shared<StorageServiceNotEnoughSpace>(
-                        file,
-                        this->getSharedPtr<SimpleStorageService>());
+            if (not this->file_system->file_exists(dst_location->getPath() + "/" + file->getID())) {
+                if (not this->reserveSpace(dst_location)) {
+                    failure_cause = std::make_shared<StorageServiceNotEnoughSpace>(
+                            file,
+                            this->getSharedPtr<SimpleStorageService>());
+                }
             }
         }
 
