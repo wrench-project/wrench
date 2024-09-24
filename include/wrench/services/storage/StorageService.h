@@ -16,7 +16,7 @@
 #include "wrench/services/Service.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/job/StandardJob.h"
-#include "wrench/services/storage/storage_helpers/LogicalFileSystem.h"
+//#include "wrench/services/storage/storage_helpers/LogicalFileSystem.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 namespace wrench {
@@ -38,6 +38,8 @@ namespace wrench {
          * @brief Stop the servier
          */
         void stop() override;
+
+
 
         /** File Lookup methods (in simulation) **/
 
@@ -541,6 +543,11 @@ namespace wrench {
                        const std::string &service_name);
 
         virtual void setIsScratch(bool is_scratch);
+
+        /**
+         * @brief Get the File System object
+         */
+         virtual std::shared_ptr<simgrid::fsmod::FileSystem> getFileSystem() = 0;
 
         /** Fast-Access common message payloads! **/
         //        double StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD;

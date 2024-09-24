@@ -196,6 +196,9 @@ namespace wrench {
 
 
     protected:
+
+        friend class SimpleStorageServiceNonBufferizes;
+
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
@@ -226,8 +229,12 @@ namespace wrench {
         /** @brief Whether the service is bufferized */
         bool is_bufferized;
 
-        /** @brief File system */
-        std::shared_ptr<simgrid::fsmod::FileSystem> file_system;
+        /** @brief Retrieve the simple storage service's file system object **/
+        std::shared_ptr<simgrid::fsmod::FileSystem> getFileSystem() {
+            return this->file_system;
+        }
+
+
 
 //        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
 
@@ -239,6 +246,9 @@ namespace wrench {
         friend class Simulation;
 
         void validateProperties();
+
+        /** @brief File system */
+        std::shared_ptr<simgrid::fsmod::FileSystem> file_system;
 
 #ifdef PAGE_CACHE_SIMULATION
         std::shared_ptr<MemoryManager> memory_manager;
