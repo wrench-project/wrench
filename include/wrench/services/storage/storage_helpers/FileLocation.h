@@ -59,7 +59,8 @@ namespace wrench {
 #ifdef PAGE_CACHE_SIMULATION
         std::shared_ptr<StorageService> getServerStorageService();
 #endif
-        std::string getPath();
+        std::string getDirectoryPath();
+        std::string getFilePath();
         [[nodiscard]] bool isScratch() const;
         std::string toString();
 
@@ -78,7 +79,7 @@ namespace wrench {
             return ((not lhs->is_scratch) and
                     (not rhs->is_scratch) and
                     (lhs->getStorageService() == rhs->getStorageService()) and
-                    (lhs->getPath() == rhs->getPath()) and
+                    (lhs->getDirectoryPath() == rhs->getDirectoryPath()) and
                     (lhs->file == rhs->file));
         }
         /**
@@ -93,7 +94,7 @@ namespace wrench {
             return ((not this->is_scratch) and
                     (not other->is_scratch) and
                     (this->getStorageService() == other->getStorageService()) and
-                    (this->getPath() == other->getPath()) and
+                    (this->getDirectoryPath() == other->getDirectoryPath()) and
                     (this->getFile() == other->getFile()));
         }
 
@@ -114,7 +115,7 @@ namespace wrench {
 	     * @param is_scratch: whether the location is a SCRATCH location
          */
         FileLocation(std::shared_ptr<StorageService> ss, std::shared_ptr<DataFile> file, std::string path, bool is_scratch) : storage_service(std::move(ss)),
-                                                                                                                              path(std::move(path)),
+                                                                                                                              directory_path(std::move(path)),
                                                                                                                               file(std::move(file)),
                                                                                                                               is_scratch(is_scratch) {
         }
@@ -133,7 +134,7 @@ namespace wrench {
 #endif
 
         std::shared_ptr<StorageService> storage_service;
-        std::string path;
+        std::string directory_path;
         std::shared_ptr<DataFile> file;
         bool is_scratch;
 

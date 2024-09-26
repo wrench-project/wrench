@@ -167,7 +167,7 @@ namespace wrench {
             return "SCRATCH:" + this->file->getID();
         } else {
             return this->storage_service->getName() + ":" +
-                   sanitizePath(this->path) + ":" + this->file->getID();
+                   sanitizePath(this->directory_path) + ":" + this->file->getID();
         }
     }
 
@@ -216,14 +216,25 @@ namespace wrench {
 #endif
 
     /**
-     * @brief Get the location's path
+     * @brief Get the location's directory path
      * @return a path
      */
-    std::string FileLocation::getPath() {
+    std::string FileLocation::getDirectoryPath() {
         if (this->is_scratch) {
-            throw std::invalid_argument("FileLocation::getPath(): No path for a SCRATCH location");
+            throw std::invalid_argument("FileLocation::getDirectoryPath(): No path for a SCRATCH location");
         }
-        return this->path;
+        return this->directory_path;
+    }
+
+    /**
+     * @brief Get the location's file path
+     * @return a path
+     */
+    std::string FileLocation::getFilePath() {
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getFilePath(): No path for a SCRATCH location");
+        }
+        return this->directory_path + "/" + this->file->getID();
     }
 
     /**
@@ -334,7 +345,7 @@ namespace wrench {
         if (not sss) {
             return nullptr;
         }
-        return sss->getDiskForPathOrNull(this->path);
+        return sss->getDiskForPathOrNull(this->directory_path);
     }
 
 

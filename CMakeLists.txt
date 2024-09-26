@@ -72,7 +72,7 @@ endif ()
 
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
-include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
+include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${FSMOD_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
 
 
 # For MacOS's MacPorts
@@ -554,7 +554,7 @@ set(TEST_FILES
 
 add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
-target_link_libraries(wrench ${SimGrid_LIBRARY})
+target_link_libraries(wrench ${SimGrid_LIBRARY} ${FSMOD_LIBRARY})
 
 # wrench version
 add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/conf/cmake/Version.cmake)

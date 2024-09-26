@@ -157,12 +157,12 @@ namespace wrench {
         std::string mount_point;
         std::string path_at_mount_point;
 
-        if (not this->file_system->file_exists(location->getPath())) {
+        if (not this->file_system->file_exists(location->getDirectoryPath())) {
             if (not this->isScratch()) {
                 failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));
             } // otherwise, we don't care, perhaps it was taken care of elsewhere...
         } else {
-            this->file_system->unlink_file(location->getPath());
+            this->file_system->unlink_file(location->getDirectoryPath());
         }
 
         answer_commport->dputMessage(
@@ -187,7 +187,7 @@ namespace wrench {
             const std::shared_ptr<FileLocation> &location,
             S4U_CommPort *answer_commport) {
 
-        bool file_found = this->file_system->file_exists(location->getPath());
+        bool file_found = this->file_system->file_exists(location->getDirectoryPath());
 
         answer_commport->dputMessage(
                 new StorageServiceFileLookupAnswerMessage(
@@ -373,7 +373,7 @@ namespace wrench {
      * @return true if the file is present, false otherwise
      */
     bool SimpleStorageService::hasFile(const std::shared_ptr<FileLocation> &location) {
-        return this->file_system->file_exists(location->getPath() + "/" + location->getFile()->getID());
+        return this->file_system->file_exists(location->getDirectoryPath() + "/" + location->getFile()->getID());
     }
 
     /**
@@ -393,7 +393,7 @@ namespace wrench {
      * @param location: a location
      */
     void SimpleStorageService::removeFile(const std::shared_ptr<FileLocation> &location) {
-        std::string full_path = location->getPath() + "/" + location->getFile()->getID();
+        std::string full_path = location->getDirectoryPath() + "/" + location->getFile()->getID();
         if (not this->file_system->file_exists(full_path)) {
             return;
         } else {
@@ -451,7 +451,7 @@ namespace wrench {
      * @param location: a location
      */
     void SimpleStorageService::createFile(const std::shared_ptr<FileLocation> &location) {
-        std::string full_path = location->getPath() + "/" + location->getFile()->getID();
+        std::string full_path = location->getDirectoryPath() + "/" + location->getFile()->getID();
 
         try {
             this->file_system->create_file(full_path, location->getFile()->getSize());
@@ -475,7 +475,7 @@ namespace wrench {
         }
 
         try {
-            std::string full_path = location->getPath() + "/" + location->getFile()->getID();
+            std::string full_path = location->getDirectoryPath() + "/" + location->getFile()->getID();
             auto fd = this->file_system->open(full_path, "r");
             double date = fd->stat()->last_modification_date;
             this->file_system->close(fd);

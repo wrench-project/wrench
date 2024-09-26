@@ -116,12 +116,10 @@ namespace wrench {
          * @return true if success, false otherwise
          */
         bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
-            // THIS SHOULD NO LONGER BE USED? AND INSTEAD WE SHOULD CREATE A DOT FILE WITH SET SIZE
-            // AND REMOVE OR MOVE IT WHENEVER FAILED / CREATED
-            // Just create the file on the file system, tentatively
-            // TODO: Should this be marked unevictable by caching???
             try {
-                this->file_system->create_file(location->getPath(), (sg_size_t) location->getFile()->getSize());
+                std::string dot_file = location->getDirectoryPath() + "/" + "." + location->getFile()->getID();
+                this->file_system->create_file(dot_file, (sg_size_t) location->getFile()->getSize());
+                this->file_system->make_file_unevictable(dot_file); // TODO
             } catch (simgrid::Exception &ignore) {
                 return false;
             }
@@ -133,15 +131,11 @@ namespace wrench {
          * @param location: a location
          */
         void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
-            // Just remove the file from the file system
-            if (this->file_system->file_exists(location->getPath())) {
-                throw std::runtime_error("Calling unreserveSpace() on a location for which reserveSpace() likely wasn't allocated");
+
+            std::string dot_file = location->getDirectoryPath() + "/" + "." + location->getFile()->getID();
+            if (this->file_system->file_exists(dot_file)) {
+                this->file_system->unlink_file(dot_file);
             }
-            this->file_system->unlink_file(location->getPath());
-//            std::string mount_point;
-//            std::string path_at_mount_point;
-//            this->splitPath(location->getPath(), mount_point, path_at_mount_point);
-//            this->file_systems[mount_point]->unreserveSpace(location->getFile(), path_at_mount_point);
         }
 
 //        /**
@@ -197,7 +191,7 @@ namespace wrench {
 
     protected:
 
-        friend class SimpleStorageServiceNonBufferizes;
+        friend class SimpleStorageServiceNonBufferized;
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -234,7 +228,8 @@ namespace wrench {
             return this->file_system;
         }
 
-
+        /** @brief File system */
+        std::shared_ptr<simgrid::fsmod::FileSystem> file_system;
 
 //        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
 
@@ -247,8 +242,6 @@ namespace wrench {
 
         void validateProperties();
 
-        /** @brief File system */
-        std::shared_ptr<simgrid::fsmod::FileSystem> file_system;
 
 #ifdef PAGE_CACHE_SIMULATION
         std::shared_ptr<MemoryManager> memory_manager;
