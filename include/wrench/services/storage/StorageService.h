@@ -544,11 +544,6 @@ namespace wrench {
 
         virtual void setIsScratch(bool is_scratch);
 
-        /**
-         * @brief Get the File System object
-         */
-         virtual std::shared_ptr<simgrid::fsmod::FileSystem> getFileSystem() = 0;
-
         /** Fast-Access common message payloads! **/
         //        double StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD;
         //        double StorageServiceMessagePayload_FILE_READ_ANSWER_MESSAGE_PAYLOAD;

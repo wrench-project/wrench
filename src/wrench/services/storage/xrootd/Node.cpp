@@ -770,8 +770,10 @@ namespace wrench {
                    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootDNode") {
 
             // Create /dev/null mountpoint so that Locations can be created
-            this->file_systems[LogicalFileSystem::DEV_NULL] =
-                    LogicalFileSystem::createLogicalFileSystem(hostname, this, LogicalFileSystem::DEV_NULL, "NONE");
+            // TODO: Removed this due to using simgrid:fsmod.... big deal?
+//            this->file_system->mount_dev_null_partition("/dev/null");
+//            this->file_systems[LogicalFileSystem::DEV_NULL] =
+//                    LogicalFileSystem::createLogicalFileSystem(hostname, this, LogicalFileSystem::DEV_NULL, "NONE");
 
             this->setProperties(this->default_property_values, property_list);
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
@@ -964,7 +966,7 @@ namespace wrench {
             // TODO: THIS LOCATION REWRITE WAS DONE TO FIX SOMETHING BUT HENRI HAS NO
             // TODO: IDEA HOW COME IT'S EVER WORKED BEFORE SINCE THE FTT INSIDE THE INTERNALSTORAGE
             // TODO: WILL SAY "THIS IS NOT ME, MY PARENT IS THE INTERNALSTORAGE, NOT THE NODE"
-            auto new_location = FileLocation::LOCATION(internalStorage, location->getPath(), location->getFile());
+            auto new_location = FileLocation::LOCATION(internalStorage, location->getDirectoryPath(), location->getFile());
             internalStorage->writeFile(answer_commport, new_location, num_bytes_to_write, wait_for_answer);
             //            internalStorage->writeFile(answer_commport, location, wait_for_answer);
             metavisor->files[location->getFile()].push_back(this->getSharedPtr<Node>());

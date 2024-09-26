@@ -121,7 +121,7 @@ namespace wrench {
                 target->commport->dputMessage(
                         new StorageServiceFileLookupRequestMessage(
                                 commport,
-                                FileLocation::LOCATION(target, msg->location->getPath(), msg->location->getFile()),
+                                FileLocation::LOCATION(target, msg->location->getDirectoryPath(), msg->location->getFile()),
                                 target->getMessagePayloadValue(
                                         StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
             } else {
@@ -580,13 +580,13 @@ namespace wrench {
      * @return True if the file is cached, false otherwise
      */
     bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<ServiceMessage> &message) {
-        if (cache->hasFile(msg->location->getFile(), msg->location->getPath())) {//check cache
+        if (cache->hasFile(msg->location->getFile(), msg->location->getDirectoryPath())) {//check cache
             WRENCH_INFO("Forwarding to cache reply commport %s", msg->answer_commport->get_name().c_str());
             cache->commport->putMessage(
                     new StorageServiceFileReadRequestMessage(
                             msg->answer_commport,
                             msg->requesting_host,//msg->commport_to_receive_the_file_content,
-                            FileLocation::LOCATION(cache, msg->location->getPath(), msg->location->getFile()),
+                            FileLocation::LOCATION(cache, msg->location->getDirectoryPath(), msg->location->getFile()),
                             msg->num_bytes_to_read, 0));
             return true;
 
@@ -759,7 +759,7 @@ namespace wrench {
                 //do not spend excessive time on readThrough
                 auto forward = new StorageServiceFileReadRequestMessage(msg);
                 forward->answer_commport = commport;                                                                   //setup intercept commport
-                forward->location = FileLocation::LOCATION(target, msg->location->getPath(), msg->location->getFile());//hyjack locaiton to be on target
+                forward->location = FileLocation::LOCATION(target, msg->location->getDirectoryPath(), msg->location->getFile());//hyjack locaiton to be on target
                 target->commport->dputMessage(forward);                                                                //send to target
             } else {
                 msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));

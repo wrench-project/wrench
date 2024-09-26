@@ -43,12 +43,16 @@ namespace wrench {
         struct Transaction {
             /** @brief source location */
             std::shared_ptr<FileLocation> src_location;
+            /** @brief source opened file */
+            std::shared_ptr<simgrid::fsmod::File> src_opened_file;
             /** @brief source host */
             simgrid::s4u::Host *src_host;
             /** @brief source disk */
             simgrid::s4u::Disk *src_disk;
             /** @brief destination location */
             std::shared_ptr<FileLocation> dst_location;
+            /** @brief destination opened file */
+            std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
             /** @brief destination host */
             simgrid::s4u::Host *dst_host;
             /** @brief destination disk */
@@ -65,9 +69,11 @@ namespace wrench {
             /**
              * @brief Constructor
              * @param src_location: source location
+             * @param src_opened_file: source opened file
              * @param src_host: source host
              * @param src_disk: source disk
              * @param dst_location: destination location
+             * @param dst_opened_file: destination opened file
              * @param dst_host: destination host
              * @param dst_disk: destination disk
              * @param commport: commport to report to
@@ -75,14 +81,18 @@ namespace wrench {
              */
             Transaction(
                     std::shared_ptr<FileLocation> src_location,
+                    std::shared_ptr<simgrid::fsmod::File> src_opened_file,
                     simgrid::s4u::Host *src_host,
                     simgrid::s4u::Disk *src_disk,
                     std::shared_ptr<FileLocation> dst_location,
+                    std::shared_ptr<simgrid::fsmod::File> dst_opened_file,
                     simgrid::s4u::Host *dst_host,
                     simgrid::s4u::Disk *dst_disk,
                     S4U_CommPort *commport,
-                    double transfer_size) : src_location(std::move(src_location)), src_host(src_host), src_disk(src_disk),
-                                            dst_location(std::move(dst_location)), dst_host(dst_host), dst_disk(dst_disk),
+                    double transfer_size) : src_location(std::move(src_location)), src_opened_file(std::move(src_opened_file)),
+                                            src_host(src_host), src_disk(src_disk),
+                                            dst_location(std::move(dst_location)), dst_opened_file(std::move(dst_opened_file)),
+                                            dst_host(dst_host), dst_disk(dst_disk),
                                             commport(commport), transfer_size(transfer_size), stream(nullptr) {
             }
         };
@@ -99,7 +109,7 @@ namespace wrench {
 
         //  Constructor
         SimpleStorageServiceNonBufferized(const std::string &hostname,
-                                          std::set<std::string> mount_points,
+                                          const std::set<std::string>& mount_points,
                                           WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 

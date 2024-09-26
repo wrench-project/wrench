@@ -200,7 +200,7 @@ namespace wrench {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
         // Get the partition for the path
-        auto partition = this->file_system->get_partition_for_path_or_null(location->getPath());
+        auto partition = this->file_system->get_partition_for_path_or_null(location->getDirectoryPath());
         if (!partition) {
             failure_cause = std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
         }
@@ -211,7 +211,8 @@ namespace wrench {
             // (If the file is already there, then there will just be an overwrite. Note that
             // if the overwrite fails, then the file will disappear, which is expected)
 
-            bool file_already_there = this->file_system->file_exists(location->getPath() + "/" + location->getFile()->getID());
+            bool file_already_there = this->file_system->file_exists(
+                    location->getDirectoryPath() + "/" + location->getFile()->getID());
 
             if ((not file_already_there) and (num_bytes_to_write < location->getFile()->getSize())) {
                 throw std::runtime_error("SimpleStorageServiceBufferized::processFileWriteRequest(): Cannot write fewer number of bytes than the file size if the file isn't already present");
@@ -230,8 +231,8 @@ namespace wrench {
 
         if (not failure_cause) {
 
-            if (not this->file_system->directory_exists(location->getPath())) {
-                this->file_system->create_directory(location->getPath());
+            if (not this->file_system->directory_exists(location->getDirectoryPath())) {
+                this->file_system->create_directory(location->getDirectoryPath());
             }
 
             // Generate a commport name on which to receive the file
@@ -300,11 +301,11 @@ namespace wrench {
         auto file = location->getFile();
         std::shared_ptr<sgfs::File> opened_file;
 
-        auto partition = this->file_system->get_partition_for_path_or_null(location->getPath());
-        if (not partition or this->file_system->directory_exists(location->getPath())) {
+        auto partition = this->file_system->get_partition_for_path_or_null(location->getDirectoryPath());
+        if (not partition or this->file_system->directory_exists(location->getDirectoryPath())) {
             failure_cause = std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
         } else {
-            if (not this->file_system->file_exists(location->getPath() + "/" + file->getID())) {
+            if (not this->file_system->file_exists(location->getDirectoryPath() + "/" + file->getID())) {
                 WRENCH_INFO(
                         "Received a read request for a file I don't have (%s)", location->toString().c_str());
                 failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));

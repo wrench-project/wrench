@@ -466,7 +466,7 @@ namespace wrench {
         auto file_parts = this->lookupFileLocation(location);
         if (file_parts.empty()) {
             WRENCH_DEBUG("CSS::lookupFile(): CSS doesn't know the file at location %s - %s",
-                         location->getPath().c_str(), location->getFile()->getID().c_str());
+                         location->getDirectoryPath().c_str(), location->getFile()->getID().c_str());
             return false;
         }
 
@@ -560,7 +560,7 @@ namespace wrench {
         if (src_parts.size() > 1) {
             for (const auto &src_part: src_parts) {
                 dst_parts.push_back(
-                        FileLocation::LOCATION(dst_location->getStorageService(), dst_location->getPath(), src_part->getFile()));
+                        FileLocation::LOCATION(dst_location->getStorageService(), dst_location->getDirectoryPath(), src_part->getFile()));
             }
         } else {
             dst_parts.push_back(dst_location);// no stripping, dst location doesn't have to change
@@ -630,7 +630,8 @@ namespace wrench {
             for (const auto &part: dst_parts) {
                 dest_storage_svc->deleteFileAtLocation(part);
             }
-            dest_storage_svc->createFileAtLocation(FileLocation::LOCATION(dest_storage_svc, dst_location->getPath(), dst_location->getFile()));
+            dest_storage_svc->createFileAtLocation(FileLocation::LOCATION(dest_storage_svc,
+                                                                          dst_location->getDirectoryPath(), dst_location->getFile()));
             WRENCH_DEBUG("CSS::copyFileIamSource(): All parts on destination replaced by a single file");
         }
 
@@ -677,12 +678,12 @@ namespace wrench {
                 StorageService::createFileAtLocation(// create link on source storage service
                         FileLocation::LOCATION(
                                 src_location->getStorageService(),
-                                src_location->getPath(),
+                                src_location->getDirectoryPath(),
                                 dst_part->getFile()));
                 // Prepare for copy once again
                 dst_part->getFile()->setSize(part_size);
                 src_parts.push_back(
-                        FileLocation::LOCATION(src_location->getStorageService(), src_location->getPath(), dst_part->getFile()));
+                        FileLocation::LOCATION(src_location->getStorageService(), src_location->getDirectoryPath(), dst_part->getFile()));
             }
             WRENCH_INFO("CSS::copyFileIamDestination(): %zu stripe(s) / file_part(s) created from source file", src_parts.size());
         } else {
@@ -700,13 +701,13 @@ namespace wrench {
             WRENCH_DEBUG("CSS::copyFileIamDestination(): SRC= %s - size %f at %s on  %s%s",
                          src_parts[copy_idx]->getFile()->getID().c_str(),
                          src_parts[copy_idx]->getFile()->getSize(),
-                         src_parts[copy_idx]->getPath().c_str(),
+                         src_parts[copy_idx]->getDirectoryPath().c_str(),
                          src_parts[copy_idx]->getStorageService()->getHostname().c_str(),
                          src_parts[copy_idx]->getStorageService()->getBaseRootPath().c_str());
             WRENCH_DEBUG("CSS::copyFileIamDestination(): DST= %s - size %f at %s on  %s%s",
                          dst_parts[copy_idx]->getFile()->getID().c_str(),
                          dst_parts[copy_idx]->getFile()->getSize(),
-                         dst_parts[copy_idx]->getPath().c_str(),
+                         dst_parts[copy_idx]->getDirectoryPath().c_str(),
                          dst_parts[copy_idx]->getStorageService()->getHostname().c_str(),
                          dst_parts[copy_idx]->getStorageService()->getBaseRootPath().c_str());
 
