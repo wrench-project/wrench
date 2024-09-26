@@ -232,10 +232,10 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
 
         // source should be set
         ASSERT_EQ(this->storage_service, fc.first->getSource()->getStorageService());
-        ASSERT_EQ("/", fc.first->getSource()->getPath());
+        ASSERT_EQ("/", fc.first->getSource()->getDirectoryPath());
 
         ASSERT_EQ(this->storage_service, fc.second->getSource()->getStorageService());
-        ASSERT_EQ("/", fc.second->getSource()->getPath());
+        ASSERT_EQ("/", fc.second->getSource()->getDirectoryPath());
 
         //service should be set
         ASSERT_EQ(fc.first->getService(), fc.second->getService());

@@ -811,9 +811,10 @@ namespace wrench {
      *
      * @throw invalid_argument
      */
-    void Simulation::readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk) {
+    void Simulation::readFromDisk(double num_bytes, const std::string &hostname, simgrid::s4u::Disk *disk) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
+        std::string mount_point = disk->get_property("mount");
         this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
             S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point, disk);
@@ -831,8 +832,6 @@ namespace wrench {
      * @param num_bytes_to_read - number of bytes read
      * @param num_bytes_to_write - number of bytes written
      * @param hostname - hostname where disk is located
-     * @param read_mount_point - mount point of disk to read from
-     * @param write_mount_point - mount point of disk to write to
      * @param src_disk: source disk (nullptr if not known)
      * @param dst_disk: dst disk (nullptr if not known)
      *
@@ -840,12 +839,13 @@ namespace wrench {
      */
     void Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                             const std::string &hostname,
-                                                            const std::string &read_mount_point,
-                                                            const std::string &write_mount_point,
                                                             simgrid::s4u::Disk *src_disk,
                                                             simgrid::s4u::Disk *dst_disk) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
+        std::string read_mount_point = src_disk->get_property("mount");
+        std::string write_mount_point = dst_disk->get_property("mount");
+
         this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
                                                     temp_unique_sequence_number);
         this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
@@ -871,14 +871,14 @@ namespace wrench {
      *
      * @param num_bytes: number of bytes written
      * @param hostname: name of the host to write to
-     * @param mount_point: mount point of the disk to write to at the host
      * @param disk: a simgrid disk to write to (nullptr if not known)
      *
      * @throw invalid_argument
      */
-    void Simulation::writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk) {
+    void Simulation::writeToDisk(double num_bytes, const std::string &hostname, simgrid::s4u::Disk *disk) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
+        std::string mount_point = disk->get_property("mount");
         this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
             S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point, disk);
@@ -1602,7 +1602,7 @@ namespace wrench {
      */
     std::shared_ptr<DataFile> Simulation::addFile(const std::string &id, double size) {
         if (size < 0) {
-            throw std::invalid_argument("Simulation::addFile(): Invalid arguments");
+            throw std::invalid_argument("Simulation::addFile(): Invalid file size");
         }
 
         // Create the DataFile object
@@ -1651,7 +1651,7 @@ namespace wrench {
      * @return a simulation
      */
     std::shared_ptr<Simulation> Simulation::createSimulation() {
-        LogicalFileSystem::mount_points.clear();
+//        LogicalFileSystem::mount_points.clear();
         return std::shared_ptr<Simulation>(new Simulation());
     }
 

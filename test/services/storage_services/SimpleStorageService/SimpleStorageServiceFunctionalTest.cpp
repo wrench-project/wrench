@@ -1788,7 +1788,7 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test(double buffer_size) {
     ASSERT_THROW(wrench::FileLocation::LOCATION(storage_service_100, "", file_1), std::invalid_argument);
     //    ASSERT_THROW(wrench::FileLocation::LOCATION(storage_service_100, "/bogus", file_1), std::invalid_argument);
     ASSERT_THROW(wrench::FileLocation::SCRATCH(file_1)->getStorageService(), std::invalid_argument);
-    ASSERT_THROW(wrench::FileLocation::SCRATCH(file_1)->getPath(), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::SCRATCH(file_1)->getDirectoryPath(), std::invalid_argument);
     ASSERT_THROW(wrench::FileLocation::sanitizePath(""), std::invalid_argument);
     //    ASSERT_THROW(wrench::FileLocation::sanitizePath(" "), std::invalid_argument);
     //    ASSERT_THROW(wrench::FileLocation::sanitizePath("../.."), std::invalid_argument);

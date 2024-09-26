@@ -235,10 +235,10 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
 
         // destination should be set
         ASSERT_EQ(this->storage_service, fc.first->getDestination()->getStorageService());
-        ASSERT_EQ("/", fc.first->getDestination()->getPath());
+        ASSERT_EQ("/", fc.first->getDestination()->getDirectoryPath());
 
         ASSERT_EQ(this->storage_service, fc.second->getDestination()->getStorageService());
-        ASSERT_EQ("/", fc.second->getDestination()->getPath());
+        ASSERT_EQ("/", fc.second->getDestination()->getDirectoryPath());
 
         //service should be set
         ASSERT_EQ(fc.first->getService(), fc.second->getService());

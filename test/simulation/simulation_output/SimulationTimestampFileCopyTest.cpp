@@ -250,14 +250,14 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
 
         // source and destinations should be set
         ASSERT_EQ(this->source_storage_service, fc.first->getSource()->getStorageService());
-        ASSERT_EQ("/", fc.first->getSource()->getPath());
+        ASSERT_EQ("/", fc.first->getSource()->getDirectoryPath());
         ASSERT_EQ(this->destination_storage_service, fc.first->getDestination()->getStorageService());
-        ASSERT_EQ("/", fc.first->getDestination()->getPath());
+        ASSERT_EQ("/", fc.first->getDestination()->getDirectoryPath());
 
         ASSERT_EQ(this->source_storage_service, fc.second->getSource()->getStorageService());
-        ASSERT_EQ("/", fc.second->getSource()->getPath());
+        ASSERT_EQ("/", fc.second->getSource()->getDirectoryPath());
         ASSERT_EQ(this->destination_storage_service, fc.second->getDestination()->getStorageService());
-        ASSERT_EQ("/", fc.second->getDestination()->getPath());
+        ASSERT_EQ("/", fc.second->getDestination()->getDirectoryPath());
 
         // file should be set
         ASSERT_EQ(fc.first->getFile(), fc.second->getFile());
