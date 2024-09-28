@@ -509,12 +509,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
-
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -645,12 +641,9 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -778,12 +771,8 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
-
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -926,12 +915,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
-
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1048,12 +1033,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
-
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1221,12 +1202,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
-
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());

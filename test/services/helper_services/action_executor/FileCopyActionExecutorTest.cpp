@@ -230,7 +230,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     // Put it on ss1
-    simulation->stageFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
+    this->ss1->createFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -332,7 +332,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessSameHostTest_te
     this->file = wrench::Simulation::addFile("some_file", 1000000000.0);
 
     // Put it on ss1
-    simulation->stageFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
+    this->ss1->createFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

@@ -151,8 +151,8 @@ void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
     ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceChunkingTestWMS(this, mode, "WMSHost")));
 
     // Stage the file on the StorageHost
-    ASSERT_NO_THROW(simulation->stageFile(file_size_0, storage_service_1));
-    ASSERT_NO_THROW(simulation->stageFile(file_size_100, storage_service_1));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_size_0));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_size_100));
 
     ASSERT_NO_THROW(simulation->launch());
 

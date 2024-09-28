@@ -352,7 +352,7 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
 
     // Create a file to read
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss1, file));
+    ss1->createFile(wrench::FileLocation::LOCATION(ss1, file));
 
     // Create a file to write
     this->file_to_write = wrench::Simulation::addFile("some_file_to_write", 1000000.0);

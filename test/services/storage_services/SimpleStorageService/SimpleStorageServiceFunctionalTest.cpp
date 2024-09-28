@@ -26,10 +26,10 @@ public:
     std::shared_ptr<wrench::DataFile> file_10;
     std::shared_ptr<wrench::DataFile> file_100;
     std::shared_ptr<wrench::DataFile> file_500;
-    std::shared_ptr<wrench::StorageService> storage_service_100 = nullptr;
-    std::shared_ptr<wrench::StorageService> storage_service_510 = nullptr;
-    std::shared_ptr<wrench::StorageService> storage_service_1000 = nullptr;
-    std::shared_ptr<wrench::StorageService> storage_service_multimp = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service_100 = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service_510 = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service_1000 = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service_multimp = nullptr;
 
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
@@ -123,8 +123,8 @@ private:
 
         // Bogus staging (can only be done in maestro)
         try {
-            this->simulation->stageFile(this->test->file_1, this->test->storage_service_100);
-            throw std::runtime_error("Should not be possible to call stageFile() from a non-maestro process");
+            this->test->storage_service_100->createFile(this->test->file_1);
+            throw std::runtime_error("Should not be possible to call createFile() from a non-maestro process");
         } catch (std::runtime_error &) {
         }
 
@@ -711,17 +711,11 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
     ASSERT_NO_THROW(wms = simulation->add(
                             new SimpleStorageServiceBasicFunctionalityTestWMS(this, hostname)));
 
-    // A bogus staging
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service_100), std::invalid_argument);
-
-    // Another bogus staging
-    ASSERT_THROW(simulation->stageFile(file_500, storage_service_100), std::invalid_argument);
-
     // Staging all files on the 1000 storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1000));
-    ASSERT_NO_THROW(simulation->stageFile(file_10, storage_service_1000));
-    ASSERT_NO_THROW(simulation->stageFile(file_100, storage_service_1000));
-    ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
+    ASSERT_NO_THROW(storage_service_1000->createFile(file_1));
+    ASSERT_NO_THROW(storage_service_1000->createFile(file_10));
+    ASSERT_NO_THROW(storage_service_1000->createFile(file_100));
+    ASSERT_NO_THROW(storage_service_1000->createFile(file_500));
 
 
     ASSERT_NO_THROW(simulation->launch());
@@ -883,10 +877,10 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test(double buff
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1000));
+    ASSERT_NO_THROW(storage_service_1000->createFile(file_1));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
+    ASSERT_NO_THROW(storage_service_1000->createFile(file_500));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1029,8 +1023,8 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test(double buf
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
-    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1000, "/disk1000/some_files/"));// coverage
+    ASSERT_NO_THROW(storage_service_1000->createFile(file_500));
+    ASSERT_NO_THROW(storage_service_1000->createFile(file_1, "/disk1000/some_files/"));// coverage
 
 
     // Running a "run a single task1" simulation
@@ -1235,7 +1229,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test(dou
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
+    ASSERT_NO_THROW(storage_service_1000->createFile(file_500));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1437,7 +1431,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test(do
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
+    ASSERT_NO_THROW(storage_service_1000->createFile(file_500));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1691,7 +1685,7 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test(double buffer_size) 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_10, storage_service_1000));
+    ASSERT_NO_THROW(storage_service_1000->createFile(file_10));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

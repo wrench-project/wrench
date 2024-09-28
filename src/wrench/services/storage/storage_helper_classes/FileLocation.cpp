@@ -104,7 +104,7 @@ namespace wrench {
         if (!ss or !file) {
             throw std::invalid_argument("FileLocation::LOCATION(): invalid nullptr arguments");
         }
-        return LOCATION(ss, "/", file);
+        return LOCATION(ss, ss->getMountPoint(), file);
     }
 
 #ifdef PAGE_CACHE_SIMULATION
@@ -236,6 +236,18 @@ namespace wrench {
         }
         return this->directory_path + "/" + this->file->getID();
     }
+
+    /**
+     * @brief Get the location's dot-file path
+     * @return a path
+     */
+    std::string FileLocation::getDotFilePath() {
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getDotFilePath(): No path for a SCRATCH location");
+        }
+        return this->directory_path + "/" + this->file->getID() + ".wrench_tmp";
+    }
+
 
     /**
      * @brief Get the location's scratch-ness

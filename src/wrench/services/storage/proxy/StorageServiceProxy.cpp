@@ -796,7 +796,7 @@ namespace wrench {
             for (unsigned int i = 0; i < messages.size(); i++) {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
                     if (first) {//this is the fileread we have been faking
-                        cache->createFile(msg->location->getFile());
+                        cache->createFile(FileLocation::LOCATION(cache, msg->location->getFile()));
                         tmpMsg->answer_commport->dputMessage(new StorageServiceAckMessage(*msg));
                         std::swap(messages[i], messages.back());
                         messages.back().release();

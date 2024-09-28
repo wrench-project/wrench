@@ -22,7 +22,7 @@ class WorkflowTaskTest : public ::testing::Test {
 
 public:
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
-    std::shared_ptr<wrench::StorageService> storage_service = nullptr, backup_storage_service = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service = nullptr, backup_storage_service = nullptr;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
     std::shared_ptr<wrench::Workflow> workflow;
@@ -382,9 +382,9 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test(double buffer_size) 
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
-    ASSERT_NO_THROW(simulation->stageFile(large_input_file, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(small_input_file, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(small_input_file, backup_storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(large_input_file));
+    ASSERT_NO_THROW(storage_service->createFile(small_input_file));
+    ASSERT_NO_THROW(storage_service->createFile(small_input_file));
 
     ASSERT_NO_THROW(simulation->launch());
 
