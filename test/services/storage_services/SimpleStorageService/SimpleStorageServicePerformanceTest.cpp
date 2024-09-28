@@ -30,8 +30,8 @@ public:
     std::shared_ptr<wrench::DataFile> file_1;
     std::shared_ptr<wrench::DataFile> file_2;
     std::shared_ptr<wrench::DataFile> file_3;
-    std::shared_ptr<wrench::StorageService> storage_service_1 = nullptr;
-    std::shared_ptr<wrench::StorageService> storage_service_2 = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service_1 = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service_2 = nullptr;
 
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
@@ -287,9 +287,9 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
     simulation->add(new wrench::FileRegistryService("WMSHost"));
 
     // Staging all files on the Src storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1));
-    ASSERT_NO_THROW(simulation->stageFile(file_2, storage_service_1));
-    ASSERT_NO_THROW(simulation->stageFile(file_3, storage_service_1));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_1));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_2));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_3));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -391,9 +391,9 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
     // Create a file registry
 
     // Staging all files on the  storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1));
-    ASSERT_NO_THROW(simulation->stageFile(file_2, storage_service_1));
-    ASSERT_NO_THROW(simulation->stageFile(file_3, storage_service_1));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_1));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_2));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_3));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

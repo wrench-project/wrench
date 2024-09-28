@@ -141,7 +141,7 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     std::set<std::shared_ptr<wrench::DataFile>> files_to_stage = {file_1};
 
     for (auto const &f: files_to_stage) {
-        ASSERT_NO_THROW(simulation->stageFile(f, storage_service_1));
+        ASSERT_NO_THROW(storage_service_1->createFile(f, "/"));
     }
 
     simulation->getOutput().enableDiskTimestamps(true);

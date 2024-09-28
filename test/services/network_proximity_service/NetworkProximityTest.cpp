@@ -229,7 +229,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     auto file_registry_service = simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Get a host for network proximity host
     std::string network_proximity_db_hostname = wrench::Simulation::getHostnameList()[1];
@@ -420,7 +420,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Get a host for network proximity host
     std::string network_proximity_db_hostname = wrench::Simulation::getHostnameList()[1];
@@ -577,7 +577,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Get a host for network proximity host
     std::string network_proximity_db_hostname = wrench::Simulation::getHostnameList()[1];
@@ -670,7 +670,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Get a host for network proximity host
     std::string network_proximity_db_hostname = wrench::Simulation::getHostnameList()[1];

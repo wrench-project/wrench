@@ -29,6 +29,7 @@ namespace wrench {
      * @param num_bytes_to_transfer: number of bytes to transfer
      * @param src_commport: the a source commport to receive data from
      * @param dst_location: a location to write data to
+     * @param dst_opened_file: an open file to write to
      * @param answer_commport_if_read: the commport to send an answer to in case this was a file read ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
      * @param answer_commport_if_write: the commport to send an answer to in case this was a file write ("" if none). This
@@ -43,6 +44,7 @@ namespace wrench {
                                            double num_bytes_to_transfer,
                                            S4U_CommPort *src_commport,
                                            std::shared_ptr<FileLocation> dst_location,
+                                           std::shared_ptr<simgrid::fsmod::File> dst_opened_file,
                                            S4U_CommPort *answer_commport_if_read,
                                            S4U_CommPort *answer_commport_if_write,
                                            S4U_CommPort *answer_commport_if_copy,
@@ -58,6 +60,7 @@ namespace wrench {
         this->src_location = nullptr;
         this->dst_commport = nullptr;
         this->dst_location = std::move(dst_location);
+        this->dst_opened_file = std::move(dst_opened_file);
     }
 
     /**
@@ -67,6 +70,7 @@ namespace wrench {
      * @param file: the file corresponding to the connection
      * @param num_bytes_to_transfer: number of bytes to transfer
      * @param src_location: a location to read data from
+     * @param src_opened_file: a open file to read from
      * @param dst_commport: a commport to send data to
      * @param answer_commport_if_read: the commport to send an answer to in case this was a file read ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
@@ -81,6 +85,7 @@ namespace wrench {
                                            std::shared_ptr<DataFile> file,
                                            double num_bytes_to_transfer,
                                            std::shared_ptr<FileLocation> src_location,
+                                           std::shared_ptr<simgrid::fsmod::File> src_opened_file,
                                            S4U_CommPort *dst_commport,
                                            S4U_CommPort *answer_commport_if_read,
                                            S4U_CommPort *answer_commport_if_write,
@@ -95,6 +100,7 @@ namespace wrench {
                                                                  buffer_size(buffer_size) {
         this->src_commport = nullptr;
         this->src_location = std::move(src_location);
+        this->src_opened_file = std::move(src_opened_file);
         this->dst_commport = dst_commport;
         this->dst_location = nullptr;
     }
@@ -106,7 +112,9 @@ namespace wrench {
      * @param file: the file corresponding to the connection
      * @param num_bytes_to_transfer: number of bytes to transfer
      * @param src_location: a location to read data from
+     * @param src_opened_file: a open file to read from
      * @param dst_location: a location to send data to
+     * @param dst_opened_file: a open file to write to
      * @param answer_commport_if_read: the commport to send an answer to in case this was a file read (nullptr if none). This
      *        will simply be reported to the parent service, who may use it as needed
      * @param answer_commport_if_write: the commport to send an answer to in case this was a file write (nullptr if none). This
@@ -120,7 +128,9 @@ namespace wrench {
                                            std::shared_ptr<DataFile> file,
                                            double num_bytes_to_transfer,
                                            std::shared_ptr<FileLocation> src_location,
+                                           std::shared_ptr<simgrid::fsmod::File> src_opened_file,
                                            std::shared_ptr<FileLocation> dst_location,
+                                           std::shared_ptr<simgrid::fsmod::File> dst_opened_file,
                                            S4U_CommPort *answer_commport_if_read,
                                            S4U_CommPort *answer_commport_if_write,
                                            S4U_CommPort *answer_commport_if_copy,
@@ -134,7 +144,9 @@ namespace wrench {
                                                                  buffer_size(buffer_size) {
         this->src_commport = nullptr;
         this->src_location = std::move(src_location);
+        this->src_opened_file = std::move(src_opened_file);
         this->dst_commport = nullptr;
+        this->dst_opened_file = std::move(dst_opened_file);
         this->dst_location = std::move(dst_location);
     }
 

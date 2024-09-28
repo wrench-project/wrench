@@ -228,7 +228,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     this->big_file = wrench::Simulation::addFile("big", 1000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(this->small_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(this->small_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -458,7 +458,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
     this->big_file = wrench::Simulation::addFile("big", 1000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(this->small_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(this->small_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

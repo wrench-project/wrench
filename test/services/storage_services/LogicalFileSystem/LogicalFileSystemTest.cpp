@@ -151,7 +151,7 @@
 //    auto file = wrench::Simulation::addFile("file", 1.0);
 //
 //    fs1->createDirectory(("/foo"));
-//    fs1->stageFile(file, "/foo");
+//    fs1->createFile(file, "/foo");
 //    ASSERT_FALSE(fs1->doesDirectoryExist(("/foo")));
 //    ASSERT_TRUE(fs1->isDirectoryEmpty(("/foo")));
 //    ASSERT_FALSE(fs1->isFileInDirectory(file, "/foo"));

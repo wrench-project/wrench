@@ -218,7 +218,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -314,7 +314,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionBogusSpecTest
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -422,7 +422,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceNonReadyActionTest_tes
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -544,7 +544,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -717,7 +717,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000000.0);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -847,7 +847,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000000.0);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -980,7 +980,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -1086,7 +1086,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -1253,7 +1253,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

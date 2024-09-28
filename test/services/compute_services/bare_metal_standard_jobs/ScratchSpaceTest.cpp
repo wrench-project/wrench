@@ -26,8 +26,8 @@ class ScratchSpaceTest : public ::testing::Test {
 public:
     std::shared_ptr<wrench::Workflow> workflow;
 
-    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
-    std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service1 = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service2 = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service1 = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service2 = nullptr;
@@ -258,7 +258,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
     std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 2000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -479,8 +479,8 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
     std::shared_ptr<wrench::DataFile> input_file2 = wrench::Simulation::addFile("input_file2", 10000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file1, storage_service1));
-    ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file2));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -687,9 +687,9 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
     std::shared_ptr<wrench::DataFile> input_file3 = wrench::Simulation::addFile("input_file3", 1000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file1, storage_service1));
-    ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service1));
-    ASSERT_NO_THROW(simulation->stageFile(input_file3, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file2));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file3));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -822,7 +822,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
     std::shared_ptr<wrench::DataFile> file = nullptr;
     ASSERT_NO_THROW(file = wrench::Simulation::addFile("input", 1));
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(file));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1028,9 +1028,9 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
     std::shared_ptr<wrench::DataFile> file2 = nullptr;
     ASSERT_NO_THROW(file2 = wrench::Simulation::addFile("input2", 1));
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(file1, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(file1));
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(file2, storage_service2));
+    ASSERT_NO_THROW(storage_service2->createFile(file2));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

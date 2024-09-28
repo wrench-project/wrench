@@ -229,7 +229,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFile(this->input_file, storage_service);
+    storage_service->createFile(this->input_file);
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -379,7 +379,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFile(input_file, storage_service);
+    storage_service->createFile(input_file);
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -547,7 +547,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFile(input_file, storage_service);
+    storage_service->createFile(input_file);
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

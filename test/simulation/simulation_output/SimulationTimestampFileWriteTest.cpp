@@ -181,7 +181,7 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
     std::set<std::shared_ptr<wrench::DataFile>> files_to_stage = {file_1, file_2, file_3, xl_file};
 
     for (auto const &f: files_to_stage) {
-        ASSERT_NO_THROW(simulation->stageFile(f, storage_service));
+        ASSERT_NO_THROW(storage_service->createFile(f));
     }
 
     simulation->getOutput().enableFileReadWriteCopyTimestamps(true);
