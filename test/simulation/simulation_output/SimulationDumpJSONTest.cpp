@@ -1093,7 +1093,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
 
     simulation->add(new wrench::FileRegistryService("host1"));
     for (auto const &file: link_usage_workflow->getInputFiles()) {
-        simulation->stageFile(file, client_storage_service);
+        client_storage_service->createFile(file);
     }
 
     simulation->getOutput().enableBandwidthTimestamps(true);

@@ -753,35 +753,38 @@ namespace wrench {
     }
 #endif
 
-    /**
-     * @brief Stage a copy of a file at a location (and add entries to all file registry services, if any)
-     * @param location: the file location
-     */
-    void Simulation::stageFile(const std::shared_ptr<FileLocation> &location) {
-        if (location == nullptr) {
-            throw std::invalid_argument("Simulation::stageFile(): Invalid nullptr arguments");
-        }
-
-        if (std::dynamic_pointer_cast<CompoundStorageService>(location->getStorageService())) {
-            throw std::invalid_argument("Simulation::stageFile(): Can't stage on CompoundStorageService (it is only an abstraction layer)");
-        }
-
-        if (this->is_running) {
-            throw std::runtime_error(" Simulation::stageFile(): Cannot stage a file once the simulation has started");
-        }
-
-        // Put the file on the storage service (not via the service daemon)
-        try {
-            location->getStorageService()->createFile(location);
-        } catch (ExecutionException &e) {
-            throw std::invalid_argument("Simulation::stageFile(): Not enough space on disk");
-        }
-
-        // Update all file registry services (perhaps none)
-        for (const auto &frs: this->file_registry_services) {
-            frs->addEntryToDatabase(location);
-        }
-    }
+//    /**
+//     * @brief Stage a copy of a file at a location (and add entries to all file registry services, if any)
+//     * @param location: the file location
+//     */
+//    void Simulation::stageFile(const std::shared_ptr<FileLocation> &location) {
+//
+//        std::cerr << "CALLING STATEFILE " << location->getDirectoryPath() << "\n";
+//        std::cerr << "CALLING STATEFILE " << location->getFilePath() << "\n";
+//        if (location == nullptr) {
+//            throw std::invalid_argument("Simulation::stageFile(): Invalid nullptr arguments");
+//        }
+//
+//        if (std::dynamic_pointer_cast<CompoundStorageService>(location->getStorageService())) {
+//            throw std::invalid_argument("Simulation::stageFile(): Can't stage on CompoundStorageService (it is only an abstraction layer)");
+//        }
+//
+//        if (this->is_running) {
+//            throw std::runtime_error(" Simulation::stageFile(): Cannot stage a file once the simulation has started");
+//        }
+//
+//        // Put the file on the storage service (not via the service daemon)
+//        try {
+//            location->getStorageService()->createFile(location);
+//        } catch (ExecutionException &e) {
+//            throw std::invalid_argument("Simulation::stageFile(): Not enough space on disk");
+//        }
+//
+//        // Update all file registry services (perhaps none)
+//        for (const auto &frs: this->file_registry_services) {
+//            frs->addEntryToDatabase(location);
+//        }
+//    }
 
 
     /**

@@ -292,7 +292,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
     std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    EXPECT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -449,7 +449,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
     std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    EXPECT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -565,7 +565,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
     std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    EXPECT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -717,7 +717,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
     std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    EXPECT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -885,7 +885,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
     std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    EXPECT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would

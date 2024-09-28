@@ -194,7 +194,7 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
 
     simulation->add(new wrench::FileRegistryService("host1"));
     for (auto const &file: this->workflow->getInputFiles()) {
-        simulation->stageFile(file, client_storage_service);
+        client_storage_service->createFile(file);
     }
 
 

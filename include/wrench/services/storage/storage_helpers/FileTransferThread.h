@@ -41,6 +41,7 @@ namespace wrench {
                            double num_bytes_to_transfer,
                            S4U_CommPort *src_commport,
                            std::shared_ptr<FileLocation> dst_location,
+                           std::shared_ptr<simgrid::fsmod::File> dst_opened_file,
                            S4U_CommPort *answer_commport_if_read,
                            S4U_CommPort *answer_commport_if_write,
                            S4U_CommPort *answer_commport_if_copy,
@@ -51,6 +52,7 @@ namespace wrench {
                            std::shared_ptr<DataFile> file,
                            double num_bytes_to_transfer,
                            std::shared_ptr<FileLocation> src_location,
+                           std::shared_ptr<simgrid::fsmod::File> src_opened_file,
                            S4U_CommPort *dst_commport,
                            S4U_CommPort *answer_commport_if_read,
                            S4U_CommPort *answer_commport_if_write,
@@ -62,7 +64,9 @@ namespace wrench {
                            std::shared_ptr<DataFile> file,
                            double num_bytes_to_transfer,
                            std::shared_ptr<FileLocation> src_location,
+                           std::shared_ptr<simgrid::fsmod::File> src_opened_file,
                            std::shared_ptr<FileLocation> dsg_location,
+                           std::shared_ptr<simgrid::fsmod::File> dst_opened_file,
                            S4U_CommPort *answer_commport_if_read,
                            S4U_CommPort *answer_commport_if_write,
                            S4U_CommPort *answer_commport_if_copy,
@@ -73,16 +77,20 @@ namespace wrench {
 
 
     private:
+        friend class SimpleStorageServiceBufferized;
+
         std::shared_ptr<StorageService> parent;
         std::shared_ptr<DataFile> file;
 
         // Only one of these two is valid
         S4U_CommPort *src_commport;
         std::shared_ptr<FileLocation> src_location;
+        std::shared_ptr<simgrid::fsmod::File> src_opened_file;
 
         // Only one of these two is valid
         S4U_CommPort *dst_commport;
         std::shared_ptr<FileLocation> dst_location;
+        std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
 
         double num_bytes_to_transfer;
 

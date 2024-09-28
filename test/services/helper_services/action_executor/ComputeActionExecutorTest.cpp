@@ -227,7 +227,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test(bool si
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -351,7 +351,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorFailureTest_test() {
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

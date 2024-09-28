@@ -97,8 +97,8 @@ namespace wrench {
         void removeDirectory(const std::string &path) override;
         void removeFile(const std::shared_ptr<FileLocation> &location) override;
 
-        //std::string getMountPoint();
-        std::set<std::string> getMountPoints();
+        std::string getMountPoint() override;
+        std::set<std::string> getMountPoints() override;
         bool hasMultipleMountPoints();
         bool hasMountPoint(const std::string &mp);
 
@@ -117,10 +117,12 @@ namespace wrench {
          */
         bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
             try {
-                std::string dot_file = location->getDirectoryPath() + "/" + "." + location->getFile()->getID();
-                this->file_system->create_file(dot_file, (sg_size_t) location->getFile()->getSize());
-                this->file_system->make_file_unevictable(dot_file); // TODO
-            } catch (simgrid::Exception &ignore) {
+                std::string dot_file = location->getDotFilePath();
+                if (this->reserved_space.find(dot_file) == this->reserved_space.end()) {
+                    this->file_system->create_file(dot_file, (sg_size_t) location->getFile()->getSize());
+                    this->reserved_space[location->getDotFilePath()] = this->file_system->open(dot_file, "w");
+                }
+            } catch (simgrid::Exception &e) {
                 return false;
             }
             return true;
@@ -132,8 +134,12 @@ namespace wrench {
          */
         void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
 
-            std::string dot_file = location->getDirectoryPath() + "/" + "." + location->getFile()->getID();
+            std::string dot_file = location->getDotFilePath();
             if (this->file_system->file_exists(dot_file)) {
+                if (this->reserved_space.find(dot_file) != this->reserved_space.end()) {
+                    this->reserved_space[dot_file]->close();
+                    this->reserved_space.erase(dot_file);
+                }
                 this->file_system->unlink_file(dot_file);
             }
         }
@@ -181,9 +187,9 @@ namespace wrench {
         }
 
 
-        void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
-
-        void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
+//        void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
+//
+//        void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -191,6 +197,7 @@ namespace wrench {
 
     protected:
 
+        friend class SimpleStorageServiceBufferized;
         friend class SimpleStorageServiceNonBufferized;
 
         /***********************/
@@ -232,6 +239,10 @@ namespace wrench {
         std::shared_ptr<simgrid::fsmod::FileSystem> file_system;
 
 //        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
+
+        std::shared_ptr<FailureCause> validateFileReadRequest(const std::shared_ptr<FileLocation> &location);
+        std::shared_ptr<FailureCause> validateFileWriteRequest(const std::shared_ptr<FileLocation> &location, double num_bytes_to_write, bool *file_already_there);
+        std::shared_ptr<FailureCause> validateFileCopyRequest(const std::shared_ptr<FileLocation> &src_location, std::shared_ptr<FileLocation> &dst_location,  bool *dst_file_already_there);
 
         /***********************/
         /** \endcond          **/

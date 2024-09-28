@@ -61,6 +61,7 @@ namespace wrench {
 #endif
         std::string getDirectoryPath();
         std::string getFilePath();
+        std::string getDotFilePath();
         [[nodiscard]] bool isScratch() const;
         std::string toString();
 

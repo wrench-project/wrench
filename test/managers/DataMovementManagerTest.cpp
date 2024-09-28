@@ -33,9 +33,9 @@ public:
     std::shared_ptr<wrench::DataFile> src2_file_2;
     std::shared_ptr<wrench::DataFile> src2_file_3;
 
-    std::shared_ptr<wrench::StorageService> dst_storage_service = nullptr;
-    std::shared_ptr<wrench::StorageService> src_storage_service = nullptr;
-    std::shared_ptr<wrench::StorageService> src2_storage_service = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> dst_storage_service = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> src_storage_service = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> src2_storage_service = nullptr;
 
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
@@ -376,13 +376,13 @@ void DataMovementManagerTest::do_AsyncCopy_test() {
                             this, file_registry_service, "WMSHost")));
 
     // Stage the 2 files on the StorageHost
-    ASSERT_NO_THROW(simulation->stageFile(src_file_1, src_storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(src_file_2, src_storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(src_file_3, src_storage_service));
+    ASSERT_NO_THROW(src_storage_service->createFile(src_file_1));
+    ASSERT_NO_THROW(src_storage_service->createFile(src_file_2));
+    ASSERT_NO_THROW(src_storage_service->createFile(src_file_3));
 
-    ASSERT_NO_THROW(simulation->stageFile(src2_file_1, src2_storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(src2_file_2, src2_storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(src2_file_3, src2_storage_service));
+    ASSERT_NO_THROW(src2_storage_service->createFile(src2_file_1));
+    ASSERT_NO_THROW(src2_storage_service->createFile(src2_file_2));
+    ASSERT_NO_THROW(src2_storage_service->createFile(src2_file_3));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -574,13 +574,13 @@ void DataMovementManagerTest::do_AsyncWrite_test() {
                             this, file_registry_service, "WMSHost")));
 
     // Stage the 2 files on the StorageHost
-    ASSERT_NO_THROW(simulation->stageFile(src_file_1, src_storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(src_file_2, src_storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(src_file_3, src_storage_service));
+    ASSERT_NO_THROW(src_storage_service->createFile(src_file_1));
+    ASSERT_NO_THROW(src_storage_service->createFile(src_file_2));
+    ASSERT_NO_THROW(src_storage_service->createFile(src_file_3));
 
-    ASSERT_NO_THROW(simulation->stageFile(src2_file_1, src2_storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(src2_file_2, src2_storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(src2_file_3, src2_storage_service));
+    ASSERT_NO_THROW(src2_storage_service->createFile(src2_file_1));
+    ASSERT_NO_THROW(src2_storage_service->createFile(src2_file_2));
+    ASSERT_NO_THROW(src2_storage_service->createFile(src2_file_3));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -744,13 +744,13 @@ void DataMovementManagerTest::do_AsyncRead_test() {
                             this, "WMSHost")));
 
     // Stage files
-    ASSERT_NO_THROW(simulation->stageFile(src_file_1, src_storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(src_file_2, src_storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(src_file_3, src_storage_service));
+    ASSERT_NO_THROW(src_storage_service->createFile(src_file_1));
+    ASSERT_NO_THROW(src_storage_service->createFile(src_file_2));
+    ASSERT_NO_THROW(src_storage_service->createFile(src_file_3));
 
-    ASSERT_NO_THROW(simulation->stageFile(src2_file_1, src2_storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(src2_file_2, src2_storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(src2_file_3, src2_storage_service));
+    ASSERT_NO_THROW(src2_storage_service->createFile(src2_file_1));
+    ASSERT_NO_THROW(src2_storage_service->createFile(src2_file_2));
+    ASSERT_NO_THROW(src2_storage_service->createFile(src2_file_3));
 
     ASSERT_NO_THROW(simulation->launch());
 

@@ -30,7 +30,7 @@ public:
     std::shared_ptr<wrench::WorkflowTask> task4;
     std::shared_ptr<wrench::WorkflowTask> task5;
     std::shared_ptr<wrench::WorkflowTask> task6;
-    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service = nullptr;
 
     void do_getReadyTasksTest_test();
 
@@ -294,7 +294,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

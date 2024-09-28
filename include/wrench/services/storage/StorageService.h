@@ -13,6 +13,8 @@
 #include <string>
 #include <set>
 
+#include <fsmod.hpp>
+
 #include "wrench/services/Service.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/job/StandardJob.h"
@@ -269,13 +271,31 @@ namespace wrench {
             }
             location->getStorageService()->createFile(location);
         }
+
+        /**
+         * @brief Return the storage service's default mountpoint, if any.
+         * If none, throws an std::runtime_error exception
+         */
+        virtual std::string getMountPoint() {
+            throw std::runtime_error("StorageService::getDefaultMountPoint(): no mount point!");
+        }
+
+        /**
+         * @brief Return the storage service's mountpoints. If none, throws
+         * an std::runtime_error exception
+         */
+        virtual std::set<std::string> getMountPoints() {
+            throw std::runtime_error("StorageService::getDefaultMountPoints(): no mount points!");
+        }
+
         /**
          * @brief Create a file at the storage service (in zero simulated time)
          * @param file: a file
          */
-        void createFile(const std::shared_ptr<DataFile> &file) {
-            this->createFile(file, "/");
+        virtual void createFile(const std::shared_ptr<DataFile> &file) {
+            this->createFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
+
         /**
          * @brief Create a file at the storage service (in zero simulated time)
          * @param file: a file
@@ -284,6 +304,7 @@ namespace wrench {
         virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
             this->createFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
+
         /**
          * @brief Create a file at the storage service (in zero simulated time)
          * @param location: a location
@@ -543,6 +564,8 @@ namespace wrench {
                        const std::string &service_name);
 
         virtual void setIsScratch(bool is_scratch);
+
+        std::unordered_map<std::string, std::shared_ptr<simgrid::fsmod::File>> reserved_space;
 
         /** Fast-Access common message payloads! **/
         //        double StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD;

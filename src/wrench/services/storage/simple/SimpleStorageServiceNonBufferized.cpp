@@ -63,11 +63,7 @@ namespace wrench {
      */
     void SimpleStorageServiceNonBufferized::processTransactionCompletion(const std::shared_ptr<Transaction> &transaction) {
 
-//        if (transaction->src_location) {
-//            transaction->src_location->getStorageService()->decrementNumRunningOperationsForLocation(
-//                    transaction->src_location);
-//        }
-
+        std::cerr << "IN TRANSACTION COMPLETION\n";
 
         // Deal with possibly open source file
         if (transaction->src_opened_file) {
@@ -75,7 +71,13 @@ namespace wrench {
         }
         // Deal with possibly opened destination file
         if (transaction->dst_opened_file) {
+            std::cerr << "THERE WAS AN OPENED DST FILE, JUST CLOSE IT!\n";
+            transaction->dst_opened_file->close();
+        } else {
+            std::cerr << "THE TRANSACTION DOESN'T HAVE A DST OPENED FILE, SO IT MUST HAVE BEEN A DOT FILE!\n";
+
             std::string current_path = transaction->dst_opened_file->get_path(); // Could be a "temp" file path!
+            std::cerr << "AT PATH "  << current_path << "\n";
             transaction->dst_opened_file->close();
             transaction->dst_opened_file->get_file_system()->move_file(current_path, transaction->dst_location->getFilePath());
         }
@@ -333,33 +335,8 @@ namespace wrench {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileWriteRequest(): Cannot process a write requests with a non-zero buffer size");
         }
 
-        auto file = location->getFile();
         bool file_already_there;
-
-        // Figure out whether this succeeds or not
-        std::shared_ptr<FailureCause> failure_cause = nullptr;
-
-        auto partition = this->file_system->get_partition_for_path_or_null(location->getDirectoryPath());
-        if (!partition) {
-            failure_cause = std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
-        } else {
-
-            file_already_there = this->file_system->file_exists(
-                    location->getFilePath());
-
-            if ((not file_already_there) and (num_bytes_to_write < location->getFile()->getSize())) {
-                throw std::runtime_error("SimpleStorageServiceBufferized::processFileWriteRequest(): Cannot write fewer number of bytes than the file size if the file isn't already present");
-            }
-
-            if (not file_already_there) {
-                if (partition->get_free_space() < (sg_size_t) file->getSize()) {
-                    failure_cause = std::shared_ptr<FailureCause>(
-                            new StorageServiceNotEnoughSpace(
-                                    file,
-                                    this->getSharedPtr<SimpleStorageService>()));
-                }
-            }
-        }
+        auto failure_cause = validateFileWriteRequest(location, num_bytes_to_write, &file_already_there);
 
         if (failure_cause) {
             try {
@@ -369,7 +346,7 @@ namespace wrench {
                                 false,
                                 std::shared_ptr<FailureCause>(
                                         new StorageServiceNotEnoughSpace(
-                                                file,
+                                                location->getFile(),
                                                 this->getSharedPtr<SimpleStorageService>())),
                                 {},
                                 0,
@@ -397,13 +374,12 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
 
-        // Open the dot file (will make it unevictable)
         std::shared_ptr<simgrid::fsmod::File> opened_file;
         if (not file_already_there) { // Open dot file
-            std::string dot_file_path = location->getFilePath() + ".wrench_tmp";
-            this->file_system->create_file(dot_file_path, (sg_size_t) file->getSize());
-            opened_file = this->file_system->open(dot_file_path, "w");
-        } else { // Open file and make it to full size!
+            std::cerr << "OPENING A DOT FILE\n";
+            this->reserveSpace(location);
+        } else { // Open the file
+            std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
             opened_file = this->file_system->open(location->getFilePath(), "w");
         }
 
@@ -444,25 +420,7 @@ namespace wrench {
             S4U_CommPort *answer_commport,
             simgrid::s4u::Host *requesting_host) {
 
-        // Figure out whether this succeeds or not
-        std::shared_ptr<FailureCause> failure_cause = nullptr;
-
-        auto partition = this->file_system->get_partition_for_path_or_null(location->getDirectoryPath());
-        if (!partition) {
-            failure_cause = std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
-        } else {
-            auto file = location->getFile();
-            if (not this->file_system->directory_exists(location->getDirectoryPath())) {
-                failure_cause = std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
-            } else {
-                if (not this->file_system->file_exists(location->getFilePath())) {
-                    WRENCH_INFO(
-                            "Received a read request for a file I don't have (%s)", location->toString().c_str());
-                    failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));
-                }
-            }
-        }
-
+        auto failure_cause = validateFileReadRequest(location);
         bool success = (failure_cause == nullptr);
 
         // Send back the corresponding ack
@@ -480,14 +438,9 @@ namespace wrench {
             return true;// oh well
         }
 
+
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
-            // Make the file unevictable
-            location->getStorageService()->incrementNumRunningOperationsForLocation(location);
-
-            auto file = location->getFile();
-
-            // Open the file
             auto opened_file = this->file_system->open(location->getFilePath(), "r");
 
             // Create the transaction
@@ -529,9 +482,28 @@ namespace wrench {
                     src_location->toString().c_str(),
                     dst_location->toString().c_str());
 
+        bool dst_file_already_there;
+        auto failure_cause = validateFileCopyRequest(src_location, dst_location, &dst_file_already_there);
+
+        if (failure_cause) {
+            this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), src_location->getFile(), src_location, dst_location);
+            try {
+                answer_commport->putMessage(
+                        new StorageServiceFileCopyAnswerMessage(
+                                src_location,
+                                dst_location,
+                                false,
+                                failure_cause,
+                                this->getMessagePayloadValue(
+                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+            } catch (ExecutionException &e) {
+                return true;
+            }
+            return true;
+        }
+
         auto src_host = src_location->getStorageService()->getHost();
         auto dst_host = dst_location->getStorageService()->getHost();
-
         auto src_disk = src_location->getDiskOrNull();
         if (src_disk == nullptr) {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(): source disk not found - internal error");
@@ -541,67 +513,19 @@ namespace wrench {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(): destination disk not found - internal error");
         }
 
-        auto file = src_location->getFile();
-        std::shared_ptr<FailureCause> failure_cause = nullptr;
-
+        // Open files and create a Transaction
         auto src_file_system = std::dynamic_pointer_cast<SimpleStorageService>(src_location->getStorageService())->file_system;
         auto dst_file_system = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService())->file_system;
-
-        // Check files and directory paths
-        if (not src_file_system->file_exists(src_location->getFilePath())) {
-            failure_cause = std::make_shared<FileNotFound>(src_location);
-        } else if (not dst_file_system->directory_exists(dst_location->getDirectoryPath())) {
-            failure_cause = std::make_shared<InvalidDirectoryPath>(dst_location);
-        }
-
-        // Check space if needed
-        bool dst_file_already_there;
-        if (!failure_cause) {
-            dst_file_already_there = dst_file_system->file_exists(dst_location->getFilePath());
-            if (not dst_file_already_there) {
-                auto free_space = dst_file_system->get_partition_for_path_or_null(dst_location->getFilePath())->get_free_space();
-                if (free_space < (sg_size_t) file->getSize()) {
-                    failure_cause = std::make_shared<StorageServiceNotEnoughSpace>(file,
-                            this->getSharedPtr<SimpleStorageService>());
-                }
-            }
-        }
-
-        if (failure_cause) {
-            this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
-            try {
-                answer_commport->putMessage(
-                        new StorageServiceFileCopyAnswerMessage(
-                                src_location,
-                                dst_location,
-                                false,
-                                std::shared_ptr<FailureCause>(
-                                        new StorageServiceNotEnoughSpace(
-                                                file,
-                                                this->getSharedPtr<SimpleStorageService>())),
-                                this->getMessagePayloadValue(
-                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (ExecutionException &e) {
-                return true;
-            }
-            return true;
-        }
-
-
-        // At this point, there is enough space
-        // Open files and create a Transaction
         auto src_opened_file = src_file_system->open(src_location->getFilePath(), "r");
         std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
         if (not dst_file_already_there) {
-            std::string dot_file_path = dst_location->getFilePath() + ".wrench_tmp";
-            dst_file_system->create_file(dot_file_path, (sg_size_t) file->getSize());
-            dst_opened_file = dst_file_system->open(dot_file_path, "w");
+            this->reserveSpace(dst_location);
         } else {
             dst_opened_file = dst_file_system->open(dst_location->getFilePath(), "w");
         }
 
         uint64_t transfer_size;
-        transfer_size = (uint64_t) (file->getSize());
+        transfer_size = (uint64_t) (src_location->getFile()->getSize());
         auto transaction = std::make_shared<Transaction>(
                 src_location,
                 src_opened_file,
@@ -810,20 +734,20 @@ namespace wrench {
 //        }
 //    }
 
-    /**
-     * @brief Returns the number of running transactions on a disk, as far as this
-     *        storage service know
-     * @param disk: a disk
-     * @return a number of transactions
-     */
-    int SimpleStorageServiceNonBufferized::getNumRunningTransactionsOnDisk(simgrid::s4u::Disk *disk) {
-        int count = 0;
-        for (const auto &t: this->running_transactions) {
-            if ((t->src_disk == disk) or (t->dst_disk == disk)) {
-                count++;
-            }
-        }
-        return count;
-    }
+//    /**
+//     * @brief Returns the number of running transactions on a disk, as far as this
+//     *        storage service know
+//     * @param disk: a disk
+//     * @return a number of transactions
+//     */
+//    int SimpleStorageServiceNonBufferized::getNumRunningTransactionsOnDisk(simgrid::s4u::Disk *disk) {
+//        int count = 0;
+//        for (const auto &t: this->running_transactions) {
+//            if ((t->src_disk == disk) or (t->dst_disk == disk)) {
+//                count++;
+//            }
+//        }
+//        return count;
+//    }
 
 }// namespace wrench

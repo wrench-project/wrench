@@ -1056,7 +1056,7 @@ void CompoundStorageServiceFunctionalTest::do_BasicFunctionality_test() {
                             new CompoundStorageServiceBasicFunctionalityTestCtrl(this, "CompoundStorageHost")));
 
     // A bogus staging (can't use CompoundStorageService for staging)
-    ASSERT_THROW(simulation->stageFile(file_10, compound_storage_service), std::invalid_argument);
+    ASSERT_THROW(compound_storage_service->createFile(file_10), std::invalid_argument);
 
     // Tun the simulation
     ASSERT_NO_THROW(simulation->launch());

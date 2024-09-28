@@ -355,7 +355,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -491,7 +491,7 @@ void HTCondorServiceTest::do_StandardJobTaskFailureTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -617,7 +617,7 @@ void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -760,7 +760,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1002,8 +1002,8 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(input_file3, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file2));
+    ASSERT_NO_THROW(storage_service->createFile(input_file3));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1124,8 +1124,8 @@ void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(input_file3, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file2));
+    ASSERT_NO_THROW(storage_service->createFile(input_file3));
 
     // Fails because it will try to run a grid job on a system that does not support standard jobs, WMS is set up to
     //return 0 in this case and 1 if it successfully completes.
@@ -1258,8 +1258,8 @@ void HTCondorServiceTest::do_NoNonGridUniverseSupportTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(input_file3, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file2));
+    ASSERT_NO_THROW(storage_service->createFile(input_file3));
 
     // Fails because it will try to run a grid job on a system that does not support standard jobs, WMS is set up to
     //return 0 in this case and 1 if it successfully completes.
@@ -1373,8 +1373,8 @@ void HTCondorServiceTest::do_NoGridJobSupportTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(input_file3, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file2));
+    ASSERT_NO_THROW(storage_service->createFile(input_file3));
 
     // Fails because it will try to run a grid job on a system that does not support standard jobs, WMS is set up to
     //return 0 in this case and 1 if it successfully completes.
@@ -1536,8 +1536,8 @@ void HTCondorServiceTest::do_NotEnoughResourcesTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(input_file3, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file2));
+    ASSERT_NO_THROW(storage_service->createFile(input_file3));
 
     // Fails because it will try to run a grid job on a system that does not support standard jobs, WMS is set up to
     //return 0 in this case and 1 if it successfully completes.

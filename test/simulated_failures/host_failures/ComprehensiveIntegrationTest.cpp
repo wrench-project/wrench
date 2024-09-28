@@ -488,10 +488,10 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
         if (this->storage_service1) {
-            simulation->stageFile(input_file, this->storage_service1);
+            this->storage_service1->createFile(input_file);
         }
         if (this->storage_service2) {
-            simulation->stageFile(input_file, this->storage_service2);
+            this->storage_service2->createFile(input_file);
         }
     }
 
