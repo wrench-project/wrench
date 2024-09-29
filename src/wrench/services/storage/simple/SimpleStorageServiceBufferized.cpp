@@ -479,9 +479,10 @@ namespace wrench {
             auto dst_file_system = ftt->dst_opened_file->get_file_system();
             auto dst_file_path = ftt->dst_opened_file->get_path();
             ftt->dst_opened_file->close();
-            std::cerr << "MOVING THE FILE TO THE DST FILE IN CASE IT WAS JUST A DOT FILE\n";
-            std::cerr << "THE TRANSACTION DOESN'T HAVE A DST OPENED FILE, SO IT MUST HAVE BEEN A DOT FILE!\n";
-            dst_file_system->move_file(dst_file_path, ftt->dst_location->getFilePath());
+            if (not dst_file_system->file_exists(ftt->dst_location->getFilePath())) {
+                std::cerr << ftt->dst_location->getStorageService()->getName() << ": MOVING  " << dst_file_path << " TO " << ftt->dst_location->getFilePath() << "\n";
+                dst_file_system->move_file(dst_file_path, ftt->dst_location->getFilePath());
+            }
         }
 
         if (success) {
