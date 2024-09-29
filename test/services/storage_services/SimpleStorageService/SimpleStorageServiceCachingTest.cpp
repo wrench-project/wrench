@@ -80,7 +80,9 @@ private:
         auto file_30 = wrench::Simulation::addFile("file_30", 30);
         auto file_10 = wrench::Simulation::addFile("file_10", 10);
 
+        std::cerr << "HERE1!\n";
         this->test->storage_service_1->writeFile(file_50);
+        std::cerr << "HERE2!\n";
         this->test->storage_service_1->writeFile(file_30);
         this->test->storage_service_1->writeFile(file_10);
 
@@ -154,10 +156,10 @@ void SimpleStorageServiceCachingTest::do_SimpleLRUCaching_test(double buffer_siz
 
     //    std::cerr << "\nBUFFER SIZE = " << buffer_size << "\n";
 
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //        argv[1] = strdup("--wrench-full-log");
+            argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

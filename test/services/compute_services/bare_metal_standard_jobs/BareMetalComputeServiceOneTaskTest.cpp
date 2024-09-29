@@ -827,7 +827,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-    //        argv[1] = strdup("--wrench-full-log");
+//            argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -1176,7 +1176,6 @@ private:
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
 
-
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -1217,10 +1216,10 @@ TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithPrePostCopiesTaskCleanup
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanup_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-    //    argv[1] = strdup("--wrench-full-log");
+        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -1552,8 +1551,10 @@ private:
         auto job_manager = this->createJobManager();
 
         // Remove the staged file!
+        WRENCH_INFO("Deleting staged file");
         wrench::StorageService::deleteFileAtLocation(
                 wrench::FileLocation::LOCATION(test->storage_service1, test->input_file));
+        WRENCH_INFO("Deleted stages file");
 
         wrench::Simulation::sleep(1.0);
 
@@ -1595,10 +1596,10 @@ TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithMissingFile) {
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-    //        argv[1] = strdup("--wrench-full-log");
+            argv[1] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -1639,6 +1640,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
+    std::cerr << "STARING FILE " << input_file->getID() << " on " << storage_service1->getName() << "\n";
     ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation

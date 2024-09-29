@@ -92,6 +92,7 @@ namespace wrench {
             if (location == nullptr) {
                 throw std::invalid_argument("StorageService::deleteFileAtLocation(): invalid argument argument");
             }
+            std::cerr << "CALLING GELERATE FILE AT LOCAIONT ON " << location->getStorageService()->getName() << "\n";
             location->getStorageService()->deleteFile(location);
         }
         /**
@@ -144,7 +145,7 @@ namespace wrench {
          * @param file a file
          */
         void readFile(const std::shared_ptr<DataFile> &file) {
-            this->readFile(file, "/", file->getSize());
+            this->readFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file), file->getSize());
         }
         /**
          * @brief Read a file at the storage service (incurs simulated overheads)
@@ -152,7 +153,7 @@ namespace wrench {
          * @param num_bytes a number of bytes to read
          */
         void readFile(const std::shared_ptr<DataFile> &file, double num_bytes) {
-            this->readFile(file, "/", num_bytes);
+            this->readFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file), num_bytes);
         }
         /**
          * @brief Read a file at the storage service (incurs simulated overheads)
@@ -203,7 +204,7 @@ namespace wrench {
          * @param file a file
          */
         void writeFile(const std::shared_ptr<DataFile> &file) {
-            this->writeFile(file, "/");
+            this->writeFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
         /**
          * @brief Write a file at the storage service (incurs simulated overheads)
