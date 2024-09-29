@@ -159,12 +159,12 @@ namespace wrench {
         std::string mount_point;
         std::string path_at_mount_point;
 
-        if (not this->file_system->file_exists(location->getDirectoryPath())) {
+        if (not this->file_system->file_exists(location->getFilePath())) {
             if (not this->isScratch()) {
                 failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));
             } // otherwise, we don't care, perhaps it was taken care of elsewhere...
         } else {
-            this->file_system->unlink_file(location->getDirectoryPath());
+            this->file_system->unlink_file(location->getFilePath());
         }
 
         answer_commport->dputMessage(
@@ -189,7 +189,7 @@ namespace wrench {
             const std::shared_ptr<FileLocation> &location,
             S4U_CommPort *answer_commport) {
 
-        bool file_found = this->file_system->file_exists(location->getDirectoryPath());
+        bool file_found = this->file_system->file_exists(location->getFilePath());
 
         answer_commport->dputMessage(
                 new StorageServiceFileLookupAnswerMessage(
@@ -375,7 +375,7 @@ namespace wrench {
      * @return true if the file is present, false otherwise
      */
     bool SimpleStorageService::hasFile(const std::shared_ptr<FileLocation> &location) {
-        return this->file_system->file_exists(location->getDirectoryPath() + "/" + location->getFile()->getID());
+        return this->file_system->file_exists(location->getFilePath());
     }
 
     /**
@@ -395,7 +395,7 @@ namespace wrench {
      * @param location: a location
      */
     void SimpleStorageService::removeFile(const std::shared_ptr<FileLocation> &location) {
-        std::string full_path = location->getDirectoryPath() + "/" + location->getFile()->getID();
+        std::string full_path = location->getFilePath();
         if (not this->file_system->file_exists(full_path)) {
             return;
         } else {
@@ -456,6 +456,7 @@ namespace wrench {
     void SimpleStorageService::createFile(const std::shared_ptr<FileLocation> &location) {
         std::string full_path = location->getFilePath();
 
+            std::cerr << "IN CREATE FILE SIMPLeSTORAGESERVOCE: " << full_path << "\n";
         try {
             this->file_system->create_file(full_path, location->getFile()->getSize());
         } catch (sgfs::FileAlreadyExistsException &e) {
@@ -464,6 +465,7 @@ namespace wrench {
             throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(
                     location->getFile(), location->getStorageService()));
         }
+        std::cerr << "CREATED? " << this->file_system->file_exists(full_path) << "  " << this->file_system->get_name() << "\n";
     }
 
 
@@ -478,7 +480,7 @@ namespace wrench {
         }
 
         try {
-            std::string full_path = location->getDirectoryPath() + "/" + location->getFile()->getID();
+            std::string full_path = location->getFilePath();
             auto fd = this->file_system->open(full_path, "r");
             double date = fd->stat()->last_modification_date;
             fd->close();
@@ -508,8 +510,11 @@ namespace wrench {
      */
     std::shared_ptr<FailureCause> SimpleStorageService::validateFileReadRequest(const std::shared_ptr<FileLocation> &location) {
 
-        auto partition = this->file_system->get_partition_for_path_or_null(location->getDirectoryPath());
-        if (not partition or this->file_system->directory_exists(location->getDirectoryPath())) {
+        std::cerr << "IN VALIDATE FILE READ REQUEST: " << location->toString() << "\n";
+        std::cerr << "IN VALIDATE FILE READ REQUEST (DIRPATH): " << location->getDirectoryPath() << "\n";
+        auto partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
+        std::cerr << "PARTTIOGN IS NUILL: " << (partition == nullptr) << "\n";
+        if ((not partition) or (not this->file_system->directory_exists(location->getDirectoryPath()))) {
             return std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
         }
         if (not this->file_system->file_exists(location->getFilePath())) {
@@ -526,7 +531,7 @@ namespace wrench {
      */
     std::shared_ptr<FailureCause> SimpleStorageService::validateFileWriteRequest(const std::shared_ptr<FileLocation> &location, double num_bytes_to_write, bool *file_already_there) {
 
-        auto partition = this->file_system->get_partition_for_path_or_null(location->getDirectoryPath());
+        auto partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
         if (!partition) {
             *file_already_there = false;
             return std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
@@ -566,11 +571,17 @@ namespace wrench {
         auto src_file_system = std::dynamic_pointer_cast<SimpleStorageService>(src_location->getStorageService())->file_system;
         auto dst_file_system = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService())->file_system;
 
+        std::cerr << "IN VALIDATE FILE COPY REQUEST\n";
+
         // Check files and directory paths
         if (not src_file_system->file_exists(src_location->getFilePath())) {
             return std::make_shared<FileNotFound>(src_location);
         }
+
         if (not dst_file_system->directory_exists(dst_location->getDirectoryPath())) {
+            std::cerr << "===> 1 " << dst_file_system->directory_exists("/disk2") << "\n";
+            std::cerr << "===> 2 " << dst_file_system->directory_exists("/disk2/") << "\n";
+            std::cerr << "NOT VALIDATING: " << dst_file_system->get_name() << " " << dst_location->getDirectoryPath() << "\n";
             return std::make_shared<InvalidDirectoryPath>(dst_location);
         }
 
