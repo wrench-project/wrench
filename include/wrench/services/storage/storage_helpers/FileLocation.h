@@ -61,7 +61,6 @@ namespace wrench {
 #endif
         std::string getDirectoryPath();
         std::string getFilePath();
-        std::string getDotFilePath();
         [[nodiscard]] bool isScratch() const;
         std::string toString();
 
@@ -103,10 +102,13 @@ namespace wrench {
         static bool properPathPrefix(const std::string &path1, const std::string &path2);
 
     private:
-        friend class LogicalFileSystem;
         friend class Simulation;
         friend class SimpleStorageServiceNonBufferized;
+        friend class SimpleStorageServiceBufferized;
         friend class FileTransferThread;
+
+        std::string getADotFilePath();
+        static long dot_file_sequence_number;
 
         /**
          * @brief Constructor

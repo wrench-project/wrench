@@ -401,6 +401,8 @@ namespace wrench {
             throw std::invalid_argument("StorageService::deleteFile(): Cannot be called on a SCRATCH location");
         }
 
+        std::cerr << "IN deleteFile: " << location->toString() << "\n";
+
         assertServiceIsUp(this->getSharedPtr<Service>());
 
         // Send a message to the storage service's daemon

@@ -29,6 +29,8 @@ namespace wrench {
 
     std::unordered_map<std::string, std::shared_ptr<FileLocation>> FileLocation::file_location_map;
     size_t FileLocation::file_location_map_previous_size = 0;
+    long FileLocation::dot_file_sequence_number = 0;
+
 
     FileLocation::~FileLocation() = default;
 
@@ -238,14 +240,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the location's dot-file path
+     * @brief Get a path to a dot-file for the location
      * @return a path
      */
-    std::string FileLocation::getDotFilePath() {
+    std::string FileLocation::getADotFilePath() {
         if (this->is_scratch) {
             throw std::invalid_argument("FileLocation::getDotFilePath(): No path for a SCRATCH location");
         }
-        return this->directory_path + "/" + this->file->getID() + ".wrench_tmp";
+        return this->directory_path + "/" + this->file->getID() + ".wrench_tmp." + std::to_string(FileLocation::dot_file_sequence_number++);
     }
 
 

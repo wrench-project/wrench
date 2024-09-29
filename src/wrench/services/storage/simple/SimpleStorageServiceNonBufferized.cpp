@@ -67,19 +67,19 @@ namespace wrench {
 
         // Deal with possibly open source file
         if (transaction->src_opened_file) {
+            std::cerr << "THERE WAS AN OPENED SOURCE FILE, WHICH I AM CLOSING\n";
             transaction->src_opened_file->close();
         }
         // Deal with possibly opened destination file
         if (transaction->dst_opened_file) {
             std::cerr << "THERE WAS AN OPENED DST FILE, JUST CLOSE IT!\n";
+            auto dst_file_system = transaction->dst_opened_file->get_file_system();
+            auto dst_file_path = transaction->dst_opened_file->get_path();
             transaction->dst_opened_file->close();
-        } else {
-            std::cerr << "THE TRANSACTION DOESN'T HAVE A DST OPENED FILE, SO IT MUST HAVE BEEN A DOT FILE!\n";
-
-            std::string current_path = transaction->dst_opened_file->get_path(); // Could be a "temp" file path!
-            std::cerr << "AT PATH "  << current_path << "\n";
-            transaction->dst_opened_file->close();
-            transaction->dst_opened_file->get_file_system()->move_file(current_path, transaction->dst_location->getFilePath());
+            if (not dst_file_system->file_exists(transaction->dst_location->getFilePath())) {
+                std::cerr << transaction->dst_location->getStorageService()->getName() << ": MOVING  " << dst_file_path << " TO " << transaction->dst_location->getFilePath() << "\n";
+                dst_file_system->move_file(dst_file_path, transaction->dst_location->getFilePath());
+            }
         }
 
 //        // If I was the source and the destination was bufferized, I am the one creating the file there! (yes,
@@ -376,8 +376,10 @@ namespace wrench {
 
         std::shared_ptr<simgrid::fsmod::File> opened_file;
         if (not file_already_there) { // Open dot file
-            std::cerr << "OPENING A DOT FILE\n";
-            this->reserveSpace(location);
+            std::cerr << "FILE NOT ALREADY THERE, OPENING A DOT FILE \n";
+            std::string dot_file_path = location->getADotFilePath();
+            this->file_system->create_file(dot_file_path, location->getFile()->getSize());
+            opened_file = this->file_system->open(dot_file_path, "w");
         } else { // Open the file
             std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
             opened_file = this->file_system->open(location->getFilePath(), "w");
@@ -518,10 +520,14 @@ namespace wrench {
         auto dst_file_system = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService())->file_system;
         auto src_opened_file = src_file_system->open(src_location->getFilePath(), "r");
         std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
-        if (not dst_file_already_there) {
-            this->reserveSpace(dst_location);
-        } else {
-            dst_opened_file = dst_file_system->open(dst_location->getFilePath(), "w");
+        if (not dst_file_already_there) { // Open dot file
+            std::cerr << "FILE NOT ALREADY THERE, OPENING A DOT FILE \n";
+            std::string dot_file_path = dst_location->getADotFilePath();
+            this->file_system->create_file(dot_file_path, dst_location->getFile()->getSize());
+            dst_opened_file = this->file_system->open(dot_file_path, "w");
+        } else { // Open the file
+            std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
+            dst_opened_file = this->file_system->open(dst_location->getFilePath(), "w");
         }
 
         uint64_t transfer_size;
