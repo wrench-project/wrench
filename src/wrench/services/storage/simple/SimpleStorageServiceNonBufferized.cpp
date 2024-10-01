@@ -63,8 +63,6 @@ namespace wrench {
      */
     void SimpleStorageServiceNonBufferized::processTransactionCompletion(const std::shared_ptr<Transaction> &transaction) {
 
-        std::cerr << "IN TRANSACTION COMPLETION\n";
-
         // Deal with possibly open source file
         if (transaction->src_opened_file) {
             std::cerr << "THERE WAS AN OPENED SOURCE FILE, WHICH I AM CLOSING\n";
@@ -82,6 +80,7 @@ namespace wrench {
             if (not dst_file_system->file_exists(transaction->dst_location->getFilePath())) {
                 std::cerr << transaction->dst_location->getStorageService()->getName() << ": MOVING  " << dst_file_path << " TO " << transaction->dst_location->getFilePath() << "\n";
                 dst_file_system->move_file(dst_file_path, transaction->dst_location->getFilePath());
+                std::cerr << "DONE THE MOVE\n";
             }
         }
 
@@ -130,6 +129,7 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         }
+        std::cerr << "DONE WITH TRANSACTION!\n";
     }
 
     /**

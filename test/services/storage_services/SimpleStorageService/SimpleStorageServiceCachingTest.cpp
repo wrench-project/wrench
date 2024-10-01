@@ -227,17 +227,23 @@ private:
         auto file_60 = wrench::Simulation::addFile("file_60", 60);
         auto file_70 = wrench::Simulation::addFile("file_70", 70);
 
+        std::cerr << "WRITING FILE 10\n";
         ss1->writeFile(file_10);
+        std::cerr << "WRITING FILE 20\n";
         ss1->writeFile(file_20);
+        std::cerr << "WRITING FILE 50\n";
         ss1->writeFile(file_50);
 
+        std::cerr << "WRITING FILE 30\n";
         ss2->writeFile(file_30);
+        std::cerr << "WRITING FILE 40\n";
         ss2->writeFile(file_40);
 
         // The LRU list:  SS1: file_10, file_20, file_50
         //                SS2: file_30, file_40
 
         // Copy file_50 SS1 -> SS2
+        std::cerr << "************************ DOING THE  FILE COPY ******************* \n";
         wrench::StorageService::copyFile(wrench::FileLocation::LOCATION(ss1, file_50), wrench::FileLocation::LOCATION(ss2, file_50));
 
         // The LRU list:  SS1: file_10, file_20, file_50
@@ -285,6 +291,11 @@ void SimpleStorageServiceCachingTest::do_SimpleLRUCachingCopy_test(double buffer
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
+
+    std::cerr << "************************************************\n";
+    std::cerr << "************ BUFFER SIZE: " << buffer_size << " *****************\n";
+    std::cerr << "************************************************\n";
+
 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
