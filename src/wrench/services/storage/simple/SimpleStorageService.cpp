@@ -190,6 +190,7 @@ namespace wrench {
             const std::shared_ptr<FileLocation> &location,
             S4U_CommPort *answer_commport) {
 
+        std::cerr << "LOOKING FOR FILE: " << location->getFilePath() << "\n";
         bool file_found = this->file_system->file_exists(location->getFilePath());
 
         answer_commport->dputMessage(
@@ -457,7 +458,6 @@ namespace wrench {
     void SimpleStorageService::createFile(const std::shared_ptr<FileLocation> &location) {
         std::string full_path = location->getFilePath();
 
-        std::cerr << "IN CREATE FILE SIMPLeSTORAGESERVOCE: " << full_path << "\n";
         try {
             this->file_system->create_file(full_path, location->getFile()->getSize());
         } catch (sgfs::FileAlreadyExistsException &e) {
@@ -543,8 +543,6 @@ namespace wrench {
             return std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
         }
 
-        std::cerr << "IN VALIDATE FILE WRITE 1: " << partition->get_free_space() << "\n";
-
         bool file_already_there = this->file_system->file_exists(location->getFilePath());
         try {
             if (not file_already_there) { // Open dot file
@@ -571,8 +569,6 @@ namespace wrench {
                     new StorageServiceNotEnoughSpace(
                             file,
                             this->getSharedPtr<SimpleStorageService>()));
-        } catch (simgrid::Exception &e) {
-            std::cerr << "WRTF!@#!" << e.what() << "\n";
         }
 //        std::cerr << "IN VALIDATE FILE WRITE 2: " << partition->get_free_space() << "\n";
         return nullptr;
@@ -618,12 +614,12 @@ namespace wrench {
             if (not dst_file_already_there) { // Open dot file
 //                std::cerr << "FILE NOT ALREADY THERE, OPENING A DOT FILE \n";
                 std::string dot_file_path = dst_location->getADotFilePath();
-                this->file_system->create_file(dot_file_path, dst_location->getFile()->getSize());
-                dst_opened_file = this->file_system->open(dot_file_path, "r+");
+                dst_file_system->create_file(dot_file_path, dst_location->getFile()->getSize());
+                dst_opened_file = dst_file_system->open(dot_file_path, "r+");
                 dst_opened_file->seek(0, SEEK_SET);
             } else { // Open the file
 //                std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
-                dst_opened_file = this->file_system->open(dst_location->getFilePath(), "r+");
+                dst_opened_file = dst_file_system->open(dst_location->getFilePath(), "r+");
                 dst_opened_file->seek(0, SEEK_SET);
             }
         } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
@@ -632,7 +628,7 @@ namespace wrench {
         }
 
         // Open source file
-        src_opened_file = this->file_system->open(src_location->getFilePath(), "r");
+        src_opened_file = src_file_system->open(src_location->getFilePath(), "r");
 
         return nullptr;
     }

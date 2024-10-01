@@ -194,9 +194,7 @@ namespace wrench {
 
 
         std::shared_ptr<simgrid::fsmod::File> opened_file;
-        std::cerr << "BEFORE VALIDATION\n";
         auto failure_cause = validateFileWriteRequest(location, num_bytes_to_write, opened_file);
-        std::cerr << "AFTER VALIDATION: " << this->file_system->get_partitions().at(0)->get_free_space() << "\n";
 
 
         if (failure_cause) {
@@ -337,6 +335,8 @@ namespace wrench {
             std::shared_ptr<FileLocation> &dst_location,
             S4U_CommPort *answer_commport) {
 
+        std::cerr << "IN BUFFERED PROCESS FILE COPY REQUEST\n";
+
         std::shared_ptr<simgrid::fsmod::File> src_opened_file;
         std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
         auto failure_cause = validateFileCopyRequest(src_location, dst_location, src_opened_file, dst_opened_file);
@@ -455,7 +455,6 @@ namespace wrench {
         }
         // Deal with possibly opened destination file
         if (ftt->dst_opened_file) {
-            std::cerr << "THERE WAS AN OPENED DST FILE, JUST CLOSE IT!\n";
             auto dst_file_system = ftt->dst_opened_file->get_file_system();
             auto dst_file_path = ftt->dst_opened_file->get_path();
             ftt->dst_opened_file->close();
@@ -547,6 +546,8 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         }
+
+        std::cerr << "DONE WITH FILE TRANSFER THREAD\n";
 
         return true;
     }

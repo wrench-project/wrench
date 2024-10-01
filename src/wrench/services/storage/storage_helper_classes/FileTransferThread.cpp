@@ -329,9 +329,7 @@ namespace wrench {
                         if (!dst_ss) {
                             throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Storage Service should be a SimpleStorageService for disk write");
                         }
-                        std::cerr << "WRITING A CHUNK TO THE DISK!\n";
                         this->dst_opened_file->write(msg->payload);
-                        std::cerr << "DONE WRITING TO THE DISK!\n";
 //                        simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
 //                                                dst_location->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
@@ -368,7 +366,6 @@ namespace wrench {
                         throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
                     }
 //                    simulation->writeToDisk(msg->payload, ss->hostname, location->getDiskOrNull());
-                    std::cerr << "WRITING LAST CHNUNK TO THE DISK\n";
                     this->dst_opened_file->write(msg->payload);
 
 #ifdef PAGE_CACHE_SIMULATION
