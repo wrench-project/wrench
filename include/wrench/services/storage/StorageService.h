@@ -62,7 +62,7 @@ namespace wrench {
          * @return true if the file is present, or false
          */
         bool lookupFile(const std::shared_ptr<DataFile> &file) {
-            return this->lookupFile(file, "/");
+            return this->lookupFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
         /**
          * @brief Lookup whether a file exists on the storage service (incurs simulated overheads)
@@ -100,7 +100,7 @@ namespace wrench {
          * @param file a file
          */
         void deleteFile(const std::shared_ptr<DataFile> &file) {
-            this->deleteFile(file, "/");
+            this->deleteFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
         /**
          * @brief Delete a file at the storage service (incurs simulated overheads)
@@ -243,7 +243,7 @@ namespace wrench {
          * @return true if the file is present, false otherwise
          */
         bool hasFile(const std::shared_ptr<DataFile> &file) {
-            return this->hasFile(file, "/");
+            return this->hasFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
         /**
          * @brief Determines whether a file is present at the storage service (in zero simulated time)
@@ -329,7 +329,7 @@ namespace wrench {
          * @param file: a file
          */
         void removeFile(const std::shared_ptr<DataFile> &file) {
-            this->removeFile(file, "/");
+            this->removeFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
         /**
          * @brief Remove a file at the storage service (in zero simulated time)
@@ -370,7 +370,7 @@ namespace wrench {
          * @return a date in seconds
          */
         double getFileLastWriteDate(const std::shared_ptr<DataFile> &file) {
-            return this->getFileLastWriteDate(file, "/");
+            return this->getFileLastWriteDate(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
         /**
          * @brief Get a file's last write date at the storage service (in zero simulated time)
@@ -442,7 +442,7 @@ namespace wrench {
          * @return a path
          */
         virtual std::string getBaseRootPath() {
-            return "/";
+            throw std::runtime_error("StorageService::traceTotalFiles: should have been overridden by derived class");
         }
 
         /**
