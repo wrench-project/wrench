@@ -147,6 +147,7 @@ namespace wrench {
                     // Bufferized
                     double remaining = dwmb.second;
                     while (remaining - buffer_size > DBL_EPSILON) {
+
                         dwmb.first->putMessage(
                                 new StorageServiceFileContentChunkMessage(
                                         file, buffer_size, false));

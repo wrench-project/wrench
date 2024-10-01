@@ -80,10 +80,14 @@ private:
         auto file_30 = wrench::Simulation::addFile("file_30", 30);
         auto file_10 = wrench::Simulation::addFile("file_10", 10);
 
-        std::cerr << "HERE1!\n";
+        std::cerr << "*#################################################################\n";
+        std::cerr << "*#################################################################\n";
+        std::cerr << "*#################################################################\n";
+        std::cerr << "********** WRITE FILE 50\n";
         this->test->storage_service_1->writeFile(file_50);
-        std::cerr << "HERE2!\n";
+        std::cerr << "********** WRITE FILE 30\n";
         this->test->storage_service_1->writeFile(file_30);
+        std::cerr << "********** WRITE FILE 10\n";
         this->test->storage_service_1->writeFile(file_10);
 
         // The LRU list:  file_50, file_30, file_10
@@ -92,6 +96,7 @@ private:
         auto file_70 = wrench::Simulation::addFile("file_70", 70);
 
         this->test->storage_service_1->writeFile(file_70);
+        // The LRU list:  file_10, file_70
 
         // Check that file_50 and file_30 have been kicked out
         if (this->test->storage_service_1->lookupFile(
@@ -104,7 +109,9 @@ private:
         }
 
         // The LRU list: file_10, file_70
+        std::cerr << "********** EXPECTED 10,70 and  TO CHANGE to: 70, 10\n";
         this->test->storage_service_1->readFile(file_10);
+        std::cerr << "*********** SHOULD HAVE CHANGED TO 70.10\n";
 
         // The LRU list: file_70, file_10
 
@@ -154,12 +161,11 @@ void SimpleStorageServiceCachingTest::do_SimpleLRUCaching_test(double buffer_siz
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    //    std::cerr << "\nBUFFER SIZE = " << buffer_size << "\n";
-
-    int argc = 2;
+        std::cerr << "\nBUFFER SIZE = " << buffer_size << "\n";
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-            argv[1] = strdup("--wrench-full-log");
+//            argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

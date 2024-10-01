@@ -193,8 +193,11 @@ namespace wrench {
                                                                  S4U_CommPort *answer_commport) {
 
 
-        bool file_already_there;
-        auto failure_cause = validateFileWriteRequest(location, num_bytes_to_write, &file_already_there);
+        std::shared_ptr<simgrid::fsmod::File> opened_file;
+        std::cerr << "BEFORE VALIDATION\n";
+        auto failure_cause = validateFileWriteRequest(location, num_bytes_to_write, opened_file);
+        std::cerr << "AFTER VALIDATION: " << this->file_system->get_partitions().at(0)->get_free_space() << "\n";
+
 
         if (failure_cause) {
             try {
@@ -213,10 +216,10 @@ namespace wrench {
             return true;
         }
 
-        // Create directory if need be
-        if (not this->file_system->directory_exists(location->getDirectoryPath())) {
-            this->file_system->create_directory(location->getDirectoryPath());
-        }
+//        // Create directory if need be
+//        if (not this->file_system->directory_exists(location->getDirectoryPath())) {
+//            this->file_system->create_directory(location->getDirectoryPath());
+//        }
 
         // Generate a commport name on which to receive the file
         auto file_reception_commport = S4U_CommPort::getTemporaryCommPort();
@@ -232,16 +235,9 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
 
-        std::shared_ptr<simgrid::fsmod::File> opened_file;
-        if (not file_already_there) { // Open dot file
-            std::cerr << "FILE NOT ALREADY THERE, OPENING A DOT FILE \n";
-            std::string dot_file_path = location->getADotFilePath();
-            this->file_system->create_file(dot_file_path, location->getFile()->getSize());
-            opened_file = this->file_system->open(dot_file_path, "w");
-        } else { // Open the file
-            std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
-            opened_file = this->file_system->open(location->getFilePath(), "w");
-        }
+
+        std::cerr << "BEFORE STARTING FT THREAD: " << this->file_system->get_partitions().at(0)->get_free_space() << "\n";
+
 
         // Create a FileTransferThread
         auto ftt = std::make_shared<FileTransferThread>(
@@ -263,7 +259,6 @@ namespace wrench {
         // Keep track of the commport as well
         this->ongoing_tmp_commports[ftt] = file_reception_commport;
 
-
         return true;
     }
 
@@ -279,7 +274,8 @@ namespace wrench {
             double num_bytes_to_read,
             S4U_CommPort *answer_commport) {
 
-        auto failure_cause = validateFileReadRequest(location);
+        std::shared_ptr<simgrid::fsmod::File> opened_file;
+        auto failure_cause = validateFileReadRequest(location, opened_file);
 
         bool success = (failure_cause == nullptr);
 
@@ -305,9 +301,6 @@ namespace wrench {
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
-
-            auto opened_file = this->file_system->open(location->getFilePath(), "r");
-
             // Create a FileTransferThread
             auto ftt = std::make_shared<FileTransferThread>(
                     this->hostname,
@@ -344,8 +337,9 @@ namespace wrench {
             std::shared_ptr<FileLocation> &dst_location,
             S4U_CommPort *answer_commport) {
 
-        bool dst_file_already_there;
-        auto failure_cause = validateFileCopyRequest(src_location, dst_location, &dst_file_already_there);
+        std::shared_ptr<simgrid::fsmod::File> src_opened_file;
+        std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
+        auto failure_cause = validateFileCopyRequest(src_location, dst_location, src_opened_file, dst_opened_file);
 
         if (failure_cause) {
             this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), src_location->getFile(), src_location, dst_location);
@@ -367,20 +361,6 @@ namespace wrench {
             return true;
         }
 
-        // Open files and create a Transaction
-        auto src_file_system = std::dynamic_pointer_cast<SimpleStorageService>(src_location->getStorageService())->file_system;
-        auto dst_file_system = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService())->file_system;
-        auto src_opened_file = src_file_system->open(src_location->getFilePath(), "r");
-        std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
-        if (not dst_file_already_there) { // Open dot file
-            std::cerr << "FILE NOT ALREADY THERE, OPENING A DOT FILE \n";
-            std::string dot_file_path = dst_location->getADotFilePath();
-            this->file_system->create_file(dot_file_path, dst_location->getFile()->getSize());
-            dst_opened_file = this->file_system->open(dot_file_path, "w");
-        } else { // Open the file
-            std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
-            dst_opened_file = this->file_system->open(dst_location->getFilePath(), "w");
-        }
 
         WRENCH_INFO("Starting a thread to copy file %s from %s to %s",
                     src_location->getFile()->getID().c_str(),
@@ -485,6 +465,7 @@ namespace wrench {
             }
         }
 
+#if 0
         if (success) {
 //                WRENCH_INFO("File %s stored!", file->getID().c_str());
 //                this->file_systems[dst_mount_point]->storeFileInDirectory(
@@ -492,6 +473,8 @@ namespace wrench {
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // Maybe no corresponding timestamp.
             try {
+                std::cerr << "XXX src_location == null " << src_location << "\n";
+                std::cerr << "XXX dst_location == null " << dst_location << "\n";
                 this->simulation->getOutput().addTimestampFileCopyCompletion(Simulation::getCurrentSimulatedDate(),
                                                                              src_location->getFile(), src_location, dst_location);
             } catch (invalid_argument &ignore) {
@@ -526,6 +509,41 @@ namespace wrench {
                             dst_location,
                             success,
                             std::move(failure_cause),
+                            this->getMessagePayloadValue(
+                                    SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+        }
+#endif
+
+        // Send back the relevant ack if this was a read
+        if (ftt->dst_location == nullptr) {
+            //            WRENCH_INFO("Sending back an ack for a successful file read");
+            ftt->answer_commport_if_read->dputMessage(new StorageServiceAckMessage(ftt->src_location));
+        } else if (ftt->src_location == nullptr) {
+//            StorageService::createFileAtLocation(ftt->dst_location);
+            WRENCH_INFO("File %s stored", ftt->dst_location->getFile()->getID().c_str());
+            // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
+            // Maybe no corresponding timestamp.
+            //            WRENCH_INFO("Sending back an ack for a successful file read");
+            ftt->answer_commport_if_write->dputMessage(new StorageServiceAckMessage(ftt->dst_location));
+        } else {
+            if (ftt->dst_location->getStorageService() == shared_from_this()) {
+//                this->createFile(ftt->dst_location);
+                WRENCH_INFO("File %s stored", ftt->dst_location->getFile()->getID().c_str());
+                try {
+                    this->simulation->getOutput().addTimestampFileCopyCompletion(
+                            Simulation::getCurrentSimulatedDate(), ftt->dst_location->getFile(), ftt->src_location, ftt->dst_location);
+                } catch (invalid_argument &ignore) {
+                }
+            }
+            std::cerr << "SENDING BACK FILE COPY\n";
+
+            //            WRENCH_INFO("Sending back an ack for a file copy");
+            ftt->answer_commport_if_copy->dputMessage(
+                    new StorageServiceFileCopyAnswerMessage(
+                            ftt->src_location,
+                            ftt->dst_location,
+                            true,
+                            nullptr,
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         }

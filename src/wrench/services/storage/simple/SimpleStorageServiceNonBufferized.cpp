@@ -68,6 +68,9 @@ namespace wrench {
         // Deal with possibly open source file
         if (transaction->src_opened_file) {
             std::cerr << "THERE WAS AN OPENED SOURCE FILE, WHICH I AM CLOSING\n";
+            // Doing a 1-byte write just so that the file access date is updated
+            transaction->src_opened_file->seek(0, SEEK_SET);
+            transaction->src_opened_file->read(1);
             transaction->src_opened_file->close();
         }
         // Deal with possibly opened destination file
@@ -100,7 +103,7 @@ namespace wrench {
             //            WRENCH_INFO("Sending back an ack for a successful file read");
             transaction->commport->dputMessage(new StorageServiceAckMessage(transaction->src_location));
         } else if (transaction->src_location == nullptr) {
-            StorageService::createFileAtLocation(transaction->dst_location);
+//            StorageService::createFileAtLocation(transaction->dst_location);
             WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // Maybe no corresponding timestamp.
@@ -108,7 +111,7 @@ namespace wrench {
             transaction->commport->dputMessage(new StorageServiceAckMessage(transaction->dst_location));
         } else {
             if (transaction->dst_location->getStorageService() == shared_from_this()) {
-                this->createFile(transaction->dst_location);
+//                this->createFile(transaction->dst_location);
                 WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
                 try {
                     this->simulation->getOutput().addTimestampFileCopyCompletion(
@@ -335,8 +338,8 @@ namespace wrench {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileWriteRequest(): Cannot process a write requests with a non-zero buffer size");
         }
 
-        bool file_already_there;
-        auto failure_cause = validateFileWriteRequest(location, num_bytes_to_write, &file_already_there);
+        std::shared_ptr<simgrid::fsmod::File> opened_file;
+        auto failure_cause = validateFileWriteRequest(location, num_bytes_to_write, opened_file);
 
         if (failure_cause) {
             try {
@@ -358,10 +361,10 @@ namespace wrench {
             return true;
         }
 
-        // Create directory if need be
-        if (not this->file_system->directory_exists(location->getDirectoryPath())) {
-            this->file_system->create_directory(location->getDirectoryPath());
-        }
+//        // Create directory if need be
+//        if (not this->file_system->directory_exists(location->getDirectoryPath())) {
+//            this->file_system->create_directory(location->getDirectoryPath());
+//        }
 
         // Reply with a "go ahead, send me the file" message
         answer_commport->dputMessage(
@@ -374,16 +377,6 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
 
-        std::shared_ptr<simgrid::fsmod::File> opened_file;
-        if (not file_already_there) { // Open dot file
-            std::cerr << "FILE NOT ALREADY THERE, OPENING A DOT FILE \n";
-            std::string dot_file_path = location->getADotFilePath();
-            this->file_system->create_file(dot_file_path, location->getFile()->getSize());
-            opened_file = this->file_system->open(dot_file_path, "w");
-        } else { // Open the file
-            std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
-            opened_file = this->file_system->open(location->getFilePath(), "w");
-        }
 
         // Create the streaming activity
         auto me_host = simgrid::s4u::this_actor::get_host();
@@ -422,7 +415,8 @@ namespace wrench {
             S4U_CommPort *answer_commport,
             simgrid::s4u::Host *requesting_host) {
 
-        auto failure_cause = validateFileReadRequest(location);
+        std::shared_ptr<simgrid::fsmod::File> opened_file;
+        auto failure_cause = validateFileReadRequest(location, opened_file);
         bool success = (failure_cause == nullptr);
 
         // Send back the corresponding ack
@@ -443,8 +437,6 @@ namespace wrench {
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
-            auto opened_file = this->file_system->open(location->getFilePath(), "r");
-
             // Create the transaction
             auto me_host = simgrid::s4u::this_actor::get_host();
             auto me_disk = location->getDiskOrNull();
@@ -484,8 +476,9 @@ namespace wrench {
                     src_location->toString().c_str(),
                     dst_location->toString().c_str());
 
-        bool dst_file_already_there;
-        auto failure_cause = validateFileCopyRequest(src_location, dst_location, &dst_file_already_there);
+        std::shared_ptr<simgrid::fsmod::File> src_opened_file;
+        std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
+        auto failure_cause = validateFileCopyRequest(src_location, dst_location, src_opened_file, dst_opened_file);
 
         if (failure_cause) {
             this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), src_location->getFile(), src_location, dst_location);
@@ -513,21 +506,6 @@ namespace wrench {
         auto dst_disk = dst_location->getDiskOrNull();
         if (dst_disk == nullptr) {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(): destination disk not found - internal error");
-        }
-
-        // Open files and create a Transaction
-        auto src_file_system = std::dynamic_pointer_cast<SimpleStorageService>(src_location->getStorageService())->file_system;
-        auto dst_file_system = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService())->file_system;
-        auto src_opened_file = src_file_system->open(src_location->getFilePath(), "r");
-        std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
-        if (not dst_file_already_there) { // Open dot file
-            std::cerr << "FILE NOT ALREADY THERE, OPENING A DOT FILE \n";
-            std::string dot_file_path = dst_location->getADotFilePath();
-            this->file_system->create_file(dot_file_path, dst_location->getFile()->getSize());
-            dst_opened_file = this->file_system->open(dot_file_path, "w");
-        } else { // Open the file
-            std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
-            dst_opened_file = this->file_system->open(dst_location->getFilePath(), "w");
         }
 
         uint64_t transfer_size;
@@ -685,6 +663,7 @@ namespace wrench {
             auto transaction = this->pending_transactions.front();
             this->pending_transactions.pop_front();
 
+            // Sadly we cannot do this with simgrid::fsmod...
             auto sg_iostream = simgrid::s4u::Io::streamto_init(transaction->src_host,
                                                                transaction->src_disk,
                                                                transaction->dst_host,

@@ -270,8 +270,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Method to received a f from the network onto the local disk
-    * @param f: the f
+    * @brief Method to received a file from the network onto the local disk
+    * @param f: the file to receive
     * @param commport: the source commport
     * @param location: the destination location
     *
@@ -281,6 +281,7 @@ namespace wrench {
                                                     S4U_CommPort *commport,
                                                     const std::shared_ptr<FileLocation> &location) {
         /** Ideal Fluid model buffer size */
+        std::cerr << "IN RECEIVE FILE FROM NETWORK!\n";
         if (this->buffer_size < DBL_EPSILON) {
             throw std::runtime_error(
                     "FileTransferThread::receiveFileFromNetwork(): Zero buffer size not implemented yet");
@@ -328,8 +329,11 @@ namespace wrench {
                         if (!dst_ss) {
                             throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Storage Service should be a SimpleStorageService for disk write");
                         }
-                        simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
-                                                dst_location->getDiskOrNull());
+                        std::cerr << "WRITING A CHUNK TO THE DISK!\n";
+                        this->dst_opened_file->write(msg->payload);
+                        std::cerr << "DONE WRITING TO THE DISK!\n";
+//                        simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
+//                                                dst_location->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
                     }
 #endif
@@ -363,7 +367,10 @@ namespace wrench {
                     if (!ss) {
                         throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
                     }
-                    simulation->writeToDisk(msg->payload, ss->hostname, location->getDiskOrNull());
+//                    simulation->writeToDisk(msg->payload, ss->hostname, location->getDiskOrNull());
+                    std::cerr << "WRITING LAST CHNUNK TO THE DISK\n";
+                    this->dst_opened_file->write(msg->payload);
+
 #ifdef PAGE_CACHE_SIMULATION
                 }
 #endif
@@ -380,8 +387,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to send a f from the local disk to the network
-     * @param f: the f
+     * @brief Method to send a file from the local disk to the network
+     * @param f: the file to send
      * @param location: the source location
      * @param num_bytes: number of bytes to transfer
      * @param commport: the destination commport
@@ -423,7 +430,8 @@ namespace wrench {
                         if (!ss) {
                             throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
                         }
-                        simulation->readFromDisk(chunk_size, ss->hostname, location->getDiskOrNull());
+//                        simulation->readFromDisk(chunk_size, ss->hostname, location->getDiskOrNull());
+                        this->src_opened_file->read(chunk_size);
 #ifdef PAGE_CACHE_SIMULATION
                     }
 #endif
@@ -452,7 +460,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to copy a f locally
+     * @brief Method to copy a file locally
      * @param f: the f to copy
      * @param src_loc: the source location
      * @param dst_loc: the destination location
@@ -482,31 +490,34 @@ namespace wrench {
             if (!src_ss) {
                 throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Disk operation can only be to a SimpleStorageService");
             }
-            auto src_mount_point = src_loc->getDiskOrNull()->get_property("mount");
+//            auto src_mount_point = src_loc->getDiskOrNull()->get_property("mount");
             auto dst_ss = std::dynamic_pointer_cast<SimpleStorageService>(dst_loc->getStorageService());
             if (!dst_ss) {
                 throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Disk operation can only be to a SimpleStorageService");
             }
-            auto dst_mount_point = dst_loc->getDiskOrNull()->get_property("mount");
+//            auto dst_mount_point = dst_loc->getDiskOrNull()->get_property("mount");
 
             // Read the first chunk
             simulation->readFromDisk(to_send, src_ss->hostname, src_loc->getDiskOrNull());
+            src_opened_file->read(to_send);
             // start the pipeline
             while (remaining - this->buffer_size > DBL_EPSILON) {
-                simulation->readFromDiskAndWriteToDiskConcurrently(
-                        this->buffer_size, this->buffer_size, src_loc->getStorageService()->hostname,
-                        src_loc->getDiskOrNull(), dst_loc->getDiskOrNull());
-
+//                simulation->readFromDiskAndWriteToDiskConcurrently(
+//                        this->buffer_size, this->buffer_size, src_loc->getStorageService()->hostname,
+//                        src_loc->getDiskOrNull(), dst_loc->getDiskOrNull());
+                dst_opened_file->write(this->buffer_size);
+                src_opened_file->read(this->buffer_size);
                 remaining -= this->buffer_size;
             }
             // Write the last chunk
-            simulation->writeToDisk(remaining, dst_loc->getStorageService()->hostname,
-                                    dst_loc->getDiskOrNull());
+//            simulation->writeToDisk(remaining, dst_loc->getStorageService()->hostname,
+//                                    dst_loc->getDiskOrNull());
+            dst_opened_file->write(this->buffer_size);
         }
     }
 
     /**
-     * @brief Download a f to a local partition/disk
+     * @brief Download a file to a local partition/disk
      * @param f: the f to download
      * @param src_loc: the source location
      * @param dst_loc: the destination location
@@ -562,7 +573,6 @@ namespace wrench {
                                      message->getName() + "] message!");
         }
 
-
         try {
             bool done = false;
             // Receive the first chunk
@@ -593,9 +603,10 @@ namespace wrench {
                 } else {
 #endif
                     // Write to disk
-                    simulation->writeToDisk(msg->payload,
-                                            dst_ss->getHostname(),
-                                            dst_loc->getDiskOrNull());
+//                    simulation->writeToDisk(msg->payload,
+//                                            dst_ss->getHostname(),
+//                                            dst_loc->getDiskOrNull());
+                    dst_opened_file->write(msg->payload);
 #ifdef PAGE_CACHE_SIMULATION
                 }
 #endif
@@ -619,9 +630,10 @@ namespace wrench {
             } else {
 #endif
                 // Write last chunk to disk
-                simulation->writeToDisk(msg->payload,
-                                        dst_ss->getHostname(),
-                                        dst_loc->getDiskOrNull());
+//                simulation->writeToDisk(msg->payload,
+//                                        dst_ss->getHostname(),
+//                                        dst_loc->getDiskOrNull());
+                  dst_opened_file->write(msg->payload);
 #ifdef PAGE_CACHE_SIMULATION
             }
 
