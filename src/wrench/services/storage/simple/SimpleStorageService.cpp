@@ -25,6 +25,7 @@
 #include <wrench/util/UnitParser.h>
 #include <wrench/failure_causes/InvalidDirectoryPath.h>
 #include <wrench/failure_causes/FileNotFound.h>
+#include <wrench/failure_causes/NotAllowed.h>
 
 namespace sgfs = simgrid::fsmod;
 
@@ -456,7 +457,7 @@ namespace wrench {
     void SimpleStorageService::createFile(const std::shared_ptr<FileLocation> &location) {
         std::string full_path = location->getFilePath();
 
-            std::cerr << "IN CREATE FILE SIMPLeSTORAGESERVOCE: " << full_path << "\n";
+        std::cerr << "IN CREATE FILE SIMPLeSTORAGESERVOCE: " << full_path << "\n";
         try {
             this->file_system->create_file(full_path, location->getFile()->getSize());
         } catch (sgfs::FileAlreadyExistsException &e) {
@@ -506,20 +507,20 @@ namespace wrench {
     /**
      * @brief Helper method to validate a file read request
      * @param location: the location to read
+     * @param opened_file: an opened file (if success)
      * @return a FailureCause or nullptr if success
      */
-    std::shared_ptr<FailureCause> SimpleStorageService::validateFileReadRequest(const std::shared_ptr<FileLocation> &location) {
+    std::shared_ptr<FailureCause> SimpleStorageService::validateFileReadRequest(const std::shared_ptr<FileLocation> &location,
+                                                                                std::shared_ptr<simgrid::fsmod::File> &opened_file) {
 
-        std::cerr << "IN VALIDATE FILE READ REQUEST: " << location->toString() << "\n";
-        std::cerr << "IN VALIDATE FILE READ REQUEST (DIRPATH): " << location->getDirectoryPath() << "\n";
         auto partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
-        std::cerr << "PARTTIOGN IS NUILL: " << (partition == nullptr) << "\n";
         if ((not partition) or (not this->file_system->directory_exists(location->getDirectoryPath()))) {
             return std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
         }
         if (not this->file_system->file_exists(location->getFilePath())) {
             return std::shared_ptr<FailureCause>(new FileNotFound(location));
         }
+        opened_file = this->file_system->open(location->getFilePath(), "r");
         return nullptr;
     }
 
@@ -527,31 +528,53 @@ namespace wrench {
      * @brief Helper method to validate a file write request
      * @param location: the location to read
      * @param file_already_there: indicates (on output) whether the file is already there or not
+     * @param opened_file: an opened file (if success)
      * @return a FailureCause or nullptr if success
      */
-    std::shared_ptr<FailureCause> SimpleStorageService::validateFileWriteRequest(const std::shared_ptr<FileLocation> &location, double num_bytes_to_write, bool *file_already_there) {
+    std::shared_ptr<FailureCause> SimpleStorageService::validateFileWriteRequest(const std::shared_ptr<FileLocation> &location,
+                                                                                 double num_bytes_to_write,
+                                                                                 std::shared_ptr<simgrid::fsmod::File> &opened_file) {
 
+        auto file = location->getFile();
+
+        // Is the partition valid?
         auto partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
         if (!partition) {
-            *file_already_there = false;
             return std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
-        } else {
-            *file_already_there = this->file_system->file_exists(location->getFilePath());
-
-            if ((not *file_already_there) and (num_bytes_to_write < location->getFile()->getSize())) {
-                throw std::runtime_error("SimpleStorageService::validateFileCopyRequest(): Cannot write fewer number of bytes than the file size if the file isn't already present");
-            }
-
-            if (not *file_already_there) {
-                auto file = location->getFile();
-                if (partition->get_free_space() < (sg_size_t) file->getSize()) {
-                    return std::shared_ptr<FailureCause>(
-                            new StorageServiceNotEnoughSpace(
-                                    file,
-                                    this->getSharedPtr<SimpleStorageService>()));
-                }
-            }
         }
+
+        std::cerr << "IN VALIDATE FILE WRITE 1: " << partition->get_free_space() << "\n";
+
+        bool file_already_there = this->file_system->file_exists(location->getFilePath());
+        try {
+            if (not file_already_there) { // Open dot file
+                if (num_bytes_to_write < location->getFile()->getSize()) {
+                    std::string err_msg = "Cannot write fewer number of bytes than the file size if the file isn't already present";
+                    return std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<Service>(), err_msg));
+                }
+                std::cerr << "FILE NOT ALREADY THERE, OPENING A DOT FILE \n";
+                std::string dot_file_path = location->getADotFilePath();
+                std::cerr << "CALLING FS: CREATE FILE FOR  " << location->getFile()->getSize() << "\n";
+                this->file_system->create_file(dot_file_path, location->getFile()->getSize());
+                std::cerr << "CALLED CREATE FILE\n";
+                std::cerr << "OPENING FILE\n";
+                opened_file = this->file_system->open(dot_file_path, "r+");
+                opened_file->seek(0, SEEK_SET);
+            } else { // Open the file
+//                std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
+                opened_file = this->file_system->open(location->getFilePath(), "r+");
+                opened_file->seek(0, SEEK_SET);
+            }
+        } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
+            std::cerr << "IN CATCH!!\n";
+            return std::shared_ptr<FailureCause>(
+                    new StorageServiceNotEnoughSpace(
+                            file,
+                            this->getSharedPtr<SimpleStorageService>()));
+        } catch (simgrid::Exception &e) {
+            std::cerr << "WRTF!@#!" << e.what() << "\n";
+        }
+//        std::cerr << "IN VALIDATE FILE WRITE 2: " << partition->get_free_space() << "\n";
         return nullptr;
     }
 
@@ -559,43 +582,58 @@ namespace wrench {
      * @brief Helper method to validate a file copy request
      * @param src_location: the src location
      * @param dst_location: the dst location
-     * @param dst_file_already_there: indicates (on output) whether the dst file is already there or not
+     * @param src_opened_file: a src opened file (if success)
+     * @param dst_opened_file: a dst opened file (if success)
      * @return A FailureCause or nullptr if success
      */
     std::shared_ptr<FailureCause> SimpleStorageService::validateFileCopyRequest(const std::shared_ptr<FileLocation> &src_location,
                                                                                 std::shared_ptr<FileLocation> &dst_location,
-                                                                                bool *dst_file_already_there) {
-        *dst_file_already_there = false;
+                                                                                std::shared_ptr<simgrid::fsmod::File> &src_opened_file,
+                                                                                std::shared_ptr<simgrid::fsmod::File> &dst_opened_file) {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
+        auto file = src_location->getFile();
 
         auto src_file_system = std::dynamic_pointer_cast<SimpleStorageService>(src_location->getStorageService())->file_system;
         auto dst_file_system = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService())->file_system;
 
-        std::cerr << "IN VALIDATE FILE COPY REQUEST\n";
+        // Validate source
+        auto src_partition = src_file_system->get_partition_for_path_or_null(src_location->getFilePath());
 
-        // Check files and directory paths
+        if ((not src_partition) or (not src_file_system->directory_exists(src_location->getDirectoryPath()))) {
+            return std::shared_ptr<FailureCause>(new InvalidDirectoryPath(src_location));
+        }
         if (not src_file_system->file_exists(src_location->getFilePath())) {
-            return std::make_shared<FileNotFound>(src_location);
+            return std::shared_ptr<FailureCause>(new FileNotFound(src_location));
         }
 
-        if (not dst_file_system->directory_exists(dst_location->getDirectoryPath())) {
-            std::cerr << "===> 1 " << dst_file_system->directory_exists("/disk2") << "\n";
-            std::cerr << "===> 2 " << dst_file_system->directory_exists("/disk2/") << "\n";
-            std::cerr << "NOT VALIDATING: " << dst_file_system->get_name() << " " << dst_location->getDirectoryPath() << "\n";
-            return std::make_shared<InvalidDirectoryPath>(dst_location);
+        // Validate destination
+        auto dst_partition = dst_file_system->get_partition_for_path_or_null(dst_location->getFilePath());
+        if (!dst_partition) {
+            return std::shared_ptr<FailureCause>(new InvalidDirectoryPath(dst_location));
         }
 
-        // Check space if needed
-        if (!failure_cause) {
-            *dst_file_already_there = dst_file_system->file_exists(dst_location->getFilePath());
-            if (not *dst_file_already_there) {
-                auto free_space = dst_file_system->get_partition_for_path_or_null(dst_location->getFilePath())->get_free_space();
-                if (free_space < (sg_size_t) dst_location->getFile()->getSize()) {
-                    return std::make_shared<StorageServiceNotEnoughSpace>(dst_location->getFile(),
-                                                                          this->getSharedPtr<SimpleStorageService>());
-                }
+        // Open destination file (as it may fail)
+        try {
+            bool dst_file_already_there = dst_file_system->file_exists(dst_location->getFilePath());
+            if (not dst_file_already_there) { // Open dot file
+//                std::cerr << "FILE NOT ALREADY THERE, OPENING A DOT FILE \n";
+                std::string dot_file_path = dst_location->getADotFilePath();
+                this->file_system->create_file(dot_file_path, dst_location->getFile()->getSize());
+                dst_opened_file = this->file_system->open(dot_file_path, "r+");
+                dst_opened_file->seek(0, SEEK_SET);
+            } else { // Open the file
+//                std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
+                dst_opened_file = this->file_system->open(dst_location->getFilePath(), "r+");
+                dst_opened_file->seek(0, SEEK_SET);
             }
+        } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
+            return std::shared_ptr<FailureCause>(
+                    new StorageServiceNotEnoughSpace(file, this->getSharedPtr<SimpleStorageService>()));
         }
+
+        // Open source file
+        src_opened_file = this->file_system->open(src_location->getFilePath(), "r");
+
         return nullptr;
     }
 

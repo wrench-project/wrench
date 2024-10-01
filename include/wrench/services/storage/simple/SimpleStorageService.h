@@ -250,9 +250,10 @@ namespace wrench {
 
 //        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
 
-        std::shared_ptr<FailureCause> validateFileReadRequest(const std::shared_ptr<FileLocation> &location);
-        std::shared_ptr<FailureCause> validateFileWriteRequest(const std::shared_ptr<FileLocation> &location, double num_bytes_to_write, bool *file_already_there);
-        std::shared_ptr<FailureCause> validateFileCopyRequest(const std::shared_ptr<FileLocation> &src_location, std::shared_ptr<FileLocation> &dst_location,  bool *dst_file_already_there);
+        std::shared_ptr<FailureCause> validateFileReadRequest(const std::shared_ptr<FileLocation> &location, std::shared_ptr<simgrid::fsmod::File> &opened_file);
+        std::shared_ptr<FailureCause> validateFileWriteRequest(const std::shared_ptr<FileLocation> &location, double num_bytes_to_write, std::shared_ptr<simgrid::fsmod::File> &opened_file);
+        std::shared_ptr<FailureCause> validateFileCopyRequest(const std::shared_ptr<FileLocation> &src_location, std::shared_ptr<FileLocation> &dst_location,
+                                                              std::shared_ptr<simgrid::fsmod::File> &src_opened_file, std::shared_ptr<simgrid::fsmod::File> &dst_opened_file);
 
         /***********************/
         /** \endcond          **/
