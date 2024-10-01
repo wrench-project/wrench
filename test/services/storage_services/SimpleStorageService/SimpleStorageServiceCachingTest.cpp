@@ -379,22 +379,24 @@ private:
         //                SS2: file_30
 
         // Copy Asynchronously file_50 SS1 -> SS2
-        //        std::cerr << "STARTING ASYNCHRONOUS COPY: file_50 SS1 -> SS2\n";
+        std::cerr << "*** STARTING ASYNCHRONOUS COPY: file_50 SS1 -> SS2\n";
         data_manager->initiateAsynchronousFileCopy(wrench::FileLocation::LOCATION(ss1, file_50), wrench::FileLocation::LOCATION(ss2, file_50));
 
+        std::cerr << "****************** SLEEPING FOR 1 SEC\n";
         wrench::Simulation::sleep(1);
-        //        std::cerr << "Reading file_10 from SS1\n";
+                std::cerr << "Reading file_10 from SS1\n";
         ss1->readFile(wrench::FileLocation::LOCATION(ss1, file_10));
-        //        std::cerr << "Reading file_20 from SS1\n";
+                std::cerr << "Reading file_20 from SS1\n";
         ss1->readFile(wrench::FileLocation::LOCATION(ss1, file_20));
-        //        std::cerr << "NOW file_50 should be the LRU on SS1\n";
+                std::cerr << "NOW file_50 should be the LRU on SS1\n";
 
         // The LRU list:  SS1: file_50, file_10, file_20
         //                SS2: file_30
 
         // Writing a file to ss1, which "shouldn't" evict file_50 even though it's the LRU
         // Instead it should evict file_10 and file_20
-        //        std::cerr << "WRITING file_40 to SS1, which should evict file_10 and file_20\n";
+        std::cerr << "*******************************************\n";
+                std::cerr << "WRITING file_40 to SS1, which should evict file_10 and file_20\n";
         ss1->writeFile(file_40);
 
         if (ss1->lookupFile(file_10)) {
@@ -455,6 +457,9 @@ void SimpleStorageServiceCachingTest::do_SimpleLRUCachingUnevictable_test(double
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
+    std::cerr << "*****************************************\n";
+    std::cerr << "******************************** BUFFER SIZE = " << buffer_size << "\n";
+    std::cerr << "*****************************************\n";
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
