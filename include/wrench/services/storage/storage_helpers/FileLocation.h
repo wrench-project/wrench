@@ -103,8 +103,9 @@ namespace wrench {
 
     private:
         friend class Simulation;
+        friend class SimpleStorageService;
         friend class SimpleStorageServiceNonBufferized;
-        friend class SimpleStorageServiceBufferized;
+//        friend class SimpleStorageServiceBufferized;
         friend class FileTransferThread;
 
         std::string getADotFilePath();
