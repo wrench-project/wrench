@@ -38,14 +38,21 @@ int main(int argc, char **argv) {
 
     // Define command-line argument options
     po::options_description desc("Allowed options");
-    desc.add_options()("help", "Show this help message")("simulation-logging", po::bool_switch()->default_value(false),
-                                                         "Show full simulation log during execution")("daemon-logging", po::bool_switch()->default_value(false),
-                                                                                                      "Show full daemon log during execution")("port", po::value<int>()->default_value(8101)->notifier(in(1024, 49151, "port")),
-                                                                                                                                               "port number, between 1024 and 4951, on which this daemon will listen")("allow-origin", po::value<std::string>()->default_value(""),
-                                                                                                                                                                                                                       "allow origin for http connections to avoid CORS errors if needed (e.g., --allow-origin http://localhost:8000)")("sleep-us", po::value<int>()->default_value(200)->notifier(in(0, 1000000, "sleep-us")),
-                                                                                                                                                                                                                                                                                                                                        "number of micro-seconds, between 0 and 1000000, that the simulation "
-                                                                                                                                                                                                                                                                                                                                        "thread sleeps at each iteration of its main loop (smaller means faster "
-                                                                                                                                                                                                                                                                                                                                        "simulation, larger means less CPU load)");
+    desc.add_options()("help", "Show this help message")
+            ("simulation-logging", po::bool_switch()->default_value(false),
+             "Show full simulation log during execution")
+            ("daemon-logging", po::bool_switch()->default_value(false),
+             "Show full daemon log during execution")
+            ("port", po::value<int>()->default_value(8101)->notifier(in(1024, 49151, "port")),
+             "A port number, between 1024 and 4951, on which this daemon will listen for 'start simulation' requests")
+            ("allow-origin", po::value<std::string>()->default_value(""),
+             "Allow origin for http connections to avoid CORS errors if needed (e.g., --allow-origin http://localhost:8000)")
+            ("simulation-port", po::value<int>()->notifier(in(1024, 49151, "simulation-port")),
+             "A fixed port number to be use for all simulations (prevents concurrent simulations, use at your own risk)")
+            ("sleep-us", po::value<int>()->default_value(200)->notifier(in(0, 1000000, "sleep-us")),
+             "A number of micro-seconds, between 0 and 1000000, that the simulation "
+             "thread sleeps at each iteration of its main loop (smaller means faster "
+             "simulation, larger means less CPU load)");
 
     // Parse command-line arguments
     po::variables_map vm;
@@ -63,10 +70,16 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
+    int simulation_port = 0;
+    if (vm.count("simulation-port")) {
+        simulation_port = vm["simulation-port"].as<int>();
+    }
+
     // Create and run the WRENCH daemon
     WRENCHDaemon daemon(vm["simulation-logging"].as<bool>(),
                         vm["daemon-logging"].as<bool>(),
                         vm["port"].as<int>(),
+                        simulation_port,
                         vm["allow-origin"].as<std::string>(),
                         vm["sleep-us"].as<int>());
 
