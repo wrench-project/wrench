@@ -36,7 +36,8 @@ std::vector<std::string> WRENCHDaemon::allowed_origins;
 * @brief Constructor
 * @param simulation_logging true if simulation logging should be printed
 * @param daemon_logging true if daemon logging should be printed
-* @param port_number port number on which to listen
+* @param port_number port number on which to listen for 'start simulation' requests
+* @param simulation_port_number port number on which to listen for a new simulation (0 means: use a random port each time)
 * @param allowed_origin allowed origin for http connection
 * @param sleep_us number of micro-seconds or real time that the simulation daemon's simulation execution_controller
 *        thread should sleep at each iteration
@@ -44,10 +45,12 @@ std::vector<std::string> WRENCHDaemon::allowed_origins;
 WRENCHDaemon::WRENCHDaemon(bool simulation_logging,
                            bool daemon_logging,
                            int port_number,
+                           int simulation_port_number,
                            const std::string &allowed_origin,
                            int sleep_us) : simulation_logging(simulation_logging),
                                            daemon_logging(daemon_logging),
                                            port_number(port_number),
+                                           fixed_simulation_port_number(simulation_port_number),
                                            sleep_us(sleep_us) {
     WRENCHDaemon::allowed_origins.push_back(allowed_origin);
 }
@@ -165,8 +168,11 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
 
     // Find an available port number on which the simulation daemon will be able to run
     int simulation_port_number;
-    while (isPortTaken(simulation_port_number = PORT_MIN + rand() % (PORT_MAX - PORT_MIN)))
-        ;
+    if (this->fixed_simulation_port_number == 0) {
+        while (isPortTaken(simulation_port_number = PORT_MIN + rand() % (PORT_MAX - PORT_MIN)));
+    } else {
+        simulation_port_number = this->fixed_simulation_port_number;
+    }
 
     // Create a shared memory segment, to which an error message will be written by
     // the child process (the simulation daemon) in case it fails on startup
