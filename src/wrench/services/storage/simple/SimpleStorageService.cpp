@@ -480,7 +480,6 @@ namespace wrench {
             throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(
                     location->getFile(), location->getStorageService()));
         }
-        std::cerr << "CREATED? " << this->file_system->file_exists(full_path) << "  " << this->file_system->get_name() << "\n";
     }
 
 
@@ -575,7 +574,6 @@ namespace wrench {
                 opened_file->seek(0, SEEK_SET);
             }
         } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
-            std::cerr << "IN CATCH!! NOT ENOiuGH SPACE IN VALIDATE FILE WRITE!!!!\n";
             return std::shared_ptr<FailureCause>(
                     new StorageServiceNotEnoughSpace(
                             file,
