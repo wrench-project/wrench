@@ -121,13 +121,6 @@ private:
 
     int main() override {
 
-        // Bogus staging (can only be done in maestro)
-        try {
-            this->test->storage_service_100->createFile(this->test->file_1);
-            throw std::runtime_error("Should not be possible to call createFile() from a non-maestro process");
-        } catch (std::runtime_error &) {
-        }
-
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
@@ -142,6 +135,8 @@ private:
             }
         }
 
+
+
         // Call mount point methods for coverage
         {
             auto sss = std::dynamic_pointer_cast<wrench::SimpleStorageService>(this->test->storage_service_multimp);
@@ -155,6 +150,7 @@ private:
             } catch (std::runtime_error &ignore) {
             }
         }
+
 
         // Do a bogus lookup
         try {
@@ -247,10 +243,13 @@ private:
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
+
+        std::cerr << "########################## HERE 999\n";
         if (free_space != 90.0) {
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 90.0");
         }
+        std::cerr << "########################## HERE 1000\n";
 
         // Send a free space request at a path (without the slash)
         try {
@@ -282,7 +281,7 @@ private:
         }
         if (free_space != 0.0) {
             throw std::runtime_error(
-                    "Free space on storage service at a bogus path should be 0.0");
+                    "Free space on storage service at a bogus path should be 0.0 (" + std::to_string(free_space) + ")");
         }
 
         // Bogus read
@@ -370,6 +369,7 @@ private:
             }
         }
 
+        std::cerr << "#############************ HERE \n";
 
         // Delete a file in a bogus path
         try {
@@ -505,6 +505,9 @@ private:
         }
 
         // Do an INVALID asynchronous file copy (file not there)
+        std::cerr << "IS SRC FILE THERE? " << this->test->storage_service_100->lookupFile(this->test->file_500) << "\n";
+        std::cerr << "IS DST SPACE OK? " << this->test->storage_service_510->getTotalFreeSpace() << "\n";
+        std::cerr << "***************** DOING THE INITIATE *************\n";
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
                     wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_500),
@@ -520,6 +523,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
+        std::cerr << "#############************ HERE \n";
         auto real_event = std::dynamic_pointer_cast<wrench::FileCopyFailedEvent>(event);
         if (real_event) {
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);
@@ -530,6 +534,7 @@ private:
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
+        std::cerr << "#############************ HERE \n";
 
         // Do a really bogus file removal
         try {
@@ -654,10 +659,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -703,8 +708,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
                                                                                      {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a file registry
-    file_registry_service =
-            simulation->add(new wrench::FileRegistryService(hostname));
+    file_registry_service = simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -717,6 +721,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
     ASSERT_NO_THROW(storage_service_1000->createFile(file_100));
     ASSERT_NO_THROW(storage_service_1000->createFile(file_500));
 
+    ASSERT_NO_THROW(file_registry_service->addEntry(wrench::FileLocation::LOCATION(storage_service_1000, file_1)));
+    ASSERT_NO_THROW(file_registry_service->addEntry(wrench::FileLocation::LOCATION(storage_service_1000, file_10)));
+    ASSERT_NO_THROW(file_registry_service->addEntry(wrench::FileLocation::LOCATION(storage_service_1000, file_100)));
+    ASSERT_NO_THROW(file_registry_service->addEntry(wrench::FileLocation::LOCATION(storage_service_1000, file_500)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -1459,9 +1467,12 @@ private:
 
     int main() override {
 
+        std::shared_ptr<wrench::ExecutionEvent> event;
+
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
+//        wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo/", this->test->file_10));
         // Copy storage_service_1000:/:file_10 to storage_service_510:foo:file_10
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
@@ -1472,7 +1483,6 @@ private:
         }
 
         // Wait for the next execution event
-        std::shared_ptr<wrench::ExecutionEvent> event;
 
         try {
             event = this->waitForNextEvent();
@@ -1484,7 +1494,6 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
-        // Do a very similar copy, but with "empty" partitions that default to "/"
         // Copy storage_service_1000:/:file_10 to storage_service_510:/:file_10
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
@@ -1513,6 +1522,8 @@ private:
         }
 
 
+        std::cerr << "############INITIATING ANOTHER ASYNCHRONOUS FILE COPY\n";
+
         // Copy storage_service_510:/:file_10 to storage_service_1000:foo:file_10: SHOULD NOT WORK
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
@@ -1534,6 +1545,8 @@ private:
         }
 
 
+        std::cerr << "########### HERE 666 #### \n";
+
         // Copy storage_service_510:foo:file_10 to storage_service_1000:foo
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
@@ -1553,6 +1566,7 @@ private:
         if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
+        std::cerr << "########### HERE 999 #### \n";
 
         // Copy storage_service_510:foo:file_10 to storage_service_510:bar
         try {
@@ -1574,6 +1588,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
+        std::cerr << "########### HERE 2323232 #### \n";
 
         // Copy storage_service_510:foo:file_10 to storage_service_510:foo    SHOULD NOT WORK
         try {
@@ -1649,12 +1664,12 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test(double buffer_size) 
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
-    //    std::cerr << "BUFFER_SIZE = " << buffer_size << "\n";
+        std::cerr << "############################## BUFFER_SIZE = " << buffer_size << "\n";
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

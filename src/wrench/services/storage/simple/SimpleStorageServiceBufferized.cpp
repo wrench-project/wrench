@@ -132,6 +132,7 @@ namespace wrench {
         // Wait for a message
         std::shared_ptr<SimulationMessage> message = nullptr;
 
+        WRENCH_INFO("BUFFERISZED WATOING ON COMMPORT: %s", this->commport->get_cname());
         try {
             message = this->commport->getMessage();
         } catch (ExecutionException &e) {
@@ -145,6 +146,7 @@ namespace wrench {
             return processStopDaemonRequest(msg->ack_commport);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFreeSpaceRequestMessage>(message)) {
+            std::cerr << "BUFFERIZEDS: CALL PROCESS FREE SPACE REQUEST: PATH = " << msg->path << "\n";
             return processFreeSpaceRequest(msg->answer_commport, msg->path);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileDeleteRequestMessage>(message)) {
@@ -339,7 +341,10 @@ namespace wrench {
 
         std::shared_ptr<simgrid::fsmod::File> src_opened_file;
         std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
+
         auto failure_cause = validateFileCopyRequest(src_location, dst_location, src_opened_file, dst_opened_file);
+        std::cerr << "AFTER VALIDATE: " << failure_cause << "\n";
+        if (failure_cause) std::cerr << "AFTER VALIDATE: " << failure_cause->toString() << "\n";
 
         if (failure_cause) {
             this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), src_location->getFile(), src_location, dst_location);
@@ -349,10 +354,7 @@ namespace wrench {
                                 src_location,
                                 dst_location,
                                 false,
-                                std::shared_ptr<FailureCause>(
-                                        new StorageServiceNotEnoughSpace(
-                                                src_location->getFile(),
-                                                this->getSharedPtr<SimpleStorageService>())),
+                                failure_cause,
                                 this->getMessagePayloadValue(
                                         SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {

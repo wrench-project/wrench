@@ -47,11 +47,11 @@ namespace wrench {
         }
 #endif
         this->answer_commport = answer_commport;
-        if (path.empty()) {
-            this->path = "/";
-        } else {
+//        if (path.empty()) {
+//            this->path = "/";
+//        } else {
             this->path = path;
-        }
+//        }
     }
 
     /**

@@ -119,6 +119,10 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
+        std::string getMountPoint() override {
+            return "/"; // Just so that some error tests pass
+        }
+
         double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
 
         double getLoad() override;

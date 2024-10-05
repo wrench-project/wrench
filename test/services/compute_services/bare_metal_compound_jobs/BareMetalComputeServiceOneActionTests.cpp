@@ -1478,16 +1478,18 @@ private:
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
-
         // Create a compound job
         auto job = job_manager->createCompoundJob("my_job");
         auto action = job->addSleepAction("my_sleep", 10.0);
 
+
         // Suspend the compute service
+        std::cerr << "SUSPENDING THE COMPUTE SERVICE\n";
         this->test->compute_service->suspend();
 
         // Submit the job
         try {
+            std::cerr << "SUBMITTING THE JOB\n";
             job_manager->submitJob(job, this->test->compute_service, {});
             throw std::runtime_error("Shouldn't be able to submit a job to a suspended service");
         } catch (wrench::ExecutionException &e) {
@@ -1504,6 +1506,9 @@ private:
             }
         }
 
+        // Weird: if we don't resume, then SimGrid complains about a deadlock....
+//        this->test->compute_service->resume();
+
         return 0;
     }
 };
@@ -1516,11 +1521,11 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
-    //    argv[1] = strdup("--wrench-full-log");
+        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
