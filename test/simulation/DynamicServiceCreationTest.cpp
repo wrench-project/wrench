@@ -359,7 +359,8 @@ private:
                                                     {})));
 
         std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = this->test->workflow->getReadyTasks();
-//        tasks = {this->test->task1, this->test->task2};
+        tasks = {this->test->task1, this->test->task2};
+//        tasks = {this->test->task1};
 
         std::shared_ptr<wrench::StandardJob> one_task_jobs[tasks.size()];
         int job_index = 0;
