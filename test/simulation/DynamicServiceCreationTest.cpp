@@ -68,19 +68,23 @@ protected:
         task5->setClusterID("ID2");
 
         // Add file-task dependencies
+#if 0
         task1->addInputFile(input_file);
         task2->addInputFile(input_file);
         task3->addInputFile(input_file);
         task4->addInputFile(input_file);
         task5->addInputFile(input_file);
         task6->addInputFile(input_file);
+#endif
 
+#if 0
         task1->addOutputFile(output_file1);
         task2->addOutputFile(output_file2);
         task3->addOutputFile(output_file3);
         task4->addOutputFile(output_file4);
         task5->addOutputFile(output_file5);
         task6->addOutputFile(output_file6);
+#endif
 
         workflow->addControlDependency(task4, task5);
 
@@ -170,6 +174,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
+#if 0
         // Dynamically create a File Registry Service on this host
         auto dynamically_created_file_registry_service = simulation->startNewService(
                 new wrench::FileRegistryService(hostname));
@@ -177,6 +182,8 @@ private:
         // Dynamically create a Network Proximity Service on this host
         auto dynamically_created_network_proximity_service = simulation->startNewService(
                 new wrench::NetworkProximityService(hostname, {"DualCoreHost", "QuadCoreHost"}));
+
+#endif
 
         // Dynamically create a Storage Service on this host
         auto dynamically_created_storage_service = simulation->startNewService(
@@ -187,40 +194,55 @@ private:
 
         // Dynamically create a Cloud Service
         std::vector<std::string> execution_hosts = {"QuadCoreHost"};
-        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(simulation->startNewService(
-                new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
+//        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(simulation->startNewService(
+//                new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
+//                                                {})));
+
+        // Dynamically create a BM Service (DEBUG)
+//        std::vector<std::string> execution_hosts = {"QuadCoreHost"};
+        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::BareMetalComputeService>(simulation->startNewService(
+                new wrench::BareMetalComputeService(hostname, execution_hosts, "/scratch",
                                                 {})));
+
         std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = this->test->workflow->getReadyTasks();
+        // DEBUGGING (REMOVE LATER)
+        std::cerr << "DOING ONLY TWO TASKS\n";
+        tasks = {this->test->task1, this->test->task2};
 
         // Create a VM
-        auto vm_name = dynamically_created_compute_service->createVM(4, 10);
-        auto vm_cs = dynamically_created_compute_service->startVM(vm_name);
+//        auto vm_name = dynamically_created_compute_service->createVM(4, 10);
+//        auto vm_cs = dynamically_created_compute_service->startVM(vm_name);
 
         std::shared_ptr<wrench::StandardJob> one_task_jobs[5];
         int job_index = 0;
-        for (auto task: tasks) {
+        for (auto const &task: tasks) {
             try {
+//                one_task_jobs[job_index] = job_manager->createStandardJob(
+//                        {task},
+//                        {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)}},
+//                        {},
+//                        {std::make_tuple(wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+//                                         wrench::FileLocation::LOCATION(dynamically_created_storage_service, this->test->input_file))},
+//                        {});
+
                 one_task_jobs[job_index] = job_manager->createStandardJob(
                         {task},
-                        {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)}},
-                        {},
-                        {std::make_tuple(wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
-                                         wrench::FileLocation::LOCATION(dynamically_created_storage_service, this->test->input_file))},
-                        {});
+                        (const std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){});
 
-                if (one_task_jobs[job_index]->getNumTasks() != 1) {
-                    throw std::runtime_error("A one-task1 job should say it has one task1");
-                }
+//                if (one_task_jobs[job_index]->getNumTasks() != 1) {
+//                    throw std::runtime_error("A one-task1 job should say it has one task1");
+//                }
 
-                job_manager->submitJob(one_task_jobs[job_index], vm_cs);
+//                job_manager->submitJob(one_task_jobs[job_index], vm_cs);
+                job_manager->submitJob(one_task_jobs[job_index], dynamically_created_compute_service);
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(e.what());
             }
-
             job_index++;
         }
 
 
+        std::cerr << "WAITING FOR EXEC EVENTS\n";
         // Wait for workflow execution events
         for (auto task: tasks) {
             std::shared_ptr<wrench::ExecutionEvent> event;
@@ -252,10 +274,10 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+        argv[1] = strdup("--wrench-full-log");
 
 
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};

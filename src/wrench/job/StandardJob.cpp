@@ -320,15 +320,11 @@ namespace wrench {
         // Does the lambda capture of cjob_file_locations work?
         std::weak_ptr<CompoundJob> weak_cjob = cjob;
         auto lambda_execute = [weak_cjob](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
-            std::cerr << "IN SCRATCH CLEANUP LAMBDA!!\n";
             auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
             auto scratch = cs->getScratch();
             if (scratch) {
                 auto cjob = weak_cjob.lock();
-                std::cerr << "-=-==>  FREE SPACE: " << scratch->getTotalFreeSpaceZeroTime() << "\n";
-                std::cerr << "REMOVING DIRECTORY: " << scratch->getBaseRootPath() + cjob->getName() << "\n";
                 scratch->removeDirectory(scratch->getBaseRootPath() + cjob->getName());
-                std::cerr << "-=-==>  FREE SPACE: " << scratch->getTotalFreeSpaceZeroTime() << "\n";
             }
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
