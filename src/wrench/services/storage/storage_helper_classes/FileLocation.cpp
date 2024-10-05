@@ -106,10 +106,6 @@ namespace wrench {
         if (!ss or !file) {
             throw std::invalid_argument("FileLocation::LOCATION(): invalid nullptr arguments");
         }
-        std::cerr << "HERE CALLING get_MountPoint on the STorage Service\n";
-        std::cerr << "======> " << ss->getName() << "\n";
-        std::cerr << "===========> " << (std::dynamic_pointer_cast<StorageService>(ss)  != nullptr) << "\n";
-        std::cerr << "===========> " << (std::dynamic_pointer_cast<SimpleStorageService>(ss)  != nullptr) << "\n";
         return LOCATION(ss, ss->getMountPoint(), file);
     }
 
