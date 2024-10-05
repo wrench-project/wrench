@@ -38,6 +38,25 @@ namespace wrench {
         double getTotalFreeSpaceAtPath(const std::string &path) override;
 
         /**
+        * @brief Return the storage service's default mountpoint, if any.
+        * If none, throws an std::runtime_error exception
+        */
+        virtual std::string getMountPoint() override {
+            // TODO: HENRI modified this method due to the overhaul of the storage service implementation,
+            // TODO: but has no idea if any of this makes sense :)
+            std::cerr << " GETTING THE MOUNT POINT OF THE REMOTE\n";
+            std::cerr << " THE REMOTE: " << this->remote << "\n";
+            std::cerr << " THE CACHE: " << this->cache << "\n";
+            if (this->remote) {
+                return this->remote->getMountPoint();
+            } else if (this->cache) {
+                return this->cache->getMountPoint();
+            } else {
+                return "";
+            }
+        };
+
+        /**
 	 * @brief Get the last write date of a file
 	 * @param location: the file location
 	 * @return a (simulated) date in seconds

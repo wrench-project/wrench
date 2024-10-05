@@ -129,11 +129,12 @@ private:
 
 
         // Try to lookup file2 from remote although it is on target
-        auto start = simulation->getCurrentSimulatedDate();
+        auto start = wrench::Simulation::getCurrentSimulatedDate();
+        std::cerr << "DOiJNG THE FIRST LOOKUP\n";
         if (proxy->lookupFile(test->remote, file2)) {
             throw std::runtime_error("Found file that does not exist");
         }
-        auto firstCache = simulation->getCurrentSimulatedDate() - start;
+        auto firstCache = wrench::Simulation::getCurrentSimulatedDate() - start;
 
         // locate file2 via proxy and target
         if (!proxy->lookupFile(this->test->target, file2)) {
@@ -261,11 +262,11 @@ void StorageServiceProxyBasicTest::do_BasicFunctionality_test(bool arg, std::str
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 3;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-default-control-message-size=1");
-    //   argv[1] = strdup("--wrench-full-log");
+       argv[2] = strdup("--wrench-full-log");
     //argv[2] = strdup("--log=wrench_core_commport.threshold=debug");
     //argv[3] = strdup("--log=wrench_core_proxy_file_server.threshold=debug");
     simulation->init(&argc, argv);

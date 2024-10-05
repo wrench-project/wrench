@@ -333,6 +333,7 @@ namespace wrench {
  * @brief Suspend the daemon/actor.
  */
     void S4U_Daemon::suspendActor() {
+        std::cerr << "****** SUSPENDING A DAEMONIZED ACTOR : " << this->s4u_actor->is_daemon() << " ********\n";
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
             this->s4u_actor->suspend();
         }

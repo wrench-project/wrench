@@ -63,6 +63,7 @@ namespace wrench {
      */
     void SimpleStorageServiceNonBufferized::processTransactionCompletion(const std::shared_ptr<Transaction> &transaction) {
 
+        std::cerr << "A TRANSACTION COMPLETED!\n";
         // Deal with possibly open source file
         if (transaction->src_opened_file) {
             std::cerr << "THERE WAS AN OPENED SOURCE FILE, WHICH I AM CLOSING\n";
@@ -99,16 +100,19 @@ namespace wrench {
 
         // Send back the relevant ack if this was a read
         if (transaction->dst_location == nullptr) {
+            std::cerr << "IT WAS A READ\n";
             //            WRENCH_INFO("Sending back an ack for a successful file read");
             transaction->commport->dputMessage(new StorageServiceAckMessage(transaction->src_location));
         } else if (transaction->src_location == nullptr) {
 //            StorageService::createFileAtLocation(transaction->dst_location);
+            std::cerr << "IT WAS A STORE\n";
             WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // Maybe no corresponding timestamp.
             //            WRENCH_INFO("Sending back an ack for a successful file read");
             transaction->commport->dputMessage(new StorageServiceAckMessage(transaction->dst_location));
         } else {
+            std::cerr << "IT WAS A COPY\n";
             if (transaction->dst_location->getStorageService() == shared_from_this()) {
 //                this->createFile(transaction->dst_location);
                 WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
@@ -205,8 +209,12 @@ namespace wrench {
 
             this->startPendingTransactions();
 
+           WRENCH_INFO("BACK TO MAIN LOOP");
+
+
             // Create an async recv on the mailbox if needed
             if (not comm_has_been_posted) {
+                WRENCH_INFO("NONBUFFEREIZED POSRING MB_RECV  ON COMMPORT: %s", this->commport->get_cname());
                 try {
                     comm_ptr = this->commport->s4u_mb->get_async<void>((void **) (&(simulation_message)));
                 } catch (wrench::ExecutionException &e) {
@@ -214,11 +222,17 @@ namespace wrench {
                     continue;
                 }
                 comm_has_been_posted = true;
+            } else {
+                WRENCH_INFO("A MB_RECV HAS ALREADY BEE POSTED ON COMMPORT %s", this->commport->get_cname());
             }
             // Create an async recv on the message queue if needed
             if (not mess_has_been_posted) {
+                WRENCH_INFO("NONBUFFEREIZED POSRING MQ_RECV  ON COMMPORT: %s", this->commport->get_cname());
                 mess_ptr = this->commport->s4u_mq->get_async<void>((void **) (&(simulation_message)));
                 mess_has_been_posted = true;
+            } else {
+                WRENCH_INFO("A MQ_RECV HAS ALREADY BEE POSTED ON COMMPORT %s", this->commport->get_cname());
+
             }
 
             // Create all activities to wait on
@@ -228,6 +242,8 @@ namespace wrench {
             for (auto const &transaction: this->running_transactions) {
                 pending_activities.push(transaction->stream);
             }
+
+            std::cerr << "WAITING ON  THE NEXT ACTIVITY TO COMPLETE\n";
 
             // Wait for one activity to complete
             simgrid::s4u::ActivityPtr finished_activity;
@@ -257,11 +273,15 @@ namespace wrench {
                 continue;
             }
 
+            std::cerr << "AN ACTIVITY DID COMPLETE!\n";
+
             if (finished_activity == comm_ptr) {
+                WRENCH_INFO("MB_RECV COMPLETED ON PORT %s", this->commport->get_cname());
                 auto msg = simulation_message.get();
                 comm_has_been_posted = false;
                 if (not processNextMessage(msg)) break;
             } else if (finished_activity == mess_ptr) {
+                WRENCH_INFO("MQ_RECV COMPLETED ON PORT %s", this->commport->get_cname());
                 auto msg = simulation_message.get();
                 mess_has_been_posted = false;
                 if (not processNextMessage(msg)) break;
@@ -294,6 +314,7 @@ namespace wrench {
             return processStopDaemonRequest(msg->ack_commport);
 
         } else if (auto msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage *>(message)) {
+            std::cerr << "CALL PROCESS FREE SPACE REQUEST\n";
             return processFreeSpaceRequest(msg->answer_commport, msg->path);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message)) {
@@ -421,7 +442,7 @@ namespace wrench {
 
         // Send back the corresponding ack
         try {
-            answer_commport->putMessage(
+            answer_commport->dputMessage(
                     new StorageServiceFileReadAnswerMessage(
                             location,
                             success,
@@ -438,6 +459,7 @@ namespace wrench {
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
             // Create the transaction
+            std::cerr << "CREATING A TRANSACTION\n";
             auto me_host = simgrid::s4u::this_actor::get_host();
             auto me_disk = location->getDiskOrNull();
             auto transaction = std::make_shared<Transaction>(
@@ -454,6 +476,7 @@ namespace wrench {
 
             // Add it to the Pool of pending data communications
             this->pending_transactions.push_back(transaction);
+            std::cerr << "CREATED A TRANSACTION\n";
         }
 
         return true;
@@ -472,6 +495,7 @@ namespace wrench {
             std::shared_ptr<FileLocation> &dst_location,
             S4U_CommPort *answer_commport) {
 
+        std::cerr << "############# IN FILE COPY REQUEST\n";
         WRENCH_INFO("FileCopyRequest: %s -> %s",
                     src_location->toString().c_str(),
                     dst_location->toString().c_str());
@@ -480,10 +504,11 @@ namespace wrench {
         std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
         auto failure_cause = validateFileCopyRequest(src_location, dst_location, src_opened_file, dst_opened_file);
 
+        std::cerr << "############# IN FILE COPY REQUEST: AFTER VALIDATION\n";
         if (failure_cause) {
             this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), src_location->getFile(), src_location, dst_location);
             try {
-                answer_commport->putMessage(
+                answer_commport->dputMessage(
                         new StorageServiceFileCopyAnswerMessage(
                                 src_location,
                                 dst_location,
@@ -508,6 +533,8 @@ namespace wrench {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(): destination disk not found - internal error");
         }
 
+        WRENCH_INFO("CREATI G A TRANSACTION");
+
         uint64_t transfer_size;
         transfer_size = (uint64_t) (src_location->getFile()->getSize());
         auto transaction = std::make_shared<Transaction>(
@@ -523,6 +550,8 @@ namespace wrench {
                 transfer_size);
 
         this->pending_transactions.push_back(transaction);
+
+        std::cerr << "####################### DONE WITH FILE COPY REQUEST\n";
 
         return true;
     }
@@ -655,11 +684,13 @@ namespace wrench {
     * @brief Start pending file transfer threads if any and if possible
     */
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
+        std::cerr << "IN START PENDING TRANSACTION\n";
         while ((not this->pending_transactions.empty()) and
                (this->running_transactions.size() < this->num_concurrent_connections)) {
             //            WRENCH_INFO("Starting pending transaction for file %s",
             //                        this->transactions[this->pending_sg_iostreams.at(0)]->file->getID().c_str());
 
+            std::cerr << "STARTING A TRANS\n";
             auto transaction = this->pending_transactions.front();
             this->pending_transactions.pop_front();
 
@@ -675,7 +706,10 @@ namespace wrench {
             this->stream_to_transactions[sg_iostream] = transaction;
             this->running_transactions.insert(transaction);
             sg_iostream->start();
+            std::cerr << "STARTED A TRANS\n";
+
         }
+        std::cerr << "LEAVING START PENDING TRANSACTION \n";
     }
 
     /**

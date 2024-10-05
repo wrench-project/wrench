@@ -354,7 +354,7 @@ void CompoundStorageServiceFunctionalTest::do_CopyToCSS_test() {
                                     allocatorCallback,
                                     {{wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "400"}}, {})));
 
-    // Create a Controler
+    // Create a Controller
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
                             new CSSCopyToCSSTestCtrl(this, "CompoundStorageHost")));
@@ -1056,7 +1056,9 @@ void CompoundStorageServiceFunctionalTest::do_BasicFunctionality_test() {
                             new CompoundStorageServiceBasicFunctionalityTestCtrl(this, "CompoundStorageHost")));
 
     // A bogus staging (can't use CompoundStorageService for staging)
-    ASSERT_THROW(compound_storage_service->createFile(file_10), std::invalid_argument);
+    std::cerr << "################# CREATE FILE\n";
+    ASSERT_THROW(compound_storage_service->createFile(file_10), std::runtime_error);
+    std::cerr << "################# FAILED AS EXPECTED\n";
 
     // Tun the simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1084,6 +1086,7 @@ private:
 
         auto job_manager = this->createJobManager();
 
+
         // 1 - Copy from CSS to SS, using a file that was not created on CSS beforehand
         auto jobCopyError = job_manager->createCompoundJob("jobCopyError");
         auto fileCopyActionCSS_SS = jobCopyError->addFileCopyAction(
@@ -1092,11 +1095,11 @@ private:
                 wrench::FileLocation::LOCATION(test->simple_storage_service_1000_0, test->file_500));
 
         job_manager->submitJob(jobCopyError, test->compute_service, {});
+        wrench::Simulation::sleep(10000);
 
         // Dirty solution to make all tests run : normally we would stop simulation after the
         // first error, and wouldn't care about what happens to following jobs, but here we need to
         // give some time to each job to "properly" fail
-        simulation->sleep(10000);
 
         // 2 - Copy from SS to CSS, using a file that is too big to be allocated
         auto jobCopySizeError = job_manager->createCompoundJob("jobCopySizeError");
@@ -1107,8 +1110,7 @@ private:
                 wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1000));
 
         job_manager->submitJob(jobCopySizeError, test->compute_service, {});
-
-        simulation->sleep(10000);
+        wrench::Simulation::sleep(10000);
 
         // 3 - Read from CSS, using a file that was not written/copied to it beforehand
         auto jobReadError = job_manager->createCompoundJob("jobReadError");
@@ -1117,26 +1119,24 @@ private:
                 wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1000));
 
         job_manager->submitJob(jobReadError, test->compute_service, {});
-
-        simulation->sleep(10000);
+        wrench::Simulation::sleep(10000);
 
         // 4 - Try to write a file too big on CSS
         auto jobWriteError = job_manager->createCompoundJob("jobWriteError");
-        auto fileWriteActionCSS = jobWriteError->addFileReadAction(
+        auto fileWriteActionCSS = jobWriteError->addFileWriteAction(
                 "fileWriteActionCSS",
                 wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1000));
 
         job_manager->submitJob(jobWriteError, test->compute_service, {});
-
-        simulation->sleep(10000);
+        wrench::Simulation::sleep(10000);
 
         // 5 - Delete file from CSS, but it's not there
         auto jobDeleteError = job_manager->createCompoundJob("jobDeleteError");
         auto fileDeleteActionCSS = jobDeleteError->addFileReadAction(
                 "fileDeleteActionCSS",
                 wrench::FileLocation::LOCATION(test->compound_storage_service, test->file_1000));
-
         job_manager->submitJob(jobDeleteError, test->compute_service, {});
+        wrench::Simulation::sleep(10000);
 
         // 1
         this->waitForNextEvent();
@@ -1157,14 +1157,14 @@ private:
         if (!jobReadError->hasFailed())
             throw std::runtime_error("3-Unexpected job state: " + jobReadError->getStateAsString());
         if (!std::dynamic_pointer_cast<wrench::FileNotFound>(fileReadActionCSS->getFailureCause()))
-            throw std::runtime_error("3-Did not receive a 'FileNotFound' failure cause as expected");
+            throw std::runtime_error("3-Did not receive a 'FileNotFound' failure cause as expected (Instead received: " + fileReadActionCSS->getFailureCause()->toString() + ")");
 
         // 4
         this->waitForNextEvent();
         if (!jobWriteError->hasFailed())
             throw std::runtime_error("4-Unexpected job state: " + jobWriteError->getStateAsString());
-        if (!std::dynamic_pointer_cast<wrench::FileNotFound>(fileWriteActionCSS->getFailureCause()))
-            throw std::runtime_error("4-Did not receive a 'FileNotFound' failure cause as expected");
+        if (!std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(fileWriteActionCSS->getFailureCause()))
+            throw std::runtime_error("4-Did not receive a 'FileNotFound' failure cause as expected (Instead received: " + fileWriteActionCSS->getFailureCause()->toString() + ")");
 
         // 5
         this->waitForNextEvent();
@@ -1191,10 +1191,10 @@ void CompoundStorageServiceFunctionalTest::do_BasicError_test() {
     // xbt_log_control_set("wrench_core_file_transfer_thread.thres:info");
     // xbt_log_control_set("wrench_core_storage_service.thres:info");
 
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

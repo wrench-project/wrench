@@ -869,6 +869,7 @@ namespace wrench {
                     designated_locations_subset.size());
 
         // Contact every SimpleStorageService that we want to use, and request a FileWrite
+        std::cerr << "IN  FILE WRITE GETTING TEMP PCOMMPORT\n";
         auto recv_commport = S4U_CommPort::getTemporaryCommPort();
         unsigned int request_count = 0;
         WRENCH_INFO("CSS::writeFile(): Using commport created : %s", recv_commport->get_name().c_str());
@@ -1008,12 +1009,15 @@ namespace wrench {
         this->partial_io_stripe_index[location->getFile()] = locations_start;
 
         // Contact every SSS
+        std::cerr << "IN  FILE READ GETTING TEMP PCOMMPORT\n";
         auto recv_commport = S4U_CommPort::getTemporaryCommPort();
         unsigned int request_count = 0;
+        std::cerr << "CONTACTING EVERY SSS\n";
         for (const auto &dloc: designated_locations_subset) {
             WRENCH_DEBUG("CSS::readFile(): Sending full read request %d on file %s (<%f> b) to %s",
                          request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
 
+            std::cerr << "DEPUTTING MESSAGE TO " << dloc->getStorageService()->commport->get_name() << "\n";
             dloc->getStorageService()->commport->dputMessage(
                     new StorageServiceFileReadRequestMessage(
                             recv_commport,
@@ -1030,14 +1034,18 @@ namespace wrench {
         std::vector<std::unique_ptr<wrench::StorageServiceFileReadAnswerMessage>> messages = {};
         unsigned int recv = 0;
         while (recv < request_count) {
-            // Wait for answer to current reqeust
+            std::cerr << "WAITING FOR ANSWER from COMMPORT: " << recv_commport->get_name() << "\n";
+            // Wait for answer to current request
             auto msg = recv_commport->getMessage<StorageServiceFileReadAnswerMessage>(this->network_timeout, "CSS::readFile(): ");
-            if (not msg->success)
+            if (not msg->success) {
                 throw ExecutionException(msg->failure_cause);
+            }
 
             messages.push_back(std::move(msg));
             recv++;
         }
+
+        std::cerr << "YES!\n";
 
         WRENCH_DEBUG("CSS::readFile(): %u FileReadRequests sent and validated", request_count);
 

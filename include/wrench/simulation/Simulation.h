@@ -67,6 +67,8 @@ namespace wrench {
         void init(int *, char **);
 
         static bool isInitialized();
+        bool isRunning() const;
+
 
         void instantiatePlatform(const std::string &);
         void instantiatePlatform(const std::function<void()> &);
@@ -255,7 +257,6 @@ namespace wrench {
 
         void platformSanityCheck();
         void checkSimulationSetup();
-        //        bool isRunning() const;
 
         void startAllProcesses();
         void addService(const std::shared_ptr<ComputeService> &service);

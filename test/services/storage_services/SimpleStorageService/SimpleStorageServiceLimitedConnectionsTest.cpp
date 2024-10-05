@@ -272,8 +272,8 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test(d
 
     // Staging all files on the WMS storage service
     for (int i = 0; i < NUM_PARALLEL_TRANSFERS; i++) {
-        ASSERT_NO_THROW(storage_service_wms_unlimited->createFile(files[i], "/"));
-        ASSERT_NO_THROW(storage_service_wms_limited->createFile(files[i], "/"));
+        ASSERT_NO_THROW(storage_service_wms_unlimited->createFile(files[i], "/disk1/"));
+        ASSERT_NO_THROW(storage_service_wms_limited->createFile(files[i], "/disk2/"));
     }
 
     // Running a "run a single task1" simulation

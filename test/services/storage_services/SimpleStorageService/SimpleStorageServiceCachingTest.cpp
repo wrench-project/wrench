@@ -384,12 +384,15 @@ private:
 
         std::cerr << "****************** SLEEPING FOR 1 SEC\n";
         wrench::Simulation::sleep(1);
-                std::cerr << "Reading file_10 from SS1\n";
+        std::cerr << "Reading file_10 from SS1\n";
         ss1->readFile(wrench::FileLocation::LOCATION(ss1, file_10));
-                std::cerr << "Reading file_20 from SS1\n";
+        std::cerr << "READ FILE!\n";
+        std::cerr << "Reading file_20 from SS1\n";
         ss1->readFile(wrench::FileLocation::LOCATION(ss1, file_20));
-                std::cerr << "NOW file_50 should be the LRU on SS1\n";
+        std::cerr << "NOW file_50 should be the LRU on SS1\n";
 
+        std::cerr << "**************** SLEEPOING FOREVER\n";
+        wrench::Simulation::sleep(1000000);
         // The LRU list:  SS1: file_50, file_10, file_20
         //                SS2: file_30
 
@@ -460,10 +463,10 @@ void SimpleStorageServiceCachingTest::do_SimpleLRUCachingUnevictable_test(double
     std::cerr << "*****************************************\n";
     std::cerr << "******************************** BUFFER SIZE = " << buffer_size << "\n";
     std::cerr << "*****************************************\n";
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
