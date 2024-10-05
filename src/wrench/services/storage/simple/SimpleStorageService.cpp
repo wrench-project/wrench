@@ -307,11 +307,20 @@ namespace wrench {
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFreeSpaceRequest(S4U_CommPort *answer_commport, const std::string &path) {
-        double free_space = 0;
 
-        auto sanitized_path = FileLocation::sanitizePath(path);
-        for (auto const &p: this->file_system->get_partitions()) {
-            free_space += p->get_free_space();
+        // TODO: Remove the sanitize
+        double free_space = 0.0;
+        std::cerr << "IN PROCESS FREE SPACE REQUEST PATH = " << path << "\n";
+        if (not path.empty()) {
+            auto sanitized_path = FileLocation::sanitizePath(path);
+            try {
+                free_space = this->file_system->get_free_space_at_path(path);
+            } catch (simgrid::Exception &ignore) {
+            }
+        } else {
+            for (auto const &part: this->file_system->get_partitions()) {
+                free_space += part->get_free_space();
+            }
         }
 
         answer_commport->dputMessage(
@@ -552,25 +561,21 @@ namespace wrench {
                 }
                 std::cerr << "FILE NOT ALREADY THERE, OPENING A DOT FILE \n";
                 std::string dot_file_path = location->getADotFilePath();
-                std::cerr << "CALLING FS: CREATE FILE FOR  " << location->getFile()->getSize() << "\n";
                 this->file_system->create_file(dot_file_path, location->getFile()->getSize());
-                std::cerr << "CALLED CREATE FILE\n";
-                std::cerr << "OPENING FILE\n";
                 opened_file = this->file_system->open(dot_file_path, "r+");
                 opened_file->seek(0, SEEK_SET);
             } else { // Open the file
-//                std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
+                std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
                 opened_file = this->file_system->open(location->getFilePath(), "r+");
                 opened_file->seek(0, SEEK_SET);
             }
         } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
-            std::cerr << "IN CATCH!!\n";
+            std::cerr << "IN CATCH!! NOT ENOiuGH SPACE IN VALIDATE FILE WRITE!!!!\n";
             return std::shared_ptr<FailureCause>(
                     new StorageServiceNotEnoughSpace(
                             file,
                             this->getSharedPtr<SimpleStorageService>()));
         }
-//        std::cerr << "IN VALIDATE FILE WRITE 2: " << partition->get_free_space() << "\n";
         return nullptr;
     }
 
@@ -592,6 +597,8 @@ namespace wrench {
         auto src_file_system = std::dynamic_pointer_cast<SimpleStorageService>(src_location->getStorageService())->file_system;
         auto dst_file_system = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService())->file_system;
 
+        std::cerr << "IN VALIDATE: GOTTHE FS\n";
+
         // Validate source
         auto src_partition = src_file_system->get_partition_for_path_or_null(src_location->getFilePath());
 
@@ -601,6 +608,8 @@ namespace wrench {
         if (not src_file_system->file_exists(src_location->getFilePath())) {
             return std::shared_ptr<FailureCause>(new FileNotFound(src_location));
         }
+
+        std::cerr << "SOURCE IS OK!\n";
 
         // Validate destination
         auto dst_partition = dst_file_system->get_partition_for_path_or_null(dst_location->getFilePath());

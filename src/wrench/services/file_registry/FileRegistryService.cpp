@@ -15,6 +15,7 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simulation/SimulationMessage.h>
+#include <wrench/simulation/Simulation.h>
 #include <wrench/services/ServiceMessage.h>
 
 #include <wrench/services/file_registry/FileRegistryService.h>
@@ -129,9 +130,16 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void FileRegistryService::addEntry(const std::shared_ptr<FileLocation> &location) {
+
         if (location == nullptr) {
             throw std::invalid_argument("FileRegistryService::addEntry(): Invalid nullptr argument");
         }
+
+        if (not this->simulation->isRunning()) {
+            this->addEntryToDatabase(location);
+            return;
+        }
+
         assertServiceIsUp();
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
@@ -158,6 +166,16 @@ namespace wrench {
     void FileRegistryService::removeEntry(const std::shared_ptr<FileLocation> &location) {
         if (location == nullptr) {
             throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid nullptr argument");
+        }
+
+        if (not this->simulation->isRunning()) {
+            bool success = removeEntryFromDatabase(location);
+            if (!success) {
+                WRENCH_WARN(
+                        "Attempted to remove non-existent (%s,%s) entry from file registry service (ignored)",
+                        location->getFile()->getID().c_str(), location->toString().c_str());
+            }
+            return;
         }
 
         assertServiceIsUp();

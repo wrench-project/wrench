@@ -169,30 +169,28 @@ namespace wrench {
     /***************************************************************/
 
     /**
-     * @brief Synchronously asks the storage service for its total free space capacity, that is,
-     *  the total capacity at the "/" path.
-     *  Note that this doesn't mean that that free space could be used to store a single
-     *  file, as the storage service may have file systems at multiple mount points, may me
-     *  a front-end for a set of storage systems, etc.
+     * @brief Synchronously asks the storage service for its total free space capacity
      * @return A number of bytes
      *
      */
     double StorageService::getTotalFreeSpace() {
-        return this->getTotalFreeSpaceAtPath("/");
+        std::cerr << "IN STORAGE SERVICE: CALLING getTotalFreeSpaceAtPath  with empty path\n";
+        return getTotalFreeSpaceAtPath("");
     }
 
     /**
      * @brief Synchronously asks the storage service for its total free space capacity
-     * at a particular path. Note that this doesn't mean that that free space could be used to store a single
-     *  file, as the storage service may have file systems at multiple mount points, may be
-     *  a front-end for a set of storage systems, etc.
-     *  @param path a path (if empty, "/" will be used)
+     * at a particular path (i.e., at the partition that holds that path). If the path
+     * is the empty string, then it's the sum total free space across all partitions. If the
+     * path is invalid, then this method returns 0.
+     *  @param path a path
      *
-     *  @return A number of bytes
+     *  @return A number of bytes (or 0 if the path is invalid)
      */
     double StorageService::getTotalFreeSpaceAtPath(const std::string &path) {
         assertServiceIsUp();
 
+        std::cerr << "SENDING A MESSAGE TO GET THE GOTAL FREE SPACE AT '" << path << "'\n";
         // Send a message to the daemon
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
         this->commport->putMessage(new StorageServiceFreeSpaceRequestMessage(
@@ -204,6 +202,7 @@ namespace wrench {
         // Wait for a reply
         auto msg = answer_commport->getMessage<StorageServiceFreeSpaceAnswerMessage>(this->network_timeout, "StorageService::getTotalFreeSpaceAtPath() Received an");
 
+        std::cerr << "GOT A REPLY: " << msg->free_space << "\n";
         return msg->free_space;
     }
 
@@ -218,6 +217,7 @@ namespace wrench {
     bool StorageService::lookupFile(S4U_CommPort *answer_commport,
                                     const std::shared_ptr<FileLocation> &location) {
 
+        std::cerr << "XXX INTHE REAL LOKUPFILE\n";
         if (!answer_commport or !location) {
             throw std::invalid_argument("StorageService::lookupFile(): Invalid nullptr arguments");
         }
@@ -519,6 +519,8 @@ namespace wrench {
             throw std::invalid_argument("StorageService::initiateFileCopy(): src and dst locations should be for the same file");
         }
 
+        std::cerr << "IN INITIATE FILE COPY\n";
+
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
 
@@ -545,6 +547,7 @@ namespace wrench {
                                                                                              src_location,
                                                                                              dst_location);
 
+        std::cerr << "IN INITIATE FILE COPY - CONTACTING THE DST LOCATION\n";
         // Send a message to the daemon on the dst location
         commport_to_contact->putMessage(
                 new StorageServiceFileCopyRequestMessage(
@@ -553,6 +556,8 @@ namespace wrench {
                         dst_location,
                         dst_location->getStorageService()->getMessagePayloadValue(
                                 StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+
+        std::cerr << "DONE WIT INITIATE FILE COPY\n";
     }
 
 

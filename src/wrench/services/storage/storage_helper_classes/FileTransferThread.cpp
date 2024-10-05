@@ -226,6 +226,7 @@ namespace wrench {
         } else if ((this->src_location) and (this->src_location->getStorageService() == this->parent) and
                    (this->dst_location) and (this->dst_location->getStorageService() == this->parent)) {
             /** Copying a local file */
+            std::cerr << "DOING A LOCAL COPY!!\n";
             copyFileLocally(this->file, this->src_location, this->dst_location);
 
         } else if (((this->src_location) and (this->dst_location) and
@@ -324,12 +325,12 @@ namespace wrench {
                         }
                     } else {
 #endif
-                        // Write to disk
-                        auto dst_ss = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService());
-                        if (!dst_ss) {
-                            throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Storage Service should be a SimpleStorageService for disk write");
-                        }
-                        this->dst_opened_file->write(msg->payload);
+                    // Write to disk
+                    auto dst_ss = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService());
+                    if (!dst_ss) {
+                        throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Storage Service should be a SimpleStorageService for disk write");
+                    }
+                    this->dst_opened_file->write(msg->payload);
 //                        simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
 //                                                dst_location->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
@@ -339,7 +340,7 @@ namespace wrench {
                     // Wait for the comm to finish
                     msg = req->wait();
                     if (auto file_content_chunk_msg =
-                                dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
+                            dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                         done = file_content_chunk_msg->last_chunk;
                     } else {
                         throw std::runtime_error(
@@ -360,13 +361,13 @@ namespace wrench {
                     }
                 } else {
 #endif
-                    // Write to disk
-                    auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
-                    if (!ss) {
-                        throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
-                    }
+                // Write to disk
+                auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
+                if (!ss) {
+                    throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
+                }
 //                    simulation->writeToDisk(msg->payload, ss->hostname, location->getDiskOrNull());
-                    this->dst_opened_file->write(msg->payload);
+                this->dst_opened_file->write(msg->payload);
 
 #ifdef PAGE_CACHE_SIMULATION
                 }
@@ -422,13 +423,13 @@ namespace wrench {
                         simulation->readWithMemoryCache(f, chunk_size, location);
                     } else {
 #endif
-                        WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
-                        auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
-                        if (!ss) {
-                            throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
-                        }
+                    WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
+                    auto ss = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
+                    if (!ss) {
+                        throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
+                    }
 //                        simulation->readFromDisk(chunk_size, ss->hostname, location->getDiskOrNull());
-                        this->src_opened_file->read(chunk_size);
+                    this->src_opened_file->read(chunk_size);
 #ifdef PAGE_CACHE_SIMULATION
                     }
 #endif
@@ -466,8 +467,6 @@ namespace wrench {
                                              const std::shared_ptr<FileLocation> &src_loc,
                                              const std::shared_ptr<FileLocation> &dst_loc) {
 
-        double remaining = f->getSize();
-        double to_send = std::min<double>(this->buffer_size, remaining);
 
         if ((src_loc->getStorageService() == dst_loc->getStorageService()) and
             (src_loc->getDirectoryPath() == dst_loc->getDirectoryPath())) {
@@ -477,39 +476,23 @@ namespace wrench {
             return;
         }
 
-        /** Ideal Fluid model buffer size */
-        if (this->buffer_size < DBL_EPSILON) {
-            throw std::runtime_error(
-                    "FileTransferThread::copyFileLocally(): Zero buffer size not implemented yet");
+        auto src_ss = std::dynamic_pointer_cast<SimpleStorageService>(src_loc->getStorageService());
+        if (!src_ss) {
+            throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Disk operation can only be to a SimpleStorageService");
+        }
+        auto dst_ss = std::dynamic_pointer_cast<SimpleStorageService>(dst_loc->getStorageService());
+        if (!dst_ss) {
+            throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Disk operation can only be to a SimpleStorageService");
+        }
 
-        } else {
-            auto src_ss = std::dynamic_pointer_cast<SimpleStorageService>(src_loc->getStorageService());
-            if (!src_ss) {
-                throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Disk operation can only be to a SimpleStorageService");
-            }
-//            auto src_mount_point = src_loc->getDiskOrNull()->get_property("mount");
-            auto dst_ss = std::dynamic_pointer_cast<SimpleStorageService>(dst_loc->getStorageService());
-            if (!dst_ss) {
-                throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Disk operation can only be to a SimpleStorageService");
-            }
-//            auto dst_mount_point = dst_loc->getDiskOrNull()->get_property("mount");
-
-            // Read the first chunk
-            simulation->readFromDisk(to_send, src_ss->hostname, src_loc->getDiskOrNull());
-            src_opened_file->read(to_send);
-            // start the pipeline
-            while (remaining - this->buffer_size > DBL_EPSILON) {
-//                simulation->readFromDiskAndWriteToDiskConcurrently(
-//                        this->buffer_size, this->buffer_size, src_loc->getStorageService()->hostname,
-//                        src_loc->getDiskOrNull(), dst_loc->getDiskOrNull());
-                dst_opened_file->write(this->buffer_size);
-                src_opened_file->read(this->buffer_size);
-                remaining -= this->buffer_size;
-            }
-            // Write the last chunk
-//            simulation->writeToDisk(remaining, dst_loc->getStorageService()->hostname,
-//                                    dst_loc->getDiskOrNull());
-            dst_opened_file->write(this->buffer_size);
+        // Read the first chunk
+        std::cerr << "DOING THE COPY: " << dst_opened_file->get_path() << "\n";
+        double remaining = f->getSize();
+        while (remaining > DBL_EPSILON) {
+            double to_read = std::min<double>(remaining, this->buffer_size);
+            src_opened_file->read(to_read);
+            dst_opened_file->write(to_read);
+            remaining -= to_read;
         }
     }
 
@@ -575,7 +558,7 @@ namespace wrench {
             // Receive the first chunk
             auto msg = commport_to_receive_the_file_content->getMessage();
             if (auto file_content_chunk_msg =
-                        dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
+                    dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                 done = file_content_chunk_msg->last_chunk;
             } else {
                 throw std::runtime_error(
@@ -599,11 +582,11 @@ namespace wrench {
                     simulation->writebackWithMemoryCache(f, msg->payload, dst_loc, false);
                 } else {
 #endif
-                    // Write to disk
+                // Write to disk
 //                    simulation->writeToDisk(msg->payload,
 //                                            dst_ss->getHostname(),
 //                                            dst_loc->getDiskOrNull());
-                    dst_opened_file->write(msg->payload);
+                dst_opened_file->write(msg->payload);
 #ifdef PAGE_CACHE_SIMULATION
                 }
 #endif
@@ -611,7 +594,7 @@ namespace wrench {
                 //                    WRENCH_INFO("Wrote of %f of f  %s", msg->payload, f->getID().c_str());
                 msg = req->wait();
                 if (auto file_content_chunk_msg =
-                            dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
+                        dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                     done = file_content_chunk_msg->last_chunk;
                 } else {
                     throw std::runtime_error(
@@ -626,11 +609,11 @@ namespace wrench {
                 simulation->writebackWithMemoryCache(f, msg->payload, dst_loc, false);
             } else {
 #endif
-                // Write last chunk to disk
+            // Write last chunk to disk
 //                simulation->writeToDisk(msg->payload,
 //                                        dst_ss->getHostname(),
 //                                        dst_loc->getDiskOrNull());
-                  dst_opened_file->write(msg->payload);
+            dst_opened_file->write(msg->payload);
 #ifdef PAGE_CACHE_SIMULATION
             }
 

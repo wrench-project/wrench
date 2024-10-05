@@ -138,7 +138,7 @@ namespace wrench {
         }
 
         //        if (log) WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->get_cname(), timeout);
-        if (true) WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->get_cname(), timeout);
+        WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->get_cname(), timeout);
 
 
         simgrid::s4u::ActivitySet pending_receives;
@@ -432,7 +432,7 @@ namespace wrench {
 
         S4U_CommPort::used_commports.insert(commport);
         commport->reset();// Just in case
-        //        WRENCH_DEBUG("Gotten temporary commport %s (%p %p)", commport->name.c_str(), commport->mq_comm.get(), commport->mb_comm.get());
+                WRENCH_DEBUG("Gotten temporary commport %s (%p %p)", commport->name.c_str(), commport->mq_comm.get(), commport->mb_comm.get());
         return commport;
     }
 

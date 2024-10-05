@@ -493,6 +493,8 @@ namespace wrench {
      * @return true if the file is present, false otherwise
      */
     bool StorageServiceProxy::lookupFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file) {
+        std::cerr << "THIS: " << this->getName() << "\n";
+        std::cerr << "CALLING LOOKUP FROm MY PARENT CLASS\n";
         return this->lookupFile(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), file));
     }
 

@@ -15,6 +15,8 @@
 #include <simgrid/s4u.hpp>
 #include <iostream>
 
+//#include <wrench/simulation/Simulation.h>
+
 //#define ACTOR_TRACKING_OUTPUT yes
 
 
@@ -24,8 +26,8 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
-    class Simulation;
     class S4U_CommPort;
+    class Simulation;
 
     /**
      * @brief A generic "running daemon" abstraction that serves as a basis for all simulated processes
