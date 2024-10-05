@@ -1506,8 +1506,9 @@ private:
             }
         }
 
-        // Weird: if we don't resume, then SimGrid complains about a deadlock....
-//        this->test->compute_service->resume();
+        // Weird: if we don't resume, then SimGrid complains about a deadlock.... couldn't
+        // reproduced in a MWE, and valgrind shows nothing wrong
+        this->test->compute_service->resume();
 
         return 0;
     }

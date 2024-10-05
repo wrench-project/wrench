@@ -209,12 +209,8 @@ namespace wrench {
 
             this->startPendingTransactions();
 
-           WRENCH_INFO("BACK TO MAIN LOOP");
-
-
             // Create an async recv on the mailbox if needed
             if (not comm_has_been_posted) {
-                WRENCH_INFO("NONBUFFEREIZED POSRING MB_RECV  ON COMMPORT: %s", this->commport->get_cname());
                 try {
                     comm_ptr = this->commport->s4u_mb->get_async<void>((void **) (&(simulation_message)));
                 } catch (wrench::ExecutionException &e) {
@@ -222,16 +218,13 @@ namespace wrench {
                     continue;
                 }
                 comm_has_been_posted = true;
-            } else {
-                WRENCH_INFO("A MB_RECV HAS ALREADY BEE POSTED ON COMMPORT %s", this->commport->get_cname());
             }
+
             // Create an async recv on the message queue if needed
             if (not mess_has_been_posted) {
-                WRENCH_INFO("NONBUFFEREIZED POSRING MQ_RECV  ON COMMPORT: %s", this->commport->get_cname());
                 mess_ptr = this->commport->s4u_mq->get_async<void>((void **) (&(simulation_message)));
                 mess_has_been_posted = true;
             } else {
-                WRENCH_INFO("A MQ_RECV HAS ALREADY BEE POSTED ON COMMPORT %s", this->commport->get_cname());
 
             }
 
@@ -242,8 +235,6 @@ namespace wrench {
             for (auto const &transaction: this->running_transactions) {
                 pending_activities.push(transaction->stream);
             }
-
-            std::cerr << "WAITING ON  THE NEXT ACTIVITY TO COMPLETE\n";
 
             // Wait for one activity to complete
             simgrid::s4u::ActivityPtr finished_activity;
@@ -273,15 +264,11 @@ namespace wrench {
                 continue;
             }
 
-            std::cerr << "AN ACTIVITY DID COMPLETE!\n";
-
             if (finished_activity == comm_ptr) {
-                WRENCH_INFO("MB_RECV COMPLETED ON PORT %s", this->commport->get_cname());
                 auto msg = simulation_message.get();
                 comm_has_been_posted = false;
                 if (not processNextMessage(msg)) break;
             } else if (finished_activity == mess_ptr) {
-                WRENCH_INFO("MQ_RECV COMPLETED ON PORT %s", this->commport->get_cname());
                 auto msg = simulation_message.get();
                 mess_has_been_posted = false;
                 if (not processNextMessage(msg)) break;
@@ -314,7 +301,6 @@ namespace wrench {
             return processStopDaemonRequest(msg->ack_commport);
 
         } else if (auto msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage *>(message)) {
-            std::cerr << "CALL PROCESS FREE SPACE REQUEST\n";
             return processFreeSpaceRequest(msg->answer_commport, msg->path);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message)) {
@@ -459,7 +445,6 @@ namespace wrench {
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
             // Create the transaction
-            std::cerr << "CREATING A TRANSACTION\n";
             auto me_host = simgrid::s4u::this_actor::get_host();
             auto me_disk = location->getDiskOrNull();
             auto transaction = std::make_shared<Transaction>(
@@ -476,7 +461,6 @@ namespace wrench {
 
             // Add it to the Pool of pending data communications
             this->pending_transactions.push_back(transaction);
-            std::cerr << "CREATED A TRANSACTION\n";
         }
 
         return true;
@@ -684,13 +668,11 @@ namespace wrench {
     * @brief Start pending file transfer threads if any and if possible
     */
     void SimpleStorageServiceNonBufferized::startPendingTransactions() {
-        std::cerr << "IN START PENDING TRANSACTION\n";
         while ((not this->pending_transactions.empty()) and
                (this->running_transactions.size() < this->num_concurrent_connections)) {
             //            WRENCH_INFO("Starting pending transaction for file %s",
             //                        this->transactions[this->pending_sg_iostreams.at(0)]->file->getID().c_str());
 
-            std::cerr << "STARTING A TRANS\n";
             auto transaction = this->pending_transactions.front();
             this->pending_transactions.pop_front();
 
@@ -706,10 +688,7 @@ namespace wrench {
             this->stream_to_transactions[sg_iostream] = transaction;
             this->running_transactions.insert(transaction);
             sg_iostream->start();
-            std::cerr << "STARTED A TRANS\n";
-
         }
-        std::cerr << "LEAVING START PENDING TRANSACTION \n";
     }
 
     /**

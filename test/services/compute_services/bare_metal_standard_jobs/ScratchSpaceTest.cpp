@@ -131,11 +131,11 @@ void ScratchSpaceTest::do_BogusScratchSpace_test() {
 
     // Create a Compute Service
     ASSERT_THROW(compute_service = simulation->add(
-                         new wrench::BareMetalComputeService(hostname,
-                                                             {std::make_pair(hostname,
-                                                                             std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             wrench::ComputeService::ALL_RAM))},
-                                                             "/scratch_bogus", {})),
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname,
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                "/scratch_bogus", {})),
                  std::invalid_argument);
 
 
@@ -162,43 +162,41 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        {
-            // Create a sequential task1 that lasts one min and requires 1 cores
-            std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task1", 60, 1, 1, 0);
-            task->addInputFile(wrench::Simulation::getFileByID("input_file"));
-            task->addOutputFile(wrench::Simulation::getFileByID("output_file"));
+        // Create a sequential task1 that lasts one min and requires 1 cores
+        std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task1", 60, 1, 1, 0);
+        task->addInputFile(wrench::Simulation::getFileByID("input_file"));
+        task->addOutputFile(wrench::Simulation::getFileByID("output_file"));
 
-            // Create a StandardJob with some pre-copies
-            auto job = job_manager->createStandardJob(
-                    {task},
-                    (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
-                    {std::make_tuple(
-                            wrench::FileLocation::LOCATION(this->test->storage_service1, wrench::Simulation::getFileByID("input_file")),
-                            wrench::FileLocation::SCRATCH(wrench::Simulation::getFileByID("input_file")))},
-                    {},
-                    {});
+        // Create a StandardJob with some pre-copies
+        auto job = job_manager->createStandardJob(
+                {task},
+                (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
+                {std::make_tuple(
+                        wrench::FileLocation::LOCATION(this->test->storage_service1, wrench::Simulation::getFileByID("input_file")),
+                        wrench::FileLocation::SCRATCH(wrench::Simulation::getFileByID("input_file")))},
+                {},
+                {});
 
-            // Submit the job for execution
-            job_manager->submitJob(job, this->test->compute_service);
+        // Submit the job for execution
+        job_manager->submitJob(job, this->test->compute_service);
 
-            // Wait for a workflow execution event
-            std::shared_ptr<wrench::ExecutionEvent> event;
-            try {
-                event = this->waitForNextEvent();
-            } catch (wrench::ExecutionException &e) {
-                throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+        // Wait for a workflow execution event
+        std::shared_ptr<wrench::ExecutionEvent> event;
+        try {
+            event = this->waitForNextEvent();
+        } catch (wrench::ExecutionException &e) {
+            throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+        }
+        if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
+            //sleep to make sure that the files are deleted
+            wrench::S4U_Simulation::sleep(100);
+            double free_space_size = this->test->compute_service->getFreeScratchSpaceSize();
+            if (free_space_size < this->test->compute_service->getTotalScratchSpaceSize()) {
+                throw std::runtime_error(
+                        "File was not deleted from scratch");
             }
-            if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
-                //sleep to make sure that the files are deleted
-                wrench::S4U_Simulation::sleep(100);
-                double free_space_size = this->test->compute_service->getFreeScratchSpaceSize();
-                if (free_space_size < this->test->compute_service->getTotalScratchSpaceSize()) {
-                    throw std::runtime_error(
-                            "File was not deleted from scratch");
-                }
-            } else {
-                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
-            }
+        } else {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         return 0;
@@ -215,9 +213,10 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -229,20 +228,20 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService(hostname,
-                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                                "/scratch3000",
-                                                                {})));
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                          wrench::ComputeService::ALL_RAM))},
+                                                "/scratch3000",
+                                                {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -250,8 +249,8 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
 
     ASSERT_NO_THROW(wms = simulation->add(
-                            new SimpleScratchSpaceTestWMS(
-                                    this, hostname)));
+            new SimpleScratchSpaceTestWMS(
+                    this, hostname)));
 
     // Create two files
     std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 1000.0);
@@ -435,35 +434,35 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
 
     // Create a Storage Service3
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
-                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
-                                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
+                                                                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
 
     // Create a Compute Service that does not have scratch space
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService(hostname,
-                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                                "")));
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                          wrench::ComputeService::ALL_RAM))},
+                                                "")));
 
     // Create a Compute Service that has smaller scratch space than the files to be stored
     ASSERT_NO_THROW(compute_service1 = simulation->add(
-                            new wrench::BareMetalComputeService(hostname,
-                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                                "/scratch100")));
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                          wrench::ComputeService::ALL_RAM))},
+                                                "/scratch100")));
 
     // Create a Compute Service that has enough scratch space to store the files
     ASSERT_NO_THROW(compute_service2 = simulation->add(
-                            new wrench::BareMetalComputeService(hostname,
-                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                                "/scratch10000")));
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                          wrench::ComputeService::ALL_RAM))},
+                                                "/scratch10000")));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -471,8 +470,8 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
 
     ASSERT_NO_THROW(wms = simulation->add(
-                            new SimpleScratchSpaceFailureTestWMS(
-                                    this, hostname)));
+            new SimpleScratchSpaceFailureTestWMS(
+                    this, hostname)));
 
     // Create two files
     std::shared_ptr<wrench::DataFile> input_file1 = wrench::Simulation::addFile("input_file1", 10000.0);
@@ -660,17 +659,17 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service that does not have scratch space
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BatchComputeService(hostname,
-                                                            {hostname}, "/scratch3000", {})));
+            new wrench::BatchComputeService(hostname,
+                                            {hostname}, "/scratch3000", {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -678,8 +677,8 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
 
     ASSERT_NO_THROW(wms = simulation->add(
-                            new PilotJobScratchSpaceTestWMS(
-                                    this, hostname)));
+            new PilotJobScratchSpaceTestWMS(
+                    this, hostname)));
 
     // Create two files
     std::shared_ptr<wrench::DataFile> input_file1 = wrench::Simulation::addFile("input_file1", 1000.0);
@@ -801,19 +800,19 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
-                                                                                     {},
-                                                                                     {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
+                                                                     {},
+                                                                     {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
 
     // Create a Cloud Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService(hostname, {"Host1"}, "/scratch3000", {}, {})));
+            new wrench::BareMetalComputeService(hostname, {"Host1"}, "/scratch3000", {}, {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
 
     ASSERT_NO_THROW(wms = simulation->add(
-                            new ScratchSpaceRaceConditionTestWMS(this, hostname)));
+            new ScratchSpaceRaceConditionTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -866,13 +865,13 @@ private:
 
         //check if this file is staged at mount point of non-scratch
         if (not wrench::StorageService::lookupFileAtLocation(
-                    wrench::FileLocation::LOCATION(test->storage_service1, file1))) {
+                wrench::FileLocation::LOCATION(test->storage_service1, file1))) {
             throw std::runtime_error(
                     "The file1 was supposed to be staged at the mount point but is not");
         }
         //check if this file is staged at mount point of non-scratch
         if (not wrench::StorageService::lookupFileAtLocation(
-                    wrench::FileLocation::LOCATION(test->storage_service2, file2))) {
+                wrench::FileLocation::LOCATION(test->storage_service2, file2))) {
             throw std::runtime_error(
                     "The file2 was supposed to be staged in / partition but is not");
         }
@@ -911,7 +910,7 @@ private:
         //the file1 should still be non-scratch space, the job should only delete file from it's scratch job's partition
         //check if this file is staged in mount point of non-scratch
         if (not wrench::StorageService::lookupFileAtLocation(
-                    wrench::FileLocation::LOCATION(test->storage_service1, file1))) {
+                wrench::FileLocation::LOCATION(test->storage_service1, file1))) {
             throw std::runtime_error(
                     "The file1 again was supposed to be staged in / partition but is not");
         }
@@ -964,7 +963,7 @@ private:
 
         //we just copied file to /test partition of storage service2, so it must be there
         if (not wrench::StorageService::lookupFileAtLocation(
-                    wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->storage_service2->getBaseRootPath() + "/test", file2))) {
+                wrench::FileLocation::LOCATION(this->test->storage_service2, this->test->storage_service2->getBaseRootPath() + "/test", file2))) {
 
             throw std::runtime_error(
                     "The file2 was supposed to be stored in /test partition but is not");
@@ -998,25 +997,25 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
-                                                                                     {},
-                                                                                     {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1.0}})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
+                                                                     {},
+                                                                     {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1.0}})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-                            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
-                                                                                     {},
-                                                                                     {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
+                                                                     {},
+                                                                     {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
 
     // Create a Cloud Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::BareMetalComputeService(hostname, {"Host1"}, "/scratch3000", {}, {})));
+            new wrench::BareMetalComputeService(hostname, {"Host1"}, "/scratch3000", {}, {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
 
     ASSERT_NO_THROW(wms = simulation->add(
-                            new ScratchNonScratchPartitionsTestWMS(this, hostname)));
+            new ScratchNonScratchPartitionsTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));

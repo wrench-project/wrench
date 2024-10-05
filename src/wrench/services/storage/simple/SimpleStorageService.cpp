@@ -395,8 +395,13 @@ namespace wrench {
      */
     void SimpleStorageService::removeDirectory(const std::string &path) {
         if (not this->file_system->directory_exists(path)) {
+            std::cerr << "DIRECTORy DOENS NOT EXIST\n";
             return;
         } else {
+            std::cerr << "DIRECTORy  EXISTS REMOVING IT\n";
+            for (auto const &f : this->file_system->list_files_in_directory(path)) {
+                std::cerr << "   ==> " << f << "\n";
+            }
             this->file_system->unlink_directory(path);
         }
     }
