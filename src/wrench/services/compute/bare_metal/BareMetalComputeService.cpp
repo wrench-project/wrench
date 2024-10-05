@@ -619,11 +619,11 @@ namespace wrench {
 
 
     /**
- * @brief Process a compound job termination request
- *
- * @param job: the job to terminate
- * @param answer_commport: the commport to which the answer message should be sent
- */
+     * @brief Process a compound job termination request
+     *
+     * @param job: the job to terminate
+     * @param answer_commport: the commport to which the answer message should be sent
+     */
     void BareMetalComputeService::processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job,
                                                                        S4U_CommPort *answer_commport) {
         // If the job doesn't exit, we reply right away
@@ -703,6 +703,7 @@ namespace wrench {
  *        executed inside me
  */
     void BareMetalComputeService::cleanUpScratch() {
+        std::cerr << "******* IN CLEANUP SCRATCH *****\n";
         for (auto const &j: this->files_in_scratch) {
             for (auto const &f: j.second) {
                 this->getScratch()->deleteFile(
