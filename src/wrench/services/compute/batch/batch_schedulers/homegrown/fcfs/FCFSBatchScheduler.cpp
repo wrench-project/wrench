@@ -179,7 +179,7 @@ namespace wrench {
             }
 
 #if 0
-            std::cerr << "AFTER ACCOUNTING FOR THIS JOB: \n";
+        std::cerr << "AFTER ACCOUNTING FOR THIS JOB: \n";
         for (auto h : core_available_times) {
           std::cerr << "  " << h.first << ":\n";
           for (auto t : h.second) {

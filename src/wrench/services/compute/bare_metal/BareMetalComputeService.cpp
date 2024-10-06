@@ -703,7 +703,6 @@ namespace wrench {
  *        executed inside me
  */
     void BareMetalComputeService::cleanUpScratch() {
-        std::cerr << "******* IN CLEANUP SCRATCH *****\n";
         for (auto const &j: this->files_in_scratch) {
             for (auto const &f: j.second) {
                 this->getScratch()->deleteFile(
