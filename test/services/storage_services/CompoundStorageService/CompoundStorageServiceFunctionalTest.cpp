@@ -248,6 +248,7 @@ private:
         job_manager->submitJob(job, test->compute_service, {});
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
 
+        std::cerr << "##################### TEST: HERE\n";
         if (not std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
@@ -733,7 +734,7 @@ private:
 
         for (auto const &a: actions) {
             if (a->getState() != wrench::Action::State::COMPLETED) {
-                auto exc_msg = "Action " + a->getName() + " did not complete";
+                auto exc_msg = "Action " + a->getName() + " did not complete (" + a->getStateAsString() + ")";
                 throw std::runtime_error(exc_msg);
             }
         }
@@ -775,10 +776,10 @@ void CompoundStorageServiceFunctionalTest::do_fullJob_test() {
     // xbt_log_control_set("wrench_core_compound_storage_system.thresh:debug");
     // xbt_log_control_set("wrench_core_file_transfer_thread.thres:info");
 
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    // argv[1] = strdup("--wrench-full-log");
+     argv[1] = strdup("--wrench-full-log");
 
     // Setting up simulation and platform
     ASSERT_NO_THROW(simulation->init(&argc, argv));

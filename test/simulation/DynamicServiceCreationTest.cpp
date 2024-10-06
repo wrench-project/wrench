@@ -305,7 +305,9 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
 
 
 /**********************************************************************/
-/**            SIMGRID VECTOR RESERVE BUG          **/
+/**            SIMGRID VECTOR RESERVE BUG                            **/
+/**            HAPPENS WHEN the "touch" read() to update a file's    **/
+/**            access date is done with simulate=true                **/
 /**********************************************************************/
 
 class WeirdVectorBugTestWMS : public wrench::ExecutionController {
@@ -320,30 +322,19 @@ private:
 
     int main() override {
 
-        // Coverage
-        try {
-            wrench::Simulation::turnOnHost("bogus");
-            throw std::runtime_error("Should not be able to turn on bogus host");
-        } catch (std::invalid_argument &e) {}
-        try {
-            wrench::Simulation::turnOffHost("bogus");
-            throw std::runtime_error("Should not be able to turn off bogus host");
-        } catch (std::invalid_argument &e) {}
-        try {
-            wrench::Simulation::turnOnLink("bogus");
-            throw std::runtime_error("Should not be able to turn on bogus link");
-        } catch (std::invalid_argument &e) {}
-        try {
-            wrench::Simulation::turnOffLink("bogus");
-            throw std::runtime_error("Should not be able to turn off bogus link");
-        } catch (std::invalid_argument &e) {}
-
-
-        // Create a data movement manager
-        auto data_movement_manager = this->createDataMovementManager();
-
         // Create a job manager
         auto job_manager = this->createJobManager();
+
+        // Dynamically create a BM Service
+        std::vector<std::string> execution_hosts = {"QuadCoreHost"};
+        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::BareMetalComputeService>(simulation->startNewService(
+                new wrench::BareMetalComputeService(hostname, execution_hosts, "/scratch",
+                                                    {})));
+
+        std::cerr << "##################################################\n";
+        std::cerr << "##################################################\n";
+        std::cerr << "##################################################\n";
+        std::cerr << "##################################################\n";
 
         // Dynamically create a Storage Service on this host
         auto dynamically_created_storage_service = simulation->startNewService(
@@ -352,20 +343,15 @@ private:
                                                                          {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
 
-        // Dynamically create a BM Service
-        std::vector<std::string> execution_hosts = {"QuadCoreHost"};
-        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::BareMetalComputeService>(simulation->startNewService(
-                new wrench::BareMetalComputeService(hostname, execution_hosts, "/scratch",
-                                                    {})));
-
-        std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = this->test->workflow->getReadyTasks();
-        tasks = {this->test->task1, this->test->task2};
-//        tasks = {this->test->task1};
+        std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks;
+        tasks = this->test->workflow->getReadyTasks();
+//        tasks = {this->test->task1, this->test->task2};
 
         std::shared_ptr<wrench::StandardJob> one_task_jobs[tasks.size()];
         int job_index = 0;
         for (auto const &task: tasks) {
             try {
+                std::cerr << "CREATING A STANDARD JOB!\n";
                 one_task_jobs[job_index] = job_manager->createStandardJob(
                         {task},
                         {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)}},
@@ -458,7 +444,7 @@ void DynamicServiceCreationTest::do_WeirdVectorBug_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
 
     ASSERT_NO_THROW(wms = simulation->add(
-            new DynamicServiceCreationReadyTasksTestWMS(this, hostname)));
+            new WeirdVectorBugTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
