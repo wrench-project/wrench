@@ -190,7 +190,6 @@ namespace wrench {
             const std::shared_ptr<FileLocation> &location,
             S4U_CommPort *answer_commport) {
 
-        std::cerr << "LOOKING FOR FILE: " << location->getFilePath() << "\n";
         bool file_found = this->file_system->file_exists(location->getFilePath());
 
         answer_commport->dputMessage(
@@ -310,7 +309,6 @@ namespace wrench {
 
         // TODO: Remove the sanitize
         double free_space = 0.0;
-        std::cerr << "IN PROCESS FREE SPACE REQUEST PATH = " << path << "\n";
         if (not path.empty()) {
             auto sanitized_path = FileLocation::sanitizePath(path);
             try {
@@ -395,13 +393,8 @@ namespace wrench {
      */
     void SimpleStorageService::removeDirectory(const std::string &path) {
         if (not this->file_system->directory_exists(path)) {
-            std::cerr << "DIRECTORy DOENS NOT EXIST\n";
             return;
         } else {
-            std::cerr << "DIRECTORy  EXISTS REMOVING IT\n";
-            for (auto const &f : this->file_system->list_files_in_directory(path)) {
-                std::cerr << "   ==> " << f << "\n";
-            }
             this->file_system->unlink_directory(path);
         }
     }
@@ -557,19 +550,21 @@ namespace wrench {
         }
 
         bool file_already_there = this->file_system->file_exists(location->getFilePath());
+        WRENCH_INFO("PARTIONT FREE SPACE = %d", partition->get_free_space());
+        WRENCH_INFO("Validating FileWrite request: num_bytes_to_write = %d", num_bytes_to_write);
+        WRENCH_INFO("Validating FileWrite request: file %s already there: %d", location->getFilePath().c_str(), file_already_there);
         try {
             if (not file_already_there) { // Open dot file
                 if (num_bytes_to_write < location->getFile()->getSize()) {
                     std::string err_msg = "Cannot write fewer number of bytes than the file size if the file isn't already present";
                     return std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<Service>(), err_msg));
                 }
-                std::cerr << "FILE NOT ALREADY THERE, OPENING A DOT FILE \n";
+                WRENCH_INFO("CREATING NEW FILE WITH TOTAL SIZE %lf", location->getFile()->getSize());
                 std::string dot_file_path = location->getADotFilePath();
                 this->file_system->create_file(dot_file_path, location->getFile()->getSize());
                 opened_file = this->file_system->open(dot_file_path, "r+");
                 opened_file->seek(0, SEEK_SET);
             } else { // Open the file
-                std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
                 opened_file = this->file_system->open(location->getFilePath(), "r+");
                 opened_file->seek(0, SEEK_SET);
             }
@@ -600,8 +595,6 @@ namespace wrench {
         auto src_file_system = std::dynamic_pointer_cast<SimpleStorageService>(src_location->getStorageService())->file_system;
         auto dst_file_system = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService())->file_system;
 
-        std::cerr << "IN VALIDATE: GOTTHE FS\n";
-
         // Validate source
         auto src_partition = src_file_system->get_partition_for_path_or_null(src_location->getFilePath());
 
@@ -611,8 +604,6 @@ namespace wrench {
         if (not src_file_system->file_exists(src_location->getFilePath())) {
             return std::shared_ptr<FailureCause>(new FileNotFound(src_location));
         }
-
-        std::cerr << "SOURCE IS OK!\n";
 
         // Validate destination
         auto dst_partition = dst_file_system->get_partition_for_path_or_null(dst_location->getFilePath());

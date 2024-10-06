@@ -52,7 +52,6 @@ namespace wrench {
                                                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
                                                                                                                                                            "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {
-
         this->buffer_size = 0;
         this->is_bufferized = false;
     }
@@ -63,25 +62,21 @@ namespace wrench {
      */
     void SimpleStorageServiceNonBufferized::processTransactionCompletion(const std::shared_ptr<Transaction> &transaction) {
 
-        std::cerr << "A TRANSACTION COMPLETED!\n";
         // Deal with possibly open source file
         if (transaction->src_opened_file) {
-            std::cerr << "THERE WAS AN OPENED SOURCE FILE, WHICH I AM CLOSING\n";
             // Doing a 1-byte write just so that the file access date is updated
             transaction->src_opened_file->seek(0, SEEK_SET);
-            transaction->src_opened_file->read(1);
+            transaction->src_opened_file->read(1, false); // TODO WEIRD: tru makes it break with a crazy bug in lmm solver
             transaction->src_opened_file->close();
         }
         // Deal with possibly opened destination file
         if (transaction->dst_opened_file) {
-            std::cerr << "THERE WAS AN OPENED DST FILE, JUST CLOSE IT!\n";
             auto dst_file_system = transaction->dst_opened_file->get_file_system();
             auto dst_file_path = transaction->dst_opened_file->get_path();
             transaction->dst_opened_file->close();
             if (not dst_file_system->file_exists(transaction->dst_location->getFilePath())) {
                 std::cerr << transaction->dst_location->getStorageService()->getName() << ": MOVING  " << dst_file_path << " TO " << transaction->dst_location->getFilePath() << "\n";
                 dst_file_system->move_file(dst_file_path, transaction->dst_location->getFilePath());
-                std::cerr << "DONE THE MOVE\n";
             }
         }
 
@@ -100,19 +95,16 @@ namespace wrench {
 
         // Send back the relevant ack if this was a read
         if (transaction->dst_location == nullptr) {
-            std::cerr << "IT WAS A READ\n";
             //            WRENCH_INFO("Sending back an ack for a successful file read");
             transaction->commport->dputMessage(new StorageServiceAckMessage(transaction->src_location));
         } else if (transaction->src_location == nullptr) {
 //            StorageService::createFileAtLocation(transaction->dst_location);
-            std::cerr << "IT WAS A STORE\n";
             WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
             // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
             // Maybe no corresponding timestamp.
             //            WRENCH_INFO("Sending back an ack for a successful file read");
             transaction->commport->dputMessage(new StorageServiceAckMessage(transaction->dst_location));
         } else {
-            std::cerr << "IT WAS A COPY\n";
             if (transaction->dst_location->getStorageService() == shared_from_this()) {
 //                this->createFile(transaction->dst_location);
                 WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
@@ -123,7 +115,7 @@ namespace wrench {
                 }
             }
 
-            //            WRENCH_INFO("Sending back an ack for a file copy");
+            WRENCH_INFO("Sending back an ack for a file copy");
             transaction->commport->dputMessage(
                     new StorageServiceFileCopyAnswerMessage(
                             transaction->src_location,
@@ -345,10 +337,13 @@ namespace wrench {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileWriteRequest(): Cannot process a write requests with a non-zero buffer size");
         }
 
+        WRENCH_INFO("Processing FileWriteRequests");
+
         std::shared_ptr<simgrid::fsmod::File> opened_file;
         auto failure_cause = validateFileWriteRequest(location, num_bytes_to_write, opened_file);
 
         if (failure_cause) {
+            WRENCH_INFO("ERROR CAUSE: %s", failure_cause->toString().c_str());
             try {
                 answer_commport->dputMessage(
                         new StorageServiceFileWriteAnswerMessage(
@@ -479,7 +474,6 @@ namespace wrench {
             std::shared_ptr<FileLocation> &dst_location,
             S4U_CommPort *answer_commport) {
 
-        std::cerr << "############# IN FILE COPY REQUEST\n";
         WRENCH_INFO("FileCopyRequest: %s -> %s",
                     src_location->toString().c_str(),
                     dst_location->toString().c_str());
@@ -488,7 +482,6 @@ namespace wrench {
         std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
         auto failure_cause = validateFileCopyRequest(src_location, dst_location, src_opened_file, dst_opened_file);
 
-        std::cerr << "############# IN FILE COPY REQUEST: AFTER VALIDATION\n";
         if (failure_cause) {
             this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), src_location->getFile(), src_location, dst_location);
             try {
@@ -517,8 +510,6 @@ namespace wrench {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileCopyRequestIAmNotTheSource(): destination disk not found - internal error");
         }
 
-        WRENCH_INFO("CREATI G A TRANSACTION");
-
         uint64_t transfer_size;
         transfer_size = (uint64_t) (src_location->getFile()->getSize());
         auto transaction = std::make_shared<Transaction>(
@@ -534,8 +525,6 @@ namespace wrench {
                 transfer_size);
 
         this->pending_transactions.push_back(transaction);
-
-        std::cerr << "####################### DONE WITH FILE COPY REQUEST\n";
 
         return true;
     }

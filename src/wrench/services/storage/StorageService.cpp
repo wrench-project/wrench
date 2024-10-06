@@ -174,7 +174,6 @@ namespace wrench {
      *
      */
     double StorageService::getTotalFreeSpace() {
-        std::cerr << "IN STORAGE SERVICE: CALLING getTotalFreeSpaceAtPath  with empty path\n";
         return getTotalFreeSpaceAtPath("");
     }
 
@@ -190,7 +189,6 @@ namespace wrench {
     double StorageService::getTotalFreeSpaceAtPath(const std::string &path) {
         assertServiceIsUp();
 
-        std::cerr << "SENDING A MESSAGE TO GET THE GOTAL FREE SPACE AT '" << path << "'\n";
         // Send a message to the daemon
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
         this->commport->putMessage(new StorageServiceFreeSpaceRequestMessage(
@@ -202,7 +200,6 @@ namespace wrench {
         // Wait for a reply
         auto msg = answer_commport->getMessage<StorageServiceFreeSpaceAnswerMessage>(this->network_timeout, "StorageService::getTotalFreeSpaceAtPath() Received an");
 
-        std::cerr << "GOT A REPLY: " << msg->free_space << "\n";
         return msg->free_space;
     }
 
@@ -217,7 +214,6 @@ namespace wrench {
     bool StorageService::lookupFile(S4U_CommPort *answer_commport,
                                     const std::shared_ptr<FileLocation> &location) {
 
-        std::cerr << "XXX INTHE REAL LOKUPFILE\n";
         if (!answer_commport or !location) {
             throw std::invalid_argument("StorageService::lookupFile(): Invalid nullptr arguments");
         }
@@ -402,8 +398,6 @@ namespace wrench {
             throw std::invalid_argument("StorageService::deleteFile(): Cannot be called on a SCRATCH location");
         }
 
-        std::cerr << "IN deleteFile: " << location->toString() << "\n";
-
         assertServiceIsUp(this->getSharedPtr<Service>());
 
         // Send a message to the storage service's daemon
@@ -519,8 +513,6 @@ namespace wrench {
             throw std::invalid_argument("StorageService::initiateFileCopy(): src and dst locations should be for the same file");
         }
 
-        std::cerr << "IN INITIATE FILE COPY\n";
-
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
 
@@ -547,7 +539,6 @@ namespace wrench {
                                                                                              src_location,
                                                                                              dst_location);
 
-        std::cerr << "IN INITIATE FILE COPY - CONTACTING THE DST LOCATION\n";
         // Send a message to the daemon on the dst location
         commport_to_contact->putMessage(
                 new StorageServiceFileCopyRequestMessage(
@@ -556,8 +547,6 @@ namespace wrench {
                         dst_location,
                         dst_location->getStorageService()->getMessagePayloadValue(
                                 StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
-
-        std::cerr << "DONE WIT INITIATE FILE COPY\n";
     }
 
 

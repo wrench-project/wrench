@@ -226,7 +226,6 @@ namespace wrench {
         } else if ((this->src_location) and (this->src_location->getStorageService() == this->parent) and
                    (this->dst_location) and (this->dst_location->getStorageService() == this->parent)) {
             /** Copying a local file */
-            std::cerr << "DOING A LOCAL COPY!!\n";
             copyFileLocally(this->file, this->src_location, this->dst_location);
 
         } else if (((this->src_location) and (this->dst_location) and
@@ -282,7 +281,6 @@ namespace wrench {
                                                     S4U_CommPort *commport,
                                                     const std::shared_ptr<FileLocation> &location) {
         /** Ideal Fluid model buffer size */
-        std::cerr << "IN RECEIVE FILE FROM NETWORK!\n";
         if (this->buffer_size < DBL_EPSILON) {
             throw std::runtime_error(
                     "FileTransferThread::receiveFileFromNetwork(): Zero buffer size not implemented yet");
@@ -486,7 +484,6 @@ namespace wrench {
         }
 
         // Read the first chunk
-        std::cerr << "DOING THE COPY: " << dst_opened_file->get_path() << "\n";
         double remaining = f->getSize();
         while (remaining > DBL_EPSILON) {
             double to_read = std::min<double>(remaining, this->buffer_size);

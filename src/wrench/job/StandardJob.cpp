@@ -328,7 +328,6 @@ namespace wrench {
             }
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
-        std::cerr << "ADDING A SCRATCH CLEANUP ACTION!!!\n";
         scratch_cleanup = cjob->addCustomAction("", 0, 0, lambda_execute, lambda_terminate);
 
 
@@ -452,8 +451,10 @@ namespace wrench {
         *latest_end_date = -1.0;
         *earliest_failure_date = -1.0;
 
+        std::cerr << "ANALyZING ACTIONS...\n";
+
         for (const auto &action: actions) {
-            //            std::cerr << "   ANALYSING ACTION " << action->getName() << "    END DATE " << action->getEndDate() << "\n";
+                        std::cerr << "   ANALYSING ACTION " << action->getName() << "    END DATE " << action->getEndDate() << "\n";
 
             // Set the dates
             if ((*earliest_start_date == -1.0) or ((action->getStartDate() < *earliest_start_date) and (action->getStartDate() != -1.0))) {
@@ -644,6 +645,7 @@ namespace wrench {
 
             t->updateStartDate(earliest_start_date);// could be -1.0 if there were no input, but will be updated below
             t->setReadInputStartDate(earliest_start_date);
+            std::cerr << "***** SETTING READ INPUT END ATE TO : " << latest_end_date << "\n";
             t->setReadInputEndDate(latest_end_date);
 
             /*

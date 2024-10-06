@@ -281,6 +281,7 @@ private:
     int main() override {
         auto job_manager = this->createJobManager();
 
+#if 1
         auto job_that_will_fail = job_manager->createStandardJob(this->test->t4,
                                                                  {{this->test->small_input_file,
                                                                    wrench::FileLocation::LOCATION(this->test->storage_service, this->test->small_input_file)},
@@ -307,6 +308,7 @@ private:
         }
         auto t4_history = this->test->t4->getExecutionHistory();
 
+#endif
 
         auto job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                      {{this->test->small_input_file,
@@ -319,6 +321,7 @@ private:
 
         this->waitForAndProcessNextEvent();
 
+#if 1
         auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5);
         job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
@@ -329,10 +332,12 @@ private:
         job_manager->submitJob(job_that_will_fail_2, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
 
+
         this->test->compute_service->stop(true, wrench::ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
         //        this->test->compute_service->stop();
 
         this->waitForAndProcessNextEvent();
+#endif
 
         return 0;
     }
@@ -348,7 +353,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test(double buffer_size) 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //        argv[1] = strdup("--wrench-full-log");
+//            argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -385,6 +390,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test(double buffer_size) 
     ASSERT_NO_THROW(storage_service->createFile(large_input_file));
     ASSERT_NO_THROW(storage_service->createFile(small_input_file));
     ASSERT_NO_THROW(storage_service->createFile(small_input_file));
+    ASSERT_NO_THROW(backup_storage_service->createFile(small_input_file));
 
     ASSERT_NO_THROW(simulation->launch());
 
