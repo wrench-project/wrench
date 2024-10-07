@@ -138,8 +138,7 @@ namespace wrench {
                 if (this->internalStorage) {
                     return this->internalStorage->getMountPoint();
                 } else {
-                    std::cerr << "NO INTERNAL STORAGE \n";
-                    throw std::runtime_error("Node::getMountPoint(): no mount point!");
+                    return "/";
                 }
             }
 
@@ -147,11 +146,12 @@ namespace wrench {
              * @brief Return the storage service's mountpoints. If none, throws
              * an std::runtime_error exception
              */
-            virtual std::set<std::string> getMountPoints() {
+            virtual std::set<std::string> getMountPoints() override {
                 if (this->internalStorage) {
                     return this->internalStorage->getMountPoints();
                 } else {
-                    throw std::runtime_error("Node::getMountPoints(): no mount point!");
+                    std::set<std::string> mps = {"/"};
+                    return mps;
                 }
             }
 
