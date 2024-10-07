@@ -85,6 +85,7 @@ namespace wrench {
         static void removeFile(const std::shared_ptr<DataFile> &file);
         static void removeAllFiles();
         static std::shared_ptr<DataFile> getFileByID(const std::string &id);
+        static std::shared_ptr<DataFile> getFileByIDOrNull(const std::string &id);
         static std::shared_ptr<DataFile> addFile(const std::string &, double);
 
 

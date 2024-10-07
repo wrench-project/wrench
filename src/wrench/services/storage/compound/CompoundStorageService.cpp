@@ -116,7 +116,8 @@ namespace wrench {
         WRENCH_INFO("CSS - Registered underlying storage services:");
         for (const auto &storage_server: this->storage_services) {
             for (const auto &service: storage_server.second) {
-                message = " - " + service->process_name + " on " + service->getHostname();
+                message = " - " + service->process_name + " on " + service->getHostname() +
+                        " (" + std::to_string(service->getTotalFreeSpaceZeroTime()) + " bytes)";
                 WRENCH_INFO("%s", message.c_str());
             }
         }
@@ -195,17 +196,25 @@ namespace wrench {
             double remaining = file_size;
             auto part_id = 0;
             while (remaining - this->max_chunk_size > DBL_EPSILON) {
-                parts.push_back(
-                        this->simulation->addFile(file_name + "_stripe_" + std::to_string(part_id), this->max_chunk_size));
+                std::string part_file_name = file_name + "_stripe_" + std::to_string(part_id);
+                std::shared_ptr<DataFile> part_file = wrench::Simulation::getFileByIDOrNull(part_file_name);
+                if (not part_file) {
+                    part_file = Simulation::addFile(part_file_name, this->max_chunk_size);
+                }
+                parts.push_back(part_file);
+//                parts.push_back(
+//                        this->simulation->addFile(file_name + "_stripe_" + std::to_string(part_id), this->max_chunk_size));
                 part_id++;
                 remaining -= this->max_chunk_size;
             }
-            parts.push_back(this->simulation->addFile(file_name + "_stripe_" + std::to_string(part_id), remaining));
+            std::string part_file_name = file_name + "_stripe_" + std::to_string(part_id);
+            std::shared_ptr<DataFile> part_file = wrench::Simulation::getFileByIDOrNull(part_file_name);
+            if (not part_file) {
+                part_file = Simulation::addFile(part_file_name, remaining);
+            }
+            parts.push_back(part_file);
         } else {
             parts.push_back(file);
-        }
-        for (auto const &p : parts) {
-            std::cerr << "===> " << p->getID() << " " << p->getSize() << "\n";
         }
 
         // Resolve allocations for all parts (possibly only one part)
@@ -215,19 +224,19 @@ namespace wrench {
             auto locations = this->allocate(part, this->storage_services, this->file_location_mapping, designated_locations, msg->stripe_count);
             if (!locations.empty()) {
                 for (auto new_loc: locations) {
-                    std::cerr << "CALLING reserveSpace() at " + new_loc->getStorageService()->getName() + "\n";
-                    new_loc->getStorageService()->reserveSpace(new_loc);
-                    std::cerr << "CALLED reserveSpace()!\n";
+                    bool success = new_loc->getStorageService()->reserveSpace(new_loc);
                     designated_locations.push_back(new_loc);
                 }
             } else {
                 WRENCH_WARN("CSS::processStorageSelectionMessage(): File %s (or parts) could not be placed on any ss", file->getID().c_str());
+                //UNRESERVE ALL PREVIOUSLY RESERVED LOCATIONS
+                for (auto &d : designated_locations) {
+                    d->getStorageService()->unreserveSpace(d);
+                }
                 designated_locations = {};
                 break;
             }
         }
-        std::cerr << "DONE!\n";
-
         if (!designated_locations.empty()) {
             this->file_location_mapping[file] = designated_locations;
             this->partial_io_stripe_index[file] = 0;
@@ -333,6 +342,7 @@ namespace wrench {
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<DataFile> file, unsigned int stripe_count, S4U_CommPort *answer_commport) {
         WRENCH_INFO("CSS::lookupOrDesignateStorageService() - DataFile + commport");
 
+        std::cerr << "IN lookupOrDesignateStorageService()\n";
         this->commport->putMessage(new CompoundStorageAllocationRequestMessage(
                 answer_commport,
                 file,
@@ -669,11 +679,13 @@ namespace wrench {
         std::vector<std::shared_ptr<FileLocation>> src_parts = {};
         std::vector<std::shared_ptr<FileLocation>> dst_parts = {};
 
+        std::cerr << "IN COPY FILE I AM THE DESTINATION\n";
         // Find one or many SSS location(s) for the destination file (depending on whether the original file needs stripping or not)*
         dst_parts = this->lookupOrDesignateStorageService(dst_location);
         if (dst_parts.empty()) {
             throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(dst_location->getFile(), this->getSharedPtr<CompoundStorageService>()));
         }
+        std::cerr << "GOT THE PARTS!!!\n";
 
         // this->traceInternalStorageUse(IOAction::CopyToStart, dst_parts);
         WRENCH_INFO("CSS::copyFileIamDestination(): Destination file will be written as %zu stripe(s) / file_part(s)", dst_parts.size());
@@ -821,12 +833,15 @@ namespace wrench {
 
         this->assertServiceIsUp();
 
+
+        std::cerr << "IN WRITE FILE!\n";
         // Find the file, or allocate file/parts of file onto known SSS
         auto designated_locations = this->lookupOrDesignateStorageService(location);
         if (designated_locations.empty()) {
             WRENCH_WARN("CSS::writeFile(): 'designated_locations' vector empry (error or lack of space from the allocator point of view)");
             throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(location->getFile(), this->getSharedPtr<CompoundStorageService>()));
         }
+        std::cerr << "I GOT THE PARTS (AND RESERVATIONS HAVEHAPPENED!)!\n";
 
         // If num_bytes_to_write > the entire file size, we have a big problem (it should almost always be way smaller, as it represents the bytes only in a subset of all file chunks)
         if (num_bytes_to_write > location->getFile()->getSize()) {
@@ -874,6 +889,7 @@ namespace wrench {
                     designated_locations.size(),
                     designated_locations_subset.size());
 
+        std::cerr << "SENDING THE FILE WRITE REQUESTS!\n";
         // Contact every SimpleStorageService that we want to use, and request a FileWrite
         auto recv_commport = S4U_CommPort::getTemporaryCommPort();
         unsigned int request_count = 0;
@@ -881,6 +897,10 @@ namespace wrench {
         for (auto &dloc: designated_locations_subset) {
             WRENCH_INFO("CSS::writeFile(): Sending full write request %d on file %s (<%f> b) to %s",
                         request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
+
+            std::cerr << "ADDED THE UNRESERVE SPACE\n";
+            //TODO: THIS IS UGLY, PERHAPS WOULD BE BETTER TO THINK UP ANOTHER "RESERVE" SCHEME...
+            dloc->getStorageService()->unreserveSpace(dloc);
 
             dloc->getStorageService()->commport->dputMessage(
                     new StorageServiceFileWriteRequestMessage(

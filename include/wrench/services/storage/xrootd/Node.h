@@ -130,6 +130,31 @@ namespace wrench {
             bool processNextMessage();
             Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
 
+            /**
+            * @brief Return the storage service's default mountpoint, if any.
+            * If none, throws an std::runtime_error exception
+            */
+            virtual std::string getMountPoint() override {
+                if (this->internalStorage) {
+                    return this->internalStorage->getMountPoint();
+                } else {
+                    std::cerr << "NO INTERNAL STORAGE \n";
+                    throw std::runtime_error("Node::getMountPoint(): no mount point!");
+                }
+            }
+
+            /**
+             * @brief Return the storage service's mountpoints. If none, throws
+             * an std::runtime_error exception
+             */
+            virtual std::set<std::string> getMountPoints() {
+                if (this->internalStorage) {
+                    return this->internalStorage->getMountPoints();
+                } else {
+                    throw std::runtime_error("Node::getMountPoints(): no mount point!");
+                }
+            }
+
         private:
             Deployment *deployment;
 

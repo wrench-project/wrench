@@ -1594,6 +1594,22 @@ namespace wrench {
     }
 
     /**
+    * @brief Find a DataFile based on its ID
+    *
+    * @param id: a string id
+    *
+    * @return the DataFile instance (or nullptr if not found)
+    *
+    */
+    std::shared_ptr<DataFile> Simulation::getFileByIDOrNull(const std::string &id) {
+        if (Simulation::data_files.find(id) == Simulation::data_files.end()) {
+            return nullptr;
+        } else {
+            return Simulation::data_files[id];
+        }
+    }
+
+    /**
      * @brief Add a new file to the simulation (use at your own peril if you're using the workflow API - use Workflow::addFile() instead)
      *
      * @param id: a unique string id
