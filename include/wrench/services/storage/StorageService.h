@@ -282,7 +282,7 @@ namespace wrench {
          * If none, throws an std::runtime_error exception
          */
         virtual std::string getMountPoint() {
-            throw std::runtime_error("StorageService::getDefaultMountPoint(): no mount point!");
+            throw std::runtime_error("StorageService::getMountPoint(): no mount point!");
         }
 
         /**
@@ -290,7 +290,7 @@ namespace wrench {
          * an std::runtime_error exception
          */
         virtual std::set<std::string> getMountPoints() {
-            throw std::runtime_error("StorageService::getDefaultMountPoints(): no mount points!");
+            throw std::runtime_error("StorageService::getMountPoints(): no mount points!");
         }
 
         /**

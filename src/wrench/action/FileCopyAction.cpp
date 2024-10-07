@@ -67,6 +67,7 @@ namespace wrench {
     void FileCopyAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
+        std::cerr << "######################### STARTING A FILE COPY ACTION: " << this->src_file_location->toString() << " --> " << this->dst_file_location->toString() << "\n";
         // File copy
         // "Fix" the scratch locations, if any
         if (this->src_file_location->isScratch()) {
@@ -77,7 +78,9 @@ namespace wrench {
             auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
             this->dst_file_location = FileLocation::LOCATION(cs->getScratch(), cs->getScratch()->getBaseRootPath() + this->getJob()->getName(), this->src_file_location->getFile());
         }
+        std::cerr << "DOING THE COPY\n";
         StorageService::copyFile(this->src_file_location, this->dst_file_location);
+        std::cerr << "###################### DONE WITH FILE COPY ACTION\n";
     }
 
     /**
