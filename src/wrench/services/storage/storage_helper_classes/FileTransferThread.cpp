@@ -328,7 +328,9 @@ namespace wrench {
                     if (!dst_ss) {
                         throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Storage Service should be a SimpleStorageService for disk write");
                     }
+                    int unique_disk_sequence_number_write = this->simulation->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), msg->payload);
                     this->dst_opened_file->write(msg->payload);
+                    this->simulation->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), msg->payload, unique_disk_sequence_number_write);
 //                        simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
 //                                                dst_location->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
@@ -365,7 +367,10 @@ namespace wrench {
                     throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
                 }
 //                    simulation->writeToDisk(msg->payload, ss->hostname, location->getDiskOrNull());
+                int unique_disk_sequence_number_write = this->simulation->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), msg->payload);
                 this->dst_opened_file->write(msg->payload);
+                this->simulation->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), msg->payload, unique_disk_sequence_number_write);
+
 
 #ifdef PAGE_CACHE_SIMULATION
                 }
@@ -427,7 +432,9 @@ namespace wrench {
                         throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
                     }
 //                        simulation->readFromDisk(chunk_size, ss->hostname, location->getDiskOrNull());
+                    int unique_disk_sequence_number_read = this->simulation->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), chunk_size);
                     this->src_opened_file->read(chunk_size);
+                    this->simulation->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), chunk_size, unique_disk_sequence_number_read);
 #ifdef PAGE_CACHE_SIMULATION
                     }
 #endif
@@ -487,8 +494,12 @@ namespace wrench {
         double remaining = f->getSize();
         while (remaining > DBL_EPSILON) {
             double to_read = std::min<double>(remaining, this->buffer_size);
+            int unique_disk_sequence_number_read = this->simulation->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), to_read);
             src_opened_file->read(to_read);
+            this->simulation->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), to_read, unique_disk_sequence_number_read);
+            int unique_disk_sequence_number_write = this->simulation->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), to_read);
             dst_opened_file->write(to_read);
+            this->simulation->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), to_read, unique_disk_sequence_number_write);
             remaining -= to_read;
         }
     }
@@ -583,7 +594,10 @@ namespace wrench {
 //                    simulation->writeToDisk(msg->payload,
 //                                            dst_ss->getHostname(),
 //                                            dst_loc->getDiskOrNull());
+                int unique_disk_sequence_number_write = this->simulation->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), msg->payload);
                 dst_opened_file->write(msg->payload);
+                this->simulation->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), msg->payload, unique_disk_sequence_number_write);
+
 #ifdef PAGE_CACHE_SIMULATION
                 }
 #endif
@@ -610,7 +624,10 @@ namespace wrench {
 //                simulation->writeToDisk(msg->payload,
 //                                        dst_ss->getHostname(),
 //                                        dst_loc->getDiskOrNull());
+            int unique_disk_sequence_number_write = this->simulation->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), msg->payload);
             dst_opened_file->write(msg->payload);
+            this->simulation->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), msg->payload, unique_disk_sequence_number_write);
+
 #ifdef PAGE_CACHE_SIMULATION
             }
 

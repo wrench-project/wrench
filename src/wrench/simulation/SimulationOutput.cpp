@@ -42,6 +42,8 @@ namespace wrench {
     /** \cond INTERNAL */
     /*******************/
 
+    int SimulationOutput::unique_disk_sequence_number = 0;
+
     /**
      * @brief Object representing an instance when a WorkflowTask was run.
      */
@@ -1704,17 +1706,18 @@ namespace wrench {
      * @param hostname: hostname being read from
      * @param path: the path
      * @param bytes: number of bytes read
-     * @param unique_sequence_number: an integer id
+     * @return a unique integer id
      */
-    void SimulationOutput::addTimestampDiskReadStart(double date,
+    int SimulationOutput::addTimestampDiskReadStart(double date,
                                                      std::string hostname,
                                                      std::string path,
-                                                     double bytes,
-                                                     int unique_sequence_number) {
+                                                     double bytes) {
         if (this->isEnabled<SimulationTimestampDiskReadStart>()) {
+            SimulationOutput::unique_disk_sequence_number++;
             this->addTimestamp<SimulationTimestampDiskReadStart>(
-                    new SimulationTimestampDiskReadStart(date, std::move(hostname), std::move(path), bytes, unique_sequence_number));
+                    new SimulationTimestampDiskReadStart(date, std::move(hostname), std::move(path), bytes, SimulationOutput::unique_disk_sequence_number));
         }
+        return SimulationOutput::unique_disk_sequence_number;
     }
 
     /**
@@ -1759,16 +1762,17 @@ namespace wrench {
      * @param hostname: hostname being read from
      * @param path: the path
      * @param bytes: number of bytes read
-     * @param unique_sequence_number: an integer id
+     * @return a unique integer id
      */
-    void SimulationOutput::addTimestampDiskWriteStart(double date, std::string hostname,
+    int SimulationOutput::addTimestampDiskWriteStart(double date, std::string hostname,
                                                       std::string path,
-                                                      double bytes,
-                                                      int unique_sequence_number) {
+                                                      double bytes) {
         if (this->isEnabled<SimulationTimestampDiskWriteStart>()) {
+            SimulationOutput::unique_disk_sequence_number++;
             this->addTimestamp<SimulationTimestampDiskWriteStart>(
-                    new SimulationTimestampDiskWriteStart(date, std::move(hostname), std::move(path), bytes, unique_sequence_number));
+                    new SimulationTimestampDiskWriteStart(date, std::move(hostname), std::move(path), bytes, SimulationOutput::unique_disk_sequence_number));
         }
+        return SimulationOutput::unique_disk_sequence_number;
     }
 
     /**

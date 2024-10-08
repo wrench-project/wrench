@@ -122,8 +122,8 @@ namespace wrench {
         void addTimestampFileCopyCompletion(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src,
                                             std::shared_ptr<FileLocation> dst);
 
-        void
-        addTimestampDiskReadStart(double date, std::string hostname, std::string mount, double bytes, int unique_sequence_number);
+        int
+        addTimestampDiskReadStart(double date, std::string hostname, std::string mount, double bytes);
 
         void
         addTimestampDiskReadFailure(double date, const std::string &hostname, const std::string &mount, double bytes, int unique_sequence_number);
@@ -131,8 +131,8 @@ namespace wrench {
         void addTimestampDiskReadCompletion(double date, const std::string &hostname, const std::string &mount, double bytes,
                                             int unique_sequence_number);
 
-        void
-        addTimestampDiskWriteStart(double date, std::string hostname, std::string mount, double bytes, int unique_sequence_number);
+        int
+        addTimestampDiskWriteStart(double date, std::string hostname, std::string mount, double bytes);
 
         void
         addTimestampDiskWriteFailure(double date, const std::string &hostname, const std::string &mount, double bytes, int unique_sequence_number);
@@ -185,6 +185,8 @@ namespace wrench {
         nlohmann::json energy_json_part;
         nlohmann::json disk_json_part;
         nlohmann::json bandwidth_json_part;
+
+        static int unique_disk_sequence_number;
 
         std::map<std::type_index, bool> enabledStatus;
 
