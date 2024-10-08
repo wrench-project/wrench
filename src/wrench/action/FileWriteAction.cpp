@@ -59,9 +59,6 @@ namespace wrench {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
 
-        std::cerr << "######################### STARTING A FILE WRITE ACTION\n";
-
-
         // Fix location if scratch
         if (this->file_location->isScratch()) {
             auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
@@ -69,7 +66,6 @@ namespace wrench {
         }
         // File write
         StorageService::writeFileAtLocation(this->file_location);
-        std::cerr << "######################### DONE WITH FILE WRITE ACTION\n";
     }
 
     /**

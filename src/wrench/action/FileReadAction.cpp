@@ -75,8 +75,6 @@ namespace wrench {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
 
-        std::cerr << "######################### STARTING A FILE READ ACTION\n";
-
         // Fix locations that are scratch
         for (unsigned long i = 0; i < this->file_locations.size(); i++) {
             if (this->file_locations[i]->isScratch()) {
@@ -98,8 +96,6 @@ namespace wrench {
                 }
             }
         }
-        std::cerr << "######################### DONE WITH FILE READ ACTION\n";
-
     }
 
     /**
