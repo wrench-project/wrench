@@ -36,7 +36,7 @@ WRENCH_LOG_CATEGORY(wrench_core_simulation, "Log category for Simulation");
 
 namespace wrench {
 
-    int Simulation::unique_disk_sequence_number = 0;
+
     bool Simulation::energy_enabled = false;
     bool Simulation::host_shutdown_enabled = false;
     bool Simulation::link_shutdown_enabled = false;
@@ -815,18 +815,16 @@ namespace wrench {
      * @throw invalid_argument
      */
     void Simulation::readFromDisk(double num_bytes, const std::string &hostname, simgrid::s4u::Disk *disk) {
-        unique_disk_sequence_number += 1;
-        int temp_unique_sequence_number = unique_disk_sequence_number;
         std::string mount_point = disk->get_property("mount");
-        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        int unique_disk_sequence_number = this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes);
         try {
             S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point, disk);
         } catch (const std::invalid_argument &ia) {
             this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
-                                                          temp_unique_sequence_number);
+                                                          unique_disk_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, unique_disk_sequence_number);
     }
 
     /**
@@ -844,29 +842,25 @@ namespace wrench {
                                                             const std::string &hostname,
                                                             simgrid::s4u::Disk *src_disk,
                                                             simgrid::s4u::Disk *dst_disk) {
-        unique_disk_sequence_number += 1;
-        int temp_unique_sequence_number = unique_disk_sequence_number;
         std::string read_mount_point = src_disk->get_property("mount");
         std::string write_mount_point = dst_disk->get_property("mount");
 
-        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
-                                                    temp_unique_sequence_number);
-        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
-                                                     temp_unique_sequence_number);
+        int unique_disk_sequence_number_read = this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read);
+        int unique_disk_sequence_number_write = this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write);
         try {
             S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname,
                                                                    read_mount_point, write_mount_point, src_disk, dst_disk);
         } catch (const std::invalid_argument &ia) {
             this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
-                                                           temp_unique_sequence_number);
+                                                           unique_disk_sequence_number_write);
             this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
-                                                          temp_unique_sequence_number);
+                                                          unique_disk_sequence_number_read);
             throw;
         }
         this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
-                                                          temp_unique_sequence_number);
+                                                          unique_disk_sequence_number_write);
         this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
-                                                         temp_unique_sequence_number);
+                                                         unique_disk_sequence_number_read);
     }
 
     /**
@@ -879,19 +873,17 @@ namespace wrench {
      * @throw invalid_argument
      */
     void Simulation::writeToDisk(double num_bytes, const std::string &hostname, simgrid::s4u::Disk *disk) {
-        unique_disk_sequence_number += 1;
-        int temp_unique_sequence_number = unique_disk_sequence_number;
         std::string mount_point = disk->get_property("mount");
-        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        int unique_disk_sequence_number = this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes);
         try {
             S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point, disk);
         } catch (const std::invalid_argument &ia) {
             this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
-                                                           temp_unique_sequence_number);
+                                                           unique_disk_sequence_number);
             throw;
         }
         this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
-                                                          temp_unique_sequence_number);
+                                                          unique_disk_sequence_number);
     }
 
 #ifdef PAGE_CACHE_SIMULATION
