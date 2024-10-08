@@ -155,6 +155,15 @@ namespace wrench {
                 }
             }
 
+            /** @brief Retrieve the simple storage service's file system object **/
+            virtual std::shared_ptr<simgrid::fsmod::FileSystem> getFileSystem() override {
+                if (this->internalStorage) {
+                    return this->internalStorage->getFileSystem();
+                } else {
+                    throw std::runtime_error("Node::getFileSystem(): No file system");
+                }
+            }
+
         private:
             Deployment *deployment;
 
