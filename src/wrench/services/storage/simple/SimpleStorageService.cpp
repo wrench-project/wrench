@@ -592,8 +592,9 @@ namespace wrench {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
         auto file = src_location->getFile();
 
-        auto src_file_system = std::dynamic_pointer_cast<SimpleStorageService>(src_location->getStorageService())->file_system;
-        auto dst_file_system = std::dynamic_pointer_cast<SimpleStorageService>(dst_location->getStorageService())->file_system;
+
+        auto src_file_system = src_location->getStorageService()->getFileSystem();
+        auto dst_file_system = dst_location->getStorageService()->getFileSystem();
 
         // Validate source
         auto src_partition = src_file_system->get_partition_for_path_or_null(src_location->getFilePath());

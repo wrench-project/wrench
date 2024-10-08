@@ -294,6 +294,15 @@ namespace wrench {
         }
 
         /**
+         * @brief Return the storage service's file system
+         * If none, throws an std::runtime_error exception
+         */
+        virtual std::shared_ptr<simgrid::fsmod::FileSystem> getFileSystem() {
+            throw std::runtime_error("StorageService::getFileSystem(): no file system!");
+        }
+
+
+        /**
          * @brief Create a file at the storage service (in zero simulated time)
          * @param file: a file
          */

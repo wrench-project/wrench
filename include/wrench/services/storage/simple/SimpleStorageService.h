@@ -200,6 +200,12 @@ namespace wrench {
             return this->buffer_size;
         }
 
+        /** @brief Retrieve the simple storage service's file system object
+         *  @return A file system
+         **/
+        std::shared_ptr<simgrid::fsmod::FileSystem> getFileSystem() override {
+            return this->file_system;
+        }
 
 //        void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
 //
@@ -244,10 +250,7 @@ namespace wrench {
         /** @brief Whether the service is bufferized */
         bool is_bufferized;
 
-        /** @brief Retrieve the simple storage service's file system object **/
-        std::shared_ptr<simgrid::fsmod::FileSystem> getFileSystem() {
-            return this->file_system;
-        }
+
 
         /** @brief File system */
         std::shared_ptr<simgrid::fsmod::FileSystem> file_system;
