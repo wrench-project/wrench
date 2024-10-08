@@ -423,7 +423,7 @@ namespace wrench {
 
         // Send back the corresponding ack
         try {
-            answer_commport->dputMessage(
+            answer_commport->putMessage(
                     new StorageServiceFileReadAnswerMessage(
                             location,
                             success,

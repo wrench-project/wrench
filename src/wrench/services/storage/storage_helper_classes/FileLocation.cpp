@@ -106,7 +106,6 @@ namespace wrench {
         if (!ss or !file) {
             throw std::invalid_argument("FileLocation::LOCATION(): invalid nullptr arguments");
         }
-        std::cerr << "IN FileLocation::LOCATION(): Calling getMountPoint()" << "\n";
         return LOCATION(ss, ss->getMountPoint(), file);
     }
 
