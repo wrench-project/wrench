@@ -367,11 +367,11 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskMultipleTest) {
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 3;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-default-control-message-size=1024");
-    //    argv[2] = strdup("--wrench-full-log");
+        argv[2] = strdup("--wrench-full-log");
 
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -392,7 +392,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     ASSERT_NO_THROW(backup_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/backup"})));
 
 
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms;
 
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskMultipleTestWMS(
                             this, wms_host)));
@@ -422,6 +422,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
      *  - 3 completed: task1 x 2, failed_task x 1
      *  - 1 failed : failed_task x 1
      */
+    std::cerr << "############### SIMULATION DONE\n";
     ASSERT_EQ(starts_trace.size(), 4);
     ASSERT_EQ(completions_trace.size(), 3);
     ASSERT_EQ(failures_trace.size(), 1);
