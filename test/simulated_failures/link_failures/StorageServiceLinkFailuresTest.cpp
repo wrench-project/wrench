@@ -329,13 +329,13 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 4;
+    int argc = 3;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-link-shutdown-simulation");
     argv[2] = strdup("--cfg=contexts/stack-size:50");
     //    argv[2] = strdup("--wrench-commport-pool-size=100000");
-            argv[3] = strdup("--wrench-full-log");
+//            argv[3] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 

@@ -260,11 +260,11 @@ void StorageServiceProxyBasicTest::do_BasicFunctionality_test(bool arg, std::str
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 3;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-default-control-message-size=1");
-       argv[2] = strdup("--wrench-full-log");
+//       argv[2] = strdup("--wrench-full-log");
     //argv[2] = strdup("--log=wrench_core_commport.threshold=debug");
     //argv[3] = strdup("--log=wrench_core_proxy_file_server.threshold=debug");
     simulation->init(&argc, argv);

@@ -836,7 +836,6 @@ namespace wrench {
             WRENCH_WARN("CSS::writeFile(): 'designated_locations' vector empry (error or lack of space from the allocator point of view)");
             throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(location->getFile(), this->getSharedPtr<CompoundStorageService>()));
         }
-        std::cerr << "I GOT THE PARTS (AND RESERVATIONS HAVEHAPPENED!)!\n";
 
         // If num_bytes_to_write > the entire file size, we have a big problem (it should almost always be way smaller, as it represents the bytes only in a subset of all file chunks)
         if (num_bytes_to_write > location->getFile()->getSize()) {
@@ -884,7 +883,6 @@ namespace wrench {
                     designated_locations.size(),
                     designated_locations_subset.size());
 
-        std::cerr << "SENDING THE FILE WRITE REQUESTS!\n";
         // Contact every SimpleStorageService that we want to use, and request a FileWrite
         auto recv_commport = S4U_CommPort::getTemporaryCommPort();
         unsigned int request_count = 0;
@@ -893,7 +891,6 @@ namespace wrench {
             WRENCH_INFO("CSS::writeFile(): Sending full write request %d on file %s (<%f> b) to %s",
                         request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
 
-            std::cerr << "ADDED THE UNRESERVE SPACE\n";
             //TODO: THIS IS UGLY, PERHAPS WOULD BE BETTER TO THINK UP ANOTHER "RESERVE" SCHEME...
             dloc->getStorageService()->unreserveSpace(dloc);
 
