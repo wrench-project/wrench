@@ -132,7 +132,6 @@ namespace wrench {
         // Wait for a message
         std::shared_ptr<SimulationMessage> message = nullptr;
 
-        WRENCH_INFO("BUFFERISZED WATOING ON COMMPORT: %s", this->commport->get_cname());
         try {
             message = this->commport->getMessage();
         } catch (ExecutionException &e) {
@@ -233,9 +232,6 @@ namespace wrench {
                         this->buffer_size,
                         this->getMessagePayloadValue(
                                 SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
-
-
-        std::cerr << "BEFORE STARTING FT THREAD: " << this->file_system->get_partitions().at(0)->get_free_space() << "\n";
 
 
         // Create a FileTransferThread
@@ -456,7 +452,6 @@ namespace wrench {
             auto dst_file_path = ftt->dst_opened_file->get_path();
             ftt->dst_opened_file->close();
             if (not dst_file_system->file_exists(ftt->dst_location->getFilePath())) {
-                std::cerr << ftt->dst_location->getStorageService()->getName() << ": MOVING  " << dst_file_path << " TO " << ftt->dst_location->getFilePath() << "\n";
                 dst_file_system->move_file(dst_file_path, ftt->dst_location->getFilePath());
             }
         }
@@ -529,7 +524,6 @@ namespace wrench {
                 } catch (invalid_argument &ignore) {
                 }
             }
-            std::cerr << "SENDING BACK FILE COPY\n";
 
             //            WRENCH_INFO("Sending back an ack for a file copy");
             ftt->answer_commport_if_copy->dputMessage(

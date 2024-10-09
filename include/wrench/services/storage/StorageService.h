@@ -54,7 +54,6 @@ namespace wrench {
             if (location == nullptr) {
                 throw std::invalid_argument("StorageService::lookupFileAtLocation(): invalid argument argument");
             }
-            std::cerr << "CALLING LOOKUP ON THE STTORAGE SERVICE DIRECTLRY\n";
             return location->getStorageService()->lookupFile(location);
         }
         /**
@@ -63,7 +62,6 @@ namespace wrench {
          * @return true if the file is present, or false
          */
         bool lookupFile(const std::shared_ptr<DataFile> &file) {
-            std::cerr << "AAAA here\n";
             return this->lookupFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
         /**
@@ -73,7 +71,6 @@ namespace wrench {
          * @return true if the file is present, or false
          */
         virtual bool lookupFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
-            std::cerr << "BBB here\n";
             return this->lookupFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
         /**
@@ -82,7 +79,6 @@ namespace wrench {
          * @return true if the file is present, or false
          */
         virtual bool lookupFile(const std::shared_ptr<FileLocation> &location) {
-            std::cerr << "IN THIS LOOKUPS FILE 12\n";
             return this->lookupFile(S4U_Daemon::getRunningActorRecvCommPort(), location);
         }
 
@@ -96,7 +92,6 @@ namespace wrench {
             if (location == nullptr) {
                 throw std::invalid_argument("StorageService::deleteFileAtLocation(): invalid argument argument");
             }
-            std::cerr << "CALLING GELERATE FILE AT LOCAIONT ON " << location->getStorageService()->getName() << "\n";
             location->getStorageService()->deleteFile(location);
         }
         /**

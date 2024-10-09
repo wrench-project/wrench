@@ -84,7 +84,7 @@ namespace wrench {
 
 
     /**
-     * @brief Helper method that avoids calling WRENCH_INFO from a .h file and do the logging for the templated getMessage() method.
+     * @brief Helper method that avoids calling WRENCH_DEBUG from a .h file and do the logging for the templated getMessage() method.
      * It also has the added bonus of checking for inheritance
      *
      * @param type: a pointer to the message so we have its type
@@ -93,11 +93,11 @@ namespace wrench {
      */
     void S4U_CommPort::templateWaitingLog(const std::string &type, unsigned long long id) {
 
-        WRENCH_INFO("Waiting for message of type <%s> from commport '%s'.  Request ID: %llu", type.c_str(), this->get_cname(), id);
+        WRENCH_DEBUG("Waiting for message of type <%s> from commport '%s'.  Request ID: %llu", type.c_str(), this->get_cname(), id);
     }
 
     /**
-     * @brief Helper method that avoids calling WRENCH_INFO from a .h file and do the logging for the templated getMessage() method.
+     * @brief Helper method that avoids calling WRENCH_DEBUG from a .h file and do the logging for the templated getMessage() method.
      * It also has the added bonus of checking for inheritance.
      *
      * @param type: a pointer to the message so we have its type
@@ -106,7 +106,7 @@ namespace wrench {
      */
     void S4U_CommPort::templateWaitingLogUpdate(const std::string &type, unsigned long long id) {
 
-        WRENCH_INFO("Received a message of type <%s> from commport '%s'.  Request ID: %llu", type.c_str(), this->get_cname(), id);
+        WRENCH_DEBUG("Received a message of type <%s> from commport '%s'.  Request ID: %llu", type.c_str(), this->get_cname(), id);
     }
 
     /**
@@ -137,30 +137,30 @@ namespace wrench {
             throw std::invalid_argument("S4U_CommPort::getMessage(): Cannot be called with NULL_COMMPORT");
         }
 
-        //        if (log) WRENCH_INFO("Getting a message from commport '%s' with timeout %lf sec", this->get_cname(), timeout);
-        WRENCH_INFO("Getting a message from commport '%s' with timeout %lf sec", this->get_cname(), timeout);
+        //        if (log) WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->get_cname(), timeout);
+        WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->get_cname(), timeout);
 
 
         simgrid::s4u::ActivitySet pending_receives;
         if (not this->mb_comm_posted) {
-            WRENCH_INFO("POSTING GET ASYNC ON MB for %s: %p", this->get_cname(), (this->mb_comm.get()));
+            WRENCH_DEBUG("POSTING GET ASYNC ON MB for %s: %p", this->get_cname(), (this->mb_comm.get()));
             this->mb_comm = this->s4u_mb->get_async<SimulationMessage>(&this->msg_mb);
             this->mb_comm_posted = true;
         } else {
-            WRENCH_INFO("GET ASYNC ON MB ALREADY POSTED FROM BEFORE FOR %s: %p", this->get_cname(), this->mb_comm.get());
+            WRENCH_DEBUG("GET ASYNC ON MB ALREADY POSTED FROM BEFORE FOR %s: %p", this->get_cname(), this->mb_comm.get());
         }
         if (not this->mq_comm_posted) {
-            WRENCH_INFO("POSTING GET ASYNC ON MQ for %s: %p", this->get_cname(), (this->mq_comm.get()));
+            WRENCH_DEBUG("POSTING GET ASYNC ON MQ for %s: %p", this->get_cname(), (this->mq_comm.get()));
             this->mq_comm = this->s4u_mq->get_async<SimulationMessage>(&this->msg_mq);
             this->mq_comm_posted = true;
         } else {
-            WRENCH_INFO("GET ASYNC ON MQ ALREADY POSTED FROM BEFORE FOR %s: %p", this->get_cname(), this->mq_comm.get());
+            WRENCH_DEBUG("GET ASYNC ON MQ ALREADY POSTED FROM BEFORE FOR %s: %p", this->get_cname(), this->mq_comm.get());
         }
 
         pending_receives.push(this->mb_comm);
         pending_receives.push(this->mq_comm);
 
-        //        WRENCH_INFO("IN GET MESSAGE: %p(%s)   %p(%s)",
+        //        WRENCH_DEBUG("IN GET MESSAGE: %p(%s)   %p(%s)",
         //                    this->mb_comm.get(), this->mb_comm->get_mailbox()->get_cname(),
         //                    this->mq_comm.get(), this->mq_comm->get_queue()->get_cname());
 
@@ -169,7 +169,7 @@ namespace wrench {
             // Wait for one activity to complete
             finished_recv = pending_receives.wait_any_for(timeout);
         } catch (simgrid::TimeoutException &e) {
-            //            WRENCH_INFO("Got A TimeoutException");
+            //            WRENCH_DEBUG("Got A TimeoutException");
             pending_receives.erase(this->mq_comm);
             pending_receives.erase(this->mb_comm);
             this->mq_comm->cancel();
@@ -180,7 +180,7 @@ namespace wrench {
             this->mb_comm_posted = false;
             throw ExecutionException(std::make_shared<NetworkError>(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->name, ""));
         } catch (simgrid::Exception &e) {
-            //            WRENCH_INFO("Got A simgrid::Exception");
+            //            WRENCH_DEBUG("Got A simgrid::Exception");
             auto failed_recv = pending_receives.get_failed_activity();
             if (failed_recv == this->mb_comm) {
                 pending_receives.erase(this->mb_comm);
@@ -202,14 +202,14 @@ namespace wrench {
         SimulationMessage *msg = nullptr;
 
         if (finished_recv == this->mb_comm) {
-            //            WRENCH_INFO("SOME COMM FINISHED ON MB");
+            //            WRENCH_DEBUG("SOME COMM FINISHED ON MB");
             pending_receives.erase(this->mq_comm);
             pending_receives.erase(this->mb_comm);
             msg = this->msg_mb;
             this->mb_comm_posted = false;
             this->mb_comm = nullptr;
         } else if (finished_recv == this->mq_comm) {
-            //            WRENCH_INFO("SOME COMM FINISHED ON MQ");
+            //            WRENCH_DEBUG("SOME COMM FINISHED ON MQ");
             pending_receives.erase(this->mb_comm);
             pending_receives.erase(this->mq_comm);
             msg = this->msg_mq;
@@ -224,7 +224,7 @@ namespace wrench {
         MessageManager::removeReceivedMessage(this, msg);
 #endif
 
-        WRENCH_INFO("Received a '%s' message from commport '%s' (%lf, %p bytes)",
+        WRENCH_DEBUG("Received a '%s' message from commport '%s' (%lf, %p bytes)",
                      msg->getName().c_str(), this->get_cname(),
                      msg->payload, msg);
 
@@ -243,7 +243,7 @@ namespace wrench {
         if (this == S4U_CommPort::NULL_COMMPORT) {
             return;
         }
-        WRENCH_INFO("Putting a %s message (%.2lf bytes, %p) to commport '%s'",
+        WRENCH_DEBUG("Putting a %s message (%.2lf bytes, %p) to commport '%s'",
                      msg->getName().c_str(), msg->payload, msg,
                      this->get_cname());
 
@@ -287,7 +287,7 @@ namespace wrench {
             return;
         }
 
-        WRENCH_INFO("Dputting a %s message (%.2lf bytes, %p) to commport '%s'",
+        WRENCH_DEBUG("Dputting a %s message (%.2lf bytes, %p) to commport '%s'",
                      msg->getName().c_str(), msg->payload, msg,
                      this->get_cname());
 
@@ -317,7 +317,7 @@ namespace wrench {
             return nullptr;
         }
 
-        WRENCH_INFO("Iputting a %s message (%.2lf bytes) to commport '%s'",
+        WRENCH_DEBUG("Iputting a %s message (%.2lf bytes) to commport '%s'",
                      msg->getName().c_str(), msg->payload,
                      this->get_cname());
 
@@ -368,7 +368,7 @@ namespace wrench {
             throw std::invalid_argument("S4U_CommPort::igetMessage(): Cannot be called with NULL_COMMPORT");
         }
 
-        WRENCH_INFO("Igetting a message from commport '%s'", this->get_cname());
+        WRENCH_DEBUG("Igetting a message from commport '%s'", this->get_cname());
 
         std::shared_ptr<S4U_PendingCommunication> pending_communication = std::make_shared<S4U_PendingCommunication>(
                 this, S4U_PendingCommunication::OperationType::RECEIVING);
@@ -432,7 +432,7 @@ namespace wrench {
 
         S4U_CommPort::used_commports.insert(commport);
         commport->reset();// Just in case
-                WRENCH_INFO("Gotten temporary commport %s (%p %p)", commport->name.c_str(), commport->mq_comm.get(), commport->mb_comm.get());
+                WRENCH_DEBUG("Gotten temporary commport %s (%p %p)", commport->name.c_str(), commport->mq_comm.get(), commport->mb_comm.get());
         return commport;
     }
 
@@ -443,7 +443,7 @@ namespace wrench {
      * @param commport: the commport to retire
      */
     void S4U_CommPort::retireTemporaryCommPort(S4U_CommPort *commport) {
-        //        WRENCH_INFO("Calling reset() on commport %s", commport->get_cname());
+        //        WRENCH_DEBUG("Calling reset() on commport %s", commport->get_cname());
         if (commport->mb_comm) {
             commport->mb_comm->cancel();
         }
@@ -454,7 +454,7 @@ namespace wrench {
         if (S4U_CommPort::used_commports.find(commport) == S4U_CommPort::used_commports.end()) {
             return;
         }
-        WRENCH_INFO("Retiring commport %s", commport->name.c_str());
+        WRENCH_DEBUG("Retiring commport %s", commport->name.c_str());
         S4U_CommPort::used_commports.erase(commport);
         S4U_CommPort::free_commports.push_front(commport);//
     }

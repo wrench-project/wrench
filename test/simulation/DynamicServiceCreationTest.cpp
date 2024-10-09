@@ -331,11 +331,6 @@ private:
                 new wrench::BareMetalComputeService(hostname, execution_hosts, "/scratch",
                                                     {})));
 
-        std::cerr << "##################################################\n";
-        std::cerr << "##################################################\n";
-        std::cerr << "##################################################\n";
-        std::cerr << "##################################################\n";
-
         // Dynamically create a Storage Service on this host
         auto dynamically_created_storage_service = simulation->startNewService(
                 wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
@@ -351,7 +346,6 @@ private:
         int job_index = 0;
         for (auto const &task: tasks) {
             try {
-                std::cerr << "CREATING A STANDARD JOB!\n";
                 one_task_jobs[job_index] = job_manager->createStandardJob(
                         {task},
                         {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)}},
@@ -367,12 +361,8 @@ private:
             job_index++;
         }
 
-        std::cerr << "**************** SLEEP 100000 **************\n";
         wrench::Simulation::sleep(10000);
 
-        WRENCH_INFO("DONE SLEEPING!!!\n");
-
-        std::cerr << "WAITING FOR EXEC EVENTS\n";
         // Wait for workflow execution events
         for (auto task: tasks) {
             std::shared_ptr<wrench::ExecutionEvent> event;
@@ -386,16 +376,12 @@ private:
             }
         }
 
-        WRENCH_INFO("GOT THEM ALL\n");
-
         for (auto &j: one_task_jobs) {
-            std::cerr << "!@#!#@!\n";
             if (j->getNumCompletedTasks() != 1) {
                 throw std::runtime_error("A job with one completed task1 should say it has one completed task1");
             }
         }
 
-        WRENCH_INFO("DONE!!!\n");
         return 0;
     }
 };

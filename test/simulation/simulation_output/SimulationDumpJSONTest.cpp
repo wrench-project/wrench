@@ -1241,10 +1241,10 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpDiskOperationsTest) {
 
 void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1278,15 +1278,15 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     nlohmann::json result_json;
     json_file >> result_json;
 
-    //    std::cerr << result_json << "\n";
+//        std::cerr << result_json << "\n";
 
     for (auto const &operation: (std::vector<std::string>){"reads"}) {
-        ASSERT_EQ(result_json["host1"]["/"][operation].size(), 3);
+        ASSERT_EQ(result_json["host1"]["/file_1"][operation].size(), 3);
 
         for (int i = 0; i < 3; i++) {
-            int num_bytes = (int) result_json["host1"]["/"][operation][i]["bytes"];
-            double duration = (double) result_json["host1"]["/"][operation][i]["end"] -
-                              (double) result_json["host1"]["/"][operation][i]["start"];
+            int num_bytes = (int) result_json["host1"]["/file_1"][operation][i]["bytes"];
+            double duration = (double) result_json["host1"]["/file_1"][operation][i]["end"] -
+                              (double) result_json["host1"]["/file_1"][operation][i]["start"];
             if (i < 2) {
                 ASSERT_EQ(num_bytes, 400000);
                 ASSERT_TRUE(std::abs<double>(duration - 0.4) < 0.0001);
@@ -1298,11 +1298,11 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     }
 
     for (auto const &operation: (std::vector<std::string>){"writes"}) {
-        ASSERT_EQ(result_json["host2"]["/"][operation].size(), 1);
+        ASSERT_EQ(result_json["host2"]["/file_1.wrench_tmp.1"][operation].size(), 1);
 
-        int num_bytes = (int) result_json["host2"]["/"][operation][0]["bytes"];
-        double duration = (double) result_json["host2"]["/"][operation][0]["end"] -
-                          (double) result_json["host2"]["/"][operation][0]["start"];
+        int num_bytes = (int) result_json["host2"]["/file_1.wrench_tmp.1"][operation][0]["bytes"];
+        double duration = (double) result_json["host2"]["/file_1.wrench_tmp.1"][operation][0]["end"] -
+                          (double) result_json["host2"]["/file_1.wrench_tmp.1"][operation][0]["start"];
         ASSERT_EQ(num_bytes, 1000000);
         ASSERT_TRUE(std::abs<double>(duration - 0.5) < 0.0001);
     }

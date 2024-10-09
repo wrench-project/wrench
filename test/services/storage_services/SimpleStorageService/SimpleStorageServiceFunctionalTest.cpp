@@ -244,12 +244,10 @@ private:
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
 
-        std::cerr << "########################## HERE 999\n";
         if (free_space != 90.0) {
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 90.0");
         }
-        std::cerr << "########################## HERE 1000\n";
 
         // Send a free space request at a path (without the slash)
         try {
@@ -368,8 +366,6 @@ private:
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
             }
         }
-
-        std::cerr << "#############************ HERE \n";
 
         // Delete a file in a bogus path
         try {
@@ -505,9 +501,6 @@ private:
         }
 
         // Do an INVALID asynchronous file copy (file not there)
-        std::cerr << "IS SRC FILE THERE? " << this->test->storage_service_100->lookupFile(this->test->file_500) << "\n";
-        std::cerr << "IS DST SPACE OK? " << this->test->storage_service_510->getTotalFreeSpace() << "\n";
-        std::cerr << "***************** DOING THE INITIATE *************\n";
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
                     wrench::FileLocation::LOCATION(this->test->storage_service_100, this->test->file_500),
@@ -523,7 +516,6 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        std::cerr << "#############************ HERE \n";
         auto real_event = std::dynamic_pointer_cast<wrench::FileCopyFailedEvent>(event);
         if (real_event) {
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);
@@ -534,8 +526,6 @@ private:
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
-        std::cerr << "#############************ HERE \n";
-
         // Do a really bogus file removal
         try {
             wrench::StorageService::deleteFileAtLocation(
@@ -659,10 +649,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-        argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1522,8 +1512,6 @@ private:
         }
 
 
-        std::cerr << "############INITIATING ANOTHER ASYNCHRONOUS FILE COPY\n";
-
         // Copy storage_service_510:/:file_10 to storage_service_1000:foo:file_10: SHOULD NOT WORK
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
@@ -1544,9 +1532,6 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
-
-        std::cerr << "########### HERE 666 #### \n";
-
         // Copy storage_service_510:foo:file_10 to storage_service_1000:foo
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
@@ -1566,7 +1551,6 @@ private:
         if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
-        std::cerr << "########### HERE 999 #### \n";
 
         // Copy storage_service_510:foo:file_10 to storage_service_510:bar
         try {
@@ -1587,8 +1571,6 @@ private:
         if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
-
-        std::cerr << "########### HERE 2323232 #### \n";
 
         // Copy storage_service_510:foo:file_10 to storage_service_510:foo    SHOULD NOT WORK
         try {
@@ -1668,8 +1650,6 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test(double buffer_size) 
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-full-log");
-
-        std::cerr << "############################## BUFFER_SIZE = " << buffer_size << "\n";
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

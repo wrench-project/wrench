@@ -1216,10 +1216,10 @@ TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithPrePostCopiesTaskCleanup
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanup_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-        argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -1640,7 +1640,6 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    std::cerr << "STARING FILE " << input_file->getID() << " on " << storage_service1->getName() << "\n";
     ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
