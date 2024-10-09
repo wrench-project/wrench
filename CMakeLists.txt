@@ -47,6 +47,23 @@ if (DEFINED SimGrid_PATH)
     endif()
 endif()
 find_package(SimGrid REQUIRED)
+
+# Find SimGrid's FS module
+if (DEFINED FSMOD_PATH)
+    if (NOT EXISTS "${FSMOD_PATH}")
+        message(FATAL_ERROR "The specified FSMOD_PATH doesn't exit")
+    else()
+        file(GLOB LIBFSMOD_FILES
+                "${FSMOD_PATH}/liblibfsmod.so"
+                "${FSMOD_PATH}/lib/libfsmod.dylib"
+                )
+        if (NOT LIBFSMOD_FILES)
+            message(FATAL_ERROR "The specified FSMOD_PATH doesn't seem to contain a valid FSMod installation")
+        else()
+            set(CMAKE_PREFIX_PATH ${FSMOD_PATH} ${CMAKE_PREFIX_PATH})
+        endif()
+    endif()
+endif()
 find_package(FSMod REQUIRED)
 
 # Find nlohmann_json
