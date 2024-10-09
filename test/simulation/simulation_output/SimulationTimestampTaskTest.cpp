@@ -422,7 +422,6 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
      *  - 3 completed: task1 x 2, failed_task x 1
      *  - 1 failed : failed_task x 1
      */
-    std::cerr << "############### SIMULATION DONE\n";
     ASSERT_EQ(starts_trace.size(), 4);
     ASSERT_EQ(completions_trace.size(), 3);
     ASSERT_EQ(failures_trace.size(), 1);

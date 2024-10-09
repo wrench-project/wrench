@@ -157,7 +157,7 @@ private:
             count++;
             wrench::S4U_Simulation::sleep(20.0);
             proximity = network_proximity_service->getHostPairDistance(hosts_to_compute_proximity).first;
-            WRENCH_INFO("PROXIMITY = %lf", proximity);
+//            WRENCH_INFO("PROXIMITY = %lf", proximity);
         }
 
         if (count == max_count) {

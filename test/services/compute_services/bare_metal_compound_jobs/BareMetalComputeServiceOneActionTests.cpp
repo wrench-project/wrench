@@ -1484,12 +1484,10 @@ private:
 
 
         // Suspend the compute service
-        std::cerr << "SUSPENDING THE COMPUTE SERVICE\n";
         this->test->compute_service->suspend();
 
         // Submit the job
         try {
-            std::cerr << "SUBMITTING THE JOB\n";
             job_manager->submitJob(job, this->test->compute_service, {});
             throw std::runtime_error("Shouldn't be able to submit a job to a suspended service");
         } catch (wrench::ExecutionException &e) {

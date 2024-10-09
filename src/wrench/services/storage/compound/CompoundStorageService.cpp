@@ -342,7 +342,6 @@ namespace wrench {
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<DataFile> file, unsigned int stripe_count, S4U_CommPort *answer_commport) {
         WRENCH_INFO("CSS::lookupOrDesignateStorageService() - DataFile + commport");
 
-        std::cerr << "IN lookupOrDesignateStorageService()\n";
         this->commport->putMessage(new CompoundStorageAllocationRequestMessage(
                 answer_commport,
                 file,
@@ -679,13 +678,11 @@ namespace wrench {
         std::vector<std::shared_ptr<FileLocation>> src_parts = {};
         std::vector<std::shared_ptr<FileLocation>> dst_parts = {};
 
-        std::cerr << "IN COPY FILE I AM THE DESTINATION\n";
         // Find one or many SSS location(s) for the destination file (depending on whether the original file needs stripping or not)*
         dst_parts = this->lookupOrDesignateStorageService(dst_location);
         if (dst_parts.empty()) {
             throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(dst_location->getFile(), this->getSharedPtr<CompoundStorageService>()));
         }
-        std::cerr << "GOT THE PARTS!!!\n";
 
         // this->traceInternalStorageUse(IOAction::CopyToStart, dst_parts);
         WRENCH_INFO("CSS::copyFileIamDestination(): Destination file will be written as %zu stripe(s) / file_part(s)", dst_parts.size());
@@ -833,8 +830,6 @@ namespace wrench {
 
         this->assertServiceIsUp();
 
-
-        std::cerr << "IN WRITE FILE!\n";
         // Find the file, or allocate file/parts of file onto known SSS
         auto designated_locations = this->lookupOrDesignateStorageService(location);
         if (designated_locations.empty()) {
