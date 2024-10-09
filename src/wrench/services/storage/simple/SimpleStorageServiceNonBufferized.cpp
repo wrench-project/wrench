@@ -66,7 +66,12 @@ namespace wrench {
         if (transaction->src_opened_file) {
             // Doing a 1-byte write just so that the file access date is updated
             transaction->src_opened_file->seek(0, SEEK_SET);
-            transaction->src_opened_file->read(1, false); // TODO WEIRD: tru makes it break with a crazy bug in lmm solver
+            // TODO WEIRD: passing true raises a crazy bug in lmm solver:
+            // TODO: "throws std::length_error with description "vector"
+            // TODO: Luckily for this method, we should pass false, but passing
+            // TODO: true by mistake has likely highlighted a strange C++ memory
+            // TODO: in the core of SimGrid's LMM solver... pretty scary.
+            transaction->src_opened_file->read(1, false);
             transaction->src_opened_file->close();
         }
         // Deal with possibly opened destination file
