@@ -44,9 +44,6 @@ namespace wrench {
         virtual std::string getMountPoint() override {
             // TODO: HENRI modified this method due to the overhaul of the storage service implementation,
             // TODO: but has no idea if any of this makes sense :)
-            std::cerr << " GETTING THE MOUNT POINT OF THE REMOTE\n";
-            std::cerr << " THE REMOTE: " << this->remote << "\n";
-            std::cerr << " THE CACHE: " << this->cache << "\n";
             if (this->remote) {
                 return this->remote->getMountPoint();
             } else if (this->cache) {

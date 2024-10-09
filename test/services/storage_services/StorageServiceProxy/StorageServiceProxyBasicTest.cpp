@@ -130,7 +130,6 @@ private:
 
         // Try to lookup file2 from remote although it is on target
         auto start = wrench::Simulation::getCurrentSimulatedDate();
-        std::cerr << "DOiJNG THE FIRST LOOKUP\n";
         if (proxy->lookupFile(test->remote, file2)) {
             throw std::runtime_error("Found file that does not exist");
         }
@@ -141,7 +140,6 @@ private:
             throw std::runtime_error("Failed to find file that exists on target");
         }
 
-        WRENCH_INFO("Read tests");
         // Read file1 via proxy
         if (testWithDefault) {
             proxy->readFile(file1);

@@ -135,8 +135,6 @@ public:
             unsigned int stripe_count /*Unused in this test*/) {
 
 
-        std::cerr << "IN ALLOCATOR\n";
-
         // Init round-robin
         static auto last_selected_server = resources.begin()->first;
         static auto internal_disk_selection = 0;
@@ -199,7 +197,6 @@ public:
             ret.push_back(designated_location);
         }
 
-        std::cerr << "RETURNING FROM ALLOCATOR\n";
         return ret;
     }
 };
@@ -782,10 +779,10 @@ void CompoundStorageServiceFunctionalTest::do_fullJob_test() {
     // xbt_log_control_set("wrench_core_compound_storage_system.thresh:debug");
     // xbt_log_control_set("wrench_core_file_transfer_thread.thres:info");
 
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     // Setting up simulation and platform
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1063,9 +1060,7 @@ void CompoundStorageServiceFunctionalTest::do_BasicFunctionality_test() {
             new CompoundStorageServiceBasicFunctionalityTestCtrl(this, "CompoundStorageHost")));
 
     // A bogus staging (can't use CompoundStorageService for staging)
-    std::cerr << "################# CREATE FILE\n";
     ASSERT_THROW(compound_storage_service->createFile(file_10), std::runtime_error);
-    std::cerr << "################# FAILED AS EXPECTED\n";
 
     // Tun the simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1096,7 +1091,6 @@ private:
 #if 1
         // 1 - Copy from CSS to SS, using a file that was not created on CSS beforehand
         {
-            std::cerr << "#### TEST 1 #####\n";
             auto jobCopyError = job_manager->createCompoundJob("jobCopyError");
             auto fileCopyActionCSS_SS = jobCopyError->addFileCopyAction(
                     "fileCopySrcCSS_DstSS",
@@ -1116,8 +1110,6 @@ private:
 
         // 2 - Copy from SS to CSS, using a file that is too big to be allocated
         {
-            std::cerr << "#### TEST 2 #####\n";
-            std::cerr << "FREE SPACE = --> " << this->test->compound_storage_service->getTotalFreeSpace() << "\n";
             auto jobCopySizeError = job_manager->createCompoundJob("jobCopySizeError");
             wrench::StorageService::createFileAtLocation(
                     wrench::FileLocation::LOCATION(test->simple_storage_service_1000_0, test->file_1000));
@@ -1137,7 +1129,6 @@ private:
 
 #if 1
         {
-            std::cerr << "#### TEST 3 #####\n";
             // 3 - Read from CSS, using a file that was not written/copied to it beforehand
             auto jobReadError = job_manager->createCompoundJob("jobReadError");
             auto fileReadActionCSS = jobReadError->addFileReadAction(
@@ -1155,9 +1146,7 @@ private:
 #endif
 
         {
-            std::cerr << "#### TEST 4 #####\n";
             // 4 - Try to write a file too big on CSS
-            std::cerr << "FREE SPACE = --> " << this->test->compound_storage_service->getTotalFreeSpace() << "\n";
             auto jobWriteError = job_manager->createCompoundJob("jobWriteError");
             auto fileWriteActionCSS = jobWriteError->addFileWriteAction(
                     "fileWriteActionCSS",
@@ -1174,7 +1163,6 @@ private:
 
 #if 1
         {
-            std::cerr << "#### TEST 5 #####\n";
             // 5 - Delete file from CSS, but it's not there
             auto jobDeleteError = job_manager->createCompoundJob("jobDeleteError");
             auto fileDeleteActionCSS = jobDeleteError->addFileReadAction(
@@ -1208,10 +1196,10 @@ void CompoundStorageServiceFunctionalTest::do_BasicError_test() {
     // xbt_log_control_set("wrench_core_file_transfer_thread.thres:info");
     // xbt_log_control_set("wrench_core_storage_service.thres:info");
 
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

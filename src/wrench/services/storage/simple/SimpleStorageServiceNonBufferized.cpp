@@ -75,7 +75,6 @@ namespace wrench {
             auto dst_file_path = transaction->dst_opened_file->get_path();
             transaction->dst_opened_file->close();
             if (not dst_file_system->file_exists(transaction->dst_location->getFilePath())) {
-                std::cerr << transaction->dst_location->getStorageService()->getName() << ": MOVING  " << dst_file_path << " TO " << transaction->dst_location->getFilePath() << "\n";
                 dst_file_system->move_file(dst_file_path, transaction->dst_location->getFilePath());
             }
         }
@@ -125,7 +124,6 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         }
-        std::cerr << "DONE WITH TRANSACTION!\n";
     }
 
     /**

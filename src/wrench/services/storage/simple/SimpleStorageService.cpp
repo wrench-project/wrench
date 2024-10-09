@@ -165,7 +165,12 @@ namespace wrench {
                 failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));
             } // otherwise, we don't care, perhaps it was taken care of elsewhere...
         } else {
-            this->file_system->unlink_file(location->getFilePath());
+            try {
+                this->file_system->unlink_file(location->getFilePath());
+            } catch (simgrid::Exception &e) {
+                std::string error_msg = "Cannot delete a file that's open for reading/writing";
+               failure_cause = std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<SimpleStorageService>(),error_msg));
+            }
         }
 
         answer_commport->dputMessage(
@@ -550,16 +555,12 @@ namespace wrench {
         }
 
         bool file_already_there = this->file_system->file_exists(location->getFilePath());
-        WRENCH_INFO("PARTIONT FREE SPACE = %d", partition->get_free_space());
-        WRENCH_INFO("Validating FileWrite request: num_bytes_to_write = %d", num_bytes_to_write);
-        WRENCH_INFO("Validating FileWrite request: file %s already there: %d", location->getFilePath().c_str(), file_already_there);
         try {
             if (not file_already_there) { // Open dot file
                 if (num_bytes_to_write < location->getFile()->getSize()) {
                     std::string err_msg = "Cannot write fewer number of bytes than the file size if the file isn't already present";
                     return std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<Service>(), err_msg));
                 }
-                WRENCH_INFO("CREATING NEW FILE WITH TOTAL SIZE %lf", location->getFile()->getSize());
                 std::string dot_file_path = location->getADotFilePath();
                 this->file_system->create_file(dot_file_path, location->getFile()->getSize());
                 opened_file = this->file_system->open(dot_file_path, "r+");
