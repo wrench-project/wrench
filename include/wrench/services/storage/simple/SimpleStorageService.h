@@ -117,7 +117,6 @@ namespace wrench {
          */
         bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
             std::shared_ptr<simgrid::fsmod::Partition> partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
-            std::cerr << "IN RESERVE SPACE for " << location->getFilePath() << " "  << location->getFile()->getSize() << " bytes; FREE = " << partition->get_free_space() << "\n";
             if (not partition) {
                 throw std::runtime_error("SimpleStorageService::reserveSpace(): Internal error, partition not found");
             }
@@ -135,7 +134,6 @@ namespace wrench {
                 success = false;
             }
             reservation_file->close();
-            std::cerr << "SUCCESS = " << success << " FREE SPACE = " << partition->get_free_space() << "\n";
             return success;
         }
 
@@ -146,7 +144,6 @@ namespace wrench {
         void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
 
             std::shared_ptr<simgrid::fsmod::Partition> partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
-            std::cerr << "IN UNRESERVE SPACE FOR " << location->getFilePath() << " " << location->getFile()->getSize() << " bytes;  FREE = " << partition->get_free_space() << "\n";
             if (not partition) {
                 throw std::runtime_error("SimpleStorageService::reserveSpace(): Internal error, partition not found");
             }
@@ -155,7 +152,6 @@ namespace wrench {
                 throw std::runtime_error("StorageService::unreserveSpace(): .reserved_space file not found - internal error");
             }
             this->file_system->truncate_file(reservation_file_path, location->getFile()->getSize());
-            std::cerr << "DONE WITH UNRESERVE SPACE FOR " << location->getFile()->getSize() << " bytes;  FREE = " << partition->get_free_space() << "\n";
         }
 
 //        /**
