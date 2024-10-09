@@ -250,10 +250,10 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-        argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
 
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
@@ -394,10 +394,10 @@ void DynamicServiceCreationTest::do_WeirdVectorBug_test() {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
 
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
