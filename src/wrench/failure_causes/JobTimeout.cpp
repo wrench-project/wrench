@@ -12,6 +12,8 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/job/Job.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_job_timeout, "Log category for JobTimeout");
 
 namespace wrench {
@@ -22,7 +24,7 @@ namespace wrench {
     * @param job: the job that has timed out
     */
     JobTimeout::JobTimeout(std::shared_ptr<Job> job) {
-        this->job = job;
+        this->job = std::move(job);
     }
 
 

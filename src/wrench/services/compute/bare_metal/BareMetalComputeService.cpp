@@ -35,8 +35,7 @@ namespace wrench {
     /**
      * @brief Destructor
      */
-    BareMetalComputeService::~BareMetalComputeService() {
-    }
+    BareMetalComputeService::~BareMetalComputeService() = default;
 
     /**
      * @brief Cleanup method
@@ -333,19 +332,19 @@ namespace wrench {
      */
     void BareMetalComputeService::initiateInstance(
             const std::string &hostname,
-            std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            std::shared_ptr<PilotJob> pj) {
+            const std::map<std::string, std::tuple<unsigned long, double>>& compute_resources,
+            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+            const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list,
+            const std::shared_ptr<PilotJob>& pj) {
 
         // Set default and specified properties
-        this->setProperties(this->default_property_values, std::move(property_list));
+        this->setProperties(this->default_property_values, property_list);
 
         // Validate that properties are correct
         this->validateProperties();
 
         // Set default and specified message payloads
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
         std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> specified_compute_resources;
         for (const auto &h: compute_resources) {
@@ -742,7 +741,7 @@ namespace wrench {
  * @brief Helper method to dispatch actions
  */
     void BareMetalComputeService::dispatchReadyActions() {
-        //        std::cerr << "DISPACHING READY ACTIONS: |" << this->ready_actions.size() << " |\n";
+        //        std::cerr << "DISPATCHING READY ACTIONS: |" << this->ready_actions.size() << " |\n";
 
         // Sort all the actions in the ready queue by (job.priority, action.priority, action.job.submit_time, action.name)
         // TODO: This may be a performance bottleneck... may have to remedy
@@ -784,7 +783,7 @@ namespace wrench {
         for (auto const &action: this->ready_actions) {
             if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
                 // The action has been dispatched (but its state it not set to RUNNING yet,
-                // since there can be zero-size, instant communication!
+                // since there can be zero-size, instant communication!)
                 break;
             }
             this->action_execution_service->submitAction(action);

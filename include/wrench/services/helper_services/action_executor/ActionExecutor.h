@@ -34,7 +34,7 @@ namespace wrench {
     public:
         unsigned long getNumCoresAllocated() const;
         double getMemoryAllocated() const;
-        double getThreadCreationOverhead();
+        double getThreadCreationOverhead() const;
         std::shared_ptr<Action> getAction();
 
         /***********************/
@@ -42,7 +42,7 @@ namespace wrench {
         /***********************/
 
         ActionExecutor(
-                std::string hostname,
+                const std::string& hostname,
                 unsigned long num_cores,
                 double ram_footprint,
                 double thread_creation_overhead,
@@ -55,7 +55,7 @@ namespace wrench {
         void kill(bool job_termination);
         void cleanup(bool has_returned_from_main, int return_value) override;
         std::shared_ptr<ActionExecutionService> getActionExecutionService() const;
-        bool getSimulateComputationAsSleep();
+        bool getSimulateComputationAsSleep() const;
 
     private:
         std::shared_ptr<Action> action;

@@ -40,7 +40,7 @@ namespace wrench {
         }
 #endif
         this->answer_commport = answer_commport;
-        this->file = file;
+        this->file = std::move(file);
         this->stripe_count = stripe_count;
     }
 
@@ -54,7 +54,7 @@ namespace wrench {
     CompoundStorageAllocationAnswerMessage::CompoundStorageAllocationAnswerMessage(
             std::vector<std::shared_ptr<FileLocation>> locations, double payload)
         : CompoundStorageServiceMessage(payload) {
-        this->locations = locations;
+        this->locations = std::move(locations);
     }
 
     /**
@@ -75,7 +75,7 @@ namespace wrench {
         }
 #endif
         this->answer_commport = answer_commport;
-        this->file = file;
+        this->file = std::move(file);
     }
 
     /**
@@ -88,7 +88,7 @@ namespace wrench {
     CompoundStorageLookupAnswerMessage::CompoundStorageLookupAnswerMessage(
             std::vector<std::shared_ptr<FileLocation>> locations, double payload)
         : CompoundStorageServiceMessage(payload) {
-        this->locations = locations;
+        this->locations = std::move(locations);
     }
 
 }// namespace wrench

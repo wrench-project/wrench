@@ -60,7 +60,7 @@ namespace wrench {
     SimpleStorageServiceBufferized::SimpleStorageServiceBufferized(const std::string &hostname,
                                                                    const std::set<std::string>& mount_points,
                                                                    WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list), "_" + std::to_string(getNewUniqueNumber())) {
+                                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, mount_points, std::move(property_list), std::move(messagepayload_list), "_" + std::to_string(getNewUniqueNumber())) {
         this->buffer_size = this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
         this->is_bufferized = true;
     }
@@ -419,7 +419,7 @@ namespace wrench {
                                                                                S4U_CommPort *dst_commport,
                                                                                const std::shared_ptr<FileLocation> &dst_location,
                                                                                bool success,
-                                                                               std::shared_ptr<FailureCause> failure_cause,
+                                                                               const std::shared_ptr<FailureCause>& failure_cause,
                                                                                S4U_CommPort *answer_commport_if_read,
                                                                                S4U_CommPort *answer_commport_if_write,
                                                                                S4U_CommPort *answer_commport_if_copy) {

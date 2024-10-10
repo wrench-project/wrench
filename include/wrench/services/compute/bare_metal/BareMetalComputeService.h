@@ -151,10 +151,10 @@ namespace wrench {
 
         // Low-level constructor helper method
         void initiateInstance(const std::string &hostname,
-                              std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-                              std::shared_ptr<PilotJob> pj);
+                              const std::map<std::string, std::tuple<unsigned long, double>>& compute_resources,
+                              const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                              const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list,
+                              const std::shared_ptr<PilotJob>& pj);
 
 
     protected:

@@ -50,7 +50,7 @@ namespace wrench {
     SimpleStorageServiceNonBufferized::SimpleStorageServiceNonBufferized(const std::string &hostname,
                                                                          const std::set<std::string>& mount_points,
                                                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, std::move(mount_points), std::move(property_list), std::move(messagepayload_list),
+                                                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, mount_points, std::move(property_list), std::move(messagepayload_list),
                                                                                                                                                            "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {
         this->buffer_size = 0;
         this->is_bufferized = false;
@@ -66,10 +66,10 @@ namespace wrench {
         if (transaction->src_opened_file) {
             // Doing a 1-byte write just so that the file access date is updated
             transaction->src_opened_file->seek(0, SEEK_SET);
-            // TODO WEIRD: passing true raises a crazy bug in lmm solver:
+            // TODO: passing true raises a crazy bug in lmm solver:
             // TODO: "throws std::length_error with description "vector"
             // TODO: Luckily for this method, we should pass false, but passing
-            // TODO: true by mistake has likely highlighted a strange C++ memory
+            // TODO: true by mistake has likely highlighted a strange C++ memory bug
             // TODO: in the core of SimGrid's LMM solver... pretty scary.
             transaction->src_opened_file->read(1, false);
             transaction->src_opened_file->close();

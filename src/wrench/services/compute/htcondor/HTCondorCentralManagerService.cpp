@@ -41,7 +41,7 @@ namespace wrench {
      * @param grid_post_overhead: grid job post-overhead
      * @param non_grid_pre_overhead: non-grid job pre-overhead
      * @param non_grid_post_overhead: non-grid job post-overhead
-     * @param fast_bmcs_resource_availability: whether to obtain direct availabily information from bare-metal services
+     * @param fast_bmcs_resource_availability: whether to obtain direct availability information from bare-metal services
      * @param fcfs: whether to enforce FCFS scheduling of jobs
      * @param compute_services: a set of 'child' compute resources available to and via the HTCondor pool
      * @param property_list: a property list ({} means "use all defaults")
@@ -83,8 +83,7 @@ namespace wrench {
     /**
      * @brief Destructor
      */
-    HTCondorCentralManagerService::~HTCondorCentralManagerService() {
-    }
+    HTCondorCentralManagerService::~HTCondorCentralManagerService() = default;
 
     /**
      * @brief Add a new 'child' compute service
