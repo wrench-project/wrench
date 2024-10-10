@@ -266,7 +266,6 @@ set(SOURCE_FILES
         include/wrench/services/compute/batch/batch_schedulers/BatchScheduler.h
         include/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
-        include/wrench/services/storage/storage_helpers/LogicalFileSystem.h
         include/wrench/services/storage/storage_helpers/LogicalFileSystemNoCaching.h
         include/wrench/services/storage/storage_helpers/LogicalFileSystemLRUCaching.h
         src/wrench/logging/TerminalOutput.cpp
@@ -372,9 +371,6 @@ set(SOURCE_FILES
         src/wrench/services/storage/storage_helper_classes/FileLocation.cpp
         src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
         include/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
-        src/wrench/services/storage/storage_helper_classes/LogicalFileSystem.cpp
-        src/wrench/services/storage/storage_helper_classes/LogicalFileSystemNoCaching.cpp
-        src/wrench/services/storage/storage_helper_classes/LogicalFileSystemLRUCaching.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
         include/wrench/simgrid_S4U_util/S4U_DaemonActor.h

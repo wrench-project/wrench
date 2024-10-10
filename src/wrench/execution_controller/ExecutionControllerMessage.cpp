@@ -25,7 +25,6 @@ namespace wrench {
      * @param message: the (string) message to be sent
      * @param payload: message size in bytes
      *
-     * @throw std::invalid_argument
      */
     ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(std::string message, double payload) : ExecutionControllerMessage(payload), message(std::move(message)) {}
 

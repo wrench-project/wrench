@@ -46,7 +46,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int TwoTasksAtATimeWMS::main() {
         /* Set the logging output to GREEN */

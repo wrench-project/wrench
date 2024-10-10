@@ -83,7 +83,6 @@ namespace wrench {
      * @param file: a file
      * @return a file location specification
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<FileLocation> FileLocation::SCRATCH(const std::shared_ptr<DataFile> &file) {
         if (file == nullptr) {
@@ -100,7 +99,6 @@ namespace wrench {
      * @param file: a file
      * @return a file location specification
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss, const std::shared_ptr<DataFile> &file) {
         if (!ss or !file) {
@@ -118,7 +116,6 @@ namespace wrench {
      * @param file: a file
      * @return a file location specification
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss,
                                                          const std::shared_ptr<StorageService> &server_ss,
@@ -141,7 +138,6 @@ namespace wrench {
      * @param path: a path
      * @return a file location specification
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss,
                                                          const std::string &path,

@@ -58,7 +58,6 @@ namespace wrench {
     *              - requested number of nodes
     *              - username
     *
-    * @throw std::invalid_argument
     */
     std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>>
     TraceFileLoader::loadFromTraceFile(const std::string& filename, bool ignore_invalid_jobs, double desired_submit_time_of_first_job) {
@@ -101,7 +100,6 @@ namespace wrench {
     *              - requested number of nodes
     *              - username
     *
-    * @throw std::invalid_argument
     */
     std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>>
     TraceFileLoader::loadFromTraceFileSWF(const std::string& filename, bool ignore_invalid_jobs, double desired_submit_time_of_first_job) {
@@ -309,7 +307,6 @@ namespace wrench {
     *              - requested number of nodes
     *              - username
     *
-    * @throw std::invalid_argument
     */
     std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>>
     TraceFileLoader::loadFromTraceFileJSON(const std::string& filename, bool ignore_invalid_jobs, double desired_submit_time_of_first_job) {

@@ -27,7 +27,6 @@ namespace wrench {
      * @param hostname: the name of the host on which to run the controller
      * @param suffix: a string to append to the controller process name (which will show up in logs)
      *
-     * @throw std::invalid_argument
      */
     ExecutionController::ExecutionController(
             const std::string &hostname,
@@ -162,7 +161,6 @@ namespace wrench {
      * @param timeout: a timeout value in seconds
      *
      * @return false if a timeout occurred (in which case no event was received/processed)
-     * @throw wrench::ExecutionException
      */
     bool ExecutionController::waitForAndProcessNextEvent(double timeout) {
         std::shared_ptr<ExecutionEvent> event = this->waitForNextEvent(timeout);

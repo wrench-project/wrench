@@ -426,7 +426,6 @@ namespace wrench {
      *              on the gantt chart may end up in 1 of 3 positions (using cores 0 and 1, 1 and 2, or 2 and 3).
      * @param data: JSON workflow execution data
      *
-     * @throws std::runtime_error
      */
     void generateHostUtilizationGraphLayout(std::vector<WorkflowTaskExecutionInstance> &data) {
         if (not searchForLayout(data, 0)) {
@@ -513,7 +512,6 @@ namespace wrench {
       * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
       * of dumpUnifiedJSON
       *
-      * @throws std::invalid_argument
       */
     void SimulationOutput::dumpWorkflowExecutionJSON(const std::shared_ptr<Workflow> &workflow,
                                                      const std::string &file_path,
@@ -684,7 +682,6 @@ namespace wrench {
      * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
      * of dumpUnifiedJSON
      *
-     * @throws std::invalid_argument
      */
     void SimulationOutput::dumpWorkflowGraphJSON(const std::shared_ptr<wrench::Workflow> &workflow,
                                                  const std::string &file_path,
@@ -823,8 +820,6 @@ namespace wrench {
      * @param file_path: the path to write the file
      * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
      * of dumpUnifiedJSON
-     * @throws std::invalid_argument
-     * @throws std::runtime_error
      */
     void SimulationOutput::dumpHostEnergyConsumptionJSON(const std::string &file_path,
                                                          bool writing_file) {
@@ -970,7 +965,6 @@ namespace wrench {
      * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
      * of dumpUnifiedJSON
      *
-     * @throws std::invalid_argument
      */
     void SimulationOutput::dumpPlatformGraphJSON(const std::string &file_path,
                                                  bool writing_file) {
@@ -1232,7 +1226,6 @@ namespace wrench {
      * @param file_path - path to save JSON at
      * @param writing_file - boolean, default true, to write the JSON to the specified file path. Used for unified output.
      *
-     * @throws invalid_argument
      */
     void SimulationOutput::dumpDiskOperationsJSON(const std::string &file_path,
                                                   bool writing_file) {
@@ -1393,8 +1386,6 @@ namespace wrench {
      * @param file_path: path where json file is written
      * @param writing_file: whether to write file to disk. Enabled by default.
      *
-     * @throws std::invalid_argument
-     * @throws std::runtime_error
      */
     void SimulationOutput::dumpLinkUsageJSON(const std::string &file_path,
                                              bool writing_file) {

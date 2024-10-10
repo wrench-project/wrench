@@ -95,7 +95,6 @@ namespace wrench {
      * @param argc: main()'s argument count
      * @param argv: main()'s argument list
      *
-     * @throw std::invalid_argument
      */
     void Simulation::init(int *argc, char **argv) {
         if (Simulation::initialized) {
@@ -313,7 +312,6 @@ namespace wrench {
      *
      * @param filename: the path to a SimGrid XML platform description file
      *
-     * @throw std::runtime_error
      */
     void Simulation::instantiatePlatform(const std::string &filename) {
         if (not this->s4u_simulation->isInitialized()) {
@@ -335,7 +333,6 @@ namespace wrench {
      *
      * @param platform: the string representation of a SimGrid XML platform description
      *
-     * @throw std::runtime_error
      */
     void Simulation::instantiatePlatformFromString(const std::string &platform) {
         auto temp_dir = std::filesystem::temp_directory_path();
@@ -425,7 +422,6 @@ namespace wrench {
      * @param link_name: the link's name
      * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampLinkUsage object
      * @return current bandwidth usage in Bps
-     * @throws std::invalid_argument
      */
     double Simulation::getLinkUsage(const std::string &link_name, bool record_as_time_stamp) {
         if (link_name.empty()) {
@@ -511,7 +507,6 @@ namespace wrench {
     /**
      * @brief Launch the simulation
      *
-     * @throw std::runtime_error
      */
     void Simulation::launch() {
         // Check that the simulation is correctly initialized
@@ -563,7 +558,6 @@ namespace wrench {
     /**
      * @brief Check that the simulation is correctly instantiated by the user
      *
-     * @throw std::runtime_exception
      */
     void Simulation::checkSimulationSetup() {
         // Check that the simulation is initialized
@@ -586,7 +580,6 @@ namespace wrench {
     /**
      * @brief Start all services
      *
-     * @throw std::runtime_error
      */
     void Simulation::startAllProcesses() {
 
@@ -636,7 +629,6 @@ namespace wrench {
      *
      * @param service: a compute service
      *
-     * @throw std::invalid_argument
      */
     void Simulation::addService(const std::shared_ptr<ComputeService> &service) {
         if (service == nullptr) {
@@ -651,7 +643,6 @@ namespace wrench {
      *
      * @param service: a network proximity service
      *
-     * @throw std::invalid_argument
      */
     void Simulation::addService(const std::shared_ptr<NetworkProximityService> &service) {
         if (service == nullptr) {
@@ -666,7 +657,6 @@ namespace wrench {
     *
     * @param service: a storage service
     *
-    * @throw std::invalid_argument
     */
     void Simulation::addService(const std::shared_ptr<StorageService> &service) {
         if (service == nullptr) {
@@ -681,7 +671,6 @@ namespace wrench {
      *
      * @param service: an execution controller
      *
-     * @throw std::invalid_argument
      */
     void Simulation::addService(const std::shared_ptr<ExecutionController> &service) {
         if (service == nullptr) {
@@ -696,7 +685,6 @@ namespace wrench {
       *
       * @param service: a file registry service
       *
-      * @throw std::invalid_argument
       */
     void Simulation::addService(const std::shared_ptr<FileRegistryService> &service) {
         if (service == nullptr) {
@@ -711,7 +699,6 @@ namespace wrench {
       *
       * @param service: an energy meter service
       *
-      * @throw std::invalid_argument
       */
     void Simulation::addService(const std::shared_ptr<EnergyMeterService> &service) {
         if (service == nullptr) {
@@ -726,7 +713,6 @@ namespace wrench {
       *
       * @param service: a link usage meter service
       *
-      * @throw std::invalid_argument
       */
     void Simulation::addService(const std::shared_ptr<BandwidthMeterService> &service) {
         if (service == nullptr) {
@@ -742,7 +728,6 @@ namespace wrench {
       *
       * @param memory_manager: a MemoryManager
       *
-      * @throw std::invalid_argument
       */
     void Simulation::addService(const std::shared_ptr<MemoryManager> &memory_manager) {
         if (memory_manager == nullptr) {
@@ -812,7 +797,6 @@ namespace wrench {
      * @param mount_point: mount point of disk to read from
      * @param disk: disk to read from (nullptr if not known)
      *
-     * @throw invalid_argument
      */
     void Simulation::readFromDisk(double num_bytes, const std::string &hostname, simgrid::s4u::Disk *disk) {
         std::string mount_point = disk->get_property("mount");
@@ -836,7 +820,6 @@ namespace wrench {
      * @param src_disk: source disk (nullptr if not known)
      * @param dst_disk: dst disk (nullptr if not known)
      *
-     * @throw invalid_argument
      */
     void Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                             const std::string &hostname,
@@ -870,7 +853,6 @@ namespace wrench {
      * @param hostname: name of the host to write to
      * @param disk: a simgrid disk to write to (nullptr if not known)
      *
-     * @throw invalid_argument
      */
     void Simulation::writeToDisk(double num_bytes, const std::string &hostname, simgrid::s4u::Disk *disk) {
         std::string mount_point = disk->get_property("mount");
@@ -1219,7 +1201,6 @@ namespace wrench {
      * @brief Obtains the current energy consumption of a host
      * @param hostname: the host name
      * @return current energy consumption in joules
-     * @throws std::invalid_argument
      */
     double Simulation::getEnergyConsumed(const std::string &hostname) {
         return this->getEnergyConsumed(hostname, false);
@@ -1231,7 +1212,6 @@ namespace wrench {
      * @param hostname: the host name
      * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampEnergyConsumption object
      * @return current energy consumption in joules
-     * @throws std::invalid_argument
      */
     double Simulation::getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp) {
         if (hostname.empty()) {
@@ -1252,7 +1232,6 @@ namespace wrench {
     * @brief Obtains the current energy consumption of a host
     * @param hostnames: the list of hostnames
     * @return current energy consumption in joules for each host, as a map indexed by hostnames
-    * @throws std::invalid_argument
     */
     std::map<std::string, double> Simulation::getEnergyConsumed(const std::vector<std::string> &hostnames) {
         return this->getEnergyConsumed(hostnames, false);
@@ -1264,7 +1243,6 @@ namespace wrench {
     * @param hostnames: the list of hostnames
     * @param record_as_time_stamps: whether or not to record a SimulationTimestampEnergyConsumption object for each host when this method is called
     * @return current energy consumption in joules for each host, as a map indexed by hostnames
-    * @throws std::invalid_argument
     */
     std::map<std::string, double>
     Simulation::getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps) {
@@ -1340,8 +1318,6 @@ namespace wrench {
      *        the reference and will call the destructor.
      * @param service: An instance of a service
      * @return A pointer to the service instance
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     std::shared_ptr<ComputeService> Simulation::startNewService(ComputeService *service) {
         if (service == nullptr) {
@@ -1370,8 +1346,6 @@ namespace wrench {
      *        the reference and will call the destructor.
      * @param service: An instance of a service
      * @return A pointer to the service instance
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     std::shared_ptr<StorageService> Simulation::startNewService(StorageService *service) {
         if (service == nullptr) {
@@ -1397,8 +1371,6 @@ namespace wrench {
      *        the reference and will call the destructor.
      * @param service: An instance of a service
      * @return A pointer to the service instance
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     std::shared_ptr<NetworkProximityService> Simulation::startNewService(NetworkProximityService *service) {
         if (service == nullptr) {
@@ -1423,8 +1395,6 @@ namespace wrench {
      *        the reference and will call the destructor.
      * @param service: An instance of a service
      * @return A pointer to the service instance
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     std::shared_ptr<FileRegistryService> Simulation::startNewService(FileRegistryService *service) {
         if (service == nullptr) {
@@ -1450,8 +1420,6 @@ namespace wrench {
      *        the reference and will call the destructor.
      * @param service: An instance of a service
      * @return A pointer to the service instance
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     std::shared_ptr<MemoryManager> Simulation::startNewService(MemoryManager *service) {
         if (service == nullptr) {
@@ -1473,7 +1441,6 @@ namespace wrench {
 
     /**
      * @brief Checks that the platform is well defined
-     * @throw std::invalid_argument
      */
     void Simulation::platformSanityCheck() {
         auto hostnames = wrench::Simulation::getHostnameList();
@@ -1575,7 +1542,6 @@ namespace wrench {
     *
     * @return the DataFile instance (or throws a std::invalid_argument if not found)
     *
-    * @throw std::invalid_argument
     */
     std::shared_ptr<DataFile> Simulation::getFileByID(const std::string &id) {
         if (Simulation::data_files.find(id) == Simulation::data_files.end()) {
@@ -1609,7 +1575,6 @@ namespace wrench {
      *
      * @return the DataFile instance
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<DataFile> Simulation::addFile(const std::string &id, double size) {
         if (size < 0) {

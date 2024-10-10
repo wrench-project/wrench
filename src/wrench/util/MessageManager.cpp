@@ -27,7 +27,6 @@ namespace wrench {
      * @brief Insert a message in the manager's  "database"
      * @param commport: the name of the relevant commport
      * @param msg: the message
-     * @throw std::runtime_error
      */
     void MessageManager::manageMessage(const S4U_CommPort *commport, SimulationMessage *msg) {
         if (msg == nullptr) {

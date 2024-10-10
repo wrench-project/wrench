@@ -33,7 +33,6 @@ namespace wrench {
      * @param name: the job's name (if empty, a unique name will be chosen for you)
      * @param job_manager: the Job Manager in charge of this job
      *
-     * @throw std::invalid_argument
      */
     CompoundJob::CompoundJob(std::string name, std::shared_ptr<JobManager> job_manager)
         : Job(std::move(name), std::move(job_manager)),

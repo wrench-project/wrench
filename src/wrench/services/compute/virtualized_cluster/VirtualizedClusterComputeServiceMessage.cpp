@@ -28,7 +28,6 @@ namespace wrench {
      * @param dest_pm_hostname: the name of the destination physical machine host
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     VirtualizedClusterComputeServiceMigrateVMRequestMessage::VirtualizedClusterComputeServiceMigrateVMRequestMessage(
             S4U_CommPort *answer_commport,

@@ -50,7 +50,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int TwoTasksAtATimeVirtualizedClusterWMS::main() {
         /* Set the logging output to GREEN */

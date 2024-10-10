@@ -123,7 +123,6 @@ namespace wrench {
      *
      * @return 1 if a failure timestamp should be generated, 0 otherwise
      *
-     * @throw std::runtime_error
      */
     int ActionExecutor::main() {
         S4U_Simulation::computeZeroFlop();// to block in case pstate speed is 0

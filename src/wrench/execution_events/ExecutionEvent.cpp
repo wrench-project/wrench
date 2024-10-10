@@ -32,8 +32,6 @@ namespace wrench {
      * @param timeout: a timeout value in seconds (-1 means: no timeout)
      * @return a workflow execution event (or nullptr in case of a timeout)
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     std::shared_ptr<ExecutionEvent>
     ExecutionEvent::waitForNextExecutionEvent(S4U_CommPort *commport, double timeout) {

@@ -67,7 +67,6 @@ namespace wrench {
     * @brief Set a message payload of the Service
     * @param messagepayload: the message payload (which must a a string representation of a >=0 double)
     * @param value: the message payload value
-    * @throw std::invalid_argument
     */
     void Service::setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE messagepayload, double value) {
         // Check that the value is a >=0 double
@@ -85,7 +84,6 @@ namespace wrench {
      * @param property: the property
      * @return the property value as a string
      *
-     * @throw std::invalid_argument
      */
     std::string Service::getPropertyValueAsString(WRENCH_PROPERTY_TYPE property) {
         if (this->property_list.find(property) == this->property_list.end()) {
@@ -101,7 +99,6 @@ namespace wrench {
      * @param property: the property
      * @return the property value as a double
      *
-     * @throw std::invalid_argument
      */
     double Service::getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE property) {
         double value;
@@ -174,7 +171,6 @@ namespace wrench {
     * @param property: the property
     * @return the property value as an unsigned long
     *
-    * @throw std::invalid_argument
     */
     unsigned long Service::getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE property) {
         unsigned long value;
@@ -200,7 +196,6 @@ namespace wrench {
      * @param message_payload: the message payload
      * @return the message payload value as a double
      *
-     * @throw std::invalid_argument
      */
     double Service::getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE message_payload) {
         if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
@@ -238,7 +233,6 @@ namespace wrench {
      * @param property: the property
      * @return the property value as a boolean
      *
-     * @throw std::invalid_argument
      */
     bool Service::getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE property) {
         std::string string_value;
@@ -260,8 +254,6 @@ namespace wrench {
      * @param daemonize: true if the daemon is to be daemonized, false otherwise
      * @param auto_restart: true if the daemon should restart automatically after a reboot or not
      *
-     * @throw std::runtime_error
-     * @throw std::shared_ptr<HostError>
      */
     void Service::start(const std::shared_ptr<Service> &this_service, bool daemonize, bool auto_restart) {
         // Setting the state to UP
@@ -296,8 +288,6 @@ namespace wrench {
     /**
      * @brief Synchronously stop the service (does nothing if the service is already stopped)
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     void Service::stop() {
         // Do nothing if the service is already down
@@ -351,7 +341,6 @@ namespace wrench {
     /**
       * @brief Resume the service
       *
-      * @throw ExecutionException
       */
     void Service::resume() {
         if (this->state != Service::SUSPENDED) {
@@ -445,7 +434,6 @@ namespace wrench {
     /**
      * @brief Check whether the service is properly configured and running
      *
-     * @throws WorkflowExecutionException
      */
     void Service::serviceSanityCheck() {
         assertServiceIsUp();
@@ -470,7 +458,6 @@ namespace wrench {
 
     /**
      * @brief Throws an exception if the service is not up
-     * @throw ExecutionException
      */
     void Service::assertServiceIsUp() {
         if (this->state == Service::DOWN) {

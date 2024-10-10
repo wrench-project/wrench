@@ -43,7 +43,6 @@ namespace wrench {
      *
      * @return the WorkflowTask instance
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<WorkflowTask> Workflow::addTask(const std::string &id,
                                                     double flops,
@@ -80,7 +79,6 @@ namespace wrench {
      * @brief Remove a file from the workflow (but not from the simulation)
      * @param file: a file
      *
-     * @throw std::invalid_argument
      */
     void Workflow::removeFile(const std::shared_ptr<DataFile> &file) {
         if (this->task_output_files.find(file) != this->task_output_files.end()) {
@@ -107,7 +105,6 @@ namespace wrench {
      *
      * @param task: a task
      *
-     * @throw std::invalid_argument
      */
     void Workflow::removeTask(const std::shared_ptr<WorkflowTask> &task) {
         if (task == nullptr) {
@@ -160,7 +157,6 @@ namespace wrench {
      *
      * @return a workflow task (or throws a std::invalid_argument if not found)
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<WorkflowTask> Workflow::getTaskByID(const std::string &id) {
         if (tasks.find(id) == tasks.end()) {
@@ -177,7 +173,6 @@ namespace wrench {
      * @param dst: the child task
      * @param redundant_dependencies: whether DAG redundant dependencies should be kept in the graph
      *
-     * @throw std::invalid_argument
      */
     void Workflow::addControlDependency(const std::shared_ptr<WorkflowTask> &src, const std::shared_ptr<WorkflowTask> &dst, bool redundant_dependencies) {
         if ((src == nullptr) || (dst == nullptr)) {

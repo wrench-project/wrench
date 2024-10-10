@@ -75,8 +75,6 @@ namespace wrench {
     /**
      * @brief Stop the bandwidth meter
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     void BandwidthMeterService::stop() {
         this->commport->putMessage(
@@ -140,7 +138,6 @@ namespace wrench {
      * @brief Process the next message
      * @return true if the daemon should continue, false otherwise
      *
-     * @throw std::runtime_error
      */
     bool BandwidthMeterService::processNextMessage(double timeout) {
 

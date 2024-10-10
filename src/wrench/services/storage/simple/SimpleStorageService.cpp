@@ -97,7 +97,6 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      * @param suffix: the suffix (for the service name)
      *
-     * @throw std::invalid_argument
      */
     SimpleStorageService::SimpleStorageService(
             const std::string &hostname,

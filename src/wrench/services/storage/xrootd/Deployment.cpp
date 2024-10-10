@@ -130,7 +130,6 @@ namespace wrench {
         //        * @param file: A shared pointer to a file
         //        * @param location: A shared pointer to the Node to put the file on.  The Node MUST be a storage server
         //        *
-        //        * @throw std::invalid_argument
         //        */
         //         void Deployment::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location) {
         //            if(file==nullptr){
@@ -147,7 +146,6 @@ namespace wrench {
         * @brief remove a specific file from the registry.  DOES NOT REMOVE FILE FROM SERVERS
         * @param file: A shared pointer to the file to remove
         *
-        * @throw std::invalid_argument
         */
         void Deployment::deleteFile(const std::shared_ptr<DataFile> &file) {
             files.erase(file);
@@ -157,7 +155,6 @@ namespace wrench {
         * @param file: A shared pointer to the file the location is for
         * @param location: The location to remove
         *
-        * @throw std::invalid_argument
         */
         void Deployment::removeFileLocation(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location) {
             if (file == nullptr) {

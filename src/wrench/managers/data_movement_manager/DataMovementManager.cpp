@@ -50,8 +50,6 @@ namespace wrench {
     /**
      * @brief Stop the manager
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     void DataMovementManager::stop() {
         this->commport->putMessage(new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
@@ -63,8 +61,6 @@ namespace wrench {
      * @param dst: the destination location
      * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
      *
-     * @throw std::invalid_argument
-     * @throw ExecutionException
      */
     void DataMovementManager::initiateAsynchronousFileCopy(const std::shared_ptr<FileLocation> &src,
                                                            const std::shared_ptr<FileLocation> &dst,
@@ -94,8 +90,6 @@ namespace wrench {
      * @brief Ask the data manager to initiate an asynchronous file read
      * @param location: the location to read from
      *
-     * @throw std::invalid_argument
-     * @throw ExecutionException
      */
     void DataMovementManager::initiateAsynchronousFileRead(const std::shared_ptr<FileLocation> &location) {
         this->initiateAsynchronousFileRead(location, location->getFile()->getSize());
@@ -106,8 +100,6 @@ namespace wrench {
      * @param location: the location to read from
      * @param num_bytes: the number of bytes to read
      *
-     * @throw std::invalid_argument
-     * @throw ExecutionException
      */
     void DataMovementManager::initiateAsynchronousFileRead(const std::shared_ptr<FileLocation> &location,
                                                            const double num_bytes) {
@@ -136,8 +128,6 @@ namespace wrench {
      * @param location: the location to read from
      * @param file_registry_service: a file registry service to update once the file write has (successfully) completed
      *
-     * @throw std::invalid_argument
-     * @throw ExecutionException
      */
     void DataMovementManager::initiateAsynchronousFileWrite(const std::shared_ptr<FileLocation> &location,
                                                             const std::shared_ptr<FileRegistryService> &file_registry_service) {
@@ -169,8 +159,6 @@ namespace wrench {
      * @param dst: the destination location
      * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
      *
-     * @throw std::invalid_argument
-     * @throw ExecutionException
      */
     void DataMovementManager::doSynchronousFileCopy(const std::shared_ptr<FileLocation> &src,
                                                     const std::shared_ptr<FileLocation> &dst,
@@ -219,7 +207,6 @@ namespace wrench {
      * @brief Process the next message
      * @return true if the daemon should continue, false otherwise
      *
-     * @throw std::runtime_error
      */
     bool DataMovementManager::processNextMessage() {
         std::shared_ptr<SimulationMessage> message = nullptr;
