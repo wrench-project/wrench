@@ -77,7 +77,6 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      * @param suffix: suffix to append to the service name and commport
      *
-     * @throw std::invalid_argument
      */
     BatchComputeService::BatchComputeService(const std::string &hostname,
                                              std::vector<std::string> compute_hosts,
@@ -312,7 +311,6 @@ namespace wrench {
      * @param key: the argument key ("-N", "-c", "-t")
      * @param args: the argument map
      * @return the value of the argument
-     * @throw std::invalid_argument
      */
     unsigned long BatchComputeService::parseUnsignedLongServiceSpecificArgument(
             const std::string &key,
@@ -849,7 +847,6 @@ namespace wrench {
      * @param executor: the standard job executor
      * @param job: the job
      *
-     * @throw std::runtime_error
      */
     void BatchComputeService::processCompoundJobCompletion(
             const std::shared_ptr<BareMetalComputeServiceOneShot> &executor,
@@ -1097,7 +1094,6 @@ namespace wrench {
     /**
      * @brief Start the process that will replay the background load
      *
-     * @throw std::runtime_error
      */
     void BatchComputeService::startBackgroundWorkloadProcess() {
         if (this->workload_trace.empty()) {

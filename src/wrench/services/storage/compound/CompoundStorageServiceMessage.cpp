@@ -26,7 +26,6 @@ namespace wrench {
      * @param stripe_count: the strip count
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CompoundStorageAllocationRequestMessage::CompoundStorageAllocationRequestMessage(S4U_CommPort *answer_commport,
                                                                                      std::shared_ptr<DataFile> file,
@@ -49,7 +48,6 @@ namespace wrench {
      * @param locations: Existing or newly allocated FileLocations for requested file
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CompoundStorageAllocationAnswerMessage::CompoundStorageAllocationAnswerMessage(
             std::vector<std::shared_ptr<FileLocation>> locations, double payload)
@@ -63,7 +61,6 @@ namespace wrench {
      * @param file: the file for which storage allocation is requested
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CompoundStorageLookupRequestMessage::CompoundStorageLookupRequestMessage(S4U_CommPort *answer_commport,
                                                                              std::shared_ptr<DataFile> file, double payload)
@@ -83,7 +80,6 @@ namespace wrench {
      * @param locations: Known FileLocations for requested file
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CompoundStorageLookupAnswerMessage::CompoundStorageLookupAnswerMessage(
             std::vector<std::shared_ptr<FileLocation>> locations, double payload)

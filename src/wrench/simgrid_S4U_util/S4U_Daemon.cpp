@@ -121,7 +121,6 @@ namespace wrench {
      * @param has_returned_from_main: whether the daemon returned from main() by itself
      * @param return_value: the return value from main (if has_terminated_cleanly is true)
      *
-     * @throw std::runtime_error
      */
     void S4U_Daemon::cleanup(bool has_returned_from_main, int return_value) {
         //        WRENCH_INFO("IN S4U_Daemon::cleanup() for %s", this->process_name.c_str());
@@ -168,8 +167,6 @@ namespace wrench {
      * @param daemonized: whether the S4U actor should be daemonized
      * @param auto_restart: whether the S4U actor should automatically restart after a host reboot
      *
-     * @throw std::runtime_error
-     * @throw std::shared_ptr<HostError>
      */
     void S4U_Daemon::startDaemon(bool daemonized, bool auto_restart) {
 
@@ -310,7 +307,6 @@ namespace wrench {
  * @brief Kill the daemon/actor (does nothing if already dead)
  *
  * @return true if actor was killed, false if not (e.g., daemon was already dead)
- * @throw std::shared_ptr<FatalFailure>
  */
     bool S4U_Daemon::killActor() {
         // Do the kill only if valid actor and not already done

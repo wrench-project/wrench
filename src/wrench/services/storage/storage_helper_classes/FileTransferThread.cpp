@@ -275,7 +275,6 @@ namespace wrench {
     * @param commport: the source commport
     * @param location: the destination location
     *
-    * @throw shared_ptr<FailureCause>
     */
     void FileTransferThread::receiveFileFromNetwork(const std::shared_ptr<DataFile> &f,
                                                     S4U_CommPort *commport,
@@ -394,7 +393,6 @@ namespace wrench {
      * @param num_bytes: number of bytes to transfer
      * @param commport: the destination commport
      *
-     * @throw shared_ptr<FailureCause>
      */
     void FileTransferThread::sendLocalFileToNetwork(const std::shared_ptr<DataFile> &f,
                                                     const std::shared_ptr<FileLocation> &location,

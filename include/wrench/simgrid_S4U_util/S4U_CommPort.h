@@ -54,7 +54,6 @@ namespace wrench {
          * @param error_prefix: any string you wish to prefix the error message with
          * @return the message, in a unique_ptr of the type specified.  Otherwise throws a runtime_error
          *
-         * @throw std::shared_ptr<NetworkError>
          */
         template<class TMessageType>
         std::unique_ptr<TMessageType> getMessage(const std::string &error_prefix = "") {
@@ -86,7 +85,6 @@ namespace wrench {
          *
          * @return the message, in a unique_ptr of the type specified.  Otherwise throws a runtime_error
          *
-         * @throw std::shared_ptr<NetworkError>
          */
         template<class TMessageType>
         std::unique_ptr<TMessageType> getMessage(double timeout, const std::string &error_prefix = "") {
@@ -116,7 +114,6 @@ namespace wrench {
          *
          * @return the message, or nullptr (in which case it's likely a brutal termination)
          *
-         * @throw std::shared_ptr<NetworkError>
          */
         std::unique_ptr<SimulationMessage> getMessage() {
             return getMessage(true);
@@ -128,7 +125,6 @@ namespace wrench {
          * @param timeout:  a timeout value in seconds (<0 means never timeout)
          * @return the message, or nullptr (in which case it's likely a brutal termination)
          *
-         * @throw std::shared_ptr<NetworkError>
          */
         std::unique_ptr<SimulationMessage> getMessage(double timeout) {
             return this->getMessage(timeout, true);

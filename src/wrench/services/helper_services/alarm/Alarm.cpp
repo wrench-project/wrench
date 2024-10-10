@@ -79,8 +79,6 @@ namespace wrench {
      * @param suffix: a (possibly empty) suffix to append to the daemon name (useful in debug output)
      * @return a shared_ptr reference to the alarm service
      *
-     * @throw std::shared_ptr<HostError>
-     * @throw std::runtime_error
      */
     std::shared_ptr<Alarm>
     Alarm::createAndStartAlarm(Simulation *simulation, double date, std::string hostname,

@@ -28,7 +28,6 @@ namespace wrench {
    * @param service_specific_args: a map of extra arguments (each specified by a name and value, both strings) required by some services
    * @param payload: message size in bytes
    *
-   * @throw std::invalid_arguments
    */
     ComputeServiceSubmitCompoundJobRequestMessage::ComputeServiceSubmitCompoundJobRequestMessage(
             S4U_CommPort *answer_commport,
@@ -54,7 +53,6 @@ namespace wrench {
      * @param failure_cause: cause of the failure (nullptr if success == true)
      * @param payload: message size in bytes
      *
-     * @throw std::invalid_arguments
      */
     ComputeServiceSubmitCompoundJobAnswerMessage::ComputeServiceSubmitCompoundJobAnswerMessage(std::shared_ptr<CompoundJob> job,
                                                                                                std::shared_ptr<ComputeService> compute_service,
@@ -81,7 +79,6 @@ namespace wrench {
      * @param cs: the compute service on which the job has completed
      * @param payload: message size in bytes
      *
-     * @throw std::invalid_arguments
      */
     ComputeServiceCompoundJobDoneMessage::ComputeServiceCompoundJobDoneMessage(std::shared_ptr<CompoundJob> job,
                                                                                std::shared_ptr<ComputeService> cs,
@@ -104,7 +101,6 @@ namespace wrench {
      * @param cs: the compute service on which the job has failed
      * @param payload: message size in bytes
      *
-     * @throw std::invalid_argument
      */
     ComputeServiceCompoundJobFailedMessage::ComputeServiceCompoundJobFailedMessage(std::shared_ptr<CompoundJob> job,
                                                                                    std::shared_ptr<ComputeService> cs,
@@ -126,7 +122,6 @@ namespace wrench {
     * @param job: a compound job to terminate
     * @param payload: message size in bytes
     *
-    * @throw std::invalid_arguments
     */
     ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(
             S4U_CommPort *answer_commport,
@@ -150,7 +145,6 @@ namespace wrench {
      * @param failure_cause: cause of the failure (nullptr if success == true)
      * @param payload: message size in bytes
      *
-     * @throw std::invalid_arguments
      */
     ComputeServiceTerminateCompoundJobAnswerMessage::ComputeServiceTerminateCompoundJobAnswerMessage(std::shared_ptr<CompoundJob> job,
                                                                                                      std::shared_ptr<ComputeService> compute_service,
@@ -178,7 +172,6 @@ namespace wrench {
      * @param cs: the compute service on which the pilot job has started
      * @param payload: message size in bytes
      *
-     * @throw std::invalid_argument
      */
     ComputeServicePilotJobStartedMessage::ComputeServicePilotJobStartedMessage(std::shared_ptr<PilotJob> job,
                                                                                std::shared_ptr<ComputeService> cs,
@@ -200,7 +193,6 @@ namespace wrench {
      * @param cs: the compute service on which the pilot job has expired
      * @param payload: message size in bytes
      *
-     * @throw std::invalid_argument
      */
     ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(std::shared_ptr<PilotJob> job,
                                                                                std::shared_ptr<ComputeService> cs,
@@ -223,7 +215,6 @@ namespace wrench {
      * @param key: the desired resource information (i.e., dictionary key) that's needed)
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(
             S4U_CommPort *answer_commport,
@@ -246,7 +237,6 @@ namespace wrench {
      * @param info: the resource description map
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     ComputeServiceResourceInformationAnswerMessage::ComputeServiceResourceInformationAnswerMessage(
             std::map<std::string, double> info, double payload)
@@ -261,7 +251,6 @@ namespace wrench {
     * @param ram: the desired RAM
     * @param payload: the message size in bytes
     *
-    * @throw std::invalid_argument
     */
     ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
             S4U_CommPort *answer_commport, unsigned long num_cores, double ram, double payload) : ComputeServiceMessage(

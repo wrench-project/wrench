@@ -58,7 +58,6 @@ namespace wrench {
        * @brief Helper static method to parse resource specifications to the <cores,ram> format
        * @param spec: specification string
        * @return a <cores, ram> tuple
-       * @throw std::invalid_argument
        */
     std::tuple<std::string, unsigned long> BareMetalComputeService::parseResourceSpec(const std::string &spec) {
         std::vector<std::string> tokens;
@@ -184,9 +183,6 @@ namespace wrench {
      *      - If a "hostname:num_cores" value is provided for an action, then the service will run that
      *        action with this many cores on that host.
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     void BareMetalComputeService::submitCompoundJob(
             std::shared_ptr<CompoundJob> job,
@@ -277,7 +273,6 @@ namespace wrench {
      * @param suffix: a string to append to the process name
      * @param scratch_space: the scratch storage service
      *
-     * @throw std::invalid_argument
      */
     BareMetalComputeService::BareMetalComputeService(
             const std::string &hostname,
@@ -328,7 +323,6 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      * @param pj: a containing PilotJob  (nullptr if none)
      *
-     * @throw std::invalid_argument
      */
     void BareMetalComputeService::initiateInstance(
             const std::string &hostname,
@@ -409,7 +403,6 @@ namespace wrench {
      *x
      * @return false if the daemon should terminate, true otherwise
      *
-     * @throw std::runtime_error
      */
     bool BareMetalComputeService::processNextMessage() {
         S4U_Simulation::computeZeroFlop();
@@ -484,8 +477,6 @@ namespace wrench {
    *
    * @param job: a compound job
    *
-   * @throw ExecutionException
-   * @throw std::runtime_error
    */
     void BareMetalComputeService::terminateCompoundJob(std::shared_ptr<CompoundJob> job) {
         assertServiceIsUp();
@@ -715,7 +706,6 @@ namespace wrench {
     /**
  * @brief Method to make sure that property specs are valid
  *
- * @throw std::invalid_argument
  */
     void BareMetalComputeService::validateProperties() {
         bool success = true;

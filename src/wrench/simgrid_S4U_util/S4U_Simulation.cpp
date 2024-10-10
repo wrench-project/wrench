@@ -90,7 +90,6 @@ namespace wrench {
     /**
      * @brief Start the simulation
      *
-     * @throw std::runtime_error
      */
     void S4U_Simulation::runSimulation() {
         // Setup a handler for deadlocks
@@ -139,7 +138,6 @@ namespace wrench {
      *
      * @param filename the path to an XML platform description file
      *
-     * @throw std::invalid_argument
      */
     void S4U_Simulation::setupPlatform(const std::string &filename) {
         try {
@@ -159,7 +157,6 @@ namespace wrench {
      *
      * @param creation_function void() function to create the platform
      *
-     * @throw std::invalid_argument
      */
     void S4U_Simulation::setupPlatform(const std::function<void()> &creation_function) {
         creation_function();
@@ -364,7 +361,6 @@ namespace wrench {
  * @param hostname: the name of the host
  * @return the number of cores of the host
  *
- * @throw std::invalid_argument
  */
     unsigned int S4U_Simulation::getHostNumCores(const std::string &hostname) {
         auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
@@ -388,7 +384,6 @@ namespace wrench {
  * @param hostname: the name of the host
  * @return the flop rate in floating point operations per second
  *
- * @throw std::invalid_argument
  */
     double S4U_Simulation::getHostFlopRate(const std::string &hostname) {
         auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
@@ -404,7 +399,6 @@ namespace wrench {
  * @param hostname: the name of the host
  * @return true or false
  *
- * @throw std::invalid_argument
  */
     bool S4U_Simulation::isHostOn(const std::string &hostname) {
 
@@ -420,7 +414,6 @@ namespace wrench {
  *
  * @param hostname: the name of the host to turn off
  *
- * @throw std::invalid_argument
  */
     void S4U_Simulation::turnOffHost(const std::string &hostname) {
 
@@ -436,7 +429,6 @@ namespace wrench {
  *
  * @param hostname: the name of the host to turn on
  *
- * @throw std::invalid_argument
  */
     void S4U_Simulation::turnOnHost(const std::string &hostname) {
 
@@ -453,7 +445,6 @@ namespace wrench {
 * @param link_name: the name of the link
 * @return true or false
 *
-* @throw std::invalid_argument
 */
     bool S4U_Simulation::isLinkOn(const std::string &link_name) {
         auto link = simgrid::s4u::Link::by_name_or_null(link_name);
@@ -468,7 +459,6 @@ namespace wrench {
  *
  * @param link_name: the name of the link to turn off
  *
- * @throw std::invalid_argument
  */
     void S4U_Simulation::turnOffLink(const std::string &link_name) {
         auto link = simgrid::s4u::Link::by_name_or_null(link_name);
@@ -483,7 +473,6 @@ namespace wrench {
  *
  * @param link_name: the name of the link to turn on
  *
- * @throw std::invalid_argument
  */
     void S4U_Simulation::turnOnLink(const std::string &link_name) {
         auto link = simgrid::s4u::Link::by_name_or_null(link_name);
@@ -498,7 +487,6 @@ namespace wrench {
  *
  * @return the flop rate in floating point operations per second
  *
- * @throw std::invalid_argument
  */
     double S4U_Simulation::getFlopRate() {
         return simgrid::s4u::Host::current()->get_speed();// changed it to speed of the current pstate
@@ -809,8 +797,6 @@ namespace wrench {
 * @brief Get the energy consumed by the host up to now
 * @param hostname: the host name
 * @return the energy consumed by the host in Joules
-* @throw std::invalid_argument
-* @throw std::runtime_error
 */
     double S4U_Simulation::getEnergyConsumedByHost(const std::string &hostname) {
         double energy_consumed;
@@ -834,7 +820,6 @@ namespace wrench {
      * @brief Get the total energy consumed by a set of hosts
      * @param hostnames: the list of hostnames
      * @return The total energy consumed by all the hosts in Joules
-     * @throw std::runtime_error
      */
     double S4U_Simulation::getTotalEnergyConsumed(const std::vector<std::string> &hostnames) {
         double total_energy = 0;
@@ -857,8 +842,6 @@ namespace wrench {
 *
 * @param hostname: the host name
 * @param pstate: the power state index (the power state index is specified in the platform xml description file)
-* @throw std::invalid_argument
-* @throw std::runtime_error
 */
     void S4U_Simulation::setPstate(const std::string &hostname, unsigned long pstate) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -883,8 +866,6 @@ namespace wrench {
 * @brief Get the total number of power states of a host
 * @param hostname: the host name
 * @return The number of power states available for the host (as specified in the platform xml description file)
-* @throw std::invalid_argument
-* @throw std::runtime_error
 */
     int S4U_Simulation::getNumberofPstates(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -904,7 +885,6 @@ namespace wrench {
 * @brief Get the current power state of a host
 * @param hostname: the host name
 * @return The index of the current pstate of the host (as specified in the platform xml description file)
-* @throw std::runtime_error
 */
     unsigned long S4U_Simulation::getCurrentPstate(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -924,8 +904,6 @@ namespace wrench {
     * @brief Get the minimum power consumption (i.e., idling) for a host at its current pstate
     * @param hostname: the host name
     * @return The power consumption for this host if idle (as specified in the platform xml description file)
-    * @throw std::invalid_argument
-    * @throw std::runtime_error
     */
     double S4U_Simulation::getMinPowerConsumption(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -945,8 +923,6 @@ namespace wrench {
     * @brief Get the maximum power consumption (i.e., 100% load) for a host at its current pstate
     * @param hostname: the host name
     * @return The power consumption for this host if 100% used (as specified in the platform xml description file)
-    * @throw std::invalid_argument
-    * @throw std::runtime_error
     */
     double S4U_Simulation::getMaxPowerConsumption(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -969,8 +945,6 @@ namespace wrench {
     * @brief Get the list of power states available for a host
     * @param hostname: the host name
     * @return a list of power states available for the host (as specified in the platform xml description file)
-    * @throw std::invalid_argument
-    * @throw std::runtime_error
     */
     std::vector<int> S4U_Simulation::getListOfPstates(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -1009,7 +983,6 @@ namespace wrench {
     * @param hostname: the host's name
     * @return a vector of mount points
     *
-    * @throw std::invalid_argument
     */
     std::vector<std::string> S4U_Simulation::getDisks(const std::string &hostname) {
         simgrid::s4u::Host *host;
@@ -1100,7 +1073,6 @@ namespace wrench {
 * @param mount_point: the mount point (e.g.,  "/home")
 * @return the capacity of the disk / mount point
 *
-* @throw std::invalid_argument
 */
     double S4U_Simulation::getDiskCapacity(const std::string &hostname, std::string mount_point) {
         //        WRENCH_INFO("==== %s %s ==== ", hostname.c_str(), mount_point.c_str());

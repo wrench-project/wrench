@@ -147,8 +147,6 @@ namespace wrench {
      *
      * @param message: the simulation message to process
      *
-     * @throw std::runtime_error when receiving an unexpected message type.
-     *
      * @return false if the daemon should terminate
      */
     bool CompoundStorageService::processNextMessage(SimulationMessage *message) {
@@ -815,7 +813,6 @@ namespace wrench {
      * @param num_bytes_to_write: number of bytes to write to the file
      * @param wait_for_answer: whether to wait for the answer
      *
-     * @throw ExecutionException
      */
     void CompoundStorageService::writeFile(S4U_CommPort *answer_commport /*unused*/,
                                            const std::shared_ptr<FileLocation> &location,
@@ -1147,8 +1144,6 @@ namespace wrench {
      *
      * @return The free space in bytes at the path
      *
-     * @throw ExecutionException
-     *
      */
     double CompoundStorageService::getTotalFreeSpaceAtPath(const std::string &path) {
         WRENCH_DEBUG("CSS::getFreeSpace Forwarding request to internal services");
@@ -1165,7 +1160,6 @@ namespace wrench {
     /**
      *  @brief setIsScratch can't be used on a CompoundStorageService because it doesn't have any actual storage resources.
      *  @param is_scratch true or false
-     *  @throw std::logic_error
      */
     void CompoundStorageService::setIsScratch(bool is_scratch) {
         WRENCH_WARN("CSS::setScratch Forbidden because CompoundStorageService doesn't manage any storage resources itself");
@@ -1241,8 +1235,6 @@ namespace wrench {
      * @brief Process a stop daemon request
      *
      * @param ack_commport: the commport to which the ack should be sent
-     *
-     * @throw wrench::ExecutionException if communication fails.
      *
      * @return false if the daemon should terminate
      */

@@ -25,7 +25,6 @@ namespace wrench {
      * @param termination_cause: the termination cause (if failure notifications are sent)
      * @param payload: message size in bytes
      *
-     * @throw std::invalid_arguments
      */
     ServiceStopDaemonMessage::ServiceStopDaemonMessage(S4U_CommPort *ack_commport, bool send_failure_notifications,
                                                        ComputeService::TerminationCause termination_cause,
@@ -36,7 +35,6 @@ namespace wrench {
      * @brief Constructor
      * @param payload: message size in bytes
      *
-     * @throw std::invalid_arguments
      */
     ServiceDaemonStoppedMessage::ServiceDaemonStoppedMessage(double payload)
         : ServiceMessage(payload) {}

@@ -92,9 +92,6 @@ namespace wrench {
      *         - "-u": username (optional)
      *      - to a CloudComputeService: {}
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     void ComputeService::submitJob(const std::shared_ptr<CompoundJob> &job, const std::map<std::string, std::string> &service_specific_args) {
         if (job == nullptr) {
@@ -111,9 +108,6 @@ namespace wrench {
      *
      * @param job: the job to terminate
      *
-     * @throw std::invalid_argument
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     void ComputeService::terminateJob(const std::shared_ptr<CompoundJob> &job) {
         if (job == nullptr) {
@@ -190,8 +184,6 @@ namespace wrench {
      *                     perform this operation in zero simulated time.
      * @return the host count
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     unsigned long ComputeService::getNumHosts(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -206,9 +198,6 @@ namespace wrench {
       *                     perform this operation in zero simulated time.
       * @return a vector of hostnames
       *
-      *
-      * @throw ExecutionException
-      * @throw std::runtime_error
       */
     std::vector<std::string> ComputeService::getHosts(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -231,8 +220,6 @@ namespace wrench {
       *                     perform this operation in zero simulated time.
       * @return a map of core counts, indexed by hostnames
       *
-      * @throw ExecutionException
-      * @throw std::runtime_error
       */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumCores(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -253,8 +240,6 @@ namespace wrench {
       *                     perform this operation in zero simulated time.
       * @return total core counts
       *
-      * @throw ExecutionException
-      * @throw std::runtime_error
       */
     unsigned long ComputeService::getTotalNumCores(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -277,8 +262,6 @@ namespace wrench {
      *        jobs may be pending and "ahead" in the queue, e.g., because they depend on current
      *        actions that are not using all available resources).
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumIdleCores(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -299,8 +282,6 @@ namespace wrench {
      *                     perform this operation in zero simulated time.
      * @return the ram availability map (could be empty)
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     std::map<std::string, double> ComputeService::getPerHostAvailableMemoryCapacity(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -324,8 +305,6 @@ namespace wrench {
      *                     perform this operation in zero simulated time.
      * @return total idle core count.
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     unsigned long ComputeService::getTotalNumIdleCores(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -376,7 +355,6 @@ namespace wrench {
     *                     perform this operation in zero simulated time.
     * @return a list of flop rates in flop/sec
     *
-    * @throw ExecutionException
     */
     std::map<std::string, double> ComputeService::getCoreFlopRate(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -396,7 +374,6 @@ namespace wrench {
     *                     perform this operation in zero simulated time.
     * @return a map of RAM capacities, indexed by hostname
     *
-    * @throw ExecutionException
     */
     std::map<std::string, double> ComputeService::getMemoryCapacity(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -418,8 +395,6 @@ namespace wrench {
      *                     perform this operation in zero simulated time.
      * @return service information
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     std::map<std::string, double> ComputeService::getServiceResourceInformation(const std::string &key, bool simulate_it) {
         assertServiceIsUp();

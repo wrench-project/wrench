@@ -26,7 +26,6 @@ namespace wrench {
      * @param job_args_to_scheduler: the arguments required by batscheduler of batsim
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(S4U_CommPort *answer_commport,
                                                                                      std::string job_args_to_scheduler,
@@ -51,7 +50,6 @@ namespace wrench {
      * @param answer_commport: the commport to reply to
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     BatchSchedReadyMessage::BatchSchedReadyMessage(std::string &answer_commport, double payload)
             : BatchComputeServiceMessage("BATCH_SCHED_READY", payload) {
@@ -69,7 +67,6 @@ namespace wrench {
      * @param batsched_decision_reply: the decision reply from Batsched
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(S4U_CommPort *answer_commport,
                                                                            std::string batsched_decision_reply,
@@ -94,7 +91,6 @@ namespace wrench {
      * @param estimated_job_start_time: the estimated job start time
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     BatchQueryAnswerMessage::BatchQueryAnswerMessage(double estimated_job_start_time, double payload)
         : BatchComputeServiceMessage(payload) {
@@ -109,7 +105,6 @@ namespace wrench {
      * @param job_args_to_scheduler: the arguments required by batscheduler of batsim
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(std::string &answer_commport,
                                                                                Job *job,
@@ -139,7 +134,6 @@ namespace wrench {
      * @param reply: the replied answer by scheduler
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     BatchJobReplyFromSchedulerMessage::BatchJobReplyFromSchedulerMessage(std::string reply, double payload)
             : BatchComputeServiceMessage("BATCH_JOB_REPLY_FROM_SCHEDULER", payload), reply(reply) {}
@@ -152,7 +146,6 @@ namespace wrench {
      * @param job: the BatchComputeService job
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(S4U_CommPort *answer_commport,
                                                                                std::shared_ptr<BatchJob> job, double payload)
@@ -176,7 +169,6 @@ namespace wrench {
      * @param job: a BatchComputeService job
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_arguments
      */
     AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job, double payload)
         : ServiceMessage(payload) {
@@ -195,7 +187,6 @@ namespace wrench {
      * @param job_id: the id of a BatchComputeService job
      * @param payload:the message size in bytes
      *
-     * @throw std::invalid_arguments
      */
     AlarmNotifyBatschedMessage::AlarmNotifyBatschedMessage(std::string job_id, double payload)
             : ServiceMessage("ALARM_NOTIFY_BATSCHED", payload), job_id(job_id) {}

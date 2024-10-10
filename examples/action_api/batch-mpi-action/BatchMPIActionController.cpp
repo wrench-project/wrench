@@ -45,7 +45,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int BatchMPIActionController::main() {
         /* Set the logging output to GREEN */

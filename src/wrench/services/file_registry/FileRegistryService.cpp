@@ -52,9 +52,6 @@ namespace wrench {
      * @param file: the file to lookup
      * @return The list locations for the file
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     std::set<std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(const std::shared_ptr<DataFile> &file) {
         if (file == nullptr) {
@@ -124,9 +121,6 @@ namespace wrench {
      * @brief Add an entry
      * @param location: a file location
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     void FileRegistryService::addEntry(const std::shared_ptr<FileLocation> &location) {
 
@@ -158,9 +152,6 @@ namespace wrench {
      * @brief Remove an entry
      * @param location: a file location
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     void FileRegistryService::removeEntry(const std::shared_ptr<FileLocation> &location) {
         if (location == nullptr) {

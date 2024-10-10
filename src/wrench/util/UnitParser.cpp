@@ -103,7 +103,6 @@ namespace wrench {
      * @param string: the size specification
      * @return the size in bytes
      *
-     * @throws std::invalid_argument
      */
     double UnitParser::parse_size(const std::string &string) {
         static const UnitParser::unit_scale units{std::make_tuple("b", 0.125, 2, true),
@@ -123,7 +122,6 @@ namespace wrench {
      * @param string: the size specification
      * @return the size in bytes
      *
-     * @throws std::invalid_argument
      */
     double UnitParser::parse_compute_speed(const std::string &string) {
         static const UnitParser::unit_scale units{std::make_tuple("f", 1.0, 10, true)};
@@ -139,7 +137,6 @@ namespace wrench {
     * @param string: the bandwidth specification
     * @return the bandwidth in byte/sec
     *
-    * @throws std::invalid_argument
     */
     double UnitParser::parse_bandwidth(const std::string &string) {
         static const UnitParser::unit_scale units{std::make_tuple("bps", 0.125, 2, true),
@@ -158,7 +155,6 @@ namespace wrench {
     * @param string: the time specification
     * @return the time in second
     *
-    * @throws std::invalid_argument
     */
     double UnitParser::parse_time(const std::string &string) {
         static const unit_scale units{std::make_pair("w", 7 * 24 * 60 * 60),

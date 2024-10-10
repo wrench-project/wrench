@@ -61,7 +61,6 @@ namespace wrench {
          * @brief Adds a child node to an XRootD supervisor
          * @param child: the new child to add
          * @return the child id of the new node
-         * @throws runtime_error if node already has 64 children.
          */
         //should this throw an exception instead?
         std::shared_ptr<Node> Node::addChild(std::shared_ptr<Node> child) {
@@ -915,7 +914,6 @@ namespace wrench {
         * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
         * @param location: a file location, must be the same object as the function is invoked on
         *
-        * @throw std::invalid_argument
         */
         void Node::createFile(const std::shared_ptr<FileLocation> &location) {
             if (internalStorage == nullptr) {
@@ -930,7 +928,6 @@ namespace wrench {
         * @brief remove a new file in the federation on this node.
         * @param location: a file location, must be the same object as the function is invoked on
         *
-        * @throw std::invalid_argument
         */
         void Node::removeFile(const std::shared_ptr<FileLocation> &location) {
             if (internalStorage == nullptr) {
@@ -947,12 +944,11 @@ namespace wrench {
 
         /**
         * @brief write a file on this node.
-	* @param answer_commport: a commport on which to send the answer message
+	    * @param answer_commport: a commport on which to send the answer message
         * @param location: a location
-	* @param num_bytes_to_write: A number of bytes to write
-	* @param wait_for_answer: true if this method should wait for the answer, false otherwise
+	    * @param num_bytes_to_write: A number of bytes to write
+	    * @param wait_for_answer: true if this method should wait for the answer, false otherwise
         *
-        * @throw std::invalid_argument
         */
         void Node::writeFile(S4U_CommPort *answer_commport,
                              const std::shared_ptr<FileLocation> &location,

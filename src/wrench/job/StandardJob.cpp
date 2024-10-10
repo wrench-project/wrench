@@ -32,7 +32,6 @@ namespace wrench {
      * @param cleanup_file_deletions: a vector of tuples that specify which file copies should be removed from which
      *                         locations. This will happen regardless of whether the job succeeds or fails
      *
-     * @throw std::invalid_argument
      */
     StandardJob::StandardJob(std::shared_ptr<JobManager> job_manager,
                              std::vector<std::shared_ptr<WorkflowTask>> tasks,
