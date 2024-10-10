@@ -44,7 +44,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int TwoActionsAtATimeExecutionController::main() {
         /* Initialize and seed a RNG */

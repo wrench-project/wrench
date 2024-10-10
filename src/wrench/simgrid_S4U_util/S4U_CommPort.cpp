@@ -115,8 +115,6 @@ namespace wrench {
      * @param log: should the log message be printed
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
-     * @throw std::shared_ptr<NetworkError>
-     *
      */
     std::unique_ptr<SimulationMessage> S4U_CommPort::getMessage(bool log) {
 
@@ -130,7 +128,6 @@ namespace wrench {
      * @param log: should the log message be printed
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
-     * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_CommPort::getMessage(double timeout, bool log) {
         if (this == S4U_CommPort::NULL_COMMPORT) {
@@ -236,7 +233,6 @@ namespace wrench {
      *
      * @param msg: the SimulationMessage
      *
-     * @throw std::shared_ptr<NetworkError>
      */
     void S4U_CommPort::putMessage(SimulationMessage *msg) {
 
@@ -308,7 +304,6 @@ namespace wrench {
     *
     * @return a pending communication handle
     *
-    * @throw std::shared_ptr<NetworkError>
     */
     std::shared_ptr<S4U_PendingCommunication>
     S4U_CommPort::iputMessage(SimulationMessage *msg) {
@@ -360,7 +355,6 @@ namespace wrench {
     *
     * @return a pending communication handle
     *
-     * @throw std::shared_ptr<NetworkError>
     */
     std::shared_ptr<S4U_PendingCommunication> S4U_CommPort::igetMessage() {
 

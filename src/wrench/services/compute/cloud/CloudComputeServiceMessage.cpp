@@ -28,7 +28,6 @@ namespace wrench {
      * @param answer_commport: the commport to which to send the answer
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CloudComputeServiceGetExecutionHostsRequestMessage::CloudComputeServiceGetExecutionHostsRequestMessage(
             S4U_CommPort *answer_commport, double payload) : CloudComputeServiceMessage(payload) {
@@ -64,7 +63,6 @@ namespace wrench {
      * @param messagepayload_list: a message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CloudComputeServiceCreateVMRequestMessage::CloudComputeServiceCreateVMRequestMessage(
             S4U_CommPort *answer_commport,
@@ -112,7 +110,6 @@ namespace wrench {
      * @param termination_cause: termination cause (for failure notifications)
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CloudComputeServiceShutdownVMRequestMessage::CloudComputeServiceShutdownVMRequestMessage(
             S4U_CommPort *answer_commport,
@@ -150,7 +147,6 @@ namespace wrench {
      * @param vm_name: the name of the VM host
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CloudComputeServiceStartVMRequestMessage::CloudComputeServiceStartVMRequestMessage(
             S4U_CommPort *answer_commport,
@@ -187,7 +183,6 @@ namespace wrench {
      * @param vm_name: the name of the VM host
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CloudComputeServiceSuspendVMRequestMessage::CloudComputeServiceSuspendVMRequestMessage(
             S4U_CommPort *answer_commport,
@@ -221,7 +216,6 @@ namespace wrench {
      * @param vm_name: the name of the VM host
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CloudComputeServiceResumeVMRequestMessage::CloudComputeServiceResumeVMRequestMessage(
             S4U_CommPort *answer_commport,
@@ -256,7 +250,6 @@ namespace wrench {
      * @param vm_name: the name of the VM host
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CloudComputeServiceDestroyVMRequestMessage::CloudComputeServiceDestroyVMRequestMessage(
             S4U_CommPort *answer_commport,

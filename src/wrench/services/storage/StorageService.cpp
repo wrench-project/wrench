@@ -33,7 +33,6 @@ namespace wrench {
      * @param hostname: the name of the host on which the service should run
      * @param service_name: the name of the storage service
      *
-     * @throw std::invalid_argument
      */
     StorageService::StorageService(const std::string &hostname,
                                    const std::string &service_name) : Service(hostname, service_name) {
@@ -102,7 +101,6 @@ namespace wrench {
      * @param num_bytes_to_write: the number of bytes to write to the file.
      * @param wait_for_answer: whether to wait for the answer
      *
-     * @throw ExecutionException
      */
     void StorageService::writeFile(S4U_CommPort *answer_commport,
                                    const std::shared_ptr<FileLocation> &location,
@@ -315,8 +313,6 @@ namespace wrench {
      *
      * @param locations: a map of files to locations
      *
-     * @throw std::runtime_error
-     * @throw ExecutionException
      */
     void StorageService::readFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
         StorageService::writeOrReadFiles(READ, std::move(locations));
@@ -327,8 +323,6 @@ namespace wrench {
      *
      * @param locations: a map of files to locations
      *
-     * @throw std::runtime_error
-     * @throw ExecutionException
      */
     void StorageService::writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
         StorageService::writeOrReadFiles(WRITE, std::move(locations));
@@ -340,8 +334,6 @@ namespace wrench {
  * @param action: FileOperation::READ (download) or FileOperation::WRITE
  * @param locations: a map of files to locations
  *
- * @throw std::runtime_error
- * @throw ExecutionException
  */
     void StorageService::writeOrReadFiles(FileOperation action,
                                           std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
@@ -427,8 +419,6 @@ namespace wrench {
      * @param src_location: the location where to read the file
      * @param dst_location: the location where to write the file
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     void StorageService::copyFile(const std::shared_ptr<FileLocation> &src_location,
                                   const std::shared_ptr<FileLocation> &dst_location) {
@@ -499,9 +489,6 @@ namespace wrench {
      * @param src_location: the source location
      * @param dst_location: the destination location
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     *
      */
     void StorageService::initiateFileCopy(S4U_CommPort *answer_commport,
                                           const std::shared_ptr<FileLocation> &src_location,
@@ -556,7 +543,6 @@ namespace wrench {
     //     *
     //     * @param location: a file location, must be the same object as the function is invoked on
     //     *
-    //     * @throw std::invalid_argument
     //     */
     //    void StorageService::createFile(const std::shared_ptr<FileLocation> &location) {
     //        if (location->getStorageService() != this->getSharedPtr<StorageService>()) {

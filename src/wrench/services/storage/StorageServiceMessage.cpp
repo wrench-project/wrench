@@ -34,7 +34,6 @@ namespace wrench {
     * @param path: the path
     * @param payload: the message size in bytes
     *
-    * @throw std::invalid_argument
     */
     StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(S4U_CommPort *answer_commport,
                                                                                  const std::string &path,
@@ -59,7 +58,6 @@ namespace wrench {
      * @param free_space: the free space, in bytes, at each mount point, as a map
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(
             double free_space, double payload)
@@ -72,8 +70,6 @@ namespace wrench {
     * @param answer_commport: the commport to which to send the answer
     * @param location: the file location (hopefully)
     * @param payload: the message size in bytes
-    *
-    * @throw std::invalid_argument
     */
     StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(S4U_CommPort *answer_commport,
                                                                                    const std::shared_ptr<FileLocation> &location,
@@ -95,7 +91,6 @@ namespace wrench {
      * @param file_is_available: true if the file is available on the storage system
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     StorageServiceFileLookupAnswerMessage::StorageServiceFileLookupAnswerMessage(std::shared_ptr<DataFile> file,
                                                                                  bool file_is_available,
@@ -117,7 +112,6 @@ namespace wrench {
      * @param location: the location
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(S4U_CommPort *answer_commport,
                                                                                    const std::shared_ptr<FileLocation> &location,
@@ -141,7 +135,6 @@ namespace wrench {
      * @param failure_cause: the cause of a failure (nullptr means "no failure")
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     StorageServiceFileDeleteAnswerMessage::StorageServiceFileDeleteAnswerMessage(std::shared_ptr<DataFile> file,
                                                                                  std::shared_ptr<StorageService> storage_service,
@@ -170,7 +163,6 @@ namespace wrench {
     * @param dst: the destination location
     * @param payload: the message size in bytes
     *
-    * @throw std::invalid_argument
     */
     StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(S4U_CommPort *answer_commport,
                                                                                std::shared_ptr<FileLocation> src,
@@ -195,7 +187,6 @@ namespace wrench {
      * @param failure_cause: the cause of a failure (nullptr if success==true)
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(std::shared_ptr<FileLocation> src,
                                                                              std::shared_ptr<FileLocation> dst,
@@ -225,7 +216,6 @@ namespace wrench {
     * @param num_bytes_to_write: the number of bytes to write to the file
     * @param payload: the message size in bytes
     *
-    * @throw std::invalid_argument
     */
     StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(S4U_CommPort *answer_commport,
                                                                                  simgrid::s4u::Host *requesting_host,
@@ -254,7 +244,6 @@ namespace wrench {
      * @param buffer_size: the buffer size to use
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(std::shared_ptr<FileLocation> &location,
                                                                                bool success,
@@ -286,7 +275,6 @@ namespace wrench {
    * @param num_bytes_to_read: the number of bytes to read
    * @param payload: the message size in bytes
    *
-   * @throw std::invalid_argument
    */
 
     StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(S4U_CommPort *answer_commport,
@@ -313,7 +301,6 @@ namespace wrench {
     * @brief Constructor
     * @param other: packet to copy
     *
-    * @throw std::invalid_argument
     */
     StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage &other) : StorageServiceFileReadRequestMessage(&other) {
     }
@@ -322,7 +309,6 @@ namespace wrench {
     * @brief Constructor
     * @param other: packet to copy
     *
-    * @throw std::invalid_argument
     */
     StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage *other) : StorageServiceMessage(other->payload), answer_commport(other->answer_commport), location(other->location), num_bytes_to_read(other->num_bytes_to_read) {
     }
@@ -337,7 +323,6 @@ namespace wrench {
      * @param number_of_sources: the number of sources that will send file chunks over
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(std::shared_ptr<FileLocation> location,
                                                                              bool success,

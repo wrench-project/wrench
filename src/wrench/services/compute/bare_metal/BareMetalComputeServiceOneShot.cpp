@@ -41,7 +41,6 @@ namespace wrench {
      * @param suffix: a string to append to the process name
      * @param scratch_space: the scratch space to use
      *
-     * @throw std::invalid_argument
      */
     BareMetalComputeServiceOneShot::BareMetalComputeServiceOneShot(
             std::shared_ptr<CompoundJob> job,

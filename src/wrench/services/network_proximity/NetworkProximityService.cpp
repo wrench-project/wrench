@@ -85,8 +85,6 @@ namespace wrench {
      *      - a (x,y) coordinate pair
      *      - a timestamp (the oldest timestamp of measurements used to compute the coordinate)
      *
-     * @throw WorkFlowExecutionException
-     * @throw std::runtime_error
      */
     std::pair<std::pair<double, double>, double>
     NetworkProximityService::getHostCoordinate(const std::string& requested_host) {
@@ -123,9 +121,6 @@ namespace wrench {
      * @return A pair:
      *           - The proximity value between the pair of hosts (or DBL_MAX if none)
      *           - The timestamp of the oldest measurement use to compute the proximity value (or -1.0 if none)
-     *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     std::pair<double, double> NetworkProximityService::getHostPairDistance(std::pair<std::string, std::string> hosts) {
         assertServiceIsUp();
@@ -476,7 +471,6 @@ namespace wrench {
 
     /**
      * @brief Internal method to validate Network Proximity Service Properties
-     * @throw std::invalid_argument
      */
     void NetworkProximityService::validateProperties() {
         std::string error_prefix = "NetworkProximityService::NetworkProximityService(): ";

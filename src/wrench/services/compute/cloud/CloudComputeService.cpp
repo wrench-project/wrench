@@ -37,7 +37,6 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
-     * @throw std::runtime_error
      */
     CloudComputeService::CloudComputeService(const std::string &hostname,
                                              const std::vector<std::string> &execution_hosts,
@@ -85,8 +84,6 @@ namespace wrench {
      *
      * @return A VM name
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     std::string CloudComputeService::createVM(unsigned long num_cores,
                                               double ram_memory,
@@ -127,8 +124,6 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     void CloudComputeService::shutdownVM(const std::string &vm_name) {
         this->shutdownVM(vm_name, false, ComputeService::TerminationCause::TERMINATION_NONE);
@@ -142,8 +137,6 @@ namespace wrench {
      * @param send_failure_notifications: whether to send the failure notifications
      * @param termination_cause: the termination cause (if failure notifications are sent)
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     void CloudComputeService::shutdownVM(const std::string &vm_name, bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -174,8 +167,6 @@ namespace wrench {
      *
      * @return A BareMetalComputeService that runs on the VM
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     std::shared_ptr<BareMetalComputeService> CloudComputeService::startVM(const std::string &vm_name) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -206,8 +197,6 @@ namespace wrench {
      *
      * @return A BareMetalComputeService that runs on the VM, or nullptr if none
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     std::shared_ptr<BareMetalComputeService> CloudComputeService::getVMComputeService(const std::string &vm_name) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -223,8 +212,6 @@ namespace wrench {
      *
      * @return physical host name
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     std::string CloudComputeService::getVMPhysicalHostname(const std::string &vm_name) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -238,8 +225,6 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     void CloudComputeService::suspendVM(const std::string &vm_name) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -268,8 +253,6 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     void CloudComputeService::resumeVM(const std::string &vm_name) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -298,8 +281,6 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     void CloudComputeService::destroyVM(const std::string &vm_name) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -327,7 +308,6 @@ namespace wrench {
      * @brief Method to check whether a VM is currently running
      * @param vm_name: the name of the VM
      * @return true or false
-     * @throw std::invalid_argument
      */
     bool CloudComputeService::isVMRunning(const std::string &vm_name) {
         auto vm_pair_it = this->vm_list.find(vm_name);
@@ -345,7 +325,6 @@ namespace wrench {
      * @brief Method to check whether a VM is currently down
      * @param vm_name: the name of the VM
      * @return true or false
-     * @throw std::invalid_argument
      */
     bool CloudComputeService::isVMDown(const std::string &vm_name) {
         auto vm_pair_it = this->vm_list.find(vm_name);
@@ -363,7 +342,6 @@ namespace wrench {
      * @brief Method to check whether a VM is currently running
      * @param vm_name: the name of the VM
      * @return true or false
-     * @throw std::invalid_argument
      */
     bool CloudComputeService::isVMSuspended(const std::string &vm_name) {
         auto vm_pair_it = this->vm_list.find(vm_name);
@@ -408,7 +386,6 @@ namespace wrench {
     //     * @param message: message to be sent
     //     * @return a simulation message
     //     *
-    //     * @throw std::runtime_error
     //     */
     //    template<class TMessageType>
     //    std::shared_ptr<TMessageType> CloudComputeService::sendRequestAndWaitForAnswer(S4U_CommPort *answer_commport,
@@ -426,7 +403,6 @@ namespace wrench {
      *
      * @return false if the daemon should terminate, true otherwise
      *
-     * @throw std::runtime_error
      */
     bool CloudComputeService::processNextMessage() {
         S4U_Simulation::computeZeroFlop();
@@ -1150,7 +1126,6 @@ namespace wrench {
     /**
      * @brief Validate the service's properties
      *
-     * @throw std::invalid_argument
      */
     void CloudComputeService::validateProperties() {
         // VM Boot overhead

@@ -37,7 +37,6 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
-     * @throw std::runtime_error
      */
     HTCondorComputeService::HTCondorComputeService(const std::string &hostname,
                                                    const std::set<std::shared_ptr<ComputeService>> &compute_services,
@@ -124,8 +123,6 @@ namespace wrench {
      * @param job: a compound job
      * @param service_specific_args: service specific arguments
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     void HTCondorComputeService::submitCompoundJob(std::shared_ptr<CompoundJob> job,
                                                    const std::map<std::string, std::string> &service_specific_args) {
@@ -210,7 +207,6 @@ namespace wrench {
      *
      * @return false if the daemon should terminate, true otherwise
      *
-     * @throw std::runtime_error
      */
     bool HTCondorComputeService::processNextMessage() {
         // Wait for a message
@@ -257,7 +253,6 @@ namespace wrench {
      * @param job: the job
      * @param service_specific_args: service specific arguments
      *
-     * @throw std::runtime_error
      */
     void HTCondorComputeService::processSubmitCompoundJob(S4U_CommPort *answer_commport,
                                                           const std::shared_ptr<CompoundJob> &job,

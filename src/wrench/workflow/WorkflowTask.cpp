@@ -51,7 +51,6 @@ namespace wrench {
      * @brief Add an input file to the task
      *
      * @param file: the file
-     * @throw std::invalid_argument
      */
     void WorkflowTask::addInputFile(const std::shared_ptr<DataFile> &file) {
         WRENCH_DEBUG("Adding file '%s' as input to task %s", file->getID().c_str(), this->getID().c_str());
@@ -477,7 +476,6 @@ namespace wrench {
      * @brief Set the task's end date
      *
      * @param date: the end date
-     * @throws std::runtime_error
      */
     void WorkflowTask::setEndDate(double date) {
         if (not this->execution_history.empty()) {
@@ -491,7 +489,6 @@ namespace wrench {
      * @brief Set the date when the computation portion of a WorkflowTask has begun
      *
      * @param date: the date when the computation portion of the WorkflowTask has begun
-     * @throws std::runtime_error
      */
     void WorkflowTask::setComputationStartDate(double date) {
         if (not this->execution_history.empty()) {
@@ -506,7 +503,6 @@ namespace wrench {
      * @brief Set the date when the computation portion of a WorkflowTask has ended
      *
      * @param date: the date when the computation portion of the WorkflowTask has ended
-     * @throws std::runtime_error
      */
     void WorkflowTask::setComputationEndDate(double date) {
         if (not this->execution_history.empty()) {
@@ -521,7 +517,6 @@ namespace wrench {
      * @brief Set the date when the read input portion of a WorkflowTask has begun
      *
      * @param date: the date when the read input portion of a WorkflowTask has begun
-     * @throws std::runtime_error
      */
     void WorkflowTask::setReadInputStartDate(double date) {
         if (not this->execution_history.empty()) {
@@ -536,7 +531,6 @@ namespace wrench {
      * @brief Set the date when the read input portion of a WorkflowTask has completed
      *
      * @param date: the date when the read input portion of a WorkflowTask has completed
-     * @throws std::runtime_error
      */
     void WorkflowTask::setReadInputEndDate(double date) {
         if (not this->execution_history.empty()) {
@@ -551,7 +545,6 @@ namespace wrench {
      * @brief Set the date when the write output portion of a WorkflowTask has begun
      *
      * @param date: the date when the write output portion of a task has begun
-     * @throws std::runtime_error
      */
     void WorkflowTask::setWriteOutputStartDate(double date) {
         if (not this->execution_history.empty()) {
@@ -566,7 +559,6 @@ namespace wrench {
      * @brief Set the date when the write output portion of a WorkflowTask has completed
      *
      * @param date: the date when the write output portion of a task has completed
-     * @throws std::runtime_error
      */
     void WorkflowTask::setWriteOutputEndDate(double date) {
         if (not this->execution_history.empty()) {

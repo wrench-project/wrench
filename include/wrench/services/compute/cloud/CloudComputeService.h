@@ -153,7 +153,6 @@ namespace wrench {
          * @param tosend: message to be sent
          * @return a simulation message
          *
-         * @throw std::runtime_error
          */
         std::shared_ptr<TMessageType> sendRequestAndWaitForAnswer(S4U_CommPort *answer_commport, ComputeServiceMessage *tosend) {
             serviceSanityCheck();

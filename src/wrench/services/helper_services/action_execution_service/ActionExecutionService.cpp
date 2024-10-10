@@ -68,7 +68,6 @@ namespace wrench {
      * @brief Helper static method to parse resource specifications to the <cores,ram> format
      * @param spec: specification string
      * @return a <host, core> tuple
-     * @throw std::invalid_argument
      */
     static std::tuple<simgrid::s4u::Host *, unsigned long> parseResourceSpec(const std::string &spec) {
         std::vector<std::string> tokens;
@@ -521,7 +520,6 @@ namespace wrench {
      *
      * @return false if the daemon should terminate, true otherwise
      *
-     * @throw std::runtime_error
      */
     bool ActionExecutionService::processNextMessage() {
         S4U_Simulation::computeZeroFlop();
@@ -720,8 +718,6 @@ namespace wrench {
      * @param action: an action
      * @param termination_cause: termination cause
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     void ActionExecutionService::terminateAction(std::shared_ptr<Action> action,
                                                  ComputeService::TerminationCause termination_cause) {
@@ -1059,7 +1055,6 @@ namespace wrench {
     /**
      * @brief Method to make sure that property specs are valid
      *
-     * @throw std::invalid_argument
      */
     void ActionExecutionService::validateProperties() {
         bool success = true;
