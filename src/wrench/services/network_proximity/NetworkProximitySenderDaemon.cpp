@@ -60,12 +60,12 @@ namespace wrench {
 
     NetworkProximitySenderDaemon::NetworkProximitySenderDaemon(
             Simulation *simulation,
-            std::string hostname,
+            const std::string& hostname,
             S4U_CommPort *network_proximity_service_commport,
             double message_size, double measurement_period,
             double noise,
             int noise_seed,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(std::move(hostname), "network_proximity_sender_daemon") {
+            const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list) : Service(hostname, "network_proximity_sender_daemon") {
         // Set the message payloads
         setMessagePayloads(messagepayload_list, {});
 

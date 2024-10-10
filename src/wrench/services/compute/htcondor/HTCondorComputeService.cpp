@@ -41,13 +41,13 @@ namespace wrench {
      */
     HTCondorComputeService::HTCondorComputeService(const std::string &hostname,
                                                    const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                                   WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname, "htcondor_service", "") {
+                                                   const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                                                   const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list) : ComputeService(hostname, "htcondor_service", "") {
         // Set default and specified properties
-        this->setProperties(this->default_property_values, std::move(property_list));
+        this->setProperties(this->default_property_values, property_list);
 
         // Set default and specified message payloads
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
         //        // Check that there are child services
         //        if (compute_services.empty()) {
@@ -108,8 +108,7 @@ namespace wrench {
     /**
      * @brief Destructor
      */
-    HTCondorComputeService::~HTCondorComputeService() {
-    }
+    HTCondorComputeService::~HTCondorComputeService() = default;
 
     /**
      * @brief Add a new 'child' compute service
@@ -164,7 +163,7 @@ namespace wrench {
      * @param local_storage_service: a storage service
      */
     void HTCondorComputeService::setLocalStorageService(std::shared_ptr<wrench::StorageService> local_storage_service) {
-        this->local_storage_service = local_storage_service;
+        this->local_storage_service = std::move(local_storage_service);
     }
 
     /**

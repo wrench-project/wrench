@@ -26,7 +26,7 @@ namespace wrench {
 
     /**
      * @brief Block the calling process until a ExecutionEvent is generated
-     *        based on messages received on a commport, or until a timeout ooccurs
+     *        based on messages received on a commport, or until a timeout occurs
      *
      * @param commport: the name of the receiving commport
      * @param timeout: a timeout value in seconds (-1 means: no timeout)

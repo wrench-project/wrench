@@ -19,8 +19,7 @@ namespace wrench {
     * @brief Constructor
     *
     */
-    SomeActionsHaveFailed::SomeActionsHaveFailed() {
-    }
+    SomeActionsHaveFailed::SomeActionsHaveFailed() = default;
 
     /**
      * @brief Get the human-readable failure message

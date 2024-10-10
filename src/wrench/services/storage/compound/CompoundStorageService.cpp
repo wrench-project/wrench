@@ -833,7 +833,7 @@ namespace wrench {
         // Find the file, or allocate file/parts of file onto known SSS
         auto designated_locations = this->lookupOrDesignateStorageService(location);
         if (designated_locations.empty()) {
-            WRENCH_WARN("CSS::writeFile(): 'designated_locations' vector empry (error or lack of space from the allocator point of view)");
+            WRENCH_WARN("CSS::writeFile(): 'designated_locations' vector empty (error or lack of space from the allocator point of view)");
             throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(location->getFile(), this->getSharedPtr<CompoundStorageService>()));
         }
 
@@ -843,7 +843,7 @@ namespace wrench {
             throw std::invalid_argument("'num_bytes_to_write' is larger than actual file size");
         }
 
-        // Identify, for current main file, where to start writing (maybe at the begining, maybe somewhere in the file, indicated by a chunk index)
+        // Identify, for current main file, where to start writing (maybe at the beginning, maybe somewhere in the file, indicated by a chunk index)
         WRENCH_INFO("CSS::writeFile(): looking for first and last stripes to write for %s", location->getFile()->getID().c_str());
         auto locations_start = this->partial_io_stripe_index[location->getFile()];
         if (locations_start == designated_locations.size()) {

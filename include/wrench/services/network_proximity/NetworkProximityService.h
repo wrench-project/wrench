@@ -65,10 +65,10 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-        NetworkProximityService(std::string db_hostname,
+        NetworkProximityService(const std::string& db_hostname,
                                 std::vector<std::string> hosts_in_network,
-                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                                const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
+                                const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -78,7 +78,7 @@ namespace wrench {
 
         std::pair<double, double> getHostPairDistance(std::pair<std::string, std::string> hosts);
 
-        std::pair<std::pair<double, double>, double> getHostCoordinate(std::string);
+        std::pair<std::pair<double, double>, double> getHostCoordinate(const std::string&);
 
         std::string getNetworkProximityServiceType();
 
@@ -109,9 +109,9 @@ namespace wrench {
         std::map<std::string, std::pair<std::complex<double>, double>> coordinate_lookup_table;
 
         std::shared_ptr<NetworkProximityReceiverDaemon>
-        getCommunicationPeer(std::shared_ptr<NetworkProximitySenderDaemon> sender_daemon);
+        getCommunicationPeer(const std::shared_ptr<NetworkProximitySenderDaemon>& sender_daemon);
 
-        void vivaldiUpdate(double proximityValue, std::string sender_hostname, std::string peer_hostname);
+        void vivaldiUpdate(double proximityValue, const std::string& sender_hostname, const std::string& peer_hostname);
 
         void validateProperties();
     };

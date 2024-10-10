@@ -54,9 +54,9 @@ namespace wrench {
 
     public:
         // Public Constructor
-        FileRegistryService(std::string hostname,
-                            WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+        FileRegistryService(const std::string& hostname,
+                            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
+                            const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list = {});
 
         /****************************/
         /** \cond DEVELOPER         */

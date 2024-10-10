@@ -16,6 +16,7 @@
 #include "wrench/managers/data_movement_manager/DataMovementManagerMessage.h"
 
 #include <memory>
+#include <utility>
 
 WRENCH_LOG_CATEGORY(wrench_core_data_movement_manager_file_writer_thread, "Log category for Data Movement Manager FileWriterThread");
 
@@ -28,11 +29,11 @@ namespace wrench {
      * @param creator_commport: the commport of the manager's creator
      * @param location: the write location
      */
-    FileWriterThread::FileWriterThread(std::string hostname,
+    FileWriterThread::FileWriterThread(const std::string& hostname,
                                        S4U_CommPort *creator_commport,
                                        std::shared_ptr<FileLocation> location) : Service(hostname, "file_writer_thread") {
         this->creator_commport = creator_commport;
-        this->location = location;
+        this->location = std::move(location);
     }
 
     /**

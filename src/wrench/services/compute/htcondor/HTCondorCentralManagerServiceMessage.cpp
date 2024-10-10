@@ -9,6 +9,10 @@
 
 #include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h>
 
+#include <utility>
+
+#include <utility>
+
 namespace wrench {
 
     /**
@@ -26,7 +30,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     NegotiatorCompletionMessage::NegotiatorCompletionMessage(std::set<std::shared_ptr<Job>> scheduled_jobs, double payload)
-        : HTCondorCentralManagerServiceMessage(payload), scheduled_jobs(scheduled_jobs) {}
+        : HTCondorCentralManagerServiceMessage(payload), scheduled_jobs(std::move(std::move(scheduled_jobs))) {}
 
 
     /**

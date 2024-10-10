@@ -35,7 +35,7 @@ namespace wrench {
      * @param action_execution_service: the parent action execution service
      */
     ActionExecutor::ActionExecutor(
-            std::string hostname,
+            const std::string& hostname,
             unsigned long num_cores,
             double ram_footprint,
             double thread_creation_overhead,
@@ -69,7 +69,7 @@ namespace wrench {
      * @brief Return the executor's thread creation overhead
      * @return an overhead (in seconds)
      */
-    double ActionExecutor::getThreadCreationOverhead() {
+    double ActionExecutor::getThreadCreationOverhead() const {
         return this->thread_creation_overhead;
     }
 
@@ -77,7 +77,7 @@ namespace wrench {
      * @brief Returns whether computation should be simulated as sleep
      * @return true or false
      */
-    bool ActionExecutor::getSimulateComputationAsSleep() {
+    bool ActionExecutor::getSimulateComputationAsSleep() const {
         return this->simulation_compute_as_sleep;
     }
 
@@ -97,7 +97,7 @@ namespace wrench {
      */
     void ActionExecutor::cleanup(bool has_returned_from_main, int return_value) {
         WRENCH_DEBUG(
-                "In on_exit.cleanup(): ActionExecutor: %s has_returned_from_main = %d (return_value = %d, killed_on_pupose = %d)",
+                "In on_exit.cleanup(): ActionExecutor: %s has_returned_from_main = %d (return_value = %d, killed_on_purpose = %d)",
                 this->getName().c_str(), has_returned_from_main, return_value,
                 this->killed_on_purpose);
 
@@ -191,7 +191,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Return the action executor's allocated nuber of cores
+     * @brief Return the action executor's allocated number of cores
      * @return a number of cores
      */
     unsigned long ActionExecutor::getNumCoresAllocated() const {

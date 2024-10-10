@@ -64,7 +64,7 @@ namespace wrench {
     class FileRegistryFileLookupByProximityRequestMessage : public FileRegistryMessage {
     public:
         FileRegistryFileLookupByProximityRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file,
-                                                        std::string reference_host,
+                                                        const std::string& reference_host,
                                                         std::shared_ptr<NetworkProximityService> network_proximity_service,
                                                         double payload);
 
@@ -94,7 +94,7 @@ namespace wrench {
     class FileRegistryFileLookupByProximityAnswerMessage : public FileRegistryMessage {
     public:
         FileRegistryFileLookupByProximityAnswerMessage(std::shared_ptr<DataFile> file,
-                                                       std::string reference_host,
+                                                       const std::string &reference_host,
                                                        std::map<double, std::shared_ptr<FileLocation>> locations,
                                                        double payload);
 

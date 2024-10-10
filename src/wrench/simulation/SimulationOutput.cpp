@@ -162,7 +162,7 @@ namespace wrench {
      * @param include_disk: boolean specifying whether to include disk operation in JSON (disk timestamps must be enabled)
      * @param include_bandwidth: boolean specifying whether to include link bandwidth measurements in JSON
      */
-    void SimulationOutput::dumpUnifiedJSON(const std::shared_ptr<Workflow> &workflow, std::string file_path,
+    void SimulationOutput::dumpUnifiedJSON(const std::shared_ptr<Workflow> &workflow, const std::string& file_path,
                                            bool include_platform,
                                            bool include_workflow_exec,
                                            bool include_workflow_graph,

@@ -56,8 +56,8 @@ namespace wrench {
     public:
         HTCondorComputeService(const std::string &hostname,
                                const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                               WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                               const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
+                               const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list = {});
 
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;

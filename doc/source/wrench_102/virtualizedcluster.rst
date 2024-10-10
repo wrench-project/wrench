@@ -6,7 +6,7 @@ Interacting with a virtualized cluster service
 The :cpp:class:`wrench::VirtualizedClusterComputeService` derives the
 :cpp:class:`wrench::CloudComputeService` class. One interacts with it in almost
 the same way as one :ref:`interacts with a cloud
-servicde <guide-102-cloud>`. The one difference between a
+service <guide-102-cloud>`. The one difference between a
 virtualized cluster service and a cloud service is that the former
 exposes underlying physical resources, while the latter does not. More
 simply put, with a virtualized cluster service one can create VM

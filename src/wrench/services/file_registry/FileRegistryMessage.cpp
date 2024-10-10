@@ -62,7 +62,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(
-            S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file, std::string reference_host,
+            S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file, const std::string& reference_host,
             std::shared_ptr<NetworkProximityService> network_proximity_service, double payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (answer_commport == nullptr) || (reference_host == "") ||
@@ -85,7 +85,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupByProximityAnswerMessage::FileRegistryFileLookupByProximityAnswerMessage(
-            std::shared_ptr<DataFile> file, std::string reference_host,
+            std::shared_ptr<DataFile> file, const std::string& reference_host,
             std::map<double, std::shared_ptr<FileLocation>> locations,
             double payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
