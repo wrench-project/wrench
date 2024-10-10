@@ -148,7 +148,7 @@ namespace wrench {
      *
      * @param answer_commport: the commport to which to send the answer
      * @param vm_name: the name of the VM host
-     * @param payload: githe message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */

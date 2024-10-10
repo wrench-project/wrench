@@ -32,7 +32,7 @@ namespace wrench {
 
     NetworkProximityReceiverDaemon::NetworkProximityReceiverDaemon(
             Simulation *simulation,
-            std::string hostname, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(std::move(hostname), "network_proximity_receiver_daemon") {
+            const std::string& hostname, const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list) : Service(hostname, "network_proximity_receiver_daemon") {
 
         setMessagePayloads(messagepayload_list, {});
         this->simulation = simulation;

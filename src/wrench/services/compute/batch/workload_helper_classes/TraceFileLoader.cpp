@@ -61,7 +61,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>>
-    TraceFileLoader::loadFromTraceFile(std::string filename, bool ignore_invalid_jobs, double desired_submit_time_of_first_job) {
+    TraceFileLoader::loadFromTraceFile(const std::string& filename, bool ignore_invalid_jobs, double desired_submit_time_of_first_job) {
         std::istringstream ss(filename);
         std::string token;
         std::vector<std::string> tokens;
@@ -104,7 +104,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>>
-    TraceFileLoader::loadFromTraceFileSWF(std::string filename, bool ignore_invalid_jobs, double desired_submit_time_of_first_job) {
+    TraceFileLoader::loadFromTraceFileSWF(const std::string& filename, bool ignore_invalid_jobs, double desired_submit_time_of_first_job) {
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> trace_file_jobs = {};
 
         std::ifstream infile(filename);
@@ -312,7 +312,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>>
-    TraceFileLoader::loadFromTraceFileJSON(std::string filename, bool ignore_invalid_jobs, double desired_submit_time_of_first_job) {
+    TraceFileLoader::loadFromTraceFileJSON(const std::string& filename, bool ignore_invalid_jobs, double desired_submit_time_of_first_job) {
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> trace_file_jobs = {};
 
         std::ifstream file;

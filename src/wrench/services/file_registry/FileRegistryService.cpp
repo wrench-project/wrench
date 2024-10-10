@@ -38,15 +38,14 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     FileRegistryService::FileRegistryService(
-            std::string hostname,
-            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(std::move(hostname), "file_registry") {
-        this->setProperties(this->default_property_values, std::move(property_list));
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+            const std::string& hostname,
+            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+            const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list) : Service(hostname, "file_registry") {
+        this->setProperties(this->default_property_values, property_list);
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
 
-    FileRegistryService::~FileRegistryService() {
-    }
+    FileRegistryService::~FileRegistryService() = default;
 
     /**
      * @brief Lookup entries for a file

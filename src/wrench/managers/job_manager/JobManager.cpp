@@ -37,15 +37,14 @@ namespace wrench {
      * @param hostname: the name of host on which the job manager will run
      * @param creator_commport: the commport of the manager's creator
      */
-    JobManager::JobManager(std::string hostname, S4U_CommPort *creator_commport) : Service(std::move(hostname), "job_manager") {
+    JobManager::JobManager(const std::string& hostname, S4U_CommPort *creator_commport) : Service(hostname, "job_manager") {
         this->creator_commport = creator_commport;
     }
 
     /**
      * @brief Destructor, which kills the daemon (and clears all the jobs)
      */
-    JobManager::~JobManager() {
-    }
+    JobManager::~JobManager() = default;
 
     /**
      * @brief Kill the job manager (brutally terminate the daemon, clears all jobs)

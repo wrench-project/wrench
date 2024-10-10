@@ -42,21 +42,21 @@ namespace wrench {
     CloudComputeService::CloudComputeService(const std::string &hostname,
                                              const std::vector<std::string> &execution_hosts,
                                              const std::string &scratch_space_mount_point,
-                                             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname, "cloud_service", scratch_space_mount_point) {
+                                             const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                                             const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list) : ComputeService(hostname, "cloud_service", scratch_space_mount_point) {
         if (execution_hosts.empty()) {
             throw std::invalid_argument(
                     "CloudComputeService::CloudComputeService(): At least one execution host should be provided");
         }
 
         // Set default and specified properties
-        this->setProperties(this->default_property_values, std::move(property_list));
+        this->setProperties(this->default_property_values, property_list);
 
         // Validate Properties
         validateProperties();
 
         // Set default and specified message payloads
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
         // Initialize internal data structures
         this->execution_hosts = execution_hosts;
@@ -72,8 +72,7 @@ namespace wrench {
     /**
      * @brief Destructor
      */
-    CloudComputeService::~CloudComputeService() {
-    }
+    CloudComputeService::~CloudComputeService() = default;
 
 
     /**

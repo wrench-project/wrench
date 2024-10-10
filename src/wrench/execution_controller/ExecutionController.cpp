@@ -15,6 +15,8 @@
 #include <wrench/services/helper_services/alarm/Alarm.h>
 #include <wrench/failure_causes/NetworkError.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_execution_controller, "Log category for Execution Controller");
 
 namespace wrench {
@@ -127,7 +129,7 @@ namespace wrench {
      */
     void ExecutionController::setTimer(double date, std::string message) {
         Alarm::createAndStartAlarm(this->simulation, date, this->hostname, this->commport,
-                                   new ExecutionControllerAlarmTimerMessage(message, 0), "wms_timer");
+                                   new ExecutionControllerAlarmTimerMessage(std::move(message), 0), "wms_timer");
     }
 
     /**

@@ -98,7 +98,7 @@ namespace wrench {
                 S4U_CommPort *dst_commportx,
                 const std::shared_ptr<FileLocation> &dst_location,
                 bool success,
-                std::shared_ptr<FailureCause> failure_cause,
+                const std::shared_ptr<FailureCause>& failure_cause,
                 S4U_CommPort *answer_commport_if_read,
                 S4U_CommPort *answer_commport_if_write,
                 S4U_CommPort *answer_commport_if_copy);

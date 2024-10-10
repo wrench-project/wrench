@@ -123,12 +123,12 @@ namespace wrench {
             std::shared_ptr<SimpleStorageService> getStorageServer();
 
             bool cached(shared_ptr<DataFile> file);
-            std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
+            std::set<std::shared_ptr<FileLocation>> getCached(const shared_ptr<DataFile>& file);
 
 
             int main() override;
             bool processNextMessage();
-            Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
+            Node(Deployment *deployment, const std::string &hostname, const WRENCH_PROPERTY_COLLECTION_TYPE& storage_property_list, const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& storage_messagepayload_list);
 
             /**
             * @brief Return the storage service's default mountpoint, if any.
@@ -172,7 +172,7 @@ namespace wrench {
             /** @brief Fictitious file system */
             std::shared_ptr<simgrid::fsmod::FileSystem> file_system;
 
-            map<Node *, vector<stack<Node *>>> splitStack(vector<stack<Node *>> search_stack);
+            map<Node *, vector<stack<Node *>>> splitStack(const vector<stack<Node *>>& search_stack);
             virtual std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
             vector<stack<Node *>> constructFileSearchTree(const vector<shared_ptr<Node>> &targets);
             stack<Node *> constructSearchStack(Node *target);

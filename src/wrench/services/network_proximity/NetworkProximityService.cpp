@@ -49,8 +49,7 @@ namespace wrench {
     /**
      * @brief Destructor
      */
-    NetworkProximityService::~NetworkProximityService() {
-    }
+    NetworkProximityService::~NetworkProximityService() = default;
 
     /**
      * @brief Constructor
@@ -59,10 +58,10 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
-    NetworkProximityService::NetworkProximityService(std::string hostname,
+    NetworkProximityService::NetworkProximityService(const std::string& hostname,
                                                      std::vector<std::string> hosts_in_network,
-                                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(hostname, "network_proximity") {
+                                                     const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                                                     const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list) : Service(hostname, "network_proximity") {
         this->hosts_in_network = std::move(hosts_in_network);
 
         if (this->hosts_in_network.size() < 2) {
@@ -90,7 +89,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::pair<std::pair<double, double>, double>
-    NetworkProximityService::getHostCoordinate(std::string requested_host) {
+    NetworkProximityService::getHostCoordinate(const std::string& requested_host) {
         assertServiceIsUp();
 
         if (boost::iequals(
@@ -378,7 +377,7 @@ namespace wrench {
      * @return a shared_ptr to the network daemon that is the selected communication peer
      */
     std::shared_ptr<NetworkProximityReceiverDaemon>
-    NetworkProximityService::getCommunicationPeer(const std::shared_ptr<NetworkProximitySenderDaemon> sender_daemon) {
+    NetworkProximityService::getCommunicationPeer(const std::shared_ptr<NetworkProximitySenderDaemon>& sender_daemon) {
         // coverage will be (0 < coverage <= 1.0) if this is a 'vivaldi' network service
         // else if it is an 'alltoall' network service, coverage is set at 1.0
         double coverage = this->getPropertyValueAsDouble(NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE);
@@ -415,8 +414,8 @@ namespace wrench {
      * @param sender_hostname: the host at which the sending network daemon resides
      * @param peer_hostname: the host at which the receiving network daemon resides
      */
-    void NetworkProximityService::vivaldiUpdate(double proximity_value, std::string sender_hostname,
-                                                std::string peer_hostname) {
+    void NetworkProximityService::vivaldiUpdate(double proximity_value, const std::string& sender_hostname,
+                                                const std::string& peer_hostname) {
         const std::complex<double> sensitivity(0.25, 0.25);
 
         std::complex<double> sender_coordinates, peer_coordinates;
