@@ -214,11 +214,6 @@ namespace wrench {
             return true;
         }
 
-//        // Create directory if need be
-//        if (not this->file_system->directory_exists(location->getDirectoryPath())) {
-//            this->file_system->create_directory(location->getDirectoryPath());
-//        }
-
         // Generate a commport name on which to receive the file
         auto file_reception_commport = S4U_CommPort::getTemporaryCommPort();
 
@@ -380,8 +375,6 @@ namespace wrench {
         ftt->setSimulation(this->simulation);
         this->pending_file_transfer_threads.push_back(ftt);
 
-//        src_location->getStorageService()->incrementNumRunningOperationsForLocation(src_location);
-
         return true;
     }
 
@@ -508,15 +501,10 @@ namespace wrench {
             //            WRENCH_INFO("Sending back an ack for a successful file read");
             ftt->answer_commport_if_read->dputMessage(new StorageServiceAckMessage(ftt->src_location));
         } else if (ftt->src_location == nullptr) {
-//            StorageService::createFileAtLocation(ftt->dst_location);
             WRENCH_INFO("File %s stored", ftt->dst_location->getFile()->getID().c_str());
-            // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
-            // Maybe no corresponding timestamp.
-            //            WRENCH_INFO("Sending back an ack for a successful file read");
             ftt->answer_commport_if_write->dputMessage(new StorageServiceAckMessage(ftt->dst_location));
         } else {
             if (ftt->dst_location->getStorageService() == shared_from_this()) {
-//                this->createFile(ftt->dst_location);
                 WRENCH_INFO("File %s stored", ftt->dst_location->getFile()->getID().c_str());
                 try {
                     this->simulation->getOutput().addTimestampFileCopyCompletion(
