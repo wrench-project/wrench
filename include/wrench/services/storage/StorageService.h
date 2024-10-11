@@ -550,14 +550,6 @@ namespace wrench {
             // do nothing
         }
 
-        /**
-         * @brief Increment the number of operations for a location
-         * @param location: a location
-         **/
-        virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
-            // do nothing
-        }
-
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -573,8 +565,6 @@ namespace wrench {
                        const std::string &service_name);
 
         virtual void setIsScratch(bool is_scratch);
-
-        std::unordered_map<std::string, std::shared_ptr<simgrid::fsmod::File>> reserved_space;
 
         /** Fast-Access common message payloads! **/
         //        double StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD;

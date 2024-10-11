@@ -97,7 +97,7 @@ namespace wrench {
             }
         };
 
-        int getNumRunningTransactionsOnDisk(simgrid::s4u::Disk *disk);
+//        int getNumRunningTransactionsOnDisk(simgrid::s4u::Disk *disk);
 
         /***********************/
         /** \endcond          **/
