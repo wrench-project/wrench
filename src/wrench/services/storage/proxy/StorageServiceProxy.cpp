@@ -62,6 +62,11 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Determine whether the proxy has a file
+     *
+     * @param location: a file location
+     */
     bool StorageServiceProxy::hasFile(const std::shared_ptr<FileLocation> &location) {
         if (cache) {
             return cache->hasFile(location);
@@ -282,21 +287,6 @@ namespace wrench {
         }
         throw runtime_error("Proxy with no default location does not support getTotalSpace()");
     }
-
-
-    //    /**
-    //     * @brief Get the mount point of the remote server (will throw is more than one).  If there isnt a default, returns DEV_NUL
-    //     * @return the (sole) mount point of the service
-    //     */
-    //    std::string StorageServiceProxy::getMountPoint() {
-    //        if (remote) {
-    //            return remote->getMountPoint();
-    //        }
-    //        if (cache) {
-    //            return cache->getMountPoint();
-    //        }
-    //        return LogicalFileSystem::DEV_NULL;
-    //    }
 
     /**
      * @brief Returns true if the cache is bufferized, false otherwise

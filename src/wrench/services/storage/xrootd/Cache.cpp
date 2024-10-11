@@ -10,6 +10,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 namespace wrench {
     namespace XRootD {
+
         /**
          * @brief Check the cache for a file
          * @param file: The file to check the cache for

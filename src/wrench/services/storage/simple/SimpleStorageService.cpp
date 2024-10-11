@@ -117,8 +117,7 @@ namespace wrench {
             throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): A storage service must have at least one mount point");
         }
 
-        // TODO: Can we pass infinity as the second parameter?
-        this->file_system = sgfs::FileSystem::create(this->getName() + "_fs", 1024*1024*1024);
+        this->file_system = sgfs::FileSystem::create(this->getName() + "_fs", INT_MAX);
         for (const auto &mp: mount_points) {
             // Find the disk
             auto disk = S4U_Simulation::hostHasMountPoint(this->hostname, mp);
@@ -416,52 +415,6 @@ namespace wrench {
         }
     }
 
-
-//    /**
-//     * @brief Helper method to split a path into mountpoint:path_at_mount_point
-//     * @param path: a path string
-//     * @param mount_point: the mountpoint
-//     * @param path_at_mount_point: the path at the mount point
-//     * @return true on success, false on failure (i.e., mount point not found)
-//     */
-//    bool SimpleStorageService::splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point) {
-//        auto sanitized_path = FileLocation::sanitizePath(path);
-//        for (auto const &fs: this->file_systems) {
-//            auto mp = fs.first;
-//            if (FileLocation::properPathPrefix(mp, sanitized_path)) {
-//                mount_point = mp;
-//                path_at_mount_point = sanitized_path.erase(0, mp.length());
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-//    /**
-//     * @brief Decrement the number of operations for a location
-//     * @param location: a location
-//     */
-//    void SimpleStorageService::decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
-//        std::string mount_point;
-//        std::string path_at_mount_point;
-//
-//        this->splitPath(location->getPath(), mount_point, path_at_mount_point);
-//        this->file_systems[mount_point]->decrementNumRunningTransactionsForFileInDirectory(location->getFile(), path_at_mount_point);
-//    }
-//
-//    /**
-//     * @brief increment the number of operations for a location
-//     * @param location: a location
-//     */
-//    void SimpleStorageService::incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
-//        std::string mount_point;
-//        std::string path_at_mount_point;
-//
-//        this->splitPath(location->getPath(), mount_point, path_at_mount_point);
-//        this->file_systems[mount_point]->incrementNumRunningTransactionsForFileInDirectory(location->getFile(), path_at_mount_point);
-//    }
-
-
     /**
      * @brief Create a file at the storage service (in zero simulated time)
      * @param location: a location
@@ -537,7 +490,7 @@ namespace wrench {
     /**
      * @brief Helper method to validate a file write request
      * @param location: the location to read
-     * @param file_already_there: indicates (on output) whether the file is already there or not
+     * @param num_bytes_to_write: number of bytes to write
      * @param opened_file: an opened file (if success)
      * @return a FailureCause or nullptr if success
      */
@@ -616,13 +569,11 @@ namespace wrench {
         try {
             bool dst_file_already_there = dst_file_system->file_exists(dst_location->getFilePath());
             if (not dst_file_already_there) { // Open dot file
-//                std::cerr << "FILE NOT ALREADY THERE, OPENING A DOT FILE \n";
                 std::string dot_file_path = dst_location->getADotFilePath();
                 dst_file_system->create_file(dot_file_path, dst_location->getFile()->getSize());
                 dst_opened_file = dst_file_system->open(dot_file_path, "r+");
                 dst_opened_file->seek(0, SEEK_SET);
             } else { // Open the file
-//                std::cerr << "FILE ALREADY THERE, JUST OPENING IT\n";
                 dst_opened_file = dst_file_system->open(dst_location->getFilePath(), "r+");
                 dst_opened_file->seek(0, SEEK_SET);
             }

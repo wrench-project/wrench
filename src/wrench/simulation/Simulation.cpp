@@ -794,7 +794,6 @@ namespace wrench {
      *
      * @param num_bytes: number of bytes read
      * @param hostname: hostname to read from
-     * @param mount_point: mount point of disk to read from
      * @param disk: disk to read from (nullptr if not known)
      *
      */
