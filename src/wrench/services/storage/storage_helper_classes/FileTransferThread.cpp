@@ -38,7 +38,7 @@ namespace wrench {
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
      */
-    FileTransferThread::FileTransferThread(std::string hostname,
+    FileTransferThread::FileTransferThread(const std::string& hostname,
                                            std::shared_ptr<StorageService> parent,
                                            std::shared_ptr<DataFile> file,
                                            double num_bytes_to_transfer,
@@ -48,7 +48,7 @@ namespace wrench {
                                            S4U_CommPort *answer_commport_if_read,
                                            S4U_CommPort *answer_commport_if_write,
                                            S4U_CommPort *answer_commport_if_copy,
-                                           double buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
+                                           double buffer_size) : Service(hostname, "file_transfer_thread"),
                                                                  parent(std::move(parent)),
                                                                  file(std::move(file)),
                                                                  num_bytes_to_transfer(num_bytes_to_transfer),
@@ -80,7 +80,7 @@ namespace wrench {
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
      */
-    FileTransferThread::FileTransferThread(std::string hostname,
+    FileTransferThread::FileTransferThread(const std::string& hostname,
                                            std::shared_ptr<StorageService> parent,
                                            std::shared_ptr<DataFile> file,
                                            double num_bytes_to_transfer,
@@ -90,7 +90,7 @@ namespace wrench {
                                            S4U_CommPort *answer_commport_if_read,
                                            S4U_CommPort *answer_commport_if_write,
                                            S4U_CommPort *answer_commport_if_copy,
-                                           double buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
+                                           double buffer_size) : Service(hostname, "file_transfer_thread"),
                                                                  parent(std::move(parent)),
                                                                  file(std::move(file)),
                                                                  num_bytes_to_transfer(num_bytes_to_transfer),
@@ -123,7 +123,7 @@ namespace wrench {
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
      */
-    FileTransferThread::FileTransferThread(std::string hostname,
+    FileTransferThread::FileTransferThread(const std::string& hostname,
                                            std::shared_ptr<StorageService> parent,
                                            std::shared_ptr<DataFile> file,
                                            double num_bytes_to_transfer,
@@ -134,7 +134,7 @@ namespace wrench {
                                            S4U_CommPort *answer_commport_if_read,
                                            S4U_CommPort *answer_commport_if_write,
                                            S4U_CommPort *answer_commport_if_copy,
-                                           double buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
+                                           double buffer_size) : Service(hostname, "file_transfer_thread"),
                                                                  parent(std::move(parent)),
                                                                  file(std::move(file)),
                                                                  num_bytes_to_transfer(num_bytes_to_transfer),

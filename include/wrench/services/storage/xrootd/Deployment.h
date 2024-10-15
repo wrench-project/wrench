@@ -77,8 +77,8 @@ namespace wrench {
             std::shared_ptr<Node> createSupervisor(const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE node_property_list = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list = {});
 
             friend Node;
-            std::vector<std::shared_ptr<Node>> getFileNodes(std::shared_ptr<DataFile> file);
-            std::shared_ptr<Node> createNode(const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list_override, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list_override);
+            std::vector<std::shared_ptr<Node>> getFileNodes(const std::shared_ptr<DataFile>& file);
+            std::shared_ptr<Node> createNode(const std::string &hostname, const WRENCH_PROPERTY_COLLECTION_TYPE& property_list_override, const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list_override);
             /** @brief All nodes that are connected to this XRootD data Federation */
             std::vector<std::shared_ptr<Node>> nodes;
             /** @brief All nodes in the XRootD Federation that have and internal file server */

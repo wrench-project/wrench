@@ -207,7 +207,7 @@ namespace wrench {
             //                S4U_CommPort::dputMessage(remote->commport, message.release());
             //                return true;
             //            }
-            //            throw std::runtime_error( "StorageServiceProxy:processNextMessage(): Unexpected [" + message->getName() + "] message that either could not be forwared");
+            //            throw std::runtime_error( "StorageServiceProxy:processNextMessage(): Unexpected [" + message->getName() + "] message that either could not be forwarded");
         } else if (auto msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {//Our remote lookup has finished
             std::vector<unique_ptr<ServiceMessage>> &messages = pending[msg->file];
             for (unsigned int i = 0; i < messages.size(); i++) {
@@ -427,7 +427,7 @@ namespace wrench {
     StorageServiceProxy::StorageServiceProxy(const std::string &hostname,
                                              const std::shared_ptr<StorageService> &cache,
                                              const std::shared_ptr<StorageService> &default_remote,
-                                             WRENCH_PROPERTY_COLLECTION_TYPE properties, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads) : StorageService(hostname,
+                                             WRENCH_PROPERTY_COLLECTION_TYPE properties, const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& message_payloads) : StorageService(hostname,
                                                                                                                                                                   "storage_proxy"),
                                                                                                                                                    cache(cache),
                                                                                                                                                    remote(default_remote) {
@@ -436,8 +436,8 @@ namespace wrench {
         if (properties.find(StorageServiceProperty::BUFFER_SIZE) != properties.end()) {
             throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): You cannot pass a buffer size property to a StorageServiceProxy");
         }
-        this->setProperties(this->default_property_values, std::move(properties));
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(message_payloads));
+        this->setProperties(this->default_property_values, properties);
+        this->setMessagePayloads(this->default_messagepayload_values, message_payloads);
         this->setProperty(StorageServiceProperty::BUFFER_SIZE, cache->getPropertyValueAsString(StorageServiceProperty::BUFFER_SIZE));//the internal cache has the same buffer properties as this service.
 
         //        if (cache and cache->hasMultipleMountPoints()) {
@@ -449,7 +449,7 @@ namespace wrench {
         //        if (cache and default_remote) {
         //            if ((cache->isBufferized() and not default_remote->isBufferized()) or
         //                (not cache->isBufferized() and default_remote->isBufferized())) {
-        //                throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): The cache and the default_remote storage services must has the same bufferization mode");
+        //                throw std::invalid_argument("StorageServiceProxy::StorageServiceProxy(): The cache and the default_remote storage services must have the same bufferization mode");
         //        }
 
         string readProperty = getPropertyValueAsString(StorageServiceProxyProperty::UNCACHED_READ_METHOD);
@@ -463,7 +463,7 @@ namespace wrench {
         } else {
             throw invalid_argument("Unknown value " + readProperty + " for StorageServiceProxyProperty::UNCACHED_READ_METHOD");
         }
-        this->network_timeout = -1.0;//turn off network time out.  A proxy will wait to respond to a second file request until it has downloaded the file completely.  For large files this can easily excede any reasonable timeout.  So we dissable it completely
+        this->network_timeout = -1.0;//turn off network time out.  A proxy will wait to respond to a second file request until it has downloaded the file completely.  For large files this can easily exceed any reasonable timeout.  So we disable it completely
     }
 
     /**
@@ -581,7 +581,7 @@ namespace wrench {
             return true;
 
         } else {
-            //im not really sure what this was suppose to be for.  Preventing read from a file being written I think, but Im not 100% sure
+            //im not really sure what this was suppose to be for.  Preventing read from a file being written I think, but I'm not 100% sure
             //std::vector<unique_ptr<ServiceMessage>> &messages = pending[msg->location->getFile()];
             // for (unsigned int i = 0; i < messages.size(); i++) {
             //    if (auto tmpMsg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(messages[i].get())) {
@@ -616,7 +616,7 @@ namespace wrench {
         return false;
     }
     /**
-     * @brief function for CopyThenRead method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServerFileCopyAnswer.  The only behavioral difference is in uncached files. This copies the file requested to the cache, and forwards the ongoing reads to the cache.  This is the default, and gives the most accurate time-to-cache for a file, and the most accurate network congestion, but overestimates how long the file will take to arive at the end.
+     * @brief function for CopyThenRead method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServerFileCopyAnswer.  The only behavioral difference is in uncached files. This copies the file requested to the cache, and forwards the ongoing reads to the cache.  This is the default, and gives the most accurate time-to-cache for a file, and the most accurate network congestion, but overestimates how long the file will take to arrive at the end.
      * @param message the message that is being processed
      * @return True if the message was processed by this function.  False otherwise
      */
@@ -704,7 +704,7 @@ namespace wrench {
                 if (auto tmpMsg = dynamic_cast<StorageServiceFileReadRequestMessage *>(messages[i].get())) {
                     if (msg->success) {
                         tmpMsg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(tmpMsg->location, true, nullptr, nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));//magic read, send buffersize 0 and we are assumed to be nonbufferized
-                        tmpMsg->answer_commport->putMessage(new StorageServiceAckMessage(tmpMsg->location));                                                                                                         //emediatly send the expected ack
+                        tmpMsg->answer_commport->putMessage(new StorageServiceAckMessage(tmpMsg->location));                                                                                                         //immediately send the expected ack
                         std::swap(messages[i], messages.back());
                         messages.pop_back();
                         i--;
@@ -721,7 +721,7 @@ namespace wrench {
         return false;
     }
     /**
-     * @brief function for CopyThenRead ReadThrough method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServiceAnswerMessage and some StorageService Ack messages. The only behavioral difference is in uncached files.  This reads the file directly to the client with the proxy acting as a mediary.  Once the write finishes, the file is instantly created on the cache.  Assuming the network is configured properly, this gives the best network congestion and time-to-arival estimate, but at the cost of time-to-cache, which it over estimates.  Concurrent reads will wait until the file is cached.
+     * @brief function for CopyThenRead ReadThrough method. this function will handle everything to do with StorageServerReadRequestMessage.  Also handles StorageServiceAnswerMessage and some StorageService Ack messages. The only behavioral difference is in uncached files.  This reads the file directly to the client with the proxy acting as a mediary.  Once the write finishes, the file is instantly created on the cache.  Assuming the network is configured properly, this gives the best network congestion and time-to-arrival estimate, but at the cost of time-to-cache, which it over estimates.  Concurrent reads will wait until the file is cached.
      * @param message the message that is being processed
      * @return True if the message was processed by this function.  False otherwise
      */
@@ -744,12 +744,12 @@ namespace wrench {
                     return true;
                 }
                 //pending[msg->location->getFile()].push_back(std::move(message));
-                //Readthrough: read from target to client emediatly, then instantly create on cache.  REQUIRES EXTANT NETWORK PATH
+                //Readthrough: read from target to client immediately, then instantly create on cache.  REQUIRES EXTANT NETWORK PATH
                 //readthrough:  all block until first read is finished, then all others read
                 //do not spend excessive time on readThrough
                 auto forward = new StorageServiceFileReadRequestMessage(msg);
                 forward->answer_commport = commport;                                                                   //setup intercept commport
-                forward->location = FileLocation::LOCATION(target, msg->location->getDirectoryPath(), msg->location->getFile());//hyjack locaiton to be on target
+                forward->location = FileLocation::LOCATION(target, msg->location->getDirectoryPath(), msg->location->getFile());//hijack location to be on target
                 target->commport->dputMessage(forward);                                                                //send to target
             } else {
                 msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));

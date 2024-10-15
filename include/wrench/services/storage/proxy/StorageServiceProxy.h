@@ -113,7 +113,7 @@ namespace wrench {
         bool processNextMessage();
         bool rejectDuplicateRead(const std::shared_ptr<DataFile> &file);
 
-        explicit StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService> &cache = nullptr, const std::shared_ptr<StorageService> &default_remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads = {});
+        explicit StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService> &cache = nullptr, const std::shared_ptr<StorageService> &default_remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& message_payloads = {});
 
         /**
          * @brief Reserve space at the storage service
