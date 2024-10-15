@@ -301,7 +301,7 @@ namespace wrench {
                     } else {//no internal storage
 
 
-                        if (children.size() > 0) {//recursive search
+                        if (!children.empty()) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
                             Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
                                                        new FileNotFoundAlarm(msg->answer_commport, file, false, answered), "XROOTD_FileNotFoundAlarm");
@@ -497,7 +497,7 @@ namespace wrench {
                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                         msg->answered));
                     } else {//File not in internal storage or cache
-                        if (children.size() > 0 &&
+                        if (!children.empty() &&
                             msg->timeToLive > 0) {//shotgun continued search message to all children
                             WRENCH_DEBUG(" Basic Search broadcast for %s", msg->file->getID().c_str());
 
@@ -1013,7 +1013,7 @@ namespace wrench {
         bool Node::hasFile(const shared_ptr<FileLocation> &location) {
             if (internalStorage)
                 return internalStorage->hasFile(location);
-            //return false;//no internal storage here, so I dont have any files.  But I am pretending to have some, so its reasonable to ask.
+            //return false;//no internal storage here, so I dont have any files.  But I am pretending to have some, so it's reasonable to ask.
             //alternatively
             return !constructFileSearchTree(metavisor->getFileNodes(location->getFile())).empty();//meta search the subtree for the file.  If its in the subtree we can find a route to it, so we have it
         }
@@ -1038,7 +1038,7 @@ namespace wrench {
             if (internalStorage) {
                 return internalStorage->isBufferized();
             } else {
-                return 0;// TODO: IS THIS A GOOD IDEA? MAY MESS UP COPYING???
+                return false;// TODO: IS THIS A GOOD IDEA? MAY MESS UP COPYING???
                 throw std::runtime_error("Node::isBufferized() called on non storage Node " + hostname);
             }
         }

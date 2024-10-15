@@ -45,9 +45,9 @@ namespace wrench {
      * @return a pointer to a simple storage service
      */
     SimpleStorageService *SimpleStorageService::createSimpleStorageService(const std::string &hostname,
-                                                                           std::set<std::string> mount_points,
+                                                                           const std::set<std::string>& mount_points,
                                                                            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
+                                                                           const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list) {
 
         bool bufferized = false;// By default, non-bufferized
         //        bool bufferized = true; // By default, bufferized
@@ -85,8 +85,7 @@ namespace wrench {
     /**
      * @brief Destructor
      */
-    SimpleStorageService::~SimpleStorageService() {
-    }
+    SimpleStorageService::~SimpleStorageService() = default;
 
     /**
      * @brief Private constructor
@@ -101,12 +100,12 @@ namespace wrench {
     SimpleStorageService::SimpleStorageService(
             const std::string &hostname,
             const std::set<std::string> &mount_points,
-            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+            const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list,
             const std::string &suffix) : StorageService(hostname, "simple_storage" + suffix) {
 
-        this->setProperties(this->default_property_values, std::move(property_list));
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+        this->setProperties(this->default_property_values, property_list);
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
         //        this->StorageServiceMessagePayload_FILE_READ_REQUEST_MESSAGE_PAYLOAD = this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD);
         //        this->StorageServiceMessagePayload_FILE_READ_ANSWER_MESSAGE_PAYLOAD = this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD);
@@ -286,7 +285,7 @@ namespace wrench {
      */
     std::string SimpleStorageService::getMountPoint() {
         if (this->file_system->get_partitions().size() > 1) {
-            throw std::invalid_argument("SimpleStorageService::getMountPoint(): Storage service has mutiple mount points");
+            throw std::invalid_argument("SimpleStorageService::getMountPoint(): Storage service has multiple mount points");
         } else {
             return this->file_system->get_partitions().at(0)->get_name();
         }
