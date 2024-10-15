@@ -10,6 +10,8 @@
 
 #include <wrench/services/storage/xrootd/Node.h>
 #include <wrench/services/storage/xrootd/Deployment.h>
+
+#include <utility>
 namespace wrench {
     namespace XRootD {
 
@@ -27,7 +29,7 @@ namespace wrench {
             if (this->root_supervisor) {
                 throw std::runtime_error("Deployment::createRootSupervisor(): A Root supervisor has already been created for this XRootD deployment");
             }
-            std::shared_ptr<Node> ret = createNode(hostname, node_property_list, node_messagepayload_list);
+            std::shared_ptr<Node> ret = createNode(hostname, std::move(node_property_list), std::move(node_messagepayload_list));
             ret->makeSupervisor();
             supervisors.push_back(ret);
             this->root_supervisor = ret;
@@ -54,7 +56,7 @@ namespace wrench {
         std::shared_ptr<Node> Deployment::createSupervisor(const std::string &hostname,
                                                            WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
                                                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list) {
-            std::shared_ptr<Node> ret = createNode(hostname, node_property_list, node_messagepayload_list);
+            std::shared_ptr<Node> ret = createNode(hostname, std::move(node_property_list), std::move(node_messagepayload_list));
             ret->makeSupervisor();
             supervisors.push_back(ret);
             return ret;
@@ -78,8 +80,8 @@ namespace wrench {
                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,
                 WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list) {
-            std::shared_ptr<Node> ret = createNode(hostname, node_property_list, node_messagepayload_list);
-            ret->makeFileServer({mount_point}, storage_property_list, storage_messagepayload_list);
+            std::shared_ptr<Node> ret = createNode(hostname, std::move(node_property_list), std::move(node_messagepayload_list));
+            ret->makeFileServer({mount_point}, std::move(storage_property_list), std::move(storage_messagepayload_list));
             simulation->add(ret->internalStorage);
             dataservers.push_back(ret);
             return ret;
@@ -91,10 +93,10 @@ namespace wrench {
         * @param messagepayload_list_override: The message payload list to use for the new Node
         * @return a shared pointer to the newly created Node
         */
-        std::shared_ptr<Node> Deployment::createNode(const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list_override, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list_override) {
+        std::shared_ptr<Node> Deployment::createNode(const std::string &hostname, const WRENCH_PROPERTY_COLLECTION_TYPE& property_list_override, const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list_override) {
             WRENCH_PROPERTY_COLLECTION_TYPE properties = property_values;
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE payloads = messagepayload_values;
-            for (auto property: property_list_override) {//override XRootD default properties with supplied properties for this node
+            for (const auto& property: property_list_override) {//override XRootD default properties with supplied properties for this node
                 properties[property.first] = property.second;
             }
             for (auto property: messagepayload_list_override) {//override XRootD default message payload with supplied properties for this node
@@ -112,7 +114,7 @@ namespace wrench {
         *
         * @return vector of Node pointers that are all File Servers with the file
         */
-        std::vector<std::shared_ptr<Node>> Deployment::getFileNodes(std::shared_ptr<DataFile> file) {
+        std::vector<std::shared_ptr<Node>> Deployment::getFileNodes(const std::shared_ptr<DataFile>& file) {
             return files[file];
         }
         /**

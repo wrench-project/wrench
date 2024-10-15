@@ -35,7 +35,7 @@ namespace wrench {
         }
 
 
-        FileTransferThread(std::string hostname,
+        FileTransferThread(const std::string& hostname,
                            std::shared_ptr<StorageService> parent,
                            std::shared_ptr<DataFile> file,
                            double num_bytes_to_transfer,
@@ -47,7 +47,7 @@ namespace wrench {
                            S4U_CommPort *answer_commport_if_copy,
                            double buffer_size);
 
-        FileTransferThread(std::string hostname,
+        FileTransferThread(const std::string& hostname,
                            std::shared_ptr<StorageService> parent,
                            std::shared_ptr<DataFile> file,
                            double num_bytes_to_transfer,
@@ -59,7 +59,7 @@ namespace wrench {
                            S4U_CommPort *answer_commport_if_copy,
                            double buffer_size);
 
-        FileTransferThread(std::string hostname,
+        FileTransferThread(const std::string& hostname,
                            std::shared_ptr<StorageService> parent,
                            std::shared_ptr<DataFile> file,
                            double num_bytes_to_transfer,
