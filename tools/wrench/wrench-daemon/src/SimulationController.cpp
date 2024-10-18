@@ -378,7 +378,7 @@ namespace wrench {
 
         std::string cs_name = data["service_name"];
         unsigned long num_cores = data["num_cores"];
-        double ram_memory = data["ram_memory"];
+        sg_size_t ram_memory = data["ram_memory"];
         std::string property_list_string = data["property_list"];
         std::string message_payload_list_string = data["message_payload_list"];
 
@@ -984,7 +984,7 @@ namespace wrench {
 
         std::string compute_action_name = data["name"];
         double flops = data["flops"];
-        double ram = data["ram"];
+        sg_size_t ram = data["ram"];
         unsigned long min_num_cores = data["min_num_cores"];
         unsigned long max_num_cores = data["max_num_cores"];
         std::pair<std::string, double> parallel_model = data["parallel_model"];
@@ -1160,7 +1160,7 @@ namespace wrench {
         }
 
         std::string file_read_action_name = data["name"];
-        double num_bytes_to_read = data["num_bytes_to_read"];
+        sg_size_t num_bytes_to_read = data["num_bytes_to_read"];
 
         shared_ptr<FileReadAction> action;
         if (num_bytes_to_read == -1) {
