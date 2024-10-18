@@ -138,7 +138,7 @@ namespace wrench {
                             action->getName().c_str(),
                             action->getExecutionHistory().top().execution_host.c_str(),
                             action->getExecutionHistory().top().physical_execution_host.c_str());
-                WRENCH_INFO("     - it used %lu cores for computation, and %luu bytes of RAM",
+                WRENCH_INFO("     - it used %lu cores for computation, and %llu bytes of RAM",
                             action->getExecutionHistory().top().num_cores_allocated,
                             action->getExecutionHistory().top().ram_allocated);
                 WRENCH_INFO("     - it started at time %.2lf and finished at time %.2lf",
