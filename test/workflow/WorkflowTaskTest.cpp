@@ -29,7 +29,7 @@ public:
     std::shared_ptr<wrench::WorkflowTask> t1, t2, t4, t5, t6;
     std::shared_ptr<wrench::DataFile> large_input_file, small_input_file, t4_output_file;
 
-    void do_WorkflowTaskExecutionHistory_test(double buffer_size);
+    void do_WorkflowTaskExecutionHistory_test(sg_size_t buffer_size);
 
 protected:
     ~WorkflowTaskTest() {
@@ -348,12 +348,12 @@ TEST_F(WorkflowTaskTest, WorkflowTaskExecutionHistoryTest) {
     DO_TEST_WITH_FORK_ONE_ARG(do_WorkflowTaskExecutionHistory_test, 0);
 }
 
-void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test(double buffer_size) {
+void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test(sg_size_t buffer_size) {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//            argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

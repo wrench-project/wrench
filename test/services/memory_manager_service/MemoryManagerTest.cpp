@@ -17,7 +17,7 @@
 
 WRENCH_LOG_CATEGORY(memory_manager_test, "Log category for MemoryManager test");
 
-#define GB (1000.0 * 1000.0 * 1000.0)
+#define GB (1000000000ULL)
 #define PAGE_CACHE_RAM_SIZE 32
 #define FILE_SIZE 20
 
@@ -182,7 +182,7 @@ private:
         }
 
         // Coverage
-        auto memory_manager = this->simulation->getMemoryManagerByHost(this->getHostname());
+        auto memory_manager = this->getSimulation()->getMemoryManagerByHost(this->getHostname());
         auto disk = memory_manager->getMemory();
         memory_manager->setMemory(disk);
         memory_manager->setDirtyRatio(memory_manager->getDirtyRatio());

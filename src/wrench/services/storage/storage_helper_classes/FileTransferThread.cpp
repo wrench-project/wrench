@@ -13,10 +13,9 @@
 #include "wrench/services/storage/storage_helpers/FileTransferThreadMessage.h"
 
 #include <wrench-dev.h>
-#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <utility>
-#include <wrench/services/memory/MemoryManager.h>
+//#include <wrench/services/memory/MemoryManager.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_file_transfer_thread, "Log category for File Transfer Thread");
 
@@ -41,14 +40,14 @@ namespace wrench {
     FileTransferThread::FileTransferThread(const std::string& hostname,
                                            std::shared_ptr<StorageService> parent,
                                            std::shared_ptr<DataFile> file,
-                                           double num_bytes_to_transfer,
+                                           sg_size_t num_bytes_to_transfer,
                                            S4U_CommPort *src_commport,
                                            std::shared_ptr<FileLocation> dst_location,
                                            std::shared_ptr<simgrid::fsmod::File> dst_opened_file,
                                            S4U_CommPort *answer_commport_if_read,
                                            S4U_CommPort *answer_commport_if_write,
                                            S4U_CommPort *answer_commport_if_copy,
-                                           double buffer_size) : Service(hostname, "file_transfer_thread"),
+                                           sg_size_t buffer_size) : Service(hostname, "file_transfer_thread"),
                                                                  parent(std::move(parent)),
                                                                  file(std::move(file)),
                                                                  num_bytes_to_transfer(num_bytes_to_transfer),
@@ -83,14 +82,14 @@ namespace wrench {
     FileTransferThread::FileTransferThread(const std::string& hostname,
                                            std::shared_ptr<StorageService> parent,
                                            std::shared_ptr<DataFile> file,
-                                           double num_bytes_to_transfer,
+                                           sg_size_t num_bytes_to_transfer,
                                            std::shared_ptr<FileLocation> src_location,
                                            std::shared_ptr<simgrid::fsmod::File> src_opened_file,
                                            S4U_CommPort *dst_commport,
                                            S4U_CommPort *answer_commport_if_read,
                                            S4U_CommPort *answer_commport_if_write,
                                            S4U_CommPort *answer_commport_if_copy,
-                                           double buffer_size) : Service(hostname, "file_transfer_thread"),
+                                           sg_size_t buffer_size) : Service(hostname, "file_transfer_thread"),
                                                                  parent(std::move(parent)),
                                                                  file(std::move(file)),
                                                                  num_bytes_to_transfer(num_bytes_to_transfer),
@@ -126,7 +125,7 @@ namespace wrench {
     FileTransferThread::FileTransferThread(const std::string& hostname,
                                            std::shared_ptr<StorageService> parent,
                                            std::shared_ptr<DataFile> file,
-                                           double num_bytes_to_transfer,
+                                           sg_size_t num_bytes_to_transfer,
                                            std::shared_ptr<FileLocation> src_location,
                                            std::shared_ptr<simgrid::fsmod::File> src_opened_file,
                                            std::shared_ptr<FileLocation> dst_location,
@@ -134,7 +133,7 @@ namespace wrench {
                                            S4U_CommPort *answer_commport_if_read,
                                            S4U_CommPort *answer_commport_if_write,
                                            S4U_CommPort *answer_commport_if_copy,
-                                           double buffer_size) : Service(hostname, "file_transfer_thread"),
+                                           sg_size_t buffer_size) : Service(hostname, "file_transfer_thread"),
                                                                  parent(std::move(parent)),
                                                                  file(std::move(file)),
                                                                  num_bytes_to_transfer(num_bytes_to_transfer),
@@ -173,8 +172,8 @@ namespace wrench {
         std::shared_ptr<NetworkError> failure_cause = nullptr;
 
         WRENCH_INFO(
-                "New FileTransferThread (file=%s, bytes_to_transfer=%.2lf, src_commport=%s; src_location=%s; dst_commport=%s; dst_location=%s; "
-                "answer_commport_if_read=%s; answer_commport_if_write=%s; answer_commport_if_copy=%s; buffer size=%.2lf)",
+                "New FileTransferThread (file=%s, bytes_to_transfer=%llu, src_commport=%s; src_location=%s; dst_commport=%s; dst_location=%s; "
+                "answer_commport_if_read=%s; answer_commport_if_write=%s; answer_commport_if_copy=%s; buffer size=%llu)",
                 file->getID().c_str(),
                 this->num_bytes_to_transfer,
                 ((src_commport == nullptr) ? "none" : src_commport->get_cname()),
@@ -280,7 +279,7 @@ namespace wrench {
                                                     S4U_CommPort *commport,
                                                     const std::shared_ptr<FileLocation> &location) {
         /** Ideal Fluid model buffer size */
-        if (this->buffer_size < DBL_EPSILON) {
+        if (this->buffer_size == 0) {
             throw std::runtime_error(
                     "FileTransferThread::receiveFileFromNetwork(): Zero buffer size not implemented yet");
 
@@ -327,9 +326,9 @@ namespace wrench {
                     if (!dst_ss) {
                         throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Storage Service should be a SimpleStorageService for disk write");
                     }
-                    int unique_disk_sequence_number_write = this->simulation->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), msg->payload);
+                    int unique_disk_sequence_number_write = this->simulation_->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), msg->payload);
                     this->dst_opened_file->write(msg->payload);
-                    this->simulation->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), msg->payload, unique_disk_sequence_number_write);
+                    this->simulation_->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), msg->payload, unique_disk_sequence_number_write);
 //                        simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
 //                                                dst_location->getDiskOrNull());
 #ifdef PAGE_CACHE_SIMULATION
@@ -366,9 +365,9 @@ namespace wrench {
                     throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
                 }
 //                    simulation->writeToDisk(msg->payload, ss->hostname, location->getDiskOrNull());
-                int unique_disk_sequence_number_write = this->simulation->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, this->dst_opened_file->get_path(), msg->payload);
+                int unique_disk_sequence_number_write = this->simulation_->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, this->dst_opened_file->get_path(), msg->payload);
                 this->dst_opened_file->write(msg->payload);
-                this->simulation->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, this->dst_opened_file->get_path(), msg->payload, unique_disk_sequence_number_write);
+                this->simulation_->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, this->dst_opened_file->get_path(), msg->payload, unique_disk_sequence_number_write);
 
 
 #ifdef PAGE_CACHE_SIMULATION
@@ -396,10 +395,10 @@ namespace wrench {
      */
     void FileTransferThread::sendLocalFileToNetwork(const std::shared_ptr<DataFile> &f,
                                                     const std::shared_ptr<FileLocation> &location,
-                                                    double num_bytes,
+                                                    sg_size_t num_bytes,
                                                     S4U_CommPort *commport) {
         /** Ideal Fluid model buffer size */
-        if (this->buffer_size < DBL_EPSILON) {
+        if (this->buffer_size == 0) {
             throw std::runtime_error(
                     "FileTransferThread::sendLocalFileToNetwork(): Zero buffer size not implemented yet");
 
@@ -408,7 +407,8 @@ namespace wrench {
                 /** Non-zero buffer size */
                 std::shared_ptr<S4U_PendingCommunication> req = nullptr;
                 // Sending a zero-byte f is really sending a 1-byte f
-                double remaining = std::max<double>(1, num_bytes);
+                sg_size_t remaining = std::max<sg_size_t>(1, num_bytes);
+
 
 #ifdef PAGE_CACHE_SIMULATION
                 if (Simulation::isPageCachingEnabled()) {
@@ -416,8 +416,8 @@ namespace wrench {
                 }
 #endif
 
-                while (remaining > DBL_EPSILON) {
-                    double chunk_size = std::min<double>(this->buffer_size, remaining);
+                while (remaining > 0) {
+                    sg_size_t chunk_size = std::min<sg_size_t>(this->buffer_size, remaining);
 
 #ifdef PAGE_CACHE_SIMULATION
                     if (Simulation::isPageCachingEnabled()) {
@@ -430,14 +430,14 @@ namespace wrench {
                         throw std::runtime_error("FileTransferThread::receiveFileFromNetwork(): Writing to disk can only be to a SimpleStorageService");
                     }
 //                        simulation->readFromDisk(chunk_size, ss->hostname, location->getDiskOrNull());
-                    int unique_disk_sequence_number_read = this->simulation->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), chunk_size);
+                    int unique_disk_sequence_number_read = this->simulation_->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), chunk_size);
                     this->src_opened_file->read(chunk_size);
-                    this->simulation->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), chunk_size, unique_disk_sequence_number_read);
+                    this->simulation_->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), chunk_size, unique_disk_sequence_number_read);
 #ifdef PAGE_CACHE_SIMULATION
                     }
 #endif
 
-                    remaining -= this->buffer_size;
+                    remaining -= chunk_size;
                     if (req) {
                         req->wait();
                         //                        WRENCH_INFO("Bytes sent over the network were received");
@@ -489,15 +489,15 @@ namespace wrench {
         }
 
         // Read the first chunk
-        double remaining = f->getSize();
-        while (remaining > DBL_EPSILON) {
-            double to_read = std::min<double>(remaining, this->buffer_size);
-            int unique_disk_sequence_number_read = this->simulation->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), to_read);
+        sg_size_t remaining = f->getSize();
+        while (remaining > 0) {
+            sg_size_t to_read = std::min<sg_size_t>(remaining, this->buffer_size);
+            int unique_disk_sequence_number_read = this->simulation_->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), to_read);
             src_opened_file->read(to_read);
-            this->simulation->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), to_read, unique_disk_sequence_number_read);
-            int unique_disk_sequence_number_write = this->simulation->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), to_read);
+            this->simulation_->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, src_opened_file->get_path(), to_read, unique_disk_sequence_number_read);
+            int unique_disk_sequence_number_write = this->simulation_->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), to_read);
             dst_opened_file->write(to_read);
-            this->simulation->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), to_read, unique_disk_sequence_number_write);
+            this->simulation_->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), to_read, unique_disk_sequence_number_write);
             remaining -= to_read;
         }
     }
@@ -522,8 +522,8 @@ namespace wrench {
                     f->getID().c_str(), src_loc->toString().c_str());
 
         // Check that the buffer size is compatible
-        if (((this->buffer_size < DBL_EPSILON) && (src_loc->getStorageService()->getBufferSize() > DBL_EPSILON)) or
-            ((this->buffer_size > DBL_EPSILON) && (src_loc->getStorageService()->getBufferSize() < DBL_EPSILON))) {
+        if (((this->buffer_size == 0) && (src_loc->getStorageService()->getBufferSize() > 0)) or
+            ((this->buffer_size > 0) && (src_loc->getStorageService()->getBufferSize() == 0))) {
             throw std::invalid_argument("FileTransferThread::downloadFileFromStorageService(): "
                                         "Incompatible buffer size specs (both must be zero, or both must be non-zero");
         }
@@ -592,9 +592,9 @@ namespace wrench {
 //                    simulation->writeToDisk(msg->payload,
 //                                            dst_ss->getHostname(),
 //                                            dst_loc->getDiskOrNull());
-                int unique_disk_sequence_number_write = this->simulation->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), msg->payload);
+                int unique_disk_sequence_number_write = this->simulation_->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), msg->payload);
                 dst_opened_file->write(msg->payload);
-                this->simulation->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), msg->payload, unique_disk_sequence_number_write);
+                this->simulation_->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), msg->payload, unique_disk_sequence_number_write);
 
 #ifdef PAGE_CACHE_SIMULATION
                 }
@@ -622,9 +622,9 @@ namespace wrench {
 //                simulation->writeToDisk(msg->payload,
 //                                        dst_ss->getHostname(),
 //                                        dst_loc->getDiskOrNull());
-            int unique_disk_sequence_number_write = this->simulation->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), msg->payload);
+            int unique_disk_sequence_number_write = this->simulation_->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), msg->payload);
             dst_opened_file->write(msg->payload);
-            this->simulation->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), msg->payload, unique_disk_sequence_number_write);
+            this->simulation_->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, dst_opened_file->get_path(), msg->payload, unique_disk_sequence_number_write);
 
 #ifdef PAGE_CACHE_SIMULATION
             }

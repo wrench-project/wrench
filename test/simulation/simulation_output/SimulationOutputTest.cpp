@@ -44,11 +44,11 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         //      // Create the files
-        //      input_file = wrench::Simulation::addFile("input_file", 10.0);
-        //      output_file1 = wrench::Simulation::addFile("output_file1", 10.0);
-        //      output_file2 = wrench::Simulation::addFile("output_file2", 10.0);
-        //      output_file3 = wrench::Simulation::addFile("output_file3", 10.0);
-        //      output_file4 = wrench::Simulation::addFile("output_file4", 10.0);
+        //      input_file = wrench::Simulation::addFile("input_file", 10);
+        //      output_file1 = wrench::Simulation::addFile("output_file1", 10);
+        //      output_file2 = wrench::Simulation::addFile("output_file2", 10);
+        //      output_file3 = wrench::Simulation::addFile("output_file3", 10);
+        //      output_file4 = wrench::Simulation::addFile("output_file4", 10);
         //
         //      // Create the tasks
         //      task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0.0);
@@ -117,10 +117,10 @@ private:
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         try {
-            this->simulation->getOutput().addTimestampTaskStart(0.0, nullptr);
-            this->simulation->getOutput().addTimestampTaskCompletion(0.0, nullptr);
-            this->simulation->getOutput().addTimestampTaskTermination(0.0, nullptr);
-            this->simulation->getOutput().addTimestampTaskFailure(0.0, nullptr);
+            this->getSimulation()->getOutput().addTimestampTaskStart(0.0, nullptr);
+            this->getSimulation()->getOutput().addTimestampTaskCompletion(0.0, nullptr);
+            this->getSimulation()->getOutput().addTimestampTaskTermination(0.0, nullptr);
+            this->getSimulation()->getOutput().addTimestampTaskFailure(0.0, nullptr);
             throw std::runtime_error("Should have caught exception!");
         } catch (std::exception &ignore) {
         }

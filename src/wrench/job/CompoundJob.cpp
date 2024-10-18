@@ -113,7 +113,7 @@ namespace wrench {
      */
     std::shared_ptr<ComputeAction> CompoundJob::addComputeAction(const std::string &name,
                                                                  double flops,
-                                                                 double ram,
+                                                                 sg_size_t ram,
                                                                  unsigned long min_num_cores,
                                                                  unsigned long max_num_cores,
                                                                  const std::shared_ptr<ParallelModel> &parallel_model) {
@@ -147,7 +147,7 @@ namespace wrench {
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
                                                                    const std::shared_ptr<DataFile> &file,
                                                                    const std::shared_ptr<StorageService> &storage_service,
-                                                                   const double num_bytes_to_read) {
+                                                                   const sg_size_t num_bytes_to_read) {
         return addFileReadAction(name, FileLocation::LOCATION(storage_service, file), num_bytes_to_read);
     }
 
@@ -201,7 +201,7 @@ namespace wrench {
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
                                                                    const std::shared_ptr<FileLocation> &file_location) {
         std::vector<std::shared_ptr<FileLocation>> v = {file_location};
-        return this->addFileReadAction(name, v, -1.0);
+        return this->addFileReadAction(name, v, file_location->getFile()->getSize());
     }
 
     /**
@@ -213,7 +213,7 @@ namespace wrench {
      */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
                                                                    const std::shared_ptr<FileLocation> &file_location,
-                                                                   const double num_bytes_to_read) {
+                                                                   const sg_size_t num_bytes_to_read) {
         std::vector<std::shared_ptr<FileLocation>> v = {file_location};
         return this->addFileReadAction(name, v, num_bytes_to_read);
     }
@@ -227,7 +227,7 @@ namespace wrench {
     */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
                                                                    const std::vector<std::shared_ptr<FileLocation>> &file_locations) {
-        return this->addFileReadAction(name, file_locations, -1.0);
+        return this->addFileReadAction(name, file_locations, 0);
     }
 
     /**
@@ -239,7 +239,7 @@ namespace wrench {
     */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
                                                                    const std::vector<std::shared_ptr<FileLocation>> &file_locations,
-                                                                   const double num_bytes_to_read) {
+                                                                   const sg_size_t num_bytes_to_read) {
         auto new_action = std::shared_ptr<FileReadAction>(
                 new FileReadAction(name, file_locations, num_bytes_to_read));
         this->addAction(new_action);
@@ -335,7 +335,7 @@ namespace wrench {
     * @return a custom action
     */
     std::shared_ptr<CustomAction> CompoundJob::addCustomAction(const std::string &name,
-                                                               double ram,
+                                                               sg_size_t ram,
                                                                unsigned long num_cores,
                                                                const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_execute,
                                                                const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_terminate) {
@@ -699,8 +699,8 @@ namespace wrench {
    * @brief Get the minimum required amount of memory to run the job
    * @return a number of bytes
    */
-    double CompoundJob::getMinimumRequiredMemory() {
-        double min_ram = 0;
+    sg_size_t CompoundJob::getMinimumRequiredMemory() {
+        sg_size_t min_ram = 0;
         for (auto const &action: this->actions) {
             min_ram = (min_ram < action->getMinRAMFootprint() ? action->getMinRAMFootprint() : min_ram);
         }

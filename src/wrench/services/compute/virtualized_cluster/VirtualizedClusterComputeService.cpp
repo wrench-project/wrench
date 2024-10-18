@@ -39,7 +39,7 @@ namespace wrench {
                                                                        std::vector<std::string> &execution_hosts,
                                                                        const std::string &scratch_space_mount_point,
                                                                        const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
-                                                                       const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list)
+                                                                       const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list)
         : CloudComputeService(hostname, execution_hosts, scratch_space_mount_point) {
         // Set default and specified properties
         this->setProperties(this->default_property_values, property_list);
@@ -62,10 +62,10 @@ namespace wrench {
      */
     std::string
     VirtualizedClusterComputeService::createVM(unsigned long num_cores,
-                                               double ram_memory,
+                                               sg_size_t ram_memory,
                                                const std::string &physical_host,
                                                WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
+                                               WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) {
         if (num_cores == ComputeService::ALL_CORES) {
             throw std::invalid_argument(
                     "CloudComputeService::createVM(): the VM's number of cores cannot be ComputeService::ALL_CORES");

@@ -24,7 +24,6 @@
 #include <wrench/services/memory/MemoryManager.h>
 #include <wrench/util/UnitParser.h>
 #include <wrench/failure_causes/InvalidDirectoryPath.h>
-#include <wrench/failure_causes/FileNotFound.h>
 #include <wrench/failure_causes/NotAllowed.h>
 
 namespace sgfs = simgrid::fsmod;
@@ -47,13 +46,13 @@ namespace wrench {
     SimpleStorageService *SimpleStorageService::createSimpleStorageService(const std::string &hostname,
                                                                            const std::set<std::string>& mount_points,
                                                                            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                                           const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list) {
+                                                                           const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) {
 
         bool bufferized = false;// By default, non-bufferized
         //        bool bufferized = true; // By default, bufferized
 
         if (property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != property_list.end()) {
-            double buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
+            sg_size_t buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
             bufferized = buffer_size >= 1.0;// more than one byte means bufferized
         } else {
             property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE] = "0B";// enforce a zero buffersize
@@ -101,7 +100,7 @@ namespace wrench {
             const std::string &hostname,
             const std::set<std::string> &mount_points,
             const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
-            const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list,
+            const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list,
             const std::string &suffix) : StorageService(hostname, "simple_storage" + suffix) {
 
         this->setProperties(this->default_property_values, property_list);
@@ -194,12 +193,16 @@ namespace wrench {
 
         bool file_found = this->file_system->file_exists(location->getFilePath());
 
-        answer_commport->dputMessage(
-                new StorageServiceFileLookupAnswerMessage(
-                        location->getFile(),
-                        file_found,
-                        this->getMessagePayloadValue(
-                                SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+        try {
+            // Synchronous so that it won't be overtaken by an MQ message
+            answer_commport->putMessage(
+                    new StorageServiceFileLookupAnswerMessage(
+                            location->getFile(),
+                            file_found,
+                            this->getMessagePayloadValue(
+                                    SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (ExecutionException &ignore) {} // Oh, well
+
         return true;
     }
 
@@ -207,11 +210,11 @@ namespace wrench {
     * @brief Get the total static capacity of the storage service (in zero simulation time)
     * @return capacity of the storage service in bytes
     */
-    double SimpleStorageService::getTotalSpace() {
-        double capacity = 0.0;
+    sg_size_t SimpleStorageService::getTotalSpace() {
+        sg_size_t capacity = 0;
         auto partitions = this->file_system->get_partitions();
         for (auto const &p: partitions) {
-            capacity += (double)p->get_size();
+            capacity += p->get_size();
         }
         return capacity;
     }
@@ -221,11 +224,11 @@ namespace wrench {
      *        for IO tracing purpose.
      * @return total free space in bytes
     */
-    double SimpleStorageService::getTotalFreeSpaceZeroTime() {
-        double free_space = 0;
+    sg_size_t SimpleStorageService::getTotalFreeSpaceZeroTime() {
+        sg_size_t free_space = 0;
         auto partitions = this->file_system->get_partitions();
         for (auto const &p: partitions) {
-            free_space += (double)p->get_free_space();
+            free_space += p->get_free_space();
         }
         return free_space;
     }
@@ -235,11 +238,11 @@ namespace wrench {
      *        for IO tracing purposes
      * @return total number of files
      */
-    double SimpleStorageService::getTotalFilesZeroTime() {
-        double num_files = 0;
+    unsigned long SimpleStorageService::getTotalFilesZeroTime() {
+        unsigned long num_files = 0;
         auto partitions = this->file_system->get_partitions();
         for (auto const &p: partitions) {
-            num_files += (double)p->get_num_files();
+            num_files += p->get_num_files();
         }
         return num_files;
     }
@@ -310,7 +313,7 @@ namespace wrench {
     bool SimpleStorageService::processFreeSpaceRequest(S4U_CommPort *answer_commport, const std::string &path) {
 
         // TODO: Remove the sanitize
-        double free_space = 0.0;
+        sg_size_t free_space = 0;
         if (not path.empty()) {
             auto sanitized_path = FileLocation::sanitizePath(path);
             try {
@@ -494,7 +497,7 @@ namespace wrench {
      * @return a FailureCause or nullptr if success
      */
     std::shared_ptr<FailureCause> SimpleStorageService::validateFileWriteRequest(const std::shared_ptr<FileLocation> &location,
-                                                                                 double num_bytes_to_write,
+                                                                                 sg_size_t num_bytes_to_write,
                                                                                  std::shared_ptr<simgrid::fsmod::File> &opened_file) {
 
         auto file = location->getFile();
@@ -586,6 +589,5 @@ namespace wrench {
 
         return nullptr;
     }
-
 
 }// namespace wrench

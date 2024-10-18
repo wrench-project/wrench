@@ -240,7 +240,7 @@ private:
 
     int main() override {
 
-        this->simulation->sleep(10 * 3600);
+        wrench::Simulation::sleep(10 * 3600);
 
         return 0;
     }

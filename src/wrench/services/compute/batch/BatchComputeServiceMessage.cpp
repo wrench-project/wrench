@@ -16,7 +16,7 @@ namespace wrench {
      *
      * @param payload: the message size in bytes
      */
-    BatchComputeServiceMessage::BatchComputeServiceMessage(double payload) : ComputeServiceMessage(payload) {
+    BatchComputeServiceMessage::BatchComputeServiceMessage(sg_size_t payload) : ComputeServiceMessage(payload) {
     }
 
 #if 0
@@ -29,7 +29,7 @@ namespace wrench {
      */
     BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(S4U_CommPort *answer_commport,
                                                                                      std::string job_args_to_scheduler,
-                                                                                     double payload)
+                                                                                     sg_size_t payload)
             : BatchComputeServiceMessage("BATCH_SIMULATION_BEGINS", payload) {
       if (job_args_to_scheduler.empty()) {
         throw std::invalid_argument(
@@ -51,7 +51,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      *
      */
-    BatchSchedReadyMessage::BatchSchedReadyMessage(std::string &answer_commport, double payload)
+    BatchSchedReadyMessage::BatchSchedReadyMessage(std::string &answer_commport, sg_size_t payload)
             : BatchComputeServiceMessage("BATCH_SCHED_READY", payload) {
       if (answer_commport.empty()) {
         throw std::invalid_argument(
@@ -70,7 +70,7 @@ namespace wrench {
      */
     BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(S4U_CommPort *answer_commport,
                                                                            std::string batsched_decision_reply,
-                                                                           double payload)
+                                                                           sg_size_t payload)
         : BatchComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_commport == nullptr) {
@@ -92,7 +92,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      *
      */
-    BatchQueryAnswerMessage::BatchQueryAnswerMessage(double estimated_job_start_time, double payload)
+    BatchQueryAnswerMessage::BatchQueryAnswerMessage(double estimated_job_start_time, sg_size_t payload)
         : BatchComputeServiceMessage(payload) {
         this->estimated_start_time = estimated_job_start_time;
     }
@@ -109,7 +109,7 @@ namespace wrench {
     BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(std::string &answer_commport,
                                                                                Job *job,
                                                                                std::string job_args_to_scheduler,
-                                                                               double payload)
+                                                                               sg_size_t payload)
             : BatchComputeServiceMessage("BATCH_JOB_SUBMISSION_TO_SCHEDULER", payload) {
       if (job_args_to_scheduler.empty()) {
         throw std::invalid_argument(
@@ -135,7 +135,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      *
      */
-    BatchJobReplyFromSchedulerMessage::BatchJobReplyFromSchedulerMessage(std::string reply, double payload)
+    BatchJobReplyFromSchedulerMessage::BatchJobReplyFromSchedulerMessage(std::string reply, sg_size_t payload)
             : BatchComputeServiceMessage("BATCH_JOB_REPLY_FROM_SCHEDULER", payload), reply(reply) {}
 
 #endif
@@ -148,7 +148,7 @@ namespace wrench {
      *
      */
     BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(S4U_CommPort *answer_commport,
-                                                                               std::shared_ptr<BatchJob> job, double payload)
+                                                                               std::shared_ptr<BatchJob> job, sg_size_t payload)
         : BatchComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (job == nullptr) {
@@ -170,7 +170,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      *
      */
-    AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job, double payload)
+    AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job, sg_size_t payload)
         : ServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (job == nullptr) {
@@ -188,7 +188,7 @@ namespace wrench {
      * @param payload:the message size in bytes
      *
      */
-    AlarmNotifyBatschedMessage::AlarmNotifyBatschedMessage(std::string job_id, double payload)
+    AlarmNotifyBatschedMessage::AlarmNotifyBatschedMessage(std::string job_id, sg_size_t payload)
             : ServiceMessage("ALARM_NOTIFY_BATSCHED", payload), job_id(job_id) {}
 #endif
 

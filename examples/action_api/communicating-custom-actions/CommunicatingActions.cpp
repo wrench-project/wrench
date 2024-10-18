@@ -26,7 +26,7 @@
 
 #include "CommunicatingActionsController.h"// Controller implementation
 
-#define KB 1000.0
+#define KB 1000ULL
 #define MB (1000 * KB)
 #define GB (1000 * MB)
 #define GB (1000 * MB)

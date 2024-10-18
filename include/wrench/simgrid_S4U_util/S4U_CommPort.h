@@ -68,11 +68,11 @@ namespace wrench {
 #ifndef NDEBUG
                 this->templateWaitingLogUpdate(get_type_name<TMessageType>(), id);
 #endif
-                message.release();
+                message.release(); // NOLINT(bugprone-unused-return-value)
                 return std::unique_ptr<TMessageType>(msg);
             } else {
                 std::cerr << "message = " << message.get() << "\n";
-                throw std::runtime_error(error_prefix + " Unexpected [" + ((message.get() != nullptr) ? message->getName() : "null-message") + "] message while waiting for " +
+                throw std::runtime_error(error_prefix + " Unexpected [" + ((message != nullptr) ? message->getName() : "null-message") + "] message while waiting for " +
                                          get_type_name<TMessageType>() + ". Request ID: " + std::to_string(id));
             }
         }
@@ -98,7 +98,7 @@ namespace wrench {
             auto message = this->getMessage(timeout, false);
 
             if (auto msg = dynamic_cast<TMessageType *>(message.get())) {
-                message.release();
+                message.release(); // NOLINT(bugprone-unused-return-value)
 #ifndef NDEBUG
                 this->templateWaitingLogUpdate(tn, id);
 #endif
@@ -150,7 +150,7 @@ namespace wrench {
         /**
          * @brief The default control message size
          */
-        static double default_control_message_size;
+        static sg_size_t default_control_message_size;
 
         /**
          * @brief The "not a commport_name" commport_name, to avoid getting answers back when asked
@@ -163,7 +163,7 @@ namespace wrench {
 	 * @brief Return the commport's name (as a C++ string)
 	 * @return the commport's name
 	 */
-        [[nodiscard]] const std::string get_name() const {
+        [[nodiscard]] std::string get_name() const {
             return this->name;
         }
 

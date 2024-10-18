@@ -279,7 +279,6 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
     // testing invalid task1 creation
     ASSERT_THROW(workflow->addTask("task1-error", -100, 1, 1, 0), std::invalid_argument);
     ASSERT_THROW(workflow->addTask("task1-error", 100, 2, 1, 0), std::invalid_argument);
-    ASSERT_THROW(workflow->addTask("task1-error", 100, 1, 1, -1.0), std::invalid_argument);
 
     // testing whether a task1 id exists
     ASSERT_THROW(workflow->getTaskByID("task1-test-00"), std::invalid_argument);
@@ -311,7 +310,6 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
 }
 
 TEST_F(WorkflowTest, DataFile) {
-    ASSERT_THROW(wrench::Simulation::addFile("file-error-00", -1), std::invalid_argument);
     ASSERT_THROW(wrench::Simulation::addFile("file-01", 10), std::invalid_argument);
 
     ASSERT_THROW(wrench::Simulation::getFileByID("file-nonexist"), std::invalid_argument);
@@ -338,7 +336,7 @@ TEST_F(WorkflowTest, DataFile) {
 TEST_F(WorkflowTest, IsDone) {
     ASSERT_FALSE(workflow->isDone());
 
-    for (auto task: workflow->getTasks()) {
+    for (const auto &task: workflow->getTasks()) {
         task->setInternalState(wrench::WorkflowTask::InternalState::TASK_COMPLETED);
         task->setState(wrench::WorkflowTask::State::COMPLETED);
     }
@@ -357,7 +355,7 @@ TEST_F(WorkflowTest, SumFlops) {
 
 class AllDependenciesWorkflowTest : public ::testing::Test {
 protected:
-    ~AllDependenciesWorkflowTest() {
+    ~AllDependenciesWorkflowTest() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }

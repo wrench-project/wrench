@@ -64,7 +64,7 @@ protected:
 
         workflow = wrench::Workflow::createWorkflow();
 
-        file_1 = wrench::Simulation::addFile("file_1", 100.0);
+        file_1 = wrench::Simulation::addFile("file_1", 100);
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -157,16 +157,16 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     ASSERT_EQ(5, diskwrite_timestamps.size());
 
     // Coverage
-    diskread_timestamps.front()->getContent()->getBytes();
-    diskread_timestamps.front()->getContent()->getCounter();
-    diskread_timestamps.front()->getContent()->getDate();
+    auto rb = diskread_timestamps.front()->getContent()->getBytes();
+    auto rc = diskread_timestamps.front()->getContent()->getCounter();
+    auto rd = diskread_timestamps.front()->getContent()->getDate();
     diskread_timestamps.front()->getContent()->getEndpoint();
     diskread_timestamps.front()->getContent()->getHostname();
     diskread_timestamps.front()->getContent()->getMount();
 
-    diskwrite_timestamps.front()->getContent()->getBytes();
-    diskwrite_timestamps.front()->getContent()->getCounter();
-    diskwrite_timestamps.front()->getContent()->getDate();
+    auto wb = diskwrite_timestamps.front()->getContent()->getBytes();
+    auto wc = diskwrite_timestamps.front()->getContent()->getCounter();
+    auto wd = diskwrite_timestamps.front()->getContent()->getDate();
     diskwrite_timestamps.front()->getContent()->getEndpoint();
     diskwrite_timestamps.front()->getContent()->getHostname();
     diskwrite_timestamps.front()->getContent()->getMount();

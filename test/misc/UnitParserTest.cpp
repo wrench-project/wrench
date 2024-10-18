@@ -24,12 +24,11 @@ TEST_F(UnitParserTest, ParseTest) {
 
 void UnitParserTest::do_parse_test() {
 
-    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10b"), 10.0 / 8.0);
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10"), 10.0);
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10B"), 10.0);
-    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10kB"), 10.0 * 1000.0);
-    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10MB"), 10.0 * 1000.0 * 1000.0);
-    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10GB"), 10.0 * 1000.0 * 1000.0 * 1000.0);
+    ASSERT_EQ(wrench::UnitParser::parse_size("10kB"), 10 * 1000);
+    ASSERT_EQ(wrench::UnitParser::parse_size("10MB"), 10 * 1000 * 1000ULL);
+    ASSERT_EQ(wrench::UnitParser::parse_size("10GB"), 10000000000ULL);
     ASSERT_THROW(wrench::UnitParser::parse_size("10FO"), std::invalid_argument);
 
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_compute_speed("10"), 10.0);

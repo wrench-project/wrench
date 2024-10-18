@@ -60,7 +60,7 @@ namespace wrench {
             /** @brief commport_name to report to */
             S4U_CommPort *commport;
             /** @brief transfer size */
-            double transfer_size;
+            sg_size_t transfer_size;
             /** @brief SG IO op */
             simgrid::s4u::IoPtr stream;
 
@@ -89,7 +89,7 @@ namespace wrench {
                     simgrid::s4u::Host *dst_host,
                     simgrid::s4u::Disk *dst_disk,
                     S4U_CommPort *commport,
-                    double transfer_size) : src_location(std::move(src_location)), src_opened_file(std::move(src_opened_file)),
+                    sg_size_t transfer_size) : src_location(std::move(src_location)), src_opened_file(std::move(src_opened_file)),
                                             src_host(src_host), src_disk(src_disk),
                                             dst_location(std::move(dst_location)), dst_opened_file(std::move(dst_opened_file)),
                                             dst_host(dst_host), dst_disk(dst_disk),
@@ -111,7 +111,7 @@ namespace wrench {
         SimpleStorageServiceNonBufferized(const std::string &hostname,
                                           const std::set<std::string>& mount_points,
                                           WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                                          WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
         friend class Simulation;
 
@@ -124,13 +124,13 @@ namespace wrench {
         bool processNextMessage(SimulationMessage *message);
 
         bool processFileWriteRequest(std::shared_ptr<FileLocation> &location,
-                                     double num_bytes_to_write,
+                                     sg_size_t num_bytes_to_write,
                                      S4U_CommPort *answer_commport,
                                      simgrid::s4u::Host *requesting_host);
 
         bool
         processFileReadRequest(const std::shared_ptr<FileLocation> &location,
-                               double num_bytes_to_read, S4U_CommPort *answer_commport,
+                               sg_size_t num_bytes_to_read, S4U_CommPort *answer_commport,
                                simgrid::s4u::Host *requesting_host);
 
 

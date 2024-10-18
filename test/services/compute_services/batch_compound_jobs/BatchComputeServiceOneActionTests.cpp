@@ -59,8 +59,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
-        input_file = wrench::Simulation::addFile("input_file", 10000.0);
-        output_file = wrench::Simulation::addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000);
+        output_file = wrench::Simulation::addFile("output_file", 20000);
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"

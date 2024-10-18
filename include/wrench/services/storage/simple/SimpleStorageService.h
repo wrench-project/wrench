@@ -53,7 +53,7 @@ namespace wrench {
                 {SimpleStorageServiceProperty::CACHING_BEHAVIOR, "NONE"}};
 
         /** @brief Default message payload values */
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
                 {SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
@@ -84,7 +84,7 @@ namespace wrench {
         static SimpleStorageService *createSimpleStorageService(const std::string &hostname,
                                                                 const std::set<std::string>& mount_points,
                                                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                                                const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list = {});
+                                                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -102,11 +102,11 @@ namespace wrench {
         bool hasMultipleMountPoints();
         bool hasMountPoint(const std::string &mp);
 
-        double getTotalSpace() override;
+        sg_size_t getTotalSpace() override;
 
-        double getTotalFreeSpaceZeroTime() override;
+        sg_size_t getTotalFreeSpaceZeroTime() override;
 
-        double getTotalFilesZeroTime() override;
+        unsigned long getTotalFilesZeroTime() override;
 
         std::string getBaseRootPath() override;
 
@@ -192,7 +192,7 @@ namespace wrench {
          * @brief Determine the storage service's buffer size
          * @return a size in bytes
          */
-        double getBufferSize() const override {
+        sg_size_t getBufferSize() const override {
             return this->buffer_size;
         }
 
@@ -222,7 +222,7 @@ namespace wrench {
         SimpleStorageService(const std::string &hostname,
                              const std::set<std::string> &mount_points,
                              const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
-                             const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list,
+                             const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list,
                              const std::string &suffix);
 
 
@@ -241,7 +241,7 @@ namespace wrench {
 
 
         /** @brief The service's buffer size */
-        double buffer_size = 10000000;
+        sg_size_t buffer_size = 10000000;
 
         /** @brief Whether the service is bufferized */
         bool is_bufferized;
@@ -254,7 +254,7 @@ namespace wrench {
 //        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
 
         std::shared_ptr<FailureCause> validateFileReadRequest(const std::shared_ptr<FileLocation> &location, std::shared_ptr<simgrid::fsmod::File> &opened_file);
-        std::shared_ptr<FailureCause> validateFileWriteRequest(const std::shared_ptr<FileLocation> &location, double num_bytes_to_write, std::shared_ptr<simgrid::fsmod::File> &opened_file);
+        std::shared_ptr<FailureCause> validateFileWriteRequest(const std::shared_ptr<FileLocation> &location, sg_size_t num_bytes_to_write, std::shared_ptr<simgrid::fsmod::File> &opened_file);
         std::shared_ptr<FailureCause> validateFileCopyRequest(const std::shared_ptr<FileLocation> &src_location, std::shared_ptr<FileLocation> &dst_location,
                                                               std::shared_ptr<simgrid::fsmod::File> &src_opened_file, std::shared_ptr<simgrid::fsmod::File> &dst_opened_file);
 

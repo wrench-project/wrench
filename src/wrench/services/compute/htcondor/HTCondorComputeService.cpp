@@ -41,7 +41,7 @@ namespace wrench {
     HTCondorComputeService::HTCondorComputeService(const std::string &hostname,
                                                    const std::set<std::shared_ptr<ComputeService>> &compute_services,
                                                    const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
-                                                   const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list) : ComputeService(hostname, "htcondor_service", "") {
+                                                   const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : ComputeService(hostname, "htcondor_service", "") {
         // Set default and specified properties
         this->setProperties(this->default_property_values, property_list);
 
@@ -187,7 +187,7 @@ namespace wrench {
                 this->commport->get_cname());
 
         // start the central manager service
-        this->central_manager->setSimulation(this->simulation);
+        this->central_manager->setSimulation(this->simulation_);
         this->central_manager->start(this->central_manager, true, false);// Daemonized, no auto-restart
 
         // Start the Scratch Storage Service
@@ -307,7 +307,7 @@ namespace wrench {
       * @param num_cores: the desired number of cores
       * @param ram: the desired RAM
       */
-    void HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(S4U_CommPort *answer_commport, unsigned long num_cores, double ram) {
+    void HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(S4U_CommPort *answer_commport, unsigned long num_cores, sg_size_t ram) {
         throw std::runtime_error("HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A HTCondor service does not support this operation");
     }
 

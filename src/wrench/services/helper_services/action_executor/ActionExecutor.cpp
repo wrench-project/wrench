@@ -37,7 +37,7 @@ namespace wrench {
     ActionExecutor::ActionExecutor(
             const std::string& hostname,
             unsigned long num_cores,
-            double ram_footprint,
+            sg_size_t ram_footprint,
             double thread_creation_overhead,
             bool simulate_computation_as_sleep,
             S4U_CommPort *callback_commport,
@@ -185,7 +185,7 @@ namespace wrench {
      * @brief Return the action executor's allocated RAM
      * @return a number of bytes
      */
-    double ActionExecutor::getMemoryAllocated() const {
+    sg_size_t ActionExecutor::getMemoryAllocated() const {
         return this->ram_footprint;
     }
 

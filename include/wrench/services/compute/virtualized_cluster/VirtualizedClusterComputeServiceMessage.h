@@ -28,7 +28,7 @@ namespace wrench {
      */
     class VirtualizedClusterComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        VirtualizedClusterComputeServiceMessage(double payload);
+        VirtualizedClusterComputeServiceMessage(sg_size_t payload);
     };
 
 
@@ -40,7 +40,7 @@ namespace wrench {
         VirtualizedClusterComputeServiceMigrateVMRequestMessage(S4U_CommPort *answer_commport,
                                                                 const std::string &vm_name,
                                                                 const std::string &dest_pm_hostname,
-                                                                double payload);
+                                                                sg_size_t payload);
 
         /** @brief The name of the host on which the VM is currently executed */
         std::string vm_name;
@@ -57,7 +57,7 @@ namespace wrench {
     public:
         VirtualizedClusterComputeServiceMigrateVMAnswerMessage(bool success,
                                                                std::shared_ptr<FailureCause> failure_cause,
-                                                               double payload);
+                                                               sg_size_t payload);
 
         /** @brief Whether the VM migration was successful or not */
         bool success;

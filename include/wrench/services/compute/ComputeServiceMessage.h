@@ -31,7 +31,7 @@ namespace wrench {
      */
     class ComputeServiceMessage : public ServiceMessage {
     protected:
-        ComputeServiceMessage(double payload);
+        ComputeServiceMessage(sg_size_t payload);
     };
 
 
@@ -42,7 +42,7 @@ namespace wrench {
     //    public:
     //        ComputeServiceSubmitStandardJobRequestMessage(const std::string answer_commport, std::shared_ptr<StandardJob> ,
     //                                                      const std::map<std::string, std::string> service_specific_args,
-    //                                                      double payload);
+    //                                                      sg_size_t payload);
     //
     //        /** @brief The commport_name to which the answer message should be sent */
     //        std::string answer_commport;
@@ -58,7 +58,7 @@ namespace wrench {
     //    class ComputeServiceSubmitStandardJobAnswerMessage : public ComputeServiceMessage {
     //    public:
     //        ComputeServiceSubmitStandardJobAnswerMessage(std::shared_ptr<StandardJob> , std::shared_ptr<ComputeService>, bool success,
-    //                                                     std::shared_ptr<FailureCause> failure_cause, double payload);
+    //                                                     std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
     //
     //        /** @brief The standard job that was submitted */
     //        std::shared_ptr<StandardJob> job;
@@ -75,7 +75,7 @@ namespace wrench {
     //     */
     //    class ComputeServiceStandardJobDoneMessage : public ComputeServiceMessage {
     //    public:
-    //        ComputeServiceStandardJobDoneMessage(std::shared_ptr<StandardJob> , std::shared_ptr<ComputeService>, double payload);
+    //        ComputeServiceStandardJobDoneMessage(std::shared_ptr<StandardJob> , std::shared_ptr<ComputeService>, sg_size_t payload);
     //
     //        /** @brief The job that has completed */
     //        std::shared_ptr<StandardJob> job;
@@ -90,7 +90,7 @@ namespace wrench {
     //    public:
     //        ComputeServiceStandardJobFailedMessage(std::shared_ptr<StandardJob> , std::shared_ptr<ComputeService>,
     //                                               std::shared_ptr<FailureCause> cause,
-    //                                               double payload);
+    //                                               sg_size_t payload);
     //
     //        /** @brief The job that has failed */
     //        std::shared_ptr<StandardJob> job;
@@ -105,7 +105,7 @@ namespace wrench {
     //    */
     //    class ComputeServiceTerminateStandardJobRequestMessage : public ComputeServiceMessage {
     //    public:
-    //        ComputeServiceTerminateStandardJobRequestMessage(std::string answer_commport, std::shared_ptr<StandardJob> , double payload);
+    //        ComputeServiceTerminateStandardJobRequestMessage(std::string answer_commport, std::shared_ptr<StandardJob> , sg_size_t payload);
     //
     //        /** @brief The commport_name to which the answer message should be sent */
     //        std::string answer_commport;
@@ -119,7 +119,7 @@ namespace wrench {
     //    class ComputeServiceTerminateStandardJobAnswerMessage : public ComputeServiceMessage {
     //    public:
     //        ComputeServiceTerminateStandardJobAnswerMessage(std::shared_ptr<StandardJob> , std::shared_ptr<ComputeService>, bool success,
-    //                                                        std::shared_ptr<FailureCause> failure_cause, double payload);
+    //                                                        std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
     //
     //        /** @brief The standard job to terminate */
     //        std::shared_ptr<StandardJob> job;
@@ -139,7 +139,7 @@ namespace wrench {
         ComputeServiceSubmitCompoundJobRequestMessage(S4U_CommPort *answer_commport,
                                                       std::shared_ptr<CompoundJob> job,
                                                       std::map<std::string, std::string> service_specific_args,
-                                                      double payload);
+                                                      sg_size_t payload);
 
         /** @brief The commport_name to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -155,7 +155,7 @@ namespace wrench {
     class ComputeServiceSubmitCompoundJobAnswerMessage : public ComputeServiceMessage {
     public:
         ComputeServiceSubmitCompoundJobAnswerMessage(std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>, bool success,
-                                                     std::shared_ptr<FailureCause> failure_cause, double payload);
+                                                     std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
 
         /** @brief The standard job that was submitted */
         std::shared_ptr<CompoundJob> job;
@@ -172,7 +172,7 @@ namespace wrench {
      */
     class ComputeServiceCompoundJobDoneMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceCompoundJobDoneMessage(std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>, double payload);
+        ComputeServiceCompoundJobDoneMessage(std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>, sg_size_t payload);
 
         /** @brief The job that has completed */
         std::shared_ptr<CompoundJob> job;
@@ -186,7 +186,7 @@ namespace wrench {
     class ComputeServiceCompoundJobFailedMessage : public ComputeServiceMessage {
     public:
         ComputeServiceCompoundJobFailedMessage(std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>,
-                                               double payload);
+                                               sg_size_t payload);
 
         /** @brief The job that has failed */
         std::shared_ptr<CompoundJob> job;
@@ -199,7 +199,7 @@ namespace wrench {
     */
     class ComputeServiceTerminateCompoundJobRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceTerminateCompoundJobRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<CompoundJob>, double payload);
+        ComputeServiceTerminateCompoundJobRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<CompoundJob>, sg_size_t payload);
 
         /** @brief The commport_name to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -213,7 +213,7 @@ namespace wrench {
     class ComputeServiceTerminateCompoundJobAnswerMessage : public ComputeServiceMessage {
     public:
         ComputeServiceTerminateCompoundJobAnswerMessage(std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>, bool success,
-                                                        std::shared_ptr<FailureCause> failure_cause, double payload);
+                                                        std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
 
         /** @brief The standard job to terminate */
         std::shared_ptr<CompoundJob> job;
@@ -231,7 +231,7 @@ namespace wrench {
      */
     class ComputeServicePilotJobStartedMessage : public ComputeServiceMessage {
     public:
-        ComputeServicePilotJobStartedMessage(std::shared_ptr<PilotJob>, std::shared_ptr<ComputeService>, double payload);
+        ComputeServicePilotJobStartedMessage(std::shared_ptr<PilotJob>, std::shared_ptr<ComputeService>, sg_size_t payload);
 
         /** @brief The pilot job that has started */
         std::shared_ptr<PilotJob> job;
@@ -244,7 +244,7 @@ namespace wrench {
      */
     class ComputeServicePilotJobExpiredMessage : public ComputeServiceMessage {
     public:
-        ComputeServicePilotJobExpiredMessage(std::shared_ptr<PilotJob>, std::shared_ptr<ComputeService>, double payload);
+        ComputeServicePilotJobExpiredMessage(std::shared_ptr<PilotJob>, std::shared_ptr<ComputeService>, sg_size_t payload);
 
         /** @brief The pilot job that has expired */
         std::shared_ptr<PilotJob> job;
@@ -258,7 +258,7 @@ namespace wrench {
     */
     class ComputeServiceResourceInformationRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceResourceInformationRequestMessage(S4U_CommPort *answer_commport, const std::string &key, double payload);
+        ComputeServiceResourceInformationRequestMessage(S4U_CommPort *answer_commport, const std::string &key, sg_size_t payload);
 
         /** @brief The commport_name to which the answer should be sent */
         S4U_CommPort *answer_commport;
@@ -272,7 +272,7 @@ namespace wrench {
     class ComputeServiceResourceInformationAnswerMessage : public ComputeServiceMessage {
     public:
         ComputeServiceResourceInformationAnswerMessage(std::map<std::string, double> info,
-                                                       double payload);
+                                                       sg_size_t payload);
 
         /** @brief The resource information map */
         std::map<std::string, double> info;
@@ -285,14 +285,14 @@ namespace wrench {
     public:
         ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(S4U_CommPort *answer_commport,
                                                                                 unsigned long num_cores,
-                                                                                double ram, double payload);
+                                                                                sg_size_t ram, sg_size_t payload);
 
         /** @brief The commport_name to which a reply should be sent */
         S4U_CommPort *answer_commport;
         /** @brief The number of cores desired */
         unsigned long num_cores;
         /** @brief The RAM desired */
-        double ram;
+        sg_size_t ram;
     };
 
     /**
@@ -300,7 +300,7 @@ namespace wrench {
      */
     class ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(bool answer, double payload);
+        ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(bool answer, sg_size_t payload);
 
         /** @brief The true/false answer */
         bool answer;

@@ -268,7 +268,7 @@ namespace wrench {
      * @return The free space in bytes of each mount point, as a map
      *
      */
-    double StorageServiceProxy::getTotalFreeSpaceAtPath(const std::string &path) {
+    sg_size_t StorageServiceProxy::getTotalFreeSpaceAtPath(const std::string &path) {
         if (remote) {
             return remote->getTotalFreeSpaceAtPath(path);
         }
@@ -281,7 +281,7 @@ namespace wrench {
      * @return The free space in bytes of each mount point, as a map
      *
      */
-    double StorageServiceProxy::getTotalSpace() {
+    sg_size_t StorageServiceProxy::getTotalSpace() {
         if (remote) {
             return remote->getTotalSpace();
         }
@@ -312,7 +312,7 @@ namespace wrench {
      * @brief Get the buffer size of the cache (which could be 0 or >0), or 0 if there is no cache
      * @return a size in bytes
      */
-    double StorageServiceProxy::getBufferSize() const {
+    sg_size_t StorageServiceProxy::getBufferSize() const {
         if (cache) {
             return cache->getBufferSize();
         } else {
@@ -427,7 +427,7 @@ namespace wrench {
     StorageServiceProxy::StorageServiceProxy(const std::string &hostname,
                                              const std::shared_ptr<StorageService> &cache,
                                              const std::shared_ptr<StorageService> &default_remote,
-                                             WRENCH_PROPERTY_COLLECTION_TYPE properties, const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& message_payloads) : StorageService(hostname,
+                                             WRENCH_PROPERTY_COLLECTION_TYPE properties, const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& message_payloads) : StorageService(hostname,
                                                                                                                                                                   "storage_proxy"),
                                                                                                                                                    cache(cache),
                                                                                                                                                    remote(default_remote) {
@@ -491,7 +491,7 @@ namespace wrench {
     //     * @param location: a location
     //     * @param num_bytes: a number of bytes to read
     //     */
-    //    void StorageServiceProxy::readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+    //    void StorageServiceProxy::readFile(const std::shared_ptr<FileLocation> &location, sg_size_t num_bytes) {
     //        this->readFile(ProxyLocation::LOCATION(remote, this->getSharedPtr<StorageService>(), location->getFile()));
     //    }
 
@@ -510,7 +510,7 @@ namespace wrench {
      * @param file: the file
      * @param num_bytes: the number of bytes to read
      */
-    void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, double num_bytes) {
+    void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, sg_size_t num_bytes) {
         this->readFile(ProxyLocation::LOCATION(targetServer, this->getSharedPtr<StorageService>(), file), num_bytes);
     }
 
@@ -531,7 +531,7 @@ namespace wrench {
  * @param path: the file path
  * @param num_bytes: the number of bytes to read
  */
-    void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes) {
+    void StorageServiceProxy::readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path, sg_size_t num_bytes) {
         this->readFile(ProxyLocation::LOCATION(targetServer, std::static_pointer_cast<StorageService>(shared_from_this()), path, file), num_bytes);
     }
 

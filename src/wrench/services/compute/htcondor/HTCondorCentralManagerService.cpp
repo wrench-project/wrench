@@ -59,7 +59,7 @@ namespace wrench {
             bool fcfs,
             std::set<shared_ptr<ComputeService>> compute_services,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
+            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list)
         : ComputeService(hostname, "htcondor_central_manager", "") {
         this->negotiator_startup_overhead = negotiator_startup_overhead;
 
@@ -151,7 +151,7 @@ namespace wrench {
                             this->fcfs,
                             this->compute_services,
                             this->running_jobs, this->pending_jobs, this->commport);
-                    negotiator->setSimulation(this->simulation);
+                    negotiator->setSimulation(this->simulation_);
                     negotiator->start(negotiator, true, false);// Daemonized, no auto-restart
                 }
             }

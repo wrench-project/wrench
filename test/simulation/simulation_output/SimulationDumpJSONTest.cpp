@@ -656,12 +656,12 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     auto independent_tasks_workflow = wrench::Workflow::createWorkflow();
 
     t1 = independent_tasks_workflow->addTask("task1", 1.0, 1, 1, 0);
-    t1->addInputFile(wrench::Simulation::addFile("task1_input", 1.0));
-    t1->addOutputFile(wrench::Simulation::addFile("task1_output", 1.0));
+    t1->addInputFile(wrench::Simulation::addFile("task1_input", 1));
+    t1->addOutputFile(wrench::Simulation::addFile("task1_output", 1));
 
     t2 = independent_tasks_workflow->addTask("task2", 1.0, 1, 1, 0);
-    t2->addInputFile(wrench::Simulation::addFile("task2_input", 1.0));
-    t2->addOutputFile(wrench::Simulation::addFile("task2_output", 1.0));
+    t2->addInputFile(wrench::Simulation::addFile("task2_input", 1));
+    t2->addOutputFile(wrench::Simulation::addFile("task2_output", 1));
 
     EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowGraphJSON(independent_tasks_workflow, workflow_graph_json_file_path));
 
@@ -734,25 +734,25 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     auto fork_join_workflow = wrench::Workflow::createWorkflow();
 
     t1 = fork_join_workflow->addTask("task1", 1.0, 1, 1, 0);
-    t1->addInputFile(wrench::Simulation::addFile("task1_input", 1.0));
-    t1->addOutputFile(wrench::Simulation::addFile("task1_output1", 1.0));
-    t1->addOutputFile(wrench::Simulation::addFile("task1_output2", 1.0));
+    t1->addInputFile(wrench::Simulation::addFile("task1_input", 1));
+    t1->addOutputFile(wrench::Simulation::addFile("task1_output1", 1));
+    t1->addOutputFile(wrench::Simulation::addFile("task1_output2", 1));
 
     t2 = fork_join_workflow->addTask("task2", 1.0, 1, 1, 0);
     t2->addInputFile(wrench::Simulation::getFileByID("task1_output1"));
-    t2->addOutputFile(wrench::Simulation::addFile("task2_output1", 1.0));
+    t2->addOutputFile(wrench::Simulation::addFile("task2_output1", 1));
     fork_join_workflow->addControlDependency(t1, t2);
 
     t3 = fork_join_workflow->addTask("task3", 1.0, 1, 1, 0);
     t3->addInputFile(wrench::Simulation::getFileByID("task1_output2"));
-    t3->addOutputFile(wrench::Simulation::addFile("task3_output1", 1.0));
+    t3->addOutputFile(wrench::Simulation::addFile("task3_output1", 1));
     fork_join_workflow->addControlDependency(t1, t3);
 
     t4 = fork_join_workflow->addTask("task4", 1.0, 1, 1, 0);
     t4->addInputFile(wrench::Simulation::getFileByID("task2_output1"));
     t4->addInputFile(wrench::Simulation::
                              getFileByID("task3_output1"));
-    t4->addOutputFile(wrench::Simulation::addFile("task4_output1", 1.0));
+    t4->addOutputFile(wrench::Simulation::addFile("task4_output1", 1));
     fork_join_workflow->addControlDependency(t2, t4);
     fork_join_workflow->addControlDependency(t3, t4);
 
@@ -806,7 +806,7 @@ private:
         // at time 0.0, the pstate is set to 1 as specified in the platform file,
         // then again at time 0.0, it is set to pstate 0 and only one timestamp should
         // be generated for this host at time 0.0
-        this->simulation->setPstate(this->getHostname(), 0);
+        this->getSimulation()->setPstate(this->getHostname(), 0);
 
         const std::vector<std::string> hostnames = wrench::Simulation::getHostnameList();
         const double TWO_SECOND_PERIOD = 2.0;
@@ -1079,7 +1079,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     storage_services_list.insert(client_storage_service);
     storage_services_list.insert(server_storage_service);
 
-    const double GB = 1000.0 * 1000.0 * 1000.0;
+    const sg_size_t GB = 1000000000ULL;
     //std::shared_ptr<wrench::DataFile> file = new wrench::DataFile("test_file", 10*GB);
     auto link_usage_workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::WorkflowTask> single_task;
@@ -1226,7 +1226,7 @@ private:
 
     int main() override {
 
-        auto file_1 = wrench::Simulation::addFile("file_1", 1.00 * 1000 * 1000);
+        auto file_1 = wrench::Simulation::addFile("file_1", 1000 * 1000);
 
         wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss1, file_1));
         wrench::StorageService::writeFileAtLocation(wrench::FileLocation::LOCATION(this->test->ss2, file_1));

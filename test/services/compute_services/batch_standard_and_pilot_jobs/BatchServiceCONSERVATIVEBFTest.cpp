@@ -302,14 +302,14 @@ private:
             }
 
             // Get predictions for scalability measures
-            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs = {
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job1_" + std::to_string(i), 1, 10, 60},
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job2_" + std::to_string(i), 1, 10, 10000},
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job3_" + std::to_string(i), 2, 10, 10},
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job4_" + std::to_string(i), 2, 10, 80},
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job5_" + std::to_string(i), 5, 10, 400},
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job6_" + std::to_string(i), 3, 10, 400},
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job7_" + std::to_string(i), 4, 10, 400},
+            std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs = {
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job1_" + std::to_string(i), 1, 10, 60},
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job2_" + std::to_string(i), 1, 10, 10000},
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job3_" + std::to_string(i), 2, 10, 10},
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job4_" + std::to_string(i), 2, 10, 80},
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job5_" + std::to_string(i), 5, 10, 400},
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job6_" + std::to_string(i), 3, 10, 400},
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job7_" + std::to_string(i), 4, 10, 400},
             };
 
             std::map<std::string, double> jobs_estimated_start_times =
@@ -476,14 +476,14 @@ private:
 
         // Sleep for 10 seconds
         wrench::Simulation::sleep(10);
-        std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs = {
-                (std::tuple<std::string, unsigned long, unsigned long, double>){"job1", 1, 10, 60},   // 0
-                (std::tuple<std::string, unsigned long, unsigned long, double>){"job2", 1, 10, 10000},// 0
-                (std::tuple<std::string, unsigned long, unsigned long, double>){"job3", 2, 10, 10},   // 60
-                (std::tuple<std::string, unsigned long, unsigned long, double>){"job4", 2, 10, 80},   // 240
-                (std::tuple<std::string, unsigned long, unsigned long, double>){"job5", 5, 10, 400},  // -1
-                (std::tuple<std::string, unsigned long, unsigned long, double>){"job6", 3, 10, 400},  // 240
-                (std::tuple<std::string, unsigned long, unsigned long, double>){"job7", 4, 10, 400},  // 240
+        std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs = {
+                (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"job1", 1, 10, 60},   // 0
+                (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"job2", 1, 10, 10000},// 0
+                (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"job3", 2, 10, 10},   // 60
+                (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"job4", 2, 10, 80},   // 240
+                (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"job5", 5, 10, 400},  // -1
+                (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"job6", 3, 10, 400},  // 240
+                (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"job7", 4, 10, 400},  // 240
         };
 
         // Get Predictions
@@ -970,14 +970,14 @@ private:
 
 #if 1
             // Get predictions for scalability measures
-            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs = {
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job1_" + std::to_string(i), 1, 10, 60},
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job2_" + std::to_string(i), 1, 10, 10000},
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job3_" + std::to_string(i), 2, 10, 10},
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job4_" + std::to_string(i), 2, 10, 80},
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job5_" + std::to_string(i), 5, 10, 400},
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job6_" + std::to_string(i), 3, 10, 400},
-                    (std::tuple<std::string, unsigned long, unsigned long, double>){"testing_job7_" + std::to_string(i), 4, 10, 400},
+            std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs = {
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job1_" + std::to_string(i), 1, 10, 60},
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job2_" + std::to_string(i), 1, 10, 10000},
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job3_" + std::to_string(i), 2, 10, 10},
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job4_" + std::to_string(i), 2, 10, 80},
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job5_" + std::to_string(i), 5, 10, 400},
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job6_" + std::to_string(i), 3, 10, 400},
+                    (std::tuple<std::string, unsigned long, unsigned long, sg_size_t>){"testing_job7_" + std::to_string(i), 4, 10, 400},
             };
 
             std::map<std::string, double> jobs_estimated_start_times =

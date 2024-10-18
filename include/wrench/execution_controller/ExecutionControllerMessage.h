@@ -23,7 +23,7 @@ namespace wrench {
     */
     class ExecutionControllerMessage : public SimulationMessage {
     protected:
-        explicit ExecutionControllerMessage(double payload);
+        explicit ExecutionControllerMessage(sg_size_t payload);
     };
 
 
@@ -32,7 +32,7 @@ namespace wrench {
      */
     class ExecutionControllerAlarmTimerMessage : public ExecutionControllerMessage {
     public:
-        explicit ExecutionControllerAlarmTimerMessage(std::string message, double payload);
+        explicit ExecutionControllerAlarmTimerMessage(std::string message, sg_size_t payload);
         /** @brief The message sent my the timer */
         std::string message;
     };
