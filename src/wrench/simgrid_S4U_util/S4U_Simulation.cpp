@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <set>
+#include <climits>
 #include <cfloat>
 #include <wrench/util/UnitParser.h>
 #include <simgrid/plugins/energy.h>
@@ -542,10 +543,10 @@ namespace wrench {
     * @param mount_point: mount point (or empty if disk is known)
     * @param disk: a disk to write to, if known (if known, this method will run much faster)
     */
-    void S4U_Simulation::writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk) {
+    void S4U_Simulation::writeToDisk(sg_size_t num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk) {
         mount_point = FileLocation::sanitizePath(mount_point);
 
-        WRENCH_DEBUG("Writing %lf bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
+        WRENCH_DEBUG("Writing %llu bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
 
         if (not disk) {
             auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
@@ -581,13 +582,13 @@ namespace wrench {
 * @param src_disk: source disk (nullptr if not known)
 * @param dst_disk: dst disk (nullptr if not known)
 */
-    void S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
+    void S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(sg_size_t num_bytes_to_read, sg_size_t num_bytes_to_write,
                                                                 const std::string &hostname,
                                                                 const std::string &read_mount_point,
                                                                 const std::string &write_mount_point,
                                                                 simgrid::s4u::Disk *src_disk,
                                                                 simgrid::s4u::Disk *dst_disk) {
-        WRENCH_DEBUG("Reading %.2lf bytes from disk %s:%s and writing %lf bytes to disk %s:%s",
+        WRENCH_DEBUG("Reading %llu bytes from disk %s:%s and writing %llu bytes to disk %s:%s",
                      num_bytes_to_read, hostname.c_str(), read_mount_point.c_str(),
                      num_bytes_to_write, hostname.c_str(), write_mount_point.c_str());
 
@@ -638,10 +639,10 @@ namespace wrench {
 * @param mount_point: mount point
  * @param disk: disk to read from (nullptr if not known)
 */
-    void S4U_Simulation::readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk) {
+    void S4U_Simulation::readFromDisk(sg_size_t num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk) {
         mount_point = FileLocation::sanitizePath(mount_point);
 
-        WRENCH_DEBUG("Reading %.2lf bytes from disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
+        WRENCH_DEBUG("Reading %llu bytes from disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
 
         if (not disk) {
             auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
@@ -688,7 +689,7 @@ namespace wrench {
 * @param hostname: the name of the host
 * @return a memory_manager_service capacity in bytes
 */
-    double S4U_Simulation::getHostMemoryCapacity(const std::string &hostname) {
+    sg_size_t S4U_Simulation::getHostMemoryCapacity(const std::string &hostname) {
         auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -700,7 +701,7 @@ namespace wrench {
 * @brief Get the memory_manager_service capacity of the current host
 * @return a memory_manager_service capacity in bytes
 */
-    double S4U_Simulation::getMemoryCapacity() {
+    sg_size_t S4U_Simulation::getMemoryCapacity() {
         return getHostMemoryCapacity(simgrid::s4u::Host::current());
     }
 
@@ -709,15 +710,15 @@ namespace wrench {
 * @param host: the host
 * @return a memory_manager_service capacity in bytes
 */
-    double S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host *host) {
-        static std::map<simgrid::s4u::Host *, double> memoized;
+    sg_size_t S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host *host) {
+        static std::map<simgrid::s4u::Host *, sg_size_t> memoized;
 
         if (memoized.find(host) != memoized.end()) {
             return memoized[host];
         }
 
         std::set<std::string> tags = {"mem", "Mem", "MEM", "ram", "Ram", "RAM", "memory_manager_service", "Memory", "MEMORY"};
-        double capacity_value = S4U_Simulation::DEFAULT_RAM;
+        sg_size_t capacity_value = S4U_Simulation::DEFAULT_RAM;
 
         for (auto const &tag: tags) {
             const char *capacity_string = host->get_property(tag);
@@ -1074,7 +1075,7 @@ namespace wrench {
 * @return the capacity of the disk / mount point
 *
 */
-    double S4U_Simulation::getDiskCapacity(const std::string &hostname, std::string mount_point) {
+    sg_size_t S4U_Simulation::getDiskCapacity(const std::string &hostname, std::string mount_point) {
         //        WRENCH_INFO("==== %s %s ==== ", hostname.c_str(), mount_point.c_str());
         simgrid::s4u::Host *host;
         try {
@@ -1099,7 +1100,7 @@ namespace wrench {
                 continue;
             }
 
-            double capacity;
+            sg_size_t capacity;
             const char *capacity_str = d->get_property("size");
 
             if (capacity_str) {
@@ -1110,7 +1111,7 @@ namespace wrench {
                                                 " at host " + hostname + " has invalid size");
                 }
             } else {
-                capacity = DBL_MAX;// Default size if no size property specified
+                capacity = LONG_LONG_MAX;// Default size if no size property specified
             }
 
             return capacity;
@@ -1133,7 +1134,7 @@ namespace wrench {
     void S4U_Simulation::createNewDisk(const std::string &hostname, const std::string &disk_id,
                                        double read_bandwidth_in_bytes_per_sec,
                                        double write_bandwidth_in_bytes_per_sec,
-                                       double capacity_in_bytes,
+                                       sg_size_t capacity_in_bytes,
                                        const std::string &mount_point) {
         // Get the host
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);

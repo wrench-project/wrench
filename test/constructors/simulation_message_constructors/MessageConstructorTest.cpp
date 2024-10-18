@@ -123,7 +123,7 @@ private:
         auto commport = wrench::S4U_CommPort::getTemporaryCommPort();
 
         auto network_proximity_daemon = std::shared_ptr<wrench::NetworkProximitySenderDaemon>(
-                new wrench::NetworkProximitySenderDaemon(this->simulation, "Host1",
+                new wrench::NetworkProximitySenderDaemon(this->getSimulation(), "Host1",
                                                          commport,
                                                          10.0, 1.0,
                                                          1.0, 0, {}));

@@ -29,7 +29,7 @@ namespace wrench {
      * @param id: the file id
      * @param s: the file size
      */
-    DataFile::DataFile(std::string id, double s) : id(std::move(id)), size(s) {
+    DataFile::DataFile(std::string id, sg_size_t s) : id(std::move(id)), size(s) {
         TRACK_OBJECT("file");
     }
 
@@ -37,7 +37,7 @@ namespace wrench {
      * @brief Get the file size
      * @return a size in bytes
      */
-    double DataFile::getSize() const {
+    sg_size_t DataFile::getSize() const {
         return this->size;
     }
 
@@ -47,7 +47,7 @@ namespace wrench {
      * has been created is a valid thing to do)
      * @param s: a size in byte
      */
-    void DataFile::setSize(double s) {
+    void DataFile::setSize(sg_size_t s) {
         this->size = s;
     }
 

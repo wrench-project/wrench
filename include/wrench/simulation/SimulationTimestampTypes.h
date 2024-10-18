@@ -87,7 +87,7 @@ namespace wrench {
     class SimulationTimestampType {
     public:
         SimulationTimestampType();
-        double getDate() const;
+        [[nodiscard]] double getDate() const;
 
     protected:
         /**
@@ -426,10 +426,10 @@ namespace wrench {
          * @brief Retrieve the matching endpoint, if any
          */
         SimulationTimestampDiskRead *getEndpoint() override;
-        double getBytes() const;
+        [[nodiscard]] sg_size_t getBytes() const;
         std::string getHostname();
         std::string getMount();
-        int getCounter() const;
+        [[nodiscard]] int getCounter() const;
 
     protected:
         /**
@@ -445,7 +445,7 @@ namespace wrench {
         /**
          * @brief amount of bytes being read
          */
-        double bytes;
+        sg_size_t bytes;
 
         /**
          * @brief counter to differentiate reads
@@ -460,7 +460,7 @@ namespace wrench {
 
         void setEndpoints();
         friend class SimulationOutput;
-        SimulationTimestampDiskRead(double date, std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskRead(double date, std::string hostname, std::string mount, sg_size_t bytes, int counter);
     };
 
     class SimulationTimestampDiskReadFailure;
@@ -472,7 +472,7 @@ namespace wrench {
     class SimulationTimestampDiskReadStart : public SimulationTimestampDiskRead {
     public:
         friend class SimulationOutput;
-        SimulationTimestampDiskReadStart(double date, std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskReadStart(double date, std::string hostname, std::string mount, sg_size_t bytes, int counter);
 
         friend class SimulationTimestampDiskReadFailure;
         friend class SimulationTimestampDiskReadCompletion;
@@ -484,7 +484,7 @@ namespace wrench {
     class SimulationTimestampDiskReadFailure : public SimulationTimestampDiskRead {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskReadFailure(double date, const std::string &hostname, const std::string &mount, double bytes, int counter);
+        SimulationTimestampDiskReadFailure(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes, int counter);
     };
 
     /**
@@ -493,7 +493,7 @@ namespace wrench {
     class SimulationTimestampDiskReadCompletion : public SimulationTimestampDiskRead {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskReadCompletion(double date, const std::string &hostname, const std::string &mount, double bytes, int counter);
+        SimulationTimestampDiskReadCompletion(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes, int counter);
     };
 
     class SimulationTimestampDiskWriteStart;
@@ -508,10 +508,10 @@ namespace wrench {
          * @brief Retrieve the matching endpoint, if any
          */
         SimulationTimestampDiskWrite *getEndpoint() override;
-        double getBytes() const;
+        [[nodiscard]] sg_size_t getBytes() const;
         std::string getHostname();
         std::string getMount();
-        int getCounter() const;
+        [[nodiscard]] int getCounter() const;
 
     protected:
         /**
@@ -527,7 +527,7 @@ namespace wrench {
         /**
          * @brief amount of bytes being written
          */
-        double bytes;
+        sg_size_t bytes;
 
         /**
          * @brief counter to differentiate writes
@@ -541,7 +541,7 @@ namespace wrench {
 
         void setEndpoints();
         friend class SimulationOutput;
-        SimulationTimestampDiskWrite(double date, std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskWrite(double date, std::string hostname, std::string mount, sg_size_t bytes, int counter);
     };
 
     class SimulationTimestampDiskWriteFailure;
@@ -553,7 +553,7 @@ namespace wrench {
     class SimulationTimestampDiskWriteStart : public SimulationTimestampDiskWrite {
     public:
         friend class SimulationOutput;
-        SimulationTimestampDiskWriteStart(double date, std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskWriteStart(double date, std::string hostname, std::string mount, sg_size_t bytes, int counter);
 
         friend class SimulationTimestampDiskWriteFailure;
         friend class SimulationTimestampDiskWriteCompletion;
@@ -565,7 +565,7 @@ namespace wrench {
     class SimulationTimestampDiskWriteFailure : public SimulationTimestampDiskWrite {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskWriteFailure(double date, const std::string &hostname, const std::string &mount, double bytes, int counter);
+        SimulationTimestampDiskWriteFailure(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes, int counter);
     };
 
     /**
@@ -574,7 +574,7 @@ namespace wrench {
     class SimulationTimestampDiskWriteCompletion : public SimulationTimestampDiskWrite {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskWriteCompletion(double date, const std::string &hostname, const std::string &mount, double bytes, int counter);
+        SimulationTimestampDiskWriteCompletion(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes, int counter);
     };
 
     /**
@@ -583,7 +583,7 @@ namespace wrench {
     class SimulationTimestampPstateSet : public SimulationTimestampType {
     public:
         std::string getHostname();
-        int getPstate() const;
+        [[nodiscard]] int getPstate() const;
 
     private:
         friend class SimulationOutput;
@@ -598,7 +598,7 @@ namespace wrench {
     class SimulationTimestampEnergyConsumption : public SimulationTimestampType {
     public:
         std::string getHostname();
-        double getConsumption() const;
+        [[nodiscard]] double getConsumption() const;
 
     private:
         friend class SimulationOutput;
@@ -613,7 +613,7 @@ namespace wrench {
     class SimulationTimestampLinkUsage : public SimulationTimestampType {
     public:
         std::string getLinkname();
-        double getUsage() const;
+        [[nodiscard]] double getUsage() const;
 
     private:
         friend class SimulationOutput;

@@ -15,6 +15,7 @@
 #include <set>
 #include <stack>
 #include <iostream>
+#include <simgrid/forward.h>
 
 namespace wrench {
 
@@ -65,7 +66,7 @@ namespace wrench {
 
         virtual unsigned long getMinNumCores() const;
         virtual unsigned long getMaxNumCores() const;
-        virtual double getMinRAMFootprint() const;
+        virtual sg_size_t getMinRAMFootprint() const;
 
         virtual bool usesScratch() const;
 
@@ -91,7 +92,7 @@ namespace wrench {
             /** @brief Number of allocated cores **/
             unsigned long num_cores_allocated = 0;
             /** @brief RAM allocated cores **/
-            double ram_allocated = 0;
+            sg_size_t ram_allocated = 0;
             /** @brief Failure cause (if applicable) **/
             std::shared_ptr<FailureCause> failure_cause;
         };
@@ -118,7 +119,7 @@ namespace wrench {
         void setState(Action::State new_state);
         void setExecutionHost(const std::string &host);
         void setNumCoresAllocated(unsigned long num_cores);
-        void setRAMAllocated(double ram);
+        void setRAMAllocated(sg_size_t ram);
         void setFailureCause(const std::shared_ptr<FailureCause> &failure_cause);
 
         virtual ~Action();

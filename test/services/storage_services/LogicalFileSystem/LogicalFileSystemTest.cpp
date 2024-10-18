@@ -148,7 +148,7 @@
 //    // Create a Logical File System
 //    auto fs1 = wrench::LogicalFileSystem::createLogicalFileSystem("Host", storage_service.get(), "/dev/null");
 //
-//    auto file = wrench::Simulation::addFile("file", 1.0);
+//    auto file = wrench::Simulation::addFile("file", 1);
 //
 //    fs1->createDirectory(("/foo"));
 //    fs1->createFile(file, "/foo");

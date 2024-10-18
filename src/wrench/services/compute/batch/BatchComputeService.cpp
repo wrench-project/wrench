@@ -59,7 +59,7 @@ namespace wrench {
                                              std::vector<std::string> compute_hosts,
                                              std::string scratch_space_mount_point,
                                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : BatchComputeService(hostname, std::move(compute_hosts), ComputeService::ALL_CORES,
+                                             WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : BatchComputeService(hostname, std::move(compute_hosts), ComputeService::ALL_CORES,
                                                                                                                               ComputeService::ALL_RAM, scratch_space_mount_point, std::move(property_list),
                                                                                                                               std::move(messagepayload_list), "") {}
 
@@ -81,10 +81,10 @@ namespace wrench {
     BatchComputeService::BatchComputeService(const std::string &hostname,
                                              std::vector<std::string> compute_hosts,
                                              unsigned long cores_per_host,
-                                             double ram_per_host,
+                                             sg_size_t ram_per_host,
                                              std::string scratch_space_mount_point,
                                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+                                             WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
                                              const std::string &suffix) : ComputeService(hostname,
                                                                                          "BatchComputeService" + suffix,
                                                                                          scratch_space_mount_point) {
@@ -113,7 +113,7 @@ namespace wrench {
         auto first_host = *(this->compute_hosts.begin());
         auto num_cores_available = (first_host->get_core_count());
         double speed = first_host->get_speed();
-        double ram_available = S4U_Simulation::getHostMemoryCapacity(first_host);
+        sg_size_t ram_available = S4U_Simulation::getHostMemoryCapacity(first_host);
 
         for (auto const &h: this->compute_hosts) {
             // Compute speed
@@ -123,7 +123,7 @@ namespace wrench {
                         "to be homogeneous (different flop rates detected)");
             }
             // RAM
-            if (std::abs(ram_available - S4U_Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
+            if (ram_available != S4U_Simulation::getHostMemoryCapacity(h)) {
                 throw std::invalid_argument(
                         "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different RAM capacities detected)");
@@ -225,7 +225,7 @@ namespace wrench {
      *         not enough cores per host)
      */
     std::map<std::string, double> BatchComputeService::getStartTimeEstimates(
-            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
+            std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) {
         try {
             auto estimates = this->scheduler->getStartTimeEstimates(std::move(set_of_jobs));
             return estimates;
@@ -487,7 +487,7 @@ namespace wrench {
      *              - number of cores (unsigned long)
      *              - bytes of RAM (double)
      */
-    void BatchComputeService::freeUpResources(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &resources) {
+    void BatchComputeService::freeUpResources(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &resources) {
         for (auto r: resources) {
             this->available_nodes_to_cores[r.first] += std::get<0>(r.second);
         }
@@ -972,7 +972,7 @@ namespace wrench {
      * @param cores_per_node_asked_for
      */
     void BatchComputeService::startJob(
-            const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &resources,
+            const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &resources,
             const std::shared_ptr<CompoundJob> &compound_job,
             const std::shared_ptr<BatchJob> &batch_job, unsigned long num_nodes_allocated,
             unsigned long allocated_time,
@@ -983,7 +983,7 @@ namespace wrench {
 
         compound_job->pushCallbackCommPort(this->commport);
 
-        std::map<std::string, std::tuple<unsigned long, double>> resources_by_hostname;
+        std::map<std::string, std::tuple<unsigned long, sg_size_t>> resources_by_hostname;
         for (auto const &h: resources) {
             resources_by_hostname[h.first->get_name()] = h.second;
         }
@@ -1000,7 +1000,7 @@ namespace wrench {
                         "_one_shot_bm_",
                         this->getScratch()));
 
-        executor->simulation = this->simulation;
+        executor->simulation_ = this->simulation_;
         executor->start(executor, true, false);// Daemonized, no auto-restart
         batch_job->setBeginTimestamp(S4U_Simulation::getClock());
         batch_job->setEndingTimestamp(S4U_Simulation::getClock() + (double) allocated_time);
@@ -1013,7 +1013,7 @@ namespace wrench {
 
         auto msg = new AlarmJobTimeOutMessage(batch_job, 0);
 
-        std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
+        std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation_,
                                                                       batch_job->getEndingTimestamp(),
                                                                       this->hostname,
                                                                       this->commport, msg,
@@ -1110,7 +1110,7 @@ namespace wrench {
                 this->getPropertyValueAsBoolean(
                         BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE),
                 this->workload_trace);
-        this->workload_trace_replayer->setSimulation(this->simulation);
+        this->workload_trace_replayer->setSimulation(this->simulation_);
         this->workload_trace_replayer->start(this->workload_trace_replayer, true,
                                              false);// Daemonized, no auto-restart
     }
@@ -1294,7 +1294,7 @@ namespace wrench {
         std::map<simgrid::s4u::Host *, unsigned long>::iterator it;
 
         for (auto node: node_resources) {
-            double ram_capacity = S4U_Simulation::getHostMemoryCapacity(
+            sg_size_t ram_capacity = S4U_Simulation::getHostMemoryCapacity(
                     this->host_id_to_names[node]);// Use the whole RAM
             this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
             resources.insert(std::make_pair(this->host_id_to_names[node], std::make_tuple(
@@ -1313,7 +1313,7 @@ namespace wrench {
      * @param ram: the desired RAM
      */
     void BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(S4U_CommPort *answer_commport,
-                                                                                 unsigned long num_cores, double ram) {
+                                                                                 unsigned long num_cores, sg_size_t ram) {
         throw std::runtime_error(
                 "BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A BatchComputeService compute service does not support this operation");
     }

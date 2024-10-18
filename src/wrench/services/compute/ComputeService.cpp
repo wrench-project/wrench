@@ -22,9 +22,6 @@ WRENCH_LOG_CATEGORY(wrench_core_compute_service, "Log category for Compute Servi
 
 namespace wrench {
 
-    constexpr unsigned long ComputeService::ALL_CORES;
-    constexpr double ComputeService::ALL_RAM;
-
     /**
      * @brief Stop the compute service
      */
@@ -145,7 +142,7 @@ namespace wrench {
         if (this->scratch_space_mount_point.empty()) return;// No mount point provided
 
 
-        if (wrench::Simulation::isLinkShutdownSimulationEnabled() and (this->getPropertyValueAsDouble(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE) == 0)) {
+        if (wrench::Simulation::isLinkShutdownSimulationEnabled() and (this->getPropertyValueAsSizeInByte(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE) == 0)) {
             throw std::runtime_error("ComputeService::startScratchStorageService(): Compute service " + this->name +
                                      " cannot start a scratch service with (default) buffer size 0 because link shutdown " +
                                      "simulation is enabled. Set a non-zero buffer size by setting the "
@@ -161,7 +158,7 @@ namespace wrench {
         // Set the storage service's network timeout to that of this compute service
         ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
         this->scratch_space_storage_service =
-                this->simulation->startNewService(ss);
+                this->simulation_->startNewService(ss);
     }
 
     /**
@@ -328,7 +325,7 @@ namespace wrench {
      * @param ram: the desired RAM
      * @return true if idle resources are available, false otherwise
      */
-    bool ComputeService::isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, double ram) {
+    bool ComputeService::isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, sg_size_t ram) {
         assertServiceIsUp();
 
         // send an "info request" message to the daemon's commport

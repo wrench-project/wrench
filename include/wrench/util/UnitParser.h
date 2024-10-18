@@ -12,6 +12,7 @@
 #define WRENCH_UNITPARSER_H
 
 #include <unordered_map>
+#include <simgrid/forward.h>
 
 namespace wrench {
 
@@ -41,7 +42,7 @@ namespace wrench {
         static double parseValueWithUnit(const std::string &string, const unit_scale &units, const char *default_unit);
 
     public:
-        static double parse_size(const std::string &string);
+        static sg_size_t parse_size(const std::string &string);
         static double parse_compute_speed(const std::string &string);
         static double parse_bandwidth(const std::string &string);
         static double parse_time(const std::string &string);

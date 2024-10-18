@@ -47,8 +47,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
-        input_file = wrench::Simulation::addFile("input_file", 10.0);
-        output_file1 = wrench::Simulation::addFile("output_file1", 10.0);
+        input_file = wrench::Simulation::addFile("input_file", 10);
+        output_file1 = wrench::Simulation::addFile("output_file1", 10);
 
         // Create one task1
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);

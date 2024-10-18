@@ -14,6 +14,7 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <simgrid/forward.h>
 
 
 namespace wrench {
@@ -28,7 +29,7 @@ namespace wrench {
     class SimulationMessage {
 
     public:
-        explicit SimulationMessage(double payload);
+        explicit SimulationMessage(sg_size_t payload);
         virtual ~SimulationMessage();
 
         virtual std::string getName();
@@ -36,7 +37,7 @@ namespace wrench {
         /** @brief The message name */
         //std::string name;//we dont need this anymore :)
         /** @brief The message size in bytes */
-        double payload;
+        sg_size_t payload;
     };
 
 

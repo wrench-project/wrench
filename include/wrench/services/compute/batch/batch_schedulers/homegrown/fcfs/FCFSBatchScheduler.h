@@ -41,9 +41,9 @@ namespace wrench {
 
         std::shared_ptr<BatchJob> pickNextJobToSchedule();
 
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) override;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> scheduleOnHosts(unsigned long, unsigned long, sg_size_t) override;
 
-        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
+        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) override;
     };
 
 }// namespace wrench

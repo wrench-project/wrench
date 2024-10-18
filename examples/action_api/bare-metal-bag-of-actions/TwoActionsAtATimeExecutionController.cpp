@@ -18,7 +18,7 @@
 #include "TwoActionsAtATimeExecutionController.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
-#define MB (1000.0 * 1000.0)
+#define MB (1000000ULL)
 
 WRENCH_LOG_CATEGORY(custom_controller, "Log category for TwoActionsAtATimeExecutionController");
 
@@ -118,7 +118,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void TwoActionsAtATimeExecutionController::processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent> event) {
+    void TwoActionsAtATimeExecutionController::processEventCompoundJobCompletion(const std::shared_ptr<CompoundJobCompletedEvent> &event) {
         WRENCH_INFO("Compound job %s has completed:", event->job->getName().c_str());
         // sort actions by start time
         auto job_actions = event->job->getActions();
@@ -145,7 +145,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void TwoActionsAtATimeExecutionController::processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent> event) {
+    void TwoActionsAtATimeExecutionController::processEventCompoundJobFailure(const std::shared_ptr<CompoundJobFailedEvent> &event) {
         WRENCH_INFO("Compound job %s has failed!", event->job->getName().c_str());
         throw std::runtime_error("This should not happen in this example");
     }

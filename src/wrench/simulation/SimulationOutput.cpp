@@ -79,7 +79,7 @@ namespace wrench {
         /* @brief flop rate of the host that ran the task */
         double host_flop_rate = 0.0;
         /* @brief RAM capacity of the host that ran the task */
-        double host_memory = 0.0;
+        sg_size_t host_memory = 0.0;
         /* @brief number of cores of the host that ran the task */
         unsigned long long host_num_cores = 0;
 
@@ -648,7 +648,7 @@ namespace wrench {
             }
         }
 
-        // Set the "vertical position" of each WorkflowExecutionInstance so we know where to plot each rectangle
+        // Set the "vertical position" of each WorkflowExecutionInstance, so we know where to plot each rectangle
         if (generate_host_utilization_layout) {
             generateHostUtilizationGraphLayout(data);
             std::ofstream output("host_utilization_layout.json");
@@ -746,7 +746,7 @@ namespace wrench {
 
         nlohmann::json machines = nlohmann::json::array();
         for (auto const &m: used_machines) {
-            double memory = Simulation::getHostMemoryCapacity(m);
+            sg_size_t memory = Simulation::getHostMemoryCapacity(m);
             unsigned long num_cores = Simulation::getHostNumCores(m);
             double flop_rate = Simulation::getHostFlopRate(m);
             double ghz_rate = flop_rate / (1000.0 * 1000.0 * 1000.0);
@@ -1046,7 +1046,7 @@ namespace wrench {
                 platform_graph_json["routes"].push_back(route_forward_json);
 
                 // populate "route_backward" with an ordered list of network links along
-                // the route between target and source; the "route_backward" could be different
+                // the route between target and source; the "route_backward" could be different,
                 // so we need to add it if it is in fact different
                 nlohmann::json route_backward_json;
                 (*target)->route_to(*source, route_backward, &route_backward_latency);
@@ -1355,7 +1355,7 @@ namespace wrench {
 
     /** Writes a JSON file containing link usage information as a JSON array.
      *
-     * This information will not be generated without using the bandwidth meter service and providing it with linknames
+     * This information will not be generated without using the bandwidth meter service and providing it with link names
      * to monitor.
      *
      *<pre>
@@ -1463,7 +1463,7 @@ namespace wrench {
         this->setEnabled<SimulationTimestampDiskReadFailure>(false);
         this->setEnabled<SimulationTimestampDiskReadCompletion>(false);
 
-        // By default disable (for now) all disk write timestamps
+        // By default, disable (for now) all disk write timestamps
         this->setEnabled<SimulationTimestampDiskWriteStart>(false);
         this->setEnabled<SimulationTimestampDiskWriteFailure>(false);
         this->setEnabled<SimulationTimestampDiskWriteCompletion>(false);
@@ -1702,7 +1702,7 @@ namespace wrench {
     int SimulationOutput::addTimestampDiskReadStart(double date,
                                                      std::string hostname,
                                                      std::string path,
-                                                     double bytes) {
+                                                     sg_size_t bytes) {
         if (this->isEnabled<SimulationTimestampDiskReadStart>()) {
             SimulationOutput::unique_disk_sequence_number++;
             this->addTimestamp<SimulationTimestampDiskReadStart>(
@@ -1721,7 +1721,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampDiskReadFailure(double date, const std::string &hostname,
                                                        const std::string &path,
-                                                       double bytes,
+                                                       sg_size_t bytes,
                                                        int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskReadFailure>()) {
             this->addTimestamp<SimulationTimestampDiskReadFailure>(
@@ -1739,7 +1739,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampDiskReadCompletion(double date, const std::string &hostname,
                                                           const std::string &path,
-                                                          double bytes,
+                                                          sg_size_t bytes,
                                                           int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskReadCompletion>()) {
             this->addTimestamp<SimulationTimestampDiskReadCompletion>(
@@ -1757,7 +1757,7 @@ namespace wrench {
      */
     int SimulationOutput::addTimestampDiskWriteStart(double date, std::string hostname,
                                                       std::string path,
-                                                      double bytes) {
+                                                      sg_size_t bytes) {
         if (this->isEnabled<SimulationTimestampDiskWriteStart>()) {
             SimulationOutput::unique_disk_sequence_number++;
             this->addTimestamp<SimulationTimestampDiskWriteStart>(
@@ -1776,7 +1776,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampDiskWriteFailure(double date, const std::string &hostname,
                                                         const std::string &path,
-                                                        double bytes,
+                                                        sg_size_t bytes,
                                                         int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskWriteFailure>()) {
             this->addTimestamp<SimulationTimestampDiskWriteFailure>(
@@ -1794,7 +1794,7 @@ namespace wrench {
     */
     void SimulationOutput::addTimestampDiskWriteCompletion(double date, const std::string &hostname,
                                                            const std::string &path,
-                                                           double bytes,
+                                                           sg_size_t bytes,
                                                            int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskWriteCompletion>()) {
             this->addTimestamp<SimulationTimestampDiskWriteCompletion>(
@@ -1856,10 +1856,10 @@ namespace wrench {
     /**
      * @brief Add a link usage timestamp
      * @param date: the date
-     * @param linkname: a linkname
+     * @param link_name: a link name
      * @param bytes_per_second: link usage in bytes_per_second
      */
-    void SimulationOutput::addTimestampLinkUsage(double date, const std::string &linkname,
+    void SimulationOutput::addTimestampLinkUsage(double date, const std::string &link_name,
                                                  double bytes_per_second) {
         static std::unordered_map<std::string, std::vector<SimulationTimestampLinkUsage *>> last_two_timestamps;
 
@@ -1867,25 +1867,25 @@ namespace wrench {
             return;
         }
 
-        auto new_timestamp = new SimulationTimestampLinkUsage(date, linkname, bytes_per_second);
+        auto new_timestamp = new SimulationTimestampLinkUsage(date, link_name, bytes_per_second);
 
         // If less thant 2 time-stamp for that link, just record and add
-        if (last_two_timestamps[linkname].size() < 2) {
-            last_two_timestamps[linkname].push_back(new_timestamp);
+        if (last_two_timestamps[link_name].size() < 2) {
+            last_two_timestamps[link_name].push_back(new_timestamp);
             this->addTimestamp<SimulationTimestampLinkUsage>(new_timestamp);
             return;
         }
 
         // Otherwise, check whether we can merge
-        bool can_merge = DBL_EQUAL(last_two_timestamps[linkname].at(0)->getUsage(),
-                                   last_two_timestamps[linkname].at(1)->getUsage()) and
-                         DBL_EQUAL(last_two_timestamps[linkname].at(1)->getUsage(), new_timestamp->getUsage());
+        bool can_merge = DBL_EQUAL(last_two_timestamps[link_name].at(0)->getUsage(),
+                                   last_two_timestamps[link_name].at(1)->getUsage()) and
+                         DBL_EQUAL(last_two_timestamps[link_name].at(1)->getUsage(), new_timestamp->getUsage());
 
         if (can_merge) {
-            last_two_timestamps[linkname].at(1)->setDate(new_timestamp->getDate());
+            last_two_timestamps[link_name].at(1)->setDate(new_timestamp->getDate());
         } else {
-            last_two_timestamps[linkname][0] = last_two_timestamps[linkname][1];
-            last_two_timestamps[linkname][1] = new_timestamp;
+            last_two_timestamps[link_name][0] = last_two_timestamps[link_name][1];
+            last_two_timestamps[link_name][1] = new_timestamp;
             this->addTimestamp<SimulationTimestampLinkUsage>(new_timestamp);
         }
     }

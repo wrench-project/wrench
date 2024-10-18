@@ -39,7 +39,7 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"1\" > "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100000000000000000000B\"/>"
+                          "             <prop id=\"size\" value=\"10000000000000000B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
@@ -67,12 +67,12 @@ protected:
 
         workflow = wrench::Workflow::createWorkflow();
 
-        file_1 = wrench::Simulation::addFile("file_1", 100.0);
-        file_2 = wrench::Simulation::addFile("file_2", 100.0);
-        file_3 = wrench::Simulation::addFile("file_3", 100.0);
+        file_1 = wrench::Simulation::addFile("file_1", 100);
+        file_2 = wrench::Simulation::addFile("file_2", 100);
+        file_3 = wrench::Simulation::addFile("file_3", 100);
 
-        xl_file = wrench::Simulation::addFile("xl_file", 1000000000.0);
-        too_large_file = wrench::Simulation::addFile("too_large_file", 10000000000000000000.0);
+        xl_file = wrench::Simulation::addFile("xl_file", 1000000000ULL);
+        too_large_file = wrench::Simulation::addFile("too_large_file", 1000000000000000ULL);
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";

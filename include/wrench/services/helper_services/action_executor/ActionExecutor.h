@@ -33,7 +33,7 @@ namespace wrench {
 
     public:
         unsigned long getNumCoresAllocated() const;
-        double getMemoryAllocated() const;
+        sg_size_t getMemoryAllocated() const;
         double getThreadCreationOverhead() const;
         std::shared_ptr<Action> getAction();
 
@@ -44,7 +44,7 @@ namespace wrench {
         ActionExecutor(
                 const std::string& hostname,
                 unsigned long num_cores,
-                double ram_footprint,
+                sg_size_t ram_footprint,
                 double thread_creation_overhead,
                 bool simulate_computation_as_sleep,
                 S4U_CommPort *callback_commport,
@@ -67,7 +67,7 @@ namespace wrench {
         double thread_creation_overhead;
 
         unsigned long num_cores;
-        double ram_footprint;
+        sg_size_t ram_footprint;
 
         /***********************/
         /** \endcond           */

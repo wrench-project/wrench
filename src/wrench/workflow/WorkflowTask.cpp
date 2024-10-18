@@ -32,7 +32,7 @@ namespace wrench {
                                const double flops,
                                const unsigned long min_num_cores,
                                const unsigned long max_num_cores,
-                               const double memory_requirement) : id(std::move(id)), color(""), flops(flops),
+                               const sg_size_t memory_requirement) : id(std::move(id)), color(""), flops(flops),
                                                                   min_num_cores(min_num_cores),
                                                                   max_num_cores(max_num_cores),
                                                                   memory_requirement(memory_requirement),
@@ -183,7 +183,7 @@ namespace wrench {
      *
      * @return a memory requirement (in bytes)
      */
-    double WorkflowTask::getMemoryRequirement() const {
+    sg_size_t WorkflowTask::getMemoryRequirement() const {
         return this->memory_requirement;
     }
 
@@ -193,7 +193,7 @@ namespace wrench {
      * @param num_bytes: a number of bytes
      *
      */
-    void WorkflowTask::setMemoryRequirement(double num_bytes) {
+    void WorkflowTask::setMemoryRequirement(sg_size_t num_bytes) {
         this->memory_requirement = num_bytes;
     }
 

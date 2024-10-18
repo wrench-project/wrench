@@ -37,7 +37,7 @@ namespace wrench {
     std::set<S4U_CommPort *> S4U_CommPort::used_commports;
     std::deque<S4U_CommPort *> S4U_CommPort::commports_to_drain;
     unsigned long S4U_CommPort::commport_pool_size = 5000;
-    double S4U_CommPort::default_control_message_size;
+    sg_size_t S4U_CommPort::default_control_message_size;
 
     /**
      * @brief Constructor
@@ -221,9 +221,9 @@ namespace wrench {
         MessageManager::removeReceivedMessage(this, msg);
 #endif
 
-        WRENCH_DEBUG("Received a '%s' message from commport '%s' (%lf, %p bytes)",
+        WRENCH_DEBUG("Received a '%s' message from commport '%s' (%p, %llu bytes)",
                      msg->getName().c_str(), this->get_cname(),
-                     msg->payload, msg);
+                     msg, msg->payload);
 
         return std::unique_ptr<SimulationMessage>(msg);
     }
@@ -239,8 +239,8 @@ namespace wrench {
         if (this == S4U_CommPort::NULL_COMMPORT) {
             return;
         }
-        WRENCH_DEBUG("Putting a %s message (%.2lf bytes, %p) to commport '%s'",
-                     msg->getName().c_str(), msg->payload, msg,
+        WRENCH_DEBUG("Putting a %s message (%p, %llu bytes) to commport '%s'",
+                     msg->getName().c_str(), msg, msg->payload,
                      this->get_cname());
 
 #ifdef MESSAGE_MANAGER
@@ -283,8 +283,8 @@ namespace wrench {
             return;
         }
 
-        WRENCH_DEBUG("Dputting a %s message (%.2lf bytes, %p) to commport '%s'",
-                     msg->getName().c_str(), msg->payload, msg,
+        WRENCH_DEBUG("Dputting a %s message (%p, %llu bytes) to commport '%s'",
+                     msg->getName().c_str(), msg, msg->payload,
                      this->get_cname());
 
 #ifdef MESSAGE_MANAGER
@@ -312,7 +312,7 @@ namespace wrench {
             return nullptr;
         }
 
-        WRENCH_DEBUG("Iputting a %s message (%.2lf bytes) to commport '%s'",
+        WRENCH_DEBUG("Iputting a %s message (%llu bytes) to commport '%s'",
                      msg->getName().c_str(), msg->payload,
                      this->get_cname());
 

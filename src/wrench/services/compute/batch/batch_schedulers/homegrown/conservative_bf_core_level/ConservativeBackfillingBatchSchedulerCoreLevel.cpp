@@ -238,8 +238,8 @@ namespace wrench {
      * @param ram_per_node: amount of RAM
      * @return a host:<core,RAM> map
      */
-    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>>
-    ConservativeBackfillingBatchSchedulerCoreLevel::scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
+    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>>
+    ConservativeBackfillingBatchSchedulerCoreLevel::scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, sg_size_t ram_per_node) {
         if (ram_per_node == ComputeService::ALL_RAM) {
             ram_per_node = S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
         }
@@ -285,7 +285,7 @@ namespace wrench {
      * @return map of estimates
      */
     std::map<std::string, double> ConservativeBackfillingBatchSchedulerCoreLevel::getStartTimeEstimates(
-            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
+            std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) {
         std::map<std::string, double> to_return;
 
         for (auto const &j: set_of_jobs) {

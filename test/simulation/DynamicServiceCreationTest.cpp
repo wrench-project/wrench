@@ -49,13 +49,13 @@ protected:
 
 
         // Create the files
-        input_file = wrench::Simulation::addFile("input_file", 10.0);
-        output_file1 = wrench::Simulation::addFile("output_file1", 10.0);
-        output_file2 = wrench::Simulation::addFile("output_file2", 10.0);
-        output_file3 = wrench::Simulation::addFile("output_file3", 10.0);
-        output_file4 = wrench::Simulation::addFile("output_file4", 10.0);
-        output_file5 = wrench::Simulation::addFile("output_file5", 10.0);
-        output_file6 = wrench::Simulation::addFile("output_file6", 10.0);
+        input_file = wrench::Simulation::addFile("input_file", 10);
+        output_file1 = wrench::Simulation::addFile("output_file1", 10);
+        output_file2 = wrench::Simulation::addFile("output_file2", 10);
+        output_file3 = wrench::Simulation::addFile("output_file3", 10);
+        output_file4 = wrench::Simulation::addFile("output_file4", 10);
+        output_file5 = wrench::Simulation::addFile("output_file5", 10);
+        output_file6 = wrench::Simulation::addFile("output_file6", 10);
 
         // Create the tasks
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
@@ -174,15 +174,15 @@ private:
         auto job_manager = this->createJobManager();
 
         // Dynamically create a File Registry Service on this host
-        auto dynamically_created_file_registry_service = simulation->startNewService(
+        auto dynamically_created_file_registry_service = this->getSimulation()->startNewService(
                 new wrench::FileRegistryService(hostname));
 
         // Dynamically create a Network Proximity Service on this host
-        auto dynamically_created_network_proximity_service = simulation->startNewService(
+        auto dynamically_created_network_proximity_service = this->getSimulation()->startNewService(
                 new wrench::NetworkProximityService(hostname, {"DualCoreHost", "QuadCoreHost"}));
 
         // Dynamically create a Storage Service on this host
-        auto dynamically_created_storage_service = simulation->startNewService(
+        auto dynamically_created_storage_service = this->getSimulation()->startNewService(
                 wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
                                                                          {},
                                                                          {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
@@ -190,7 +190,7 @@ private:
 
         // Dynamically create a Cloud Service
         std::vector<std::string> execution_hosts = {"QuadCoreHost"};
-        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(simulation->startNewService(
+        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->getSimulation()->startNewService(
                 new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
                                                 {})));
 
@@ -327,12 +327,12 @@ private:
 
         // Dynamically create a BM Service
         std::vector<std::string> execution_hosts = {"QuadCoreHost"};
-        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::BareMetalComputeService>(simulation->startNewService(
+        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::BareMetalComputeService>(this->getSimulation()->startNewService(
                 new wrench::BareMetalComputeService(hostname, execution_hosts, "/scratch",
                                                     {})));
 
         // Dynamically create a Storage Service on this host
-        auto dynamically_created_storage_service = simulation->startNewService(
+        auto dynamically_created_storage_service = this->getSimulation()->startNewService(
                 wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
                                                                          {},
                                                                          {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));

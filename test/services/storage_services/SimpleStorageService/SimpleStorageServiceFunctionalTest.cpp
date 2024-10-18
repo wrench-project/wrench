@@ -62,10 +62,10 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
-        file_1 = wrench::Simulation::addFile("file_1", 1.0);
-        file_10 = wrench::Simulation::addFile("file_10", 10.0);
-        file_100 = wrench::Simulation::addFile("file_100", 100.0);
-        file_500 = wrench::Simulation::addFile("file_500", 500.0);
+        file_1 = wrench::Simulation::addFile("file_1", 1);
+        file_10 = wrench::Simulation::addFile("file_10", 10);
+        file_100 = wrench::Simulation::addFile("file_100", 100);
+        file_500 = wrench::Simulation::addFile("file_500", 500);
 
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"

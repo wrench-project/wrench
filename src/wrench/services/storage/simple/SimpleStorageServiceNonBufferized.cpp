@@ -22,7 +22,7 @@
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
-#include <wrench/services/memory/MemoryManager.h>
+//#include <wrench/services/memory/MemoryManager.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_simple_storage_service_non_bufferized,
                     "Log category for Simple Storage Service Non Bufferized");
@@ -50,7 +50,7 @@ namespace wrench {
     SimpleStorageServiceNonBufferized::SimpleStorageServiceNonBufferized(const std::string &hostname,
                                                                          const std::set<std::string>& mount_points,
                                                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, mount_points, std::move(property_list), std::move(messagepayload_list),
+                                                                         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, mount_points, std::move(property_list), std::move(messagepayload_list),
                                                                                                                                                            "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {
         this->buffer_size = 0;
         this->is_bufferized = false;
@@ -113,7 +113,7 @@ namespace wrench {
 //                this->createFile(transaction->dst_location);
                 WRENCH_INFO("File %s stored", transaction->dst_location->getFile()->getID().c_str());
                 try {
-                    this->simulation->getOutput().addTimestampFileCopyCompletion(
+                    this->simulation_->getOutput().addTimestampFileCopyCompletion(
                             Simulation::getCurrentSimulatedDate(), transaction->dst_location->getFile(), transaction->src_location, transaction->dst_location);
                 } catch (invalid_argument &ignore) {
                 }
@@ -186,7 +186,7 @@ namespace wrench {
             }
 
             // Start periodical flushing via a memory manager
-            this->memory_manager = MemoryManager::initAndStart(this->simulation, memory_disk, 0.4, 5, 30, this->hostname);
+            this->memory_manager = MemoryManager::initAndStart(this->simulation_, memory_disk, 0.4, 5, 30, this->hostname);
         }
 #endif
 
@@ -332,7 +332,7 @@ namespace wrench {
      * @return true if this process should keep running
      */
     bool SimpleStorageServiceNonBufferized::processFileWriteRequest(std::shared_ptr<FileLocation> &location,
-                                                                    double num_bytes_to_write,
+                                                                    sg_size_t num_bytes_to_write,
                                                                     S4U_CommPort *answer_commport,
                                                                     simgrid::s4u::Host *requesting_host) {
 
@@ -416,7 +416,7 @@ namespace wrench {
      */
     bool SimpleStorageServiceNonBufferized::processFileReadRequest(
             const std::shared_ptr<FileLocation> &location,
-            double num_bytes_to_read,
+            sg_size_t num_bytes_to_read,
             S4U_CommPort *answer_commport,
             simgrid::s4u::Host *requesting_host) {
 
@@ -486,7 +486,7 @@ namespace wrench {
         auto failure_cause = validateFileCopyRequest(src_location, dst_location, src_opened_file, dst_opened_file);
 
         if (failure_cause) {
-            this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), src_location->getFile(), src_location, dst_location);
+            this->simulation_->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), src_location->getFile(), src_location, dst_location);
             try {
                 answer_commport->dputMessage(
                         new StorageServiceFileCopyAnswerMessage(

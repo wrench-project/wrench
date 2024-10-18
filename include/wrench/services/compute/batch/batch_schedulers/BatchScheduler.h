@@ -103,7 +103,7 @@ namespace wrench {
          * @param set_of_jobs: the set of job configurations whose start times should be estimated
          * @return start time estimates
          */
-        virtual std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) = 0;
+        virtual std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) = 0;
 
     protected:
         /**

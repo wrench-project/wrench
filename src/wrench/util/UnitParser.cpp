@@ -13,9 +13,10 @@
 #include <unordered_map>
 #include <vector>
 #include <cerrno>
-#include <stdlib.h>
+#include <cstdlib>
 #include <wrench/util/UnitParser.h>
 #include <cfloat>
+#include <climits>
 
 namespace wrench {
 
@@ -24,7 +25,7 @@ namespace wrench {
     //     * @brief A helper nested class to facilitate unit conversion
     //     * (Essentially Cut-And-Pasted from simgrid/src/surf/xml/surfxml_sax_cb.cpp)
     //     */
-    //    class unit_scale : public WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE {
+    //    class unit_scale : public WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE {
     //    public:
     //        using std::unordered_map<std::string, double>::unordered_map;
     //        // tuples are : <unit, value for unit, base (2 or 10), true if abbreviated>
@@ -104,13 +105,17 @@ namespace wrench {
      * @return the size in bytes
      *
      */
-    double UnitParser::parse_size(const std::string &string) {
-        static const UnitParser::unit_scale units{std::make_tuple("b", 0.125, 2, true),
-                                                  std::make_tuple("b", 0.125, 10, true),
-                                                  std::make_tuple("B", 1.0, 2, true),
-                                                  std::make_tuple("B", 1.0, 10, true)};
+    sg_size_t UnitParser::parse_size(const std::string &string) {
+        static const UnitParser::unit_scale units{std::make_tuple("B", 1.0, 10, true),
+                                                  std::make_tuple("B", 1.0, 2, true)
+                                                  };
         try {
-            return parseValueWithUnit(string, units, "B");// default: bytes
+            double value = parseValueWithUnit(string, units, "B"); // default: bytes
+            if (value == DBL_MAX) {
+                return LONG_LONG_MAX;
+            } else {
+                return (sg_size_t) value;
+            }
         } catch (std::runtime_error &e) {
             throw std::invalid_argument(e.what());
         }

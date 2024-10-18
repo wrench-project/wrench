@@ -17,8 +17,8 @@
 #include "JobActionFailureController.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
-#define MB (1000.0 * 1000.0)
-#define GB (1000.0 * 1000.0 * 1000.0)
+#define MB (1000000ULL)
+#define GB (1000000000ULL)
 
 WRENCH_LOG_CATEGORY(custom_controller, "Log category for JobActionFailureController");
 

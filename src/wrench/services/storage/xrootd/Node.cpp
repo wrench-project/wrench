@@ -132,7 +132,7 @@ namespace wrench {
             } catch (ExecutionException &e) {
                 WRENCH_INFO(
                         "Got a network error while getting some message... ignoring");
-                return true;// oh well
+                return true;// oh! well
             }
 
             WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
@@ -303,7 +303,7 @@ namespace wrench {
 
                         if (!children.empty()) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
-                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
+                            Alarm::createAndStartAlarm(this->simulation_, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
                                                        new FileNotFoundAlarm(msg->answer_commport, file, false, answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
                                 WRENCH_DEBUG("Starting advanced lookup for %s", file->getID().c_str());
@@ -403,7 +403,7 @@ namespace wrench {
 
                         if (!children.empty()) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
-                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
+                            Alarm::createAndStartAlarm(this->simulation_, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
                                                        new FileNotFoundAlarm(msg->answer_commport, file, true, answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
                                 WRENCH_DEBUG("Starting advanced search for %s", file->getID().c_str());
@@ -447,7 +447,7 @@ namespace wrench {
                                                     metavisor->defaultTimeToLive));
                                 }
                             }
-                        } else {// you asked a leaf directly and it didn't have the file
+                        } else {// you asked a leaf directly, and it didn't have the file
                             msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(
                                     FileLocation::LOCATION(internalStorage, file),
                                     false,
@@ -768,7 +768,7 @@ namespace wrench {
         *
         */
         Node::Node(Deployment *deployment, const std::string &hostname, const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
-                   const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list) : StorageService(hostname, "XRootDNode") {
+                   const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : StorageService(hostname, "XRootDNode") {
 
             // Create /dev/null mountpoint so that Locations can be created
             // TODO: Removed this due to using simgrid:fsmod.... big deal?
@@ -793,7 +793,7 @@ namespace wrench {
         * @return true if the Node was made a storage server.  false if it was already a storage server
         */
         bool Node::makeFileServer(std::set<std::string> path, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                  WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
+                                  WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) {
             if (internalStorage != nullptr) {
                 return false;
             }
@@ -952,7 +952,7 @@ namespace wrench {
         */
         void Node::writeFile(S4U_CommPort *answer_commport,
                              const std::shared_ptr<FileLocation> &location,
-                             double num_bytes_to_write,
+                             sg_size_t num_bytes_to_write,
                              bool wait_for_answer) {
             if (internalStorage == nullptr) {
                 std::string error_message = "Cannot write file at non-storage XRootD node";
@@ -962,8 +962,8 @@ namespace wrench {
             }
             // Replace the location with
             // TODO: THIS LOCATION REWRITE WAS DONE TO FIX SOMETHING BUT HENRI HAS NO
-            // TODO: IDEA HOW COME IT'S EVER WORKED BEFORE SINCE THE FTT INSIDE THE INTERNALSTORAGE
-            // TODO: WILL SAY "THIS IS NOT ME, MY PARENT IS THE INTERNALSTORAGE, NOT THE NODE"
+            // TODO: IDEA HOW COME IT'S EVER WORKED BEFORE SINCE THE FTT INSIDE THE INTERNAL STORAGE
+            // TODO: WILL SAY "THIS IS NOT ME, MY PARENT IS THE INTERNAL STORAGE, NOT THE NODE"
             auto new_location = FileLocation::LOCATION(internalStorage, location->getDirectoryPath(), location->getFile());
             internalStorage->writeFile(answer_commport, new_location, num_bytes_to_write, wait_for_answer);
             //            internalStorage->writeFile(answer_commport, location, wait_for_answer);
@@ -991,9 +991,9 @@ namespace wrench {
          */
         std::shared_ptr<Node> Node::addChildStorageServer(const std::string &hostname, const std::string &mount_point,
                                                           WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,
-                                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,
+                                                          WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE storage_messagepayload_list,
                                                           WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
-                                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list) {
+                                                          WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE node_messagepayload_list) {
             if (storage_property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != storage_property_list.end()) {
                 if (UnitParser::parse_size(storage_property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]) < 1) {
                     throw std::invalid_argument("Node::addChildStorageServer(): XRootD current does not support 0 buffer_size");
@@ -1013,16 +1013,16 @@ namespace wrench {
         bool Node::hasFile(const shared_ptr<FileLocation> &location) {
             if (internalStorage)
                 return internalStorage->hasFile(location);
-            //return false;//no internal storage here, so I dont have any files.  But I am pretending to have some, so it's reasonable to ask.
+            //return false;//no internal storage here, so I don't have any files.  But I am pretending to have some, so it's reasonable to ask.
             //alternatively
-            return !constructFileSearchTree(metavisor->getFileNodes(location->getFile())).empty();//meta search the subtree for the file.  If its in the subtree we can find a route to it, so we have it
+            return !constructFileSearchTree(metavisor->getFileNodes(location->getFile())).empty();//meta-search the subtree for the file.  If it's in the subtree we can find a route to it, so we have it
         }
 
         /**
          * @brief Get the storage service's total space (in zero simulated time)
          * @return a capacity in bytes
          */
-        double Node::getTotalSpace() {
+        sg_size_t Node::getTotalSpace() {
             if (internalStorage) {
                 return internalStorage->getTotalSpace();
             } else {
@@ -1047,7 +1047,7 @@ namespace wrench {
          * @brief Determine the storage service's buffer size
          * @return a size in bytes
          */
-        double Node::getBufferSize() const {
+        sg_size_t Node::getBufferSize() const {
             if (internalStorage) {
                 return internalStorage->getBufferSize();
             } else {

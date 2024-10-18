@@ -30,13 +30,13 @@ namespace wrench {
      * @brief Constructor
      * @param payload: message size in bytes
      */
-    SimulationMessage::SimulationMessage(double payload) {
+    SimulationMessage::SimulationMessage(sg_size_t payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (payload < 0) {
             throw std::invalid_argument("SimulationMessage::SimulationMessage(): Invalid arguments");
         }
 #endif
-        this->payload = std::max<double>(0, payload);
+        this->payload = std::max<sg_size_t>(0, payload);
         TRACK_OBJECT("message");
     }
 

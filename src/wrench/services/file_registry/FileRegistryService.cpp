@@ -24,7 +24,6 @@
 #include <wrench/data_file/DataFile.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/network_proximity/NetworkProximityService.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_file_registry_service,
                     "Log category for File Registry Service");
@@ -40,7 +39,7 @@ namespace wrench {
     FileRegistryService::FileRegistryService(
             const std::string& hostname,
             const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
-            const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list) : Service(hostname, "file_registry") {
+            const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : Service(hostname, "file_registry") {
         this->setProperties(this->default_property_values, property_list);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
@@ -128,7 +127,7 @@ namespace wrench {
             throw std::invalid_argument("FileRegistryService::addEntry(): Invalid nullptr argument");
         }
 
-        if (not this->simulation->isRunning()) {
+        if (not this->simulation_->isRunning()) {
             this->addEntryToDatabase(location);
             return;
         }
@@ -158,7 +157,7 @@ namespace wrench {
             throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid nullptr argument");
         }
 
-        if (not this->simulation->isRunning()) {
+        if (not this->simulation_->isRunning()) {
             bool success = removeEntryFromDatabase(location);
             if (!success) {
                 WRENCH_WARN(

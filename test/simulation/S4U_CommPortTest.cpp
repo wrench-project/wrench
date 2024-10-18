@@ -260,10 +260,11 @@ void S4U_CommPortTest::do_AsynchronousCommunication_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 2;
+    int argc = 3;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-link-shutdown-simulation");
+    argv[2] = strdup("--wrench-default-control-message-size=10");
     //        argv[2] = strdup("--wrench-log-full");
 
     simulation->init(&argc, argv);
@@ -351,7 +352,6 @@ TEST_F(S4U_CommPortTest, NetworkTimeout) {
 
 void S4U_CommPortTest::do_NetworkTimeout_test() {
 
-
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
@@ -418,7 +418,6 @@ TEST_F(S4U_CommPortTest, NullCommPort) {
 }
 
 void S4U_CommPortTest::do_NullCommPort_test() {
-
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();

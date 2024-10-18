@@ -102,7 +102,7 @@ namespace wrench {
      *
      */
     void DataMovementManager::initiateAsynchronousFileRead(const std::shared_ptr<FileLocation> &location,
-                                                           const double num_bytes) {
+                                                           const sg_size_t num_bytes) {
         if ((location == nullptr)) {
             throw std::invalid_argument("DataMovementManager::initiateAsynchronousFileRead(): Invalid nullptr arguments");
         }
@@ -119,7 +119,7 @@ namespace wrench {
         this->pending_file_reads.push_front(std::make_unique<ReadRequestSpecs>(location, num_bytes));
         // Initiate the read in a thread
         auto frt = std::make_shared<FileReaderThread>(this->hostname, this->commport, location, num_bytes);
-        frt->setSimulation(this->simulation);
+        frt->setSimulation(this->simulation_);
         frt->start(frt, true, false);
     }
 
@@ -146,9 +146,9 @@ namespace wrench {
 
         this->pending_file_writes.push_front(std::make_unique<WriteRequestSpecs>(location, file_registry_service));
 
-        // Initiate the write in a thread
+        // Initiate the write operation in a thread
         auto fwt = std::make_shared<FileWriterThread>(this->hostname, this->commport, location);
-        fwt->setSimulation(this->simulation);
+        fwt->setSimulation(this->simulation_);
         fwt->start(fwt, true, false);
     }
 

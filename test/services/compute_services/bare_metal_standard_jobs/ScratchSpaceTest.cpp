@@ -253,8 +253,8 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
                     this, hostname)));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 1000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 2000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 1000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 2000);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(storage_service1->createFile(input_file));
@@ -474,8 +474,8 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
                     this, hostname)));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file1 = wrench::Simulation::addFile("input_file1", 10000.0);
-    std::shared_ptr<wrench::DataFile> input_file2 = wrench::Simulation::addFile("input_file2", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file1 = wrench::Simulation::addFile("input_file1", 10000);
+    std::shared_ptr<wrench::DataFile> input_file2 = wrench::Simulation::addFile("input_file2", 10000);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(storage_service1->createFile(input_file1));
@@ -681,9 +681,9 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
                     this, hostname)));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file1 = wrench::Simulation::addFile("input_file1", 1000.0);
-    std::shared_ptr<wrench::DataFile> input_file2 = wrench::Simulation::addFile("input_file2", 1000.0);
-    std::shared_ptr<wrench::DataFile> input_file3 = wrench::Simulation::addFile("input_file3", 1000.0);
+    std::shared_ptr<wrench::DataFile> input_file1 = wrench::Simulation::addFile("input_file1", 1000);
+    std::shared_ptr<wrench::DataFile> input_file2 = wrench::Simulation::addFile("input_file2", 1000);
+    std::shared_ptr<wrench::DataFile> input_file3 = wrench::Simulation::addFile("input_file3", 1000);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(storage_service1->createFile(input_file1));
