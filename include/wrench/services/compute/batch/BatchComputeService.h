@@ -76,7 +76,7 @@ namespace wrench {
                 {BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "false"},
                 {BatchComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
                 {BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
@@ -108,7 +108,7 @@ namespace wrench {
                             std::vector<std::string> compute_hosts,
                             std::string scratch_space_mount_point,
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
@@ -117,7 +117,7 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
-        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> resources);
+        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> resources);
 
         std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> getQueue();
 
@@ -151,10 +151,10 @@ namespace wrench {
         BatchComputeService(const std::string &hostname,
                             std::vector<std::string> compute_hosts,
                             unsigned long cores_per_host,
-                            double ram_per_host,
+                            sg_size_t ram_per_host,
                             std::string scratch_space_mount_point,
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+                            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
                             const std::string &suffix);
 
         //submits a standard job
@@ -265,7 +265,7 @@ namespace wrench {
         void processAlarmJobTimeout(const std::shared_ptr<BatchJob> &batch_job);
 
         //free up resources
-        void freeUpResources(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &resources);
+        void freeUpResources(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &resources);
 
         //send call back to the pilot job submitters
         void sendPilotJobExpirationNotification(const std::shared_ptr<PilotJob> &job);
@@ -277,11 +277,11 @@ namespace wrench {
         void processJobSubmission(const std::shared_ptr<BatchJob> &job, S4U_CommPort *answer_commport);
 
         //start a job
-        void startJob(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &, const std::shared_ptr<CompoundJob> &,
+        void startJob(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &, const std::shared_ptr<CompoundJob> &,
                       const std::shared_ptr<BatchJob> &, unsigned long, unsigned long, unsigned long);
 
         // process a resource request
-        void processIsThereAtLeastOneHostWithAvailableResources(S4U_CommPort *answer_commport, unsigned long num_cores, double ram);
+        void processIsThereAtLeastOneHostWithAvailableResources(S4U_CommPort *answer_commport, unsigned long num_cores, sg_size_t ram);
 
 #ifdef ENABLE_BATSCHED
         void processExecuteJobFromBatSched(const std::string &bat_sched_reply);

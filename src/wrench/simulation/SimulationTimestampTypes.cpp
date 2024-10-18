@@ -666,7 +666,7 @@ namespace wrench {
     SimulationTimestampDiskRead::SimulationTimestampDiskRead(double date,
                                                              std::string hostname,
                                                              std::string mount,
-                                                             double bytes,
+                                                             sg_size_t bytes,
                                                              int counter) : hostname(std::move(hostname)), mount(std::move(mount)), bytes(bytes), counter(counter) {
         this->date = date;
     }
@@ -689,9 +689,9 @@ namespace wrench {
 
     /**
      * @brief retrieves the amount of bytes being read
-     * @return number of bytes as double
+     * @return number of bytes
      */
-    double SimulationTimestampDiskRead::getBytes() const {
+    sg_size_t SimulationTimestampDiskRead::getBytes() const {
         return this->bytes;
     }
 
@@ -747,7 +747,7 @@ namespace wrench {
      */
     SimulationTimestampDiskReadStart::SimulationTimestampDiskReadStart(double date, std::string hostname,
                                                                        std::string mount,
-                                                                       double bytes,
+                                                                       sg_size_t bytes,
                                                                        int counter) : SimulationTimestampDiskRead(date, std::move(hostname), std::move(mount), bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadStart timestamp for disk read");
 
@@ -773,7 +773,7 @@ namespace wrench {
      */
     SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure(double date, const std::string &hostname,
                                                                            const std::string &mount,
-                                                                           double bytes,
+                                                                           sg_size_t bytes,
                                                                            int counter) : SimulationTimestampDiskRead(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadFailure timestamp for disk read");
 
@@ -799,7 +799,7 @@ namespace wrench {
     SimulationTimestampDiskReadCompletion::SimulationTimestampDiskReadCompletion(double date,
                                                                                  const std::string &hostname,
                                                                                  const std::string &mount,
-                                                                                 double bytes,
+                                                                                 sg_size_t bytes,
                                                                                  int counter) : SimulationTimestampDiskRead(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadCompletion timestamp for disk read");
 
@@ -824,7 +824,7 @@ namespace wrench {
      */
     SimulationTimestampDiskWrite::SimulationTimestampDiskWrite(double date, std::string hostname,
                                                                std::string mount,
-                                                               double bytes,
+                                                               sg_size_t bytes,
                                                                int counter) : hostname(std::move(hostname)), mount(std::move(mount)), bytes(bytes), counter(counter) {
         this->date = date;
     }
@@ -849,7 +849,7 @@ namespace wrench {
      * @brief retrieves the amount of bytes being written
      * @return number of bytes as double
      */
-    double SimulationTimestampDiskWrite::getBytes() const {
+    sg_size_t SimulationTimestampDiskWrite::getBytes() const {
         return this->bytes;
     }
 
@@ -906,7 +906,7 @@ namespace wrench {
      */
     SimulationTimestampDiskWriteStart::SimulationTimestampDiskWriteStart(double date, std::string hostname,
                                                                          std::string mount,
-                                                                         double bytes,
+                                                                         sg_size_t bytes,
                                                                          int counter) : SimulationTimestampDiskWrite(date, std::move(hostname), std::move(mount), bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteStart timestamp for disk write");
 
@@ -931,7 +931,7 @@ namespace wrench {
      */
     SimulationTimestampDiskWriteFailure::SimulationTimestampDiskWriteFailure(double date, const std::string &hostname,
                                                                              const std::string &mount,
-                                                                             double bytes,
+                                                                             sg_size_t bytes,
                                                                              int counter) : SimulationTimestampDiskWrite(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteFailure timestamp for disk write");
 
@@ -956,7 +956,7 @@ namespace wrench {
      */
     SimulationTimestampDiskWriteCompletion::SimulationTimestampDiskWriteCompletion(double date, const std::string &hostname,
                                                                                    const std::string &mount,
-                                                                                   double bytes,
+                                                                                   sg_size_t bytes,
                                                                                    int counter) : SimulationTimestampDiskWrite(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteCompletion timestamp for disk write");
 

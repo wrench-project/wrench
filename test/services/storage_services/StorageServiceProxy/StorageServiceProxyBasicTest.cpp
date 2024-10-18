@@ -161,24 +161,24 @@ private:
             }
         }
         // read file2 via proxy and target
-        start = simulation->getCurrentSimulatedDate();
+        start = wrench::Simulation::getCurrentSimulatedDate();
         proxy->readFile(this->test->target, file2);
-        auto firstFile = simulation->getCurrentSimulatedDate();
+        auto firstFile = wrench::Simulation::getCurrentSimulatedDate();
         // read file2 via proxy and target
         proxy->readFile(this->test->target, file2);
-        auto secondFile = simulation->getCurrentSimulatedDate();
+        auto secondFile = wrench::Simulation::getCurrentSimulatedDate();
 
         if (firstFile - start < (secondFile - firstFile) * 1.2) {
             throw std::runtime_error("caching was not significantly faster than not caching for file read");
         }
 
         //check the file again, it should now be cached
-        start = simulation->getCurrentSimulatedDate();
+        start = wrench::Simulation::getCurrentSimulatedDate();
 
         if (!proxy->lookupFile(test->remote, file2)) {
             throw std::runtime_error("Could not find previously found file after read");
         }
-        auto secondCache = simulation->getCurrentSimulatedDate() - start;
+        auto secondCache = wrench::Simulation::getCurrentSimulatedDate() - start;
 
         if (firstCache < secondCache * 1.2) {
             throw std::runtime_error("caching was not significantly faster than not caching for file lookup");
@@ -191,7 +191,7 @@ private:
         if (testWithDefault) {
             proxy->writeFile(file3);
         }
-        simulation->sleep(1000);
+        wrench::Simulation::sleep(1000);
         WRENCH_INFO("Activating backdoor");
         ///activating backdoor
         S4U_Simulation::setLinkBandwidth("backdoor", 1000000000);

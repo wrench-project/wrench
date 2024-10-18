@@ -14,9 +14,9 @@
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
-#define GFLOP (1000.0 * 1000.0 * 1000.0)
-#define MBYTE (1000.0 * 1000.0)
-#define GBYTE (1000.0 * 1000.0 * 1000.0)
+#define GFLOP (1000 * 1000.0 * 1000.0)
+#define MBYTE (1000000ULL)
+#define GBYTE (1000000000ULL)
 
 WRENCH_LOG_CATEGORY(xrootd_storage_service_full_functional_test, "Log category for XRootDServiceFullFunctionalTest");
 
@@ -228,7 +228,7 @@ private:
      *
      * @param event: the event
      */
-    void processEventCompoundJobCompletion(std::shared_ptr<wrench::CompoundJobCompletedEvent> event) override {
+    void processEventCompoundJobCompletion(const std::shared_ptr<wrench::CompoundJobCompletedEvent> &event) override {
         /* Retrieve the job that this event is for */
         auto job = event->job;
         /* Print info about all actions in the job */

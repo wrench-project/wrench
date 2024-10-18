@@ -122,7 +122,7 @@ namespace wrench {
             // Take measurements
             for (auto &h: this->time_to_next_measurement) {
                 if (h.second < EPSILON) {
-                    this->simulation->getEnergyConsumed(h.first, true);
+                    this->simulation_->getEnergyConsumed(h.first, true);
                     this->time_to_next_measurement[h.first] = this->measurement_periods[h.first];
                 }
             }

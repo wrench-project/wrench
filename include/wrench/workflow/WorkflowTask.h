@@ -50,9 +50,9 @@ namespace wrench {
 
         void setParallelModel(std::shared_ptr<ParallelModel> model);
 
-        double getMemoryRequirement() const;
+        sg_size_t getMemoryRequirement() const;
 
-        void setMemoryRequirement(double num_bytes);
+        void setMemoryRequirement(sg_size_t num_bytes);
 
         unsigned long getNumberOfChildren();
 
@@ -283,7 +283,7 @@ namespace wrench {
         unsigned long min_num_cores;
         unsigned long max_num_cores;
         std::shared_ptr<ParallelModel> parallel_model;
-        double memory_requirement;
+        sg_size_t memory_requirement;
         unsigned long priority = 0;    // Task priority
         int toplevel;                  // 0 if entry task
         int bottomlevel;               // 0 if exit task
@@ -303,7 +303,7 @@ namespace wrench {
                      double flops,
                      unsigned long min_num_cores,
                      unsigned long max_num_cores,
-                     double memory_requirement);
+                     sg_size_t memory_requirement);
 
         // Containing job
         Job *job;

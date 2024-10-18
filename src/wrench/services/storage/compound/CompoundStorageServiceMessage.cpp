@@ -17,7 +17,7 @@ namespace wrench {
      * @brief Constructor
      * @param payload: the message size in bytes
      */
-    CompoundStorageServiceMessage::CompoundStorageServiceMessage(double payload) : StorageServiceMessage(payload) {}
+    CompoundStorageServiceMessage::CompoundStorageServiceMessage(sg_size_t payload) : StorageServiceMessage(payload) {}
 
     /**
      * @brief Constructor
@@ -30,7 +30,7 @@ namespace wrench {
     CompoundStorageAllocationRequestMessage::CompoundStorageAllocationRequestMessage(S4U_CommPort *answer_commport,
                                                                                      std::shared_ptr<DataFile> file,
                                                                                      unsigned int stripe_count,
-                                                                                     double payload)
+                                                                                     sg_size_t payload)
         : CompoundStorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_commport == nullptr) {
@@ -50,7 +50,7 @@ namespace wrench {
      *
      */
     CompoundStorageAllocationAnswerMessage::CompoundStorageAllocationAnswerMessage(
-            std::vector<std::shared_ptr<FileLocation>> locations, double payload)
+            std::vector<std::shared_ptr<FileLocation>> locations, sg_size_t payload)
         : CompoundStorageServiceMessage(payload) {
         this->locations = std::move(locations);
     }
@@ -63,7 +63,7 @@ namespace wrench {
      *
      */
     CompoundStorageLookupRequestMessage::CompoundStorageLookupRequestMessage(S4U_CommPort *answer_commport,
-                                                                             std::shared_ptr<DataFile> file, double payload)
+                                                                             std::shared_ptr<DataFile> file, sg_size_t payload)
         : CompoundStorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_commport == nullptr) {
@@ -82,7 +82,7 @@ namespace wrench {
      *
      */
     CompoundStorageLookupAnswerMessage::CompoundStorageLookupAnswerMessage(
-            std::vector<std::shared_ptr<FileLocation>> locations, double payload)
+            std::vector<std::shared_ptr<FileLocation>> locations, sg_size_t payload)
         : CompoundStorageServiceMessage(payload) {
         this->locations = std::move(locations);
     }

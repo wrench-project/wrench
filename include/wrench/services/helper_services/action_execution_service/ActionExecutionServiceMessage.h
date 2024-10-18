@@ -31,7 +31,7 @@ namespace wrench {
      */
     class ActionExecutionServiceMessage : public SimulationMessage {
     protected:
-        ActionExecutionServiceMessage(double payload);
+        ActionExecutionServiceMessage(sg_size_t payload);
     };
 
     /**
@@ -42,7 +42,7 @@ namespace wrench {
         ActionExecutionServiceSubmitActionRequestMessage(
                 S4U_CommPort *reply_commport,
                 std::shared_ptr<Action> action,
-                double payload);
+                sg_size_t payload);
 
         /** @brief The action to be executed */
         std::shared_ptr<Action> action;
@@ -58,7 +58,7 @@ namespace wrench {
         ActionExecutionServiceSubmitActionAnswerMessage(
                 bool success,
                 std::shared_ptr<FailureCause> cause,
-                double payload);
+                sg_size_t payload);
 
         /** @brief Whether the action submission was a success or not */
         bool success;
@@ -75,7 +75,7 @@ namespace wrench {
                 S4U_CommPort *reply_commport,
                 std::shared_ptr<Action> action,
                 ComputeService::TerminationCause termination_cause,
-                double payload);
+                sg_size_t payload);
 
         /** @brief The reply commport_name */
         S4U_CommPort *reply_commport;
@@ -93,7 +93,7 @@ namespace wrench {
         ActionExecutionServiceTerminateActionAnswerMessage(
                 bool success,
                 std::shared_ptr<FailureCause> cause,
-                double payload);
+                sg_size_t payload);
 
         /** @brief The success status */
         bool success;
@@ -108,7 +108,7 @@ namespace wrench {
     public:
         ActionExecutionServiceActionDoneMessage(
                 std::shared_ptr<Action> action,
-                double payload);
+                sg_size_t payload);
 
         /** @brief The action that completed  */
         std::shared_ptr<Action> action;

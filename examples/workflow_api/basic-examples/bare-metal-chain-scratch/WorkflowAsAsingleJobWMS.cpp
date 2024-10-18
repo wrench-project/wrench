@@ -101,7 +101,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void WorkflowAsAsingleJobWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
+    void WorkflowAsAsingleJobWMS::processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */
@@ -115,7 +115,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void WorkflowAsAsingleJobWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
+    void WorkflowAsAsingleJobWMS::processEventStandardJobFailure(const std::shared_ptr<StandardJobFailedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */

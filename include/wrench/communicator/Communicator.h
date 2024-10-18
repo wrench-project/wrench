@@ -21,11 +21,11 @@ namespace wrench {
         unsigned long join(unsigned long desired_rank);
         unsigned long getNumRanks();
         void barrier();
-        void sendAndReceive(const std::map<unsigned long, double> &sends, int num_receives);
-        void sendReceiveAndCompute(const std::map<unsigned long, double> &sends, int num_receives, double flops);
+        void sendAndReceive(const std::map<unsigned long, sg_size_t> &sends, int num_receives);
+        void sendReceiveAndCompute(const std::map<unsigned long, sg_size_t> &sends, int num_receives, double flops);
 
-        void MPI_Alltoall(double bytes, std::string config = "ompi");
-        void MPI_Bcast(int root_rank, double bytes, std::string config = "ompi");
+        void MPI_Alltoall(sg_size_t bytes, std::string config = "ompi");
+        void MPI_Bcast(int root_rank, sg_size_t bytes, std::string config = "ompi");
         void MPI_Barrier(std::string config = "ompi");
 
         ~Communicator();

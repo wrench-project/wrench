@@ -130,7 +130,7 @@ namespace wrench {
 
             /* Change the pstate of large VM  */
             WRENCH_INFO("Changing the pstate of the large VM to the lower pstate to save on energy temporarily");
-            this->simulation->setPstate("CloudHost1", 1);
+            this->getSimulation()->setPstate("CloudHost1", 1);
 
             /* Sleep 10 seconds */
             WRENCH_INFO("Sleeping for 10 seconds");
@@ -138,7 +138,7 @@ namespace wrench {
 
             /* Change the pstate of CloudHost1  */
             WRENCH_INFO("Changing the pstate of the large VM back to the higher pstate");
-            this->simulation->setPstate("CloudHost1", 0);
+            this->getSimulation()->setPstate("CloudHost1", 0);
 
             /* Wait for  workflow execution event and process it. In this case we know that
              * the event will be a StandardJobCompletionEvent, which is processed by the method
@@ -166,7 +166,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void TwoTasksAtATimeCloudWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
+    void TwoTasksAtATimeCloudWMS::processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */
@@ -179,7 +179,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void TwoTasksAtATimeCloudWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
+    void TwoTasksAtATimeCloudWMS::processEventStandardJobFailure(const std::shared_ptr<StandardJobFailedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */

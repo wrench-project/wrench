@@ -18,7 +18,7 @@ namespace wrench {
      *
      * @param payload: the message size in bytes
      */
-    ExecutionControllerMessage::ExecutionControllerMessage(double payload) : SimulationMessage(payload) {}
+    ExecutionControllerMessage::ExecutionControllerMessage(sg_size_t payload) : SimulationMessage(payload) {}
 
     /**
      * @brief Constructor
@@ -26,7 +26,7 @@ namespace wrench {
      * @param payload: message size in bytes
      *
      */
-    ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(std::string message, double payload) : ExecutionControllerMessage(payload), message(std::move(message)) {}
+    ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(std::string message, sg_size_t payload) : ExecutionControllerMessage(payload), message(std::move(message)) {}
 
 
 }// namespace wrench

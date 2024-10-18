@@ -65,17 +65,10 @@ namespace wrench {
 
     /**
     * @brief Set a message payload of the Service
-    * @param messagepayload: the message payload (which must a a string representation of a >=0 double)
+    * @param messagepayload: the message payload (which must be a string representation of a >=0 sg_size_t)
     * @param value: the message payload value
     */
-    void Service::setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE messagepayload, double value) {
-        // Check that the value is a >=0 double
-
-        if (value < 0) {
-            throw std::invalid_argument(
-                    "Service::setMessagePayload(): Invalid message payload value " + ServiceMessagePayload::translatePayloadType(messagepayload) + ": " +
-                    std::to_string(value));
-        }
+    void Service::setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE messagepayload, sg_size_t value) {
         this->messagepayload_list[messagepayload] = value;
     }
 
@@ -153,8 +146,19 @@ namespace wrench {
      * @param property: the property
      * @return the size in byte
      */
-    double Service::getPropertyValueAsSizeInByte(WRENCH_PROPERTY_TYPE property) {
-        return this->getPropertyValueWithUnitsAsValue(property, UnitParser::parse_size);
+    sg_size_t Service::getPropertyValueAsSizeInByte(WRENCH_PROPERTY_TYPE property) {
+        sg_size_t value;
+        std::string string_value;
+        string_value = this->getPropertyValueAsString(property);
+        if (string_value == "infinity") {
+            return LONG_LONG_MAX;
+        }
+        if (string_value == "zero") {
+            return 0;
+        }
+        value = (sg_size_t) this->getPropertyValueWithUnitsAsValue(property, UnitParser::parse_size);
+
+        return value;
     }
 
     /**
@@ -197,7 +201,7 @@ namespace wrench {
      * @return the message payload value as a double
      *
      */
-    double Service::getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE message_payload) {
+    sg_size_t Service::getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE message_payload) {
         if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
             try {
                 throw std::invalid_argument(
@@ -216,7 +220,7 @@ namespace wrench {
      * @brief Get all message payloads and their values of the Service
      * @return the message payload map
      */
-    const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &Service::getMessagePayloadList() const {
+    const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE &Service::getMessagePayloadList() const {
         return this->messagepayload_list;
     }
 
@@ -418,8 +422,8 @@ namespace wrench {
      * @param default_messagepayload_values: list of default message payloads
      * @param overridden_messagepayload_values: list of overridden message payloads (override the default)
      */
-    void Service::setMessagePayloads(const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &default_messagepayload_values,
-                                     const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &overridden_messagepayload_values) {
+    void Service::setMessagePayloads(const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE &default_messagepayload_values,
+                                     const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE &overridden_messagepayload_values) {
         // Set default messagepayloads
         for (auto const &p: default_messagepayload_values) {
             this->setMessagePayload(p.first, p.second);

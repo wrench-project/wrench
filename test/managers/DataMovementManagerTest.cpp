@@ -170,7 +170,7 @@ private:
         // Create a new file registry service to resume normal testing
         file_registry_service = std::shared_ptr<wrench::FileRegistryService>(new wrench::FileRegistryService(
                 this->hostname, {}, {}));
-        file_registry_service->setSimulation(this->simulation);
+        file_registry_service->setSimulation(this->getSimulation());
         file_registry_service->start(file_registry_service, true, false);
 
         // try asynchronous copy and register
@@ -491,7 +491,7 @@ private:
             // try asynchronous write and register that should NOT work
             std::shared_ptr<wrench::ExecutionEvent> async_write_event;
 
-            auto too_big = wrench::Simulation::addFile("too_bit", 1000000000000000.0);
+            auto too_big = wrench::Simulation::addFile("too_bit", 1000000000000000ULL);
             auto write_location = wrench::FileLocation::LOCATION(this->test->dst_storage_service, too_big);
 
             try {

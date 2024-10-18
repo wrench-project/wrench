@@ -82,11 +82,11 @@ private:
         // the first call to setPstate(hostname, 2) should record a timestamp
         // then the second call to setPstate(hostname, 1) should record a timestamp that replaces the one previously added
         // so that we don't end up with timestamps that show two different pstates at the same point in time
-        this->simulation->setPstate(this->getHostname(), 2);
-        this->simulation->setPstate(this->getHostname(), 1);
+        this->getSimulation()->setPstate(this->getHostname(), 2);
+        this->getSimulation()->setPstate(this->getHostname(), 1);
 
         wrench::S4U_Simulation::sleep(10.0);
-        this->simulation->setPstate(this->getHostname(), 2);
+        this->getSimulation()->setPstate(this->getHostname(), 2);
 
         return 0;
     }
@@ -173,13 +173,13 @@ private:
     int main() override {
         const double MEGAFLOP = 1000.0 * 1000.0;
         wrench::S4U_Simulation::compute(100.0 * MEGAFLOP);             // compute for 1 second
-        this->simulation->getEnergyConsumed(this->getHostname(), true);// 200 joules
+        this->getSimulation()->getEnergyConsumed(this->getHostname(), true);// 200 joules
         wrench::S4U_Simulation::compute(100.0 * MEGAFLOP);             // compute for 1 second
-        this->simulation->getEnergyConsumed(this->getHostname(), true);// now 400 joules
+        this->getSimulation()->getEnergyConsumed(this->getHostname(), true);// now 400 joules
 
         // following two calls should not add any timestamps
-        this->simulation->getEnergyConsumed(this->getHostname());
-        this->simulation->getEnergyConsumed(this->getHostname(), false);
+        this->getSimulation()->getEnergyConsumed(this->getHostname());
+        this->getSimulation()->getEnergyConsumed(this->getHostname(), false);
 
         return 0;
     }

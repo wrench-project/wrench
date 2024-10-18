@@ -32,7 +32,7 @@ WRENCH_LOG_CATEGORY(simulation_controller, "Log category for SimulationControlle
     }
 
 #define PARSE_MESSAGE_PAYLOAD_LIST()                                                     \
-    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;                  \
+    WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE service_message_payload_list;                  \
     {                                                                                    \
         json jsonData = json::parse(message_payload_list_string);                        \
         for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {                 \
@@ -57,7 +57,7 @@ namespace wrench {
 
         this->things_to_do.push([this, s, &s_created]() {
             try {
-                auto new_service_shared_ptr = this->simulation->startNewService(s);
+                auto new_service_shared_ptr = this->getSimulation()->startNewService(s);
                 if (auto cs = std::dynamic_pointer_cast<wrench::ComputeService>(new_service_shared_ptr)) {
                     WRENCH_INFO("Started a new compute service");
                     this->compute_service_registry.insert(new_service_shared_ptr->getName(), cs);
@@ -308,7 +308,7 @@ namespace wrench {
 
         PARSE_MESSAGE_PAYLOAD_LIST()
 
-        map<std::string, std::tuple<unsigned long, double>> resources;
+        map<std::string, std::tuple<unsigned long, sg_size_t>> resources;
         json jsonData = json::parse(resource);
         for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
             auto spec = it.value();

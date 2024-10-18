@@ -123,7 +123,7 @@ namespace wrench {
             // Take measurements
             for (auto &l: this->time_to_next_measurement) {
                 if (l.second < EPSILON) {
-                    this->simulation->getLinkUsage(l.first, true);
+                    this->simulation_->getLinkUsage(l.first, true);
                     this->time_to_next_measurement[l.first] = this->measurement_periods[l.first];
                 }
             }

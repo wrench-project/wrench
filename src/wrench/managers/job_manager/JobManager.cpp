@@ -581,7 +581,7 @@ namespace wrench {
                     // Create a bare-metal compute service and start it
                     auto execution_service = executor->getActionExecutionService();
 
-                    std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
+                    std::map<std::string, std::tuple<unsigned long, sg_size_t>> specified_compute_resources;
                     for (const auto &h: execution_service->getComputeResources()) {
                         specified_compute_resources[h.first->get_name()] = h.second;
                     }
@@ -597,7 +597,7 @@ namespace wrench {
                                     "_one_shot_bm",
                                     std::dynamic_pointer_cast<ComputeService>(execution_service->getParentService())->getScratch()));
 
-                    bm_cs->simulation = executor->getSimulation();
+                    bm_cs->simulation_ = executor->getSimulation();
                     bm_cs->start(bm_cs, true, false);// Daemonized, no auto-restart
                     job->compute_service = bm_cs;
 
@@ -715,7 +715,7 @@ namespace wrench {
         std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> state_changes;
         std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
-        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
+        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation_);
         job->applyTaskUpdates(state_changes, failure_count_increments);
     }
 
@@ -928,7 +928,7 @@ namespace wrench {
         std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> state_changes;
         std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
-        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
+        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation_);
 
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job->compound_job);
@@ -960,13 +960,13 @@ namespace wrench {
         std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> state_changes;
         std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
-        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
+        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation_);
 
         // Fix the failure cause in case it's a failure cause that refers to a job (in which case it is
         // right now referring to the compound job instead of the standard job
-        if (auto actual_cause = std::dynamic_pointer_cast<JobKilled>(job_failure_cause)) {
+        if (std::dynamic_pointer_cast<JobKilled>(job_failure_cause)) {
             job_failure_cause = std::make_shared<JobKilled>(job);
-        } else if (auto actual_cause = std::dynamic_pointer_cast<JobTimeout>(job_failure_cause)) {
+        } else if (std::dynamic_pointer_cast<JobTimeout>(job_failure_cause)) {
             job_failure_cause = std::make_shared<JobTimeout>(job);
         } else if (auto actual_cause = std::dynamic_pointer_cast<NotEnoughResources>(job_failure_cause)) {
             job_failure_cause = std::make_shared<NotEnoughResources>(job, actual_cause->getService());

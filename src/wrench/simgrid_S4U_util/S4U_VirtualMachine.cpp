@@ -31,9 +31,9 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means use all defaults)
      */
     S4U_VirtualMachine::S4U_VirtualMachine(const std::string &vm_name,
-                                           unsigned long num_cores, double ram_memory,
+                                           unsigned long num_cores, sg_size_t ram_memory,
                                            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : vm_name(vm_name), num_cores(num_cores), ram_memory(ram_memory),
+                                           WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : vm_name(vm_name), num_cores(num_cores), ram_memory(ram_memory),
                                                                                                         property_list(property_list), messagepayload_list(messagepayload_list) {
         this->state = State::DOWN;
     }
@@ -63,7 +63,7 @@ namespace wrench {
     * @brief Get the memory_manager_service consumption
     * @return the memory_manager_service consumption
     */
-    double S4U_VirtualMachine::getMemory() {
+    sg_size_t S4U_VirtualMachine::getMemory() {
         return this->ram_memory;
     }
 
@@ -189,7 +189,7 @@ namespace wrench {
      * @brief Get the message payload list for the bare-metal compute service that will run on the VM ({} means "use all defaults")
      * @return a message payload list
      */
-    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE S4U_VirtualMachine::getMessagePayloadList() {
+    WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE S4U_VirtualMachine::getMessagePayloadList() {
         return this->messagepayload_list;
     }
 

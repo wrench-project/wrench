@@ -123,21 +123,21 @@ namespace wrench {
                                             std::shared_ptr<FileLocation> dst);
 
         int
-        addTimestampDiskReadStart(double date, std::string hostname, std::string mount, double bytes);
+        addTimestampDiskReadStart(double date, std::string hostname, std::string mount, sg_size_t bytes);
 
         void
-        addTimestampDiskReadFailure(double date, const std::string &hostname, const std::string &mount, double bytes, int unique_sequence_number);
+        addTimestampDiskReadFailure(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes, int unique_sequence_number);
 
-        void addTimestampDiskReadCompletion(double date, const std::string &hostname, const std::string &mount, double bytes,
+        void addTimestampDiskReadCompletion(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes,
                                             int unique_sequence_number);
 
         int
-        addTimestampDiskWriteStart(double date, std::string hostname, std::string mount, double bytes);
+        addTimestampDiskWriteStart(double date, std::string hostname, std::string mount, sg_size_t bytes);
 
         void
-        addTimestampDiskWriteFailure(double date, const std::string &hostname, const std::string &mount, double bytes, int unique_sequence_number);
+        addTimestampDiskWriteFailure(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes, int unique_sequence_number);
 
-        void addTimestampDiskWriteCompletion(double date, const std::string &hostname, const std::string &mount, double bytes,
+        void addTimestampDiskWriteCompletion(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes,
                                              int unique_sequence_number);
 
         void addTimestampPstateSet(double date, const std::string &hostname, int pstate);

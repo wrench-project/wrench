@@ -18,7 +18,7 @@ namespace wrench {
      * @brief Constructor
      * @param payload: message size in bytes
      */
-    ComputeServiceMessage::ComputeServiceMessage(double payload) : ServiceMessage(payload) {
+    ComputeServiceMessage::ComputeServiceMessage(sg_size_t payload) : ServiceMessage(payload) {
     }
 
     /**
@@ -33,7 +33,7 @@ namespace wrench {
             S4U_CommPort *answer_commport,
             std::shared_ptr<CompoundJob> job,
             std::map<std::string, std::string> service_specific_args,
-            double payload) : ComputeServiceMessage(payload) {
+            sg_size_t payload) : ComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
@@ -58,7 +58,7 @@ namespace wrench {
                                                                                                std::shared_ptr<ComputeService> compute_service,
                                                                                                bool success,
                                                                                                std::shared_ptr<FailureCause> failure_cause,
-                                                                                               double payload) : ComputeServiceMessage(payload) {
+                                                                                               sg_size_t payload) : ComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((job == nullptr) || (compute_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
@@ -82,7 +82,7 @@ namespace wrench {
      */
     ComputeServiceCompoundJobDoneMessage::ComputeServiceCompoundJobDoneMessage(std::shared_ptr<CompoundJob> job,
                                                                                std::shared_ptr<ComputeService> cs,
-                                                                               double payload)
+                                                                               sg_size_t payload)
         : ComputeServiceMessage(payload) {
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -104,7 +104,7 @@ namespace wrench {
      */
     ComputeServiceCompoundJobFailedMessage::ComputeServiceCompoundJobFailedMessage(std::shared_ptr<CompoundJob> job,
                                                                                    std::shared_ptr<ComputeService> cs,
-                                                                                   double payload)
+                                                                                   sg_size_t payload)
         : ComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((job == nullptr) || (cs == nullptr)) {
@@ -126,7 +126,7 @@ namespace wrench {
     ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(
             S4U_CommPort *answer_commport,
             std::shared_ptr<CompoundJob> job,
-            double payload) : ComputeServiceMessage(payload) {
+            sg_size_t payload) : ComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
@@ -150,7 +150,7 @@ namespace wrench {
                                                                                                      std::shared_ptr<ComputeService> compute_service,
                                                                                                      bool success,
                                                                                                      std::shared_ptr<FailureCause> failure_cause,
-                                                                                                     double payload) : ComputeServiceMessage(payload) {
+                                                                                                     sg_size_t payload) : ComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((job == nullptr) || (compute_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
@@ -175,7 +175,7 @@ namespace wrench {
      */
     ComputeServicePilotJobStartedMessage::ComputeServicePilotJobStartedMessage(std::shared_ptr<PilotJob> job,
                                                                                std::shared_ptr<ComputeService> cs,
-                                                                               double payload)
+                                                                               sg_size_t payload)
         : ComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((job == nullptr) || (cs == nullptr)) {
@@ -196,7 +196,7 @@ namespace wrench {
      */
     ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(std::shared_ptr<PilotJob> job,
                                                                                std::shared_ptr<ComputeService> cs,
-                                                                               double payload)
+                                                                               sg_size_t payload)
         : ComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((job == nullptr) || (cs == nullptr)) {
@@ -219,7 +219,7 @@ namespace wrench {
     ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(
             S4U_CommPort *answer_commport,
             const std::string &key,
-            double payload)
+            sg_size_t payload)
         : ComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) or key.empty()) {
@@ -239,7 +239,7 @@ namespace wrench {
      *
      */
     ComputeServiceResourceInformationAnswerMessage::ComputeServiceResourceInformationAnswerMessage(
-            std::map<std::string, double> info, double payload)
+            std::map<std::string, double> info, sg_size_t payload)
         : ComputeServiceMessage(payload), info(std::move(info)) {}
 
 
@@ -253,9 +253,7 @@ namespace wrench {
     *
     */
     ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
-            S4U_CommPort *answer_commport, unsigned long num_cores, double ram, double payload) : ComputeServiceMessage(
-
-                                                                                                          payload) {
+            S4U_CommPort *answer_commport, unsigned long num_cores, sg_size_t ram, sg_size_t payload) : ComputeServiceMessage(payload) {
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (not answer_commport) {
@@ -276,5 +274,5 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
-            bool answer, double payload) : ComputeServiceMessage(payload), answer(answer) {}
+            bool answer, sg_size_t payload) : ComputeServiceMessage(payload), answer(answer) {}
 }// namespace wrench

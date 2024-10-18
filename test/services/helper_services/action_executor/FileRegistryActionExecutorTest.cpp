@@ -144,7 +144,7 @@ private:
                     nullptr);
 
             // Start it
-            file_read_action_executor->setSimulation(this->simulation);
+            file_read_action_executor->setSimulation(this->getSimulation());
             file_read_action_executor->start(file_read_action_executor, true, false);
 
             // Wait for a message from it
@@ -187,7 +187,7 @@ private:
                                                nullptr));
 
             // Start it
-            file_read_action_executor->setSimulation(this->simulation);
+            file_read_action_executor->setSimulation(this->getSimulation());
             file_read_action_executor->start(file_read_action_executor, true, false);
 
             // Wait for a message from it
@@ -242,7 +242,7 @@ void FileRegistryActionExecutorTest::do_FileRegistryActionExecutorSuccessTest_te
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
     ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 

@@ -246,7 +246,7 @@ namespace wrench {
         std::shared_ptr<BareMetalComputeService> target_cs = nullptr;
 
         unsigned long min_required_num_cores = job->getMinimumRequiredNumCores();
-        double min_required_memory = job->getMinimumRequiredMemory();
+        sg_size_t min_required_memory = job->getMinimumRequiredMemory();
 
         // Figure out which BareMetalComputeServices are available
         for (auto const &cs: this->compute_services) {

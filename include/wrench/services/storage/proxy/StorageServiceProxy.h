@@ -34,8 +34,8 @@ namespace wrench {
         using StorageService::writeFile;
 
 
-        double getTotalSpace() override;
-        double getTotalFreeSpaceAtPath(const std::string &path) override;
+        sg_size_t getTotalSpace() override;
+        sg_size_t getTotalFreeSpaceAtPath(const std::string &path) override;
 
         /**
         * @brief Return the storage service's default mountpoint, if any.
@@ -64,11 +64,11 @@ namespace wrench {
 
         virtual bool lookupFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
 
-        //void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) override;
+        //void readFile(const std::shared_ptr<FileLocation> &location, sg_size_t num_bytes) override;
         virtual void readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
-        virtual void readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, double num_bytes);
+        virtual void readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, sg_size_t num_bytes);
         virtual void readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path);
-        virtual void readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes);
+        virtual void readFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path, sg_size_t num_bytes);
 
         virtual void writeFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file, const std::string &path);
         virtual void writeFile(const std::shared_ptr<StorageService> &targetServer, const std::shared_ptr<DataFile> &file);
@@ -84,7 +84,7 @@ namespace wrench {
 
         bool isBufferized() const override;//cache
 
-        double getBufferSize() const override;//cache
+        sg_size_t getBufferSize() const override;//cache
 
         bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
@@ -100,7 +100,7 @@ namespace wrench {
         static std::shared_ptr<StorageServiceProxy> createRedirectProxy(
                 const std::string &hostname,
                 const std::shared_ptr<StorageService> &cache,
-                const std::shared_ptr<StorageService> &remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads = {}) {
+                const std::shared_ptr<StorageService> &remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE message_payloads = {}) {
             return std::make_shared<StorageServiceProxy>(hostname, cache, remote, properties, message_payloads);
         }
 
@@ -113,7 +113,7 @@ namespace wrench {
         bool processNextMessage();
         bool rejectDuplicateRead(const std::shared_ptr<DataFile> &file);
 
-        explicit StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService> &cache = nullptr, const std::shared_ptr<StorageService> &default_remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& message_payloads = {});
+        explicit StorageServiceProxy(const std::string &hostname, const std::shared_ptr<StorageService> &cache = nullptr, const std::shared_ptr<StorageService> &default_remote = nullptr, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& message_payloads = {});
 
         /**
          * @brief Reserve space at the storage service
@@ -141,7 +141,7 @@ namespace wrench {
          * @param message_payloads: Message Payloads for the fileServiceProxy
          * @return the StorageServiceProxy created
          */
-        static std::shared_ptr<StorageServiceProxy> createCachelessRedirectProxy(const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads = {}) {
+        static std::shared_ptr<StorageServiceProxy> createCachelessRedirectProxy(const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE message_payloads = {}) {
 
             throw std::runtime_error("Cacheless proxies are not currently supported");
             return std::make_shared<StorageServiceProxy>(hostname, nullptr, nullptr, properties, message_payloads);
@@ -155,7 +155,7 @@ namespace wrench {
          * @param message_payloads: Message Payloads for the fileServiceProxy
          * @return the StorageServiceProxy created
          */
-        static std::shared_ptr<StorageServiceProxy> createCachelessProxy(const std::string &hostname, const std::shared_ptr<StorageService> &default_remote, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE message_payloads = {}) {
+        static std::shared_ptr<StorageServiceProxy> createCachelessProxy(const std::string &hostname, const std::shared_ptr<StorageService> &default_remote, WRENCH_PROPERTY_COLLECTION_TYPE properties = {}, WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE message_payloads = {}) {
 
             throw std::runtime_error("Cacheless proxies are not currently supported");
             return std::make_shared<StorageServiceProxy>(hostname, nullptr, default_remote, properties, message_payloads);
@@ -186,7 +186,7 @@ namespace wrench {
                 {StorageServiceProxyProperty::MESSAGE_OVERHEAD, "0"}};
 
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
                 {ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},

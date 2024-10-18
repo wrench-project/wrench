@@ -28,7 +28,7 @@ namespace wrench {
             throw std::invalid_argument("AmdahlParallelModel::AmdahlParallelModel(): "
                                         "Invalid alpha argument (must be between 0.0 and 1.0)");
         }
-        this->alpha = alpha;
+        this->alpha_ = alpha;
     }
 
     /**
@@ -36,7 +36,7 @@ namespace wrench {
      * @return the alpha parameter (a value between 0.9 and 1.0)
      */
     double AmdahlParallelModel::getAlpha() const {
-        return this->alpha;
+        return this->alpha_;
     }
 
     /**
@@ -44,7 +44,7 @@ namespace wrench {
      * @param alpha: the alpha parameter (a value between 0.9 and 1.0)
      */
     void AmdahlParallelModel::setAlpha(double alpha) {
-        this->alpha = alpha;
+        this->alpha_ = alpha;
     }
 
 
@@ -55,7 +55,7 @@ namespace wrench {
      * @return an amount of work in flops
      */
     double AmdahlParallelModel::getPurelySequentialWork(double total_work, unsigned long num_threads) {
-        return (1 - this->alpha) * total_work;
+        return (1 - this->alpha_) * total_work;
     }
 
     /**
@@ -65,6 +65,6 @@ namespace wrench {
      * @return an amount of work in flops
      */
     double AmdahlParallelModel::getParallelPerThreadWork(double total_work, unsigned long num_threads) {
-        return (total_work * this->alpha) / (double) num_threads;
+        return (total_work * this->alpha_) / (double) num_threads;
     }
 }// namespace wrench

@@ -73,8 +73,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
-        input_file = wrench::Simulation::addFile("input_file", 10000.0);
-        output_file = wrench::Simulation::addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000);
+        output_file = wrench::Simulation::addFile("output_file", 20000);
 
         // Create one task1
         task = workflow->addTask("task1", 3600, 1, 1, 0);
@@ -206,7 +206,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
     // Empty resource list
     ASSERT_THROW(compute_service = simulation->add(
                          new wrench::BareMetalComputeService("bogus",
-                                                             (std::map<std::string, std::tuple<unsigned long, double>>){},
+                                                             (std::map<std::string, std::tuple<unsigned long, sg_size_t>>){},
                                                              {})),
                  std::invalid_argument);
 
@@ -257,16 +257,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
                          new wrench::BareMetalComputeService(hostname,
                                                              {std::make_pair("RAMHost",
                                                                              std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             -1.0))},
-                                                             {})),
-                 std::invalid_argument);
-
-    // Bad RAM
-    ASSERT_THROW(compute_service = simulation->add(
-                         new wrench::BareMetalComputeService(hostname,
-                                                             {std::make_pair("RAMHost",
-                                                                             std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             100000.0))},
+                                                                                             100000))},
                                                              {})),
                  std::invalid_argument);
 
@@ -275,7 +266,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
                          new wrench::BareMetalComputeService(hostname,
                                                              {std::make_pair("RAMHost",
                                                                              std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             100000.0))},
+                                                                                             100000))},
                                                              "",
                                                              {std::make_pair(
                                                                      wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD,

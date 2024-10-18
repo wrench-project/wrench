@@ -44,7 +44,7 @@ namespace wrench {
                                       std::shared_ptr<FileRegistryService> file_registry_service,
                                       std::shared_ptr<FileLocation> file_location) : FileRegistryAction(FileRegistryAction::DELETE, name, std::move(file_registry_service), std::move(file_location)) {}
 
-        //        void execute(std::shared_ptr<ActionExecutor> action_executor,unsigned long num_threads, double ram_footprint) override;
+        //        void execute(std::shared_ptr<ActionExecutor> action_executor,unsigned long num_threads, sg_size_t ram_footprint) override;
         //        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
 
     private:

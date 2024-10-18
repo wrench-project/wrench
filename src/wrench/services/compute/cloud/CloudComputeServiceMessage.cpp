@@ -19,7 +19,7 @@ namespace wrench {
      *
      * @param payload: the message size in bytes
      */
-    CloudComputeServiceMessage::CloudComputeServiceMessage(double payload) : ComputeServiceMessage(payload) {
+    CloudComputeServiceMessage::CloudComputeServiceMessage(sg_size_t payload) : ComputeServiceMessage(payload) {
     }
 
     /**
@@ -30,7 +30,7 @@ namespace wrench {
      *
      */
     CloudComputeServiceGetExecutionHostsRequestMessage::CloudComputeServiceGetExecutionHostsRequestMessage(
-            S4U_CommPort *answer_commport, double payload) : CloudComputeServiceMessage(payload) {
+            S4U_CommPort *answer_commport, sg_size_t payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_commport == nullptr) {
             throw std::invalid_argument(
@@ -48,7 +48,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     CloudComputeServiceGetExecutionHostsAnswerMessage::CloudComputeServiceGetExecutionHostsAnswerMessage(
-            std::vector<std::string> &execution_hosts, double payload) : CloudComputeServiceMessage(payload), execution_hosts(execution_hosts) {}
+            std::vector<std::string> &execution_hosts, sg_size_t payload) : CloudComputeServiceMessage(payload), execution_hosts(execution_hosts) {}
 
     /**
      * @brief Constructor
@@ -67,11 +67,11 @@ namespace wrench {
     CloudComputeServiceCreateVMRequestMessage::CloudComputeServiceCreateVMRequestMessage(
             S4U_CommPort *answer_commport,
             unsigned long num_cores,
-            double ram_memory,
+            sg_size_t ram_memory,
             const std::string &physical_host,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            double payload) : CloudComputeServiceMessage(payload) {
+            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+            sg_size_t payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || (ram_memory < 0.0)) {
             //        std::cerr << answer_commport << " - " << pm_hostname << " - " << vm_name << std::endl;
@@ -98,7 +98,7 @@ namespace wrench {
     CloudComputeServiceCreateVMAnswerMessage::CloudComputeServiceCreateVMAnswerMessage(bool success,
                                                                                        std::string &vm_name,
                                                                                        std::shared_ptr<FailureCause> failure_cause,
-                                                                                       double payload) : CloudComputeServiceMessage(payload), success(success), vm_name(vm_name),
+                                                                                       sg_size_t payload) : CloudComputeServiceMessage(payload), success(success), vm_name(vm_name),
                                                                                                          failure_cause(std::move(failure_cause)) {}
 
     /**
@@ -116,7 +116,7 @@ namespace wrench {
             const std::string &vm_name,
             bool send_failure_notifications,
             ComputeService::TerminationCause termination_cause,
-            double payload) : CloudComputeServiceMessage(payload) {
+            sg_size_t payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
@@ -138,7 +138,7 @@ namespace wrench {
      */
     CloudComputeServiceShutdownVMAnswerMessage::CloudComputeServiceShutdownVMAnswerMessage(bool success,
                                                                                            std::shared_ptr<FailureCause> failure_cause,
-                                                                                           double payload) : CloudComputeServiceMessage(payload), success(success), failure_cause(std::move(failure_cause)) {}
+                                                                                           sg_size_t payload) : CloudComputeServiceMessage(payload), success(success), failure_cause(std::move(failure_cause)) {}
 
     /**
      * @brief Constructor
@@ -151,7 +151,7 @@ namespace wrench {
     CloudComputeServiceStartVMRequestMessage::CloudComputeServiceStartVMRequestMessage(
             S4U_CommPort *answer_commport,
             const std::string &vm_name,
-            double payload) : CloudComputeServiceMessage(payload) {
+            sg_size_t payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
@@ -173,7 +173,7 @@ namespace wrench {
     CloudComputeServiceStartVMAnswerMessage::CloudComputeServiceStartVMAnswerMessage(bool success,
                                                                                      std::shared_ptr<BareMetalComputeService> cs,
                                                                                      std::shared_ptr<FailureCause> failure_cause,
-                                                                                     double payload) : CloudComputeServiceMessage(payload), success(success), cs(std::move(cs)),
+                                                                                     sg_size_t payload) : CloudComputeServiceMessage(payload), success(success), cs(std::move(cs)),
                                                                                                        failure_cause(std::move(failure_cause)) {}
 
     /**
@@ -187,7 +187,7 @@ namespace wrench {
     CloudComputeServiceSuspendVMRequestMessage::CloudComputeServiceSuspendVMRequestMessage(
             S4U_CommPort *answer_commport,
             const std::string &vm_name,
-            double payload) : CloudComputeServiceMessage(payload) {
+            sg_size_t payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
@@ -207,7 +207,7 @@ namespace wrench {
      */
     CloudComputeServiceSuspendVMAnswerMessage::CloudComputeServiceSuspendVMAnswerMessage(bool success,
                                                                                          std::shared_ptr<FailureCause> failure_cause,
-                                                                                         double payload) : CloudComputeServiceMessage(payload), success(success), failure_cause(std::move(failure_cause)) {}
+                                                                                         sg_size_t payload) : CloudComputeServiceMessage(payload), success(success), failure_cause(std::move(failure_cause)) {}
 
     /**
      * @brief Constructor
@@ -220,7 +220,7 @@ namespace wrench {
     CloudComputeServiceResumeVMRequestMessage::CloudComputeServiceResumeVMRequestMessage(
             S4U_CommPort *answer_commport,
             const std::string &vm_name,
-            double payload) : CloudComputeServiceMessage(payload) {
+            sg_size_t payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
@@ -240,7 +240,7 @@ namespace wrench {
      */
     CloudComputeServiceResumeVMAnswerMessage::CloudComputeServiceResumeVMAnswerMessage(bool success,
                                                                                        std::shared_ptr<FailureCause> failure_cause,
-                                                                                       double payload) : CloudComputeServiceMessage(payload), success(success), failure_cause(std::move(failure_cause)) {}
+                                                                                       sg_size_t payload) : CloudComputeServiceMessage(payload), success(success), failure_cause(std::move(failure_cause)) {}
 
 
     /**
@@ -254,7 +254,7 @@ namespace wrench {
     CloudComputeServiceDestroyVMRequestMessage::CloudComputeServiceDestroyVMRequestMessage(
             S4U_CommPort *answer_commport,
             const std::string &vm_name,
-            double payload) : CloudComputeServiceMessage(payload) {
+            sg_size_t payload) : CloudComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
@@ -274,7 +274,7 @@ namespace wrench {
      */
     CloudComputeServiceDestroyVMAnswerMessage::CloudComputeServiceDestroyVMAnswerMessage(bool success,
                                                                                          std::shared_ptr<FailureCause> failure_cause,
-                                                                                         double payload) : CloudComputeServiceMessage(payload), success(success), failure_cause(std::move(failure_cause)) {}
+                                                                                         sg_size_t payload) : CloudComputeServiceMessage(payload), success(success), failure_cause(std::move(failure_cause)) {}
 
 
 }// namespace wrench

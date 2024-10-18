@@ -36,7 +36,7 @@ namespace wrench {
          */
         class Message : public StorageServiceMessage {
         protected:
-            Message(double payload);
+            Message(sg_size_t payload);
         };
         /**
          * @brief A message sent to a XRootD Node to continue an ongoing search for a file
@@ -47,7 +47,7 @@ namespace wrench {
                                   std::shared_ptr<StorageServiceFileReadRequestMessage> original,
                                   std::shared_ptr<DataFile> file,
                                   Node *node,
-                                  double payload,
+                                  sg_size_t payload,
                                   std::shared_ptr<bool> answered,
                                   int timeToLive);
             ContinueSearchMessage(ContinueSearchMessage *toCopy);
@@ -75,7 +75,7 @@ namespace wrench {
         class UpdateCacheMessage : public Message {
         public:
             UpdateCacheMessage(S4U_CommPort *answer_commport, std::shared_ptr<StorageServiceFileReadRequestMessage> original, Node *node, std::shared_ptr<DataFile> file, std::set<std::shared_ptr<FileLocation>> locations,
-                               double payload, std::shared_ptr<bool> answered);
+                               sg_size_t payload, std::shared_ptr<bool> answered);
             UpdateCacheMessage(UpdateCacheMessage &other);
             UpdateCacheMessage(UpdateCacheMessage *other);
             /** @brief CommPort to which the FINAL answer message should be sent */
@@ -116,7 +116,7 @@ namespace wrench {
          */
         class RippleDelete : public Message {
         public:
-            RippleDelete(std::shared_ptr<DataFile> file, double payload, int timeToLive);
+            RippleDelete(std::shared_ptr<DataFile> file, sg_size_t payload, int timeToLive);
             RippleDelete(RippleDelete *other);
             RippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive);
             /** @brief The file to delete */
@@ -134,7 +134,7 @@ namespace wrench {
                                           std::shared_ptr<StorageServiceFileReadRequestMessage> original,
                                           std::shared_ptr<DataFile> file,
                                           Node *node,
-                                          double payload,
+                                          sg_size_t payload,
                                           std::shared_ptr<bool> answered,
                                           int timeToLive,
                                           std::vector<std::stack<Node *>> search_stack);
@@ -151,7 +151,7 @@ namespace wrench {
          */
         class AdvancedRippleDelete : public RippleDelete {
         public:
-            AdvancedRippleDelete(std::shared_ptr<DataFile> file, double payload, int timeToLive, std::vector<std::stack<Node *>> search_stack);
+            AdvancedRippleDelete(std::shared_ptr<DataFile> file, sg_size_t payload, int timeToLive, std::vector<std::stack<Node *>> search_stack);
             AdvancedRippleDelete(AdvancedRippleDelete *other);
             AdvancedRippleDelete(StorageServiceFileDeleteRequestMessage *other, int timeToLive, std::vector<std::stack<Node *>> search_stack);
             AdvancedRippleDelete(RippleDelete *other, std::vector<std::stack<Node *>> search_stack);

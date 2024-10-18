@@ -18,7 +18,7 @@
 #include "GreedyExecutionController.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
-#define MB (1000.0 * 1000.0)
+#define MB (1000000ULL)
 
 WRENCH_LOG_CATEGORY(custom_controller, "Log category for GreedyExecutionController");
 
@@ -158,7 +158,7 @@ namespace wrench {
      * @brief Method to handle a compound job failure
      * @param event: the event
      */
-    void GreedyExecutionController::processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent> event) {
+    void GreedyExecutionController::processEventCompoundJobFailure(const std::shared_ptr<CompoundJobFailedEvent> &event) {
         WRENCH_INFO("Job %s failed!", event->job->getName().c_str());
     }
 
@@ -166,7 +166,7 @@ namespace wrench {
      * @brief Method to handle a compound job completion
      * @param event: the event
      */
-    void GreedyExecutionController::processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent> event) {
+    void GreedyExecutionController::processEventCompoundJobCompletion(const std::shared_ptr<CompoundJobCompletedEvent> &event) {
         WRENCH_INFO("Job %s completed successfully!", event->job->getName().c_str());
     }
 

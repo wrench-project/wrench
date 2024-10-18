@@ -38,7 +38,7 @@ namespace wrench {
                                    const std::string &service_name) : Service(hostname, service_name) {
 
         this->state = StorageService::UP;
-        this->is_scratch = false;
+        this->is_scratch_ = false;
     }
 
     /**
@@ -46,7 +46,7 @@ namespace wrench {
      * @param is_scratch: true if scratch, false otherwise
      */
     void StorageService::setIsScratch(bool is_scratch) {
-        this->is_scratch = is_scratch;
+        this->is_scratch_ = is_scratch;
     }
 
 
@@ -104,7 +104,7 @@ namespace wrench {
      */
     void StorageService::writeFile(S4U_CommPort *answer_commport,
                                    const std::shared_ptr<FileLocation> &location,
-                                   double num_bytes_to_write,
+                                   sg_size_t num_bytes_to_write,
                                    bool wait_for_answer) {
 
         if (location == nullptr) {
@@ -143,8 +143,8 @@ namespace wrench {
                 auto file = location->getFile();
                 for (auto const &dwmb: msg->data_write_commport_and_bytes) {
                     // Bufferized
-                    double remaining = dwmb.second;
-                    while (remaining - buffer_size > DBL_EPSILON) {
+                    sg_size_t remaining = dwmb.second;
+                    while (remaining > buffer_size) {
 
                         dwmb.first->putMessage(
                                 new StorageServiceFileContentChunkMessage(
@@ -155,7 +155,7 @@ namespace wrench {
                             file, remaining, true));
 
                     //Waiting for the final ack
-                    answer_commport->getMessage<StorageServiceAckMessage>("StorageService::writeFile(): Received an");
+                    answer_commport->getMessage<StorageServiceAckMessage>(this->network_timeout, "StorageService::writeFile(): Received an");
                 }
             }
         }
@@ -171,7 +171,7 @@ namespace wrench {
      * @return A number of bytes
      *
      */
-    double StorageService::getTotalFreeSpace() {
+    sg_size_t StorageService::getTotalFreeSpace() {
         return getTotalFreeSpaceAtPath("");
     }
 
@@ -184,7 +184,7 @@ namespace wrench {
      *
      *  @return A number of bytes (or 0 if the path is invalid)
      */
-    double StorageService::getTotalFreeSpaceAtPath(const std::string &path) {
+    sg_size_t StorageService::getTotalFreeSpaceAtPath(const std::string &path) {
         assertServiceIsUp();
 
         // Send a message to the daemon
@@ -243,7 +243,7 @@ namespace wrench {
      */
     void StorageService::readFile(S4U_CommPort *answer_commport,
                                   const std::shared_ptr<FileLocation> &location,
-                                  double num_bytes,
+                                  sg_size_t num_bytes,
                                   bool wait_for_answer) {
 
         if (!answer_commport or !location or (num_bytes < 0.0)) {
@@ -459,7 +459,7 @@ namespace wrench {
 
         // Send a message to the daemon of the dst service
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
-        src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
+        src_location->getStorageService()->getSimulation()->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
                                                                                              src_location,
                                                                                              dst_location);
         commport_to_contact->putMessage(
@@ -522,7 +522,7 @@ namespace wrench {
             commport_to_contact = dst_location->getStorageService()->commport;
         }
 
-        src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
+        src_location->getStorageService()->getSimulation()->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
                                                                                              src_location,
                                                                                              dst_location);
 

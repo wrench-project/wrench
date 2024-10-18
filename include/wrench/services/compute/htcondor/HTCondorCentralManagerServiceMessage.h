@@ -27,7 +27,7 @@ namespace wrench {
      */
     class HTCondorCentralManagerServiceMessage : public ServiceMessage {
     protected:
-        HTCondorCentralManagerServiceMessage(double payload);
+        HTCondorCentralManagerServiceMessage(sg_size_t payload);
     };
 
     /**
@@ -36,7 +36,7 @@ namespace wrench {
      */
     class NegotiatorCompletionMessage : public HTCondorCentralManagerServiceMessage {
     public:
-        NegotiatorCompletionMessage(std::set<std::shared_ptr<Job>> scheduled_jobs, double payload);
+        NegotiatorCompletionMessage(std::set<std::shared_ptr<Job>> scheduled_jobs, sg_size_t payload);
 
         /** @brief List of scheduled jobs */
         std::set<std::shared_ptr<Job>> scheduled_jobs;
@@ -48,7 +48,7 @@ namespace wrench {
      */
     class CentralManagerWakeUpMessage : public HTCondorCentralManagerServiceMessage {
     public:
-        explicit CentralManagerWakeUpMessage(double payload);
+        explicit CentralManagerWakeUpMessage(sg_size_t payload);
     };
 
     /***********************/

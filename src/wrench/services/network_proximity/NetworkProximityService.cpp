@@ -61,7 +61,7 @@ namespace wrench {
     NetworkProximityService::NetworkProximityService(const std::string& hostname,
                                                      std::vector<std::string> hosts_in_network,
                                                      const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
-                                                     const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& messagepayload_list) : Service(hostname, "network_proximity") {
+                                                     const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : Service(hostname, "network_proximity") {
         this->hosts_in_network = std::move(hosts_in_network);
 
         if (this->hosts_in_network.size() < 2) {
@@ -183,7 +183,7 @@ namespace wrench {
         for (const auto &h: this->hosts_in_network) {
             // Set up network sender daemons
             auto np_sender_daemon = std::make_shared<NetworkProximitySenderDaemon>(
-                    this->simulation, h, this->commport,
+                    this->simulation_, h, this->commport,
                     this->getPropertyValueAsDouble(
                             NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
                     this->getPropertyValueAsTimeInSecond(
@@ -195,7 +195,7 @@ namespace wrench {
                     this->messagepayload_list);
             this->network_sender_daemons.push_back(np_sender_daemon);
 
-            auto np_receiver_daemon = std::make_shared<NetworkProximityReceiverDaemon>(this->simulation, h, this->messagepayload_list);
+            auto np_receiver_daemon = std::make_shared<NetworkProximityReceiverDaemon>(this->simulation_, h, this->messagepayload_list);
             this->network_receiver_daemons.push_back(np_receiver_daemon);
 
             // if this network service type is 'vivaldi', set up the coordinate lookup table
