@@ -1163,7 +1163,7 @@ namespace wrench {
         sg_size_t num_bytes_to_read = data["num_bytes_to_read"];
 
         shared_ptr<FileReadAction> action;
-        if (num_bytes_to_read == -1) {
+        if (num_bytes_to_read == 0) {
             action = compound_job->addFileReadAction(file_read_action_name, file, ss);
         } else {
             action = compound_job->addFileReadAction(file_read_action_name, file, ss, num_bytes_to_read);
