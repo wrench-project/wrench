@@ -1514,7 +1514,8 @@ namespace wrench {
         //        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
         //            throw std::runtime_error("Unknown workflow  " + workflow_name);
         //        }
-        auto file = Simulation::addFile(data["name"], data["size"]);
+        sg_size_t file_size = data["size"]; // size in bytes from the JSON
+        auto file = Simulation::addFile(data["name"], file_size);
         return {};
     }
 
