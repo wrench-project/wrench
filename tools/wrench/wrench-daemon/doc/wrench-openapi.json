@@ -132,7 +132,7 @@
                 "properties": {
                   "increment": {
                     "type": "number",
-                    "format": "float",
+                    "format": "double",
                     "description": "Increment in seconds."
                   }
                 }
@@ -730,6 +730,7 @@
                   },
                   "size": {
                     "type": "integer",
+		    "format": "int64",
                     "description": "size of the file in bytes"
                   }
                 }
@@ -1555,7 +1556,8 @@
                         "type": "string"
                       },
                       "value": {
-                        "type": "number"
+                        "type": "number",
+			"format": "int64"
                       }
                     },
                     "description": "a message payload list ({} means “use all defaults”)"
@@ -1639,7 +1641,8 @@
                         "type": "string"
                       },
                       "value": {
-                        "type": "number"
+                        "type": "number",
+			"format": "int64"
                       }
                     },
                     "description": "a message payload list ({} means “use all defaults”)"
@@ -1723,7 +1726,8 @@
                         "type": "string"
                       },
                       "value": {
-                        "type": "number"
+                        "type": "integer",
+			"format": "int64"
                       }
                     },
                     "description": "a message payload list ({} means “use all defaults”)"
@@ -1930,7 +1934,8 @@
                     "flop_rates": {
                       "type": "array",
                       "items": {
-                        "type": "number"
+                        "type": "number",
+			"format": "double"
                       },
                       "description": "the service's compute hosts' flop rates"
                     }
@@ -1990,7 +1995,8 @@
                     "flop_rates": {
                       "type": "array",
                       "items": {
-                        "type": "integer"
+                        "type": "integer",
+			"format": "int64"
                       },
                       "description": "the service's compute hosts' core counts"
                     }
@@ -2643,19 +2649,23 @@
                     "description": "the name of compute action."
                   },
                   "flops": {
-                    "type": "float",
+                    "type": "number",
+		    "format": "double",
                     "description": "amount of flops"
                   },
                   "ram": {
-                    "type": "float",
+                    "type": "integer",
+                    "format": "int64",
                     "description": "amount of ram needed."
                   },
                   "max_num_cores": {
-                    "type": "long",
+                    "type": "integer",
+                    "format": "int64",
                     "description": "maximum amount of cores."
                   },
                   "min_num_cores": {
-                    "type": "long",
+                    "type": "integer",
+                    "format": "int64",
                     "description": "minimum amount of cores."
                   },
                   "parallel_model": {
@@ -3258,10 +3268,12 @@
                 "properties": {
                   "num_cores": {
                     "type": "integer",
+		    "format": "int64",
                     "description": "the required number of cores"
                   },
                   "ram_memory": {
-                    "type": "number",
+                    "type": "integer",
+		    "format": "int64",
                     "description": "the required memory in bytes"
                   },
                   "property_list": {
@@ -3283,7 +3295,8 @@
                         "type": "string"
                       },
                       "value": {
-                        "type": "number"
+                        "type": "integer",
+			"format": "int64"
                       }
                     },
                     "description": "a message payload list ({} means “use all defaults”)"
@@ -3910,10 +3923,12 @@
                   },
                   "min_cores_per_task": {
                     "type": "integer",
+		    "format": "int64",
                     "description": "min cores per task"
                   },
                   "max_cores_per_task": {
                     "type": "integer",
+		    "format": "int64",
                     "description": "max cores per task"
                   },
                   "enforce_num_cores": {
@@ -4016,6 +4031,7 @@
         "properties": {
           "port_number": {
             "type": "integer",
+	    "format": "int32",
             "description": "a port number to which all subsequent HTTP requests should be sent"
           },
           "wrench_api_request_success": {
@@ -4041,22 +4057,22 @@
           },
           "flops": {
             "type": "number",
-            "format": "number",
+            "format": "double",
             "description": "the task's floating operations per second"
           },
           "min_num_cores": {
-            "type": "number",
-            "format": "unsigned long",
+            "type": "integer",
+            "format": "int64",
             "description": "the task's minimum number of cores"
           },
           "max_num_cores": {
-            "type": "number",
-            "format": "unsigned long",
+            "type": "integer",
+            "format": "int64",
             "description": "the task's maximum number of cores"
           },
           "memory": {
-            "type": "number",
-            "format": "number",
+            "type": "integer",
+            "format": "int64",
             "description": "the task's memory requirement"
           }
         }
@@ -4114,7 +4130,8 @@
             "description": "the name of the storage service the file is stored in"
           },
           "num_bytes_to_read": {
-            "type": "number",
+            "type": "integer",
+	    "format": "int64",
             "description": "number of bytes to read from the file"
           }
         }
@@ -4205,7 +4222,8 @@
             "description": "true if success, false if failure"
           },
           "state": {
-            "type": "number",
+            "type": "integer",
+	    "format": "int32",
             "description": "a state as an integer"
           },
           "failure_cause": {
@@ -4223,6 +4241,7 @@
           },
           "time": {
             "type": "number",
+	    "format": "double",
             "description": "a simulated date"
           },
           "failure_cause": {
@@ -4407,7 +4426,7 @@
             "description": "the new action's name."
           },
           "uses_scratch": {
-            "type": "number",
+            "type": "boolean",
             "description": "Whether the action uses scratch."
           },
           "num_bytes_to_read": {
@@ -4428,7 +4447,8 @@
         "type": "object",
         "properties": {
           "size": {
-            "type": "number",
+            "type": "integer",
+	    "format": "int64",
             "description": "the file's size in bytes."
           },
           "wrench_api_request_success": {
@@ -4446,6 +4466,7 @@
         "properties": {
           "flops": {
             "type": "number",
+	    "format": "double",
             "description": "the task's flops."
           },
           "wrench_api_request_success": {
@@ -4479,7 +4500,8 @@
         "type": "object",
         "properties": {
           "memory": {
-            "type": "number",
+            "type": "integer",
+	    "format": "int64",
             "description": "the task's memory requirement in bytes."
           },
           "wrench_api_request_success": {
@@ -4496,7 +4518,8 @@
         "type": "object",
         "properties": {
           "number_of_children": {
-            "type": "number",
+            "type": "integer",
+	    "format": "int64",
             "description": "the task's number of children."
           },
           "wrench_api_request_success": {
@@ -4513,7 +4536,8 @@
         "type": "object",
         "properties": {
           "bottom_level": {
-            "type": "number",
+            "type": "integer",
+	    "format": "int64",
             "description": "the task's bottom-level."
           },
           "wrench_api_request_success": {
