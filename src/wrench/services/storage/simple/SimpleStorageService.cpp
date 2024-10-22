@@ -51,26 +51,21 @@ namespace wrench {
         bool bufferized = false;// By default, non-bufferized
         //        bool bufferized = true; // By default, bufferized
 
-        std::cerr << "ASDASD\n";
         if (property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != property_list.end()) {
             sg_size_t buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
-            bufferized = buffer_size >= 1.0;// more than one byte means bufferized
+            bufferized = buffer_size >= 1;// more than one byte means bufferized
         } else {
             property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE] = "0B";// enforce a zero buffersize
         }
-        std::cerr << "ASDASD\n";
 
         if (Simulation::isLinkShutdownSimulationEnabled() and (not bufferized)) {
             throw std::runtime_error("SimpleStorageService::createSimpleStorageService(): Cannot use non-bufferized (i.e., buffer size == 0) "
                                      "storage services and also simulate link shutdowns. This feature is not implemented yet.");
         }
 
-        std::cerr << "ASDASD\n";
         if (bufferized) {
-        std::cerr << "ASDASD4\n";
             return (SimpleStorageService *) (new SimpleStorageServiceBufferized(hostname, mount_points, property_list, messagepayload_list));
         } else {
-        std::cerr << "ASDASD1\n";
             return (SimpleStorageService *) (new SimpleStorageServiceNonBufferized(hostname, mount_points, property_list, messagepayload_list));
         }
     }
@@ -139,7 +134,8 @@ namespace wrench {
             } else {
                 throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): Invalid caching behavior " + caching_behavior_property);
             }
-            this->file_system->mount_partition(mp, sgfs::OneDiskStorage::create(this->getName()+"_fspart_"+mp, disk), (sg_size_t)disk_capacity, caching_scheme);
+            auto storage = sgfs::OneDiskStorage::create(this->getName()+"_fspart_"+mp, disk);
+            this->file_system->mount_partition(mp, storage, (sg_size_t)disk_capacity, caching_scheme);
         }
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(
