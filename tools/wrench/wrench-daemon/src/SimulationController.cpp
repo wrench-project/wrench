@@ -564,11 +564,17 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::addSimpleStorageService(json data) {
+        std::cerr << "data = " << data << "\n";
         std::string head_host = data["head_host"];
         std::set<std::string> mount_points = data["mount_points"];
 
         // Create the new service
+        std::cerr << "CREATING THE SERVICE\n";
+        for (auto const &h: wrench::Simulation::getHostnameList()) {
+            std::cerr << "--> " << h << "\n";
+        }
         auto new_service = SimpleStorageService::createSimpleStorageService(head_host, mount_points, {}, {});
+        std::cerr << "CREATED THE SERVICE\n";
         return this->startService<wrench::StorageService>(new_service);
     }
 
