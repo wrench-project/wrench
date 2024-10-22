@@ -1525,11 +1525,6 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getFileSize(json data) {
-        //        std::string workflow_name = data["workflow_name"];
-        //        std::shared_ptr<Workflow> workflow;
-        //        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
-        //            throw std::runtime_error("Unknown workflow " + workflow_name);
-        //        }
         auto file = Simulation::getFileByID(data["file_id"]);
         json answer;
         answer["size"] = file->getSize();
