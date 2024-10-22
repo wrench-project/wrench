@@ -337,7 +337,7 @@ namespace wrench {
                                                                     S4U_CommPort *answer_commport,
                                                                     simgrid::s4u::Host *requesting_host) {
 
-        if (buffer_size >= 1.0) {
+        if (buffer_size >= 1) {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileWriteRequest(): Cannot process a write requests with a non-zero buffer size");
         }
 
