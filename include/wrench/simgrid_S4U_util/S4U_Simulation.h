@@ -12,6 +12,7 @@
 #define WRENCH_S4U_SIMULATION_H
 
 #include <set>
+#include <climits>
 #include <simgrid/s4u.hpp>
 #include <simgrid/kernel/routing/ClusterZone.hpp>
 
@@ -28,7 +29,7 @@ namespace wrench {
     class S4U_Simulation {
     public:
         /** @brief The ram capacity of a physical host whenever not specified in the platform description file */
-        static constexpr double DEFAULT_RAM = (1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0);// 1 PiB
+        static constexpr sg_size_t DEFAULT_RAM = LONG_LONG_MAX;
 
     public:
         static void enableSMPI();
@@ -51,8 +52,8 @@ namespace wrench {
         static void turnOffLink(const std::string &link_name);
         static void turnOnLink(const std::string &link_name);
         static double getFlopRate();
-        static double getHostMemoryCapacity(const std::string &hostname);
-        static double getMemoryCapacity();
+        static sg_size_t getHostMemoryCapacity(const std::string &hostname);
+        static sg_size_t getMemoryCapacity();
         static void compute(double);
         static void compute_multi_threaded(unsigned long num_threads,
                                            double thread_creation_overhead,
@@ -60,16 +61,16 @@ namespace wrench {
                                            double parallel_per_thread_work);
         static void sleep(double);
         static void computeZeroFlop();
-        static void writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk);
-        static void readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk);
-        static void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
+        static void writeToDisk(sg_size_t num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk);
+        static void readFromDisk(sg_size_t num_bytes, const std::string &hostname, std::string mount_point, simgrid::s4u::Disk *disk);
+        static void readFromDiskAndWriteToDiskConcurrently(sg_size_t num_bytes_to_read, sg_size_t num_bytes_to_write,
                                                            const std::string &hostname,
                                                            const std::string &read_mount_point,
                                                            const std::string &write_mount_point,
                                                            simgrid::s4u::Disk *src_disk,
                                                            simgrid::s4u::Disk *dst_disk);
 
-        static double getDiskCapacity(const std::string &hostname, std::string mount_point);
+        static sg_size_t getDiskCapacity(const std::string &hostname, std::string mount_point);
         static std::vector<std::string> getDisks(const std::string &hostname);
         static simgrid::s4u::Disk *hostHasMountPoint(const std::string &hostname, const std::string &mount_point);
 
@@ -104,19 +105,22 @@ namespace wrench {
         static std::map<std::string, std::vector<std::string>> getAllClusterIDsByZone();
         static std::map<std::string, std::vector<std::string>> getAllSubZoneIDsByZone();
 
-        static void createNewDisk(const std::string &hostname, const std::string &disk_id, double read_bandwidth_in_bytes_per_sec, double write_bandwidth_in_bytes_per_sec, double capacity_in_bytes, const std::string &mount_point);
+        static void createNewDisk(const std::string &hostname, const std::string &disk_id, double read_bandwidth_in_bytes_per_sec, double write_bandwidth_in_bytes_per_sec, sg_size_t capacity_in_bytes, const std::string &mount_point);
 
         void shutdown() const;
 
         static simgrid::s4u::Host *get_host_or_vm_by_name_or_null(const std::string &name);
         static simgrid::s4u::Host *get_host_or_vm_by_name(const std::string &name);
 
-        static double getHostMemoryCapacity(simgrid::s4u::Host *host);
+        static sg_size_t getHostMemoryCapacity(simgrid::s4u::Host *host);
 
     private:
-        static void traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string, std::vector<std::string>> &result, bool get_subzones, bool get_clusters, bool get_hosts_from_zones, bool get_hosts_from_clusters);
+        static void traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string,
+                                                 std::vector<std::string>> &result,
+                                                 bool get_subzones, bool get_clusters,
+                                                 bool get_hosts_from_zones, bool get_hosts_from_clusters);
 
-        simgrid::s4u::Engine *engine;
+        simgrid::s4u::Engine *engine = nullptr;
         bool initialized = false;
         bool platform_setup = false;
     };

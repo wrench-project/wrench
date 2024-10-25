@@ -77,6 +77,7 @@ def main():
     _create_file(FILE_CONTENT_README_MD, args.project_dir + "/README.md")
     _create_file(FILE_CONTENT_CMAKELISTS_TXT, args.project_dir + "/CMakeLists.txt")
     _create_file(FILE_CONTENT_FINDSIMGRID_CMAKE, args.project_dir + "/CMakeModules/FindSimGrid.cmake")
+    _create_file(FILE_CONTENT_FINDFSMOD_CMAKE, args.project_dir + "/CMakeModules/FindFSMod.cmake")
     _create_file(FILE_CONTENT_FINDWRENCH_CMAKE, args.project_dir + "/CMakeModules/FindWRENCH.cmake")
     _create_file(FILE_CONTENT_PLATFORM_XML, args.project_dir + "/data/platform.xml")
 

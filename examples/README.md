@@ -34,7 +34,7 @@ to analyze action failures.
     as an execution controller).
 
   - `action_api/*-bag-of-actions`: A simulation of the execution of a
-  bag-of-actions workload on various compute servies, with all data being read/written from/to a single
+  bag-of-actions workload on various compute services, with all data being read/written from/to a single
   storage service. 
     
   - 'XRootD': A simulation of a storage system that resembles the XRootD storage system.

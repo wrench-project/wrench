@@ -25,7 +25,7 @@ namespace wrench {
             throw std::invalid_argument("ConstantEfficiencyParallelModel::ConstantEfficiencyParallelModel(): "
                                         "Invalid efficiency argument (must be between 0.0 and 1.0)");
         }
-        this->efficiency = efficiency;
+        this->efficiency_ = efficiency;
     }
 
     /**
@@ -33,15 +33,15 @@ namespace wrench {
      * @return a parallel efficiency (a number between 0.0 and 1.0)
      */
     double wrench::ConstantEfficiencyParallelModel::getEfficiency() const {
-        return this->efficiency;
+        return this->efficiency_;
     }
 
     /**
      * @brief Set the model's parallel efficiency
-     * @param efficiency: a parallel efficiency (a number between 0.0 and 1.0)
+     * @param eff: a parallel efficiency (a number between 0.0 and 1.0)
      */
     void wrench::ConstantEfficiencyParallelModel::setEfficiency(double efficiency) {
-        this->efficiency = efficiency;
+        this->efficiency_ = efficiency;
     }
 
     //    /**
@@ -78,7 +78,7 @@ namespace wrench {
      * @return an amount of work (in flops)
      */
     double ConstantEfficiencyParallelModel::getParallelPerThreadWork(double total_work, unsigned long num_threads) {
-        return (total_work) / ((double) num_threads * this->efficiency);
+        return (total_work) / ((double) num_threads * this->efficiency_);
     }
 
 }// namespace wrench

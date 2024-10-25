@@ -26,7 +26,7 @@ namespace wrench {
     class ServiceTerminationDetector : public Service {
 
     public:
-        explicit ServiceTerminationDetector(std::string host_on_which_to_run, std::shared_ptr<Service> service_to_monitor,
+        explicit ServiceTerminationDetector(const std::string& host_on_which_to_run, std::shared_ptr<Service> service_to_monitor,
                                             S4U_CommPort *commport_to_notify, bool notify_on_crash, bool notify_on_termination);
 
 

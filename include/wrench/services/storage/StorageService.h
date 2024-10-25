@@ -13,10 +13,11 @@
 #include <string>
 #include <set>
 
+#include <fsmod.hpp>
+
 #include "wrench/services/Service.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/job/StandardJob.h"
-#include "wrench/services/storage/storage_helpers/LogicalFileSystem.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 namespace wrench {
@@ -39,6 +40,8 @@ namespace wrench {
          */
         void stop() override;
 
+
+
         /** File Lookup methods (in simulation) **/
 
         /**
@@ -58,7 +61,7 @@ namespace wrench {
          * @return true if the file is present, or false
          */
         bool lookupFile(const std::shared_ptr<DataFile> &file) {
-            return this->lookupFile(file, "/");
+            return this->lookupFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
         /**
          * @brief Lookup whether a file exists on the storage service (incurs simulated overheads)
@@ -95,7 +98,7 @@ namespace wrench {
          * @param file a file
          */
         void deleteFile(const std::shared_ptr<DataFile> &file) {
-            this->deleteFile(file, "/");
+            this->deleteFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
         /**
          * @brief Delete a file at the storage service (incurs simulated overheads)
@@ -129,7 +132,7 @@ namespace wrench {
          * @param location a location
          * @param num_bytes a number of bytes to read
          */
-        static void readFileAtLocation(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+        static void readFileAtLocation(const std::shared_ptr<FileLocation> &location, sg_size_t num_bytes) {
             if (location == nullptr) {
                 throw std::invalid_argument("StorageService::readFileAtLocation(): invalid argument argument");
             }
@@ -140,15 +143,15 @@ namespace wrench {
          * @param file a file
          */
         void readFile(const std::shared_ptr<DataFile> &file) {
-            this->readFile(file, "/", file->getSize());
+            this->readFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file), file->getSize());
         }
         /**
          * @brief Read a file at the storage service (incurs simulated overheads)
          * @param file a file
          * @param num_bytes a number of bytes to read
          */
-        void readFile(const std::shared_ptr<DataFile> &file, double num_bytes) {
-            this->readFile(file, "/", num_bytes);
+        void readFile(const std::shared_ptr<DataFile> &file, sg_size_t num_bytes) {
+            this->readFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file), num_bytes);
         }
         /**
          * @brief Read a file at the storage service (incurs simulated overheads)
@@ -164,7 +167,7 @@ namespace wrench {
          * @param path a path
          * @param num_bytes a number of bytes to read
          */
-        virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path, double num_bytes) {
+        virtual void readFile(const std::shared_ptr<DataFile> &file, const std::string &path, sg_size_t num_bytes) {
             this->readFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file), num_bytes);
         }
         /**
@@ -179,7 +182,7 @@ namespace wrench {
          * @param location a location
          * @param num_bytes a number of bytes to read
          */
-        virtual void readFile(const std::shared_ptr<FileLocation> &location, double num_bytes) {
+        virtual void readFile(const std::shared_ptr<FileLocation> &location, sg_size_t num_bytes) {
             this->readFile(S4U_Daemon::getRunningActorRecvCommPort(), location, num_bytes, true);
         }
 
@@ -194,13 +197,15 @@ namespace wrench {
             }
             location->getStorageService()->writeFile(location);
         }
+
         /**
          * @brief Write a file at the storage service (incurs simulated overheads)
          * @param file a file
          */
         void writeFile(const std::shared_ptr<DataFile> &file) {
-            this->writeFile(file, "/");
+            this->writeFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
+
         /**
          * @brief Write a file at the storage service (incurs simulated overheads)
          * @param file a file
@@ -209,6 +214,7 @@ namespace wrench {
         virtual void writeFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
             this->writeFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
+
         /**
          * @brief Write a file at the storage service (incurs simulated overheads)
          * @param location a location
@@ -232,14 +238,16 @@ namespace wrench {
             }
             return location->getStorageService()->hasFile(location);
         }
+
         /**
          * @brief Determines whether a file is present at the storage service (in zero simulated time)
          * @param file: a file
          * @return true if the file is present, false otherwise
          */
         bool hasFile(const std::shared_ptr<DataFile> &file) {
-            return this->hasFile(file, "/");
+            return this->hasFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
+
         /**
          * @brief Determines whether a file is present at the storage service (in zero simulated time)
          * @param file: a file
@@ -249,6 +257,7 @@ namespace wrench {
         virtual bool hasFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
             return this->hasFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
+
         /**
          * @brief Determines whether a file is present at the storage service (in zero simulated time)
          * @param location: a location
@@ -267,13 +276,40 @@ namespace wrench {
             }
             location->getStorageService()->createFile(location);
         }
+
+        /**
+         * @brief Return the storage service's default mountpoint, if any.
+         * If none, throws an std::runtime_error exception
+         */
+        virtual std::string getMountPoint() {
+            throw std::runtime_error("StorageService::getMountPoint(): no mount point!");
+        }
+
+        /**
+         * @brief Return the storage service's mountpoints. If none, throws
+         * an std::runtime_error exception
+         */
+        virtual std::set<std::string> getMountPoints() {
+            throw std::runtime_error("StorageService::getMountPoints(): no mount points!");
+        }
+
+        /**
+         * @brief Return the storage service's file system
+         * If none, throws an std::runtime_error exception
+         */
+        virtual std::shared_ptr<simgrid::fsmod::FileSystem> getFileSystem() {
+            throw std::runtime_error("StorageService::getFileSystem(): no file system!");
+        }
+
+
         /**
          * @brief Create a file at the storage service (in zero simulated time)
          * @param file: a file
          */
-        void createFile(const std::shared_ptr<DataFile> &file) {
-            this->createFile(file, "/");
+        virtual void createFile(const std::shared_ptr<DataFile> &file) {
+            this->createFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
+
         /**
          * @brief Create a file at the storage service (in zero simulated time)
          * @param file: a file
@@ -282,6 +318,7 @@ namespace wrench {
         virtual void createFile(const std::shared_ptr<DataFile> &file, const std::string &path) {
             this->createFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), FileLocation::sanitizePath(path), file));
         }
+
         /**
          * @brief Create a file at the storage service (in zero simulated time)
          * @param location: a location
@@ -305,7 +342,7 @@ namespace wrench {
          * @param file: a file
          */
         void removeFile(const std::shared_ptr<DataFile> &file) {
-            this->removeFile(file, "/");
+            this->removeFile(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
         /**
          * @brief Remove a file at the storage service (in zero simulated time)
@@ -346,7 +383,7 @@ namespace wrench {
          * @return a date in seconds
          */
         double getFileLastWriteDate(const std::shared_ptr<DataFile> &file) {
-            return this->getFileLastWriteDate(file, "/");
+            return this->getFileLastWriteDate(wrench::FileLocation::LOCATION(this->getSharedPtr<StorageService>(), file));
         }
         /**
          * @brief Get a file's last write date at the storage service (in zero simulated time)
@@ -376,14 +413,14 @@ namespace wrench {
          * @brief Get the storage service's total space (in zero simulated time)
          * @return a capacity in bytes
          */
-        virtual double getTotalSpace() = 0;
+        virtual sg_size_t getTotalSpace() = 0;
 
         /** Service free space method */
         /**
          * @brief Get the storage service's total free space (incurs simulated overhead)
          * @return a capacity in bytes
          */
-        double getTotalFreeSpace();
+        virtual sg_size_t getTotalFreeSpace();
 
         /** Service free space method */
         /**
@@ -391,7 +428,7 @@ namespace wrench {
          * @brief path a path
          * @return a capacity in bytes
          */
-        virtual double getTotalFreeSpaceAtPath(const std::string &path);
+        virtual sg_size_t getTotalFreeSpaceAtPath(const std::string &path);
 
         /** Service free space tracing (doesn't incur simulated overhead) */
         /**
@@ -399,7 +436,7 @@ namespace wrench {
          *  @return Current free space in bytes
          *
          */
-        virtual double getTotalFreeSpaceZeroTime() {
+        virtual sg_size_t getTotalFreeSpaceZeroTime() {
             throw std::runtime_error("StorageService::traceTotalFreeSpace: should have been overridden by derived class");
         }
 
@@ -409,7 +446,7 @@ namespace wrench {
          *  @return Current number of registered Datafile for all filesystem(s) from this service
          *
          */
-        virtual double getTotalFilesZeroTime() {
+        virtual unsigned long getTotalFilesZeroTime() {
             throw std::runtime_error("StorageService::traceTotalFiles: should have been overridden by derived class");
         }
 
@@ -418,7 +455,7 @@ namespace wrench {
          * @return a path
          */
         virtual std::string getBaseRootPath() {
-            return "/";
+            throw std::runtime_error("StorageService::traceTotalFiles: should have been overridden by derived class");
         }
 
         /**
@@ -452,14 +489,14 @@ namespace wrench {
          * @brief Determine the storage service's buffer size
          * @return a size in bytes
          */
-        virtual double getBufferSize() const = 0;
+        virtual sg_size_t getBufferSize() const = 0;
 
         /**
          * @brief Determines whether the storage service is a scratch service of a ComputeService
          * @return true if it is, false otherwise
          */
         bool isScratch() const {
-            return this->is_scratch;
+            return this->is_scratch_;
         }
 
         /***********************/
@@ -502,12 +539,12 @@ namespace wrench {
 
         virtual void readFile(S4U_CommPort *answer_commport,
                               const std::shared_ptr<FileLocation> &location,
-                              double num_bytes,
+                              sg_size_t num_bytes,
                               bool wait_for_answer);
 
         virtual void writeFile(S4U_CommPort *answer_commport,
                                const std::shared_ptr<FileLocation> &location,
-                               double num_bytes_to_write,
+                               sg_size_t num_bytes_to_write,
                                bool wait_for_answer);
 
         /**
@@ -516,14 +553,6 @@ namespace wrench {
          **/
         virtual void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
             // do nothing
-        }
-
-        /**
-         * @brief Increment the number of operations for a location
-         * @param location: a location
-         **/
-        virtual void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) {
-            // no nothing
         }
 
         /***********************/
@@ -556,14 +585,14 @@ namespace wrench {
         };
 
 
-        virtual void writeFilePartial(const std::shared_ptr<FileLocation> &location, double num_bytes_to_write) {
+        virtual void writeFilePartial(const std::shared_ptr<FileLocation> &location, sg_size_t num_bytes_to_write) {
             this->writeFile(S4U_Daemon::getRunningActorRecvCommPort(), location, num_bytes_to_write, true);
         }
 
         static void writeOrReadFiles(FileOperation action,
                                      std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations);
 
-        bool is_scratch;
+        bool is_scratch_;
     };
 
 

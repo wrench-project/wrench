@@ -116,7 +116,7 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest(double buffer
                             this, storage_service, file_registry_service, "WMSHost")));
 
     // Stage the file on the StorageHost
-    ASSERT_NO_THROW(simulation->stageFile(file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(file));
 
     ASSERT_NO_THROW(simulation->launch());
 

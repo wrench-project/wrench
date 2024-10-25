@@ -27,7 +27,7 @@ namespace wrench {
     /**
      * @brief Abstraction of a service message payload collection type
      */
-    typedef std::map<WRENCH_MESSAGEPAYLOAD_TYPE, double> WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE;
+    typedef std::map<WRENCH_MESSAGEPAYLOAD_TYPE, sg_size_t> WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE;
 
 
     class FailureCause;
@@ -59,7 +59,7 @@ namespace wrench {
         bool getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE);
 
         double getPropertyValueAsTimeInSecond(WRENCH_PROPERTY_TYPE);
-        double getPropertyValueAsSizeInByte(WRENCH_PROPERTY_TYPE);
+        sg_size_t getPropertyValueAsSizeInByte(WRENCH_PROPERTY_TYPE);
         double getPropertyValueAsBandwidthInBytePerSecond(WRENCH_PROPERTY_TYPE);
 
         const WRENCH_PROPERTY_COLLECTION_TYPE &getPropertyList() const;
@@ -80,8 +80,8 @@ namespace wrench {
         simgrid::s4u::Host *getHost();
 
 
-        double getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE);
-        const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &getMessagePayloadList() const;
+        sg_size_t getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE);
+        const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE &getMessagePayloadList() const;
 
         void setStateToDown();
 
@@ -114,10 +114,10 @@ namespace wrench {
                            const WRENCH_PROPERTY_COLLECTION_TYPE &overriden_property_values);
 
         // MessagePayload stuff
-        void setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE, double);
+        void setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE, sg_size_t);
 
-        void setMessagePayloads(const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &default_messagepayload_values,
-                                const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &overriden_messagepayload_values);
+        void setMessagePayloads(const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE &default_messagepayload_values,
+                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE &overriden_messagepayload_values);
 
         void serviceSanityCheck();
 
@@ -125,7 +125,7 @@ namespace wrench {
         WRENCH_PROPERTY_COLLECTION_TYPE property_list;
 
         /** @brief The service's messagepayload list */
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list;
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list;
 
         /** @brief The service's name */
         std::string name;

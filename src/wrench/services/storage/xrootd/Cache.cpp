@@ -10,16 +10,17 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 namespace wrench {
     namespace XRootD {
+
         /**
          * @brief Check the cache for a file
          * @param file: The file to check the cache for
          * @return true if the file is cached and if timestamp (not implemented) is valid, false otherwise
          */
-        bool Cache::isCached(std::shared_ptr<DataFile> file) {
+        bool Cache::isCached(const std::shared_ptr<DataFile>& file) {
             double earliestAllowedTime = wrench::S4U_Simulation::getClock() - maxCacheTime;
             auto entries = cache[file];
             //after getting all possible cache entries, loop through them "all" and check the timestamps, removing any that fail.  If you find even 1 success, return true and stop cleaning.
-            for (auto ittr = entries.begin(); ittr != entries.end(); /*intentionaly blank*/) {
+            for (auto ittr = entries.begin(); ittr != entries.end(); /*intentionally blank*/) {
                 auto entry = *ittr;
                 if (entry.second < earliestAllowedTime) {
                     ittr = entries.erase(ittr);

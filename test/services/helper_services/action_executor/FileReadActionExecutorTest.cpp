@@ -158,7 +158,7 @@ private:
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_read_action, nullptr));
 
         // Start it
-        file_read_action_executor->setSimulation(this->simulation);
+        file_read_action_executor->setSimulation(this->getSimulation());
         file_read_action_executor->start(file_read_action_executor, true, false);
 
         // Wait for a message from it
@@ -217,9 +217,9 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -262,7 +262,7 @@ private:
 
         // Add a file read action with bogus locations
         try {
-            auto other_file = this->simulation->addFile("other_file", 1.0);
+            auto other_file = this->getSimulation()->addFile("other_file", 1);
             job->addFileReadAction("",
                                    {wrench::FileLocation::LOCATION(this->test->ss, "/bogus/", this->test->file),
                                     wrench::FileLocation::LOCATION(this->test->ss, other_file)});
@@ -277,7 +277,7 @@ private:
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_read_action, nullptr));
         // Start it
-        file_read_action_executor->setSimulation(this->simulation);
+        file_read_action_executor->setSimulation(this->getSimulation());
         file_read_action_executor->start(file_read_action_executor, true, false);
 
         // Wait for a message from it
@@ -331,9 +331,9 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -381,7 +381,7 @@ private:
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_read_action, nullptr));
         // Start it
-        file_read_action_executor->setSimulation(this->simulation);
+        file_read_action_executor->setSimulation(this->getSimulation());
         file_read_action_executor->start(file_read_action_executor, true, false);
 
         // Wait for a message from it
@@ -445,7 +445,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -494,7 +494,7 @@ private:
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_read_action, nullptr));
         // Start it
-        file_read_action_executor->setSimulation(this->simulation);
+        file_read_action_executor->setSimulation(this->getSimulation());
         file_read_action_executor->start(file_read_action_executor, true, false);
 
         // Sleep 1 sec
@@ -567,9 +567,9 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

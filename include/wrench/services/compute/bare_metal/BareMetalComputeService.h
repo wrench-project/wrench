@@ -58,7 +58,7 @@ namespace wrench {
                 {BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, "false"},
                 {BareMetalComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
                 {BareMetalComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {BareMetalComputeServiceMessagePayload::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
@@ -91,17 +91,17 @@ namespace wrench {
     public:
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
-                                const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
+                                const std::map<std::string, std::tuple<unsigned long, sg_size_t>> &compute_resources,
                                 const std::string &scratch_space_mount_point,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
                                 const std::vector<std::string> &compute_hosts,
                                 const std::string &scratch_space_mount_point,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
@@ -117,7 +117,7 @@ namespace wrench {
 
         ~BareMetalComputeService() override;
 
-        bool isThereAtLeastOneHostWithIdleResourcesInstant(unsigned long num_cores, double ram);
+        bool isThereAtLeastOneHostWithIdleResourcesInstant(unsigned long num_cores, sg_size_t ram);
 
     protected:
         friend class JobManager;
@@ -127,23 +127,23 @@ namespace wrench {
 
 
         BareMetalComputeService(const std::string &hostname,
-                                std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+                                std::map<std::string, std::tuple<unsigned long, sg_size_t>> compute_resources,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
                                 std::shared_ptr<PilotJob> pj, const std::string &suffix,
                                 std::shared_ptr<StorageService> scratch_space);// reference to upper level scratch space
 
         //        BareMetalComputeService(const std::string &hostname,
-        //                                std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources,
+        //                                std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> compute_resources,
         //                                WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-        //                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+        //                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
         //                                std::shared_ptr<PilotJob> pj, const std::string &suffix,
         //                                std::shared_ptr<StorageService> scratch_space);
 
         BareMetalComputeService(const std::string &hostname,
-                                const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
+                                const std::map<std::string, std::tuple<unsigned long, sg_size_t>> &compute_resources,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
                                 std::shared_ptr<StorageService> scratch_space);
 
         void validateProperties();
@@ -151,10 +151,10 @@ namespace wrench {
 
         // Low-level constructor helper method
         void initiateInstance(const std::string &hostname,
-                              std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-                              std::shared_ptr<PilotJob> pj);
+                              const std::map<std::string, std::tuple<unsigned long, sg_size_t>>& compute_resources,
+                              const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                              const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list,
+                              const std::shared_ptr<PilotJob>& pj);
 
 
     protected:
@@ -219,7 +219,7 @@ namespace wrench {
                                       std::map<std::string, std::string> &service_specific_arguments);
 
         void processIsThereAtLeastOneHostWithAvailableResources(
-                S4U_CommPort *answer_commport, unsigned long num_cores, double ram);
+                S4U_CommPort *answer_commport, unsigned long num_cores, sg_size_t ram);
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 

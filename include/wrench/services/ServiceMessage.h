@@ -26,7 +26,7 @@ namespace wrench {
      */
     class ServiceMessage : public SimulationMessage {
     protected:
-        explicit ServiceMessage(double payload);
+        explicit ServiceMessage(sg_size_t payload);
     };
 
     /**
@@ -36,7 +36,7 @@ namespace wrench {
     public:
         //        ~ServiceStopDaemonMessage(){};
 
-        ServiceStopDaemonMessage(S4U_CommPort *ack_commport, bool send_failure_notifications, ComputeService::TerminationCause termination_cause, double payload);
+        ServiceStopDaemonMessage(S4U_CommPort *ack_commport, bool send_failure_notifications, ComputeService::TerminationCause termination_cause, sg_size_t payload);
 
         /** @brief the commport_name to which the "I stopped" ack should be sent */
         S4U_CommPort *ack_commport;
@@ -51,7 +51,7 @@ namespace wrench {
      */
     class ServiceDaemonStoppedMessage : public ServiceMessage {
     public:
-        explicit ServiceDaemonStoppedMessage(double payload);
+        explicit ServiceDaemonStoppedMessage(sg_size_t payload);
     };
 
     /***********************/

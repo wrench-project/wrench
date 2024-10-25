@@ -42,9 +42,9 @@ namespace wrench {
 
         S4U_VirtualMachine(const std::string &vm_hostname,
                            unsigned long num_cores,
-                           double ram_memory,
+                           sg_size_t ram_memory,
                            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
+                           WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list);
 
         void start(std::string &pm_name);
 
@@ -58,9 +58,9 @@ namespace wrench {
 
         std::string getPhysicalHostname();
         unsigned long getNumCores();
-        double getMemory();
+        sg_size_t getMemory();
         WRENCH_PROPERTY_COLLECTION_TYPE getPropertyList();
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE getMessagePayloadList();
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE getMessagePayloadList();
 
         State getState();
         std::string getStateAsString();
@@ -71,10 +71,10 @@ namespace wrench {
         std::string vm_name;
         simgrid::s4u::VirtualMachine *vm;
         unsigned long num_cores;
-        double ram_memory;
+        sg_size_t ram_memory;
         std::string pm_name;
         WRENCH_PROPERTY_COLLECTION_TYPE property_list;
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list;
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list;
     };
 
     /***********************/

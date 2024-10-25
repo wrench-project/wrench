@@ -40,7 +40,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int SimpleWMS::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
@@ -113,7 +112,7 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void SimpleWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
+    void SimpleWMS::processEventStandardJobFailure(const std::shared_ptr<StandardJobFailedEvent> &event) {
         auto job = event->standard_job;
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
         WRENCH_INFO("Task %s has failed", (*job->getTasks().begin())->getID().c_str());
@@ -126,7 +125,7 @@ namespace wrench {
     *
     * @param event: a workflow execution event
     */
-    void SimpleWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
+    void SimpleWMS::processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent> &event) {
         auto job = event->standard_job;
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
         WRENCH_INFO("Task %s has COMPLETED (on service %s)",
@@ -142,7 +141,7 @@ namespace wrench {
     *
     * @param event: a workflow execution event
     */
-    void SimpleWMS::processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent> event) {
+    void SimpleWMS::processEventPilotJobStart(const std::shared_ptr<PilotJobStartedEvent> &event) {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
         WRENCH_INFO("The pilot job has started (it exposes bare-metal compute service %s)",
                     event->pilot_job->getComputeService()->getName().c_str());
@@ -156,7 +155,7 @@ namespace wrench {
     *
     * @param event: a workflow execution event
     */
-    void SimpleWMS::processEventPilotJobExpiration(std::shared_ptr<PilotJobExpiredEvent> event) {
+    void SimpleWMS::processEventPilotJobExpiration(const std::shared_ptr<PilotJobExpiredEvent> &event) {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
         WRENCH_INFO("The pilot job has expired (it was exposing bare-metal compute service %s)",
                     event->pilot_job->getComputeService()->getName().c_str());

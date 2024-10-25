@@ -32,8 +32,8 @@ namespace wrench {
         public:
             std::shared_ptr<Node> addChildSupervisor(const std::string &hostname);
             std::shared_ptr<Node> addChildStorageServer(const std::string &hostname, const std::string &mount_point,
-                                                        WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list = {},
-                                                        WRENCH_PROPERTY_COLLECTION_TYPE node_property_list = {}, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list = {});
+                                                        WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list = {}, WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE storage_messagepayload_list = {},
+                                                        WRENCH_PROPERTY_COLLECTION_TYPE node_property_list = {}, WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE node_messagepayload_list = {});
 
             std::shared_ptr<Node> getChild(unsigned int n);
             Node *getParent();
@@ -55,14 +55,14 @@ namespace wrench {
 
             virtual void writeFile(S4U_CommPort *answer_commport,
                                    const std::shared_ptr<FileLocation> &location,
-                                   double num_bytes_to_write,
+                                   sg_size_t num_bytes_to_write,
                                    bool wait_for_answer) override;
 
             virtual double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
 
-            virtual double getTotalSpace() override;
+            virtual sg_size_t getTotalSpace() override;
             virtual bool isBufferized() const override;
-            virtual double getBufferSize() const override;
+            virtual sg_size_t getBufferSize() const override;
             virtual bool reserveSpace(std::shared_ptr<FileLocation> &location) override;
             virtual void unreserveSpace(std::shared_ptr<FileLocation> &location) override;
 
@@ -82,7 +82,7 @@ namespace wrench {
                     {Property::REDUCED_SIMULATION, "false"},
                     {Property::FILE_NOT_FOUND_TIMEOUT, "30"}};
 
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
                     {MessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                     {MessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                     {MessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
@@ -123,23 +123,56 @@ namespace wrench {
             std::shared_ptr<SimpleStorageService> getStorageServer();
 
             bool cached(shared_ptr<DataFile> file);
-            std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
+            std::set<std::shared_ptr<FileLocation>> getCached(const shared_ptr<DataFile>& file);
 
 
             int main() override;
             bool processNextMessage();
-            Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
+            Node(Deployment *deployment, const std::string &hostname, const WRENCH_PROPERTY_COLLECTION_TYPE& storage_property_list, const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& storage_messagepayload_list);
+
+            /**
+            * @brief Return the storage service's default mountpoint, if any.
+            * If none, throws an std::runtime_error exception
+            */
+            virtual std::string getMountPoint() override {
+                if (this->internalStorage) {
+                    return this->internalStorage->getMountPoint();
+                } else {
+                    return "/";
+                }
+            }
+
+            /**
+             * @brief Return the storage service's mountpoints. If none, throws
+             * an std::runtime_error exception
+             */
+            virtual std::set<std::string> getMountPoints() override {
+                if (this->internalStorage) {
+                    return this->internalStorage->getMountPoints();
+                } else {
+                    std::set<std::string> mps = {"/"};
+                    return mps;
+                }
+            }
+
+            /** @brief Retrieve the simple storage service's file system object **/
+            virtual std::shared_ptr<simgrid::fsmod::FileSystem> getFileSystem() override {
+                if (this->internalStorage) {
+                    return this->internalStorage->getFileSystem();
+                } else {
+                    throw std::runtime_error("Node::getFileSystem(): No file system");
+                }
+            }
 
         private:
             Deployment *deployment;
 
             std::shared_ptr<Node> addChild(std::shared_ptr<Node> child);
 
-            /** @brief File systems */
-            std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
+            /** @brief Fictitious file system */
+            std::shared_ptr<simgrid::fsmod::FileSystem> file_system;
 
-
-            map<Node *, vector<stack<Node *>>> splitStack(vector<stack<Node *>> search_stack);
+            map<Node *, vector<stack<Node *>>> splitStack(const vector<stack<Node *>>& search_stack);
             virtual std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
             vector<stack<Node *>> constructFileSearchTree(const vector<shared_ptr<Node>> &targets);
             stack<Node *> constructSearchStack(Node *target);
@@ -147,7 +180,7 @@ namespace wrench {
 
             bool makeSupervisor();
             bool makeFileServer(std::set<std::string> path, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
+                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list);
 
             /** @brief A pointer to the internal file storage, IF it exists */
             std::shared_ptr<SimpleStorageService> internalStorage = nullptr;

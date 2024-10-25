@@ -45,7 +45,7 @@ namespace wrench {
                                           const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
 
         void initiateAsynchronousFileRead(const std::shared_ptr<FileLocation> &location,
-                                          const double num_bytes);
+                                          const sg_size_t num_bytes);
 
         void initiateAsynchronousFileRead(const std::shared_ptr<FileLocation> &location);
 
@@ -99,12 +99,12 @@ namespace wrench {
 
         struct ReadRequestSpecs {
             std::shared_ptr<FileLocation> location;
-            double num_bytes;
+            sg_size_t num_bytes;
 
             ~ReadRequestSpecs() = default;
 
             ReadRequestSpecs(std::shared_ptr<FileLocation> location,
-                             double num_bytes) : location(std::move(location)), num_bytes(num_bytes) {}
+                             sg_size_t num_bytes) : location(std::move(location)), num_bytes(num_bytes) {}
 
             bool operator==(const ReadRequestSpecs &rhs) const {
                 return (location->equal(rhs.location));

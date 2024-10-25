@@ -60,7 +60,7 @@ namespace wrench {
         /** @brief Storage service */
         std::shared_ptr<StorageService> service;
         /** @brief Free space in byte */
-        double free_space;
+        sg_size_t free_space;
         /** @brief the file count */
         uint64_t file_count;
     };
@@ -107,27 +107,31 @@ namespace wrench {
         CompoundStorageService(const std::string &hostname,
                                std::set<std::shared_ptr<StorageService>> storage_services,
                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                               WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
         CompoundStorageService(const std::string &hostname,
                                std::set<std::shared_ptr<StorageService>> storage_services,
                                StorageSelectionStrategyCallback &allocate,
                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                               const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
+
+        std::string getMountPoint() override {
+            return "/"; // Just so that some error tests pass
+        }
 
         double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
 
         double getLoad() override;
 
         // Overload StorageService's implementation.
-        double getTotalSpace() override;
+        sg_size_t getTotalSpace() override;
 
         // Overload StorageService's implementation.
-        double getTotalFreeSpaceAtPath(const std::string &path) override;
+        sg_size_t getTotalFreeSpaceAtPath(const std::string &path) override;
 
         // Overload StorageService's implementation.
         void setIsScratch(bool is_scratch) override;
@@ -144,7 +148,7 @@ namespace wrench {
          * @brief Determine the storage service's buffer size
          * @return a size in bytes
          */
-        double getBufferSize() const override {
+        sg_size_t getBufferSize() const override {
             return 0;
         }
 
@@ -198,20 +202,20 @@ namespace wrench {
 
         std::vector<std::shared_ptr<FileLocation>> lookupFileLocation(const std::shared_ptr<DataFile> &file, S4U_CommPort *answer_commport);
 
-        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location);
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation>& location);
 
-        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation> location, unsigned int stripe_count);
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<FileLocation>& location, unsigned int stripe_count);
 
         bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
         void writeFile(S4U_CommPort *answer_commport,
                        const std::shared_ptr<FileLocation> &location,
-                       double num_bytes_to_write,
+                       sg_size_t num_bytes_to_write,
                        bool wait_for_answer) override;
 
         void readFile(S4U_CommPort *answer_commport,
                       const std::shared_ptr<FileLocation> &location,
-                      double num_bytes,
+                      sg_size_t num_bytes,
                       bool wait_for_answer) override;
 
         void deleteFile(S4U_CommPort *answer_commport,
@@ -266,7 +270,7 @@ namespace wrench {
          *         that the CompoundStorageService will always immediately refuse / reject such
          *         requests, with minimum cost to the user.
          */
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
                 {CompoundStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {CompoundStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {CompoundStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, 0},
@@ -294,7 +298,7 @@ namespace wrench {
 
         int main() override;
 
-        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile> concrete_file_location,
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile>& concrete_file_location,
                                                                                    unsigned int stripe_count,
                                                                                    S4U_CommPort *answer_commport);
 
@@ -320,7 +324,7 @@ namespace wrench {
          *        Should usually be user-provided, or will be
          *        set to the smallest disk size as default.
          */
-        double max_chunk_size = 0;
+        sg_size_t max_chunk_size = 0;
 
         /**
          *  @brief  Whether to strip a file in the CSS or in the external allocation function.

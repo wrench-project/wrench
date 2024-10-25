@@ -32,7 +32,7 @@ WRENCH_LOG_CATEGORY(simulation_controller, "Log category for SimulationControlle
     }
 
 #define PARSE_MESSAGE_PAYLOAD_LIST()                                                     \
-    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE service_message_payload_list;                  \
+    WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE service_message_payload_list;                  \
     {                                                                                    \
         json jsonData = json::parse(message_payload_list_string);                        \
         for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {                 \
@@ -57,7 +57,7 @@ namespace wrench {
 
         this->things_to_do.push([this, s, &s_created]() {
             try {
-                auto new_service_shared_ptr = this->simulation->startNewService(s);
+                auto new_service_shared_ptr = this->getSimulation()->startNewService(s);
                 if (auto cs = std::dynamic_pointer_cast<wrench::ComputeService>(new_service_shared_ptr)) {
                     WRENCH_INFO("Started a new compute service");
                     this->compute_service_registry.insert(new_service_shared_ptr->getName(), cs);
@@ -308,7 +308,7 @@ namespace wrench {
 
         PARSE_MESSAGE_PAYLOAD_LIST()
 
-        map<std::string, std::tuple<unsigned long, double>> resources;
+        map<std::string, std::tuple<unsigned long, sg_size_t>> resources;
         json jsonData = json::parse(resource);
         for (auto it = jsonData.cbegin(); it != jsonData.cend(); ++it) {
             auto spec = it.value();
@@ -378,7 +378,7 @@ namespace wrench {
 
         std::string cs_name = data["service_name"];
         unsigned long num_cores = data["num_cores"];
-        double ram_memory = data["ram_memory"];
+        sg_size_t ram_memory = data["ram_memory"];
         std::string property_list_string = data["property_list"];
         std::string message_payload_list_string = data["message_payload_list"];
 
@@ -984,7 +984,7 @@ namespace wrench {
 
         std::string compute_action_name = data["name"];
         double flops = data["flops"];
-        double ram = data["ram"];
+        sg_size_t ram = data["ram"];
         unsigned long min_num_cores = data["min_num_cores"];
         unsigned long max_num_cores = data["max_num_cores"];
         std::pair<std::string, double> parallel_model = data["parallel_model"];
@@ -1160,10 +1160,10 @@ namespace wrench {
         }
 
         std::string file_read_action_name = data["name"];
-        double num_bytes_to_read = data["num_bytes_to_read"];
+        sg_size_t num_bytes_to_read = data["num_bytes_to_read"];
 
         shared_ptr<FileReadAction> action;
-        if (num_bytes_to_read == -1) {
+        if (num_bytes_to_read == 0) {
             action = compound_job->addFileReadAction(file_read_action_name, file, ss);
         } else {
             action = compound_job->addFileReadAction(file_read_action_name, file, ss, num_bytes_to_read);
@@ -1514,7 +1514,8 @@ namespace wrench {
         //        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
         //            throw std::runtime_error("Unknown workflow  " + workflow_name);
         //        }
-        auto file = Simulation::addFile(data["name"], data["size"]);
+        sg_size_t file_size = data["size"]; // size in bytes from the JSON
+        auto file = Simulation::addFile(data["name"], file_size);
         return {};
     }
 
@@ -1524,11 +1525,6 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getFileSize(json data) {
-        //        std::string workflow_name = data["workflow_name"];
-        //        std::shared_ptr<Workflow> workflow;
-        //        if (not this->workflow_registry.lookup(workflow_name, workflow)) {
-        //            throw std::runtime_error("Unknown workflow " + workflow_name);
-        //        }
         auto file = Simulation::getFileByID(data["file_id"]);
         json answer;
         answer["size"] = file->getSize();

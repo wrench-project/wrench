@@ -228,7 +228,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     this->big_file = wrench::Simulation::addFile("big", 1000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(this->small_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(this->small_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -350,7 +350,7 @@ private:
 
         // Get a "COMPOUND JOB FAILED" event (default handler)
         auto fail_job = job_manager->createCompoundJob("fail_job");
-        auto file = wrench::Simulation::addFile("somefile", 1.0);
+        auto file = wrench::Simulation::addFile("somefile", 1);
         fail_job->addFileReadAction("file_read_action",
                                     wrench::FileLocation::LOCATION(this->test->storage_service1, file));
         job_manager->submitJob(fail_job, vm_cs);
@@ -364,39 +364,39 @@ private:
         return 0;
     }
 
-    void processEventStandardJobCompletion(std::shared_ptr<wrench::StandardJobCompletedEvent> event) override {
+    void processEventStandardJobCompletion(const std::shared_ptr<wrench::StandardJobCompletedEvent> &event) override {
         this->counter = 1;
     }
 
-    void processEventPilotJobStart(std::shared_ptr<wrench::PilotJobStartedEvent> event) override {
+    void processEventPilotJobStart(const std::shared_ptr<wrench::PilotJobStartedEvent> &event) override {
         this->counter = 2;
     }
 
-    void processEventStandardJobFailure(std::shared_ptr<wrench::StandardJobFailedEvent> event) override {
+    void processEventStandardJobFailure(const std::shared_ptr<wrench::StandardJobFailedEvent> &event) override {
         this->counter = 3;
     }
 
-    void processEventPilotJobExpiration(std::shared_ptr<wrench::PilotJobExpiredEvent> event) override {
+    void processEventPilotJobExpiration(const std::shared_ptr<wrench::PilotJobExpiredEvent> &event) override {
         this->counter = 4;
     }
 
-    void processEventFileCopyCompletion(std::shared_ptr<wrench::FileCopyCompletedEvent> event) override {
+    void processEventFileCopyCompletion(const std::shared_ptr<wrench::FileCopyCompletedEvent> &event) override {
         this->counter = 5;
     }
 
-    void processEventFileCopyFailure(std::shared_ptr<wrench::FileCopyFailedEvent> event) override {
+    void processEventFileCopyFailure(const std::shared_ptr<wrench::FileCopyFailedEvent> &event) override {
         this->counter = 6;
     }
 
-    void processEventTimer(std::shared_ptr<wrench::TimerEvent> event) override {
+    void processEventTimer(const std::shared_ptr<wrench::TimerEvent> &event) override {
         this->counter = 7;
     }
 
-    void processEventCompoundJobCompletion(std::shared_ptr<wrench::CompoundJobCompletedEvent> event) override {
+    void processEventCompoundJobCompletion(const std::shared_ptr<wrench::CompoundJobCompletedEvent> &event) override {
         this->counter = 8;
     }
 
-    void processEventCompoundJobFailure(std::shared_ptr<wrench::CompoundJobFailedEvent> event) override {
+    void processEventCompoundJobFailure(const std::shared_ptr<wrench::CompoundJobFailedEvent> &event) override {
         this->counter = 9;
     }
 };
@@ -458,7 +458,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
     this->big_file = wrench::Simulation::addFile("big", 1000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(this->small_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(this->small_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

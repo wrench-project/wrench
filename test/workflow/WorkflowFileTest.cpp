@@ -16,9 +16,15 @@
 TEST(DataFileTest, FileStructure) {
     auto workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::DataFile> f1 = wrench::Simulation::addFile("file-01", 100);
-
     ASSERT_EQ(f1->getID(), "file-01");
     ASSERT_EQ(f1->getSize(), 100);
+
+    auto size2 = wrench::Simulation::addFile("file-02", "100MB")->getSize();
+    ASSERT_EQ(size2, 100000000ULL);
+    auto size3 = wrench::Simulation::addFile("file-03", "100MiB")->getSize();
+    ASSERT_EQ(size3, 100ULL * 1024ULL * 1024ULL);
+    ASSERT_THROW(wrench::Simulation::addFile("file-04", "100MXiB"), std::invalid_argument);
+
     workflow->clear();
     wrench::Simulation::removeAllFiles();
 }

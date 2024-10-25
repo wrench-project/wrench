@@ -118,7 +118,7 @@ private:
         auto switcher = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(
                 "Host1", 123, 1, 50, 1, 10,
                 "link1", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK);
-        switcher->setSimulation(this->simulation);
+        switcher->setSimulation(this->getSimulation());
         switcher->start(switcher, true, false);// Daemonized, no auto-restart
 
         // Do a bunch of resource requests
@@ -178,10 +178,11 @@ void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 3;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-link-shutdown-simulation");
+    argv[2] = strdup("--wrench-default-control-message-size=10");
 
     simulation->init(&argc, argv);
 
@@ -191,7 +192,7 @@ void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_
 
     this->cs = simulation->add(new wrench::BareMetalComputeService(
             "Host2",
-            (std::map<std::string, std::tuple<unsigned long, double>>){
+            (std::map<std::string, std::tuple<unsigned long, sg_size_t>>){
                     std::make_pair("Host2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
             },
             "/scratch",

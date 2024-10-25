@@ -33,7 +33,7 @@ namespace wrench {
                 {VirtualizedClusterComputeServiceProperty::VM_BOOT_OVERHEAD, "0"},
                 {VirtualizedClusterComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
                 {VirtualizedClusterComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {VirtualizedClusterComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {VirtualizedClusterComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
@@ -56,8 +56,8 @@ namespace wrench {
         VirtualizedClusterComputeService(const std::string &hostname,
                                          std::vector<std::string> &execution_hosts,
                                          const std::string &scratch_space_mount_point,
-                                         WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                                         const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
+                                         const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -66,10 +66,10 @@ namespace wrench {
         using CloudComputeService::createVM;
 
         virtual std::string createVM(unsigned long num_cores,
-                                     double ram_memory,
+                                     sg_size_t ram_memory,
                                      const std::string &pm_name,
                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                                     WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
         virtual void migrateVM(const std::string &vm_name, const std::string &dest_pm_hostname);
 

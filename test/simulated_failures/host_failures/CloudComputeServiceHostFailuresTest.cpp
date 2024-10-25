@@ -49,8 +49,8 @@ protected:
 
 
         // Create two files
-        input_file = wrench::Simulation::addFile("input_file", 10000.0);
-        output_file = wrench::Simulation::addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000);
+        output_file = wrench::Simulation::addFile("output_file", 20000);
 
         // Create one task1
         task = workflow->addTask("task1", 3600, 1, 1, 0);
@@ -131,7 +131,7 @@ private:
         auto murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost1",
                                                                    wrench::ResourceSwitcher::Action::TURN_OFF,
                                                                    wrench::ResourceSwitcher::ResourceType::HOST);
-        murderer->setSimulation(this->simulation);
+        murderer->setSimulation(this->getSimulation());
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         wrench::Simulation::sleep(10);
@@ -229,7 +229,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFile(this->input_file, storage_service);
+    storage_service->createFile(this->input_file);
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -261,13 +261,13 @@ private:
         // Starting a FailedHost1 murderer!!
         auto murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost1",
                                                                    wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
-        murderer->setSimulation(this->simulation);
+        murderer->setSimulation(this->getSimulation());
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
         auto resurector = std::make_shared<wrench::ResourceSwitcher>("StableHost", 1000, "FailedHost1",
                                                                      wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
-        resurector->setSimulation(this->simulation);
+        resurector->setSimulation(this->getSimulation());
         resurector->start(resurector, true, false);// Daemonized, no auto-restart
 
         wrench::Simulation::sleep(10);
@@ -379,7 +379,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFile(input_file, storage_service);
+    storage_service->createFile(input_file);
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -424,7 +424,7 @@ private:
             auto switch1 = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(
                     "StableHost", seed1, 10, 100, 10, 100,
                     "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
-            switch1->setSimulation(this->simulation);
+            switch1->setSimulation(this->getSimulation());
             switch1->start(switch1, true, false);// Daemonized, no auto-restart
 
             // Starting a FailedHost2 random repeat switch!!
@@ -432,7 +432,7 @@ private:
             auto switch2 = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(
                     "StableHost", seed1, 10, 100, 10, 100,
                     "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
-            switch2->setSimulation(this->simulation);
+            switch2->setSimulation(this->getSimulation());
             switch2->start(switch1, true, false);// Daemonized, no auto-restart
 
             // Add a task1 to the workflow
@@ -547,7 +547,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFile(input_file, storage_service);
+    storage_service->createFile(input_file);
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

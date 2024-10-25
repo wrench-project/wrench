@@ -29,7 +29,7 @@ namespace wrench {
      */
     class NetworkProximityReceiverDaemon : public Service {
     public:
-        NetworkProximityReceiverDaemon(Simulation *simulation, std::string hostname, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
+        NetworkProximityReceiverDaemon(Simulation *simulation, const std::string& hostname, const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list);
 
     private:
         friend class Simulation;
