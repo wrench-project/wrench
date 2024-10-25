@@ -22,9 +22,6 @@ WRENCH_LOG_CATEGORY(wrench_core_compute_service, "Log category for Compute Servi
 
 namespace wrench {
 
-    constexpr unsigned long ComputeService::ALL_CORES;
-    constexpr double ComputeService::ALL_RAM;
-
     /**
      * @brief Stop the compute service
      */
@@ -92,9 +89,6 @@ namespace wrench {
      *         - "-u": username (optional)
      *      - to a CloudComputeService: {}
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     void ComputeService::submitJob(const std::shared_ptr<CompoundJob> &job, const std::map<std::string, std::string> &service_specific_args) {
         if (job == nullptr) {
@@ -111,9 +105,6 @@ namespace wrench {
      *
      * @param job: the job to terminate
      *
-     * @throw std::invalid_argument
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     void ComputeService::terminateJob(const std::shared_ptr<CompoundJob> &job) {
         if (job == nullptr) {
@@ -151,7 +142,7 @@ namespace wrench {
         if (this->scratch_space_mount_point.empty()) return;// No mount point provided
 
 
-        if (wrench::Simulation::isLinkShutdownSimulationEnabled() and (this->getPropertyValueAsDouble(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE) == 0)) {
+        if (wrench::Simulation::isLinkShutdownSimulationEnabled() and (this->getPropertyValueAsSizeInByte(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE) == 0)) {
             throw std::runtime_error("ComputeService::startScratchStorageService(): Compute service " + this->name +
                                      " cannot start a scratch service with (default) buffer size 0 because link shutdown " +
                                      "simulation is enabled. Set a non-zero buffer size by setting the "
@@ -167,7 +158,7 @@ namespace wrench {
         // Set the storage service's network timeout to that of this compute service
         ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
         this->scratch_space_storage_service =
-                this->simulation->startNewService(ss);
+                this->simulation_->startNewService(ss);
     }
 
     /**
@@ -190,8 +181,6 @@ namespace wrench {
      *                     perform this operation in zero simulated time.
      * @return the host count
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     unsigned long ComputeService::getNumHosts(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -206,9 +195,6 @@ namespace wrench {
       *                     perform this operation in zero simulated time.
       * @return a vector of hostnames
       *
-      *
-      * @throw ExecutionException
-      * @throw std::runtime_error
       */
     std::vector<std::string> ComputeService::getHosts(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -231,8 +217,6 @@ namespace wrench {
       *                     perform this operation in zero simulated time.
       * @return a map of core counts, indexed by hostnames
       *
-      * @throw ExecutionException
-      * @throw std::runtime_error
       */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumCores(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -253,8 +237,6 @@ namespace wrench {
       *                     perform this operation in zero simulated time.
       * @return total core counts
       *
-      * @throw ExecutionException
-      * @throw std::runtime_error
       */
     unsigned long ComputeService::getTotalNumCores(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -277,8 +259,6 @@ namespace wrench {
      *        jobs may be pending and "ahead" in the queue, e.g., because they depend on current
      *        actions that are not using all available resources).
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumIdleCores(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -299,8 +279,6 @@ namespace wrench {
      *                     perform this operation in zero simulated time.
      * @return the ram availability map (could be empty)
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     std::map<std::string, double> ComputeService::getPerHostAvailableMemoryCapacity(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -324,8 +302,6 @@ namespace wrench {
      *                     perform this operation in zero simulated time.
      * @return total idle core count.
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     unsigned long ComputeService::getTotalNumIdleCores(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -349,7 +325,7 @@ namespace wrench {
      * @param ram: the desired RAM
      * @return true if idle resources are available, false otherwise
      */
-    bool ComputeService::isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, double ram) {
+    bool ComputeService::isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, sg_size_t ram) {
         assertServiceIsUp();
 
         // send an "info request" message to the daemon's commport
@@ -376,7 +352,6 @@ namespace wrench {
     *                     perform this operation in zero simulated time.
     * @return a list of flop rates in flop/sec
     *
-    * @throw ExecutionException
     */
     std::map<std::string, double> ComputeService::getCoreFlopRate(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -396,7 +371,6 @@ namespace wrench {
     *                     perform this operation in zero simulated time.
     * @return a map of RAM capacities, indexed by hostname
     *
-    * @throw ExecutionException
     */
     std::map<std::string, double> ComputeService::getMemoryCapacity(bool simulate_it) {
         std::map<std::string, double> dict;
@@ -418,8 +392,6 @@ namespace wrench {
      *                     perform this operation in zero simulated time.
      * @return service information
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     std::map<std::string, double> ComputeService::getServiceResourceInformation(const std::string &key, bool simulate_it) {
         assertServiceIsUp();

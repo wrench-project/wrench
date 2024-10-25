@@ -42,6 +42,8 @@ namespace wrench {
     /** \cond INTERNAL */
     /*******************/
 
+    int SimulationOutput::unique_disk_sequence_number = 0;
+
     /**
      * @brief Object representing an instance when a WorkflowTask was run.
      */
@@ -77,7 +79,7 @@ namespace wrench {
         /* @brief flop rate of the host that ran the task */
         double host_flop_rate = 0.0;
         /* @brief RAM capacity of the host that ran the task */
-        double host_memory = 0.0;
+        sg_size_t host_memory = 0.0;
         /* @brief number of cores of the host that ran the task */
         unsigned long long host_num_cores = 0;
 
@@ -160,7 +162,7 @@ namespace wrench {
      * @param include_disk: boolean specifying whether to include disk operation in JSON (disk timestamps must be enabled)
      * @param include_bandwidth: boolean specifying whether to include link bandwidth measurements in JSON
      */
-    void SimulationOutput::dumpUnifiedJSON(const std::shared_ptr<Workflow> &workflow, std::string file_path,
+    void SimulationOutput::dumpUnifiedJSON(const std::shared_ptr<Workflow> &workflow, const std::string& file_path,
                                            bool include_platform,
                                            bool include_workflow_exec,
                                            bool include_workflow_graph,
@@ -424,7 +426,6 @@ namespace wrench {
      *              on the gantt chart may end up in 1 of 3 positions (using cores 0 and 1, 1 and 2, or 2 and 3).
      * @param data: JSON workflow execution data
      *
-     * @throws std::runtime_error
      */
     void generateHostUtilizationGraphLayout(std::vector<WorkflowTaskExecutionInstance> &data) {
         if (not searchForLayout(data, 0)) {
@@ -511,7 +512,6 @@ namespace wrench {
       * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
       * of dumpUnifiedJSON
       *
-      * @throws std::invalid_argument
       */
     void SimulationOutput::dumpWorkflowExecutionJSON(const std::shared_ptr<Workflow> &workflow,
                                                      const std::string &file_path,
@@ -648,7 +648,7 @@ namespace wrench {
             }
         }
 
-        // Set the "vertical position" of each WorkflowExecutionInstance so we know where to plot each rectangle
+        // Set the "vertical position" of each WorkflowExecutionInstance, so we know where to plot each rectangle
         if (generate_host_utilization_layout) {
             generateHostUtilizationGraphLayout(data);
             std::ofstream output("host_utilization_layout.json");
@@ -682,7 +682,6 @@ namespace wrench {
      * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
      * of dumpUnifiedJSON
      *
-     * @throws std::invalid_argument
      */
     void SimulationOutput::dumpWorkflowGraphJSON(const std::shared_ptr<wrench::Workflow> &workflow,
                                                  const std::string &file_path,
@@ -747,7 +746,7 @@ namespace wrench {
 
         nlohmann::json machines = nlohmann::json::array();
         for (auto const &m: used_machines) {
-            double memory = Simulation::getHostMemoryCapacity(m);
+            sg_size_t memory = Simulation::getHostMemoryCapacity(m);
             unsigned long num_cores = Simulation::getHostNumCores(m);
             double flop_rate = Simulation::getHostFlopRate(m);
             double ghz_rate = flop_rate / (1000.0 * 1000.0 * 1000.0);
@@ -821,8 +820,6 @@ namespace wrench {
      * @param file_path: the path to write the file
      * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
      * of dumpUnifiedJSON
-     * @throws std::invalid_argument
-     * @throws std::runtime_error
      */
     void SimulationOutput::dumpHostEnergyConsumptionJSON(const std::string &file_path,
                                                          bool writing_file) {
@@ -968,7 +965,6 @@ namespace wrench {
      * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
      * of dumpUnifiedJSON
      *
-     * @throws std::invalid_argument
      */
     void SimulationOutput::dumpPlatformGraphJSON(const std::string &file_path,
                                                  bool writing_file) {
@@ -1050,7 +1046,7 @@ namespace wrench {
                 platform_graph_json["routes"].push_back(route_forward_json);
 
                 // populate "route_backward" with an ordered list of network links along
-                // the route between target and source; the "route_backward" could be different
+                // the route between target and source; the "route_backward" could be different,
                 // so we need to add it if it is in fact different
                 nlohmann::json route_backward_json;
                 (*target)->route_to(*source, route_backward, &route_backward_latency);
@@ -1230,7 +1226,6 @@ namespace wrench {
      * @param file_path - path to save JSON at
      * @param writing_file - boolean, default true, to write the JSON to the specified file path. Used for unified output.
      *
-     * @throws invalid_argument
      */
     void SimulationOutput::dumpDiskOperationsJSON(const std::string &file_path,
                                                   bool writing_file) {
@@ -1360,7 +1355,7 @@ namespace wrench {
 
     /** Writes a JSON file containing link usage information as a JSON array.
      *
-     * This information will not be generated without using the bandwidth meter service and providing it with linknames
+     * This information will not be generated without using the bandwidth meter service and providing it with link names
      * to monitor.
      *
      *<pre>
@@ -1391,8 +1386,6 @@ namespace wrench {
      * @param file_path: path where json file is written
      * @param writing_file: whether to write file to disk. Enabled by default.
      *
-     * @throws std::invalid_argument
-     * @throws std::runtime_error
      */
     void SimulationOutput::dumpLinkUsageJSON(const std::string &file_path,
                                              bool writing_file) {
@@ -1470,7 +1463,7 @@ namespace wrench {
         this->setEnabled<SimulationTimestampDiskReadFailure>(false);
         this->setEnabled<SimulationTimestampDiskReadCompletion>(false);
 
-        // By default disable (for now) all disk write timestamps
+        // By default, disable (for now) all disk write timestamps
         this->setEnabled<SimulationTimestampDiskWriteStart>(false);
         this->setEnabled<SimulationTimestampDiskWriteFailure>(false);
         this->setEnabled<SimulationTimestampDiskWriteCompletion>(false);
@@ -1704,17 +1697,18 @@ namespace wrench {
      * @param hostname: hostname being read from
      * @param path: the path
      * @param bytes: number of bytes read
-     * @param unique_sequence_number: an integer id
+     * @return a unique integer id
      */
-    void SimulationOutput::addTimestampDiskReadStart(double date,
+    int SimulationOutput::addTimestampDiskReadStart(double date,
                                                      std::string hostname,
                                                      std::string path,
-                                                     double bytes,
-                                                     int unique_sequence_number) {
+                                                     sg_size_t bytes) {
         if (this->isEnabled<SimulationTimestampDiskReadStart>()) {
+            SimulationOutput::unique_disk_sequence_number++;
             this->addTimestamp<SimulationTimestampDiskReadStart>(
-                    new SimulationTimestampDiskReadStart(date, std::move(hostname), std::move(path), bytes, unique_sequence_number));
+                    new SimulationTimestampDiskReadStart(date, std::move(hostname), std::move(path), bytes, SimulationOutput::unique_disk_sequence_number));
         }
+        return SimulationOutput::unique_disk_sequence_number;
     }
 
     /**
@@ -1727,7 +1721,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampDiskReadFailure(double date, const std::string &hostname,
                                                        const std::string &path,
-                                                       double bytes,
+                                                       sg_size_t bytes,
                                                        int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskReadFailure>()) {
             this->addTimestamp<SimulationTimestampDiskReadFailure>(
@@ -1745,7 +1739,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampDiskReadCompletion(double date, const std::string &hostname,
                                                           const std::string &path,
-                                                          double bytes,
+                                                          sg_size_t bytes,
                                                           int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskReadCompletion>()) {
             this->addTimestamp<SimulationTimestampDiskReadCompletion>(
@@ -1759,16 +1753,17 @@ namespace wrench {
      * @param hostname: hostname being read from
      * @param path: the path
      * @param bytes: number of bytes read
-     * @param unique_sequence_number: an integer id
+     * @return a unique integer id
      */
-    void SimulationOutput::addTimestampDiskWriteStart(double date, std::string hostname,
+    int SimulationOutput::addTimestampDiskWriteStart(double date, std::string hostname,
                                                       std::string path,
-                                                      double bytes,
-                                                      int unique_sequence_number) {
+                                                      sg_size_t bytes) {
         if (this->isEnabled<SimulationTimestampDiskWriteStart>()) {
+            SimulationOutput::unique_disk_sequence_number++;
             this->addTimestamp<SimulationTimestampDiskWriteStart>(
-                    new SimulationTimestampDiskWriteStart(date, std::move(hostname), std::move(path), bytes, unique_sequence_number));
+                    new SimulationTimestampDiskWriteStart(date, std::move(hostname), std::move(path), bytes, SimulationOutput::unique_disk_sequence_number));
         }
+        return SimulationOutput::unique_disk_sequence_number;
     }
 
     /**
@@ -1781,7 +1776,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampDiskWriteFailure(double date, const std::string &hostname,
                                                         const std::string &path,
-                                                        double bytes,
+                                                        sg_size_t bytes,
                                                         int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskWriteFailure>()) {
             this->addTimestamp<SimulationTimestampDiskWriteFailure>(
@@ -1799,7 +1794,7 @@ namespace wrench {
     */
     void SimulationOutput::addTimestampDiskWriteCompletion(double date, const std::string &hostname,
                                                            const std::string &path,
-                                                           double bytes,
+                                                           sg_size_t bytes,
                                                            int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskWriteCompletion>()) {
             this->addTimestamp<SimulationTimestampDiskWriteCompletion>(
@@ -1861,10 +1856,10 @@ namespace wrench {
     /**
      * @brief Add a link usage timestamp
      * @param date: the date
-     * @param linkname: a linkname
+     * @param link_name: a link name
      * @param bytes_per_second: link usage in bytes_per_second
      */
-    void SimulationOutput::addTimestampLinkUsage(double date, const std::string &linkname,
+    void SimulationOutput::addTimestampLinkUsage(double date, const std::string &link_name,
                                                  double bytes_per_second) {
         static std::unordered_map<std::string, std::vector<SimulationTimestampLinkUsage *>> last_two_timestamps;
 
@@ -1872,25 +1867,25 @@ namespace wrench {
             return;
         }
 
-        auto new_timestamp = new SimulationTimestampLinkUsage(date, linkname, bytes_per_second);
+        auto new_timestamp = new SimulationTimestampLinkUsage(date, link_name, bytes_per_second);
 
         // If less thant 2 time-stamp for that link, just record and add
-        if (last_two_timestamps[linkname].size() < 2) {
-            last_two_timestamps[linkname].push_back(new_timestamp);
+        if (last_two_timestamps[link_name].size() < 2) {
+            last_two_timestamps[link_name].push_back(new_timestamp);
             this->addTimestamp<SimulationTimestampLinkUsage>(new_timestamp);
             return;
         }
 
         // Otherwise, check whether we can merge
-        bool can_merge = DBL_EQUAL(last_two_timestamps[linkname].at(0)->getUsage(),
-                                   last_two_timestamps[linkname].at(1)->getUsage()) and
-                         DBL_EQUAL(last_two_timestamps[linkname].at(1)->getUsage(), new_timestamp->getUsage());
+        bool can_merge = DBL_EQUAL(last_two_timestamps[link_name].at(0)->getUsage(),
+                                   last_two_timestamps[link_name].at(1)->getUsage()) and
+                         DBL_EQUAL(last_two_timestamps[link_name].at(1)->getUsage(), new_timestamp->getUsage());
 
         if (can_merge) {
-            last_two_timestamps[linkname].at(1)->setDate(new_timestamp->getDate());
+            last_two_timestamps[link_name].at(1)->setDate(new_timestamp->getDate());
         } else {
-            last_two_timestamps[linkname][0] = last_two_timestamps[linkname][1];
-            last_two_timestamps[linkname][1] = new_timestamp;
+            last_two_timestamps[link_name][0] = last_two_timestamps[link_name][1];
+            last_two_timestamps[link_name][1] = new_timestamp;
             this->addTimestamp<SimulationTimestampLinkUsage>(new_timestamp);
         }
     }

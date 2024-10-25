@@ -27,10 +27,10 @@ namespace wrench {
                   const std::string &hostname);
 
     protected:
-        void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) override;
-        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) override;
-        void processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent> event) override;
-        void processEventPilotJobExpiration(std::shared_ptr<PilotJobExpiredEvent> event) override;
+        void processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent> &event) override;
+        void processEventStandardJobFailure(const std::shared_ptr<StandardJobFailedEvent> &event) override;
+        void processEventPilotJobStart(const std::shared_ptr<PilotJobStartedEvent> &event) override;
+        void processEventPilotJobExpiration(const std::shared_ptr<PilotJobExpiredEvent> &event) override;
 
     private:
         int main() override;

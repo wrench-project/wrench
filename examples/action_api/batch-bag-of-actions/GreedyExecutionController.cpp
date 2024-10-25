@@ -17,7 +17,7 @@
 #include "GreedyExecutionController.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
-#define MB (1000.0 * 1000.0)
+#define MB (1000000ULL)
 
 WRENCH_LOG_CATEGORY(custom_controller, "Log category for GreedyExecutionController");
 
@@ -43,7 +43,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int GreedyExecutionController::main() {
         /* Initialize and seed a RNG */

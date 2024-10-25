@@ -188,7 +188,7 @@ int main(int argc, char **argv) {
 
     std::cerr << "Staging task input files..." << std::endl;
     for (auto const &f: workflow->getInputFiles()) {
-        simulation->stageFile(f, storage_service);
+        storage_service->createFile(f);
     }
 
     double start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();

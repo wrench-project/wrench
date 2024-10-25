@@ -41,7 +41,7 @@ namespace wrench {
         friend class ParallelModel;
 
         ConstantEfficiencyParallelModel(double efficiency);
-        double efficiency;// Parallel efficiency
+        double efficiency_;// Parallel efficiency
     };
 
 

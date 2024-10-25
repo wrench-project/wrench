@@ -236,7 +236,7 @@ private:
                                            action, nullptr));
 
         // Start it
-        action_executor->setSimulation(this->simulation);
+        action_executor->setSimulation(this->getSimulation());
         action_executor->start(action_executor, true, false);
 
         //        WRENCH_INFO("SLEEPING %lf", this->sleep_time);
@@ -351,11 +351,11 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     this->ss2 = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file to read
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss1, file));
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
+    ss1->createFile(wrench::FileLocation::LOCATION(ss1, file));
 
     // Create a file to write
-    this->file_to_write = wrench::Simulation::addFile("some_file_to_write", 1000000.0);
+    this->file_to_write = wrench::Simulation::addFile("some_file_to_write", 1000000);
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

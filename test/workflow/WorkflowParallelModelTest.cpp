@@ -199,8 +199,7 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
     double makespan = task->getComputationEndDate() - task->getComputationStartDate();
     double expected_makespan = work / (4 * efficiency);
 
-    WRENCH_INFO("--> %lf %lf\n", makespan, expected_makespan);
-
+//    WRENCH_INFO("--> %lf %lf\n", makespan, expected_makespan);
     if (std::abs(makespan - expected_makespan) > 0.001) {
         throw std::runtime_error("Unexpected task1 makespan: " + std::to_string(makespan) +
                                  " instead of " + std::to_string(expected_makespan));

@@ -14,8 +14,8 @@
  **/
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
-#define MBYTE (1000.0 * 1000.0)
-#define GBYTE (1000.0 * 1000.0 * 1000.0)
+#define MBYTE (1000000ULL)
+#define GBYTE (1000000000ULL)
 
 #include <iostream>
 #include <iomanip>
@@ -73,7 +73,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int Controller::main() {
 
@@ -170,7 +169,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void Controller::processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent> event) {
+    void Controller::processEventCompoundJobCompletion(const std::shared_ptr<CompoundJobCompletedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->job;
         WRENCH_INFO("Notified that compound job %s has successfully completed", job->getName().c_str());
@@ -181,7 +180,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void Controller::processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent> event) {
+    void Controller::processEventCompoundJobFailure(const std::shared_ptr<CompoundJobFailedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->job;
         auto action = *(job->getActions().begin());

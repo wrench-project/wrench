@@ -12,6 +12,7 @@
 
 #include <string>
 #include <map>
+#include <simgrid/forward.h>
 
 namespace wrench {
 
@@ -21,19 +22,19 @@ namespace wrench {
     class DataFile {
 
     public:
-        double getSize() const;
-        void setSize(double size);
-        std::string getID() const;
+        [[nodiscard]] sg_size_t getSize() const;
+        void setSize(sg_size_t size);
+        [[nodiscard]] std::string getID() const;
         ~DataFile();
 
     protected:
         friend class Simulation;
-        DataFile(std::string id, double size);
+        DataFile(std::string id, sg_size_t size);
 
         /** @brief File id/name **/
         std::string id;
         /** @brief File size in bytes **/
-        double size;// in bytes
+        sg_size_t size;// in bytes
     };
 
 }// namespace wrench

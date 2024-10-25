@@ -173,27 +173,27 @@ private:
 
 
             try {
-                this->simulation->getEnergyConsumed("dummy_unavailable_host");
+                this->getSimulation()->getEnergyConsumed("dummy_unavailable_host");
                 throw std::runtime_error("Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
             try {
-                std::map<std::string, double> value = this->simulation->getEnergyConsumed(std::vector<std::string>({"dummy_unavailable_host"}));
+                std::map<std::string, double> value = this->getSimulation()->getEnergyConsumed(std::vector<std::string>({"dummy_unavailable_host"}));
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
             try {
-                this->simulation->getNumberofPstates("dummy_unavailable_host");
+                this->getSimulation()->getNumberOfPstates("dummy_unavailable_host");
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
             try {
-                double value = this->simulation->getCurrentPstate("dummy_unavailable_host");
+                double value = this->getSimulation()->getCurrentPstate("dummy_unavailable_host");
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
@@ -201,35 +201,35 @@ private:
 
 
             try {
-                this->simulation->getMinPowerConsumption("dummy_unavailable_host");
+                this->getSimulation()->getMinPowerConsumption("dummy_unavailable_host");
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
             try {
-                double value = this->simulation->getMaxPowerConsumption("dummy_unavailable_host");
+                double value = this->getSimulation()->getMaxPowerConsumption("dummy_unavailable_host");
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
             try {
-                this->simulation->setPstate("dummy_unavailable_host", 1);
+                this->getSimulation()->setPstate("dummy_unavailable_host", 1);
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
             try {
-                this->simulation->setPstate("dummy_unavailable_host", 2);
+                this->getSimulation()->setPstate("dummy_unavailable_host", 2);
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
             try {
-                this->simulation->setPstate("MyHost1", 1000);
+                this->getSimulation()->setPstate("MyHost1", 1000);
                 throw std::runtime_error(
                         "Should not have been able to set a bogus pstate");
             } catch (std::invalid_argument &e) {
@@ -289,10 +289,10 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
                                     this, hostname)));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    EXPECT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -344,20 +344,20 @@ private:
             this->waitForAndProcessNextEvent();
 
             try {
-                this->simulation->getEnergyConsumed("MyHost1");
+                this->getSimulation()->getEnergyConsumed("MyHost1");
                 throw std::runtime_error("Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
 
             try {
-                std::map<std::string, double> value = this->simulation->getEnergyConsumed(std::vector<std::string>({"MyHost1"}));
+                std::map<std::string, double> value = this->getSimulation()->getEnergyConsumed(std::vector<std::string>({"MyHost1"}));
                 throw std::runtime_error(
                         "Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
 
             try {
-                wrench::Simulation::getNumberofPstates("MyHost1");
+                wrench::Simulation::getNumberOfPstates("MyHost1");
                 throw std::runtime_error(
                         "Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
@@ -385,7 +385,7 @@ private:
             }
 
             try {
-                this->simulation->setPstate("MyHost1", 1);
+                this->getSimulation()->setPstate("MyHost1", 1);
                 throw std::runtime_error(
                         "Should not have been able to set the pstate without activating energy plugin");
             } catch (std::runtime_error &e) {
@@ -446,10 +446,10 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
 
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    EXPECT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -562,10 +562,10 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
                                     this, hostname)));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    EXPECT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -600,9 +600,9 @@ private:
         {
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
-            int cur_pstate = this->simulation->getCurrentPstate(simulation_hosts[1]);
-            this->simulation->getMaxPowerConsumption(simulation_hosts[1]);
-            this->simulation->getMinPowerConsumption(simulation_hosts[1]);
+            int cur_pstate = this->getSimulation()->getCurrentPstate(simulation_hosts[1]);
+            this->getSimulation()->getMaxPowerConsumption(simulation_hosts[1]);
+            this->getSimulation()->getMinPowerConsumption(simulation_hosts[1]);
             //switch pstates right off the bat
 
             // coverage
@@ -617,40 +617,40 @@ private:
             std::vector<int> list_of_pstates = wrench::Simulation::getListOfPstates(simulation_hosts[1]);
             int max_num_pstate = list_of_pstates.size();
             int pstate = std::max(0, max_num_pstate - 1);
-            this->simulation->setPstate(simulation_hosts[1], pstate);
+            this->getSimulation()->setPstate(simulation_hosts[1], pstate);
 
             //check if the changed pstate is not equal to the current pstate
-            if (cur_pstate == this->simulation->getCurrentPstate(simulation_hosts[1])) {
+            if (cur_pstate == this->getSimulation()->getCurrentPstate(simulation_hosts[1])) {
                 throw std::runtime_error(
                         "The pstate should have changed but it did not change");
             }
 
             //check if the max power possible/min power available in this pstate is different than the maximum power possible/min power available in the previous state
             for (auto host: simulation_hosts) {
-                std::vector<int> states = this->simulation->getListOfPstates(host);
+                std::vector<int> states = this->getSimulation()->getListOfPstates(host);
                 int prev_max_power = -1;
                 int prev_min_power = -1;
                 for (auto state: states) {
                     //check if max power is different in all the states as is in xml
-                    this->simulation->setPstate(host, state);
-                    if (prev_max_power == this->simulation->getMaxPowerConsumption(host)) {
+                    this->getSimulation()->setPstate(host, state);
+                    if (prev_max_power == this->getSimulation()->getMaxPowerConsumption(host)) {
                         throw std::runtime_error(
                                 "The max power from the xml and the APIs do not match");
                     }
-                    prev_max_power = this->simulation->getMaxPowerConsumption(host);
+                    prev_max_power = this->getSimulation()->getMaxPowerConsumption(host);
 
                     //check if the min power is different in all the states as is in xml
-                    this->simulation->setPstate(host, state);
-                    if (prev_min_power == this->simulation->getMinPowerConsumption(host)) {
+                    this->getSimulation()->setPstate(host, state);
+                    if (prev_min_power == this->getSimulation()->getMinPowerConsumption(host)) {
                         throw std::runtime_error(
                                 "The min power from the xml and the APIs do not match");
                     }
-                    prev_min_power = this->simulation->getMinPowerConsumption(host);
+                    prev_min_power = this->getSimulation()->getMinPowerConsumption(host);
                 }
             }
             //lets check if the energy consumed by host1 is less than the energy consumed by host1 + host2
-            double energy_consumed_1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
-            std::map<std::string, double> energy_consumed_2_map = this->simulation->getEnergyConsumed(std::vector<std::string>({simulation_hosts[1], simulation_hosts[2]}));
+            double energy_consumed_1 = this->getSimulation()->getEnergyConsumed(simulation_hosts[1]);
+            std::map<std::string, double> energy_consumed_2_map = this->getSimulation()->getEnergyConsumed(std::vector<std::string>({simulation_hosts[1], simulation_hosts[2]}));
             double energy_consumed_2 = 0.0;
             for (auto const &h: energy_consumed_2_map) {
                 energy_consumed_2 += h.second;
@@ -714,10 +714,10 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
                                     this, hostname)));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    EXPECT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -770,7 +770,7 @@ private:
 
 
             //First energy consumption test
-            double before_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
+            double before_current_energy_consumed_by_host1 = this->getSimulation()->getEnergyConsumed(simulation_hosts[1]);
             //run a new job
             //let's execute the job, this should take ~100 sec based on the 100MF speed
             std::string my_commport = "test_callback_commport";
@@ -778,7 +778,7 @@ private:
             job_manager->submitJob(job1, this->test->compute_service);
             this->waitForAndProcessNextEvent();
 
-            double after_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
+            double after_current_energy_consumed_by_host1 = this->getSimulation()->getEnergyConsumed(simulation_hosts[1]);
             double energy_consumed_while_running_with_higher_speed = after_current_energy_consumed_by_host1 - before_current_energy_consumed_by_host1;
             double higher_speed_compuation_time = wrench::S4U_Simulation::getClock();
 
@@ -788,13 +788,13 @@ private:
             }
 
             //switch pstate
-            int max_pstate_possible = this->simulation->getNumberofPstates(simulation_hosts[1]);
+            int max_pstate_possible = this->getSimulation()->getNumberOfPstates(simulation_hosts[1]);
             //let's directly switch to pstate 2
             int pstate = 2;
-            this->simulation->setPstate(simulation_hosts[1], pstate);
+            this->getSimulation()->setPstate(simulation_hosts[1], pstate);
 
             //Second energy consumption test
-            double before_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
+            double before_current_energy_consumed_by_host2 = this->getSimulation()->getEnergyConsumed(simulation_hosts[1]);
             //run a new job
             //let's execute the job, this should take ~100 sec based on the 100MF speed
             my_commport = "test_callback_commport";
@@ -802,7 +802,7 @@ private:
             job_manager->submitJob(job2, this->test->compute_service);
             this->waitForAndProcessNextEvent();
 
-            double after_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
+            double after_current_energy_consumed_by_host2 = this->getSimulation()->getEnergyConsumed(simulation_hosts[1]);
             double energy_consumed_while_running_with_lower_speed = after_current_energy_consumed_by_host2 - before_current_energy_consumed_by_host2;
             double lower_speed_computation_time = wrench::S4U_Simulation::getClock() - higher_speed_compuation_time;
 
@@ -882,10 +882,10 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
                                     this, hostname)));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    EXPECT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -924,15 +924,15 @@ private:
         {
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
-            double after_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
+            double after_current_energy_consumed_by_host1 = this->getSimulation()->getEnergyConsumed(simulation_hosts[1]);
 
             //switch pstate
-            int max_pstate_possible = this->simulation->getNumberofPstates(simulation_hosts[1]);
+            int max_pstate_possible = this->getSimulation()->getNumberOfPstates(simulation_hosts[1]);
             //let's directly switch to pstate 2
 
             //Second energy consumption test
             wrench::Simulation::sleep(10);
-            double before_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
+            double before_current_energy_consumed_by_host2 = this->getSimulation()->getEnergyConsumed(simulation_hosts[1]);
         }
 
         return 0;

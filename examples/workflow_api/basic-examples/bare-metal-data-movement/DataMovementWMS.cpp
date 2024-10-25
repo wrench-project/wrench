@@ -47,7 +47,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int DataMovementWMS::main() {
         /* Set the logging output to GREEN */
@@ -137,7 +136,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void DataMovementWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
+    void DataMovementWMS::processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */
@@ -150,7 +149,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void DataMovementWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
+    void DataMovementWMS::processEventStandardJobFailure(const std::shared_ptr<StandardJobFailedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */

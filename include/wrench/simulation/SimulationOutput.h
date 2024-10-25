@@ -64,7 +64,7 @@ namespace wrench {
 
         void dumpLinkUsageJSON(const std::string &file_path, bool writing_file = true);
 
-        void dumpUnifiedJSON(const std::shared_ptr<Workflow> &workflow, std::string file_path,
+        void dumpUnifiedJSON(const std::shared_ptr<Workflow> &workflow, const std::string& file_path,
                              bool include_platform = false,
                              bool include_workflow_exec = true,
                              bool include_workflow_graph = false,
@@ -122,22 +122,22 @@ namespace wrench {
         void addTimestampFileCopyCompletion(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src,
                                             std::shared_ptr<FileLocation> dst);
 
-        void
-        addTimestampDiskReadStart(double date, std::string hostname, std::string mount, double bytes, int unique_sequence_number);
+        int
+        addTimestampDiskReadStart(double date, std::string hostname, std::string mount, sg_size_t bytes);
 
         void
-        addTimestampDiskReadFailure(double date, const std::string &hostname, const std::string &mount, double bytes, int unique_sequence_number);
+        addTimestampDiskReadFailure(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes, int unique_sequence_number);
 
-        void addTimestampDiskReadCompletion(double date, const std::string &hostname, const std::string &mount, double bytes,
+        void addTimestampDiskReadCompletion(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes,
                                             int unique_sequence_number);
 
-        void
-        addTimestampDiskWriteStart(double date, std::string hostname, std::string mount, double bytes, int unique_sequence_number);
+        int
+        addTimestampDiskWriteStart(double date, std::string hostname, std::string mount, sg_size_t bytes);
 
         void
-        addTimestampDiskWriteFailure(double date, const std::string &hostname, const std::string &mount, double bytes, int unique_sequence_number);
+        addTimestampDiskWriteFailure(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes, int unique_sequence_number);
 
-        void addTimestampDiskWriteCompletion(double date, const std::string &hostname, const std::string &mount, double bytes,
+        void addTimestampDiskWriteCompletion(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes,
                                              int unique_sequence_number);
 
         void addTimestampPstateSet(double date, const std::string &hostname, int pstate);
@@ -185,6 +185,8 @@ namespace wrench {
         nlohmann::json energy_json_part;
         nlohmann::json disk_json_part;
         nlohmann::json bandwidth_json_part;
+
+        static int unique_disk_sequence_number;
 
         std::map<std::type_index, bool> enabledStatus;
 

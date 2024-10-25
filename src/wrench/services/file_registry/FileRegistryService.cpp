@@ -15,6 +15,7 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simulation/SimulationMessage.h>
+#include <wrench/simulation/Simulation.h>
 #include <wrench/services/ServiceMessage.h>
 
 #include <wrench/services/file_registry/FileRegistryService.h>
@@ -23,7 +24,6 @@
 #include <wrench/data_file/DataFile.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/network_proximity/NetworkProximityService.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_file_registry_service,
                     "Log category for File Registry Service");
@@ -37,24 +37,20 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     FileRegistryService::FileRegistryService(
-            std::string hostname,
-            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(std::move(hostname), "file_registry") {
-        this->setProperties(this->default_property_values, std::move(property_list));
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+            const std::string& hostname,
+            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+            const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : Service(hostname, "file_registry") {
+        this->setProperties(this->default_property_values, property_list);
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
 
-    FileRegistryService::~FileRegistryService() {
-    }
+    FileRegistryService::~FileRegistryService() = default;
 
     /**
      * @brief Lookup entries for a file
      * @param file: the file to lookup
      * @return The list locations for the file
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     std::set<std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(const std::shared_ptr<DataFile> &file) {
         if (file == nullptr) {
@@ -124,14 +120,18 @@ namespace wrench {
      * @brief Add an entry
      * @param location: a file location
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     void FileRegistryService::addEntry(const std::shared_ptr<FileLocation> &location) {
+
         if (location == nullptr) {
             throw std::invalid_argument("FileRegistryService::addEntry(): Invalid nullptr argument");
         }
+
+        if (not this->simulation_->isRunning()) {
+            this->addEntryToDatabase(location);
+            return;
+        }
+
         assertServiceIsUp();
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
@@ -151,13 +151,20 @@ namespace wrench {
      * @brief Remove an entry
      * @param location: a file location
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     void FileRegistryService::removeEntry(const std::shared_ptr<FileLocation> &location) {
         if (location == nullptr) {
             throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid nullptr argument");
+        }
+
+        if (not this->simulation_->isRunning()) {
+            bool success = removeEntryFromDatabase(location);
+            if (!success) {
+                WRENCH_WARN(
+                        "Attempted to remove non-existent (%s,%s) entry from file registry service (ignored)",
+                        location->getFile()->getID().c_str(), location->toString().c_str());
+            }
+            return;
         }
 
         assertServiceIsUp();

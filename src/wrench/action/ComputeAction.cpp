@@ -33,7 +33,7 @@ namespace wrench {
      */
     ComputeAction::ComputeAction(const std::string &name,
                                  double flops,
-                                 double ram,
+                                 sg_size_t ram,
                                  unsigned long min_num_cores,
                                  unsigned long max_num_cores,
                                  std::shared_ptr<ParallelModel> parallel_model) : Action(name, "compute_") {
@@ -76,7 +76,7 @@ namespace wrench {
      * @brief Returns the action's minimum required memory footprint
      * @return a number of bytes
      */
-    double ComputeAction::getMinRAMFootprint() const {
+    sg_size_t ComputeAction::getMinRAMFootprint() const {
         return this->ram;
     }
 

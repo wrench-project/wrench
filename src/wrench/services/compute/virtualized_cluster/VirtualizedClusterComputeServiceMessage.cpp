@@ -17,7 +17,7 @@ namespace wrench {
      *
      * @param payload: the message size in bytes
      */
-    VirtualizedClusterComputeServiceMessage::VirtualizedClusterComputeServiceMessage(double payload) : ComputeServiceMessage(payload) {
+    VirtualizedClusterComputeServiceMessage::VirtualizedClusterComputeServiceMessage(sg_size_t payload) : ComputeServiceMessage(payload) {
     }
 
     /**
@@ -28,13 +28,12 @@ namespace wrench {
      * @param dest_pm_hostname: the name of the destination physical machine host
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     VirtualizedClusterComputeServiceMigrateVMRequestMessage::VirtualizedClusterComputeServiceMigrateVMRequestMessage(
             S4U_CommPort *answer_commport,
             const std::string &vm_name,
             const std::string &dest_pm_hostname,
-            double payload) : VirtualizedClusterComputeServiceMessage(payload) {
+            sg_size_t payload) : VirtualizedClusterComputeServiceMessage(payload) {
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || dest_pm_hostname.empty() || vm_name.empty()) {
@@ -57,7 +56,7 @@ namespace wrench {
     VirtualizedClusterComputeServiceMigrateVMAnswerMessage::VirtualizedClusterComputeServiceMigrateVMAnswerMessage(
             bool success,
             std::shared_ptr<FailureCause> failure_cause,
-            double payload) : VirtualizedClusterComputeServiceMessage(payload), success(success),
+            sg_size_t payload) : VirtualizedClusterComputeServiceMessage(payload), success(success),
                               failure_cause(std::move(failure_cause)) {}
 
 

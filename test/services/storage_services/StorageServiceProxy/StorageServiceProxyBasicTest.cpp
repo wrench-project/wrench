@@ -129,18 +129,17 @@ private:
 
 
         // Try to lookup file2 from remote although it is on target
-        auto start = simulation->getCurrentSimulatedDate();
+        auto start = wrench::Simulation::getCurrentSimulatedDate();
         if (proxy->lookupFile(test->remote, file2)) {
             throw std::runtime_error("Found file that does not exist");
         }
-        auto firstCache = simulation->getCurrentSimulatedDate() - start;
+        auto firstCache = wrench::Simulation::getCurrentSimulatedDate() - start;
 
         // locate file2 via proxy and target
         if (!proxy->lookupFile(this->test->target, file2)) {
             throw std::runtime_error("Failed to find file that exists on target");
         }
 
-        WRENCH_INFO("Read tests");
         // Read file1 via proxy
         if (testWithDefault) {
             proxy->readFile(file1);
@@ -162,24 +161,24 @@ private:
             }
         }
         // read file2 via proxy and target
-        start = simulation->getCurrentSimulatedDate();
+        start = wrench::Simulation::getCurrentSimulatedDate();
         proxy->readFile(this->test->target, file2);
-        auto firstFile = simulation->getCurrentSimulatedDate();
+        auto firstFile = wrench::Simulation::getCurrentSimulatedDate();
         // read file2 via proxy and target
         proxy->readFile(this->test->target, file2);
-        auto secondFile = simulation->getCurrentSimulatedDate();
+        auto secondFile = wrench::Simulation::getCurrentSimulatedDate();
 
         if (firstFile - start < (secondFile - firstFile) * 1.2) {
             throw std::runtime_error("caching was not significantly faster than not caching for file read");
         }
 
         //check the file again, it should now be cached
-        start = simulation->getCurrentSimulatedDate();
+        start = wrench::Simulation::getCurrentSimulatedDate();
 
         if (!proxy->lookupFile(test->remote, file2)) {
             throw std::runtime_error("Could not find previously found file after read");
         }
-        auto secondCache = simulation->getCurrentSimulatedDate() - start;
+        auto secondCache = wrench::Simulation::getCurrentSimulatedDate() - start;
 
         if (firstCache < secondCache * 1.2) {
             throw std::runtime_error("caching was not significantly faster than not caching for file lookup");
@@ -192,7 +191,7 @@ private:
         if (testWithDefault) {
             proxy->writeFile(file3);
         }
-        simulation->sleep(1000);
+        wrench::Simulation::sleep(1000);
         WRENCH_INFO("Activating backdoor");
         ///activating backdoor
         S4U_Simulation::setLinkBandwidth("backdoor", 1000000000);
@@ -265,7 +264,7 @@ void StorageServiceProxyBasicTest::do_BasicFunctionality_test(bool arg, std::str
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-default-control-message-size=1");
-    //   argv[1] = strdup("--wrench-full-log");
+//       argv[2] = strdup("--wrench-full-log");
     //argv[2] = strdup("--log=wrench_core_commport.threshold=debug");
     //argv[3] = strdup("--log=wrench_core_proxy_file_server.threshold=debug");
     simulation->init(&argc, argv);

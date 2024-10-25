@@ -37,8 +37,8 @@ namespace wrench {
      * @param ram_per_node: the job's ram per node
      * @return A resource list
      */
-    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> FCFSBatchScheduler::scheduleOnHosts(
-            unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
+    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> FCFSBatchScheduler::scheduleOnHosts(
+            unsigned long num_nodes, unsigned long cores_per_node, sg_size_t ram_per_node) {
 
         if (ram_per_node == ComputeService::ALL_RAM) {
             ram_per_node = S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
@@ -75,7 +75,7 @@ namespace wrench {
     }
 
     std::map<std::string, double> FCFSBatchScheduler::getStartTimeEstimates(
-            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
+            std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) {
         if (cs->getPropertyValueAsString(BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM) != "FIRSTFIT") {
             throw std::runtime_error("FCFSBatchScheduler::getStartTimeEstimates(): The fcfs scheduling algorithm can only provide start time estimates "
                                      "when the HOST_SELECTION_ALGORITHM property is set to FIRSTFIT");
@@ -107,7 +107,7 @@ namespace wrench {
             for (auto resource: batch_job->getResourcesAllocated()) {
                 auto host = resource.first;
                 unsigned long num_cores = std::get<0>(resource.second);
-                double ram = std::get<1>(resource.second);
+                sg_size_t ram = std::get<1>(resource.second);
                 // Update available_times
                 double new_available_time = *(core_available_times[host].begin() + num_cores - 1) + time_to_finish;
                 for (unsigned int i = 0; i < num_cores; i++) {
@@ -179,7 +179,7 @@ namespace wrench {
             }
 
 #if 0
-            std::cerr << "AFTER ACCOUNTING FOR THIS JOB: \n";
+        std::cerr << "AFTER ACCOUNTING FOR THIS JOB: \n";
         for (auto h : core_available_times) {
           std::cerr << "  " << h.first << ":\n";
           for (auto t : h.second) {

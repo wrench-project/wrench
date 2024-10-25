@@ -46,13 +46,13 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
-        input_file = wrench::Simulation::addFile("input_file", 10.0);
-        output_file1 = wrench::Simulation::addFile("output_file1", 10.0);
-        output_file2 = wrench::Simulation::addFile("output_file2", 10.0);
-        output_file3 = wrench::Simulation::addFile("output_file3", 10.0);
-        output_file4 = wrench::Simulation::addFile("output_file4", 10.0);
-        output_file5 = wrench::Simulation::addFile("output_file5", 10.0);
-        output_file6 = wrench::Simulation::addFile("output_file6", 10.0);
+        input_file = wrench::Simulation::addFile("input_file", 10);
+        output_file1 = wrench::Simulation::addFile("output_file1", 10);
+        output_file2 = wrench::Simulation::addFile("output_file2", 10);
+        output_file3 = wrench::Simulation::addFile("output_file3", 10);
+        output_file4 = wrench::Simulation::addFile("output_file4", 10);
+        output_file5 = wrench::Simulation::addFile("output_file5", 10);
+        output_file6 = wrench::Simulation::addFile("output_file6", 10);
 
         // Create the tasks
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
@@ -398,11 +398,6 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     std::string hostname = "DualCoreHost";
 
     // Create a Storage Service
-    ASSERT_THROW(storage_service = simulation->add(
-                         wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"}, {},
-                                                                                  {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})),
-                 std::invalid_argument);
-
     storage_service = simulation->add(
             wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
                                                                      {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "567"},
@@ -442,7 +437,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     wrench::WRENCH_PROPERTY_COLLECTION_TYPE property_list = {
             {wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"},
             {wrench::ServiceProperty::translateString("CloudComputeServiceProperty::VM_BOOT_OVERHEAD"), "100ms"}};
-    wrench::WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {
+    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {
             {wrench::CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD, 2},
             {wrench::ServiceMessagePayload::translateString("ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD"), 3},
     };
@@ -491,7 +486,6 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     ASSERT_THROW(simulation->add((wrench::FileRegistryService *) nullptr), std::invalid_argument);
 
     //    // Try to stage a file without a file registry
-    //    ASSERT_THROW(simulation->stageFile(input_file, storage_service), std::runtime_error);
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;
@@ -502,7 +496,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     file_registry_service->getNetworkTimeoutValue();
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

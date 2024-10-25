@@ -42,8 +42,8 @@ namespace wrench {
 
         int num_actions;
 
-        void processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent>) override;
-        void processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent>) override;
+        void processEventCompoundJobFailure(const std::shared_ptr<CompoundJobFailedEvent> &event) override;
+        void processEventCompoundJobCompletion(const std::shared_ptr<CompoundJobCompletedEvent> &event) override;
     };
 }// namespace wrench
 #endif//WRENCH_EXAMPLE_GREEDY_EXECUTION_CONTROLLER_H

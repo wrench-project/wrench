@@ -20,7 +20,7 @@ namespace wrench {
     *
     * @param payload: the message size in bytes
     */
-    ActionExecutionServiceMessage::ActionExecutionServiceMessage(double payload) : SimulationMessage(payload) {
+    ActionExecutionServiceMessage::ActionExecutionServiceMessage(sg_size_t payload) : SimulationMessage(payload) {
     }
 
 
@@ -33,7 +33,7 @@ namespace wrench {
     ActionExecutionServiceSubmitActionRequestMessage::ActionExecutionServiceSubmitActionRequestMessage(
             S4U_CommPort *reply_commport,
             std::shared_ptr<Action> action,
-            double payload) : ActionExecutionServiceMessage(payload) {
+            sg_size_t payload) : ActionExecutionServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((reply_commport == nullptr) || (action == nullptr)) {
             throw std::invalid_argument("ActionExecutionServiceSubmitActionRequestMessage::ActionExecutionServiceSubmitActionRequestMessage(): invalid argument");
@@ -52,7 +52,7 @@ namespace wrench {
     ActionExecutionServiceSubmitActionAnswerMessage::ActionExecutionServiceSubmitActionAnswerMessage(
             bool success,
             std::shared_ptr<FailureCause> cause,
-            double payload) : ActionExecutionServiceMessage(payload) {
+            sg_size_t payload) : ActionExecutionServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
 #endif
         this->success = success;
@@ -70,7 +70,7 @@ namespace wrench {
             S4U_CommPort *reply_commport,
             std::shared_ptr<Action> action,
             ComputeService::TerminationCause termination_cause,
-            double payload) : ActionExecutionServiceMessage(payload) {
+            sg_size_t payload) : ActionExecutionServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((reply_commport == nullptr) || (action == nullptr)) {
             throw std::invalid_argument("ActionExecutionServiceTerminateActionRequestMessage::ActionExecutionServiceTerminateActionRequestMessage(): invalid argument");
@@ -89,7 +89,7 @@ namespace wrench {
      */
     ActionExecutionServiceTerminateActionAnswerMessage::ActionExecutionServiceTerminateActionAnswerMessage(
             bool success,
-            std::shared_ptr<FailureCause> cause, double payload) : ActionExecutionServiceMessage(payload) {
+            std::shared_ptr<FailureCause> cause, sg_size_t payload) : ActionExecutionServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
 #endif
         this->success = success;
@@ -102,7 +102,7 @@ namespace wrench {
   * @param payload: the message size in bytes
   */
     ActionExecutionServiceActionDoneMessage::ActionExecutionServiceActionDoneMessage(
-            std::shared_ptr<Action> action, double payload) : ActionExecutionServiceMessage(payload) {
+            std::shared_ptr<Action> action, sg_size_t payload) : ActionExecutionServiceMessage(payload) {
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (action == nullptr) {

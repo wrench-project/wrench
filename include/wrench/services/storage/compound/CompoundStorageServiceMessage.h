@@ -27,7 +27,7 @@ namespace wrench {
      */
     class CompoundStorageServiceMessage : public StorageServiceMessage {
     protected:
-        CompoundStorageServiceMessage(double payload);
+        CompoundStorageServiceMessage(sg_size_t payload);
     };
 
     /**
@@ -38,7 +38,7 @@ namespace wrench {
         CompoundStorageAllocationRequestMessage(S4U_CommPort *answer_commport,
                                                 std::shared_ptr<DataFile> file,
                                                 unsigned int stripe_count,
-                                                double payload);
+                                                sg_size_t payload);
 
         /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -53,7 +53,7 @@ namespace wrench {
      */
     class CompoundStorageAllocationAnswerMessage : public CompoundStorageServiceMessage {
     public:
-        CompoundStorageAllocationAnswerMessage(std::vector<std::shared_ptr<FileLocation>> locations, double payload);
+        CompoundStorageAllocationAnswerMessage(std::vector<std::shared_ptr<FileLocation>> locations, sg_size_t payload);
 
         /** @brief Known or newly allocated FileLocations for requested file */
         std::vector<std::shared_ptr<FileLocation>> locations;
@@ -64,7 +64,7 @@ namespace wrench {
      */
     class CompoundStorageLookupRequestMessage : public CompoundStorageServiceMessage {
     public:
-        CompoundStorageLookupRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file, double payload);
+        CompoundStorageLookupRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file, sg_size_t payload);
 
         /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -77,7 +77,7 @@ namespace wrench {
      */
     class CompoundStorageLookupAnswerMessage : public CompoundStorageServiceMessage {
     public:
-        CompoundStorageLookupAnswerMessage(std::vector<std::shared_ptr<FileLocation>> locations, double payload);
+        CompoundStorageLookupAnswerMessage(std::vector<std::shared_ptr<FileLocation>> locations, sg_size_t payload);
 
         /** @brief Known FileLocations for requested file */
         std::vector<std::shared_ptr<FileLocation>> locations;

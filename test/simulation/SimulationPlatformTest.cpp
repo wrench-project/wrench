@@ -212,15 +212,15 @@ private:
         wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 10.0, 100.0, "/foo");
 
         // Start a storage service that uses this disk
-        auto ss = this->simulation->startNewService(wrench::SimpleStorageService::createSimpleStorageService("subzonehost", {"/foo"}, {}, {}));
+        auto ss = this->getSimulation()->startNewService(wrench::SimpleStorageService::createSimpleStorageService("subzonehost", {"/foo"}, {}, {}));
 
         // Create a file on it
-        auto too_big = wrench::Simulation::addFile("too_big", 200.0);
+        auto too_big = wrench::Simulation::addFile("too_big", 200);
         try {
             wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, too_big));
             throw std::runtime_error("Should not be able to create a file that big on the newly created storage service");
         } catch (wrench::ExecutionException &ignore) {}
-        auto not_too_big = wrench::Simulation::addFile("not_too_big", 20.0);
+        auto not_too_big = wrench::Simulation::addFile("not_too_big", 20);
         wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
         wrench::StorageService::removeFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));
         wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(ss, not_too_big));

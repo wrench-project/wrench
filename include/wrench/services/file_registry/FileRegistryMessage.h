@@ -29,7 +29,7 @@ namespace wrench {
      */
     class FileRegistryMessage : public ServiceMessage {
     protected:
-        FileRegistryMessage(double payload);
+        FileRegistryMessage(sg_size_t payload);
     };
 
     /**
@@ -37,7 +37,7 @@ namespace wrench {
      */
     class FileRegistryFileLookupRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupRequestMessage(S4U_CommPort *answer_commport, const std::shared_ptr<DataFile> &file, double payload);
+        FileRegistryFileLookupRequestMessage(S4U_CommPort *answer_commport, const std::shared_ptr<DataFile> &file, sg_size_t payload);
 
         /** @brief The commport_name to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -51,7 +51,7 @@ namespace wrench {
     class FileRegistryFileLookupAnswerMessage : public FileRegistryMessage {
     public:
         FileRegistryFileLookupAnswerMessage(std::set<std::shared_ptr<FileLocation>> locations,
-                                            double payload);
+                                            sg_size_t payload);
 
         /** @brief A (possibly empty) set of file locations */
         std::set<std::shared_ptr<FileLocation>> locations;
@@ -64,9 +64,9 @@ namespace wrench {
     class FileRegistryFileLookupByProximityRequestMessage : public FileRegistryMessage {
     public:
         FileRegistryFileLookupByProximityRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file,
-                                                        std::string reference_host,
+                                                        const std::string& reference_host,
                                                         std::shared_ptr<NetworkProximityService> network_proximity_service,
-                                                        double payload);
+                                                        sg_size_t payload);
 
         /** @brief The commport_name to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -94,9 +94,9 @@ namespace wrench {
     class FileRegistryFileLookupByProximityAnswerMessage : public FileRegistryMessage {
     public:
         FileRegistryFileLookupByProximityAnswerMessage(std::shared_ptr<DataFile> file,
-                                                       std::string reference_host,
+                                                       const std::string &reference_host,
                                                        std::map<double, std::shared_ptr<FileLocation>> locations,
-                                                       double payload);
+                                                       sg_size_t payload);
 
         /** @brief The file to lookup */
         std::shared_ptr<DataFile> file;
@@ -121,7 +121,7 @@ namespace wrench {
     class FileRegistryRemoveEntryRequestMessage : public FileRegistryMessage {
     public:
         FileRegistryRemoveEntryRequestMessage(S4U_CommPort *answer_commport,
-                                              std::shared_ptr<FileLocation> location, double payload);
+                                              std::shared_ptr<FileLocation> location, sg_size_t payload);
 
         /** @brief The commport_name to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -134,7 +134,7 @@ namespace wrench {
      */
     class FileRegistryRemoveEntryAnswerMessage : public FileRegistryMessage {
     public:
-        FileRegistryRemoveEntryAnswerMessage(bool success, double payload);
+        FileRegistryRemoveEntryAnswerMessage(bool success, sg_size_t payload);
 
         /** @brief Whether the entry removal was successful or not */
         bool success;
@@ -146,7 +146,7 @@ namespace wrench {
     class FileRegistryAddEntryRequestMessage : public FileRegistryMessage {
     public:
         FileRegistryAddEntryRequestMessage(S4U_CommPort *answer_commport,
-                                           std::shared_ptr<FileLocation> location, double payload);
+                                           std::shared_ptr<FileLocation> location, sg_size_t payload);
 
         /** @brief The commport_name to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -159,7 +159,7 @@ namespace wrench {
      */
     class FileRegistryAddEntryAnswerMessage : public FileRegistryMessage {
     public:
-        FileRegistryAddEntryAnswerMessage(double payload);
+        FileRegistryAddEntryAnswerMessage(sg_size_t payload);
     };
 
     /***********************/

@@ -32,7 +32,7 @@ namespace wrench {
     FileReaderThread::FileReaderThread(std::string hostname,
                                        S4U_CommPort *creator_commport,
                                        std::shared_ptr<FileLocation> location,
-                                       double num_bytes) : Service(hostname, "file_reader_thread") {
+                                       sg_size_t num_bytes) : Service(hostname, "file_reader_thread") {
         this->creator_commport = creator_commport;
         this->location = std::move(location);
         this->num_bytes = num_bytes;

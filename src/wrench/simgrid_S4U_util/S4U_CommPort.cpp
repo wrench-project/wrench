@@ -37,7 +37,7 @@ namespace wrench {
     std::set<S4U_CommPort *> S4U_CommPort::used_commports;
     std::deque<S4U_CommPort *> S4U_CommPort::commports_to_drain;
     unsigned long S4U_CommPort::commport_pool_size = 5000;
-    double S4U_CommPort::default_control_message_size;
+    sg_size_t S4U_CommPort::default_control_message_size;
 
     /**
      * @brief Constructor
@@ -115,8 +115,6 @@ namespace wrench {
      * @param log: should the log message be printed
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
-     * @throw std::shared_ptr<NetworkError>
-     *
      */
     std::unique_ptr<SimulationMessage> S4U_CommPort::getMessage(bool log) {
 
@@ -130,7 +128,6 @@ namespace wrench {
      * @param log: should the log message be printed
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
-     * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_CommPort::getMessage(double timeout, bool log) {
         if (this == S4U_CommPort::NULL_COMMPORT) {
@@ -138,7 +135,7 @@ namespace wrench {
         }
 
         //        if (log) WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->get_cname(), timeout);
-        if (true) WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->get_cname(), timeout);
+        WRENCH_DEBUG("Getting a message from commport '%s' with timeout %lf sec", this->get_cname(), timeout);
 
 
         simgrid::s4u::ActivitySet pending_receives;
@@ -224,9 +221,9 @@ namespace wrench {
         MessageManager::removeReceivedMessage(this, msg);
 #endif
 
-        WRENCH_DEBUG("Received a '%s' message from commport '%s' (%lf, %p bytes)",
+        WRENCH_DEBUG("Received a '%s' message from commport '%s' (%p, %llu bytes)",
                      msg->getName().c_str(), this->get_cname(),
-                     msg->payload, msg);
+                     msg, msg->payload);
 
         return std::unique_ptr<SimulationMessage>(msg);
     }
@@ -236,15 +233,14 @@ namespace wrench {
      *
      * @param msg: the SimulationMessage
      *
-     * @throw std::shared_ptr<NetworkError>
      */
     void S4U_CommPort::putMessage(SimulationMessage *msg) {
 
         if (this == S4U_CommPort::NULL_COMMPORT) {
             return;
         }
-        WRENCH_DEBUG("Putting a %s message (%.2lf bytes, %p) to commport '%s'",
-                     msg->getName().c_str(), msg->payload, msg,
+        WRENCH_DEBUG("Putting a %s message (%p, %llu bytes) to commport '%s'",
+                     msg->getName().c_str(), msg, msg->payload,
                      this->get_cname());
 
 #ifdef MESSAGE_MANAGER
@@ -287,8 +283,8 @@ namespace wrench {
             return;
         }
 
-        WRENCH_DEBUG("Dputting a %s message (%.2lf bytes, %p) to commport '%s'",
-                     msg->getName().c_str(), msg->payload, msg,
+        WRENCH_DEBUG("Dputting a %s message (%p, %llu bytes) to commport '%s'",
+                     msg->getName().c_str(), msg, msg->payload,
                      this->get_cname());
 
 #ifdef MESSAGE_MANAGER
@@ -308,7 +304,6 @@ namespace wrench {
     *
     * @return a pending communication handle
     *
-    * @throw std::shared_ptr<NetworkError>
     */
     std::shared_ptr<S4U_PendingCommunication>
     S4U_CommPort::iputMessage(SimulationMessage *msg) {
@@ -317,7 +312,7 @@ namespace wrench {
             return nullptr;
         }
 
-        WRENCH_DEBUG("Iputting a %s message (%.2lf bytes) to commport '%s'",
+        WRENCH_DEBUG("Iputting a %s message (%llu bytes) to commport '%s'",
                      msg->getName().c_str(), msg->payload,
                      this->get_cname());
 
@@ -360,7 +355,6 @@ namespace wrench {
     *
     * @return a pending communication handle
     *
-     * @throw std::shared_ptr<NetworkError>
     */
     std::shared_ptr<S4U_PendingCommunication> S4U_CommPort::igetMessage() {
 
@@ -432,7 +426,7 @@ namespace wrench {
 
         S4U_CommPort::used_commports.insert(commport);
         commport->reset();// Just in case
-        //        WRENCH_DEBUG("Gotten temporary commport %s (%p %p)", commport->name.c_str(), commport->mq_comm.get(), commport->mb_comm.get());
+                WRENCH_DEBUG("Gotten temporary commport %s (%p %p)", commport->name.c_str(), commport->mq_comm.get(), commport->mb_comm.get());
         return commport;
     }
 

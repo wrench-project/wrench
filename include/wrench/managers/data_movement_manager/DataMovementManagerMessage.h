@@ -55,13 +55,13 @@ namespace wrench {
     class DataManagerFileReadAnswerMessage : public DataMovementManagerMessage {
     public:
         DataManagerFileReadAnswerMessage(std::shared_ptr<FileLocation> location,
-                                         double num_bytes,
+                                         sg_size_t num_bytes,
                                          bool success,
                                          std::shared_ptr<FailureCause> failure_cause);
         /** @brief The read location */
         std::shared_ptr<FileLocation> location;
         /** @brief The number of bytes to read */
-        double num_bytes;
+        sg_size_t num_bytes;
         /** @brief Whether the operation succeeded */
         bool success;
         /** @brief The failure cause, if any */
@@ -90,12 +90,12 @@ namespace wrench {
    */
     class DataMovementManagerFileReaderThreadMessage : public DataMovementManagerMessage {
     public:
-        DataMovementManagerFileReaderThreadMessage(std::shared_ptr<FileLocation> location, double num_bytes,
+        DataMovementManagerFileReaderThreadMessage(std::shared_ptr<FileLocation> location, sg_size_t num_bytes,
                                                    bool success, std::shared_ptr<FailureCause> failure_cause);
         /** @brief The read location */
         std::shared_ptr<FileLocation> location;
         /** @brief The number of bytes to read */
-        double num_bytes;
+        sg_size_t num_bytes;
         /** @brief Whether the operation succeeded */
         bool success;
         /** @brief The failure cause, if any */

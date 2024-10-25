@@ -19,12 +19,12 @@ namespace wrench {
      * @param cores_per_node: number of cores per node
      * @param ram_per_node: RAM per node in bytes
      */
-    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> HomegrownBatchScheduler::selectHostsFirstFit(BatchComputeService *cs,
+    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> HomegrownBatchScheduler::selectHostsFirstFit(BatchComputeService *cs,
                                                                                                                    unsigned long num_nodes,
                                                                                                                    unsigned long cores_per_node,
-                                                                                                                   double ram_per_node) {
+                                                                                                                   sg_size_t ram_per_node) {
 
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> resources;
         unsigned long host_count = 0;
         for (auto &available_nodes_to_core: cs->available_nodes_to_cores) {
             if (available_nodes_to_core.second >= cores_per_node) {
@@ -53,12 +53,12 @@ namespace wrench {
      * @param cores_per_node: number of cores per node
      * @param ram_per_node: RAM per node in bytes
      */
-    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> HomegrownBatchScheduler::selectHostsBestFit(BatchComputeService *cs,
+    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> HomegrownBatchScheduler::selectHostsBestFit(BatchComputeService *cs,
                                                                                                                   unsigned long num_nodes,
                                                                                                                   unsigned long cores_per_node,
-                                                                                                                  double ram_per_node) {
+                                                                                                                  sg_size_t ram_per_node) {
 
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> resources;
 
         while (resources.size() < num_nodes) {
             unsigned long target_slack = 0;
@@ -109,12 +109,12 @@ namespace wrench {
      * @param cores_per_node: number of cores per node
      * @param ram_per_node: RAM per node in bytes
      */
-    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> HomegrownBatchScheduler::selectHostsRoundRobin(BatchComputeService *cs,
+    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> HomegrownBatchScheduler::selectHostsRoundRobin(BatchComputeService *cs,
                                                                                                                      unsigned long *round_robin_host_selector_idx,
                                                                                                                      unsigned long num_nodes,
                                                                                                                      unsigned long cores_per_node,
-                                                                                                                     double ram_per_node) {
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources;
+                                                                                                                     sg_size_t ram_per_node) {
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> resources;
         unsigned long cur_host_idx = *round_robin_host_selector_idx;
         unsigned long host_count = 0;
         do {

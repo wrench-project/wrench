@@ -51,14 +51,14 @@ namespace wrench {
          * @param num_bytes: the number of bytes read
          */
         FileReadCompletedEvent(std::shared_ptr<FileLocation> location,
-                               double num_bytes)
+                               sg_size_t num_bytes)
             : location(std::move(location)), num_bytes(num_bytes) {}
 
     public:
         /** @brief The  location */
         std::shared_ptr<FileLocation> location;
         /** @brief The number of bytes read */
-        double num_bytes;
+        sg_size_t num_bytes;
 
         /**
          * @brief Get a textual description of the event
