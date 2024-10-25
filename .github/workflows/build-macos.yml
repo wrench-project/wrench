@@ -55,7 +55,7 @@ jobs:
           wget --no-check-certificate https://framagit.org/simgrid/simgrid/-/archive/v3.36/simgrid-v3.36.tar.gz
           tar -xf simgrid-v3.36.tar.gz
           cd simgrid-v3.36
-          cmake .
+          cmake -CMAKE_LIBRARY_PATH_FLAG=-L/usr/local/lib .
           make -j4
           sudo make install
       - name: Source Build and Test
