@@ -37,9 +37,6 @@ jobs:
         run: |
           sudo mkdir /usr/local/lib/
           sudo cp /opt/homebrew/Cellar/gcc/14.2.0_1/lib/gcc/14/*libgfortran* /opt/homebrew/lib/
-      - name: debug1
-        run: |
-          ls /usr/local/lib/*
       - name: debug2
         run: |
           ls /opt/homebrew/lib/
