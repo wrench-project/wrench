@@ -35,7 +35,7 @@ jobs:
           ls /opt/homebrew/Cellar/gcc/14.2.0_1/lib/gcc/14/*fortran*
       - name: Symlink gfortran
         run: |
-          sudo cp /opt/homebrew/Cellar/gcc/14.2.0_1/lib/gcc/14/libgfortran.a /usr/local/lib/
+          sudo cp /opt/homebrew/Cellar/gcc/14.2.0_1/lib/gcc/14/*libgfortran* /usr/lib/
       - name: debug1
         run: |
           ls /usr/local/lib/*
