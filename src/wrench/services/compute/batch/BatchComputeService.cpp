@@ -1289,7 +1289,7 @@ namespace wrench {
         unsigned long time_in_seconds = batch_job->getRequestedTime();
         unsigned long cores_per_node_asked_for = batch_job->getRequestedCoresPerNode();
 
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources = {};
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> resources = {};
         std::vector<simgrid::s4u::Host *> hosts_assigned = {};
         std::map<simgrid::s4u::Host *, unsigned long>::iterator it;
 
