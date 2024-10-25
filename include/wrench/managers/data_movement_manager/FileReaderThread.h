@@ -33,7 +33,7 @@ namespace wrench {
     public:
         FileReaderThread(std::string hostname, S4U_CommPort *creator_commport,
                          std::shared_ptr<FileLocation> location,
-                         double num_bytes);
+                         sg_size_t num_bytes);
 
     protected:
     private:
@@ -41,7 +41,7 @@ namespace wrench {
 
         S4U_CommPort *creator_commport;
         std::shared_ptr<FileLocation> location;
-        double num_bytes;
+        sg_size_t num_bytes;
     };
 
     /***********************/

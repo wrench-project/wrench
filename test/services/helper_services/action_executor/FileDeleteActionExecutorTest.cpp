@@ -144,7 +144,7 @@ private:
         auto file_delete_action_executor = std::make_shared<wrench::ActionExecutor>(
                 "Host2", 0, 0.0, 0, false, this->commport, file_delete_action, nullptr);
         // Start it
-        file_delete_action_executor->setSimulation(this->simulation);
+        file_delete_action_executor->setSimulation(this->getSimulation());
         file_delete_action_executor->start(file_delete_action_executor, true, false);
 
         // Wait for a message from it
@@ -197,9 +197,9 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}));
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

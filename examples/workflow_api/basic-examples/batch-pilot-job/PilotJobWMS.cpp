@@ -45,7 +45,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int PilotJobWMS::main() {
         /* Set the logging output to GREEN */
@@ -134,7 +133,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void PilotJobWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
+    void PilotJobWMS::processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent> &event) {
         WRENCH_INFO("Notified that a standard job has completed");
         throw std::runtime_error("This shouldn't happen in this example");
     }
@@ -144,7 +143,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void PilotJobWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
+    void PilotJobWMS::processEventStandardJobFailure(const std::shared_ptr<StandardJobFailedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */
@@ -157,7 +156,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void PilotJobWMS::processEventPilotJobExpiration(std::shared_ptr<PilotJobExpiredEvent>) {
+    void PilotJobWMS::processEventPilotJobExpiration(const std::shared_ptr<PilotJobExpiredEvent> &event) {
         WRENCH_INFO("Notified that a pilot job has expired");
     }
 
@@ -166,7 +165,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void PilotJobWMS::processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent>) {
+    void PilotJobWMS::processEventPilotJobStart(const std::shared_ptr<PilotJobStartedEvent> &event) {
         WRENCH_INFO("Notified that a pilot job has started!");
     }
 

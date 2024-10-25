@@ -49,16 +49,16 @@ namespace wrench {
                 {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"},
         };
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
                 {ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size}};
 
     public:
         // Public Constructor
         ActionExecutionService(const std::string &hostname,
-                               const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &compute_resources,
+                               const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &compute_resources,
                                std::shared_ptr<Service> parent_service,
                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                               WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
         /***********************/
         /** \cond INTERNAL     */
@@ -74,13 +74,13 @@ namespace wrench {
 
         void terminateAction(std::shared_ptr<Action> action, ComputeService::TerminationCause termination_cause);
 
-        bool IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores, double ram);
+        bool IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores, sg_size_t ram);
 
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &getComputeResources();
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &getComputeResources();
 
         std::map<std::string, double> getResourceInformation(const std::string &key);
 
-        ~ActionExecutionService();
+        ~ActionExecutionService() override;
 
         /***********************/
         /** \endcond           */
@@ -94,10 +94,10 @@ namespace wrench {
         int num_hosts_turned_on;
 
 
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> compute_resources;
 
-        // Core availabilities (for each hosts, how many cores and how many bytes of RAM are currently available on it)
-        std::unordered_map<simgrid::s4u::Host *, double> ram_availabilities;
+        // Core availabilities (for each host, how many cores and how many bytes of RAM are currently available on it)
+        std::unordered_map<simgrid::s4u::Host *, sg_size_t> ram_availabilities;
         std::unordered_map<simgrid::s4u::Host *, unsigned long> running_thread_counts;
 
         std::shared_ptr<Service> parent_service = nullptr;
@@ -161,7 +161,7 @@ namespace wrench {
                                                                        std::set<simgrid::s4u::Host *> &hosts_to_avoid);
 
 
-        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
+        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, sg_size_t ram);
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 

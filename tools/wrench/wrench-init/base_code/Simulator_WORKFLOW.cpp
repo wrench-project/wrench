@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
 
     /* Stage input files on the storage service */
     for (auto const &f: workflow->getInputFiles()) {
-        simulation->stageFile(f, storage_service);
+        storage_service->createFile(f);
     }
 
     /* Launch the simulation */

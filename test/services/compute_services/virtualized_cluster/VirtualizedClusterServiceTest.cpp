@@ -78,13 +78,13 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
-        input_file = wrench::Simulation::addFile("input_file", 10.0);
-        output_file1 = wrench::Simulation::addFile("output_file1", 10.0);
-        output_file2 = wrench::Simulation::addFile("output_file2", 10.0);
-        output_file3 = wrench::Simulation::addFile("output_file3", 10.0);
-        output_file4 = wrench::Simulation::addFile("output_file4", 10.0);
-        output_file5 = wrench::Simulation::addFile("output_file5", 10.0);
-        output_file6 = wrench::Simulation::addFile("output_file6", 10.0);
+        input_file = wrench::Simulation::addFile("input_file", 10);
+        output_file1 = wrench::Simulation::addFile("output_file1", 10);
+        output_file2 = wrench::Simulation::addFile("output_file2", 10);
+        output_file3 = wrench::Simulation::addFile("output_file3", 10);
+        output_file4 = wrench::Simulation::addFile("output_file4", 10);
+        output_file5 = wrench::Simulation::addFile("output_file5", 10);
+        output_file6 = wrench::Simulation::addFile("output_file6", 10);
 
         // Create the tasks
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
@@ -459,7 +459,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -630,8 +630,8 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    simulation->stageFile(input_file, storage_service);
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    storage_service->createFile(input_file);
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -739,7 +739,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
             new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -757,7 +757,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
 class StopAllVMsTestWMS : public wrench::ExecutionController {
 
 public:
-    wrench::WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}};
 
     StopAllVMsTestWMS(VirtualizedClusterServiceTest *test,
@@ -848,7 +848,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
             new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -866,7 +866,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
 class ShutdownVMTestWMS : public wrench::ExecutionController {
 
 public:
-    wrench::WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {wrench::VirtualizedClusterComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
             {wrench::VirtualizedClusterComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, 1024}};
 
@@ -1087,7 +1087,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
             new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1105,7 +1105,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
 class ShutdownVMAndThenShutdownServiceTestWMS : public wrench::ExecutionController {
 
 public:
-    wrench::WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {wrench::VirtualizedClusterComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
             {wrench::VirtualizedClusterComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, 1024}};
 
@@ -1204,7 +1204,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
             new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1222,7 +1222,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
 class SubmitToVMTestWMS : public wrench::ExecutionController {
 
 public:
-    wrench::WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {wrench::VirtualizedClusterComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
             {wrench::VirtualizedClusterComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, 1024}};
 
@@ -1356,7 +1356,7 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1455,7 +1455,7 @@ void VirtualizedClusterServiceTest::do_VMStartShutdownStartShutdown_test() {
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(hostname));
-    simulation->stageFile(input_file, storage_service);
+    storage_service->createFile(input_file);
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1579,7 +1579,7 @@ void VirtualizedClusterServiceTest::do_VMShutdownWhileJobIsRunning_test() {
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(hostname));
-    simulation->stageFile(input_file, storage_service);
+    storage_service->createFile(input_file);
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1706,7 +1706,7 @@ void VirtualizedClusterServiceTest::do_VMComputeServiceStopWhileJobIsRunning_tes
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(hostname));
-    simulation->stageFile(input_file, storage_service);
+    storage_service->createFile(input_file);
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

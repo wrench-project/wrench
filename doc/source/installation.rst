@@ -22,8 +22,9 @@ And, one of the following: - **g++** - version 7.5 or higher - **clang**
 Required Dependencies
 ---------------------
 
--  `SimGrid <https://simgrid.org/>`__ – version 3.36
--  `JSON for Modern C++ <https://github.com/nlohmann/json>`__ – version
+-  `SimGrid <https://simgrid.org/>`__ ??? version 3.36
+-  `SimGrid File System Module <https://github.com/simgrid/file-system-module>`__ ??? version 0.1 or higher
+-  `JSON for Modern C++ <https://github.com/nlohmann/json>`__ ??? version
    3.9.0 or higher
 
 (See the :ref:`install-troubleshooting` section below if encountering difficulties
@@ -34,15 +35,15 @@ installing dependencies)
 Optional Dependencies
 ---------------------
 
--  `Google Test <https://github.com/google/googletest>`__ – version 1.8
+-  `Google Test <https://github.com/google/googletest>`__ ??? version 1.8
    or higher (only required for running tests)
--  `Doxygen <http://www.doxygen.org>`__ – version 1.8 or higher (only
+-  `Doxygen <http://www.doxygen.org>`__ ??? version 1.8 or higher (only
    required for generating documentation)
 -  `Sphinx <https://www.sphinx-doc.org/en/master/usage/installation.html>`__ - 
    version 4.5 or higher along with the following Python packages: 
    ``pip3 install sphinx-rtd-theme breathe recommonmark``  (only required 
    for generating documentation)
--  `Batsched <https://gitlab.inria.fr/batsim/batsched>`__ – version 1.4
+-  `Batsched <https://gitlab.inria.fr/batsim/batsched>`__ ??? version 1.4
    - useful for expanded batch-scheduled resource simulation
    capabilities
 -  `Asio <https://github.com/chriskohlhoff/asio/>`__ - tag 1.28.0 or later (only required for building `wrench-daemon`, WRENCH's REST API daemon)
@@ -149,7 +150,7 @@ Docker Containers
 
 WRENCH is also distributed in Docker containers. Please, visit the
 `WRENCH Repository on Docker
-Hub <https://hub.docker.com/r/wrenchproject/wrench/>`__ to pull WRENCH’s
+Hub <https://hub.docker.com/r/wrenchproject/wrench/>`__ to pull WRENCH???s
 Docker images.
 
 The ``latest`` tag provides a container with the latest `WRENCH
@@ -162,7 +163,7 @@ release <https://github.com/wrench-project/wrench/releases>`__:
    docker run --rm -it wrenchproject/wrench /bin/bash
 
 The ``unstable`` tag provides a container with the (almost) current code
-in the GitHub’s ``master`` branch:
+in the GitHub???s ``master`` branch:
 
 .. code:: sh
 

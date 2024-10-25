@@ -16,7 +16,7 @@ namespace wrench {
      * @brief Constructor
      * @param payload: message size in bytes
      */
-    ServiceMessage::ServiceMessage(double payload) : SimulationMessage(payload) {}
+    ServiceMessage::ServiceMessage(sg_size_t payload) : SimulationMessage(payload) {}
 
     /**
      * @brief Constructor
@@ -25,20 +25,18 @@ namespace wrench {
      * @param termination_cause: the termination cause (if failure notifications are sent)
      * @param payload: message size in bytes
      *
-     * @throw std::invalid_arguments
      */
     ServiceStopDaemonMessage::ServiceStopDaemonMessage(S4U_CommPort *ack_commport, bool send_failure_notifications,
                                                        ComputeService::TerminationCause termination_cause,
-                                                       double payload)
+                                                       sg_size_t payload)
         : ServiceMessage(payload), ack_commport(ack_commport), send_failure_notifications(send_failure_notifications), termination_cause(termination_cause) {}
 
     /**
      * @brief Constructor
      * @param payload: message size in bytes
      *
-     * @throw std::invalid_arguments
      */
-    ServiceDaemonStoppedMessage::ServiceDaemonStoppedMessage(double payload)
+    ServiceDaemonStoppedMessage::ServiceDaemonStoppedMessage(sg_size_t payload)
         : ServiceMessage(payload) {}
 
 

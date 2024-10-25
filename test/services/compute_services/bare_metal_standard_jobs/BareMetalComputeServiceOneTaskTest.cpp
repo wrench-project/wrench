@@ -73,8 +73,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
-        input_file = wrench::Simulation::addFile("input_file", 10000.0);
-        output_file = wrench::Simulation::addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000);
+        output_file = wrench::Simulation::addFile("output_file", 20000);
 
         // Create one task1
         task = workflow->addTask("task1", 3600, 1, 1, 0);
@@ -206,7 +206,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
     // Empty resource list
     ASSERT_THROW(compute_service = simulation->add(
                          new wrench::BareMetalComputeService("bogus",
-                                                             (std::map<std::string, std::tuple<unsigned long, double>>){},
+                                                             (std::map<std::string, std::tuple<unsigned long, sg_size_t>>){},
                                                              {})),
                  std::invalid_argument);
 
@@ -257,16 +257,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
                          new wrench::BareMetalComputeService(hostname,
                                                              {std::make_pair("RAMHost",
                                                                              std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             -1.0))},
-                                                             {})),
-                 std::invalid_argument);
-
-    // Bad RAM
-    ASSERT_THROW(compute_service = simulation->add(
-                         new wrench::BareMetalComputeService(hostname,
-                                                             {std::make_pair("RAMHost",
-                                                                             std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             100000.0))},
+                                                                                             100000))},
                                                              {})),
                  std::invalid_argument);
 
@@ -275,7 +266,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
                          new wrench::BareMetalComputeService(hostname,
                                                              {std::make_pair("RAMHost",
                                                                              std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             100000.0))},
+                                                                                             100000))},
                                                              "",
                                                              {std::make_pair(
                                                                      wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD,
@@ -379,12 +370,8 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
-
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -650,7 +637,7 @@ void BareMetalComputeServiceOneTaskTest::do_StandardJobConstructor_test() {
                     this, hostname1));
 
     // Staging the input_file on the storage service
-    simulation->stageFile(input_file, storage_service1);
+    storage_service1->createFile(input_file);
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -739,7 +726,7 @@ void BareMetalComputeServiceOneTaskTest::do_HostMemory_test() {
             new HostMemoryTestWMS(this, "TwoCoreHost"));
 
     // Staging the input_file on the storage service
-    simulation->stageFile(input_file, storage_service1);
+    storage_service1->createFile(input_file);
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -831,7 +818,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-    //        argv[1] = strdup("--wrench-full-log");
+//            argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -863,7 +850,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
                             new ExecutionWithLocationMapTestWMS(this, hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     simulation->getOutput().enableWorkflowTaskTimestamps(true);
 
@@ -1007,7 +994,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMapMultiple_tes
                                     this, hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     simulation->getOutput().enableWorkflowTaskTimestamps(true);
 
@@ -1121,7 +1108,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_t
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1180,7 +1167,6 @@ private:
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
 
-
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -1224,7 +1210,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -1265,7 +1251,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     simulation->getOutput().enableWorkflowTaskTimestamps(true);
 
@@ -1411,7 +1397,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1526,7 +1512,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1556,8 +1542,10 @@ private:
         auto job_manager = this->createJobManager();
 
         // Remove the staged file!
+        WRENCH_INFO("Deleting staged file");
         wrench::StorageService::deleteFileAtLocation(
                 wrench::FileLocation::LOCATION(test->storage_service1, test->input_file));
+        WRENCH_INFO("Deleted stages file");
 
         wrench::Simulation::sleep(1.0);
 
@@ -1602,7 +1590,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-    //        argv[1] = strdup("--wrench-full-log");
+//            argv[1] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -1643,7 +1631,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1756,7 +1744,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1864,7 +1852,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1970,7 +1958,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
                                     this, hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -2095,7 +2083,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
                                     this, hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -2185,7 +2173,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionButDontWait_test() {
                                     this, hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

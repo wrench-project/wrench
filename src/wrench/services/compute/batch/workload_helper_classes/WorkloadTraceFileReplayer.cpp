@@ -50,7 +50,7 @@ namespace wrench {
                 this->hostname, job_manager);
 
         // Start the WorkloadTraceFileReplayerEventReceiver
-        event_receiver->setSimulation(this->simulation);
+        event_receiver->setSimulation(this->simulation_);
         event_receiver->start(event_receiver, true, false);// Daemonized, no auto-restart
 
         double core_flop_rate = (*(this->batch_service->getCoreFlopRate(false).begin())).second;

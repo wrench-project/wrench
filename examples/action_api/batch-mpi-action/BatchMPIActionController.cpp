@@ -18,7 +18,7 @@
 #include "smpi/smpi.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
-#define MB (1000.0 * 1000.0)
+#define MB (1000000ULL)
 
 #define COMMUNICATOR_SIZE 16UL
 
@@ -45,7 +45,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int BatchMPIActionController::main() {
         /* Set the logging output to GREEN */
@@ -103,7 +102,7 @@ namespace wrench {
                 wrench::Simulation::computeMultiThreaded(num_threads, thread_creation_overhead, sequential_work, parallel_per_thread_work);
 
                 // Launch an asynchronous IO read to the storage service
-                double num_io_bytes = 100 * MB;
+                sg_size_t num_io_bytes = 100 * MB;
                 data_manager->initiateAsynchronousFileRead(FileLocation::LOCATION(storage_service, file), num_io_bytes);
 
                 // Participate in an all-to-all communication

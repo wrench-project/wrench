@@ -41,14 +41,13 @@ namespace wrench {
      * @param suffix: a string to append to the process name
      * @param scratch_space: the scratch space to use
      *
-     * @throw std::invalid_argument
      */
     BareMetalComputeServiceOneShot::BareMetalComputeServiceOneShot(
             std::shared_ptr<CompoundJob> job,
             const std::string &hostname,
-            std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+            std::map<std::string, std::tuple<unsigned long, sg_size_t>> compute_resources,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
+            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
             std::shared_ptr<PilotJob> pj,
             const std::string &suffix, std::shared_ptr<StorageService> scratch_space) : BareMetalComputeService(hostname, std::move(compute_resources), std::move(property_list), std::move(messagepayload_list), std::move(pj), suffix, std::move(scratch_space)), job(std::move(job)) {
     }
@@ -68,7 +67,7 @@ namespace wrench {
 
         // Start the ActionExecutionService
         this->action_execution_service->setParentService(this->getSharedPtr<Service>());
-        this->action_execution_service->setSimulation(this->simulation);
+        this->action_execution_service->setSimulation(this->simulation_);
         this->action_execution_service->start(this->action_execution_service, true, false);
 
         /** Note that the code below doesn't do any checks at all, the job had better be well-formed **/

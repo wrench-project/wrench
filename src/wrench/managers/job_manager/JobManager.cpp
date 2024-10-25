@@ -37,15 +37,14 @@ namespace wrench {
      * @param hostname: the name of host on which the job manager will run
      * @param creator_commport: the commport of the manager's creator
      */
-    JobManager::JobManager(std::string hostname, S4U_CommPort *creator_commport) : Service(std::move(hostname), "job_manager") {
+    JobManager::JobManager(const std::string& hostname, S4U_CommPort *creator_commport) : Service(hostname, "job_manager") {
         this->creator_commport = creator_commport;
     }
 
     /**
      * @brief Destructor, which kills the daemon (and clears all the jobs)
      */
-    JobManager::~JobManager() {
-    }
+    JobManager::~JobManager() = default;
 
     /**
      * @brief Kill the job manager (brutally terminate the daemon, clears all jobs)
@@ -59,8 +58,6 @@ namespace wrench {
     /**
      * @brief Stop the job manager
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     void JobManager::stop() {
         this->commport->putMessage(
@@ -82,7 +79,6 @@ namespace wrench {
      *                                at the end of the job.
      * @return the standard job
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             const std::vector<std::shared_ptr<WorkflowTask>> &tasks,
@@ -122,7 +118,6 @@ namespace wrench {
      *                                completed at the end of the job.
      * @return the standard job
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             const std::vector<std::shared_ptr<WorkflowTask>> &tasks,
@@ -210,7 +205,6 @@ namespace wrench {
      *
      * @return the standard job
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             const std::vector<std::shared_ptr<WorkflowTask>> &tasks,
@@ -232,7 +226,6 @@ namespace wrench {
      *
      * @return the standard job
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             const std::vector<std::shared_ptr<WorkflowTask>> &tasks,
@@ -251,7 +244,6 @@ namespace wrench {
   *                                   of tasks also included in the list)
   * @return the standard job
   *
-  * @throw std::invalid_argument
   */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             const std::vector<std::shared_ptr<WorkflowTask>> &tasks) {
@@ -272,7 +264,6 @@ namespace wrench {
      *
      * @return the standard job
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             const std::shared_ptr<WorkflowTask> &task,
@@ -296,7 +287,6 @@ namespace wrench {
      *
      * @return the standard job
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             const std::shared_ptr<WorkflowTask> &task,
@@ -317,7 +307,6 @@ namespace wrench {
      *
      * @return the standard job
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             const std::shared_ptr<WorkflowTask> &task) {
@@ -335,7 +324,6 @@ namespace wrench {
      *
      * @return the pilot job
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<PilotJob> JobManager::createPilotJob() {
         auto job = std::shared_ptr<PilotJob>(new PilotJob(this->getSharedPtr<JobManager>()));
@@ -365,8 +353,6 @@ namespace wrench {
     *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
     *
     *
-    * @throw std::invalid_argument
-    * @throw ExecutionException
     */
     void JobManager::submitJob(const std::shared_ptr<StandardJob> &job,
                                const std::shared_ptr<ComputeService> &compute_service,
@@ -493,8 +479,6 @@ namespace wrench {
      *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
      *
      *
-     * @throw std::invalid_argument
-     * @throw ExecutionException
      */
     void JobManager::submitJob(const std::shared_ptr<CompoundJob> &job,
                                const std::shared_ptr<ComputeService> &compute_service,
@@ -569,8 +553,6 @@ namespace wrench {
      *      - to a CloudComputeService: {} (pilot jobs should not be submitted directly to the service)}
      *      - to a HTCondorComputeService: {} (pilot jobs should be be submitted directly to the service)
      *
-     * @throw std::invalid_argument
-     * @throw ExecutionException
      */
     void JobManager::submitJob(const std::shared_ptr<PilotJob> &job,
                                const std::shared_ptr<ComputeService> &compute_service,
@@ -599,7 +581,7 @@ namespace wrench {
                     // Create a bare-metal compute service and start it
                     auto execution_service = executor->getActionExecutionService();
 
-                    std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
+                    std::map<std::string, std::tuple<unsigned long, sg_size_t>> specified_compute_resources;
                     for (const auto &h: execution_service->getComputeResources()) {
                         specified_compute_resources[h.first->get_name()] = h.second;
                     }
@@ -615,7 +597,7 @@ namespace wrench {
                                     "_one_shot_bm",
                                     std::dynamic_pointer_cast<ComputeService>(execution_service->getParentService())->getScratch()));
 
-                    bm_cs->simulation = executor->getSimulation();
+                    bm_cs->simulation_ = executor->getSimulation();
                     bm_cs->start(bm_cs, true, false);// Daemonized, no auto-restart
                     job->compute_service = bm_cs;
 
@@ -685,9 +667,6 @@ namespace wrench {
      * @brief Terminate a standard job  that hasn't completed/expired/failed yet
      * @param job: the job to be terminated
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     void JobManager::terminateJob(const std::shared_ptr<StandardJob> &job) {
         if (job == nullptr) {
@@ -736,7 +715,7 @@ namespace wrench {
         std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> state_changes;
         std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
-        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
+        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation_);
         job->applyTaskUpdates(state_changes, failure_count_increments);
     }
 
@@ -745,9 +724,6 @@ namespace wrench {
     * @brief Terminate a compound job  that hasn't completed/expired/failed yet
     * @param job: the job to be terminated
     *
-    * @throw ExecutionException
-    * @throw std::invalid_argument
-    * @throw std::runtime_error
     */
     void JobManager::terminateJob(const std::shared_ptr<CompoundJob> &job) {
         if (job == nullptr) {
@@ -768,9 +744,6 @@ namespace wrench {
     * @brief Terminate a pilot job that hasn't completed/expired/failed yet
     * @param job: the job to be terminated
     *
-    * @throw ExecutionException
-    * @throw std::invalid_argument
-    * @throw std::runtime_error
     */
     void JobManager::terminateJob(const std::shared_ptr<PilotJob> &job) {
         if (job == nullptr) {
@@ -801,8 +774,6 @@ namespace wrench {
      *
      * @param job: a job to forget
      *
-     * @throw std::invalid_argument
-     * @throw ExecutionException
      */
     void JobManager::forgetJob(Job *job) {
         if (job == nullptr) {
@@ -957,7 +928,7 @@ namespace wrench {
         std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> state_changes;
         std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
-        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
+        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation_);
 
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job->compound_job);
@@ -989,13 +960,13 @@ namespace wrench {
         std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> state_changes;
         std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
-        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
+        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation_);
 
         // Fix the failure cause in case it's a failure cause that refers to a job (in which case it is
         // right now referring to the compound job instead of the standard job
-        if (auto actual_cause = std::dynamic_pointer_cast<JobKilled>(job_failure_cause)) {
+        if (std::dynamic_pointer_cast<JobKilled>(job_failure_cause)) {
             job_failure_cause = std::make_shared<JobKilled>(job);
-        } else if (auto actual_cause = std::dynamic_pointer_cast<JobTimeout>(job_failure_cause)) {
+        } else if (std::dynamic_pointer_cast<JobTimeout>(job_failure_cause)) {
             job_failure_cause = std::make_shared<JobTimeout>(job);
         } else if (auto actual_cause = std::dynamic_pointer_cast<NotEnoughResources>(job_failure_cause)) {
             job_failure_cause = std::make_shared<NotEnoughResources>(job, actual_cause->getService());

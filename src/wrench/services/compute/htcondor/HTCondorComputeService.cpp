@@ -37,17 +37,16 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
-     * @throw std::runtime_error
      */
     HTCondorComputeService::HTCondorComputeService(const std::string &hostname,
                                                    const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                                   WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname, "htcondor_service", "") {
+                                                   const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                                                   const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : ComputeService(hostname, "htcondor_service", "") {
         // Set default and specified properties
-        this->setProperties(this->default_property_values, std::move(property_list));
+        this->setProperties(this->default_property_values, property_list);
 
         // Set default and specified message payloads
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
         //        // Check that there are child services
         //        if (compute_services.empty()) {
@@ -108,8 +107,7 @@ namespace wrench {
     /**
      * @brief Destructor
      */
-    HTCondorComputeService::~HTCondorComputeService() {
-    }
+    HTCondorComputeService::~HTCondorComputeService() = default;
 
     /**
      * @brief Add a new 'child' compute service
@@ -125,8 +123,6 @@ namespace wrench {
      * @param job: a compound job
      * @param service_specific_args: service specific arguments
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     void HTCondorComputeService::submitCompoundJob(std::shared_ptr<CompoundJob> job,
                                                    const std::map<std::string, std::string> &service_specific_args) {
@@ -164,7 +160,7 @@ namespace wrench {
      * @param local_storage_service: a storage service
      */
     void HTCondorComputeService::setLocalStorageService(std::shared_ptr<wrench::StorageService> local_storage_service) {
-        this->local_storage_service = local_storage_service;
+        this->local_storage_service = std::move(local_storage_service);
     }
 
     /**
@@ -191,7 +187,7 @@ namespace wrench {
                 this->commport->get_cname());
 
         // start the central manager service
-        this->central_manager->setSimulation(this->simulation);
+        this->central_manager->setSimulation(this->simulation_);
         this->central_manager->start(this->central_manager, true, false);// Daemonized, no auto-restart
 
         // Start the Scratch Storage Service
@@ -211,7 +207,6 @@ namespace wrench {
      *
      * @return false if the daemon should terminate, true otherwise
      *
-     * @throw std::runtime_error
      */
     bool HTCondorComputeService::processNextMessage() {
         // Wait for a message
@@ -258,7 +253,6 @@ namespace wrench {
      * @param job: the job
      * @param service_specific_args: service specific arguments
      *
-     * @throw std::runtime_error
      */
     void HTCondorComputeService::processSubmitCompoundJob(S4U_CommPort *answer_commport,
                                                           const std::shared_ptr<CompoundJob> &job,
@@ -313,7 +307,7 @@ namespace wrench {
       * @param num_cores: the desired number of cores
       * @param ram: the desired RAM
       */
-    void HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(S4U_CommPort *answer_commport, unsigned long num_cores, double ram) {
+    void HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(S4U_CommPort *answer_commport, unsigned long num_cores, sg_size_t ram) {
         throw std::runtime_error("HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A HTCondor service does not support this operation");
     }
 

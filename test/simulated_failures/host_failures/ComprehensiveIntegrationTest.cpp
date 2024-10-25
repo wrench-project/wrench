@@ -9,14 +9,10 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"
-#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
-#include "../failure_test_util/SleeperVictim.h"
-#include "../failure_test_util/ComputerVictim.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
 
@@ -181,7 +177,7 @@ private:
                 CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF, CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF,
                 CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON, CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON,
                 victimhost, wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST);
-        switcher->setSimulation(this->simulation);
+        switcher->setSimulation(this->getSimulation());
         switcher->start(switcher, true, false);// Daemonized, no auto-restart
     }
 
@@ -319,7 +315,7 @@ private:
         return true;
     }
 
-    void processEventStandardJobCompletion(std::shared_ptr<wrench::StandardJobCompletedEvent> event) override {
+    void processEventStandardJobCompletion(const std::shared_ptr<wrench::StandardJobCompletedEvent> &event) override {
         static int count = 0;
         auto task = *(event->standard_job->getTasks().begin());
         count++;
@@ -335,7 +331,7 @@ private:
         }
     }
 
-    void processEventStandardJobFailure(std::shared_ptr<wrench::StandardJobFailedEvent> event) override {
+    void processEventStandardJobFailure(const std::shared_ptr<wrench::StandardJobFailedEvent> &event) override {
         auto task = *(event->standard_job->getTasks().begin());
 
         WRENCH_INFO("Task '%s' has failed: %s", task->getID().c_str(), event->failure_cause->toString().c_str());
@@ -450,7 +446,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
         this->baremetal_service = std::dynamic_pointer_cast<wrench::BareMetalComputeService>(simulation->add(
                 new wrench::BareMetalComputeService(
                         "BareMetalHead",
-                        (std::map<std::string, std::tuple<unsigned long, double>>){
+                        (std::map<std::string, std::tuple<unsigned long, sg_size_t>>){
                                 std::make_pair("BareMetalHost1", std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                  wrench::ComputeService::ALL_RAM)),
                                 std::make_pair("BareMetalHost2", std::make_tuple(wrench::ComputeService::ALL_CORES,
@@ -488,10 +484,10 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
         if (this->storage_service1) {
-            simulation->stageFile(input_file, this->storage_service1);
+            this->storage_service1->createFile(input_file);
         }
         if (this->storage_service2) {
-            simulation->stageFile(input_file, this->storage_service2);
+            this->storage_service2->createFile(input_file);
         }
     }
 

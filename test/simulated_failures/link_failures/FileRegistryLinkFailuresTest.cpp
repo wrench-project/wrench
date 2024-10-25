@@ -11,6 +11,7 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 #include <algorithm>
+#include <memory>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
@@ -35,7 +36,7 @@ public:
     void do_FileRegistryLinkFailureSimpleRandom_Test();
 
 protected:
-    ~FileRegistryLinkFailuresTest() {
+    ~FileRegistryLinkFailuresTest() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }
@@ -95,7 +96,7 @@ class FileRegistryLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     FileRegistryLinkFailuresTestWMS(FileRegistryLinkFailuresTest *test,
-                                    std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                                    const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -107,14 +108,14 @@ private:
         // Create a bunch of files
         std::vector<std::shared_ptr<wrench::DataFile>> files;
         for (unsigned int i = 0; i < NUM_FILES; i++) {
-            files.push_back(wrench::Simulation::addFile("file_" + std::to_string(i), 100.0));
+            files.push_back(wrench::Simulation::addFile("file_" + std::to_string(i), 100));
         }
 
         // Create a link switcher on/off er
-        auto switcher = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
-                new wrench::ResourceRandomRepeatSwitcher("Host1", 123, 1, 15, 1, 5,
-                                                         "link1", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
-        switcher->setSimulation(this->simulation);
+        auto switcher = std::make_shared<wrench::ResourceRandomRepeatSwitcher>(
+                "Host1", 123, 1, 15, 1, 5,
+                "link1", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK);
+        switcher->setSimulation(this->getSimulation());
         switcher->start(switcher, true, false);// Daemonized, no auto-restart
 
         std::mt19937 rng(666);
@@ -157,10 +158,11 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 3;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-link-shutdown-simulation");
+    argv[2] = strdup("--wrench-default-control-message-size=10");
 
     simulation->init(&argc, argv);
 
@@ -180,7 +182,7 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
 
     // Create a file registry service
     double message_payload = 2;
-    wrench::WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE payloads =
+    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE payloads =
             {
                     {wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD, message_payload},
                     {wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD, message_payload},
@@ -198,11 +200,11 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
                                             payloads));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms;
 
     ASSERT_NO_THROW(wms = simulation->add(
-                            new FileRegistryLinkFailuresTestWMS(
-                                    this, "Host1")));
+            new FileRegistryLinkFailuresTestWMS(
+                    this, "Host1")));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

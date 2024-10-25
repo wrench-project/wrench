@@ -29,6 +29,8 @@ namespace wrench {
 
     std::unordered_map<std::string, std::shared_ptr<FileLocation>> FileLocation::file_location_map;
     size_t FileLocation::file_location_map_previous_size = 0;
+    long FileLocation::dot_file_sequence_number = 0;
+
 
     FileLocation::~FileLocation() = default;
 
@@ -81,7 +83,6 @@ namespace wrench {
      * @param file: a file
      * @return a file location specification
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<FileLocation> FileLocation::SCRATCH(const std::shared_ptr<DataFile> &file) {
         if (file == nullptr) {
@@ -98,13 +99,12 @@ namespace wrench {
      * @param file: a file
      * @return a file location specification
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss, const std::shared_ptr<DataFile> &file) {
         if (!ss or !file) {
             throw std::invalid_argument("FileLocation::LOCATION(): invalid nullptr arguments");
         }
-        return LOCATION(ss, "/", file);
+        return LOCATION(ss, ss->getMountPoint(), file);
     }
 
 #ifdef PAGE_CACHE_SIMULATION
@@ -116,7 +116,6 @@ namespace wrench {
      * @param file: a file
      * @return a file location specification
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss,
                                                          const std::shared_ptr<StorageService> &server_ss,
@@ -139,7 +138,6 @@ namespace wrench {
      * @param path: a path
      * @return a file location specification
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<FileLocation> FileLocation::LOCATION(const std::shared_ptr<StorageService> &ss,
                                                          const std::string &path,
@@ -167,7 +165,7 @@ namespace wrench {
             return "SCRATCH:" + this->file->getID();
         } else {
             return this->storage_service->getName() + ":" +
-                   sanitizePath(this->path) + ":" + this->file->getID();
+                   sanitizePath(this->directory_path) + ":" + this->file->getID();
         }
     }
 
@@ -216,15 +214,38 @@ namespace wrench {
 #endif
 
     /**
-     * @brief Get the location's path
+     * @brief Get the location's directory path
      * @return a path
      */
-    std::string FileLocation::getPath() {
+    std::string FileLocation::getDirectoryPath() {
         if (this->is_scratch) {
-            throw std::invalid_argument("FileLocation::getPath(): No path for a SCRATCH location");
+            throw std::invalid_argument("FileLocation::getDirectoryPath(): No path for a SCRATCH location");
         }
-        return this->path;
+        return this->directory_path;
     }
+
+    /**
+     * @brief Get the location's file path
+     * @return a path
+     */
+    std::string FileLocation::getFilePath() {
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getFilePath(): No path for a SCRATCH location");
+        }
+        return this->directory_path + "/" + this->file->getID();
+    }
+
+    /**
+     * @brief Get a path to a dot-file for the location
+     * @return a path
+     */
+    std::string FileLocation::getADotFilePath() {
+        if (this->is_scratch) {
+            throw std::invalid_argument("FileLocation::getDotFilePath(): No path for a SCRATCH location");
+        }
+        return this->directory_path + "/" + this->file->getID() + ".wrench_tmp." + std::to_string(FileLocation::dot_file_sequence_number++);
+    }
+
 
     /**
      * @brief Get the location's scratch-ness
@@ -334,7 +355,7 @@ namespace wrench {
         if (not sss) {
             return nullptr;
         }
-        return sss->getDiskForPathOrNull(this->path);
+        return sss->getDiskForPathOrNull(this->directory_path);
     }
 
 

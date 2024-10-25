@@ -121,7 +121,7 @@ namespace wrench {
         friend class ExecutionController;
         friend class WMS;
 
-        explicit JobManager(std::string hostname, S4U_CommPort *creator_commport);
+        explicit JobManager(const std::string& hostname, S4U_CommPort *creator_commport);
 
         /***********************/
         /** \endcond           */

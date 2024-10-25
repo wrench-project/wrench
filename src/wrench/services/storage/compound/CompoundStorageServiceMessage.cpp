@@ -17,7 +17,7 @@ namespace wrench {
      * @brief Constructor
      * @param payload: the message size in bytes
      */
-    CompoundStorageServiceMessage::CompoundStorageServiceMessage(double payload) : StorageServiceMessage(payload) {}
+    CompoundStorageServiceMessage::CompoundStorageServiceMessage(sg_size_t payload) : StorageServiceMessage(payload) {}
 
     /**
      * @brief Constructor
@@ -26,12 +26,11 @@ namespace wrench {
      * @param stripe_count: the strip count
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CompoundStorageAllocationRequestMessage::CompoundStorageAllocationRequestMessage(S4U_CommPort *answer_commport,
                                                                                      std::shared_ptr<DataFile> file,
                                                                                      unsigned int stripe_count,
-                                                                                     double payload)
+                                                                                     sg_size_t payload)
         : CompoundStorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_commport == nullptr) {
@@ -40,7 +39,7 @@ namespace wrench {
         }
 #endif
         this->answer_commport = answer_commport;
-        this->file = file;
+        this->file = std::move(file);
         this->stripe_count = stripe_count;
     }
 
@@ -49,12 +48,11 @@ namespace wrench {
      * @param locations: Existing or newly allocated FileLocations for requested file
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CompoundStorageAllocationAnswerMessage::CompoundStorageAllocationAnswerMessage(
-            std::vector<std::shared_ptr<FileLocation>> locations, double payload)
+            std::vector<std::shared_ptr<FileLocation>> locations, sg_size_t payload)
         : CompoundStorageServiceMessage(payload) {
-        this->locations = locations;
+        this->locations = std::move(locations);
     }
 
     /**
@@ -63,10 +61,9 @@ namespace wrench {
      * @param file: the file for which storage allocation is requested
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CompoundStorageLookupRequestMessage::CompoundStorageLookupRequestMessage(S4U_CommPort *answer_commport,
-                                                                             std::shared_ptr<DataFile> file, double payload)
+                                                                             std::shared_ptr<DataFile> file, sg_size_t payload)
         : CompoundStorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_commport == nullptr) {
@@ -75,7 +72,7 @@ namespace wrench {
         }
 #endif
         this->answer_commport = answer_commport;
-        this->file = file;
+        this->file = std::move(file);
     }
 
     /**
@@ -83,12 +80,11 @@ namespace wrench {
      * @param locations: Known FileLocations for requested file
      * @param payload: the message size in bytes
      *
-     * @throw std::invalid_argument
      */
     CompoundStorageLookupAnswerMessage::CompoundStorageLookupAnswerMessage(
-            std::vector<std::shared_ptr<FileLocation>> locations, double payload)
+            std::vector<std::shared_ptr<FileLocation>> locations, sg_size_t payload)
         : CompoundStorageServiceMessage(payload) {
-        this->locations = locations;
+        this->locations = std::move(locations);
     }
 
 }// namespace wrench

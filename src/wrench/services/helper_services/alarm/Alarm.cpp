@@ -14,6 +14,8 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/failure_causes/NetworkError.h>
 #include <wrench/failure_causes/HostError.h>
+
+#include <utility>
 #include "wrench/exceptions/ExecutionException.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_alarm_service, "Log category for Alarm Service");
@@ -30,8 +32,8 @@ namespace wrench {
      * @param msg: the message to send
      * @param suffix: a (possibly empty) suffix to append to the daemon name
      */
-    Alarm::Alarm(double date, std::string hostname, S4U_CommPort *reply_commport,
-                 SimulationMessage *msg, std::string suffix) : Service(hostname, "alarm_service_" + suffix) {
+    Alarm::Alarm(double date, const std::string& hostname, S4U_CommPort *reply_commport,
+                 SimulationMessage *msg, const std::string& suffix) : Service(hostname, "alarm_service_" + suffix) {
         this->date = date;
         this->reply_commport = reply_commport;
         // Make it unique so that there will be no memory leak in case the
@@ -77,16 +79,14 @@ namespace wrench {
      * @param suffix: a (possibly empty) suffix to append to the daemon name (useful in debug output)
      * @return a shared_ptr reference to the alarm service
      *
-     * @throw std::shared_ptr<HostError>
-     * @throw std::runtime_error
      */
     std::shared_ptr<Alarm>
     Alarm::createAndStartAlarm(Simulation *simulation, double date, std::string hostname,
                                S4U_CommPort *reply_commport,
                                SimulationMessage *msg, std::string suffix) {
         std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
-                new Alarm(date, std::move(hostname), reply_commport, msg, suffix));
-        alarm_ptr->simulation = simulation;
+                new Alarm(date, std::move(hostname), reply_commport, msg, std::move(suffix)));
+        alarm_ptr->simulation_ = simulation;
         alarm_ptr->start(alarm_ptr, true, false);// Daemonized, no auto-restart
         return alarm_ptr;
     }

@@ -24,7 +24,7 @@ namespace wrench {
      */
     class NetworkProximityMessage : public ServiceMessage {
     protected:
-        NetworkProximityMessage(double payload);
+        NetworkProximityMessage(sg_size_t payload);
     };
 
 
@@ -34,7 +34,7 @@ namespace wrench {
     class NetworkProximityLookupRequestMessage : public NetworkProximityMessage {
     public:
         NetworkProximityLookupRequestMessage(S4U_CommPort *answer_commport, std::pair<std::string, std::string> hosts,
-                                             double payload);
+                                             sg_size_t payload);
 
         /** @brief The commport_name to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -49,7 +49,7 @@ namespace wrench {
     class NetworkProximityLookupAnswerMessage : public NetworkProximityMessage {
     public:
         NetworkProximityLookupAnswerMessage(std::pair<std::string, std::string> hosts, double proximity_value,
-                                            double timestamp, double payload);
+                                            double timestamp, sg_size_t payload);
 
         /** @brief The hosts whose proximity values were calculated */
         std::pair<std::string, std::string> hosts;
@@ -66,7 +66,7 @@ namespace wrench {
     class NetworkProximityComputeAnswerMessage : public NetworkProximityMessage {
     public:
         NetworkProximityComputeAnswerMessage(std::pair<std::string, std::string> hosts, double proximity_value,
-                                             double payload);
+                                             sg_size_t payload);
 
         /** @brief The hosts whose proximity values were calculated */
         std::pair<std::string, std::string> hosts;
@@ -79,7 +79,7 @@ namespace wrench {
      */
     class NetworkProximityTransferMessage : public NetworkProximityMessage {
     public:
-        NetworkProximityTransferMessage(double payload);
+        NetworkProximityTransferMessage(sg_size_t payload);
     };
 
     /**
@@ -87,7 +87,7 @@ namespace wrench {
      */
     class NextContactDaemonRequestMessage : public NetworkProximityMessage {
     public:
-        NextContactDaemonRequestMessage(std::shared_ptr<NetworkProximitySenderDaemon> daemon, double payload);
+        NextContactDaemonRequestMessage(std::shared_ptr<NetworkProximitySenderDaemon> daemon, sg_size_t payload);
 
         /** @brief The NetworkProximitySenderDaemon daemon to return the answer to */
         std::shared_ptr<NetworkProximitySenderDaemon> daemon;
@@ -100,7 +100,7 @@ namespace wrench {
     public:
         NextContactDaemonAnswerMessage(std::string next_host_to_send,
                                        std::shared_ptr<NetworkProximityReceiverDaemon> next_daemon_to_send,
-                                       S4U_CommPort *next_commport_to_send, double payload);
+                                       S4U_CommPort *next_commport_to_send, sg_size_t payload);
 
         /** @brief The next host for the NetworkProximitySenderDaemon to contact */
         std::string next_host_to_send;
@@ -117,7 +117,7 @@ namespace wrench {
      */
     class CoordinateLookupRequestMessage : public NetworkProximityMessage {
     public:
-        CoordinateLookupRequestMessage(S4U_CommPort *answer_commport, std::string requested_host, double payload);
+        CoordinateLookupRequestMessage(S4U_CommPort *answer_commport, std::string requested_host, sg_size_t payload);
 
         /** @brief The commport_name to which the answer should be sent back */
         S4U_CommPort *answer_commport;
@@ -132,7 +132,7 @@ namespace wrench {
     class CoordinateLookupAnswerMessage : public NetworkProximityMessage {
     public:
         CoordinateLookupAnswerMessage(std::string requested_host, bool success, std::pair<double, double> xy_coordinate,
-                                      double timestamp, double payload);
+                                      double timestamp, sg_size_t payload);
 
         /** @brief The name of the host whose coordinates were requested  */
         std::string requested_host;

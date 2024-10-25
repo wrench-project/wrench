@@ -25,11 +25,11 @@ WRENCH_LOG_CATEGORY(wrench_core_failure_detector, "Log category for ServiceTermi
  * @param notify_on_crash: whether to send a crash notification (in case of non-clean termination)
  * @param notify_on_termination: whether to send a termination notification (in case of clean termination)
  */
-wrench::ServiceTerminationDetector::ServiceTerminationDetector(std::string host_on_which_to_run,
+wrench::ServiceTerminationDetector::ServiceTerminationDetector(const std::string& host_on_which_to_run,
                                                                std::shared_ptr<Service> service_to_monitor,
                                                                S4U_CommPort *commport_to_notify,
                                                                bool notify_on_crash,
-                                                               bool notify_on_termination) : Service(std::move(host_on_which_to_run), "service_termination_detector_for_" + service_to_monitor->getName()) {
+                                                               bool notify_on_termination) : Service(host_on_which_to_run, "service_termination_detector_for_" + service_to_monitor->getName()) {
     this->service_to_monitor = std::move(service_to_monitor);
     this->commport_to_notify = commport_to_notify;
     this->notify_on_crash = notify_on_crash;

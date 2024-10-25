@@ -41,7 +41,7 @@ namespace wrench {
                 {CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"},
                 {CloudComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
                 {CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {CloudComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {CloudComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
@@ -72,8 +72,8 @@ namespace wrench {
         CloudComputeService(const std::string &hostname,
                             const std::vector<std::string> &execution_hosts,
                             const std::string &scratch_space_mount_point,
-                            WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
+                            const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
 
         bool supportsStandardJobs() override;
@@ -85,9 +85,9 @@ namespace wrench {
         /***********************/
 
         virtual std::string createVM(unsigned long num_cores,
-                                     double ram_memory,
+                                     sg_size_t ram_memory,
                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                                     WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
         virtual void shutdownVM(const std::string &vm_name);
 
@@ -110,7 +110,6 @@ namespace wrench {
         virtual bool isVMSuspended(const std::string &vm_name);
 
         virtual bool isVMDown(const std::string &vm_name);
-
 
         //        std::vector<std::string> getExecutionHosts();
 
@@ -153,7 +152,6 @@ namespace wrench {
          * @param tosend: message to be sent
          * @return a simulation message
          *
-         * @throw std::runtime_error
          */
         std::shared_ptr<TMessageType> sendRequestAndWaitForAnswer(S4U_CommPort *answer_commport, ComputeServiceMessage *tosend) {
             serviceSanityCheck();
@@ -172,10 +170,10 @@ namespace wrench {
 
         virtual void processCreateVM(S4U_CommPort *answer_commport,
                                      unsigned long requested_num_cores,
-                                     double requested_ram,
+                                     sg_size_t requested_ram,
                                      const std::string &physical_host,
                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
+                                     WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list);
 
         virtual void
         processStartVM(S4U_CommPort *answer_commport, const std::string &vm_name);
@@ -202,7 +200,7 @@ namespace wrench {
         processBareMetalComputeServiceTermination(const std::shared_ptr<BareMetalComputeService> &cs, int exit_code);
 
         virtual void processIsThereAtLeastOneHostWithAvailableResources(
-                S4U_CommPort *answer_commport, unsigned long num_cores, double ram);
+                S4U_CommPort *answer_commport, unsigned long num_cores, sg_size_t ram);
 
 
         void stopAllVMs(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
@@ -215,7 +213,7 @@ namespace wrench {
         std::vector<std::string> execution_hosts;
 
         /** @brief Map of used RAM at the hosts */
-        std::unordered_map<std::string, double> used_ram_per_execution_host;
+        std::unordered_map<std::string, sg_size_t> used_ram_per_execution_host;
 
         /** @brief Map of number of used cores at the hosts */
         std::unordered_map<std::string, unsigned long> used_cores_per_execution_host;
@@ -229,7 +227,7 @@ namespace wrench {
 
     private:
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
-        std::string findHost(unsigned long desired_num_cores, double desired_ram, const std::string &desired_host);
+        std::string findHost(unsigned long desired_num_cores, sg_size_t desired_ram, const std::string &desired_host);
     };
 }// namespace wrench
 

@@ -90,6 +90,7 @@ private:
         auto file_70 = wrench::Simulation::addFile("file_70", 70);
 
         this->test->storage_service_1->writeFile(file_70);
+        // The LRU list:  file_10, file_70
 
         // Check that file_50 and file_30 have been kicked out
         if (this->test->storage_service_1->lookupFile(
@@ -152,12 +153,10 @@ void SimpleStorageServiceCachingTest::do_SimpleLRUCaching_test(double buffer_siz
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    //    std::cerr << "\nBUFFER SIZE = " << buffer_size << "\n";
-
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //        argv[1] = strdup("--wrench-full-log");
+//            argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -360,22 +359,17 @@ private:
         //                SS2: file_30
 
         // Copy Asynchronously file_50 SS1 -> SS2
-        //        std::cerr << "STARTING ASYNCHRONOUS COPY: file_50 SS1 -> SS2\n";
         data_manager->initiateAsynchronousFileCopy(wrench::FileLocation::LOCATION(ss1, file_50), wrench::FileLocation::LOCATION(ss2, file_50));
 
         wrench::Simulation::sleep(1);
-        //        std::cerr << "Reading file_10 from SS1\n";
         ss1->readFile(wrench::FileLocation::LOCATION(ss1, file_10));
-        //        std::cerr << "Reading file_20 from SS1\n";
         ss1->readFile(wrench::FileLocation::LOCATION(ss1, file_20));
-        //        std::cerr << "NOW file_50 should be the LRU on SS1\n";
-
+        wrench::Simulation::sleep(1000000);
         // The LRU list:  SS1: file_50, file_10, file_20
         //                SS2: file_30
 
         // Writing a file to ss1, which "shouldn't" evict file_50 even though it's the LRU
         // Instead it should evict file_10 and file_20
-        //        std::cerr << "WRITING file_40 to SS1, which should evict file_10 and file_20\n";
         ss1->writeFile(file_40);
 
         if (ss1->lookupFile(file_10)) {
@@ -439,7 +433,7 @@ void SimpleStorageServiceCachingTest::do_SimpleLRUCachingUnevictable_test(double
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

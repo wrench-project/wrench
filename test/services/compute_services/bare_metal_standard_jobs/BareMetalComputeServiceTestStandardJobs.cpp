@@ -82,13 +82,13 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
-        input_file = wrench::Simulation::addFile("input_file", 10.0);
-        output_file1 = wrench::Simulation::addFile("output_file1", 10.0);
-        output_file2 = wrench::Simulation::addFile("output_file2", 10.0);
-        output_file3 = wrench::Simulation::addFile("output_file3", 10.0);
-        output_file4 = wrench::Simulation::addFile("output_file4", 10.0);
-        output_file5 = wrench::Simulation::addFile("output_file5", 10.0);
-        output_file6 = wrench::Simulation::addFile("output_file6", 10.0);
+        input_file = wrench::Simulation::addFile("input_file", 10);
+        output_file1 = wrench::Simulation::addFile("output_file1", 10);
+        output_file2 = wrench::Simulation::addFile("output_file2", 10);
+        output_file3 = wrench::Simulation::addFile("output_file3", 10);
+        output_file4 = wrench::Simulation::addFile("output_file4", 10);
+        output_file5 = wrench::Simulation::addFile("output_file5", 10);
+        output_file6 = wrench::Simulation::addFile("output_file6", 10);
 
         // Create the tasks
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1);
@@ -237,7 +237,7 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -344,7 +344,7 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -489,7 +489,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -602,7 +602,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -737,7 +737,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -966,7 +966,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1078,7 +1078,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1196,7 +1196,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1303,7 +1303,7 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1421,7 +1421,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1551,7 +1551,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1678,7 +1678,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
