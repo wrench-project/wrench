@@ -36,13 +36,13 @@ jobs:
       - name: Symlink gfortran
         run: |
           sudo mkdir /usr/local/lib/
-          sudo cp /opt/homebrew/Cellar/gcc/14.2.0_1/lib/gcc/14/*libgfortran* /usr/local/lib/
+          sudo cp /opt/homebrew/Cellar/gcc/14.2.0_1/lib/gcc/14/*libgfortran* /opt/homebrew/lib/
       - name: debug1
         run: |
           ls /usr/local/lib/*
       - name: debug2
         run: |
-          ls /opt/homebrew/local/
+          ls /opt/homebrew/lib/
       - name: Install nlohmann-json
         run: |
           brew install nlohmann-json
