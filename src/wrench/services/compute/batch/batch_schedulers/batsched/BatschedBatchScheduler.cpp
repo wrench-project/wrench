@@ -214,7 +214,7 @@ namespace wrench {
 
 
     std::map<std::string, double> BatschedBatchScheduler::getStartTimeEstimates(
-            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
+            std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) {
 
         std::set<std::string> supported_algorithms = {"conservative_bf", "fast_conservative_bf", "fcfs_fast"};
         if (supported_algorithms.find(this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM)) == supported_algorithms.end()) {
