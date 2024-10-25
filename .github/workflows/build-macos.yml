@@ -32,8 +32,10 @@ jobs:
           brew install gcc
       - name: Symlink gfortran
         run: |
-          ls /usr/local/Cellar/
-          ls /usr/local/Cellar/gcc@14/
+          ls /opt/homebrew/Cellar/gcc/14.2.0_1/
+          ls /opt/homebrew/Cellar/gcc/14.2.0_1/lib
+          ls /opt/homebrew/Cellar/gcc/14.2.0_1/lib/gcc
+          ls /opt/homebrew/Cellar/gcc/14.2.0_1/lib/gcc/14/
       - name: Install nlohmann-json
         run: |
           brew install nlohmann-json
