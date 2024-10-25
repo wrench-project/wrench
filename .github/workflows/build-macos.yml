@@ -30,17 +30,15 @@ jobs:
       - name: Install gcc
         run: |
           brew install gcc
+      - name: Symlink gfortran
+        run: |
+          sudo ln -s /usr/local/bin/gfortran-11 /usr/local/bin/gfortran
+          sudo mkdir /usr/local/gfortran
+          sudo ln -s /usr/local/Cellar/gcc@11/*/lib/gcc/11 /usr/local/gfortran/lib
+          gfortran --version
       - name: Install nlohmann-json
         run: |
           brew install nlohmann-json
-          #wget https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.tar.gz
-          #tar -xzf v3.11.3.tar.gz
-          #cd json-3.11.3 
-          #mkdir build
-          #cd build
-          #cmake ..
-          #make -j4
-          #sudo make install
       - name: Install googletest
         run: |
           brew install googletest
