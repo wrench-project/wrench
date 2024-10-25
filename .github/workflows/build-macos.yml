@@ -40,6 +40,9 @@ jobs:
       - name: debug1
         run: |
           ls /usr/local/lib/*
+      - name: debug2
+        run: |
+          ls /opt/homebrew/local/
       - name: Install nlohmann-json
         run: |
           brew install nlohmann-json
