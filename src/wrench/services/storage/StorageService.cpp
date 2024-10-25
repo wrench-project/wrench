@@ -8,7 +8,6 @@
  */
 
 #include <wrench/services/storage/StorageServiceProperty.h>
-#include <wrench/services/storage/storage_helpers/LogicalFileSystem.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
