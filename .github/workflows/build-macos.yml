@@ -30,9 +30,10 @@ jobs:
       - name: Install gcc
         run: |
           brew install gcc
-      - name: Install gfortran
+      - name: Symlink gfortran
         run: |
-          brew install gfortran
+          ls /usr/local/Cellar/
+          ls /usr/local/Cellar/gcc@14/
       - name: Install nlohmann-json
         run: |
           brew install nlohmann-json
