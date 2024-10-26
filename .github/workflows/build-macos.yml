@@ -58,8 +58,7 @@ jobs:
           wget --no-check-certificate https://framagit.org/simgrid/simgrid/-/archive/v3.36/simgrid-v3.36.tar.gz
           tar -xf simgrid-v3.36.tar.gz
           cd simgrid-v3.36
-          sed -I ""  "s/gfortran/gfortran -L\/opt\/homebrew\/lib\//" CMakeLists.txt
-          cmake -DCMAKE_LD_FLAGS=-L/opt/homebrew/lib/ .
+          #sed -I ""  "s/gfortran/gfortran -L\/opt\/homebrew\/lib\//" CMakeLists.txt
           make -j4
           sudo make install
       - name: Source Build and Test
