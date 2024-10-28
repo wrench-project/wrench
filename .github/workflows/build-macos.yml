@@ -31,19 +31,6 @@ jobs:
       - name: Install gcc
         run: |
           brew install gcc
-      - name: debug0
-        run: |
-          ls /opt/homebrew/Cellar/gcc/14.2.0_1/lib/gcc/14/*fortran*
-      - name: Symlink gfortran
-        run: |
-          sudo mkdir /usr/local/lib/
-          sudo cp /opt/homebrew/Cellar/gcc/14.2.0_1/lib/gcc/14/*libgfortran* /opt/homebrew/lib/
-      - name: debug2
-        run: |
-          ls /opt/homebrew/lib/
-      - name: debug3
-        run: |
-          ls /opt/homebrew/bin/
       - name: Install nlohmann-json
         run: |
           brew install nlohmann-json
