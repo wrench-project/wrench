@@ -47,6 +47,9 @@ jobs:
           tar -xf simgrid-v3.36.tar.gz
           cd simgrid-v3.36
           #sed -I ""  "s/gfortran/gfortran -L\/opt\/homebrew\/lib\//" CMakeLists.txt
+          mkdir build
+          cd build
+          cmake ..
           make -j4
           sudo make install
       - name: Source Build and Test
