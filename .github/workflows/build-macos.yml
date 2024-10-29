@@ -51,8 +51,10 @@ jobs:
           #sed -I ""  "s/gfortran/gfortran -L\/opt\/homebrew\/lib\//" CMakeLists.txt
           mkdir build
           cd build
-          cp /opt/homebrew/lib/gcc/14/*libgfortran* .
           cmake ..
+          cp /opt/homebrew/lib/gcc/14/*libgfortran* .
+          ls
+          echo "DYLD_LIBRARY_PATH=$(echo $DYLD_LIBRARY_PATH:.)" >> $GITHUB_ENV
           make -j4
           sudo make install
       - name: Source Build and Test
