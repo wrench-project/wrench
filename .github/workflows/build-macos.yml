@@ -33,9 +33,6 @@ jobs:
       - name: debug0
         run: |
           ls /opt/homebrew/lib/gcc/14/
-      - name: debug1
-        run: |
-          ls /usr/local/lib
       - name: Install nlohmann-json
         run: |
           brew install nlohmann-json
@@ -54,6 +51,7 @@ jobs:
           #sed -I ""  "s/gfortran/gfortran -L\/opt\/homebrew\/lib\//" CMakeLists.txt
           mkdir build
           cd build
+          cp /opt/homebrew/lib/gcc/14/*libgfortran* .
           cmake ..
           make -j4
           sudo make install
