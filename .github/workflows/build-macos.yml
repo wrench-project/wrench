@@ -32,7 +32,7 @@ jobs:
           brew install gcc
       - name: debug0
         run: |
-          ls /opt/homebrew/lib/gcc/
+          ls /opt/homebrew/lib/gcc/14/
       - name: debug1
         run: |
           ls /usr/local/lib
