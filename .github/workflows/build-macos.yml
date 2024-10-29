@@ -17,8 +17,7 @@ concurrency:
 
 jobs:
   build:
-#    runs-on: macos-latest
-    runs-on: macos-12
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - name: Remove existing links
@@ -31,6 +30,12 @@ jobs:
       - name: Install gcc
         run: |
           brew install gcc
+      - name: debug0
+        run: |
+          ls /opt/homebrew/lib/
+      - name: debug1
+        run: |
+          ls /usr/local/lib
       - name: Install nlohmann-json
         run: |
           brew install nlohmann-json
