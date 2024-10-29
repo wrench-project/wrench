@@ -48,7 +48,7 @@ jobs:
           wget --no-check-certificate https://framagit.org/simgrid/simgrid/-/archive/v3.36/simgrid-v3.36.tar.gz
           tar -xf simgrid-v3.36.tar.gz
           cd simgrid-v3.36
-          #sed -I ""  "s/gfortran/gfortran -L\/opt\/homebrew\/lib\//" CMakeLists.txt
+          sed -I ""  "s/gfortran/gfortran -L./" CMakeLists.txt
           mkdir build
           cd build
           cmake ..
