@@ -3,6 +3,9 @@ WRENCH Release Notes
 
 ### current master branch
 
+Nothing here yet
+
+### wrench 2.4
 
 - Removal of all file system simulation code, which was replaced by calls to
   the [SimGrid File System Module (FSMod)](https://github.com/simgrid/file-system-module), which is now a new
