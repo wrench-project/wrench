@@ -1,5 +1,4 @@
 [![Build Status][build-badge]][build-link]
-[![Build-macOS Status][build-macos-badge]][build-macos-link]
 [![GitHub Release][release-badge]][release-link]
 [![License: LGPL v3][license-badge]](LICENSE.md)
 [![Coverage Status][codecov-badge]][codecov-link]
