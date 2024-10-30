@@ -51,7 +51,7 @@ jobs:
           sed -I ""  "s/gfortran/gfortran -L./" CMakeLists.txt
           mkdir build
           cd build
-          cmake -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/g++-14 ..
+          cmake -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/g++-14 -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/g++-14 ..
           cp /opt/homebrew/lib/gcc/14/*libgfortran* .
           ls
           echo "DYLD_LIBRARY_PATH=$(echo $DYLD_LIBRARY_PATH:.)" >> $GITHUB_ENV
