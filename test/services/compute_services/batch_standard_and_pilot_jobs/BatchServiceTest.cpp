@@ -73,6 +73,8 @@ public:
 
     void do_ShutdownWithPendingRunningJobsTest_test();
 
+    void do_ResourceInformationTest_test();
+
 protected:
     ~BatchServiceTest() override {
         workflow->clear();
