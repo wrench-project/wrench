@@ -23,7 +23,7 @@ Required Dependencies
 ---------------------
 
 -  `SimGrid <https://simgrid.org/>`__ ??? version 3.36
--  `SimGrid File System Module <https://github.com/simgrid/file-system-module>`__ ??? version 0.1 or higher
+-  `SimGrid File System Module <https://github.com/simgrid/file-system-module>`__ ??? version 0.2 or higher
 -  `JSON for Modern C++ <https://github.com/nlohmann/json>`__ ??? version
    3.9.0 or higher
 

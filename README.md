@@ -42,7 +42,7 @@ And, one of the following:
 ### Required Dependencies 
 
 - [SimGrid](https://framagit.org/simgrid/simgrid/) - version 3.36
-- [SimGrid File System Module](https://github.com/simgrid/file-system-module) - version 0.1 or higher
+- [SimGrid File System Module](https://github.com/simgrid/file-system-module) - version 0.2 or higher
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.11.0 or higher 
 
 ### Optional Dependencies
