@@ -32,7 +32,7 @@ jobs:
           brew install gcc
       - name: debug0
         run: |
-          ls /opt/homebrew/lib/gcc/14/
+          ls /opt/homebrew/bin/
       - name: Install nlohmann-json
         run: |
           brew install nlohmann-json
