@@ -138,8 +138,8 @@ private:
 
     int main() override {
 
-        auto file1 = wrench::Simulation::addFile("file1", 100.0);
-        auto file2 = wrench::Simulation::addFile("file2", 100.0);
+        auto file1 = wrench::Simulation::addFile("file1", 100);
+        auto file2 = wrench::Simulation::addFile("file2", 100);
         auto frs = this->test->file_registry_service;
 
         std::set<std::shared_ptr<wrench::FileLocation>> locations;
@@ -329,7 +329,7 @@ private:
 
     int main() override {
 
-        std::shared_ptr<wrench::DataFile> file1 = wrench::Simulation::addFile("file1", 100.0);
+        std::shared_ptr<wrench::DataFile> file1 = wrench::Simulation::addFile("file1", 100);
         std::shared_ptr<wrench::DataFile> nullptr_file = nullptr;
         auto frs = this->test->file_registry_service;
         auto nps = this->test->network_proximity_service;

@@ -115,13 +115,13 @@ private:
         // Starting a FailedHost murderer!!
         auto murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost",
                                                                    wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
-        murderer->setSimulation(this->simulation);
+        murderer->setSimulation(this->getSimulation());
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost resurector!!
         auto resurector = std::make_shared<wrench::ResourceSwitcher>("StableHost", 500, "FailedHost",
                                                                      wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
-        resurector->setSimulation(this->simulation);
+        resurector->setSimulation(this->getSimulation());
         resurector->start(murderer, true, false);// Daemonized, no auto-restart
 
         auto file = wrench::Simulation::getFileByID("file");
@@ -142,13 +142,13 @@ private:
         // Starting a FailedHost murderer!!
         murderer = std::make_shared<wrench::ResourceSwitcher>("StableHost", 100, "FailedHost",
                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST);
-        murderer->setSimulation(this->simulation);
+        murderer->setSimulation(this->getSimulation());
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost resurector!!
         resurector = std::make_shared<wrench::ResourceSwitcher>("StableHost", 500, "FailedHost",
                                                                 wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST);
-        resurector->setSimulation(this->simulation);
+        resurector->setSimulation(this->getSimulation());
         resurector->start(murderer, true, false);// Daemonized, no auto-restart
 
         try {
@@ -206,7 +206,7 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
 
     simulation->add(new wrench::FileRegistryService(stable_host));
 
-    simulation->stageFile(file, storage_service);
+    storage_service->createFile(file, "/");
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

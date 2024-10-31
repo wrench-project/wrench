@@ -24,7 +24,7 @@ namespace wrench {
     * @param lambda_terminate: a lambda that implements the action's termination (typically a no-op)
     */
     CustomAction::CustomAction(const std::string &name,
-                               double ram,
+                               sg_size_t ram,
                                unsigned long num_cores,
                                std::function<void(std::shared_ptr<ActionExecutor>)> lambda_execute,
                                std::function<void(std::shared_ptr<ActionExecutor>)> lambda_terminate) : Action(name, "custom_"), ram(ram), num_cores(num_cores), lambda_execute(std::move(lambda_execute)), lambda_terminate(std::move(lambda_terminate)) {
@@ -66,7 +66,7 @@ namespace wrench {
      * @brief Returns the action's minimum required memory footprint
      * @return a number of bytes
      */
-    double CustomAction::getMinRAMFootprint() const {
+    sg_size_t CustomAction::getMinRAMFootprint() const {
         return this->ram;
     }
 

@@ -122,7 +122,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void CondorWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
+    void CondorWMS::processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         WRENCH_INFO("Notified that a standard job has completed: ");

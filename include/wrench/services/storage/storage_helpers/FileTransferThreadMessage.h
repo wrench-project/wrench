@@ -35,7 +35,7 @@ namespace wrench {
          * @brief Constructor
          * @param payload: the message payload
          */
-        FileTransferThreadMessage(double payload) : ServiceMessage(payload) {}
+        FileTransferThreadMessage(sg_size_t payload) : ServiceMessage(payload) {}
     };
 
 

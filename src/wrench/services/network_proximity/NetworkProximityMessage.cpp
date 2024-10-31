@@ -16,7 +16,7 @@ namespace wrench {
      * @brief Constructor
      * @param payload: the message size in bytes
      */
-    NetworkProximityMessage::NetworkProximityMessage(double payload) : ServiceMessage(payload) {
+    NetworkProximityMessage::NetworkProximityMessage(sg_size_t payload) : ServiceMessage(payload) {
     }
 
 
@@ -28,7 +28,7 @@ namespace wrench {
      */
     NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(S4U_CommPort *answer_commport,
                                                                                std::pair<std::string, std::string> hosts,
-                                                                               double payload) : NetworkProximityMessage(payload) {
+                                                                               sg_size_t payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || (std::get<0>(hosts).empty()) || (std::get<1>(hosts).empty())) {
             throw std::invalid_argument(
@@ -49,7 +49,7 @@ namespace wrench {
      */
     NetworkProximityLookupAnswerMessage::NetworkProximityLookupAnswerMessage(std::pair<std::string, std::string> hosts,
                                                                              double proximity_value, double timestamp,
-                                                                             double payload) : NetworkProximityMessage(payload) {
+                                                                             sg_size_t payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((std::get<0>(hosts).empty()) || (std::get<1>(hosts).empty())) {
             throw std::invalid_argument(
@@ -68,7 +68,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     NetworkProximityComputeAnswerMessage::NetworkProximityComputeAnswerMessage(
-            std::pair<std::string, std::string> hosts, double proximity_value, double payload) : NetworkProximityMessage(payload) {
+            std::pair<std::string, std::string> hosts, double proximity_value, sg_size_t payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((std::get<0>(hosts).empty()) || (std::get<1>(hosts).empty())) {
             throw std::invalid_argument(
@@ -86,7 +86,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(std::shared_ptr<NetworkProximitySenderDaemon> daemon,
-                                                                     double payload) : NetworkProximityMessage(payload) {
+                                                                     sg_size_t payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (daemon == nullptr) {
             throw std::invalid_argument(
@@ -105,7 +105,7 @@ namespace wrench {
      */
     NextContactDaemonAnswerMessage::NextContactDaemonAnswerMessage(std::string next_host_to_send,
                                                                    std::shared_ptr<NetworkProximityReceiverDaemon> next_daemon_to_send,
-                                                                   S4U_CommPort *next_commport_to_send, double payload) : NetworkProximityMessage(payload) {
+                                                                   S4U_CommPort *next_commport_to_send, sg_size_t payload) : NetworkProximityMessage(payload) {
         this->next_host_to_send = std::move(next_host_to_send);
         this->next_daemon_to_send = std::move(next_daemon_to_send);
         this->next_commport_to_send = next_commport_to_send;
@@ -116,7 +116,7 @@ namespace wrench {
      * @brief Constructor
      * @param payload: the message size in bytes
      */
-    NetworkProximityTransferMessage::NetworkProximityTransferMessage(double payload) : NetworkProximityMessage(payload) {
+    NetworkProximityTransferMessage::NetworkProximityTransferMessage(sg_size_t payload) : NetworkProximityMessage(payload) {
     }
 
     /**
@@ -126,7 +126,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(S4U_CommPort *answer_commport,
-                                                                   std::string requested_host, double payload) : NetworkProximityMessage(payload) {
+                                                                   std::string requested_host, sg_size_t payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_commport == nullptr || requested_host.empty()) {
             throw std::invalid_argument(
@@ -149,7 +149,7 @@ namespace wrench {
                                                                  bool success,
                                                                  std::pair<double, double> xy_coordinate,
                                                                  double timestamp,
-                                                                 double payload) : NetworkProximityMessage(payload) {
+                                                                 sg_size_t payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (requested_host.empty()) {
             throw std::invalid_argument(

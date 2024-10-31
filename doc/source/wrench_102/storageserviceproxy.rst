@@ -114,7 +114,7 @@ For this proxy location `ss` should be the proxy to access.
 			proxy, //on the proxy
 			someOtherDataFile
 		)
-	);//read the file from the cace, or remote, not default
+	);//read the file from the cache, or remote, not default
 
 	proxy.writeFile(remote,someDataFile);//Write a file to the remote
 

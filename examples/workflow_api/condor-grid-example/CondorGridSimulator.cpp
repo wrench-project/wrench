@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
 
     // Stage the input_file on the storage service
     for (auto const &f: workflow->getInputFiles()) {
-        simulation->stageFile(f, local_ss);
+        local_ss->createFile(f);
     }
 
     // Run the simulation

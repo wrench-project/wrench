@@ -53,7 +53,7 @@ namespace wrench {
         /** @brief A convenient constant to mean "use all ram of a physical host" whenever a ram capacity
          *  is needed when instantiating compute services
          */
-        static constexpr double ALL_RAM = DBL_MAX;
+        static constexpr sg_size_t ALL_RAM = LONG_LONG_MAX;
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -111,7 +111,7 @@ namespace wrench {
 
         virtual unsigned long getTotalNumIdleCores(bool simulate_it = false);
 
-        virtual bool isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, double ram);
+        virtual bool isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, sg_size_t ram);
 
         std::map<std::string, double> getMemoryCapacity(bool simulate_it = false);
 

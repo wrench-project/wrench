@@ -358,7 +358,7 @@ private:
         auto job_manager = this->createJobManager();
 
         std::shared_ptr<wrench::BareMetalComputeService> cs =
-                simulation->add(new wrench::BareMetalComputeService("Host1", {"Host1"}, "", {}, {}));
+                this->getSimulation()->add(new wrench::BareMetalComputeService("Host1", {"Host1"}, "", {}, {}));
 
         try {
             std::shared_ptr<wrench::CompoundJob> compound_job = nullptr;
@@ -604,7 +604,7 @@ private:
         }
 
         // Sleep for 90 seconds
-        this->simulation->sleep(90);
+        wrench::Simulation::sleep(90);
 
         // Terminate the job
         try {

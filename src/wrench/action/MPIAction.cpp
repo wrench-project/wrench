@@ -47,7 +47,7 @@ namespace wrench {
 
         // Make A COPY of the list of usable hosts
         auto resources_ref = action_executor->getActionExecutionService()->getComputeResources();
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> resources(resources_ref.begin(), resources_ref.end());
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> resources(resources_ref.begin(), resources_ref.end());
 
         // Determine the host list (using worst fit)
         std::vector<simgrid::s4u::Host *> simgrid_hosts;
@@ -128,8 +128,8 @@ namespace wrench {
      * @brief Returns the action's minimum required memory footprint
      * @return Always returns 0 for an MPIAction
      */
-    double MPIAction::getMinRAMFootprint() const {
-        return 0.0;
+    sg_size_t MPIAction::getMinRAMFootprint() const {
+        return 0;
     }
 
     /**

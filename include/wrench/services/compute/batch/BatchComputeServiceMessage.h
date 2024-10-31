@@ -24,7 +24,7 @@ namespace wrench {
      */
     class BatchComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        BatchComputeServiceMessage(double payload);
+        BatchComputeServiceMessage(sg_size_t payload);
     };
 
     /**
@@ -32,7 +32,7 @@ namespace wrench {
      */
     class BatchComputeServiceJobRequestMessage : public BatchComputeServiceMessage {
     public:
-        BatchComputeServiceJobRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<BatchJob> job, double payload);
+        BatchComputeServiceJobRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<BatchJob> job, sg_size_t payload);
 
         /** @brief The commport_name to answer to */
         S4U_CommPort *answer_commport;
@@ -46,7 +46,7 @@ namespace wrench {
      */
     class AlarmJobTimeOutMessage : public ServiceMessage {
     public:
-        AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job, double payload);
+        AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job, sg_size_t payload);
         /** @brief The batch job */
         std::shared_ptr<BatchJob> job;
     };
@@ -57,7 +57,7 @@ namespace wrench {
      */
     class AlarmNotifyBatschedMessage : public ServiceMessage {
     public:
-        AlarmNotifyBatschedMessage(std::string job_id, double payload);
+        AlarmNotifyBatschedMessage(std::string job_id, sg_size_t payload);
         /** @brief the batch job's id */
         std::string job_id;
     };
@@ -69,7 +69,7 @@ namespace wrench {
      */
     class BatchSimulationBeginsToSchedulerMessage : public BatchComputeServiceMessage {
     public:
-        BatchSimulationBeginsToSchedulerMessage(std::string answer_commport, std::string job_args_to_scheduler, double payload);
+        BatchSimulationBeginsToSchedulerMessage(std::string answer_commport, std::string job_args_to_scheduler, sg_size_t payload);
 
         /** @brief The commport_name to answer to */
         std::string answer_commport;
@@ -84,7 +84,7 @@ namespace wrench {
      */
     class BatchSchedReadyMessage : public BatchComputeServiceMessage {
     public:
-        BatchSchedReadyMessage(std::string answer_commport, double payload);
+        BatchSchedReadyMessage(std::string answer_commport, sg_size_t payload);
 
         /** @brief The commport_name to answer to */
         std::string answer_commport;
@@ -99,7 +99,7 @@ namespace wrench {
      */
     class BatchExecuteJobFromBatSchedMessage : public BatchComputeServiceMessage {
     public:
-        BatchExecuteJobFromBatSchedMessage(S4U_CommPort *answer_commport, std::string batsched_decision_reply, double payload);
+        BatchExecuteJobFromBatSchedMessage(S4U_CommPort *answer_commport, std::string batsched_decision_reply, sg_size_t payload);
 
         /** @brief The commport_name to answer to */
         S4U_CommPort *answer_commport;
@@ -114,7 +114,7 @@ namespace wrench {
      */
     class BatchQueryAnswerMessage : public BatchComputeServiceMessage {
     public:
-        BatchQueryAnswerMessage(double estimated_job_start_time, double payload);
+        BatchQueryAnswerMessage(double estimated_job_start_time, sg_size_t payload);
 
         /** @brief The estimated job start time */
         double estimated_start_time;
@@ -126,7 +126,7 @@ namespace wrench {
 //     */
 //    class BatchFakeJobSubmissionReplyMessage : public BatchComputeServiceMessage {
 //    public:
-//        BatchFakeJobSubmissionReplyMessage(std::string json_data_string, double payload);
+//        BatchFakeJobSubmissionReplyMessage(std::string json_data_string, sg_size_t payload);
 //
 //        /** @brief The resources info in json data string */
 //        std::string json_data_string;
@@ -140,7 +140,7 @@ namespace wrench {
      */
     class BatchJobSubmissionToSchedulerMessage : public BatchComputeServiceMessage {
     public:
-        BatchJobSubmissionToSchedulerMessage(S4U_CommPort *answer_commport, Job* job, std::string job_args_to_scheduler, double payload);
+        BatchJobSubmissionToSchedulerMessage(S4U_CommPort *answer_commport, Job* job, std::string job_args_to_scheduler, sg_size_t payload);
 
         /** @brief The commport_name to answer to */
         S4U_CommPort *answer_commport;

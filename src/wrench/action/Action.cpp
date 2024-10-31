@@ -129,7 +129,7 @@ namespace wrench {
 
     /**
      * @brief Returns the action's failure cause
-     * @return an internal state
+     * @return aa failure cause
      */
     std::shared_ptr<FailureCause> Action::getFailureCause() const {
         return this->execution_history.top().failure_cause;
@@ -204,7 +204,7 @@ namespace wrench {
      * @brief Sets the action's allocated RAM
      * @param ram: a number of bytes
      */
-    void Action::setRAMAllocated(double ram) {
+    void Action::setRAMAllocated(sg_size_t ram) {
         this->execution_history.top().ram_allocated = ram;
     }
 
@@ -267,7 +267,7 @@ namespace wrench {
      * @brief Get the minimum required amount of RAM to execute the action
      * @return a number of bytes
      */
-    double Action::getMinRAMFootprint() const {
+    sg_size_t Action::getMinRAMFootprint() const {
         return 0.0;
     }
 

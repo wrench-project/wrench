@@ -13,6 +13,8 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
+WRENCH_LOG_CATEGORY(dynamic_service_creation_test, "Log category for DynamicServiceCreationTest test");
+
 class DynamicServiceCreationTest : public ::testing::Test {
 
 public:
@@ -30,9 +32,10 @@ public:
     std::shared_ptr<wrench::WorkflowTask> task4;
     std::shared_ptr<wrench::WorkflowTask> task5;
     std::shared_ptr<wrench::WorkflowTask> task6;
-    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service = nullptr;
 
     void do_getReadyTasksTest_test();
+    void do_WeirdVectorBug_test();
 
 protected:
     ~DynamicServiceCreationTest() {
@@ -46,13 +49,13 @@ protected:
 
 
         // Create the files
-        input_file = wrench::Simulation::addFile("input_file", 10.0);
-        output_file1 = wrench::Simulation::addFile("output_file1", 10.0);
-        output_file2 = wrench::Simulation::addFile("output_file2", 10.0);
-        output_file3 = wrench::Simulation::addFile("output_file3", 10.0);
-        output_file4 = wrench::Simulation::addFile("output_file4", 10.0);
-        output_file5 = wrench::Simulation::addFile("output_file5", 10.0);
-        output_file6 = wrench::Simulation::addFile("output_file6", 10.0);
+        input_file = wrench::Simulation::addFile("input_file", 10);
+        output_file1 = wrench::Simulation::addFile("output_file1", 10);
+        output_file2 = wrench::Simulation::addFile("output_file2", 10);
+        output_file3 = wrench::Simulation::addFile("output_file3", 10);
+        output_file4 = wrench::Simulation::addFile("output_file4", 10);
+        output_file5 = wrench::Simulation::addFile("output_file5", 10);
+        output_file6 = wrench::Simulation::addFile("output_file6", 10);
 
         // Create the tasks
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
@@ -171,15 +174,15 @@ private:
         auto job_manager = this->createJobManager();
 
         // Dynamically create a File Registry Service on this host
-        auto dynamically_created_file_registry_service = simulation->startNewService(
+        auto dynamically_created_file_registry_service = this->getSimulation()->startNewService(
                 new wrench::FileRegistryService(hostname));
 
         // Dynamically create a Network Proximity Service on this host
-        auto dynamically_created_network_proximity_service = simulation->startNewService(
+        auto dynamically_created_network_proximity_service = this->getSimulation()->startNewService(
                 new wrench::NetworkProximityService(hostname, {"DualCoreHost", "QuadCoreHost"}));
 
         // Dynamically create a Storage Service on this host
-        auto dynamically_created_storage_service = simulation->startNewService(
+        auto dynamically_created_storage_service = this->getSimulation()->startNewService(
                 wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
                                                                          {},
                                                                          {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
@@ -187,18 +190,19 @@ private:
 
         // Dynamically create a Cloud Service
         std::vector<std::string> execution_hosts = {"QuadCoreHost"};
-        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(simulation->startNewService(
+        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->getSimulation()->startNewService(
                 new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
                                                 {})));
+
         std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = this->test->workflow->getReadyTasks();
 
         // Create a VM
         auto vm_name = dynamically_created_compute_service->createVM(4, 10);
         auto vm_cs = dynamically_created_compute_service->startVM(vm_name);
 
-        std::shared_ptr<wrench::StandardJob> one_task_jobs[5];
+        std::shared_ptr<wrench::StandardJob> one_task_jobs[tasks.size()];
         int job_index = 0;
-        for (auto task: tasks) {
+        for (auto const &task: tasks) {
             try {
                 one_task_jobs[job_index] = job_manager->createStandardJob(
                         {task},
@@ -208,18 +212,12 @@ private:
                                          wrench::FileLocation::LOCATION(dynamically_created_storage_service, this->test->input_file))},
                         {});
 
-                if (one_task_jobs[job_index]->getNumTasks() != 1) {
-                    throw std::runtime_error("A one-task1 job should say it has one task1");
-                }
-
                 job_manager->submitJob(one_task_jobs[job_index], vm_cs);
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(e.what());
             }
-
             job_index++;
         }
-
 
         // Wait for workflow execution events
         for (auto task: tasks) {
@@ -255,7 +253,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
 
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
@@ -294,7 +292,151 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
+
+    // Running a "run a single task" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**            SIMGRID VECTOR RESERVE BUG                            **/
+/**            HAPPENS WHEN the "touch" read() to update a file's    **/
+/**            access date is done with simulate=true                **/
+/**********************************************************************/
+
+class WeirdVectorBugTestWMS : public wrench::ExecutionController {
+
+public:
+    WeirdVectorBugTestWMS(DynamicServiceCreationTest *test,
+                          std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+    }
+
+private:
+    DynamicServiceCreationTest *test;
+
+    int main() override {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Dynamically create a BM Service
+        std::vector<std::string> execution_hosts = {"QuadCoreHost"};
+        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::BareMetalComputeService>(this->getSimulation()->startNewService(
+                new wrench::BareMetalComputeService(hostname, execution_hosts, "/scratch",
+                                                    {})));
+
+        // Dynamically create a Storage Service on this host
+        auto dynamically_created_storage_service = this->getSimulation()->startNewService(
+                wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
+                                                                         {},
+                                                                         {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
+
+
+        std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks;
+        tasks = this->test->workflow->getReadyTasks();
+//        tasks = {this->test->task1, this->test->task2};
+
+        std::shared_ptr<wrench::StandardJob> one_task_jobs[tasks.size()];
+        int job_index = 0;
+        for (auto const &task: tasks) {
+            try {
+                one_task_jobs[job_index] = job_manager->createStandardJob(
+                        {task},
+                        {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)}},
+                        {},
+                        {std::make_tuple(wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
+                                         wrench::FileLocation::LOCATION(dynamically_created_storage_service, this->test->input_file))},
+                        {});
+
+                job_manager->submitJob(one_task_jobs[job_index], dynamically_created_compute_service);
+            } catch (wrench::ExecutionException &e) {
+                throw std::runtime_error(e.what());
+            }
+            job_index++;
+        }
+
+        wrench::Simulation::sleep(10000);
+
+        // Wait for workflow execution events
+        for (auto task: tasks) {
+            std::shared_ptr<wrench::ExecutionEvent> event;
+            try {
+                event = this->waitForNextEvent();
+            } catch (wrench::ExecutionException &e) {
+                throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            }
+            if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+            }
+        }
+
+        for (auto &j: one_task_jobs) {
+            if (j->getNumCompletedTasks() != 1) {
+                throw std::runtime_error("A job with one completed task1 should say it has one completed task1");
+            }
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(DynamicServiceCreationTest, WeirdVectorBug) {
+    DO_TEST_WITH_FORK(do_WeirdVectorBug_test);
+}
+
+void DynamicServiceCreationTest::do_WeirdVectorBug_test() {
+
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
+
+
+    std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = "DualCoreHost";
+
+    // Bogus startNewService() calls
+    ASSERT_THROW(simulation->startNewService((wrench::ComputeService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->startNewService((wrench::StorageService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->startNewService((wrench::NetworkProximityService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->startNewService((wrench::FileRegistryService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->startNewService((wrench::ComputeService *) 666), std::runtime_error);
+    ASSERT_THROW(simulation->startNewService((wrench::StorageService *) 666), std::runtime_error);
+    ASSERT_THROW(simulation->startNewService((wrench::NetworkProximityService *) 666), std::runtime_error);
+    ASSERT_THROW(simulation->startNewService((wrench::FileRegistryService *) 666), std::runtime_error);
+
+    // Create a Storage Service
+    storage_service = simulation->add(
+            wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk1"},
+                                                                     {},
+                                                                     {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
+
+    // Create a WMS
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+
+    ASSERT_NO_THROW(wms = simulation->add(
+            new WeirdVectorBugTestWMS(this, hostname)));
+
+    // Create a file registry
+    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

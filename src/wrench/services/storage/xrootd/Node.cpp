@@ -23,6 +23,8 @@
 #include <wrench/failure_causes/NotAllowed.h>
 #include <wrench/util/UnitParser.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_xrootd_data_server,
                     "Log category for XRootD");
 namespace wrench {
@@ -59,7 +61,6 @@ namespace wrench {
          * @brief Adds a child node to an XRootD supervisor
          * @param child: the new child to add
          * @return the child id of the new node
-         * @throws runtime_error if node already has 64 children.
          */
         //should this throw an exception instead?
         std::shared_ptr<Node> Node::addChild(std::shared_ptr<Node> child) {
@@ -131,7 +132,7 @@ namespace wrench {
             } catch (ExecutionException &e) {
                 WRENCH_INFO(
                         "Got a network error while getting some message... ignoring");
-                return true;// oh well
+                return true;// oh! well
             }
 
             WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
@@ -300,9 +301,9 @@ namespace wrench {
                     } else {//no internal storage
 
 
-                        if (children.size() > 0) {//recursive search
+                        if (!children.empty()) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
-                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
+                            Alarm::createAndStartAlarm(this->simulation_, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
                                                        new FileNotFoundAlarm(msg->answer_commport, file, false, answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
                                 WRENCH_DEBUG("Starting advanced lookup for %s", file->getID().c_str());
@@ -312,7 +313,7 @@ namespace wrench {
                                 map<Node *, vector<stack<Node *>>> splitStacks = splitStack(search_stack);
                                 WRENCH_DEBUG("Searching %zu subtrees for %s", search_stack.size(), file->getID().c_str());
                                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
-                                for (auto entry: splitStacks) {
+                                for (const auto& entry: splitStacks) {
                                     if (entry.first == this) {//this node was the target
                                         //we shouldn't have to worry about this, it should have been handled earlier.
                                         // But just in case, I don't want a rogue search going who knows where
@@ -334,7 +335,7 @@ namespace wrench {
                                 WRENCH_DEBUG("Starting basic lookup for %s", file->getID().c_str());
 
 
-                                for (auto child: children) {
+                                for (const auto& child: children) {
                                     child->commport->dputMessage(
                                             new ContinueSearchMessage(
                                                     msg->answer_commport,
@@ -402,7 +403,7 @@ namespace wrench {
 
                         if (!children.empty()) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
-                            Alarm::createAndStartAlarm(this->simulation, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
+                            Alarm::createAndStartAlarm(this->simulation_, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
                                                        new FileNotFoundAlarm(msg->answer_commport, file, true, answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
                                 WRENCH_DEBUG("Starting advanced search for %s", file->getID().c_str());
@@ -432,7 +433,7 @@ namespace wrench {
                                 }
                             } else {//shotgun continued search message to all children
                                 WRENCH_DEBUG("Starting basic search for %s", file->getID().c_str());
-                                for (auto child: children) {
+                                for (const auto& child: children) {
                                     child->commport->dputMessage(
                                             new ContinueSearchMessage(
                                                     msg->answer_commport,
@@ -446,8 +447,8 @@ namespace wrench {
                                                     metavisor->defaultTimeToLive));
                                 }
                             }
-                        } else {// you asked a leaf directly and it didn't have the file
-                            msg->answer_commport->dputMessage(new StorageServiceFileReadAnswerMessage(
+                        } else {// you asked a leaf directly, and it didn't have the file
+                            msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(
                                     FileLocation::LOCATION(internalStorage, file),
                                     false,
                                     std::shared_ptr<FailureCause>(
@@ -496,13 +497,13 @@ namespace wrench {
                                                 getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                         msg->answered));
                     } else {//File not in internal storage or cache
-                        if (children.size() > 0 &&
+                        if (!children.empty() &&
                             msg->timeToLive > 0) {//shotgun continued search message to all children
                             WRENCH_DEBUG(" Basic Search broadcast for %s", msg->file->getID().c_str());
 
                             S4U_Simulation::compute(
                                     this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
-                            for (auto child: children) {
+                            for (const auto& child: children) {
                                 child->commport->dputMessage(
                                         new ContinueSearchMessage(msg));
                             }
@@ -559,7 +560,7 @@ namespace wrench {
                     auto search_stack = constructFileSearchTree(targets);
                     map<Node *, vector<stack<Node *>>> splitStacks = splitStack(search_stack);
                     S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
-                    for (auto entry: splitStacks) {
+                    for (const auto& entry: splitStacks) {
                         if (entry.first == this) {//this node was the target
                             //we shouldn't have to worry about this, it should have been handled earlier.
                             // But just in case, I don't want a rogue search going who knows where
@@ -611,10 +612,10 @@ namespace wrench {
                     }
                 }
                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
-                if (children.size() > 0 && msg->timeToLive > 0) {//shotgun remove search message to all children
+                if (!children.empty() && msg->timeToLive > 0) {//shotgun remove search message to all children
                     shared_ptr<bool> answered = make_shared<bool>(false);
 
-                    for (auto child: children) {
+                    for (const auto& child: children) {
                         child->commport->dputMessage(new RippleDelete(msg));
                     }
                 }
@@ -690,7 +691,7 @@ namespace wrench {
 
             std::shared_ptr<FileLocation> best = *locations.begin();
             double bestLoad = best->getStorageService()->getLoad();
-            for (auto location: locations) {
+            for (const auto& location: locations) {
                 if (location->getStorageService()->getLoad() < bestLoad) {
                     best = location;
                     bestLoad = best->getStorageService()->getLoad();
@@ -737,14 +738,14 @@ namespace wrench {
         * @return true if the file is cached, false otherwise
         */
         bool Node::cached(shared_ptr<DataFile> file) {
-            return cache.isCached(file);
+            return cache.isCached(std::move(file));
         }
         /**
         * @brief Get all cached locations of the file.
         * @param file: The file to check the cache for
         * @return A set of valid cached files.  Empty set if none are cached
         */
-        std::set<std::shared_ptr<FileLocation>> Node::getCached(shared_ptr<DataFile> file) {
+        std::set<std::shared_ptr<FileLocation>> Node::getCached(const shared_ptr<DataFile>& file) {
             return cache[file];
         }
 
@@ -766,12 +767,14 @@ namespace wrench {
         * @param messagepayload_list: A Message Payload list
         *
         */
-        Node::Node(Deployment *deployment, const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : StorageService(hostname, "XRootDNode") {
+        Node::Node(Deployment *deployment, const std::string &hostname, const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                   const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : StorageService(hostname, "XRootDNode") {
 
             // Create /dev/null mountpoint so that Locations can be created
-            this->file_systems[LogicalFileSystem::DEV_NULL] =
-                    LogicalFileSystem::createLogicalFileSystem(hostname, this, LogicalFileSystem::DEV_NULL, "NONE");
+            // TODO: Removed this due to using simgrid:fsmod.... big deal?
+//            this->file_system->mount_dev_null_partition("/dev/null");
+//            this->file_systems[LogicalFileSystem::DEV_NULL] =
+//                    LogicalFileSystem::createLogicalFileSystem(hostname, this, LogicalFileSystem::DEV_NULL, "NONE");
 
             this->setProperties(this->default_property_values, property_list);
             setMessagePayloads(default_messagepayload_values, messagepayload_list);
@@ -790,12 +793,12 @@ namespace wrench {
         * @return true if the Node was made a storage server.  false if it was already a storage server
         */
         bool Node::makeFileServer(std::set<std::string> path, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                  WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
+                                  WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) {
             if (internalStorage != nullptr) {
                 return false;
             }
             //            internalStorage = make_shared<SimpleStorageService>(hostname, path, property_list, messagepayload_list);
-            internalStorage = std::shared_ptr<SimpleStorageService>(SimpleStorageService::createSimpleStorageService(hostname, path, property_list, messagepayload_list));
+            internalStorage = std::shared_ptr<SimpleStorageService>(SimpleStorageService::createSimpleStorageService(hostname, std::move(path), std::move(property_list), std::move(messagepayload_list)));
             return true;
         }
 
@@ -812,7 +815,7 @@ namespace wrench {
         * @param search_stack: The search stack to split
         * @return A map where each key is the next node to broadcast too, and the value is the search stack to send
         */
-        map<Node *, vector<stack<Node *>>> Node::splitStack(vector<stack<Node *>> search_stack) {
+        map<Node *, vector<stack<Node *>>> Node::splitStack(const vector<stack<Node *>>& search_stack) {
             map<Node *, vector<stack<Node *>>> splitStacks;
             for (stack<Node *> aStack: search_stack) {
                 if (!aStack.empty()) {
@@ -874,7 +877,7 @@ namespace wrench {
         */
         vector<stack<Node *>> Node::constructFileSearchTree(const vector<shared_ptr<Node>> &targets) {
             vector<stack<Node *>> ret;
-            for (auto target: targets) {
+            for (const auto& target: targets) {
                 if (target.get() == this) {
                     ret.push_back(stack<Node *>());//I don't think this should ever happen, but it might
                 } else {
@@ -911,7 +914,6 @@ namespace wrench {
         * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
         * @param location: a file location, must be the same object as the function is invoked on
         *
-        * @throw std::invalid_argument
         */
         void Node::createFile(const std::shared_ptr<FileLocation> &location) {
             if (internalStorage == nullptr) {
@@ -926,7 +928,6 @@ namespace wrench {
         * @brief remove a new file in the federation on this node.
         * @param location: a file location, must be the same object as the function is invoked on
         *
-        * @throw std::invalid_argument
         */
         void Node::removeFile(const std::shared_ptr<FileLocation> &location) {
             if (internalStorage == nullptr) {
@@ -943,16 +944,15 @@ namespace wrench {
 
         /**
         * @brief write a file on this node.
-	* @param answer_commport: a commport on which to send the answer message
+	    * @param answer_commport: a commport on which to send the answer message
         * @param location: a location
-	* @param num_bytes_to_write: A number of bytes to write
-	* @param wait_for_answer: true if this method should wait for the answer, false otherwise
+	    * @param num_bytes_to_write: A number of bytes to write
+	    * @param wait_for_answer: true if this method should wait for the answer, false otherwise
         *
-        * @throw std::invalid_argument
         */
         void Node::writeFile(S4U_CommPort *answer_commport,
                              const std::shared_ptr<FileLocation> &location,
-                             double num_bytes_to_write,
+                             sg_size_t num_bytes_to_write,
                              bool wait_for_answer) {
             if (internalStorage == nullptr) {
                 std::string error_message = "Cannot write file at non-storage XRootD node";
@@ -962,9 +962,9 @@ namespace wrench {
             }
             // Replace the location with
             // TODO: THIS LOCATION REWRITE WAS DONE TO FIX SOMETHING BUT HENRI HAS NO
-            // TODO: IDEA HOW COME IT'S EVER WORKED BEFORE SINCE THE FTT INSIDE THE INTERNALSTORAGE
-            // TODO: WILL SAY "THIS IS NOT ME, MY PARENT IS THE INTERNALSTORAGE, NOT THE NODE"
-            auto new_location = FileLocation::LOCATION(internalStorage, location->getPath(), location->getFile());
+            // TODO: IDEA HOW COME IT'S EVER WORKED BEFORE SINCE THE FTT INSIDE THE INTERNAL STORAGE
+            // TODO: WILL SAY "THIS IS NOT ME, MY PARENT IS THE INTERNAL STORAGE, NOT THE NODE"
+            auto new_location = FileLocation::LOCATION(internalStorage, location->getDirectoryPath(), location->getFile());
             internalStorage->writeFile(answer_commport, new_location, num_bytes_to_write, wait_for_answer);
             //            internalStorage->writeFile(answer_commport, location, wait_for_answer);
             metavisor->files[location->getFile()].push_back(this->getSharedPtr<Node>());
@@ -991,17 +991,17 @@ namespace wrench {
          */
         std::shared_ptr<Node> Node::addChildStorageServer(const std::string &hostname, const std::string &mount_point,
                                                           WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,
-                                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,
+                                                          WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE storage_messagepayload_list,
                                                           WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
-                                                          WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list) {
+                                                          WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE node_messagepayload_list) {
             if (storage_property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != storage_property_list.end()) {
                 if (UnitParser::parse_size(storage_property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]) < 1) {
                     throw std::invalid_argument("Node::addChildStorageServer(): XRootD current does not support 0 buffer_size");
                 }
             }
             return this->addChild(this->deployment->createStorageServer(hostname, mount_point,
-                                                                        storage_property_list, storage_messagepayload_list,
-                                                                        node_property_list, node_messagepayload_list));
+                                                                        storage_property_list, std::move(storage_messagepayload_list),
+                                                                        std::move(node_property_list), std::move(node_messagepayload_list)));
         }
 
         /**
@@ -1013,16 +1013,16 @@ namespace wrench {
         bool Node::hasFile(const shared_ptr<FileLocation> &location) {
             if (internalStorage)
                 return internalStorage->hasFile(location);
-            //return false;//no internal storage here, so I dont have any files.  But I am pretending to have some, so its reasonable to ask.
-            //alternativly
-            return !constructFileSearchTree(metavisor->getFileNodes(location->getFile())).empty();//meta search the subtree for the file.  If its in the subtree we can find a route to it, so we have it
+            //return false;//no internal storage here, so I don't have any files.  But I am pretending to have some, so it's reasonable to ask.
+            //alternatively
+            return !constructFileSearchTree(metavisor->getFileNodes(location->getFile())).empty();//meta-search the subtree for the file.  If it's in the subtree we can find a route to it, so we have it
         }
 
         /**
          * @brief Get the storage service's total space (in zero simulated time)
          * @return a capacity in bytes
          */
-        double Node::getTotalSpace() {
+        sg_size_t Node::getTotalSpace() {
             if (internalStorage) {
                 return internalStorage->getTotalSpace();
             } else {
@@ -1038,7 +1038,7 @@ namespace wrench {
             if (internalStorage) {
                 return internalStorage->isBufferized();
             } else {
-                return 0;// TODO: IS THIS A GOOD IDEA? MAY MESS UP COPYING???
+                return false;// TODO: IS THIS A GOOD IDEA? MAY MESS UP COPYING???
                 throw std::runtime_error("Node::isBufferized() called on non storage Node " + hostname);
             }
         }
@@ -1047,7 +1047,7 @@ namespace wrench {
          * @brief Determine the storage service's buffer size
          * @return a size in bytes
          */
-        double Node::getBufferSize() const {
+        sg_size_t Node::getBufferSize() const {
             if (internalStorage) {
                 return internalStorage->getBufferSize();
             } else {

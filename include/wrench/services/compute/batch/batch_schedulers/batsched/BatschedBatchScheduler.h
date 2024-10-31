@@ -90,7 +90,7 @@ namespace wrench {
          *
          * @return a map of estimated start dates (in seconds), indexed by job configuration name
          */
-        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
+        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) override;
 
     private:
         void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,

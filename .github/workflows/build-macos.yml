@@ -1,15 +1,15 @@
 name: Build-macOS
 
 on:
-  push:
-    paths-ignore:
-      - 'doc/**'
-      - '**.md'
-  workflow_run:
-    workflows: ["clang-format"]
-    branches: [master]
-    types: 
-      - completed
+  #  push:
+  #  paths-ignore:
+  #    - 'doc/**'
+  #    - '**.md'
+  #workflow_run:
+  #  workflows: ["clang-format"]
+  #  branches: [master]
+  #  types: 
+  #    - completed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,17 +30,12 @@ jobs:
       - name: Install gcc
         run: |
           brew install gcc
+      - name: debug0
+        run: |
+          ls /opt/homebrew/bin/
       - name: Install nlohmann-json
         run: |
           brew install nlohmann-json
-          #wget https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.tar.gz
-          #tar -xzf v3.11.3.tar.gz
-          #cd json-3.11.3 
-          #mkdir build
-          #cd build
-          #cmake ..
-          #make -j4
-          #sudo make install
       - name: Install googletest
         run: |
           brew install googletest
@@ -53,7 +48,13 @@ jobs:
           wget --no-check-certificate https://framagit.org/simgrid/simgrid/-/archive/v3.36/simgrid-v3.36.tar.gz
           tar -xf simgrid-v3.36.tar.gz
           cd simgrid-v3.36
-          cmake .
+          sed -I ""  "s/gfortran/gfortran -L./" CMakeLists.txt
+          mkdir build
+          cd build
+          cmake -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/g++-14 -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/g++-14 ..
+          cp /opt/homebrew/lib/gcc/14/*libgfortran* .
+          ls
+          echo "DYLD_LIBRARY_PATH=$(echo $DYLD_LIBRARY_PATH:.)" >> $GITHUB_ENV
           make -j4
           sudo make install
       - name: Source Build and Test

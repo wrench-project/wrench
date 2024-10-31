@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.12)
 message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")
 
 project(wrench CXX)
@@ -6,6 +6,8 @@ project(wrench CXX)
 # Disable annoying warnings
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 #add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
+
+
 
 # Make Release the default build type
 if(NOT CMAKE_BUILD_TYPE)
@@ -25,7 +27,6 @@ if (ENABLE_WRENCH_INTERNAL_EXCEPTIONS)
 endif ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/conf/cmake/")
-message("CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
 
 # Find Boost
 find_package(Boost REQUIRED)
@@ -48,6 +49,24 @@ if (DEFINED SimGrid_PATH)
 endif()
 find_package(SimGrid REQUIRED)
 
+# Find SimGrid's FS module
+if (DEFINED FSMOD_PATH)
+    if (NOT EXISTS "${FSMOD_PATH}")
+        message(FATAL_ERROR "The specified FSMOD_PATH doesn't exit")
+    else()
+        file(GLOB LIBFSMOD_FILES
+                "${FSMOD_PATH}/liblibfsmod.so"
+                "${FSMOD_PATH}/lib/libfsmod.dylib"
+                )
+        if (NOT LIBFSMOD_FILES)
+            message(FATAL_ERROR "The specified FSMOD_PATH doesn't seem to contain a valid FSMod installation")
+        else()
+            set(CMAKE_PREFIX_PATH ${FSMOD_PATH} ${CMAKE_PREFIX_PATH})
+        endif()
+    endif()
+endif()
+find_package(FSMod REQUIRED)
+
 # Find nlohmann_json
 find_package(nlohmann_json)
 
@@ -55,7 +74,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "2")
-set(WRENCH_VERSION_MINOR "4")
+set(WRENCH_VERSION_MINOR "5")
 set(WRENCH_VERSION_PATCH "0")
 set(WRENCH_VERSION_EXTRA "dev")
 
@@ -71,7 +90,7 @@ endif ()
 
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
-include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
+include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${FSMOD_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
 
 
 # For MacOS's MacPorts
@@ -247,7 +266,6 @@ set(SOURCE_FILES
         include/wrench/services/compute/batch/batch_schedulers/BatchScheduler.h
         include/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
-        include/wrench/services/storage/storage_helpers/LogicalFileSystem.h
         include/wrench/services/storage/storage_helpers/LogicalFileSystemNoCaching.h
         include/wrench/services/storage/storage_helpers/LogicalFileSystemLRUCaching.h
         src/wrench/logging/TerminalOutput.cpp
@@ -353,9 +371,6 @@ set(SOURCE_FILES
         src/wrench/services/storage/storage_helper_classes/FileLocation.cpp
         src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
         include/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
-        src/wrench/services/storage/storage_helper_classes/LogicalFileSystem.cpp
-        src/wrench/services/storage/storage_helper_classes/LogicalFileSystemNoCaching.cpp
-        src/wrench/services/storage/storage_helper_classes/LogicalFileSystemLRUCaching.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
         include/wrench/simgrid_S4U_util/S4U_DaemonActor.h
@@ -480,6 +495,7 @@ set(TEST_FILES
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceOutputCSVFileTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceBatschedContiguityTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceResourceInformationTest.cpp
         test/services/helper_services/HostStateChangeTest.cpp
         test/services/helper_services/AlarmTest.cpp
         test/services/storage_services/XRootDStorageService/XRootDStorageServiceBasicFunctionalTest.cpp
@@ -553,7 +569,7 @@ set(TEST_FILES
 
 add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
-target_link_libraries(wrench ${SimGrid_LIBRARY})
+target_link_libraries(wrench ${SimGrid_LIBRARY} ${FSMOD_LIBRARY})
 
 # wrench version
 add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/conf/cmake/Version.cmake)

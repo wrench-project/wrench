@@ -19,7 +19,6 @@ namespace wrench {
     DataMovementManagerMessage::DataMovementManagerMessage() : SimulationMessage(0) {
     }
 
-
     /**
      * @brief Constructor
      * @param src_location: the source location
@@ -43,7 +42,7 @@ namespace wrench {
      * @param failure_cause: a failure cause (nullptr is success if false)
      */
     DataManagerFileReadAnswerMessage::DataManagerFileReadAnswerMessage(std::shared_ptr<FileLocation> location,
-                                                                       double num_bytes,
+                                                                       sg_size_t num_bytes,
                                                                        bool success,
                                                                        std::shared_ptr<FailureCause> failure_cause) : DataMovementManagerMessage(),
                                                                                                                       location(std::move(location)), num_bytes(num_bytes), success(success), failure_cause(std::move(failure_cause)) {
@@ -70,7 +69,7 @@ namespace wrench {
      * @param failure_cause: a failure cause (nullptr is success if false)
      */
     DataMovementManagerFileReaderThreadMessage::DataMovementManagerFileReaderThreadMessage(std::shared_ptr<FileLocation> location,
-                                                                                           double num_bytes,
+                                                                                           sg_size_t num_bytes,
                                                                                            bool success,
                                                                                            std::shared_ptr<FailureCause> failure_cause)
         : DataMovementManagerMessage(), location(std::move(location)), num_bytes(num_bytes), success(success), failure_cause(std::move(failure_cause)) {

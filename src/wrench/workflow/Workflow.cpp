@@ -43,13 +43,12 @@ namespace wrench {
      *
      * @return the WorkflowTask instance
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<WorkflowTask> Workflow::addTask(const std::string &id,
                                                     double flops,
                                                     unsigned long min_num_cores,
                                                     unsigned long max_num_cores,
-                                                    double memory_requirement) {
+                                                    sg_size_t memory_requirement) {
         if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) || (memory_requirement < 0)) {
             throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
         }
@@ -80,7 +79,6 @@ namespace wrench {
      * @brief Remove a file from the workflow (but not from the simulation)
      * @param file: a file
      *
-     * @throw std::invalid_argument
      */
     void Workflow::removeFile(const std::shared_ptr<DataFile> &file) {
         if (this->task_output_files.find(file) != this->task_output_files.end()) {
@@ -107,7 +105,6 @@ namespace wrench {
      *
      * @param task: a task
      *
-     * @throw std::invalid_argument
      */
     void Workflow::removeTask(const std::shared_ptr<WorkflowTask> &task) {
         if (task == nullptr) {
@@ -160,7 +157,6 @@ namespace wrench {
      *
      * @return a workflow task (or throws a std::invalid_argument if not found)
      *
-     * @throw std::invalid_argument
      */
     std::shared_ptr<WorkflowTask> Workflow::getTaskByID(const std::string &id) {
         if (tasks.find(id) == tasks.end()) {
@@ -177,7 +173,6 @@ namespace wrench {
      * @param dst: the child task
      * @param redundant_dependencies: whether DAG redundant dependencies should be kept in the graph
      *
-     * @throw std::invalid_argument
      */
     void Workflow::addControlDependency(const std::shared_ptr<WorkflowTask> &src, const std::shared_ptr<WorkflowTask> &dst, bool redundant_dependencies) {
         if ((src == nullptr) || (dst == nullptr)) {
@@ -666,17 +661,33 @@ namespace wrench {
      *        If the workflow has not completed)
      */
     double Workflow::getCompletionDate() {
-        double makespan = -1.0;
+        double completion_date = -1.0;
         for (auto const &task: this->tasks) {
             if (task.second->getState() != WorkflowTask::State::COMPLETED) {
-                makespan = -1.0;
+                completion_date = -1.0;
                 break;
             } else {
-                makespan = std::max<double>(makespan, task.second->getEndDate());
+                completion_date = std::max<double>(completion_date, task.second->getEndDate());
             }
         }
-        return makespan;
+        return completion_date;
     }
+
+    /**
+     * @brief Returns the workflow's start date
+     * @return a date in seconds (or a negative value
+     *        if no workflow task has successfully completed)
+     */
+    double Workflow::getStartDate() {
+        double start_date = -1.0;
+        for (auto const &task: this->tasks) {
+            if (task.second->getState() == WorkflowTask::State::COMPLETED) {
+                start_date = std::min<double>(start_date, task.second->getStartDate());
+            }
+        }
+        return start_date;
+    }
+
 
     /**
      * @brief Get the workflow task for which a file is an output

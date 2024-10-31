@@ -31,7 +31,7 @@ namespace wrench {
     class FileWriterThread : public Service {
 
     public:
-        FileWriterThread(std::string hostname, S4U_CommPort *creator_commport,
+        FileWriterThread(const std::string& hostname, S4U_CommPort *creator_commport,
                          std::shared_ptr<FileLocation> location);
 
     protected:

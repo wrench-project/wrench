@@ -139,7 +139,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> compute_resources;
         compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
                 "Host2", compute_resources, {}, {}));
@@ -147,7 +147,7 @@ private:
         action_execution_service->setParentService(this->getSharedPtr<Service>());
 
         // Start it
-        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->setSimulation(this->getSimulation());
         action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
@@ -155,6 +155,9 @@ private:
 
         // Add a sleep action to it
         auto action = job->addSleepAction("my_sleep", 10.0);
+
+        // Coverage
+        auto fc = action->getFailureCause();
 
         // Submit the action to the action executor
         action_execution_service->submitAction(action);
@@ -213,9 +216,9 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
                                                                                         {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -254,7 +257,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> compute_resources;
         compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
                 "Host2", compute_resources,
@@ -263,7 +266,7 @@ private:
         action_execution_service->setParentService(this->getSharedPtr<Service>());
 
         // Start it
-        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->setSimulation(this->getSimulation());
         action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
@@ -309,9 +312,9 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionBogusSpecTest
                                                                                         {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -349,7 +352,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> compute_resources;
         compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
                 "Host2", compute_resources,
@@ -358,7 +361,7 @@ private:
         action_execution_service->setParentService(this->getSharedPtr<Service>());
 
         // Start it
-        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->setSimulation(this->getSimulation());
         action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
@@ -417,9 +420,9 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceNonReadyActionTest_tes
                                                                                         {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -458,7 +461,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> compute_resources;
         compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(new wrench::ActionExecutionService(
                 "Host2", compute_resources,
@@ -466,7 +469,7 @@ private:
         action_execution_service->setParentService(this->getSharedPtr<Service>());
 
         // Start it
-        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->setSimulation(this->getSimulation());
         action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
@@ -539,9 +542,9 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -581,7 +584,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> compute_resources;
         compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(4, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources, nullptr,
@@ -590,7 +593,7 @@ private:
         action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
 
         // Start it
-        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->setSimulation(this->getSimulation());
         action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
@@ -712,9 +715,9 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -753,7 +756,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> compute_resources;
         compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources, this->getSharedPtr<Service>(),
@@ -762,7 +765,7 @@ private:
         action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
 
         // Start it
-        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->setSimulation(this->getSimulation());
         action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
@@ -842,9 +845,9 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -883,7 +886,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> compute_resources;
         compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
@@ -891,7 +894,7 @@ private:
         action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
 
         // Start it
-        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->setSimulation(this->getSimulation());
         action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
@@ -975,9 +978,9 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -1016,7 +1019,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> compute_resources;
         compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
@@ -1024,7 +1027,7 @@ private:
         action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
 
         // Start it
-        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->setSimulation(this->getSimulation());
         action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
@@ -1081,9 +1084,9 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -1121,7 +1124,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create an ActionExecutionService
-        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> compute_resources;
+        std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> compute_resources;
         compute_resources[wrench::S4U_Simulation::get_host_or_vm_by_name("Host3")] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
@@ -1129,7 +1132,7 @@ private:
         action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
 
         // Start it
-        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->setSimulation(this->getSimulation());
         action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
@@ -1248,9 +1251,9 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host4", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

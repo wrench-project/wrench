@@ -67,6 +67,8 @@ namespace wrench {
         void init(int *, char **);
 
         static bool isInitialized();
+        [[nodiscard]] bool isRunning() const;
+
 
         void instantiatePlatform(const std::string &);
         void instantiatePlatform(const std::function<void()> &);
@@ -74,7 +76,7 @@ namespace wrench {
 
         static std::vector<std::string> getHostnameList();
         static std::map<std::string, std::vector<std::string>> getHostnameListByCluster();
-        static double getHostMemoryCapacity(const std::string &hostname);
+        static sg_size_t getHostMemoryCapacity(const std::string &hostname);
         static unsigned long getHostNumCores(const std::string &hostname);
         static double getHostFlopRate(const std::string &hostname);
         static bool hostHasMountPoint(const std::string &hostname, const std::string &scratch_space_mount_point);
@@ -83,7 +85,9 @@ namespace wrench {
         static void removeFile(const std::shared_ptr<DataFile> &file);
         static void removeAllFiles();
         static std::shared_ptr<DataFile> getFileByID(const std::string &id);
-        static std::shared_ptr<DataFile> addFile(const std::string &, double);
+        static std::shared_ptr<DataFile> getFileByIDOrNull(const std::string &id);
+        static std::shared_ptr<DataFile> addFile(const std::string &id, sg_size_t size);
+        static std::shared_ptr<DataFile> addFile(const std::string &id, const std::string &size);
 
 
         void launch();
@@ -121,30 +125,10 @@ namespace wrench {
         //        double getEnergyTimestamp(const std::string &hostname, bool can_record = false);
 
         // pstate related calls
-        static int getNumberofPstates(const std::string &hostname);
+        static int getNumberOfPstates(const std::string &hostname);
         static double getMinPowerConsumption(const std::string &hostname);
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
-
-        /**
-	 * @brief Creates a file copy on a storage service before the simulation begins
-	 * @param file: a file
-	 * @param storage_service: a storage service
-	 */
-        void stageFile(const std::shared_ptr<DataFile> file, const std::shared_ptr<StorageService> &storage_service) {
-            this->stageFile(wrench::FileLocation::LOCATION(storage_service, file));
-        }
-        /**
-         * @brief Creates a file copy on a storage service before the simulation begins
-         * @param file: a file
-         * @param storage_service: a storage service
-	 * @param path: a path
-         */
-        void stageFile(const std::shared_ptr<DataFile> file, const std::shared_ptr<StorageService> &storage_service, const std::string &path) {
-            this->stageFile(wrench::FileLocation::LOCATION(storage_service, path, file));
-        }
-
-        void stageFile(const std::shared_ptr<FileLocation> &location);
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -168,7 +152,7 @@ namespace wrench {
         static void createNewDisk(const std::string &hostname, const std::string &disk_id,
                                   double read_bandwidth_in_bytes_per_sec,
                                   double write_bandwidth_in_bytes_per_sec,
-                                  double capacity_in_bytes,
+                                  sg_size_t capacity_in_bytes,
                                   const std::string &mount_point);
 
         // pstate related calls
@@ -199,23 +183,21 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        void readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk);
-        void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
+        void readFromDisk(sg_size_t num_bytes, const std::string &hostname, simgrid::s4u::Disk *disk);
+        void readFromDiskAndWriteToDiskConcurrently(sg_size_t num_bytes_to_read, sg_size_t num_bytes_to_write,
                                                     const std::string &hostname,
-                                                    const std::string &read_mount_point,
-                                                    const std::string &write_mount_point,
                                                     simgrid::s4u::Disk *src_disk,
                                                     simgrid::s4u::Disk *dst_disk);
-        void writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point, simgrid::s4u::Disk *disk);
+        void writeToDisk(sg_size_t num_bytes, const std::string &hostname, simgrid::s4u::Disk *disk);
 
 #ifdef PAGE_CACHE_SIMULATION
-        void readWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location);
-        void writebackWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location, bool is_dirty);
-        void writeThroughWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location);
+        void readWithMemoryCache(const std::shared_ptr<DataFile> &file, sg_size_t n_bytes, const std::shared_ptr<FileLocation> &location);
+        void writebackWithMemoryCache(const std::shared_ptr<DataFile> &file, sg_size_t n_bytes, const std::shared_ptr<FileLocation> &location, bool is_dirty);
+        void writeThroughWithMemoryCache(const std::shared_ptr<DataFile> &file, sg_size_t n_bytes, const std::shared_ptr<FileLocation> &location);
         MemoryManager *getMemoryManagerByHost(const std::string &hostname);
 #endif
 
-        static double getMemoryCapacity();
+        static sg_size_t getMemoryCapacity();
         static unsigned long getNumCores();
         static double getFlopRate();
         static std::string getHostName();
@@ -252,12 +234,10 @@ namespace wrench {
         std::set<std::shared_ptr<MemoryManager>> memory_managers;
 #endif
 
-        static int unique_disk_sequence_number;
-
+//        static int unique_disk_sequence_number;
 
         void platformSanityCheck();
         void checkSimulationSetup();
-        //        bool isRunning() const;
 
         void startAllProcesses();
         void addService(const std::shared_ptr<ComputeService> &service);

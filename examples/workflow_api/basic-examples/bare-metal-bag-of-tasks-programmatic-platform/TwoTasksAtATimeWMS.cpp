@@ -46,7 +46,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int TwoTasksAtATimeWMS::main() {
         /* Set the logging output to GREEN */
@@ -138,7 +137,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void TwoTasksAtATimeWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
+    void TwoTasksAtATimeWMS::processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's tasks */
@@ -153,7 +152,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void TwoTasksAtATimeWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
+    void TwoTasksAtATimeWMS::processEventStandardJobFailure(const std::shared_ptr<StandardJobFailedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         WRENCH_INFO("Notified that a standard job has failed (failure cause: %s)",

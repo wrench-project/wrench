@@ -97,7 +97,7 @@ namespace wrench {
      * @param sends: the specification of all outgoing communications as <rank, volume in bytes> pairs
      * @param num_receives: the number of expected received (from any source)
      */
-    void Communicator::sendAndReceive(const std::map<unsigned long, double> &sends, int num_receives) {
+    void Communicator::sendAndReceive(const std::map<unsigned long, sg_size_t> &sends, int num_receives) {
         this->sendReceiveAndCompute(sends, num_receives, 0);
     }
 
@@ -109,7 +109,7 @@ namespace wrench {
      * @param num_receives: the number of expected received (from any source)
      * @param flops: the number of floating point operations to compute
      */
-    void Communicator::sendReceiveAndCompute(const std::map<unsigned long, double> &sends, int num_receives, double flops) {
+    void Communicator::sendReceiveAndCompute(const std::map<unsigned long, sg_size_t> &sends, int num_receives, double flops) {
         auto my_pid = simgrid::s4u::this_actor::get_pid();
 
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
@@ -171,11 +171,11 @@ namespace wrench {
      * @param bytes: the number of bytes in each message sent/received
      * @param config: the SMPI config option
      */
-    void Communicator::MPI_Alltoall(double bytes, std::string config) {
-        if (bytes < 1.0) {
-            throw std::runtime_error("Communicator::MPI_Alltoall(): invalid argument (should be >= 1.0)");
+    void Communicator::MPI_Alltoall(sg_size_t bytes, std::string config) {
+        if (bytes < 1) {
+            throw std::runtime_error("Communicator::MPI_Alltoall(): invalid argument (should be >= 1)");
         }
-        this->performSMPIOperation("Alltoall", this->participating_hosts, nullptr, (int) bytes, "smpi/alltoall:" + std::move(config));
+        this->performSMPIOperation("Alltoall", this->participating_hosts, nullptr, bytes, "smpi/alltoall:" + std::move(config));
     }
 
     /**
@@ -185,11 +185,11 @@ namespace wrench {
      * @param bytes: the number of bytes in each message sent/received
      * @param config: the SMPI config option
      */
-    void Communicator::MPI_Bcast(int root_rank, double bytes, std::string config) {
-        if ((bytes < 1.0) or (root_rank < 0) or (root_rank >= (int) this->size)) {
+    void Communicator::MPI_Bcast(int root_rank, sg_size_t bytes, std::string config) {
+        if ((bytes < 1) or (root_rank < 0) or (root_rank >= (int) this->size)) {
             throw std::runtime_error("Communicator::MPI_Bcast(): invalid argument");
         }
-        this->performSMPIOperation("Bcast", this->participating_hosts, this->rank_to_host[root_rank], (int) bytes, "smpi/bcast:" + std::move(config));
+        this->performSMPIOperation("Bcast", this->participating_hosts, this->rank_to_host[root_rank], bytes, "smpi/bcast:" + std::move(config));
     }
 
     /**

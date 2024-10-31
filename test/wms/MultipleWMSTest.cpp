@@ -73,9 +73,9 @@ protected:
         //        workflows.push_back(workflow);
 
         // Create the files
-        input_file = wrench::Simulation::addFile(prefix + "_input_file", 10.0);
-        output_file1 = wrench::Simulation::addFile(prefix + "output_file1", 10.0);
-        output_file2 = wrench::Simulation::addFile(prefix + "output_file2", 10.0);
+        input_file = wrench::Simulation::addFile(prefix + "_input_file", 10);
+        output_file1 = wrench::Simulation::addFile(prefix + "output_file1", 10);
+        output_file2 = wrench::Simulation::addFile(prefix + "output_file2", 10);
 
         // Create the tasks
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
@@ -211,7 +211,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
 
     // Staging the input_file on the storage service
     for (auto const &f: workflow->getInputFiles()) {
-        ASSERT_NO_THROW(simulation->stageFile(f, storage_service));
+        ASSERT_NO_THROW(storage_service->createFile(f));
     }
 
     // Running a "run a single task1" simulation
@@ -269,10 +269,10 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
 
     // Staging the input_file on the storage service
     for (auto const &f: workflow->getInputFiles()) {
-        ASSERT_NO_THROW(simulation->stageFile(f, storage_service));
+        ASSERT_NO_THROW(storage_service->createFile(f));
     }
     for (auto const &f: workflow2->getInputFiles()) {
-        ASSERT_NO_THROW(simulation->stageFile(f, storage_service));
+        ASSERT_NO_THROW(storage_service->createFile(f));
     }
 
     // Running a "run a single task1" simulation

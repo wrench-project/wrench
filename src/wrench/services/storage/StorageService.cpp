@@ -8,7 +8,6 @@
  */
 
 #include <wrench/services/storage/StorageServiceProperty.h>
-#include <wrench/services/storage/storage_helpers/LogicalFileSystem.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
@@ -33,13 +32,12 @@ namespace wrench {
      * @param hostname: the name of the host on which the service should run
      * @param service_name: the name of the storage service
      *
-     * @throw std::invalid_argument
      */
     StorageService::StorageService(const std::string &hostname,
                                    const std::string &service_name) : Service(hostname, service_name) {
 
         this->state = StorageService::UP;
-        this->is_scratch = false;
+        this->is_scratch_ = false;
     }
 
     /**
@@ -47,7 +45,7 @@ namespace wrench {
      * @param is_scratch: true if scratch, false otherwise
      */
     void StorageService::setIsScratch(bool is_scratch) {
-        this->is_scratch = is_scratch;
+        this->is_scratch_ = is_scratch;
     }
 
 
@@ -99,14 +97,13 @@ namespace wrench {
      *
      * @param answer_commport: the commport on which to expect the answer
      * @param location: the location
-     * @param num_bytes_to_write: the number of bytes to write to the file
+     * @param num_bytes_to_write: the number of bytes to write to the file.
      * @param wait_for_answer: whether to wait for the answer
      *
-     * @throw ExecutionException
      */
     void StorageService::writeFile(S4U_CommPort *answer_commport,
                                    const std::shared_ptr<FileLocation> &location,
-                                   double num_bytes_to_write,
+                                   sg_size_t num_bytes_to_write,
                                    bool wait_for_answer) {
 
         if (location == nullptr) {
@@ -145,8 +142,9 @@ namespace wrench {
                 auto file = location->getFile();
                 for (auto const &dwmb: msg->data_write_commport_and_bytes) {
                     // Bufferized
-                    double remaining = dwmb.second;
-                    while (remaining - buffer_size > DBL_EPSILON) {
+                    sg_size_t remaining = dwmb.second;
+                    while (remaining > buffer_size) {
+
                         dwmb.first->putMessage(
                                 new StorageServiceFileContentChunkMessage(
                                         file, buffer_size, false));
@@ -156,7 +154,7 @@ namespace wrench {
                             file, remaining, true));
 
                     //Waiting for the final ack
-                    answer_commport->getMessage<StorageServiceAckMessage>("StorageService::writeFile(): Received an");
+                    answer_commport->getMessage<StorageServiceAckMessage>(this->network_timeout, "StorageService::writeFile(): Received an");
                 }
             }
         }
@@ -168,28 +166,24 @@ namespace wrench {
     /***************************************************************/
 
     /**
-     * @brief Synchronously asks the storage service for its total free space capacity, that is,
-     *  the total capacity at the "/" path.
-     *  Note that this doesn't mean that that free space could be used to store a single
-     *  file, as the storage service may have file systems at multiple mount points, may me
-     *  a front-end for a set of storage systems, etc.
+     * @brief Synchronously asks the storage service for its total free space capacity
      * @return A number of bytes
      *
      */
-    double StorageService::getTotalFreeSpace() {
-        return this->getTotalFreeSpaceAtPath("/");
+    sg_size_t StorageService::getTotalFreeSpace() {
+        return getTotalFreeSpaceAtPath("");
     }
 
     /**
      * @brief Synchronously asks the storage service for its total free space capacity
-     * at a particular path. Note that this doesn't mean that that free space could be used to store a single
-     *  file, as the storage service may have file systems at multiple mount points, may be
-     *  a front-end for a set of storage systems, etc.
-     *  @param path a path (if empty, "/" will be used)
+     * at a particular path (i.e., at the partition that holds that path). If the path
+     * is the empty string, then it's the sum total free space across all partitions. If the
+     * path is invalid, then this method returns 0.
+     *  @param path a path
      *
-     *  @return A number of bytes
+     *  @return A number of bytes (or 0 if the path is invalid)
      */
-    double StorageService::getTotalFreeSpaceAtPath(const std::string &path) {
+    sg_size_t StorageService::getTotalFreeSpaceAtPath(const std::string &path) {
         assertServiceIsUp();
 
         // Send a message to the daemon
@@ -248,7 +242,7 @@ namespace wrench {
      */
     void StorageService::readFile(S4U_CommPort *answer_commport,
                                   const std::shared_ptr<FileLocation> &location,
-                                  double num_bytes,
+                                  sg_size_t num_bytes,
                                   bool wait_for_answer) {
 
         if (!answer_commport or !location or (num_bytes < 0.0)) {
@@ -318,8 +312,6 @@ namespace wrench {
      *
      * @param locations: a map of files to locations
      *
-     * @throw std::runtime_error
-     * @throw ExecutionException
      */
     void StorageService::readFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
         StorageService::writeOrReadFiles(READ, std::move(locations));
@@ -330,8 +322,6 @@ namespace wrench {
      *
      * @param locations: a map of files to locations
      *
-     * @throw std::runtime_error
-     * @throw ExecutionException
      */
     void StorageService::writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
         StorageService::writeOrReadFiles(WRITE, std::move(locations));
@@ -343,8 +333,6 @@ namespace wrench {
  * @param action: FileOperation::READ (download) or FileOperation::WRITE
  * @param locations: a map of files to locations
  *
- * @throw std::runtime_error
- * @throw ExecutionException
  */
     void StorageService::writeOrReadFiles(FileOperation action,
                                           std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
@@ -430,8 +418,6 @@ namespace wrench {
      * @param src_location: the location where to read the file
      * @param dst_location: the location where to write the file
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     void StorageService::copyFile(const std::shared_ptr<FileLocation> &src_location,
                                   const std::shared_ptr<FileLocation> &dst_location) {
@@ -472,7 +458,7 @@ namespace wrench {
 
         // Send a message to the daemon of the dst service
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
-        src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
+        src_location->getStorageService()->getSimulation()->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
                                                                                              src_location,
                                                                                              dst_location);
         commport_to_contact->putMessage(
@@ -501,9 +487,6 @@ namespace wrench {
      * @param answer_commport: the commport to which a notification message will be sent
      * @param src_location: the source location
      * @param dst_location: the destination location
-     *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      *
      */
     void StorageService::initiateFileCopy(S4U_CommPort *answer_commport,
@@ -538,7 +521,7 @@ namespace wrench {
             commport_to_contact = dst_location->getStorageService()->commport;
         }
 
-        src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
+        src_location->getStorageService()->getSimulation()->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
                                                                                              src_location,
                                                                                              dst_location);
 
@@ -559,7 +542,6 @@ namespace wrench {
     //     *
     //     * @param location: a file location, must be the same object as the function is invoked on
     //     *
-    //     * @throw std::invalid_argument
     //     */
     //    void StorageService::createFile(const std::shared_ptr<FileLocation> &location) {
     //        if (location->getStorageService() != this->getSharedPtr<StorageService>()) {

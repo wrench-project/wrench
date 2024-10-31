@@ -34,7 +34,6 @@ namespace wrench {
      *
      * @return A (unique pointer to a) simulation message
      *
-     * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait() {
         return this->wait(-1);
@@ -46,7 +45,6 @@ namespace wrench {
      *
      * @return A (unique pointer to a) simulation message
      *
-     * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait(double timeout) {
 
@@ -158,7 +156,6 @@ namespace wrench {
      *
      * @return the index of the comm to which something happened (success or failure)
      *
-     * @throw std::invalid_argument
      */
     unsigned long S4U_PendingCommunication::waitForSomethingToHappen(
             const std::vector<std::shared_ptr<S4U_PendingCommunication>> &pending_comms, double timeout) {
@@ -179,7 +176,6 @@ namespace wrench {
      * @return the index of the comm to which something happened (success or failure), or
      *         ULONG_MAX if nothing happened before the timeout expired.
      *
-     * @throw std::invalid_argument
      */
     unsigned long S4U_PendingCommunication::waitForSomethingToHappen(
             std::vector<S4U_PendingCommunication *> pending_comms, double timeout) {

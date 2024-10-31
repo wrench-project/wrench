@@ -165,7 +165,7 @@ private:
                 action, nullptr);
 
         // Start it
-        action_executor->setSimulation(this->simulation);
+        action_executor->setSimulation(this->getSimulation());
         action_executor->start(action_executor, true, false);
 
         // Wait for a message from it
@@ -230,9 +230,9 @@ void CustomActionExecutorTest::do_CustomActionExecutorSuccessTest_test() {
     this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
-    simulation->stageFile(wrench::FileLocation::LOCATION(ss, file));
+    ss->createFile(wrench::FileLocation::LOCATION(ss, file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

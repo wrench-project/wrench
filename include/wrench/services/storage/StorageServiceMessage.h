@@ -32,7 +32,7 @@ namespace wrench {
      */
     class StorageServiceMessage : public ServiceMessage {
     protected:
-        StorageServiceMessage(double payload);
+        explicit StorageServiceMessage(sg_size_t payload);
     };
 
 
@@ -41,7 +41,7 @@ namespace wrench {
      */
     class StorageServiceFreeSpaceRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFreeSpaceRequestMessage(S4U_CommPort *answer_commport, const std::string &path, double payload);
+        StorageServiceFreeSpaceRequestMessage(S4U_CommPort *answer_commport, const std::string &path, sg_size_t payload);
 
         /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -54,10 +54,10 @@ namespace wrench {
      */
     class StorageServiceFreeSpaceAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFreeSpaceAnswerMessage(double free_space, double payload);
+        StorageServiceFreeSpaceAnswerMessage(sg_size_t free_space, sg_size_t payload);
 
         /** @brief The amount of free space in bytes */
-        double free_space;
+        sg_size_t free_space;
     };
 
     /**
@@ -67,7 +67,7 @@ namespace wrench {
     public:
         StorageServiceFileLookupRequestMessage(S4U_CommPort *answer_commport,
                                                const std::shared_ptr<FileLocation> &location,
-                                               double payload);
+                                               sg_size_t payload);
 
         /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -80,7 +80,7 @@ namespace wrench {
      */
     class StorageServiceFileLookupAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileLookupAnswerMessage(std::shared_ptr<DataFile> file, bool file_is_available, double payload);
+        StorageServiceFileLookupAnswerMessage(std::shared_ptr<DataFile> file, bool file_is_available, sg_size_t payload);
 
         /** @brief The file that was looked up */
         std::shared_ptr<DataFile> file;
@@ -96,7 +96,7 @@ namespace wrench {
     public:
         StorageServiceFileDeleteRequestMessage(S4U_CommPort *answer_commport,
                                                const std::shared_ptr<FileLocation> &location,
-                                               double payload);
+                                               sg_size_t payload);
 
         /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -113,7 +113,7 @@ namespace wrench {
                                               std::shared_ptr<StorageService> storage_service,
                                               bool success,
                                               std::shared_ptr<FailureCause> failure_cause,
-                                              double payload);
+                                              sg_size_t payload);
 
         /** @brief The file that was deleted (or not) */
         std::shared_ptr<DataFile> file;
@@ -133,7 +133,7 @@ namespace wrench {
         StorageServiceFileCopyRequestMessage(S4U_CommPort *answer_commport,
                                              std::shared_ptr<FileLocation> src,
                                              std::shared_ptr<FileLocation> dst,
-                                             double payload);
+                                             sg_size_t payload);
 
         /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -151,7 +151,7 @@ namespace wrench {
         StorageServiceFileCopyAnswerMessage(std::shared_ptr<FileLocation> src,
                                             std::shared_ptr<FileLocation> dst,
                                             bool success, std::shared_ptr<FailureCause> cause,
-                                            double payload);
+                                            sg_size_t payload);
 
         /** @brief The source location */
         std::shared_ptr<FileLocation> src;
@@ -172,8 +172,8 @@ namespace wrench {
         StorageServiceFileWriteRequestMessage(S4U_CommPort *answer_commport,
                                               simgrid::s4u::Host *requesting_host,
                                               const std::shared_ptr<FileLocation> &location,
-                                              double num_bytes_to_write,
-                                              double payload);
+                                              sg_size_t num_bytes_to_write,
+                                              sg_size_t payload);
 
         /** @brief CommPort to which the answer message should be sent */
         S4U_CommPort *answer_commport;
@@ -182,7 +182,7 @@ namespace wrench {
         /** @brief The file to write */
         std::shared_ptr<FileLocation> location;
         /** @brief The number of of bytes to write to the file */
-        double num_bytes_to_write;
+        sg_size_t num_bytes_to_write;
     };
 
     /**
@@ -193,9 +193,9 @@ namespace wrench {
         StorageServiceFileWriteAnswerMessage(std::shared_ptr<FileLocation> &location,
                                              bool success,
                                              std::shared_ptr<FailureCause> failure_cause,
-                                             std::map<S4U_CommPort *, double> data_write_commport_and_bytes,
-                                             double buffer_size,
-                                             double payload);
+                                             std::map<S4U_CommPort *, sg_size_t> data_write_commport_and_bytes,
+                                             sg_size_t buffer_size,
+                                             sg_size_t payload);
 
         /** @brief The file location hould be written */
         std::shared_ptr<FileLocation> location;
@@ -204,9 +204,9 @@ namespace wrench {
         /** @brief The cause of the failure, if any, or nullptr */
         std::shared_ptr<FailureCause> failure_cause;
         /** @brief The set of destination commports and the number of bytes to send to each */
-        std::map<S4U_CommPort *, double> data_write_commport_and_bytes;
+        std::map<S4U_CommPort *, sg_size_t> data_write_commport_and_bytes;
         /** @brief The buffer size to use */
-        double buffer_size;
+        sg_size_t buffer_size;
     };
 
     /**
@@ -217,18 +217,18 @@ namespace wrench {
         StorageServiceFileReadRequestMessage(S4U_CommPort *answer_commport,
                                              simgrid::s4u::Host *requesting_host,
                                              std::shared_ptr<FileLocation> location,
-                                             double num_bytes_to_read,
-                                             double payload);
+                                             sg_size_t num_bytes_to_read,
+                                             sg_size_t payload);
         StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage &other);
-        StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage *other);
+        explicit StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage *other);
         /** @brief The commport_name to which the answer message should be sent */
         S4U_CommPort *answer_commport;
         /** @brief The requesting host */
-        simgrid::s4u::Host *requesting_host;
+        simgrid::s4u::Host *requesting_host = nullptr;
         /** @brief The file to read */
         std::shared_ptr<FileLocation> location;
         /** @brief The number of bytes to read */
-        double num_bytes_to_read;
+        sg_size_t num_bytes_to_read;
     };
 
     /**
@@ -240,9 +240,9 @@ namespace wrench {
                                             bool success,
                                             std::shared_ptr<FailureCause> failure_cause,
                                             S4U_CommPort *commport_to_receive_the_file_content,
-                                            double buffer_size,
+                                            sg_size_t buffer_size,
                                             unsigned long number_of_sources,
-                                            double payload);
+                                            sg_size_t payload);
 
         /** @brief The location of the file */
         std::shared_ptr<FileLocation> location;
@@ -253,7 +253,7 @@ namespace wrench {
         /** @brief The commport_name to which the file content should be sent (or nullptr) */
         S4U_CommPort *commport_to_receive_the_file_content;
         /** @brief The requested buffer size */
-        double buffer_size;
+        sg_size_t buffer_size;
         /** @brief The number of sources that will send data */
         unsigned long number_of_sources;
     };
@@ -264,7 +264,7 @@ namespace wrench {
     class StorageServiceFileContentChunkMessage : public StorageServiceMessage {
     public:
         explicit StorageServiceFileContentChunkMessage(std::shared_ptr<DataFile> file,
-                                                       double chunk_size, bool last_chunk);
+                                                       sg_size_t chunk_size, bool last_chunk);
 
         /** @brief The file */
         std::shared_ptr<DataFile> file;
@@ -283,7 +283,7 @@ namespace wrench {
 	 *
 	 * @param location: the file location
 	 **/
-        explicit StorageServiceAckMessage(std::shared_ptr<FileLocation> location) : StorageServiceMessage(0), location(std::move(location)) {}
+        explicit StorageServiceAckMessage(std::shared_ptr<FileLocation> location) : StorageServiceMessage(S4U_CommPort::default_control_message_size), location(std::move(location)) {}
 
         /** @brief The location */
         std::shared_ptr<FileLocation> location;

@@ -12,6 +12,8 @@
 
 #include "SimpleWMS.h"
 #include <wrench/tools/wfcommons/WfCommonsWorkflowParser.h>
+#include <iostream>
+#include <fstream>
 
 
 /**
@@ -72,7 +74,7 @@ int main(int argc, char **argv) {
      * which files can be written and read.  This particular storage service, which is an instance
      * of wrench::SimpleStorageService, is started on WMSHost in the
      * platform (platform/batch_platform.xml), which has an attached disk called large_disk. The SimpleStorageService
-     * is a bare bone storage service implementation provided by WRENCH.
+     * is a bare-bone storage service implementation provided by WRENCH.
      * Throughout the simulation execution, input/output files of workflow tasks will be located
      * in this storage service.
      */
@@ -161,7 +163,7 @@ int main(int argc, char **argv) {
     std::cerr << "Staging input files..." << std::endl;
     for (auto const &f: workflow->getInputFiles()) {
         try {
-            simulation->stageFile(f, storage_service);
+            storage_service->createFile(f);
         } catch (std::runtime_error &e) {
             std::cerr << "Exception: " << e.what() << std::endl;
             return 0;
@@ -206,6 +208,15 @@ int main(int argc, char **argv) {
 
     std::cerr << "Number of tasks that failed at least once: " << num_failed_tasks << "\n";
     std::cerr << "Average computation time / communication+IO time ratio over all tasks: " << computation_communication_ratio_average << "\n";
+
+    /* Exporting the workflow to a WfFormat instance, just for kicks
+     */
+    std::string json_string = wrench::WfCommonsWorkflowParser::createJSONStringFromWorkflow(workflow);
+    std::string output_file_path = "/tmp/output_workflow.json";
+    std::ofstream output_file(output_file_path);
+    output_file << json_string << std::endl;
+    output_file.close();
+    std::cerr << "Output WfFormat workflow instance written to " << output_file_path << std::endl;
 
     return 0;
 }

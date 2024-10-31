@@ -152,7 +152,7 @@ private:
                 "Host2", 0, 0.0, 0, false,
                 this->commport, file_copy_action, nullptr);
         // Start it
-        file_copy_action_executor->setSimulation(this->simulation);
+        file_copy_action_executor->setSimulation(this->getSimulation());
         file_copy_action_executor->start(file_copy_action_executor, true, false);
 
         // Wait for a message from it
@@ -227,10 +227,10 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000);
 
     // Put it on ss1
-    simulation->stageFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
+    this->ss1->createFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -278,7 +278,7 @@ private:
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_copy_action, nullptr));
         // Start it
-        file_copy_action_executor->setSimulation(this->simulation);
+        file_copy_action_executor->setSimulation(this->getSimulation());
         file_copy_action_executor->start(file_copy_action_executor, true, false);
 
         // Wait for a message from it
@@ -329,10 +329,10 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessSameHostTest_te
     workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
-    this->file = wrench::Simulation::addFile("some_file", 1000000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000000ULL);
 
     // Put it on ss1
-    simulation->stageFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
+    this->ss1->createFile(wrench::FileLocation::LOCATION(this->ss1, this->file));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

@@ -12,6 +12,7 @@ endif()
 
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/callback-map.h
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_crow_routes.py ${CMAKE_CURRENT_SOURCE_DIR}/doc/wrench-openapi.json ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h ${CMAKE_CURRENT_SOURCE_DIR}/include/callback-map.h
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
@@ -45,7 +46,8 @@ add_executable(wrench-daemon EXCLUDE_FROM_ALL
         include/KeyValueStore.h
         include/REST_API.h
         include/callback-map.h
-        include/routes.h)
+        include/routes.h
+        )
 
 add_dependencies(wrench-daemon wrench)
 add_dependencies(wrench-daemon wrenchwfcommonsworkflowparser)

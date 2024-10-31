@@ -83,7 +83,7 @@ namespace wrench {
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
                                                           const std::shared_ptr<DataFile> &file,
                                                           const std::shared_ptr<StorageService> &storageService,
-                                                          double num_bytes_to_read);
+                                                          sg_size_t num_bytes_to_read);
 
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
                                                           const std::shared_ptr<FileLocation> &file_location);
@@ -93,11 +93,11 @@ namespace wrench {
 
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
                                                           const std::shared_ptr<FileLocation> &file_location,
-                                                          double num_bytes_to_read);
+                                                          sg_size_t num_bytes_to_read);
 
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
                                                           const std::vector<std::shared_ptr<FileLocation>> &file_locations,
-                                                          double num_bytes_to_read);
+                                                          sg_size_t num_bytes_to_read);
 
         std::shared_ptr<FileWriteAction> addFileWriteAction(const std::string &name,
                                                             const std::shared_ptr<DataFile> &file,
@@ -132,13 +132,13 @@ namespace wrench {
 
         std::shared_ptr<ComputeAction> addComputeAction(const std::string &name,
                                                         double flops,
-                                                        double ram,
+                                                        sg_size_t ram,
                                                         unsigned long min_num_cores,
                                                         unsigned long max_num_cores,
                                                         const std::shared_ptr<ParallelModel> &parallel_model);
 
         std::shared_ptr<CustomAction> addCustomAction(const std::string &name,
-                                                      double ram,
+                                                      sg_size_t ram,
                                                       unsigned long num_cores,
                                                       const std::function<void(std::shared_ptr<ActionExecutor> action_executor)> &lambda_execute,
                                                       const std::function<void(std::shared_ptr<ActionExecutor> action_executor)> &lambda_terminate);
@@ -149,6 +149,8 @@ namespace wrench {
                                                 const std::function<void(const std::shared_ptr<ExecutionController> &controller)> &mpi_code,
                                                 unsigned long num_processes,
                                                 unsigned long num_cores_per_process);
+
+        std::shared_ptr<Action> getActionByName(const std::string &name);
 
         void removeAction(std::shared_ptr<Action> &action);
 
@@ -168,7 +170,7 @@ namespace wrench {
 
         unsigned long getMinimumRequiredNumCores();
 
-        double getMinimumRequiredMemory();
+        sg_size_t getMinimumRequiredMemory();
 
 
         /***********************/

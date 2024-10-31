@@ -33,7 +33,7 @@ namespace wrench {
         std::shared_ptr<DataFile> getFile() const;
         std::vector<std::shared_ptr<FileLocation>> getFileLocations() const;
         std::shared_ptr<FileLocation> getUsedFileLocation() const;
-        double getNumBytesToRead() const;
+        sg_size_t getNumBytesToRead() const;
         bool usesScratch() const override;
 
     protected:
@@ -41,7 +41,7 @@ namespace wrench {
 
         FileReadAction(const std::string &name,
                        std::vector<std::shared_ptr<FileLocation>> file_locations,
-                       double num_bytes_to_read);
+                       sg_size_t num_bytes_to_read);
 
 
         void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
@@ -52,7 +52,7 @@ namespace wrench {
         std::shared_ptr<DataFile> file;
         std::vector<std::shared_ptr<FileLocation>> file_locations;
         std::shared_ptr<FileLocation> used_location;
-        double num_bytes_to_read;
+        sg_size_t num_bytes_to_read;
     };
 
 

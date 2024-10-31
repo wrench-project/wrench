@@ -163,8 +163,8 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest(double buffer
                             this, storage_service, file_registry_service, "WMSHost")));
 
     // Stage the 2 files on the StorageHost
-    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(file_2, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(file_1, "/"));
+    ASSERT_NO_THROW(storage_service->createFile(file_2, "/"));
 
 
     ASSERT_NO_THROW(simulation->launch());

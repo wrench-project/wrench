@@ -186,8 +186,8 @@ private:
             unsigned int nodes = 2;
             double walltime_seconds = 1000;
             //std::tuple<std::string,unsigned int,double> my_job = {job_id,nodes,walltime_seconds};
-            std::tuple<std::string, unsigned long, unsigned long, double> my_job = std::make_tuple(job_id, nodes, 1, walltime_seconds);
-            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs = {my_job};
+            std::tuple<std::string, unsigned long, unsigned long, sg_size_t> my_job = std::make_tuple(job_id, nodes, 1, walltime_seconds);
+            std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs = {my_job};
 
             std::map<std::string, double> jobs_estimated_start_times;
 
@@ -278,11 +278,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -353,8 +353,8 @@ private:
             unsigned int nodes = 2;
             double walltime_seconds = 1000;
             //std::tuple<std::string,unsigned long,double> my_job = {job_id,nodes,walltime_seconds};
-            std::tuple<std::string, unsigned long, unsigned long, double> my_job = std::make_tuple(job_id, nodes, 1, walltime_seconds);
-            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs = {my_job};
+            std::tuple<std::string, unsigned long, unsigned long, sg_size_t> my_job = std::make_tuple(job_id, nodes, 1, walltime_seconds);
+            std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs = {my_job};
 
             std::map<std::string, double> jobs_estimated_start_times;
             try {
@@ -437,11 +437,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
 
     // Running a "run a single task1" simulation
@@ -570,12 +570,12 @@ private:
             wrench::Simulation::sleep(1.0);
 
             auto batch_service = this->test->compute_service;
-            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs = {};
+            std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs = {};
             for (int i = 0; i < 10; i++) {
                 std::string job_id = "new_job" + std::to_string(i);
                 unsigned int nodes = rand() % 4 + 1;
                 double walltime_seconds = nodes * (rand() % 10 + 1) * 60;
-                std::tuple<std::string, unsigned long, unsigned long, double> my_job = std::make_tuple(job_id, nodes, 1, walltime_seconds);
+                std::tuple<std::string, unsigned long, unsigned long, sg_size_t> my_job = std::make_tuple(job_id, nodes, 1, walltime_seconds);
                 set_of_jobs.insert(my_job);
             }
             std::map<std::string, double> jobs_estimated_start_times = batch_service->getStartTimeEstimates(
@@ -648,11 +648,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
                             this, hostname)));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -785,8 +785,8 @@ private:
             std::string job_id = "my_job1";
             unsigned int nodes = 1;
             double walltime_seconds = 400;
-            std::tuple<std::string, unsigned long, unsigned long, double> my_job = std::make_tuple(job_id, nodes, 1, walltime_seconds);
-            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs = {my_job};
+            std::tuple<std::string, unsigned long, unsigned long, sg_size_t> my_job = std::make_tuple(job_id, nodes, 1, walltime_seconds);
+            std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs = {my_job};
             std::map<std::string, double> jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
             if ((jobs_estimated_start_times[job_id] - 903) > 1) {
@@ -898,14 +898,14 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    auto input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    wrench::Simulation::addFile("output_file", 20000.0);
-    wrench::Simulation::addFile("output_file1", 20000.0);
-    wrench::Simulation::addFile("output_file2", 20000.0);
-    wrench::Simulation::addFile("output_file3", 20000.0);
+    auto input_file = wrench::Simulation::addFile("input_file", 10000);
+    wrench::Simulation::addFile("output_file", 20000);
+    wrench::Simulation::addFile("output_file1", 20000);
+    wrench::Simulation::addFile("output_file2", 20000);
+    wrench::Simulation::addFile("output_file3", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would

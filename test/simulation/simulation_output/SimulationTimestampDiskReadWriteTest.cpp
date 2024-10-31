@@ -64,7 +64,7 @@ protected:
 
         workflow = wrench::Workflow::createWorkflow();
 
-        file_1 = wrench::Simulation::addFile("file_1", 100.0);
+        file_1 = wrench::Simulation::addFile("file_1", 100);
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -114,6 +114,7 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -141,7 +142,7 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     std::set<std::shared_ptr<wrench::DataFile>> files_to_stage = {file_1};
 
     for (auto const &f: files_to_stage) {
-        ASSERT_NO_THROW(simulation->stageFile(f, storage_service_1));
+        ASSERT_NO_THROW(storage_service_1->createFile(f, "/"));
     }
 
     simulation->getOutput().enableDiskTimestamps(true);
@@ -155,16 +156,17 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     ASSERT_EQ(10, diskread_timestamps.size());
     ASSERT_EQ(5, diskwrite_timestamps.size());
 
-    diskread_timestamps.front()->getContent()->getBytes();
-    diskread_timestamps.front()->getContent()->getCounter();
-    diskread_timestamps.front()->getContent()->getDate();
+    // Coverage
+    auto rb = diskread_timestamps.front()->getContent()->getBytes();
+    auto rc = diskread_timestamps.front()->getContent()->getCounter();
+    auto rd = diskread_timestamps.front()->getContent()->getDate();
     diskread_timestamps.front()->getContent()->getEndpoint();
     diskread_timestamps.front()->getContent()->getHostname();
     diskread_timestamps.front()->getContent()->getMount();
 
-    diskwrite_timestamps.front()->getContent()->getBytes();
-    diskwrite_timestamps.front()->getContent()->getCounter();
-    diskwrite_timestamps.front()->getContent()->getDate();
+    auto wb = diskwrite_timestamps.front()->getContent()->getBytes();
+    auto wc = diskwrite_timestamps.front()->getContent()->getCounter();
+    auto wd = diskwrite_timestamps.front()->getContent()->getDate();
     diskwrite_timestamps.front()->getContent()->getEndpoint();
     diskwrite_timestamps.front()->getContent()->getHostname();
     diskwrite_timestamps.front()->getContent()->getMount();

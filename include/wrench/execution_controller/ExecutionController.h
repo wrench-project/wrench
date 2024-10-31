@@ -61,20 +61,20 @@ namespace wrench {
         void waitForAndProcessNextEvent();
         bool waitForAndProcessNextEvent(double timeout);
 
-        virtual void processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent>);
-        virtual void processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent>);
+        virtual void processEventCompoundJobFailure(const std::shared_ptr<CompoundJobFailedEvent> &event);
+        virtual void processEventCompoundJobCompletion(const std::shared_ptr<CompoundJobCompletedEvent> &event);
 
-        virtual void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>);
-        virtual void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>);
+        virtual void processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent> &event);
+        virtual void processEventStandardJobFailure(const std::shared_ptr<StandardJobFailedEvent> &event);
 
 
-        virtual void processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent>);
-        virtual void processEventPilotJobExpiration(std::shared_ptr<PilotJobExpiredEvent>);
+        virtual void processEventPilotJobStart(const std::shared_ptr<PilotJobStartedEvent> &event);
+        virtual void processEventPilotJobExpiration(const std::shared_ptr<PilotJobExpiredEvent> &event);
 
-        virtual void processEventFileCopyCompletion(std::shared_ptr<FileCopyCompletedEvent>);
-        virtual void processEventFileCopyFailure(std::shared_ptr<FileCopyFailedEvent>);
+        virtual void processEventFileCopyCompletion(const std::shared_ptr<FileCopyCompletedEvent> &event);
+        virtual void processEventFileCopyFailure(const std::shared_ptr<FileCopyFailedEvent> &event);
 
-        virtual void processEventTimer(std::shared_ptr<TimerEvent>);
+        virtual void processEventTimer(const std::shared_ptr<TimerEvent> &event);
 
         void setDaemonized(bool daemonized);
 
@@ -90,7 +90,7 @@ namespace wrench {
         friend class DataMovementManager;
         friend class JobManager;
 
-        bool daemonized = false;
+        bool daemonized_ = false;
 
     private:
         virtual int main() = 0;

@@ -47,8 +47,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
-        input_file = wrench::Simulation::addFile("input_file", 10.0);
-        output_file1 = wrench::Simulation::addFile("output_file1", 10.0);
+        input_file = wrench::Simulation::addFile("input_file", 10);
+        output_file1 = wrench::Simulation::addFile("output_file1", 10);
 
         // Create one task1
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
@@ -161,7 +161,7 @@ void BareMetalComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(input_file));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

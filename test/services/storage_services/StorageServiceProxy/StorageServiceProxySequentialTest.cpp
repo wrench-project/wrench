@@ -90,7 +90,7 @@ private:
 
 
         if (order) {
-            simulation->sleep(1);
+            wrench::Simulation::sleep(1);
         }
         WRENCH_INFO("Initiating Read %d", order);
         //read file again to check cache

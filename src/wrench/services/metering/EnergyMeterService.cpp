@@ -78,8 +78,6 @@ namespace wrench {
     /**
      * @brief Stop the energy meter
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     void EnergyMeterService::stop() {
         this->commport->putMessage(new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
@@ -124,7 +122,7 @@ namespace wrench {
             // Take measurements
             for (auto &h: this->time_to_next_measurement) {
                 if (h.second < EPSILON) {
-                    this->simulation->getEnergyConsumed(h.first, true);
+                    this->simulation_->getEnergyConsumed(h.first, true);
                     this->time_to_next_measurement[h.first] = this->measurement_periods[h.first];
                 }
             }
@@ -139,7 +137,6 @@ namespace wrench {
      * @brief Process the next message
      * @return true if the daemon should continue, false otherwise
      *
-     * @throw std::runtime_error
      */
     bool EnergyMeterService::processNextMessage(double timeout) {
 

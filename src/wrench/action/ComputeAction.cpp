@@ -33,10 +33,11 @@ namespace wrench {
      */
     ComputeAction::ComputeAction(const std::string &name,
                                  double flops,
-                                 double ram,
+                                 sg_size_t ram,
                                  unsigned long min_num_cores,
                                  unsigned long max_num_cores,
                                  std::shared_ptr<ParallelModel> parallel_model) : Action(name, "compute_") {
+
         if ((flops < 0) || (ram < 0) || (min_num_cores < 1) || (max_num_cores < min_num_cores)) {
             throw std::invalid_argument("ComputeAction::ComputeAction(): invalid arguments");
         }
@@ -75,7 +76,7 @@ namespace wrench {
      * @brief Returns the action's minimum required memory footprint
      * @return a number of bytes
      */
-    double ComputeAction::getMinRAMFootprint() const {
+    sg_size_t ComputeAction::getMinRAMFootprint() const {
         return this->ram;
     }
 

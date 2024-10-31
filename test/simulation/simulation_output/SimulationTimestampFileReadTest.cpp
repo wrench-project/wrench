@@ -73,11 +73,11 @@ protected:
 
         workflow = wrench::Workflow::createWorkflow();
 
-        file_1 = wrench::Simulation::addFile("file_1", 100.0);
-        file_2 = wrench::Simulation::addFile("file_2", 100.0);
-        file_3 = wrench::Simulation::addFile("file_3", 100.0);
+        file_1 = wrench::Simulation::addFile("file_1", 100ULL);
+        file_2 = wrench::Simulation::addFile("file_2", 100ULL);
+        file_3 = wrench::Simulation::addFile("file_3", 100ULL);
 
-        xl_file = wrench::Simulation::addFile("xl_file", 1000000000.0);
+        xl_file = wrench::Simulation::addFile("xl_file", 1000000000ULL);
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -148,6 +148,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -165,10 +166,9 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
     ASSERT_NO_THROW(storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(host1, {"/"},
                                                                                                                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
 
-    std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
 
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms;
 
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileReadBasicTestWMS(
                             this, host1)));
@@ -178,7 +178,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
     std::set<std::shared_ptr<wrench::DataFile>> files_to_stage = {file_1, file_2, file_3, xl_file};
 
     for (auto const &f: files_to_stage) {
-        ASSERT_NO_THROW(simulation->stageFile(f, storage_service));
+        ASSERT_NO_THROW(storage_service->createFile(f));
     }
 
     simulation->getOutput().enableFileReadWriteCopyTimestamps(true);
@@ -218,8 +218,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
             std::make_pair(xl_file_start, xl_file_end),
     };
 
-    std::shared_ptr<wrench::StorageService> service = storage_service;
-
+//    std::shared_ptr<wrench::StorageService> service = storage_service;
 
     for (auto &fc: file_read_timestamps) {
 
@@ -232,10 +231,10 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
 
         // source should be set
         ASSERT_EQ(this->storage_service, fc.first->getSource()->getStorageService());
-        ASSERT_EQ("/", fc.first->getSource()->getPath());
+        ASSERT_EQ("/", fc.first->getSource()->getDirectoryPath());
 
         ASSERT_EQ(this->storage_service, fc.second->getSource()->getStorageService());
-        ASSERT_EQ("/", fc.second->getSource()->getPath());
+        ASSERT_EQ("/", fc.second->getSource()->getDirectoryPath());
 
         //service should be set
         ASSERT_EQ(fc.first->getService(), fc.second->getService());

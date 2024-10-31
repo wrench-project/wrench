@@ -22,7 +22,7 @@ namespace wrench {
     class AmdahlParallelModel : public ParallelModel {
 
     public:
-        double getAlpha() const;
+        [[nodiscard]] double getAlpha() const;
         void setAlpha(double alpha);
 
         /***********************/
@@ -41,8 +41,8 @@ namespace wrench {
     private:
         friend class ParallelModel;
 
-        AmdahlParallelModel(double alpha);
-        double alpha;// Fraction of the work that's parallelizable
+        explicit AmdahlParallelModel(double alpha);
+        double alpha_;// Fraction of the work that's parallelizable
     };
 
 

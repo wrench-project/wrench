@@ -55,8 +55,8 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
-        input_file = wrench::Simulation::addFile("input_file", 10000.0);
-        output_file = wrench::Simulation::addFile("output_file", 20000.0);
+        input_file = wrench::Simulation::addFile("input_file", 10000);
+        output_file = wrench::Simulation::addFile("output_file", 20000);
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -182,7 +182,7 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
     // Empty resource list
     ASSERT_THROW(compute_service = simulation->add(
                          new wrench::BareMetalComputeService("Host1",
-                                                             (std::map<std::string, std::tuple<unsigned long, double>>){},
+                                                             (std::map<std::string, std::tuple<unsigned long, sg_size_t>>){},
                                                              {})),
                  std::invalid_argument);
 
@@ -242,7 +242,7 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
                          new wrench::BareMetalComputeService(hostname,
                                                              {std::make_pair("RAMHost",
                                                                              std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             100000.0))},
+                                                                                             100000))},
                                                              {})),
                  std::invalid_argument);
 
@@ -251,7 +251,7 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
                          new wrench::BareMetalComputeService(hostname,
                                                              {std::make_pair("RAMHost",
                                                                              std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                             100000.0))},
+                                                                                             100000))},
                                                              "",
                                                              {std::make_pair(
                                                                      wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD,
@@ -403,6 +403,12 @@ private:
         job->getPriority();     // coverage
         job->getStateAsString();// coverage
         auto action = job->addSleepAction("my_sleep", 10.0);
+        auto same_action = job->getActionByName("my_sleep");
+        try {
+            auto bogus_action = job->getActionByName("bogus");
+            throw std::runtime_error("Should not be able to lookup by name an action that doesn't exist");
+        } catch (std::invalid_argument &ignore) {}
+
         job_manager->submitJob(job, this->test->compute_service, {});
         job->getStateAsString();// coverage
 
@@ -503,12 +509,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
-
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -639,12 +641,9 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -772,12 +771,8 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
-
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -920,12 +915,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
-
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1042,12 +1033,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
-
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1215,12 +1202,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
-                 std::invalid_argument);
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
-
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1495,10 +1478,10 @@ private:
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
-
         // Create a compound job
         auto job = job_manager->createCompoundJob("my_job");
         auto action = job->addSleepAction("my_sleep", 10.0);
+
 
         // Suspend the compute service
         this->test->compute_service->suspend();
@@ -1521,6 +1504,10 @@ private:
             }
         }
 
+        // Weird: if we don't resume, then SimGrid complains about a deadlock.... couldn't
+        // reproduced in a MWE, and valgrind shows nothing wrong
+        this->test->compute_service->resume();
+
         return 0;
     }
 };
@@ -1532,12 +1519,11 @@ TEST_F(BareMetalComputeServiceOneActionTest, ServiceSuspended) {
 void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
-    //    argv[1] = strdup("--wrench-full-log");
+//        argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

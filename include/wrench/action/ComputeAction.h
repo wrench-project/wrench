@@ -32,7 +32,7 @@ namespace wrench {
         double getFlops() const;
         unsigned long getMinNumCores() const override;
         unsigned long getMaxNumCores() const override;
-        double getMinRAMFootprint() const override;
+        sg_size_t getMinRAMFootprint() const override;
         std::shared_ptr<ParallelModel> getParallelModel() const;
 
     protected:
@@ -40,7 +40,7 @@ namespace wrench {
 
         ComputeAction(const std::string &name,
                       double flops,
-                      double ram,
+                      sg_size_t ram,
                       unsigned long min_core,
                       unsigned long max_core,
                       std::shared_ptr<ParallelModel> parallel_model);
@@ -52,7 +52,7 @@ namespace wrench {
         double flops;
         unsigned long min_num_cores;
         unsigned long max_num_cores;
-        double ram;
+        sg_size_t ram;
         std::shared_ptr<ParallelModel> parallel_model;
 
         static void simulateComputationAsSleep(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work);

@@ -75,11 +75,11 @@ namespace wrench {
         this->daemon_lock = simgrid::s4u::Mutex::create();
         this->hostname = hostname;
         this->host = S4U_Simulation::get_host_or_vm_by_name(hostname);
-        this->simulation = nullptr;
+        this->simulation_ = nullptr;
         unsigned long seq = S4U_CommPort::generateUniqueSequenceNumber();
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
 
-        this->has_returned_from_main = false;
+        this->has_returned_from_main_ = false;
 
         //        std::cerr << "IN DAEMON CONSTRUCTOR: " << this->process_name << "\n";
         this->commport = S4U_CommPort::getTemporaryCommPort();
@@ -121,7 +121,6 @@ namespace wrench {
      * @param has_returned_from_main: whether the daemon returned from main() by itself
      * @param return_value: the return value from main (if has_terminated_cleanly is true)
      *
-     * @throw std::runtime_error
      */
     void S4U_Daemon::cleanup(bool has_returned_from_main, int return_value) {
         //        WRENCH_INFO("IN S4U_Daemon::cleanup() for %s", this->process_name.c_str());
@@ -168,8 +167,6 @@ namespace wrench {
      * @param daemonized: whether the S4U actor should be daemonized
      * @param auto_restart: whether the S4U actor should automatically restart after a host reboot
      *
-     * @throw std::runtime_error
-     * @throw std::shared_ptr<HostError>
      */
     void S4U_Daemon::startDaemon(bool daemonized, bool auto_restart) {
 
@@ -180,7 +177,7 @@ namespace wrench {
         }
 
         // Check that the simulation pointer is set
-        if (not this->simulation) {
+        if (not this->simulation_) {
             throw std::runtime_error(
                     "S4U_Daemon::startDaemon(): You must set the simulation field before calling startDaemon() (" +
                     this->getName() + ")");
@@ -191,14 +188,14 @@ namespace wrench {
             throw ExecutionException(std::make_shared<HostError>(hostname));
         }
 
-        this->daemonized = daemonized;
-        this->auto_restart = auto_restart;
-        this->has_returned_from_main = false;
+        this->daemonized_ = daemonized;
+        this->auto_restart_ = auto_restart;
+        this->has_returned_from_main_ = false;
         //        this->commport = this->initial_commport + "_#" + std::to_string(this->num_starts);
         // Create the s4u_actor
 
         try {
-            this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
+            this->s4u_actor = simgrid::s4u::Actor::create(this->process_name,
                                                           this->host,
                                                           S4U_DaemonActor(this));
         } catch (simgrid::Exception &e) {
@@ -216,17 +213,17 @@ namespace wrench {
         // right away, in which case calling daemonize() on it cases the calling actor to
         // terminate immediately. This is a weird simgrid::s4u behavior/bug, that may be
         // fixed at some point, but this test saves us for now.
-        if (not this->has_returned_from_main) {
+        if (not this->has_returned_from_main_) {
 
             this->setupOnExitFunction();
 
-            if (this->daemonized) {
+            if (this->daemonized_) {
                 this->s4u_actor->daemonize();
             } else {
                 S4U_Daemon::num_non_daemonized_actors_running++;
             }
 
-            if (this->auto_restart) {
+            if (this->auto_restart_) {
                 this->s4u_actor->set_auto_restart(true);
             }
         }
@@ -237,7 +234,7 @@ namespace wrench {
      */
     void S4U_Daemon::setupOnExitFunction() {
         this->s4u_actor->on_exit([this](bool failed) {
-            if (not this->daemonized) {
+            if (not this->daemonized_) {
                 S4U_Daemon::num_non_daemonized_actors_running--;
             }
             //          std::cerr << "*** NUM_NON_DAEMIONIZED_ACTORS_RUNNING = " << S4U_Daemon::num_non_daemonized_actors_running << "\n";
@@ -263,7 +260,7 @@ namespace wrench {
  * @return true or false
  */
     bool S4U_Daemon::isSetToAutoRestart() const {
-        return this->auto_restart;
+        return this->auto_restart_;
     }
 
     /**
@@ -271,7 +268,7 @@ namespace wrench {
  * @return true or false
  */
     bool S4U_Daemon::isDaemonized() const {
-        return this->daemonized;
+        return this->daemonized_;
     }
 
     /**
@@ -293,8 +290,8 @@ namespace wrench {
         // until the host has a >0 pstate
         S4U_Simulation::computeZeroFlop();
         this->state = State::UP;
-        this->return_value = this->main();
-        this->has_returned_from_main = true;
+        this->return_value_ = this->main();
+        this->has_returned_from_main_ = true;
         this->state = State::DOWN;
         S4U_Daemon::map_actor_to_recv_commport.erase(simgrid::s4u::this_actor::get_pid());
 
@@ -310,11 +307,10 @@ namespace wrench {
  * @brief Kill the daemon/actor (does nothing if already dead)
  *
  * @return true if actor was killed, false if not (e.g., daemon was already dead)
- * @throw std::shared_ptr<FatalFailure>
  */
     bool S4U_Daemon::killActor() {
         // Do the kill only if valid actor and not already done
-        if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
+        if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main_)) {
             try {
                 this->s4u_actor->kill();
             } catch (simgrid::Exception &e) {
@@ -322,7 +318,7 @@ namespace wrench {
             }
             // Really not sure why now we're setting this to true... but if we don't some tests fail.
             // Something to investigate at some point
-            this->has_returned_from_main = true;
+            this->has_returned_from_main_ = true;
             return true;
         } else {
             return false;
@@ -333,7 +329,7 @@ namespace wrench {
  * @brief Suspend the daemon/actor.
  */
     void S4U_Daemon::suspendActor() {
-        if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
+        if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main_)) {
             this->s4u_actor->suspend();
         }
     }
@@ -342,7 +338,7 @@ namespace wrench {
  * @brief Resume the daemon/actor.
  */
     void S4U_Daemon::resumeActor() {
-        if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
+        if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main_)) {
             this->s4u_actor->resume();
         }
     }
@@ -368,7 +364,7 @@ namespace wrench {
  * @return The true or false
  */
     bool S4U_Daemon::hasReturnedFromMain() const {
-        return this->has_returned_from_main;
+        return this->has_returned_from_main_;
     }
 
     /**
@@ -376,7 +372,7 @@ namespace wrench {
  * @return The return value
  */
     int S4U_Daemon::getReturnValue() const {
-        return this->return_value;
+        return this->return_value_;
     }
 
     /**
@@ -419,7 +415,7 @@ namespace wrench {
      * @return a simulation
      */
     Simulation *S4U_Daemon::getSimulation() {
-        return this->simulation;
+        return this->simulation_;
     }
 
     /**
@@ -427,7 +423,7 @@ namespace wrench {
      * @param simulation: a simulation
      */
     void S4U_Daemon::setSimulation(Simulation *simulation) {
-        this->simulation = simulation;
+        this->simulation_ = simulation;
     }
 
     /**
